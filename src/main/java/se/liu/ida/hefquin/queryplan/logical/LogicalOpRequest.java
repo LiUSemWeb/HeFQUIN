@@ -2,9 +2,8 @@ package se.liu.ida.hefquin.queryplan.logical;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.queryplan.LogicalOperator;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest> implements LogicalOperator
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest> implements NullaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final ReqType req;
@@ -16,6 +15,14 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest> implements L
 
 		this.fm = fm;
 		this.req = req;
+	}
+
+	public FederationMember getFederationMember() {
+		return fm;
+	}
+
+	public ReqType getRequest() {
+		return req;
 	}
 
 	public void visit( final LogicalPlanVisitor visitor ) {

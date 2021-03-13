@@ -23,7 +23,7 @@ public class LogicalOpTPAdd extends UnaryLogicalOpImpl
 
 	public FederationMember getFederationMember() {
 		return fm;
-	} 
+	}
 
 	public TriplePattern getTP() {
 		return tp;
