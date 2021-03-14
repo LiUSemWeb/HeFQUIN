@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.queryplan.executable.op;
+package se.liu.ida.hefquin.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
