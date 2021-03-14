@@ -1,10 +1,13 @@
 package se.liu.ida.hefquin.queryplan.executable.op;
 
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
+import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementProducer;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public interface NullaryExecutableOp<OutElmtType> extends ExecutableOperator<OutElmtType>
+public interface NullaryExecutableOp<OutElmtType>
+                          extends ExecutableOperator<OutElmtType>,
+                                  IntermediateResultElementProducer<OutElmtType>
 {
 	/**
 	 * Executes this operator and sends the produced
