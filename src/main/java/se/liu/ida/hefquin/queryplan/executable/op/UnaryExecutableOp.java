@@ -1,6 +1,8 @@
-package se.liu.ida.hefquin.queryplan.executable;
+package se.liu.ida.hefquin.queryplan.executable.op;
 
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
+import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
+import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public interface UnaryExecutableOp<InElmtType,OutElmtType>

@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest>
