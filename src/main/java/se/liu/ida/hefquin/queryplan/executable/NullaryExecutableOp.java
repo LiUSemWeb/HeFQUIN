@@ -5,5 +5,10 @@ import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public interface NullaryExecutableOp<OutElmtType> extends ExecutableOperator<OutElmtType>
 {
-	void execute( final IntermediateResultElementSink<OutElmtType> sink, final ExecutionContext execCxt );
+	/**
+	 * Executes this operator and sends the produced
+	 * result elements (if any) to the given sink.
+	 */
+	void execute( final IntermediateResultElementSink<OutElmtType> sink,
+	              final ExecutionContext execCxt );
 }
