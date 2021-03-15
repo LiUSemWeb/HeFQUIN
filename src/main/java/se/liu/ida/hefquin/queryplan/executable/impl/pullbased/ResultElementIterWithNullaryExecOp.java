@@ -1,21 +1,12 @@
 package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 
-import java.util.NoSuchElementException;
-
-import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public class ResultElementIterWithNullaryExecOp<OutElmtType> implements ResultElementIterator<OutElmtType>
+public class ResultElementIterWithNullaryExecOp<OutElmtType> extends ResultElementIterBase<OutElmtType>
 {
-	private final NullaryExecutableOp<OutElmtType> op;
-	protected final ExecutionContext execCxt;
-
-	protected final SynchronizedIntermediateResultElementSink sink;
-	protected final OpRunnerThread opRunnerThread;
-
-	protected boolean exhausted = false;
-	protected OutElmtType nextElement = null;
+	protected final OpRunnerThread<OutElmtType> opRunnerThread;
 
 	public ResultElementIterWithNullaryExecOp( final NullaryExecutableOp<OutElmtType> op,
 	                                           final ExecutionContext execCxt )
@@ -23,103 +14,45 @@ public class ResultElementIterWithNullaryExecOp<OutElmtType> implements ResultEl
 		assert op != null;
 		assert execCxt != null;
 
-		this.op = op;
-		this.execCxt = execCxt;
-
-		this.sink = new SynchronizedIntermediateResultElementSink();
-		this.opRunnerThread = new OpRunnerThread();
+		opRunnerThread = new OpRunnerThread<OutElmtType>( op, sink, execCxt );
 	}
 
 	public NullaryExecutableOp<OutElmtType> getOp() {
-		return op;
+		return opRunnerThread.getOp();
 	}
 
-	public boolean hasNext() {
-		if ( exhausted ) {
-			return false;
-		}
-
+	@Override
+	public void ensureOpRunnerThreadIsStarted() {
 		if ( opRunnerThread.getState() == Thread.State.NEW ) {
 			opRunnerThread.start();
 		}
-
-		nextElement = sink.getNextElement();
-		if ( nextElement == null ) {
-			exhausted = true;
-		}
-
-		return ! exhausted;
-	}
-
-	public OutElmtType next() {
-		if ( ! hasNext() ) {
-			throw new NoSuchElementException();
-		}
-
-		return nextElement;
 	}
 
 
-	protected class SynchronizedIntermediateResultElementSink implements IntermediateResultElementSink<OutElmtType>
+	protected static class OpRunnerThread<OutElmtType> extends Thread
 	{
-		protected OutElmtType currentElement = null;
-		protected boolean lastElementReached = false;
+		private final NullaryExecutableOp<OutElmtType> op;
+		protected final ClosableIntermediateResultElementSink<OutElmtType> sink;
+		protected final ExecutionContext execCxt;
 
-		@Override
-		synchronized public void send( final OutElmtType element ) {
-			try {
-				while (currentElement != null) {
-					this.wait();
-				}
-			}
-			catch ( final InterruptedException e ) {
-				throw new RuntimeException("unexpected interruption of the sending thread", e);
-			}
-
-			currentElement = element;
-			this.notifyAll();
+		public OpRunnerThread( final NullaryExecutableOp<OutElmtType> op,
+		                       final ClosableIntermediateResultElementSink<OutElmtType> sink,
+		                       final ExecutionContext execCxt )
+		{
+			this.op = op;
+			this.sink = sink;
+			this.execCxt = execCxt;
 		}
 
-		synchronized public void lastElementReached() {
-			lastElementReached = true;
-			this.notifyAll();
+		public NullaryExecutableOp<OutElmtType> getOp() {
+			return op;
 		}
 
-		synchronized public OutElmtType getNextElement() {
-			try {
-				while (!lastElementReached && currentElement == null) {
-					this.wait();
-				}
-			}
-			catch ( final InterruptedException e ) {
-				throw new RuntimeException("unexpected interruption of the receiving thread", e);
-			}
-
-			if (lastElementReached) {
-				return null;
-			}
-			else {
-				final OutElmtType returnElement = currentElement;
-				currentElement = null;
-				this.notifyAll();
-				return returnElement;
-			}
-		}
-
-		synchronized public boolean hasLastElementReached() {
-			return lastElementReached;
-		}
-
-	} // end of class SynchronizedIntermediateResultElementSink
-
-
-	protected class OpRunnerThread extends Thread
-	{
 		public void run() {
 			op.execute(sink, execCxt);
-			sink.lastElementReached();
+			sink.close();
 		}
 
-	} // end of class OpRunner
+	} // end of class OpRunnerThread
 	
 }
