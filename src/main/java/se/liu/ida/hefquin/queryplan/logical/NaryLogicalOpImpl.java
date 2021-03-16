@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.queryplan.logical;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
 
@@ -17,5 +18,16 @@ public abstract class NaryLogicalOpImpl implements NaryLogicalOp
 
 	public List<LogicalOperator> getChildren() {
 		return children;
+	}
+
+	@Override
+	public int numberOfChildren() { return children.size(); }
+
+	@Override
+	public LogicalOperator getChild( final int i ) throws NoSuchElementException {
+		if ( i >= children.size() )
+			throw new NoSuchElementException( "this operator does not have a " + i + "-th child" );
+		else
+			return children.get(i);
 	}
 }

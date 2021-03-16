@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.queryplan.logical;
 
+import java.util.NoSuchElementException;
+
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
 
 public abstract class BinaryLogicalOpImpl implements BinaryLogicalOp
@@ -21,6 +23,19 @@ public abstract class BinaryLogicalOpImpl implements BinaryLogicalOp
 
 	public LogicalOperator getChildOp2() {
 		return childOp2;
+	}
+
+	@Override
+	public int numberOfChildren() { return 2; }
+
+	@Override
+	public LogicalOperator getChild( final int i ) throws NoSuchElementException {
+		if ( i == 0 )
+			return childOp1;
+		else if ( i == 1 )
+			return childOp2;
+		else
+			throw new NoSuchElementException( "this operator does not have a " + i + "-th child" );
 	}
 
 }
