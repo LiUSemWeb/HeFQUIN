@@ -3,16 +3,22 @@ package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.queryplan.executable.impl.SynchronizedIntermediateResultElementSink;
+import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public abstract class ResultElementIterBase implements ResultElementIterator
 {
+	protected final ExecutionContext execCxt;
 	protected final SynchronizedIntermediateResultElementSink sink;
 
 	protected boolean exhausted = false;
 	protected SolutionMapping nextElement = null;
 
-	protected ResultElementIterBase() {
+	protected ResultElementIterBase( final ExecutionContext execCxt ) {
+		assert execCxt != null;
+		this.execCxt = execCxt;
+
 		sink = new SynchronizedIntermediateResultElementSink();
 	}
 
@@ -47,6 +53,22 @@ public abstract class ResultElementIterBase implements ResultElementIterator
 		return returnElement;
 	}
 
-	protected abstract void ensureOpRunnerThreadIsStarted();
+	protected void ensureOpRunnerThreadIsStarted() {
+		final OpRunnerThread opRunnerThread = getOpRunnerThread();
+		if ( opRunnerThread.getState() == Thread.State.NEW ) {
+			opRunnerThread.start();
+		}
+	}
+
+	public ExecutableOperator getOp() {
+		return getOpRunnerThread().getOp();
+	}
+
+	protected abstract OpRunnerThread getOpRunnerThread();
+
+	protected abstract class OpRunnerThread extends Thread
+	{
+		public abstract ExecutableOperator getOp();
+	}
 
 }

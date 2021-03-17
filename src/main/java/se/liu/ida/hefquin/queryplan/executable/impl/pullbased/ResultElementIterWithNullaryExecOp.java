@@ -1,53 +1,48 @@
 package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 
-import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public class ResultElementIterWithNullaryExecOp extends ResultElementIterBase
 {
-	protected final OpRunnerThread opRunnerThread;
+	protected final MyOpRunnerThread opRunnerThread;
 
 	public ResultElementIterWithNullaryExecOp( final NullaryExecutableOp op,
 	                                           final ExecutionContext execCxt )
 	{
+		super(execCxt);
+
 		assert op != null;
 		assert execCxt != null;
 
-		opRunnerThread = new OpRunnerThread( op, sink, execCxt );
+		opRunnerThread = new MyOpRunnerThread(op);
 	}
 
+	@Override
 	public NullaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
 	}
 
 	@Override
-	public void ensureOpRunnerThreadIsStarted() {
-		if ( opRunnerThread.getState() == Thread.State.NEW ) {
-			opRunnerThread.start();
-		}
+	protected OpRunnerThread getOpRunnerThread() {
+		return opRunnerThread;
 	}
 
 
-	protected static class OpRunnerThread extends Thread
+	protected class MyOpRunnerThread extends OpRunnerThread
 	{
 		private final NullaryExecutableOp op;
-		protected final ClosableIntermediateResultElementSink sink;
-		protected final ExecutionContext execCxt;
 
-		public OpRunnerThread( final NullaryExecutableOp op,
-		                       final ClosableIntermediateResultElementSink sink,
-		                       final ExecutionContext execCxt )
-		{
+		public MyOpRunnerThread( final NullaryExecutableOp op ) {
 			this.op = op;
-			this.sink = sink;
-			this.execCxt = execCxt;
 		}
 
+		@Override
 		public NullaryExecutableOp getOp() {
 			return op;
 		}
 
+		@Override
 		public void run() {
 			op.execute(sink, execCxt);
 			sink.close();

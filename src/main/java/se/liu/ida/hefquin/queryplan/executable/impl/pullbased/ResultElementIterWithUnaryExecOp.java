@@ -1,58 +1,53 @@
 package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 
-import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 {
-	protected final OpRunnerThread opRunnerThread;
+	protected final MyOpRunnerThread opRunnerThread;
 
 	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp op,
 	                                         final ResultBlockIterator inputIter,
 	                                         final ExecutionContext execCxt )
 	{
+		super(execCxt);
+
 		assert op != null;
 		assert inputIter != null;
-		assert execCxt != null;
 
-		opRunnerThread = new OpRunnerThread( op, inputIter, sink, execCxt );
+		opRunnerThread = new MyOpRunnerThread(op, inputIter);
 	}
 
+	@Override
 	public UnaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
 	}
 
 	@Override
-	public void ensureOpRunnerThreadIsStarted() {
-		if ( opRunnerThread.getState() == Thread.State.NEW ) {
-			opRunnerThread.start();
-		}
+	protected OpRunnerThread getOpRunnerThread() {
+		return opRunnerThread;
 	}
 
 
-	protected static class OpRunnerThread extends Thread
+	protected class MyOpRunnerThread extends OpRunnerThread
 	{
 		private final UnaryExecutableOp op;
 		protected final ResultBlockIterator inputIter;
-		protected final ClosableIntermediateResultElementSink sink;
-		protected final ExecutionContext execCxt;
 
-		public OpRunnerThread( final UnaryExecutableOp op,
-		                       final ResultBlockIterator inputIter,
-		                       final ClosableIntermediateResultElementSink sink,
-		                       final ExecutionContext execCxt )
+		public MyOpRunnerThread( final UnaryExecutableOp op,
+		                         final ResultBlockIterator inputIter )
 		{
 			this.op = op;
 			this.inputIter = inputIter;
-			this.sink = sink;
-			this.execCxt = execCxt;
 		}
 
+		@Override
 		public UnaryExecutableOp getOp() {
 			return op;
 		}
 
+		@Override
 		public void run() {
 			while ( inputIter.hasNext() ) {
 				op.process( inputIter.next(), sink, execCxt );
@@ -62,4 +57,5 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 		}
 
 	} // end of class OpRunnerThread
+
 }
