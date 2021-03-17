@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.ExecutableOperatorCreator;
 import se.liu.ida.hefquin.queryplan.PhysicalOperator;
 
@@ -12,7 +11,7 @@ public class ExecOpSPARQLRequest extends ExecOpGenericSolMapsRequest<SPARQLReque
 {
 	private static Creator creator = null;
 
-	public static ExecutableOperatorCreator<SolutionMapping> getCreator() {
+	public static ExecutableOperatorCreator getCreator() {
 		if ( creator == null ) {
 			creator = new Creator();
 		}
@@ -27,7 +26,7 @@ public class ExecOpSPARQLRequest extends ExecOpGenericSolMapsRequest<SPARQLReque
 		return fedAccessMgr.performRequest( req, (SPARQLEndpoint) fm );
 	}
 
-	protected static class Creator implements ExecutableOperatorCreator<SolutionMapping>
+	protected static class Creator implements ExecutableOperatorCreator
 	{
 		@Override
 		public ExecOpSPARQLRequest createOp( final PhysicalOperator physicalOp ) throws IllegalArgumentException {

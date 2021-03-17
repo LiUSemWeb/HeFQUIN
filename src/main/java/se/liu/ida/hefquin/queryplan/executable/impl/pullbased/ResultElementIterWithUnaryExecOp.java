@@ -4,22 +4,22 @@ import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultEl
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public class ResultElementIterWithUnaryExecOp<InElmtType,OutElmtType> extends ResultElementIterBase<OutElmtType>
+public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 {
-	protected final OpRunnerThread<InElmtType,OutElmtType> opRunnerThread;
+	protected final OpRunnerThread opRunnerThread;
 
-	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp<InElmtType,OutElmtType> op,
-	                                         final ResultBlockIterator<InElmtType> inputIter,
+	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp op,
+	                                         final ResultBlockIterator inputIter,
 	                                         final ExecutionContext execCxt )
 	{
 		assert op != null;
 		assert inputIter != null;
 		assert execCxt != null;
 
-		opRunnerThread = new OpRunnerThread<InElmtType,OutElmtType>( op, inputIter, sink, execCxt );
+		opRunnerThread = new OpRunnerThread( op, inputIter, sink, execCxt );
 	}
 
-	public UnaryExecutableOp<InElmtType,OutElmtType> getOp() {
+	public UnaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
 	}
 
@@ -31,16 +31,16 @@ public class ResultElementIterWithUnaryExecOp<InElmtType,OutElmtType> extends Re
 	}
 
 
-	protected static class OpRunnerThread<InElmtType,OutElmtType> extends Thread
+	protected static class OpRunnerThread extends Thread
 	{
-		private final UnaryExecutableOp<InElmtType,OutElmtType> op;
-		protected final ResultBlockIterator<InElmtType> inputIter;
-		protected final ClosableIntermediateResultElementSink<OutElmtType> sink;
+		private final UnaryExecutableOp op;
+		protected final ResultBlockIterator inputIter;
+		protected final ClosableIntermediateResultElementSink sink;
 		protected final ExecutionContext execCxt;
 
-		public OpRunnerThread( final UnaryExecutableOp<InElmtType,OutElmtType> op,
-		                       final ResultBlockIterator<InElmtType> inputIter,
-		                       final ClosableIntermediateResultElementSink<OutElmtType> sink,
+		public OpRunnerThread( final UnaryExecutableOp op,
+		                       final ResultBlockIterator inputIter,
+		                       final ClosableIntermediateResultElementSink sink,
 		                       final ExecutionContext execCxt )
 		{
 			this.op = op;
@@ -49,7 +49,7 @@ public class ResultElementIterWithUnaryExecOp<InElmtType,OutElmtType> extends Re
 			this.execCxt = execCxt;
 		}
 
-		public UnaryExecutableOp<InElmtType,OutElmtType> getOp() {
+		public UnaryExecutableOp getOp() {
 			return op;
 		}
 

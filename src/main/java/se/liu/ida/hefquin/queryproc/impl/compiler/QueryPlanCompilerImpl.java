@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.queryproc.impl.compiler;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.queryplan.ExecutableOperatorCreator;
 import se.liu.ida.hefquin.queryplan.ExecutablePlan;
@@ -25,57 +24,49 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
 		final ExecutionContext execCxt = createExecContext();
-		final ResultElementIterator<SolutionMapping> it = compile( qep.getRootOperator(), execCxt );
-		final ExecutableOperator<SolutionMapping> execOp = new ExecutableRootOperator<SolutionMapping>(it);
+		final ResultElementIterator it = compile( qep.getRootOperator(), execCxt );
+		final ExecutableOperator execOp = new ExecutableRootOperator(it);
 		return new ExecutablePlanImpl(execOp);
 	}
 
-	protected ResultElementIterator<SolutionMapping> compile(
-			final PhysicalOperator rootOp,
-			final ExecutionContext execCxt )
+	protected ResultElementIterator compile( final PhysicalOperator rootOp,
+	                                         final ExecutionContext execCxt )
 	{
-		final ExecutableOperatorCreator<?> execOpCreator = rootOp.getExecOpCreator();
-		final ExecutableOperatorCreator<SolutionMapping> execOpCreator2 = (ExecutableOperatorCreator<SolutionMapping>) execOpCreator;
-		final ExecutableOperator<SolutionMapping> execOp = execOpCreator2.createOp(rootOp);
+		final ExecutableOperatorCreator execOpCreator = rootOp.getExecOpCreator();
+		final ExecutableOperator execOp = execOpCreator.createOp(rootOp);
 
 		if ( rootOp.numberOfChildren() == 0 )
 		{
-			if ( ! (execOp  instanceof NullaryExecutableOp<?>) )
+			if ( ! (execOp  instanceof NullaryExecutableOp) )
 				throw new IllegalArgumentException();
 
-			return new ResultElementIterWithNullaryExecOp<SolutionMapping>(
-					(NullaryExecutableOp<SolutionMapping>) execOp,
-					execCxt );
+			final NullaryExecutableOp execOp0 = (NullaryExecutableOp) execOp;
+			return new ResultElementIterWithNullaryExecOp(execOp0, execCxt);
 		}
 		else if ( rootOp.numberOfChildren() == 1 )
 		{
-			if ( ! (execOp  instanceof UnaryExecutableOp<?,?>) )
+			if ( ! (execOp  instanceof UnaryExecutableOp) )
 				throw new IllegalArgumentException();
 
-			final ResultElementIterator<SolutionMapping> elmtIterChild = compile(rootOp.getChild(0), execCxt);
-			final ResultBlockIterator<SolutionMapping> blockIterChild = createBlockIterator(elmtIterChild);
+			final ResultElementIterator elmtIterChild = compile(rootOp.getChild(0), execCxt);
+			final ResultBlockIterator blockIterChild = createBlockIterator(elmtIterChild);
 
-			return new ResultElementIterWithUnaryExecOp<SolutionMapping,SolutionMapping>(
-					(UnaryExecutableOp<SolutionMapping,SolutionMapping>) execOp,
-					blockIterChild,
-					execCxt );
+			final UnaryExecutableOp execOp1 = (UnaryExecutableOp) execOp;
+			return new ResultElementIterWithUnaryExecOp(execOp1, blockIterChild, execCxt);
 		}
 		else if ( rootOp.numberOfChildren() == 2 )
 		{
-			if ( ! (execOp  instanceof BinaryExecutableOp<?,?,?>) )
+			if ( ! (execOp  instanceof BinaryExecutableOp) )
 				throw new IllegalArgumentException();
 
-			final ResultElementIterator<SolutionMapping> elmtIterChild1 = compile(rootOp.getChild(0), execCxt);
-			final ResultBlockIterator<SolutionMapping> blockIterChild1 = createBlockIterator(elmtIterChild1);
+			final ResultElementIterator elmtIterChild1 = compile(rootOp.getChild(0), execCxt);
+			final ResultBlockIterator blockIterChild1 = createBlockIterator(elmtIterChild1);
 
-			final ResultElementIterator<SolutionMapping> elmtIterChild2 = compile(rootOp.getChild(0), execCxt);
-			final ResultBlockIterator<SolutionMapping> blockIterChild2 = createBlockIterator(elmtIterChild2);
+			final ResultElementIterator elmtIterChild2 = compile(rootOp.getChild(0), execCxt);
+			final ResultBlockIterator blockIterChild2 = createBlockIterator(elmtIterChild2);
 
-			return new ResultElementIterWithBinaryExecOp<SolutionMapping,SolutionMapping,SolutionMapping>(
-					(BinaryExecutableOp<SolutionMapping,SolutionMapping,SolutionMapping>) execOp,
-					blockIterChild1,
-					blockIterChild2,
-					execCxt );
+			final BinaryExecutableOp execOp2 = (BinaryExecutableOp) execOp;
+			return new ResultElementIterWithBinaryExecOp(execOp2, blockIterChild1, blockIterChild2, execCxt);
 		}
 		else
 		{
@@ -88,38 +79,38 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 		// TODO: implement createExecContext()
 	}
 
-	protected ResultBlockIterator<SolutionMapping> createBlockIterator( final ResultElementIterator<SolutionMapping> elmtIter ) {
-		final IntermediateResultBlockBuilder<SolutionMapping> blockBuilder = new GenericIntermediateResultBlockBuilderImpl<SolutionMapping>();
+	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter ) {
+		final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
 		final int blockSize = 30;
-		return new ResultBlockIterOverResultElementIter<SolutionMapping>( elmtIter, blockBuilder, blockSize  );
+		return new ResultBlockIterOverResultElementIter( elmtIter, blockBuilder, blockSize );
 	}
 
 
 	protected static class ExecutablePlanImpl implements ExecutablePlan
 	{
-		private final ExecutableOperator<?> rootOp;
+		private final ExecutableOperator rootOp;
 
-		public ExecutablePlanImpl( final ExecutableOperator<?> rootOp ) {
+		public ExecutablePlanImpl( final ExecutableOperator rootOp ) {
 			assert rootOp != null;
 			this.rootOp = rootOp;
 		}
 
 		@Override
-		public ExecutableOperator<?> getRootOperator() { return rootOp; }
+		public ExecutableOperator getRootOperator() { return rootOp; }
 
 	} // end of class ExecutablePlanImpl
 
 
-	protected static class ExecutableRootOperator<ElmtType> implements ExecutableOperator<ElmtType>
+	protected static class ExecutableRootOperator implements ExecutableOperator
 	{
-		private final ResultElementIterator<ElmtType> it;
+		private final ResultElementIterator it;
 
-		public ExecutableRootOperator( final ResultElementIterator<ElmtType> it ) {
+		public ExecutableRootOperator( final ResultElementIterator it ) {
 			assert it != null;
 			this.it = it;
 		}
 
-		public ResultElementIterator<ElmtType> getResultElementIterator() { return it; }
+		public ResultElementIterator getResultElementIterator() { return it; }
 	}
 
 }

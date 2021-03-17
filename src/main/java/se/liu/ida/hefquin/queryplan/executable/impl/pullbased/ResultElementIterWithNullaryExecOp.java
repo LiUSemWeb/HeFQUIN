@@ -4,20 +4,20 @@ import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultEl
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public class ResultElementIterWithNullaryExecOp<OutElmtType> extends ResultElementIterBase<OutElmtType>
+public class ResultElementIterWithNullaryExecOp extends ResultElementIterBase
 {
-	protected final OpRunnerThread<OutElmtType> opRunnerThread;
+	protected final OpRunnerThread opRunnerThread;
 
-	public ResultElementIterWithNullaryExecOp( final NullaryExecutableOp<OutElmtType> op,
+	public ResultElementIterWithNullaryExecOp( final NullaryExecutableOp op,
 	                                           final ExecutionContext execCxt )
 	{
 		assert op != null;
 		assert execCxt != null;
 
-		opRunnerThread = new OpRunnerThread<OutElmtType>( op, sink, execCxt );
+		opRunnerThread = new OpRunnerThread( op, sink, execCxt );
 	}
 
-	public NullaryExecutableOp<OutElmtType> getOp() {
+	public NullaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
 	}
 
@@ -29,14 +29,14 @@ public class ResultElementIterWithNullaryExecOp<OutElmtType> extends ResultEleme
 	}
 
 
-	protected static class OpRunnerThread<OutElmtType> extends Thread
+	protected static class OpRunnerThread extends Thread
 	{
-		private final NullaryExecutableOp<OutElmtType> op;
-		protected final ClosableIntermediateResultElementSink<OutElmtType> sink;
+		private final NullaryExecutableOp op;
+		protected final ClosableIntermediateResultElementSink sink;
 		protected final ExecutionContext execCxt;
 
-		public OpRunnerThread( final NullaryExecutableOp<OutElmtType> op,
-		                       final ClosableIntermediateResultElementSink<OutElmtType> sink,
+		public OpRunnerThread( final NullaryExecutableOp op,
+		                       final ClosableIntermediateResultElementSink sink,
 		                       final ExecutionContext execCxt )
 		{
 			this.op = op;
@@ -44,7 +44,7 @@ public class ResultElementIterWithNullaryExecOp<OutElmtType> extends ResultEleme
 			this.execCxt = execCxt;
 		}
 
-		public NullaryExecutableOp<OutElmtType> getOp() {
+		public NullaryExecutableOp getOp() {
 			return op;
 		}
 

@@ -1,13 +1,15 @@
 package se.liu.ida.hefquin.queryplan.executable.impl;
 
-public class SynchronizedIntermediateResultElementSink<ElmtType>
-                   implements ClosableIntermediateResultElementSink<ElmtType>
+import se.liu.ida.hefquin.query.SolutionMapping;
+
+public class SynchronizedIntermediateResultElementSink
+                   implements ClosableIntermediateResultElementSink
 {
-	protected ElmtType currentElement = null;
+	protected SolutionMapping currentElement = null;
 	protected boolean closed = false;
 
 	@Override
-	synchronized public void send( final ElmtType element ) {
+	synchronized public void send( final SolutionMapping element ) {
 		if ( closed )
 			return;
 
@@ -35,7 +37,7 @@ public class SynchronizedIntermediateResultElementSink<ElmtType>
 		return closed;
 	}
 
-	synchronized public ElmtType getNextElement() {
+	synchronized public SolutionMapping getNextElement() {
 		try {
 			while (!closed && currentElement == null) {
 				this.wait();
@@ -46,7 +48,7 @@ public class SynchronizedIntermediateResultElementSink<ElmtType>
 		}
 
 		if ( currentElement != null ) {
-			final ElmtType returnElement = currentElement;
+			final SolutionMapping returnElement = currentElement;
 			currentElement = null;
 			this.notifyAll();
 			return returnElement;

@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
@@ -17,27 +18,45 @@ public class TestUtils
 		return new ExecutionContext( new FederationAccessManagerTestImpl() );
 	}
 
-	public static ResultElementIterator<String> createResultElementIteratorForTests( final String[] elements ) {
-		return new ResultElementIteratorForTests<String>( elements );
+	public static SolutionMapping createSolutionMappingForTests() {
+		return new SolutionMappingForTests(null);
 	}
 
-	public static ResultBlockIterator<String> createResultBlockIteratorForTests( final String[] elements, final int blockSize ) {
-		return new ResultBlockIterOverResultElementIter<String>(
+	public static SolutionMapping createSolutionMappingForTests( final String token ) {
+		return new SolutionMappingForTests(token);
+	}
+
+	public static ResultElementIterator createResultElementIteratorForTests( final SolutionMapping[] elements ) {
+		return new ResultElementIteratorForTests( elements );
+	}
+
+	public static ResultBlockIterator createResultBlockIteratorForTests( final int blockSize, final SolutionMapping... elements ) {
+		return new ResultBlockIterOverResultElementIter(
 				createResultElementIteratorForTests(elements),
-				new GenericIntermediateResultBlockBuilderImpl<String>(),
+				new GenericIntermediateResultBlockBuilderImpl(),
 				blockSize );
 	}
 
 
-	public static class ResultElementIteratorForTests<ElmtType> implements ResultElementIterator<ElmtType>
+	public static class SolutionMappingForTests implements SolutionMapping
 	{
-		final protected Iterator<ElmtType> it;
+		public final String token;
 
-		public ResultElementIteratorForTests( final ElmtType[] elements ) {
+		public SolutionMappingForTests( final String token ) { this.token = token; }
+
+		@Override
+		public String toString() { return token; }
+	}
+
+	public static class ResultElementIteratorForTests implements ResultElementIterator
+	{
+		protected final Iterator<SolutionMapping> it;
+
+		public ResultElementIteratorForTests( final SolutionMapping[] elements ) {
 			this( Arrays.asList(elements) );
 		}
 
-		public ResultElementIteratorForTests( final List<ElmtType> list ) {
+		public ResultElementIteratorForTests( final List<SolutionMapping> list ) {
 			it = list.iterator();
 		}
 
@@ -45,7 +64,7 @@ public class TestUtils
 		public boolean hasNext() { return it.hasNext(); }
 
 		@Override
-		public ElmtType next() { return it.next(); }
+		public SolutionMapping next() { return it.next(); }
 	}
 
 	protected static class FederationAccessManagerTestImpl implements FederationAccessManager

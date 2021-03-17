@@ -5,16 +5,16 @@ import java.util.NoSuchElementException;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlockBuilder;
 
-public class ResultBlockIterOverResultElementIter<ElmtType> implements ResultBlockIterator<ElmtType>
+public class ResultBlockIterOverResultElementIter implements ResultBlockIterator
 {
-	protected final ResultElementIterator<ElmtType> eIter;
-	protected final IntermediateResultBlockBuilder<ElmtType> blockBuilder;
+	protected final ResultElementIterator eIter;
+	protected final IntermediateResultBlockBuilder blockBuilder;
 	protected final int blockSize;
 
-	protected IntermediateResultBlock<ElmtType> currentBlock = null;
+	protected IntermediateResultBlock currentBlock = null;
 
-	public ResultBlockIterOverResultElementIter( final ResultElementIterator<ElmtType> eIter,
-	                                             final IntermediateResultBlockBuilder<ElmtType> blockBuilder,
+	public ResultBlockIterOverResultElementIter( final ResultElementIterator eIter,
+	                                             final IntermediateResultBlockBuilder blockBuilder,
 	                                             final int blockSize ) {
 		assert eIter != null;
 		assert blockBuilder != null;
@@ -42,11 +42,11 @@ public class ResultBlockIterOverResultElementIter<ElmtType> implements ResultBlo
 	}
 
 	@Override
-	public IntermediateResultBlock<ElmtType> next() {
+	public IntermediateResultBlock next() {
 		if ( ! hasNext() ) {
 			throw new NoSuchElementException();
 		}
-		final IntermediateResultBlock<ElmtType> returnBlock = currentBlock;
+		final IntermediateResultBlock returnBlock = currentBlock;
 		currentBlock = null;
 		return returnBlock;
 	}

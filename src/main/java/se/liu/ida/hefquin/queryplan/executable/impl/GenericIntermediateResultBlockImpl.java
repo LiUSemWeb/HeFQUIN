@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 
-public class GenericIntermediateResultBlockImpl<ElmtType>
-                      implements IntermediateResultBlock<ElmtType>
+public class GenericIntermediateResultBlockImpl
+                      implements IntermediateResultBlock
 {
-	protected final List<ElmtType> elements = new ArrayList<ElmtType>();
+	protected final List<SolutionMapping> elements = new ArrayList<SolutionMapping>();
 
 	@Override
 	public int size() {
@@ -17,11 +18,11 @@ public class GenericIntermediateResultBlockImpl<ElmtType>
 	}
 
 	@Override
-	public Iterator<ElmtType> iterator() {
+	public Iterator<SolutionMapping> iterator() {
 		return elements.iterator();
 	}
 
-	public void add( ElmtType element ) {
+	public void add( SolutionMapping element ) {
 		elements.add(element);
 	}
 }

@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest>
-                implements NullaryExecutableOp<SolutionMapping>
+                implements NullaryExecutableOp
 {
 	protected final ReqType req;
 	protected final FederationMember fm;
@@ -24,7 +24,7 @@ public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalR
 		this.fm = fm;
 	}
 
-	public void execute( final IntermediateResultElementSink<SolutionMapping> sink,
+	public void execute( final IntermediateResultElementSink sink,
 	                     final ExecutionContext execCxt )
 	{
 		final SolMapsResponse response = performRequest( execCxt.getFederationAccessMgr() );

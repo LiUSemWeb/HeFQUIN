@@ -8,7 +8,7 @@ public interface PhysicalOperator
 	 * Returns an {@link ExecutableOperatorCreator} that can create the
 	 * {@link ExecutableOperator} to be used for this physical operator.
 	 */
-	ExecutableOperatorCreator<?> getExecOpCreator();
+	ExecutableOperatorCreator getExecOpCreator();
 
 	/**
 	 * Returns the number of children that this operator has.

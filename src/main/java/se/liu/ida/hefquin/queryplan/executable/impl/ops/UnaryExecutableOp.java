@@ -6,22 +6,21 @@ import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementProducer
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public interface UnaryExecutableOp<InElmtType,OutElmtType>
-                             extends ExecutableOperator<OutElmtType>,
-                                     IntermediateResultElementProducer<OutElmtType>
+public interface UnaryExecutableOp extends ExecutableOperator,
+                                           IntermediateResultElementProducer
 {
 	/**
 	 * Processes the given input and sends the produced
 	 * result elements (if any) to the given sink.
 	 */
-	void process( final IntermediateResultBlock<InElmtType> input,
-	              final IntermediateResultElementSink<OutElmtType> sink,
+	void process( final IntermediateResultBlock input,
+	              final IntermediateResultElementSink sink,
 	              final ExecutionContext execCxt );
 	/**
 	 * Concludes the execution of this operator and sends
 	 * the produced result elements (if any) to the given
 	 * sink.
 	 */
-	void concludeExecution( final IntermediateResultElementSink<OutElmtType> sink,
+	void concludeExecution( final IntermediateResultElementSink sink,
 	                        final ExecutionContext execCxt );
 }

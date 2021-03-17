@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
@@ -18,9 +19,9 @@ public class ResultElementIterWithUnaryExecOpTest
 	@Test
 	public void getOpTest() {
 		final UnaryExecutableOp1ForTest op = new UnaryExecutableOp1ForTest();
-		final ResultElementIterWithUnaryExecOp<String,String> it = new ResultElementIterWithUnaryExecOp<String,String>(
+		final ResultElementIterWithUnaryExecOp it = new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(new String[]{"1","2","3"}, 2),
+				TestUtils.createResultBlockIteratorForTests(2),
 				TestUtils.createExecContextForTests() );
 
 		assertEquals( op, it.getOp() );
@@ -28,92 +29,99 @@ public class ResultElementIterWithUnaryExecOpTest
 
 	@Test
 	public void nextWithoutHasNext() {
-		final ResultElementIterator<String> it = createIterator1ForTests( new String[]{"1","2","3"}, 2 );
+		final SolutionMapping sm1 = TestUtils.createSolutionMappingForTests("1");
+		final SolutionMapping sm2 = TestUtils.createSolutionMappingForTests("2");
+		final SolutionMapping sm3 = TestUtils.createSolutionMappingForTests("3");
+		final ResultElementIterator it = createIterator1ForTests( 2, sm1, sm2, sm3 );
 
-		assertEquals( "1ok", it.next() );
-		assertEquals( "2ok", it.next() );
-		assertEquals( "3ok", it.next() );
-		assertEquals( "added", it.next() );
+		assertEquals( "1ok", it.next().toString() );
+		assertEquals( "2ok", it.next().toString() );
+		assertEquals( "3ok", it.next().toString() );
+		assertEquals( "added", it.next().toString() );
 
 		assertFalse( it.hasNext() );
 	}
 
 	@Test
 	public void nextWithHasNext() {
-		final ResultElementIterator<String> it = createIterator1ForTests( new String[]{"1","2","3"}, 2 );
+		final SolutionMapping sm1 = TestUtils.createSolutionMappingForTests("1");
+		final SolutionMapping sm2 = TestUtils.createSolutionMappingForTests("2");
+		final SolutionMapping sm3 = TestUtils.createSolutionMappingForTests("3");
+		final ResultElementIterator it = createIterator1ForTests( 2, sm1, sm2, sm3 );
 
 		assertTrue( it.hasNext() );
-		assertEquals( "1ok", it.next() );
+		assertEquals( "1ok", it.next().toString() );
 		assertTrue( it.hasNext() );
-		assertEquals( "2ok", it.next() );
+		assertEquals( "2ok", it.next().toString() );
 		assertTrue( it.hasNext() );
-		assertEquals( "3ok", it.next() );
+		assertEquals( "3ok", it.next().toString() );
 		assertTrue( it.hasNext() );
-		assertEquals( "added", it.next() );
+		assertEquals( "added", it.next().toString() );
 
 		assertFalse( it.hasNext() );
 	}
 
 	@Test
 	public void noElementFromInput() {
-		final ResultElementIterator<String> it = createIterator1ForTests( new String[]{}, 2 );
+		final ResultElementIterator it = createIterator1ForTests( 2 );
 
 		assertTrue( it.hasNext() );
-		assertEquals( "added", it.next() );
+		assertEquals( "added", it.next().toString() );
 
 		assertFalse( it.hasNext() );
 	}
 
 	@Test
 	public void noElementAtAll() {
-		final ResultElementIterator<String> it = createIterator2ForTests( new String[]{}, 2 );
+		final ResultElementIterator it = createIterator2ForTests( 2 );
 
 		assertFalse( it.hasNext() );
 	}
 
 
 
-	protected static ResultElementIterator<String> createIterator1ForTests( final String[] elements, final int blockSize ) {
-		final UnaryExecutableOp<String,String> op = new UnaryExecutableOp1ForTest();
-		return new ResultElementIterWithUnaryExecOp<String,String>(
+	protected static ResultElementIterator createIterator1ForTests( final int blockSize, final SolutionMapping... elements ) {
+		final UnaryExecutableOp op = new UnaryExecutableOp1ForTest();
+		return new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(elements, blockSize),
+				TestUtils.createResultBlockIteratorForTests(blockSize, elements),
 				TestUtils.createExecContextForTests() );
 	}
 
-	protected static ResultElementIterator<String> createIterator2ForTests( final String[] elements, final int blockSize ) {
-		final UnaryExecutableOp<String,String> op = new UnaryExecutableOp2ForTest();
-		return new ResultElementIterWithUnaryExecOp<String,String>(
+	protected static ResultElementIterator createIterator2ForTests( final int blockSize, final SolutionMapping... elements ) {
+		final UnaryExecutableOp op = new UnaryExecutableOp2ForTest();
+		return new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(elements, blockSize),
+				TestUtils.createResultBlockIteratorForTests(blockSize, elements),
 				TestUtils.createExecContextForTests() );
 	}
 
 	protected static class UnaryExecutableOp1ForTest extends UnaryExecutableOp2ForTest
 	{
 		@Override
-		public void concludeExecution( final IntermediateResultElementSink<String> sink,
+		public void concludeExecution( final IntermediateResultElementSink sink,
 		                               final ExecutionContext execCxt )
 		{
-			sink.send("added");
+			sink.send( TestUtils.createSolutionMappingForTests("added") );
 		}
 	}
 
-	protected static class UnaryExecutableOp2ForTest implements UnaryExecutableOp<String,String>
+	protected static class UnaryExecutableOp2ForTest implements UnaryExecutableOp
 	{
 		@Override
-		public void process( final IntermediateResultBlock<String> input,
-		                     final IntermediateResultElementSink<String> sink,
+		public void process( final IntermediateResultBlock input,
+		                     final IntermediateResultElementSink sink,
 		                     final ExecutionContext execCxt )
 		{
-			final Iterator<String> it = input.iterator();
+			final Iterator<SolutionMapping> it = input.iterator();
 			while ( it.hasNext() ) {
-				sink.send( it.next() + "ok" );
+				final String token = it.next().toString() + "ok";
+				sink.send( TestUtils.createSolutionMappingForTests(token) );
 			}
 		}
 
 		@Override
-		public void concludeExecution( final IntermediateResultElementSink<String> sink,
+		public void concludeExecution( final IntermediateResultElementSink sink,
 		                               final ExecutionContext execCxt )
 		{
 		}

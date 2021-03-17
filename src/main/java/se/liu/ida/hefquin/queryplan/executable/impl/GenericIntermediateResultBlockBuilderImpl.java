@@ -1,20 +1,21 @@
 package se.liu.ida.hefquin.queryplan.executable.impl;
 
+import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlockBuilder;
 
-public class GenericIntermediateResultBlockBuilderImpl<ElmtType>
-                        implements IntermediateResultBlockBuilder<ElmtType>
+public class GenericIntermediateResultBlockBuilderImpl
+                        implements IntermediateResultBlockBuilder
 {
-	protected GenericIntermediateResultBlockImpl<ElmtType> block = null;
+	protected GenericIntermediateResultBlockImpl block = null;
 
 	@Override
 	public void startNewBlock() {
-		block = new GenericIntermediateResultBlockImpl<ElmtType>();
+		block = new GenericIntermediateResultBlockImpl();
 	}
 
 	@Override
-	public void add( ElmtType element ) {
+	public void add( SolutionMapping element ) {
 		if ( block == null ) {
 			startNewBlock();
 		}
@@ -28,8 +29,8 @@ public class GenericIntermediateResultBlockBuilderImpl<ElmtType>
 	}
 
 	@Override
-	public IntermediateResultBlock<ElmtType> finishCurrentBlock() {
-		final IntermediateResultBlock<ElmtType> returnBlock = block;
+	public IntermediateResultBlock finishCurrentBlock() {
+		final IntermediateResultBlock returnBlock = block;
 		block = null;
 		return returnBlock;
 	}

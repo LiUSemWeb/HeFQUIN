@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.queryplan.executable;
 
-public interface IntermediateResultBlockBuilder<ElmtType>
+import se.liu.ida.hefquin.query.SolutionMapping;
+
+public interface IntermediateResultBlockBuilder
 {
 	/**
 	 * Starts creating a new {@link IntermediateResultBlock}.
@@ -19,7 +21,7 @@ public interface IntermediateResultBlockBuilder<ElmtType>
 	 * new block will be started first (i.e., {@link #startNewBlock()}
 	 * will be called internally). 
 	 */
-	void add( ElmtType element );
+	void add( SolutionMapping element );
 
 	/**
 	 * Returns the current size of the currently-created block.
@@ -33,5 +35,5 @@ public interface IntermediateResultBlockBuilder<ElmtType>
 	/**
 	 * Finishes the creation of the currently-created block and returns this block.
 	 */
-	IntermediateResultBlock<ElmtType> finishCurrentBlock();
+	IntermediateResultBlock finishCurrentBlock();
 }

@@ -4,13 +4,13 @@ import se.liu.ida.hefquin.queryplan.executable.impl.ClosableIntermediateResultEl
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public class ResultElementIterWithBinaryExecOp<InElmtType1,InElmtType2,OutElmtType> extends ResultElementIterBase<OutElmtType>
+public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 {
-	protected final OpRunnerThread<InElmtType1,InElmtType2,OutElmtType> opRunnerThread;
+	protected final OpRunnerThread opRunnerThread;
 
-	public ResultElementIterWithBinaryExecOp( final BinaryExecutableOp<InElmtType1,InElmtType2,OutElmtType> op,
-	                                          final ResultBlockIterator<InElmtType1> inputIter1,
-	                                          final ResultBlockIterator<InElmtType2> inputIter2,
+	public ResultElementIterWithBinaryExecOp( final BinaryExecutableOp op,
+	                                          final ResultBlockIterator inputIter1,
+	                                          final ResultBlockIterator inputIter2,
 	                                          final ExecutionContext execCxt )
 	{
 		assert op != null;
@@ -18,10 +18,10 @@ public class ResultElementIterWithBinaryExecOp<InElmtType1,InElmtType2,OutElmtTy
 		assert inputIter2 != null;
 		assert execCxt != null;
 
-		opRunnerThread = new OpRunnerThread<InElmtType1,InElmtType2,OutElmtType>( op, inputIter1, inputIter2, sink, execCxt );
+		opRunnerThread = new OpRunnerThread( op, inputIter1, inputIter2, sink, execCxt );
 	}
 
-	public BinaryExecutableOp<InElmtType1,InElmtType2,OutElmtType> getOp() {
+	public BinaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
 	}
 
@@ -33,18 +33,18 @@ public class ResultElementIterWithBinaryExecOp<InElmtType1,InElmtType2,OutElmtTy
 	}
 
 
-	protected static class OpRunnerThread<InElmtType1,InElmtType2,OutElmtType> extends Thread
+	protected static class OpRunnerThread extends Thread
 	{
-		private final BinaryExecutableOp<InElmtType1,InElmtType2,OutElmtType> op;
-		protected final ResultBlockIterator<InElmtType1> inputIter1;
-		protected final ResultBlockIterator<InElmtType2> inputIter2;
-		protected final ClosableIntermediateResultElementSink<OutElmtType> sink;
+		private final BinaryExecutableOp op;
+		protected final ResultBlockIterator inputIter1;
+		protected final ResultBlockIterator inputIter2;
+		protected final ClosableIntermediateResultElementSink sink;
 		protected final ExecutionContext execCxt;
 
-		public OpRunnerThread( final BinaryExecutableOp<InElmtType1,InElmtType2,OutElmtType> op,
-		                       final ResultBlockIterator<InElmtType1> inputIter1,
-		                       final ResultBlockIterator<InElmtType2> inputIter2,
-		                       final ClosableIntermediateResultElementSink<OutElmtType> sink,
+		public OpRunnerThread( final BinaryExecutableOp op,
+		                       final ResultBlockIterator inputIter1,
+		                       final ResultBlockIterator inputIter2,
+		                       final ClosableIntermediateResultElementSink sink,
 		                       final ExecutionContext execCxt )
 		{
 			this.op = op;
@@ -54,7 +54,7 @@ public class ResultElementIterWithBinaryExecOp<InElmtType1,InElmtType2,OutElmtTy
 			this.execCxt = execCxt;
 		}
 
-		public BinaryExecutableOp<InElmtType1,InElmtType2,OutElmtType> getOp() {
+		public BinaryExecutableOp getOp() {
 			return op;
 		}
 

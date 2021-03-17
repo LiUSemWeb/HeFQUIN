@@ -2,17 +2,18 @@ package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.impl.SynchronizedIntermediateResultElementSink;
 
-public abstract class ResultElementIterBase<OutElmtType> implements ResultElementIterator<OutElmtType>
+public abstract class ResultElementIterBase implements ResultElementIterator
 {
-	protected final SynchronizedIntermediateResultElementSink<OutElmtType> sink;
+	protected final SynchronizedIntermediateResultElementSink sink;
 
 	protected boolean exhausted = false;
-	protected OutElmtType nextElement = null;
+	protected SolutionMapping nextElement = null;
 
 	protected ResultElementIterBase() {
-		sink = new SynchronizedIntermediateResultElementSink<OutElmtType>();
+		sink = new SynchronizedIntermediateResultElementSink();
 	}
 
 	@Override
@@ -36,12 +37,12 @@ public abstract class ResultElementIterBase<OutElmtType> implements ResultElemen
 	}
 
 	@Override
-	public OutElmtType next() {
+	public SolutionMapping next() {
 		if ( ! hasNext() ) {
 			throw new NoSuchElementException();
 		}
 
-		final OutElmtType returnElement = nextElement;
+		final SolutionMapping returnElement = nextElement;
 		nextElement = null;
 		return returnElement;
 	}
