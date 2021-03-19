@@ -3,12 +3,12 @@ package se.liu.ida.hefquin.queryplan.logical;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest> extends NullaryLogicalOpImpl
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> extends NullaryLogicalOpImpl
 {
-	protected final FederationMember fm;
+	protected final MemberType fm;
 	protected final ReqType req;
 
-	LogicalOpRequest( final FederationMember fm, final ReqType req ) {
+	LogicalOpRequest( final MemberType fm, final ReqType req ) {
 		assert fm != null;
 		assert fm != req;
 		assert fm.getInterface().supportsRequest(req);
@@ -17,7 +17,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest> extends Null
 		this.req = req;
 	}
 
-	public FederationMember getFederationMember() {
+	public MemberType getFederationMember() {
 		return fm;
 	}
 

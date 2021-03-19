@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.queryplan.logical;
 
 public interface LogicalPlanVisitor
 {
-	void visit( final LogicalOpRequest<?> op );
+	void visit( final LogicalOpRequest<?,?> op );
 
 	void visit( final LogicalOpTPAdd op );
 	void visit( final LogicalOpBGPAdd op );

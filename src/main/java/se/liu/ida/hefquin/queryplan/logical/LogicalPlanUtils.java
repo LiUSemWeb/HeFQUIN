@@ -21,7 +21,7 @@ public class LogicalPlanUtils
 		public boolean wasSourceAssignment() { return isSourceAssignment; }
 
 		@Override
-		public void visit( final LogicalOpRequest<?> op ) {
+		public void visit( final LogicalOpRequest<?,?> op ) {
 			if (   !(op.req instanceof TriplePatternRequest)
 				&& !(op.req instanceof BGPRequest) )
 				isSourceAssignment = false;

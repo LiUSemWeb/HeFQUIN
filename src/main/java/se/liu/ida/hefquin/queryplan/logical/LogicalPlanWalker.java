@@ -27,7 +27,7 @@ public class LogicalPlanWalker
 		}
 
 		@Override
-		public void visit( final LogicalOpRequest<?> op ) { visit0(op); }
+		public void visit( final LogicalOpRequest<?,?> op ) { visit0(op); }
 
 		@Override
 		public void visit( final LogicalOpTPAdd op ) { visit1(op); }
