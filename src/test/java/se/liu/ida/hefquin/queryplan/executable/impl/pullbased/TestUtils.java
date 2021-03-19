@@ -4,10 +4,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
@@ -71,6 +76,16 @@ public class TestUtils
 	{
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+			return null;
+		}
+
+		@Override
+		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
+			return null;
+		}
+
+		@Override
+		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
 			return null;
 		}
 	}
