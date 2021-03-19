@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
-import se.liu.ida.hefquin.queryplan.ExecutableOperatorCreator;
 import se.liu.ida.hefquin.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.queryplan.PhysicalPlan;
@@ -32,8 +31,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	protected ResultElementIterator compile( final PhysicalOperator rootOp,
 	                                         final ExecutionContext execCxt )
 	{
-		final ExecutableOperatorCreator execOpCreator = rootOp.getExecOpCreator();
-		final ExecutableOperator execOp = execOpCreator.createOp(rootOp);
+		final ExecutableOperator execOp = rootOp.createExecOp();
 
 		if ( rootOp.numberOfChildren() == 0 )
 		{

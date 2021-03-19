@@ -5,10 +5,12 @@ import java.util.NoSuchElementException;
 public interface PhysicalOperator
 {
 	/**
-	 * Returns an {@link ExecutableOperatorCreator} that can create the
-	 * {@link ExecutableOperator} to be used for this physical operator.
+	 * Creates and returns the executable operator to be used for
+	 * this physical operator. The implementation of this method
+	 * has to create a new {@link ExecutableOperator} object each
+	 * time it is called.
 	 */
-	ExecutableOperatorCreator getExecOpCreator();
+	ExecutableOperator createExecOp();
 
 	/**
 	 * Returns the number of children that this operator has.
