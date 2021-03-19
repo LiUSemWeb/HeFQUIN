@@ -5,9 +5,9 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 
-public class ExecOpSPARQLRequest extends ExecOpGenericSolMapsRequest<SPARQLRequest>
+public class ExecOpRequestSPARQL extends ExecOpGenericSolMapsRequest<SPARQLRequest>
 {
-	public ExecOpSPARQLRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+	public ExecOpRequestSPARQL( final SPARQLRequest req, final SPARQLEndpoint fm ) {
 		super( req, fm );
 	}
 
