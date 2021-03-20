@@ -12,5 +12,7 @@ public interface FederationAccessManager
 
 	TriplesResponse performRequest( TriplePatternRequest req, TPFServer fm );
 
+	TriplesResponse performRequest( TriplePatternRequest req, BRTPFServer fm );
+
 	TriplesResponse performRequest( BindingsRestrictedTriplePatternRequest req, BRTPFServer fm );
 }

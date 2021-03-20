@@ -85,6 +85,11 @@ public class TestUtils
 		}
 
 		@Override
+		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
+			return null;
+		}
+
+		@Override
 		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
 			return null;
 		}
