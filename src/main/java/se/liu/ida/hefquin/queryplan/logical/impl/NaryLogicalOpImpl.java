@@ -1,9 +1,10 @@
-package se.liu.ida.hefquin.queryplan.logical;
+package se.liu.ida.hefquin.queryplan.logical.impl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.queryplan.logical.NaryLogicalOp;
 
 public abstract class NaryLogicalOpImpl implements NaryLogicalOp
 {

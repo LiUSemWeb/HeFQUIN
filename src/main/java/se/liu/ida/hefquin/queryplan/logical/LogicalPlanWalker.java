@@ -2,6 +2,13 @@ package se.liu.ida.hefquin.queryplan.logical;
 
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpUnion;
 
 /**
  * Applies a {@link LogicalPlanVisitor} to

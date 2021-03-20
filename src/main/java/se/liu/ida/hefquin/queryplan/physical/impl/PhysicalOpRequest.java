@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
-import se.liu.ida.hefquin.queryplan.logical.LogicalOpRequest;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>

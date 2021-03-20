@@ -1,7 +1,8 @@
-package se.liu.ida.hefquin.queryplan.logical;
+package se.liu.ida.hefquin.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.queryplan.logical.LogicalPlanVisitor;
 
 public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> extends NullaryLogicalOpImpl
 {

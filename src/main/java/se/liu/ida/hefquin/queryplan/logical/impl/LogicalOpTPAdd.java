@@ -1,8 +1,9 @@
-package se.liu.ida.hefquin.queryplan.logical;
+package se.liu.ida.hefquin.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.queryplan.logical.LogicalPlanVisitor;
 
 public class LogicalOpTPAdd extends UnaryLogicalOpImpl
 {

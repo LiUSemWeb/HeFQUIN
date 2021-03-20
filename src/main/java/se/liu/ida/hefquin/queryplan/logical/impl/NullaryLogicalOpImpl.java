@@ -1,8 +1,9 @@
-package se.liu.ida.hefquin.queryplan.logical;
+package se.liu.ida.hefquin.queryplan.logical.impl;
 
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.queryplan.logical.NullaryLogicalOp;
 
 public abstract class NullaryLogicalOpImpl implements NullaryLogicalOp
 {

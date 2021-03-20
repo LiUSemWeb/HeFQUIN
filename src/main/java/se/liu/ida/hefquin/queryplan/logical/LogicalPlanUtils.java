@@ -1,8 +1,14 @@
 package se.liu.ida.hefquin.queryplan.logical;
 
 import se.liu.ida.hefquin.federation.access.BGPRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpUnion;
 
 public class LogicalPlanUtils
 {
@@ -22,8 +28,9 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpRequest<?,?> op ) {
-			if (   !(op.req instanceof TriplePatternRequest)
-				&& !(op.req instanceof BGPRequest) )
+			final DataRetrievalRequest req = op.getRequest();
+			if (   !(req instanceof TriplePatternRequest)
+				&& !(req instanceof BGPRequest) )
 				isSourceAssignment = false;
 		}
 
