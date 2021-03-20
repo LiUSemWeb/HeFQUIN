@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.queryplan.executable;
 
 import java.util.Iterator;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 
 public interface IntermediateResultBlock
 {

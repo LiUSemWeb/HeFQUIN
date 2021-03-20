@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.queryplan.executable.impl.pullbased;
 
 import java.util.NoSuchElementException;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.queryplan.executable.impl.SynchronizedIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.query;
+package se.liu.ida.hefquin.data;
 
 public interface SolutionMapping
 {

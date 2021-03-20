@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.federation.access.impl.req;
 
 import java.util.Set;
 
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
-import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.query.TriplePattern;
 
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest

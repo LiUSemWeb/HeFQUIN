@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.query.jenaimpl;
+package se.liu.ida.hefquin.data.jenaimpl;
 
 import java.util.Iterator;
 

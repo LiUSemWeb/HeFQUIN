@@ -1,8 +1,8 @@
-package se.liu.ida.hefquin.query.jenaimpl;
+package se.liu.ida.hefquin.data.jenaimpl;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 
 public class JenaBasedSolutionMapping implements SolutionMapping
 {

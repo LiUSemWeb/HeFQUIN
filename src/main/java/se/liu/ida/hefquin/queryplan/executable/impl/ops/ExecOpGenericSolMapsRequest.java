@@ -2,11 +2,11 @@ package se.liu.ida.hefquin.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
 
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 

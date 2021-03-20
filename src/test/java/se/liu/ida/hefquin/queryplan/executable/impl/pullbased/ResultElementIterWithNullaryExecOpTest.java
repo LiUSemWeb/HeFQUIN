@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;

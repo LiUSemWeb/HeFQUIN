@@ -8,7 +8,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 

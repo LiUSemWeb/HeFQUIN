@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import se.liu.ida.hefquin.query.SolutionMapping;
+import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 
 public class GenericIntermediateResultBlockImpl
