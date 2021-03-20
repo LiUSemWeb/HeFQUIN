@@ -3,17 +3,18 @@ package se.liu.ida.hefquin.queryplan.executable.impl.ops;
 import java.util.Iterator;
 
 import se.liu.ida.hefquin.data.SolutionMapping;
+import se.liu.ida.hefquin.data.Triple;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
+public abstract class ExecOpGenericTriplesRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends ExecOpGenericRequest<ReqType,MemberType>
 {
-	public ExecOpGenericSolMapsRequest( final ReqType req, final MemberType fm ) {
+	public ExecOpGenericTriplesRequest( final ReqType req, final MemberType fm ) {
 		super( req, fm );
 	}
 
@@ -21,12 +22,16 @@ public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalR
 	public void execute( final IntermediateResultElementSink sink,
 	                     final ExecutionContext execCxt )
 	{
-		final SolMapsResponse response = performRequest( execCxt.getFederationAccessMgr() );
-		final Iterator<SolutionMapping> it = response.getIterator();
+		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
+
+		final Iterator<? extends SolutionMapping> it = convert( response.getIterator() );
 		while ( it.hasNext() ) {
 			sink.send( it.next() );
 		}
 	}
 
-	abstract protected SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr );
+	protected abstract TriplesResponse performRequest( final FederationAccessManager fedAccessMgr );
+
+	protected abstract Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples );
+
 }
