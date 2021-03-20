@@ -10,13 +10,13 @@ import se.liu.ida.hefquin.query.SolutionMapping;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest>
+public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 implements NullaryExecutableOp
 {
 	protected final ReqType req;
-	protected final FederationMember fm;
+	protected final MemberType fm;
 
-	public ExecOpGenericSolMapsRequest( final ReqType req, final FederationMember fm ) {
+	public ExecOpGenericSolMapsRequest( final ReqType req, final MemberType fm ) {
 		assert req != null;
 		assert fm != null;
 
