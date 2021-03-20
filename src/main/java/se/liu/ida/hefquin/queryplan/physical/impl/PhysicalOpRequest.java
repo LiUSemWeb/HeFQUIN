@@ -17,7 +17,6 @@ import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-                       extends NullaryPhysicalOpImpl
                        implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
