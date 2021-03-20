@@ -2,18 +2,16 @@ package se.liu.ida.hefquin.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.query.BGP;
-import se.liu.ida.hefquin.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBGPAdd extends UnaryLogicalOpImpl
+public class LogicalOpBGPAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 
 	protected final BGP bgp;
 
-	LogicalOpBGPAdd( final LogicalOperator childOp, final FederationMember fm, final BGP bgp ) {
-		super(childOp);
-
+	LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
 		assert fm != null;
 		assert bgp != null;
 		assert fm.getInterface().supportsBGPRequests();

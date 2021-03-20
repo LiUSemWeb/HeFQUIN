@@ -1,14 +1,6 @@
 package se.liu.ida.hefquin.queryplan.logical;
 
-import se.liu.ida.hefquin.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.queryplan.LogicalPlan;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpUnion;
 
 /**
  * Applies a {@link LogicalPlanVisitor} to
@@ -21,7 +13,7 @@ public class LogicalPlanWalker
 		new WalkerVisitor(visitor).walk(plan);
 	}
 
-	protected static class WalkerVisitor extends LogicalPlanVisitorBase {
+	protected static class WalkerVisitor {
 		protected final LogicalPlanVisitor visitor;
 
 		public WalkerVisitor( final LogicalPlanVisitor visitor ) {
@@ -30,51 +22,10 @@ public class LogicalPlanWalker
 		}
 
 		public void walk( final LogicalPlan plan ) {
-			plan.getRootOperator().visit(this);
-		}
-
-		@Override
-		public void visit( final LogicalOpRequest<?,?> op ) { visit0(op); }
-
-		@Override
-		public void visit( final LogicalOpTPAdd op ) { visit1(op); }
-
-		@Override
-		public void visit( final LogicalOpBGPAdd op ) { visit1(op); }
-
-		@Override
-		public void visit( final LogicalOpJoin op ) { visit2(op); }
-
-		@Override
-		public void visit( final LogicalOpUnion op ) { visit2(op); }
-
-		@Override
-		public void visit( final LogicalOpMultiwayJoin op ) { visitN(op); }
-
-		@Override
-		public void visit( final LogicalOpMultiwayUnion op ) { visitN(op); }
-
-		protected void visit0( final LogicalOperator op ) {
-			op.visit(visitor);
-		}
-
-		protected void visit1( final UnaryLogicalOp op ) {
-			op.getChildOp().visit(this);
-			op.visit(visitor);
-		}
-
-		protected void visit2( final BinaryLogicalOp op ) {
-			op.getChildOp1().visit(this);
-			op.getChildOp2().visit(this);
-			op.visit(visitor);
-		}
-
-		protected void visitN( final NaryLogicalOp op ) {
-			for( final LogicalOperator child : op.getChildren() ) {
-				child.visit(this);
+			for (int i = 0; i < plan.numberOfSubPlans(); ++i ) {
+				walk( plan.getSubPlan(i) );
 			}
-
-			op.visit(visitor);
+			plan.getRootOperator().visit(visitor);
 		}
 
 	} // end of class WalkerVisitor 
