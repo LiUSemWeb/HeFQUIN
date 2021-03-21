@@ -17,4 +17,9 @@ public abstract class ExecOpGenericRequest<ReqType extends DataRetrievalRequest,
 		this.fm = fm;
 	}
 
+	@Override
+	public int preferredInputBlockSize() {
+		return 0; // irrelevant because operators of this type do not have any input
+	}
+
 }

@@ -46,7 +46,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 				throw new IllegalArgumentException();
 
 			final ResultElementIterator elmtIterSubPlan = compile(qep.getSubPlan(0), execCxt);
-			final ResultBlockIterator blockIterSubPlan = createBlockIterator(elmtIterSubPlan);
+			final ResultBlockIterator blockIterSubPlan = createBlockIterator( elmtIterSubPlan, execOp.preferredInputBlockSize() );
 
 			final UnaryExecutableOp execOp1 = (UnaryExecutableOp) execOp;
 			return new ResultElementIterWithUnaryExecOp(execOp1, blockIterSubPlan, execCxt);
@@ -57,10 +57,10 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 				throw new IllegalArgumentException();
 
 			final ResultElementIterator elmtIterSubPlan1 = compile(qep.getSubPlan(0), execCxt);
-			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator(elmtIterSubPlan1);
+			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator( elmtIterSubPlan1, execOp.preferredInputBlockSize() );
 
 			final ResultElementIterator elmtIterSubPlan2 = compile(qep.getSubPlan(1), execCxt);
-			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator(elmtIterSubPlan2);
+			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator( elmtIterSubPlan2, execOp.preferredInputBlockSize() );
 
 			final BinaryExecutableOp execOp2 = (BinaryExecutableOp) execOp;
 			return new ResultElementIterWithBinaryExecOp(execOp2, blockIterSubPlan1, blockIterSubPlan2, execCxt);
@@ -76,10 +76,9 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 		// TODO: implement createExecContext()
 	}
 
-	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter ) {
+	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {
 		final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
-		final int blockSize = 30;
-		return new ResultBlockIterOverResultElementIter( elmtIter, blockBuilder, blockSize );
+		return new ResultBlockIterOverResultElementIter( elmtIter, blockBuilder, preferredBlockSize );
 	}
 
 
@@ -108,6 +107,9 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 		}
 
 		public ResultElementIterator getResultElementIterator() { return it; }
+
+		@Override
+		public int preferredInputBlockSize() { return 1; }
 	}
 
 }

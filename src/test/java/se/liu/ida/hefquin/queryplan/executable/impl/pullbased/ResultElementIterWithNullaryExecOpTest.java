@@ -91,6 +91,11 @@ public class ResultElementIterWithNullaryExecOpTest
 				}
 			}
 		}
+
+		@Override
+		public int preferredInputBlockSize() {
+			return 1;
+		}
 	}
 
 }

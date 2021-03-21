@@ -25,6 +25,14 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 	}
 
 	@Override
+	public int preferredInputBlockSize() {
+		// Since this algorithm processes the input solution mappings
+		// sequentially (one at a time), and input block size of 1 may
+		// reduce the response time of the overall execution process.
+		return 1;  
+	}
+
+	@Override
 	public void process(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,

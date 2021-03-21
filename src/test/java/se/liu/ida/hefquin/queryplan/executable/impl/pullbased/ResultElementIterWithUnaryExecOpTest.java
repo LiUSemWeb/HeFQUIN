@@ -125,6 +125,9 @@ public class ResultElementIterWithUnaryExecOpTest
 		                               final ExecutionContext execCxt )
 		{
 		}
+
+		@Override
+		public int preferredInputBlockSize() { return 1; }
 	}
 
 }
