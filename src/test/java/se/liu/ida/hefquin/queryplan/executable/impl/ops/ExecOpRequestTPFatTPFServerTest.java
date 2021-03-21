@@ -18,25 +18,12 @@ import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.Triple;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedTripleUtils;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.FederationAccessManager;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplesResponse;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
-import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
-public class ExecOpRequestTPFatTPFServerTest
+public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {
 	@Test
 	public void test() {
@@ -74,64 +61,17 @@ public class ExecOpRequestTPFatTPFServerTest
 
 
 	public static ExecutionContext createExecContextForTests() {
-		return new ExecutionContext( new FederationAccessManagerForTest() );
-	}
+		final List<Triple> l = new ArrayList<Triple>();
 
-	protected static class FederationAccessManagerForTest implements FederationAccessManager
-	{
-		@Override
-		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			return null;
-		}
+		final Node s = NodeFactory.createURI("http://example.org/s");
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+		l.add( JenaBasedTripleUtils.createJenaBasedTriple(s,p,o1) );
 
-		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
-			final List<Triple> l = new ArrayList<Triple>();
+		final Node o2 = NodeFactory.createURI("http://example.org/o2");
+		l.add( JenaBasedTripleUtils.createJenaBasedTriple(s,p,o2) );
 
-			final Node s = NodeFactory.createURI("http://example.org/s");
-			final Node p = NodeFactory.createURI("http://example.org/p");
-			final Node o1 = NodeFactory.createURI("http://example.org/o1");
-			l.add( JenaBasedTripleUtils.createJenaBasedTriple(s,p,o1) );
-
-			final Node o2 = NodeFactory.createURI("http://example.org/o2");
-			l.add( JenaBasedTripleUtils.createJenaBasedTriple(s,p,o2) );
-			
-			return new TriplesResponseImpl(l, fm);
-		}
-
-		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
-			return null;
-		}
-
-		@Override
-		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
-			return null;
-		}
-	}
-
-	protected static class TPFServerForTest implements TPFServer
-	{
-		final TPFInterface iface = new TPFInterfaceImpl();
-
-		@Override
-		public TPFInterface getInterface() {
-			return iface;
-		}
-	}
-
-	protected static class IntermediateResultElementSinkForTest implements IntermediateResultElementSink
-	{
-		protected final List<SolutionMapping> l = new ArrayList<>();
-
-		@Override
-		public void send(SolutionMapping element) {
-			l.add(element);
-		}
-
-		public Iterator<SolutionMapping> getSolMapsIter() {
-			return l.iterator();
-		}
+		return new ExecutionContext( new FederationAccessManagerForTest(l) );
 	}
 
 }
