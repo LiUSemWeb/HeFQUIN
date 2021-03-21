@@ -9,6 +9,8 @@ import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingMap;
 import org.apache.jena.sparql.engine.binding.BindingUtils;
 
+import se.liu.ida.hefquin.data.SolutionMapping;
+
 public class JenaBasedSolutionMappingUtils
 {
 	/**
@@ -76,6 +78,15 @@ public class JenaBasedSolutionMappingUtils
 		}
 
 		return true;		
+	}
+
+	/**
+	 * Merges the given solution mappings into one, assuming that
+	 * the given solution mappings are compatible and that both
+	 * are of type {@link JenaBasedSolutionMapping}.
+	 */
+	public static JenaBasedSolutionMapping merge( final SolutionMapping m1, final SolutionMapping m2 ) {
+		return merge( (JenaBasedSolutionMapping) m1, (JenaBasedSolutionMapping) m2 );
 	}
 
 	/**
