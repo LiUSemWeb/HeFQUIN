@@ -71,7 +71,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node o2 = NodeFactory.createURI("http://example.org/o2");
 		l.add( JenaBasedTripleUtils.createJenaBasedTriple(s,p,o2) );
 
-		return new ExecutionContext( new FederationAccessManagerForTest(l) );
+		return new ExecutionContext( new FederationAccessManagerForTest(null,l) );
 	}
 
 }

@@ -6,12 +6,29 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
+import se.liu.ida.hefquin.query.BGP;
+import se.liu.ida.hefquin.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.query.TriplePattern;
 
 public class JenaBasedQueryPatternUtils
 {
 	public static JenaBasedTriplePattern createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
 		return new JenaBasedTriplePattern( new org.apache.jena.graph.Triple(s,p,o) );
+	}
+
+	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {
+		// TODO
+		if ( pattern instanceof TriplePattern )
+			return applySolMapToTriplePattern( sm, (TriplePattern) pattern );
+		else if ( pattern instanceof BGP )
+			return applySolMapToBGP( sm, (BGP) pattern );
+		else
+			throw new UnsupportedOperationException("TODO");
+	}
+
+	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
+		// TODO
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	public static JenaBasedTriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {
