@@ -49,14 +49,14 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt)
 	{
-		final Iterator<SolutionMapping> it = fetchSolutionMappings(sm, execCxt);
+		final Iterator<? extends SolutionMapping> it = fetchSolutionMappings(sm, execCxt);
 		while ( it.hasNext() ) {
 			final SolutionMapping out = JenaBasedSolutionMappingUtils.merge( sm, it.next() );
 			sink.send(out);
 		}
 	}
 
-	protected abstract Iterator<SolutionMapping> fetchSolutionMappings(
+	protected abstract Iterator<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt );
 
