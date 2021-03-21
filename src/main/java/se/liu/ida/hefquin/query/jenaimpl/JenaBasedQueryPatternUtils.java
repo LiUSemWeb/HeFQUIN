@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.query.jenaimpl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -27,8 +30,22 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
-		// TODO
-		throw new UnsupportedOperationException("TODO");
+		final JenaBasedSolutionMapping jbsm = (JenaBasedSolutionMapping) sm;
+		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		boolean unchanged = true;
+		for ( final JenaBasedTriplePattern tp : ((JenaBasedBGP)bgp).getTriplePatterns() ) {
+			final JenaBasedTriplePattern tp2 = applySolMapToTriplePattern(jbsm, tp);
+			tps.add(tp2);
+			if ( tp2 != tp ) {
+				unchanged = false;
+			}
+		}
+
+		if ( unchanged ) {
+			return bgp;
+		} else {
+			return new JenaBasedBGP(tps);
+		}
 	}
 
 	public static JenaBasedTriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {

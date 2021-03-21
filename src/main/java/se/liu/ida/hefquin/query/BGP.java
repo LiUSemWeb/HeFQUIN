@@ -4,5 +4,8 @@ import java.util.Set;
 
 public interface BGP extends SPARQLGraphPattern
 {
-	Set<TriplePattern> getTriplePatterns(); 
+	/**
+	 * Returns an unmodifiable set of triple patterns.
+	 */
+	Set<? extends TriplePattern> getTriplePatterns(); 
 }
