@@ -32,7 +32,7 @@ import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.query.TriplePattern;
-import se.liu.ida.hefquin.query.jenaimpl.JenaBasedTriplePatternUtils;
+import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
@@ -43,7 +43,7 @@ public class ExecOpRequestTPFatTPFServerTest
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
-		final TriplePattern tp = JenaBasedTriplePatternUtils.createJenaBasedTriplePattern(s,p,v);
+		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(s,p,v);
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest() );

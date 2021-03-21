@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.query.TriplePattern;
 
-public class JenaBasedTriplePatternUtils
+public class JenaBasedQueryPatternUtils
 {
 	public static JenaBasedTriplePattern createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
 		return new JenaBasedTriplePattern( new org.apache.jena.graph.Triple(s,p,o) );
