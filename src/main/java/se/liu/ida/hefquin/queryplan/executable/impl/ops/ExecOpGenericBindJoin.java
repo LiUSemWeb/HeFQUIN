@@ -3,12 +3,15 @@ package se.liu.ida.hefquin.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.query.Query;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 import java.util.Iterator;
+import java.util.Set;
 
 public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType extends FederationMember>
 		implements UnaryExecutableOp
@@ -40,7 +43,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 	{
 		final Iterator<SolutionMapping> it = input.iterator();
 		while ( it.hasNext() ) {
-			process( it.next(), sink, execCxt );
+			sink.send(it.next());
 		}
 	}
 
@@ -51,21 +54,5 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 	{
 		// nothing to be done here
 	}
-
-	protected void process(
-			final SolutionMapping sm,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt)
-	{
-		final Iterator<? extends SolutionMapping> it = fetchSolutionMappings(sm, execCxt);
-		while ( it.hasNext() ) {
-			final SolutionMapping out = JenaBasedSolutionMappingUtils.merge( sm, it.next() );
-			sink.send(out);
-		}
-	}
-
-	protected abstract Iterator<? extends SolutionMapping> fetchSolutionMappings(
-			final SolutionMapping sm,
-			final ExecutionContext execCxt );
 
 }

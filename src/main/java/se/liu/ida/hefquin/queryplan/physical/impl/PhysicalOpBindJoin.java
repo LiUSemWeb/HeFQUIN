@@ -1,8 +1,11 @@
 package se.liu.ida.hefquin.queryplan.physical.impl;
 
+import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpBindJoinSPARQL;
+import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -33,8 +36,9 @@ public class PhysicalOpBindJoin implements UnaryPhysicalOpForLogicalOp
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
 			final FederationMember fm = tpAdd.getFederationMember();
 
-			if ( fm instanceof SPARQLEndpoint  )
-				// tpAdd.getTP()?
+			if ( fm instanceof BRTPFServer )
+				return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm );
+			else if ( fm instanceof SPARQLEndpoint)
 				return new ExecOpBindJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
