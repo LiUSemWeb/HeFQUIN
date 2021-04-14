@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 import java.util.Iterator;
+import java.util.Set;
 
 public abstract class ExecOpGenericBindJoinWithSolMapsRequests<QueryType extends Query,
 		MemberType extends FederationMember,
@@ -21,17 +22,14 @@ public abstract class ExecOpGenericBindJoinWithSolMapsRequests<QueryType extends
 	}
 
 	@Override
-	public void concludeExecution( final IntermediateResultElementSink sink,
-								   final ExecutionContext execCxt )
-	{
-		final ReqType req = createRequest(query);
-		final SolMapsResponse response = performRequest(req, execCxt.getFederationAccessMgr());
-		final Iterator<SolutionMapping> it = response.getIterator();
-		while ( it.hasNext() ) {
-			sink.send( it.next() );
-		}
+	protected Iterator<? extends SolutionMapping> fetchSolutionMappings(
+			final Set<SolutionMapping> solMaps,
+			final ExecutionContext execCxt ){
+		final ReqType req = createRequest(solMaps);
+		final SolMapsResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
+		return resp.getIterator();
 	}
 
-	protected abstract ReqType createRequest(final QueryType query);
+	protected abstract ReqType createRequest(final Set<SolutionMapping> solMaps);
 	protected abstract SolMapsResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 }

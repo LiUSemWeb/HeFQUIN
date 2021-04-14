@@ -26,20 +26,15 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
 	}
 
 	@Override
-	public void concludeExecution( final IntermediateResultElementSink sink,
+	public Iterator<? extends SolutionMapping> fetchSolutionMappings( final Set<SolutionMapping> solMaps,
 						 final ExecutionContext execCxt )
 	{
-		//final Set<SolutionMapping> solMaps= CollectionOfSM(sink);
-		final ReqType req = createRequest(query);
-		final TriplesResponse response = performRequest( req, execCxt.getFederationAccessMgr() );
-
-		final Iterator<? extends SolutionMapping> it = convert( response.getIterator(), req );
-		while ( it.hasNext() ) {
-			sink.send( it.next() );
-		}
+		final ReqType req = createRequest(solMaps);
+		final TriplesResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
+		return convert( resp.getIterator(), req );
 	}
 
-	protected abstract ReqType createRequest( final QueryType query);
+	protected abstract ReqType createRequest(final Set<SolutionMapping> solMaps);
 
 	protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 

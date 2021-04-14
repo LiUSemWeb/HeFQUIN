@@ -90,4 +90,22 @@ public class JenaBasedQueryPatternUtils
 		}
 	}
 
+	// TODO
+	public static SPARQLGraphPattern addSolMapToGraphPattern( final Set<SolutionMapping> solMaps, final SPARQLGraphPattern pattern ) {
+		if ( pattern instanceof TriplePattern )
+			return addSolMapToTriplePattern( solMaps, (TriplePattern) pattern );
+		else if ( pattern instanceof BGP )
+			return addSolMapToBGP( solMaps, (BGP) pattern );
+		else
+			throw new UnsupportedOperationException("TODO");
+	}
+
+	public static BGP addSolMapToBGP( final Set<SolutionMapping> solMaps, final BGP bgp ) {
+		// TODO: apply VALUES
+		return bgp;
+	}
+	public static JenaBasedTriplePattern addSolMapToTriplePattern( final Set<SolutionMapping> solMaps, final TriplePattern tp ) {
+		// TODO
+		return (JenaBasedTriplePattern) tp;
+	}
 }

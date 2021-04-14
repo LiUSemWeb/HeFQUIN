@@ -27,24 +27,24 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ExecOpBindJoinBRTPF extends
-		ExecOpGenericBindJoinWithTriplesRequests<TriplePattern, BRTPFServer, TriplePatternRequest>
+		ExecOpGenericBindJoinWithTriplesRequests<TriplePattern, BRTPFServer, BindingsRestrictedTriplePatternRequest>
 {
 	public ExecOpBindJoinBRTPF( final TriplePattern query, final BRTPFServer fm ) {
 		super( query, fm );
 	}
 
 	@Override
-	protected TriplePatternRequest createRequest( final TriplePattern query) {
-		return new TriplePatternRequestImpl(query);
+	protected BindingsRestrictedTriplePatternRequest createRequest( final Set<SolutionMapping> solMaps) {
+		return new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> convert(final Iterator<? extends Triple> itTriples, final TriplePatternRequest req ) {
-		return TriplesToSolMapsConverter.convert( itTriples, req.getQueryPattern());
-	}
-
-	@Override
-	protected TriplesResponse performRequest( final TriplePatternRequest req, final FederationAccessManager fedAccessMgr ) {
+	protected TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final FederationAccessManager fedAccessMgr ) {
 		return fedAccessMgr.performRequest(req, fm);
+	}
+
+	@Override
+	protected Iterator<? extends SolutionMapping> convert(final Iterator<? extends Triple> itTriples, final BindingsRestrictedTriplePatternRequest req ) {
+		return TriplesToSolMapsConverter.convert( itTriples, req.getTriplePattern());
 	}
 }

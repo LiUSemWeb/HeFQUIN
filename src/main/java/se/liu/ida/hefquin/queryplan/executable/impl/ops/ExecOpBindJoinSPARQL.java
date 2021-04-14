@@ -7,6 +7,9 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
+
+import java.util.Set;
 
 public class ExecOpBindJoinSPARQL extends ExecOpGenericBindJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
@@ -15,8 +18,9 @@ public class ExecOpBindJoinSPARQL extends ExecOpGenericBindJoinWithSolMapsReques
 	}
 
 	@Override
-	protected SPARQLRequest createRequest(final SPARQLGraphPattern query) {
-		return new SPARQLRequestImpl(query);
+	protected SPARQLRequest createRequest(final Set<SolutionMapping> solMaps) {
+		final SPARQLGraphPattern pattern = JenaBasedQueryPatternUtils.addSolMapToGraphPattern(solMaps, query);
+		return new SPARQLRequestImpl(pattern);
 	}
 
 	@Override

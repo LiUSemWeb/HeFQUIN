@@ -42,8 +42,13 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 			final ExecutionContext execCxt)
 	{
 		final Iterator<SolutionMapping> it = input.iterator();
+		Set<SolutionMapping> solMaps = null;
 		while ( it.hasNext() ) {
-			sink.send(it.next());
+			solMaps.add( it.next());
+		}
+		final Iterator<? extends SolutionMapping> out = fetchSolutionMappings(solMaps, execCxt);
+		while ( out.hasNext() ) {
+			sink.send(out.next());
 		}
 	}
 
@@ -55,4 +60,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 		// nothing to be done here
 	}
 
+	protected abstract Iterator<? extends SolutionMapping> fetchSolutionMappings(
+			final Set<SolutionMapping> solMaps,
+			final ExecutionContext execCxt );
 }
