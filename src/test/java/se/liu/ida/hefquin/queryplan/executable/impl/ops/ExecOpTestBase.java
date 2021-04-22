@@ -44,6 +44,7 @@ public abstract class ExecOpTestBase
 		@Override
 		public BRTPFInterface getInterface() { return iface; }
 	}
+
 	protected static class IntermediateResultElementSinkForTest implements IntermediateResultElementSink
 	{
 		protected final List<SolutionMapping> l = new ArrayList<>();

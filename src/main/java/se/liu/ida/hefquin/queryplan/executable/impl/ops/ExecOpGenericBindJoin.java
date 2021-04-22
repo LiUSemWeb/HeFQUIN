@@ -29,10 +29,9 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 
     @Override
     public int preferredInputBlockSize() {
-        // Since this algorithm processes the input solution mappings
-        // sequentially (one at a time), and input block size of 1 may
-        // reduce the response time of the overall execution process.
-        return 1;
+        // This algorithm can process a sequence of input solution mappings.
+        // To find a trade-off between #request and dataRecv, the size block size can be optimized in query planning
+        return 30;
     }
 
     @Override
