@@ -55,6 +55,11 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 
 		@Override
 		public void run() {
+			// Note, we do not need to check op.requiresCompleteChild1InputFirst()
+			// here because this implementation is anyways sending the complete
+			// intermediate result from input one first, before moving on to
+			// input two.
+
 			while ( inputIter1.hasNext() ) {
 				op.processBlockFromChild1( inputIter1.next(), sink, execCxt );
 			}
