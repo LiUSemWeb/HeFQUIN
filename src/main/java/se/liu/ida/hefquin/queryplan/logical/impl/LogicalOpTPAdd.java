@@ -11,7 +11,7 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 
 	protected final TriplePattern tp;
 
-	LogicalOpTPAdd( final FederationMember fm, final TriplePattern tp ) {
+	public LogicalOpTPAdd( final FederationMember fm, final TriplePattern tp ) {
 		assert fm != null;
 		assert tp != null;
 		assert fm.getInterface().supportsTriplePatternRequests();

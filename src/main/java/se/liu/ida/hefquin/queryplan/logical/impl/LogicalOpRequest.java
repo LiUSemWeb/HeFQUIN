@@ -10,7 +10,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	protected final MemberType fm;
 	protected final ReqType req;
 
-	LogicalOpRequest( final MemberType fm, final ReqType req ) {
+	public LogicalOpRequest( final MemberType fm, final ReqType req ) {
 		assert fm != null;
 		assert fm != req;
 		assert fm.getInterface().supportsRequest(req);

@@ -11,7 +11,7 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 
 	protected final BGP bgp;
 
-	LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
+	public LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
 		assert fm != null;
 		assert bgp != null;
 		assert fm.getInterface().supportsBGPRequests();
