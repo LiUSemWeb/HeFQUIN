@@ -22,9 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 
-public class ExecOpBindJoinBRTPFTest {
+public class ExecOpBindJoinBRTPFTest
+{
     @Test
     public void tpWithJoinOnObject() {
         final Var var1 = Var.alloc("v1");
@@ -51,9 +51,9 @@ public class ExecOpBindJoinBRTPFTest {
         final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
         final List<Triple> lResp = Arrays.asList(
-                JenaBasedTripleUtils.createJenaBasedTriple( y1, p, z1),
-                JenaBasedTripleUtils.createJenaBasedTriple( y1, p, z2),
-                JenaBasedTripleUtils.createJenaBasedTriple( y2, p, z3));
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y1, p, z1),
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y1, p, z2),
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y2, p, z3) );
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -115,8 +115,8 @@ public class ExecOpBindJoinBRTPFTest {
         final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
         final List<Triple> lResp = Arrays.asList(
-                JenaBasedTripleUtils.createJenaBasedTriple( x1, y1, z1),
-                JenaBasedTripleUtils.createJenaBasedTriple( x2, y2, z2));
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(x1, y1, z1),
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(x2, y2, z2) );
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -167,7 +167,7 @@ public class ExecOpBindJoinBRTPFTest {
         final Node z1 = NodeFactory.createURI("http://example.org/z1");
 
         final List<Triple> lResp = Arrays.asList(
-                JenaBasedTripleUtils.createJenaBasedTriple( y1, p, z1));
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y1, p, z1) );
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -211,7 +211,7 @@ public class ExecOpBindJoinBRTPFTest {
         final Node y1 = NodeFactory.createURI("http://example.org/y1");
 
         final List<Triple> lResp = Arrays.asList(
-                JenaBasedTripleUtils.createJenaBasedTriple( var1, p, y1));
+                (Triple) JenaBasedTripleUtils.createJenaBasedTriple(var1, p, y1) );
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
