@@ -8,6 +8,6 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 {
 	@Override
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
-		return super.supportsBGPRequests() || req instanceof BindingsRestrictedTriplePatternRequest;
+		return req instanceof BindingsRestrictedTriplePatternRequest || super.supportsRequest(req);
 	}
 }
