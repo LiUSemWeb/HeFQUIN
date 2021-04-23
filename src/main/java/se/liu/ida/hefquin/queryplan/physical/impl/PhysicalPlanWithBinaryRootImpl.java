@@ -12,9 +12,9 @@ public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoo
 	private final PhysicalPlan subPlan1;
 	private final PhysicalPlan subPlan2;
 
-	protected PhysicalPlanWithBinaryRootImpl( final BinaryPhysicalOp rootOp,
-	                                          final PhysicalPlan subPlan1,
-	                                          final PhysicalPlan subPlan2 ) {
+	public PhysicalPlanWithBinaryRootImpl( final BinaryPhysicalOp rootOp,
+	                                       final PhysicalPlan subPlan1,
+	                                       final PhysicalPlan subPlan2 ) {
 		assert rootOp != null;
 		assert subPlan1 != null;
 		assert subPlan2 != null;

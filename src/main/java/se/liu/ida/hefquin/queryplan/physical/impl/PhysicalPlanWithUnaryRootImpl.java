@@ -11,8 +11,8 @@ public class PhysicalPlanWithUnaryRootImpl implements PhysicalPlanWithUnaryRoot
 	private final UnaryPhysicalOp rootOp;
 	private final PhysicalPlan subPlan;
 
-	protected PhysicalPlanWithUnaryRootImpl( final UnaryPhysicalOp rootOp,
-	                                          final PhysicalPlan subPlan ) {
+	public PhysicalPlanWithUnaryRootImpl( final UnaryPhysicalOp rootOp,
+	                                      final PhysicalPlan subPlan ) {
 		assert rootOp != null;
 		assert subPlan != null;
 

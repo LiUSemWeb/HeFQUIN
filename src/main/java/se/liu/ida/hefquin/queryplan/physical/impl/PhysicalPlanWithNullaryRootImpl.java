@@ -10,7 +10,7 @@ public class PhysicalPlanWithNullaryRootImpl implements PhysicalPlanWithNullaryR
 {
 	private final NullaryPhysicalOp rootOp;
 
-	protected PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp ) {
+	public PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp ) {
 		assert rootOp != null;
 		this.rootOp = rootOp;
 	}
