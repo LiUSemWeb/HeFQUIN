@@ -12,9 +12,9 @@ public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot
 	private final LogicalPlan subPlan1;
 	private final LogicalPlan subPlan2;
 
-	protected LogicalPlanWithBinaryRootImpl( final BinaryLogicalOp rootOp,
-	                                         final LogicalPlan subPlan1,
-	                                         final LogicalPlan subPlan2 ) {
+	public LogicalPlanWithBinaryRootImpl( final BinaryLogicalOp rootOp,
+	                                      final LogicalPlan subPlan1,
+	                                      final LogicalPlan subPlan2 ) {
 		assert rootOp != null;
 		assert subPlan1 != null;
 		assert subPlan2 != null;

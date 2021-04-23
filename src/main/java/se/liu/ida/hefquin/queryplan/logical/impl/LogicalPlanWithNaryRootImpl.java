@@ -13,8 +13,8 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 	private final NaryLogicalOp rootOp;
 	private final List<LogicalPlan> subPlans;
 
-	protected LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
-	                                       final List<LogicalPlan> subPlans ) {
+	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final List<LogicalPlan> subPlans ) {
 		assert rootOp != null;
 		assert subPlans != null;
 

@@ -10,7 +10,7 @@ public class LogicalPlanWithNullaryRootImpl implements LogicalPlanWithNullaryRoo
 {
 	private final NullaryLogicalOp rootOp;
 
-	protected LogicalPlanWithNullaryRootImpl( final NullaryLogicalOp rootOp ) {
+	public LogicalPlanWithNullaryRootImpl( final NullaryLogicalOp rootOp ) {
 		assert rootOp != null;
 		this.rootOp = rootOp;
 	}

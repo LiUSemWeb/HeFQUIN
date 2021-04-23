@@ -11,8 +11,8 @@ public class LogicalPlanWithUnaryRootImpl implements LogicalPlanWithUnaryRoot
 	private final UnaryLogicalOp rootOp;
 	private final LogicalPlan subPlan;
 
-	protected LogicalPlanWithUnaryRootImpl( final UnaryLogicalOp rootOp,
-	                                        final LogicalPlan subPlan ) {
+	public LogicalPlanWithUnaryRootImpl( final UnaryLogicalOp rootOp,
+	                                     final LogicalPlan subPlan ) {
 		assert rootOp != null;
 		assert subPlan != null;
 
