@@ -20,6 +20,14 @@ public interface BinaryExecutableOp extends ExecutableOperator,
             final ExecutionContext execCxt );
 
 	/**
+	 * Finishes up any processing related to the input coming
+	 * from the first operand and sends the produced result
+	 * elements (if any) to the given sink.
+	 */
+	void wrapUpForChild1( final IntermediateResultElementSink sink,
+	                      final ExecutionContext execCxt );
+
+	/**
 	 * Processes the given input coming from the second operand
 	 * and sends the produced result elements (if any) to the
 	 * given sink.
@@ -28,11 +36,12 @@ public interface BinaryExecutableOp extends ExecutableOperator,
 			final IntermediateResultBlock input,
             final IntermediateResultElementSink sink,
             final ExecutionContext execCxt );
+
 	/**
-	 * Concludes the execution of this operator and sends
-	 * the produced result elements (if any) to the given
-	 * sink.
+	 * Finishes up any processing related to the input coming
+	 * from the second operand and sends the produced result
+	 * elements (if any) to the given sink.
 	 */
-	void concludeExecution( final IntermediateResultElementSink sink,
-	                        final ExecutionContext execCxt );
+	void wrapUpForChild2( final IntermediateResultElementSink sink,
+	                      final ExecutionContext execCxt );
 }

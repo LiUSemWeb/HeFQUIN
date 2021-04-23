@@ -58,12 +58,13 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 			while ( inputIter1.hasNext() ) {
 				op.processBlockFromChild1( inputIter1.next(), sink, execCxt );
 			}
+			op.wrapUpForChild1(sink, execCxt);
 
 			while ( inputIter2.hasNext() ) {
 				op.processBlockFromChild2( inputIter2.next(), sink, execCxt );
 			}
+			op.wrapUpForChild2(sink, execCxt);
 
-			op.concludeExecution(sink, execCxt);
 			sink.close();
 		}
 
