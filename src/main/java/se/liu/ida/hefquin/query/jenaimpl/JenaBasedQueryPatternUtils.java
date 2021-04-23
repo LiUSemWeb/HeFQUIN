@@ -1,9 +1,12 @@
 package se.liu.ida.hefquin.query.jenaimpl;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
@@ -17,6 +20,15 @@ public class JenaBasedQueryPatternUtils
 {
 	public static JenaBasedTriplePattern createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
 		return new JenaBasedTriplePattern( new org.apache.jena.graph.Triple(s,p,o) );
+	}
+
+	public static JenaBasedBGP createJenaBasedBGP( final BasicPattern pattern ) {
+		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		final Iterator<Triple> it = pattern.iterator();
+		while ( it.hasNext() ) {
+			tps.add( new JenaBasedTriplePattern(it.next()) );
+		}
+		return new JenaBasedBGP(tps);
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

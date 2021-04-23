@@ -1,6 +1,16 @@
 package se.liu.ida.hefquin.federation.catalog;
 
+import java.util.NoSuchElementException;
+
+import se.liu.ida.hefquin.federation.FederationMember;
+
 public interface FederationCatalog
 {
-	// TODO: define this interface
+	/**
+	 * Returns the federation member identified by the given URI.
+	 *
+	 * Throws a {@link NoSuchElementException} if there is no federation
+	 * member for the given URI.
+	 */
+	FederationMember getFederationMemberByURI( String uri );
 }
