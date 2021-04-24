@@ -14,8 +14,8 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final SourcePlanner sourcePlanner;
 	protected final QueryOptimizer optimizer;
 
-	QueryPlannerImpl( final SourcePlanner sourcePlanner,
-			          final QueryOptimizer optimizer ) {
+	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
+	                         final QueryOptimizer optimizer ) {
 		assert sourcePlanner != null;
 		assert optimizer != null;
 
