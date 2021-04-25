@@ -31,7 +31,7 @@ public class JenaBasedTriplePattern implements TriplePattern
 		if ( p != null && ! p.equals(s) )
 			n++;
 
-		if ( o != null && ! p.equals(s) && ! p.equals(p) )
+		if ( o != null && ! o.equals(s) && ! o.equals(p) )
 			n++;
 
 		return n;
