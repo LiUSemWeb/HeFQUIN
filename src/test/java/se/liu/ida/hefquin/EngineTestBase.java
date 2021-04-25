@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.Triple;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFInterface;
@@ -23,6 +24,7 @@ import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceIm
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TriplesResponseImpl;
+import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
 
 public abstract class EngineTestBase
 {
@@ -36,6 +38,7 @@ public abstract class EngineTestBase
 		public SPARQLEndpointInterface getInterface() { return iface; }
 	}
 
+
 	protected static class TPFServerForTest implements TPFServer
 	{
 		final TPFInterface iface = new TPFInterfaceImpl();
@@ -46,6 +49,7 @@ public abstract class EngineTestBase
 		public TPFInterface getInterface() { return iface; }
 	}
 
+
 	protected static class BRTPFServerForTest implements BRTPFServer
 	{
 		final BRTPFInterface iface = new BRTPFInterfaceImpl();
@@ -55,6 +59,15 @@ public abstract class EngineTestBase
 		@Override
 		public BRTPFInterface getInterface() { return iface; }
 	}
+
+
+	public static class FederationCatalogForTest extends FederationCatalogImpl
+	{
+		public void addMember( final String uri, final FederationMember fm ) {
+			membersByURI.put(uri, fm);
+		}
+	} // end of FederationCatalogForTest
+
 
 	protected static class FederationAccessManagerForTest implements FederationAccessManager
 	{
