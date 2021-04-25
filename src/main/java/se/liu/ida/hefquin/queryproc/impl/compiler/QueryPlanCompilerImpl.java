@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlo
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
+import se.liu.ida.hefquin.queryplan.executable.impl.pullbased.PullBasedPlan;
 import se.liu.ida.hefquin.queryplan.executable.impl.pullbased.ResultBlockIterOverResultElementIter;
 import se.liu.ida.hefquin.queryplan.executable.impl.pullbased.ResultBlockIterator;
 import se.liu.ida.hefquin.queryplan.executable.impl.pullbased.ResultElementIterWithBinaryExecOp;
@@ -23,8 +24,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
 		final ExecutionContext execCxt = createExecContext();
 		final ResultElementIterator it = compile( qep, execCxt );
-		final ExecutableOperator execOp = new ExecutableRootOperator(it);
-		return new ExecutablePlanImpl(execOp);
+		return new PullBasedPlan(it);
 	}
 
 	protected ResultElementIterator compile( final PhysicalPlan qep,
@@ -79,37 +79,6 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {
 		final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
 		return new ResultBlockIterOverResultElementIter( elmtIter, blockBuilder, preferredBlockSize );
-	}
-
-
-	protected static class ExecutablePlanImpl implements ExecutablePlan
-	{
-		private final ExecutableOperator rootOp;
-
-		public ExecutablePlanImpl( final ExecutableOperator rootOp ) {
-			assert rootOp != null;
-			this.rootOp = rootOp;
-		}
-
-		@Override
-		public ExecutableOperator getRootOperator() { return rootOp; }
-
-	} // end of class ExecutablePlanImpl
-
-
-	protected static class ExecutableRootOperator implements ExecutableOperator
-	{
-		private final ResultElementIterator it;
-
-		public ExecutableRootOperator( final ResultElementIterator it ) {
-			assert it != null;
-			this.it = it;
-		}
-
-		public ResultElementIterator getResultElementIterator() { return it; }
-
-		@Override
-		public int preferredInputBlockSize() { return 1; }
 	}
 
 }

@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.queryplan;
 
+import se.liu.ida.hefquin.queryproc.QueryResultSink;
+
 public interface ExecutablePlan
 {
-	ExecutableOperator getRootOperator();
+	void run( QueryResultSink resultSink );
 }
