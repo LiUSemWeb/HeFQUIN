@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.queryproc.impl.compiler;
 
+import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.queryplan.PhysicalPlan;
@@ -20,6 +21,13 @@ import se.liu.ida.hefquin.queryproc.QueryPlanCompiler;
 
 public class QueryPlanCompilerImpl implements QueryPlanCompiler
 {
+	protected final FederationAccessManager fedAccessMgr;
+
+	public QueryPlanCompilerImpl( final FederationAccessManager fedAccessMgr ) {
+		assert fedAccessMgr != null;
+		this.fedAccessMgr = fedAccessMgr;
+	}
+
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
 		final ExecutionContext execCxt = createExecContext();
@@ -72,8 +80,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	}
 
 	protected ExecutionContext createExecContext() {
-		return null;
-		// TODO: implement createExecContext()
+		return new ExecutionContext(fedAccessMgr);
 	}
 
 	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {
