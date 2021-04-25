@@ -7,6 +7,8 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.PathBlock;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
@@ -27,6 +29,24 @@ public class JenaBasedQueryPatternUtils
 		final Iterator<Triple> it = pattern.iterator();
 		while ( it.hasNext() ) {
 			tps.add( new JenaBasedTriplePattern(it.next()) );
+		}
+		return new JenaBasedBGP(tps);
+	}
+
+	/**
+	 * Assumes that the given {@link PathBlock} does not contain property path
+	 * patterns (but only triple patterns). If it does, this methods throws an
+	 * {@link IllegalArgumentException}.
+	 */
+	public static JenaBasedBGP createJenaBasedBGP( final PathBlock pattern ) {
+		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		final Iterator<TriplePath> it = pattern.iterator();
+		while ( it.hasNext() ) {
+			final TriplePath tp = it.next();
+			if ( ! tp.isTriple() ) {
+				throw new IllegalArgumentException( "the given PathBlock contains a property path pattern (" + tp.toString() + ")" );
+			}
+			tps.add( new JenaBasedTriplePattern(tp.asTriple()) );
 		}
 		return new JenaBasedBGP(tps);
 	}

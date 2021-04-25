@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementService;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -26,7 +26,6 @@ import se.liu.ida.hefquin.query.Query;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedSPARQLGraphPattern;
-import se.liu.ida.hefquin.query.jenaimpl.JenaBasedTriplePattern;
 import se.liu.ida.hefquin.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -112,8 +111,8 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( pattern instanceof ElementUnion ) {
 			return createPlanForUnionPattern( (ElementUnion) pattern, fm );
 		}
-		else if ( pattern instanceof ElementTriplesBlock ) {
-			return createPlanForBGP( ((ElementTriplesBlock) pattern).getPattern(), fm );
+		else if ( pattern instanceof ElementPathBlock ) {
+			return createPlanForBGP( ((ElementPathBlock) pattern).getPattern(), fm );
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + pattern.getClass().getName() );
@@ -158,11 +157,18 @@ public class SourcePlannerImpl implements SourcePlanner
 		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayUnion(), subPlans );
 	}
 
+	protected LogicalPlan createPlanForBGP( final PathBlock pattern, final FederationMember fm ) {
+		return createPlanForBGP( JenaBasedQueryPatternUtils.createJenaBasedBGP(pattern), fm );
+	}
+
 	protected LogicalPlan createPlanForBGP( final BasicPattern pattern, final FederationMember fm ) {
+		return createPlanForBGP( JenaBasedQueryPatternUtils.createJenaBasedBGP(pattern), fm );
+	}
+
+	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {
 		// If the federation member has an interface that supports BGP
 		// requests, then we can simply create a BGP request operator.
 		if ( fm.getInterface().supportsBGPRequests() ) {
-			final BGP bgp = JenaBasedQueryPatternUtils.createJenaBasedBGP(pattern);
 			final BGPRequest req = new BGPRequestImpl(bgp);
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
 			return new LogicalPlanWithNullaryRootImpl(op);
@@ -176,23 +182,21 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
 		}
 
-		if ( pattern.size() == 0 ) {
+		if ( bgp.getTriplePatterns().size() == 0 ) {
 			throw new IllegalArgumentException( "the given BGP is empty" );
 		}
 
-		final Iterator<Triple> it = pattern.iterator();
+		final Iterator<? extends TriplePattern> it = bgp.getTriplePatterns().iterator();
 
 		// first operator in the chain must be a request operator
-		final TriplePattern tp1 = new JenaBasedTriplePattern( it.next() );
-		final TriplePatternRequest req1 = new TriplePatternRequestImpl(tp1);
+		final TriplePatternRequest req1 = new TriplePatternRequestImpl( it.next() );
 		final LogicalOpRequest<?,?> op1 = new LogicalOpRequest<>( fm, req1 );
 		LogicalPlan currentSubPlan = new LogicalPlanWithNullaryRootImpl(op1);
 
 		// add a tpAdd operator for each of the remaining triple patterns
 		while ( it.hasNext() ) {
-			final TriplePattern tp = new JenaBasedTriplePattern( it.next() );
-			final LogicalOpTPAdd op = new LogicalOpTPAdd(fm, tp);
-			currentSubPlan = new LogicalPlanWithUnaryRootImpl(op, currentSubPlan);
+			final LogicalOpTPAdd op = new LogicalOpTPAdd( fm, it.next() );
+			currentSubPlan = new LogicalPlanWithUnaryRootImpl( op, currentSubPlan );
 		}
 
 		return currentSubPlan;
