@@ -23,7 +23,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ExecOpBindJoinBRTPFTest
+public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 {
     @Test
     public void tpWithJoinOnObject() {
@@ -55,10 +55,10 @@ public class ExecOpBindJoinBRTPFTest
                 (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y1, p, z2),
                 (Triple) JenaBasedTripleUtils.createJenaBasedTriple(y2, p, z3) );
 
-        final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
+        final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
         final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
-        final BRTPFServer fm = new ExecOpTestBase.BRTPFServerForTest();
+        final BRTPFServer fm = new BRTPFServerForTest();
 
 
         final ExecOpBindJoinBRTPF op = new ExecOpBindJoinBRTPF(tp, fm);
