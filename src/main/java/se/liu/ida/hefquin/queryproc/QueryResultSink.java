@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.queryproc;
 
+import se.liu.ida.hefquin.data.SolutionMapping;
+
 public interface QueryResultSink
 {
-	// TODO: define this interface
+	void send( SolutionMapping element );
 }
