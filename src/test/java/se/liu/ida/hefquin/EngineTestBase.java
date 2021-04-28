@@ -1,11 +1,19 @@
 package se.liu.ida.hefquin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.Triple;
+import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
+import se.liu.ida.hefquin.data.jenaimpl.JenaBasedTriple;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -25,9 +33,29 @@ import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.query.jenaimpl.JenaBasedTriplePattern;
 
 public abstract class EngineTestBase
 {
+	protected static abstract class FederationMemberBaseForTest implements FederationMember
+	{
+		protected final Graph data;
+
+		public FederationMemberBaseForTest( final Graph data ) {
+			this.data = data;
+		}
+
+		public TriplesResponse performRequest( final TriplePatternRequest req ) {
+			final org.apache.jena.graph.Triple jenaTP = ( (JenaBasedTriplePattern) req.getQueryPattern() ).asTriple();
+			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
+			final List<Triple> result = new ArrayList<>();
+			while ( it.hasNext() ) {
+				result.add( new JenaBasedTriple(it.next()) );
+			}
+			return new TriplesResponseImpl(result, this);
+		}
+	}
+
 	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
 	{
 		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl();
@@ -39,25 +67,61 @@ public abstract class EngineTestBase
 	}
 
 
-	protected static class TPFServerForTest implements TPFServer
+	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
-		final TPFInterface iface = new TPFInterfaceImpl();
+		protected final TPFInterface iface = new TPFInterfaceImpl();
 
-		public TPFServerForTest() {}
+		public TPFServerForTest() { this(null); }
+		public TPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
 		public TPFInterface getInterface() { return iface; }
 	}
 
 
-	protected static class BRTPFServerForTest implements BRTPFServer
+	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
 		final BRTPFInterface iface = new BRTPFInterfaceImpl();
 
-		public BRTPFServerForTest() {}
+		public BRTPFServerForTest() { this(null); }
+		public BRTPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
 		public BRTPFInterface getInterface() { return iface; }
+
+		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
+			// The implementation in this method is not particularly efficient,
+			// but it is sufficient for the purpose of unit tests.
+			final org.apache.jena.graph.Triple jenaTP = ( (JenaBasedTriplePattern) req.getTriplePattern() ).asTriple();
+
+			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
+			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
+				final Binding b = ((JenaBasedSolutionMapping) sm).asJenaBinding();
+				final Node s = ( jenaTP.getSubject().isVariable() )
+						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
+						: null;
+				final Node p = ( jenaTP.getPredicate().isVariable() )
+						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
+						: null;
+				final Node o = ( jenaTP.getObject().isVariable() )
+						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
+						: null;
+				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
+			}
+
+			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
+			final List<Triple> result = new ArrayList<>();
+			while ( it.hasNext() ) {
+				final org.apache.jena.graph.Triple t = it.next();
+				for ( final org.apache.jena.graph.Triple patternForTest : patternsForTest ) {
+					if ( patternForTest.matches(t) ) {
+						result.add( new JenaBasedTriple(t) );
+						break;
+					}
+				}
+			}
+			return new TriplesResponseImpl(result, this);
+		}
 	}
 
 
@@ -88,6 +152,12 @@ public abstract class EngineTestBase
 					(triplesForResponse != null) ? Arrays.asList(triplesForResponse).iterator() : null );
 		}
 
+		public FederationAccessManagerForTest()
+		{
+			this.itSolMapsForResponse = null;
+			this.itTriplesForResponse = null;
+		}
+
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
 			return new SolMapsResponseImpl(itSolMapsForResponse.next(), fm);
@@ -95,17 +165,32 @@ public abstract class EngineTestBase
 
 		@Override
 		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
-			return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			if ( itTriplesForResponse != null ) {
+				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			}
+			else {
+				return ( (TPFServerForTest) fm ).performRequest(req);
+			}
 		}
 
 		@Override
 		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
-			return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			if ( itTriplesForResponse != null ) {
+				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			}
+			else {
+				return ( (BRTPFServerForTest) fm ).performRequest(req);
+			}
 		}
 
 		@Override
 		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
-			return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			if ( itTriplesForResponse != null ) {
+				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+			}
+			else {
+				return ( (BRTPFServerForTest) fm ).performRequest(req);
+			}
 		}
 	}
 
