@@ -1,0 +1,183 @@
+package se.liu.ida.hefquin.queryproc.impl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.graph.GraphFactory;
+import org.junit.Test;
+
+import se.liu.ida.hefquin.EngineTestBase;
+import se.liu.ida.hefquin.data.SolutionMapping;
+import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
+import se.liu.ida.hefquin.federation.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.query.Query;
+import se.liu.ida.hefquin.query.jenaimpl.JenaBasedSPARQLGraphPattern;
+import se.liu.ida.hefquin.queryproc.ExecutionEngine;
+import se.liu.ida.hefquin.queryproc.QueryOptimizer;
+import se.liu.ida.hefquin.queryproc.QueryPlanCompiler;
+import se.liu.ida.hefquin.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.queryproc.impl.compiler.QueryPlanCompilerImpl;
+import se.liu.ida.hefquin.queryproc.impl.execution.ExecutionEngineImpl;
+import se.liu.ida.hefquin.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.queryproc.impl.planning.QueryPlannerImpl;
+import se.liu.ida.hefquin.queryproc.impl.srcsel.SourcePlannerImpl;
+
+public class QueryProcessorImplTest extends EngineTestBase
+{
+	@Test
+	public void oneTPFoneTriplePattern() {
+		// setting up
+		final String queryString = "SELECT * WHERE {"
+				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
+				+ "}";
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p"),
+				NodeFactory.createURI("http://example.org/o")) );
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		assertEquals( 2, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertEquals( "http://example.org/s", sm1.get(varX).getURI() );
+		assertEquals( "http://example.org/o", sm1.get(varY).getURI() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void oneBRTPFtwoTriplePatterns() {
+		// setting up
+		final String queryString = "SELECT * WHERE {"
+				+ "SERVICE <http://example.org> { ?x <http://example.org/p1> ?y; <http://example.org/p2> ?z }"
+				+ "}";
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p1"),
+				NodeFactory.createURI("http://example.org/o1")) );
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p2"),
+				NodeFactory.createURI("http://example.org/o2")) );
+
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new BRTPFServerForTest(dataForMember) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		assertEquals( 3, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		final Var varZ = Var.alloc("z");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertTrue( sm1.contains(varZ) );
+		assertEquals( "http://example.org/s", sm1.get(varX).getURI() );
+		assertEquals( "http://example.org/o1", sm1.get(varY).getURI() );
+		assertEquals( "http://example.org/o2", sm1.get(varZ).getURI() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void twoTPFtwoTriplePatterns() {
+		// setting up
+		final String queryString = "SELECT * WHERE {"
+				+ "SERVICE <http://example.org/tpf1> { ?x <http://example.org/p1> ?y }"
+				+ "SERVICE <http://example.org/tpf2> { ?x <http://example.org/p2> ?z }"
+				+ "}";
+
+		final Graph dataForMember1 = GraphFactory.createGraphMem();
+		dataForMember1.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p1"),
+				NodeFactory.createURI("http://example.org/o1")) );
+
+		final Graph dataForMember2 = GraphFactory.createGraphMem();
+		dataForMember2.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p2"),
+				NodeFactory.createURI("http://example.org/o2")) );
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
+		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		assertEquals( 3, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		final Var varZ = Var.alloc("z");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertTrue( sm1.contains(varZ) );
+		assertEquals( "http://example.org/s", sm1.get(varX).getURI() );
+		assertEquals( "http://example.org/o1", sm1.get(varY).getURI() );
+		assertEquals( "http://example.org/o2", sm1.get(varZ).getURI() );
+
+		assertFalse( it.hasNext() );
+	}
+
+
+	protected Iterator<SolutionMapping> processQuery( final String queryString,
+	                                                  final FederationCatalog fedCat,
+	                                                  final FederationAccessManager fedAccessMgr ) {
+		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final SourcePlanner sourcePlanner = new SourcePlannerImpl(fedCat);
+		final QueryOptimizer optimizer = new QueryOptimizerImpl(l2pConverter);
+		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
+		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(fedAccessMgr);
+		final ExecutionEngine execEngine = new ExecutionEngineImpl();
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine);
+		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
+		final Query query = new JenaBasedSPARQLGraphPattern( QueryFactory.create(queryString).getQueryPattern() );
+
+		qProc.processQuery(query, resultSink);
+
+		return resultSink.getSolMapsIter();
+	}
+
+}
