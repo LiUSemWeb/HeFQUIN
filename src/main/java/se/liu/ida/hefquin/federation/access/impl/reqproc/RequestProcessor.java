@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 
-public interface RequestProcessor
+public interface RequestProcessor<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
 {
-	DataRetrievalResponse performRequest( final DataRetrievalRequest req, final FederationMember fm );
+	DataRetrievalResponse performRequest( ReqType req, MemberType fm );
 }

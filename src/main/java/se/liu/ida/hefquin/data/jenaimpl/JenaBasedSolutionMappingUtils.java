@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.data.jenaimpl;
 import java.util.Iterator;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
@@ -20,6 +21,14 @@ public class JenaBasedSolutionMappingUtils
 	{
 		final Binding b = BindingFactory.binding();
 		return new JenaBasedSolutionMapping(b);
+	}
+
+	/**
+	 * Creates a solution mapping based on the given {@link QuerySolution}.
+	 */
+	public static JenaBasedSolutionMapping createJenaBasedSolutionMapping( final QuerySolution s )
+	{
+		return new JenaBasedSolutionMapping( BindingUtils.asBinding(s) );
 	}
 
 	/**

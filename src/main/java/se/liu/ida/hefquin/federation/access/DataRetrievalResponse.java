@@ -12,7 +12,18 @@ public interface DataRetrievalResponse
 	FederationMember getFederationMember();
 
 	/**
-	 * Returns the time at which this response was retrieved.
+	 * Returns the request that has been issued to obtain this response.
 	 */
-	Date getRetrievalTime();
+	DataRetrievalRequest getRequest();
+
+	/**
+	 * Returns the time at which the corresponding data retrieval
+	 * request (see {@link #getRequest()}) was started.
+	 */
+	Date getRequestStartTime();
+
+	/**
+	 * Returns the time at which the retrieval of this response was completed.
+	 */
+	Date getRetrievalEndTime();
 }

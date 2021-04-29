@@ -6,17 +6,23 @@ import java.util.List;
 
 import se.liu.ida.hefquin.data.Triple;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.TriplesResponse;
 
 public class TriplesResponseImpl
-extends DataRetrievalResponseBase 
-implements TriplesResponse
+                            extends DataRetrievalResponseBase
+                            implements TriplesResponse
 {
-	protected List<Triple> triples;
+	protected final List<Triple> triples;
 
+	/**
+	 * Initializes the retrievalEndTime to the time when this object is created.
+	 */
 	public TriplesResponseImpl( final List<Triple> triples,
-	                            final FederationMember fm ) {
-		super(fm);
+	                            final FederationMember fm,
+	                            final DataRetrievalRequest request,
+	                            final Date requestStartTime ) {
+		super(fm, request, requestStartTime);
 
 		assert triples != null;
 		this.triples = triples;
@@ -24,8 +30,10 @@ implements TriplesResponse
 
 	public TriplesResponseImpl( final List<Triple> triples,
 	                            final FederationMember fm,
-	                            final Date retrievalTime ) {
-		super(fm, retrievalTime);
+	                            final DataRetrievalRequest request,
+	                            final Date requestStartTime,
+	                            final Date retrievalEndTime ) {
+		super(fm, request, requestStartTime, retrievalEndTime);
 
 		assert triples != null;
 		this.triples = triples;

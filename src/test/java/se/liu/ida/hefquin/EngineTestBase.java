@@ -2,6 +2,7 @@ package se.liu.ida.hefquin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,6 +38,13 @@ import se.liu.ida.hefquin.query.jenaimpl.JenaBasedTriplePattern;
 
 public abstract class EngineTestBase
 {
+	/**
+	 * Change this flag to true if you also want to run the
+	 * unit tests that access servers on the actual Web.
+	 */
+	public static boolean skipLiveWebTests = true;
+
+
 	protected static abstract class FederationMemberBaseForTest implements FederationMember
 	{
 		protected final Graph data;
@@ -52,15 +60,19 @@ public abstract class EngineTestBase
 			while ( it.hasNext() ) {
 				result.add( new JenaBasedTriple(it.next()) );
 			}
-			return new TriplesResponseImpl(result, this);
+			return new TriplesResponseImpl( result, this, req, new Date() );
 		}
 	}
 
 	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
 	{
-		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl();
+		final SPARQLEndpointInterface iface;
 
-		public SPARQLEndpointForTest() {}
+		public SPARQLEndpointForTest() { this("http://example.org/sparql"); }
+
+		public SPARQLEndpointForTest( final String ifaceURL ) {
+			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+		}
 
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
@@ -120,7 +132,7 @@ public abstract class EngineTestBase
 					}
 				}
 			}
-			return new TriplesResponseImpl(result, this);
+			return new TriplesResponseImpl( result, this, req, new Date() );
 		}
 	}
 
@@ -160,13 +172,13 @@ public abstract class EngineTestBase
 
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			return new SolMapsResponseImpl(itSolMapsForResponse.next(), fm);
+			return new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
 		}
 
 		@Override
 		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
 			}
 			else {
 				return ( (TPFServerForTest) fm ).performRequest(req);
@@ -176,7 +188,7 @@ public abstract class EngineTestBase
 		@Override
 		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
 			}
 			else {
 				return ( (BRTPFServerForTest) fm ).performRequest(req);
@@ -186,7 +198,7 @@ public abstract class EngineTestBase
 		@Override
 		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl(itTriplesForResponse.next(), fm);
+				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
 			}
 			else {
 				return ( (BRTPFServerForTest) fm ).performRequest(req);

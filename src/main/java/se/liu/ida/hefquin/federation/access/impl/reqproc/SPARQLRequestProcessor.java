@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 
-public interface SPARQLRequestProcessor extends SolMapRetrievalProcessor
+public interface SPARQLRequestProcessor extends SolMapRetrievalProcessor<SPARQLRequest,SPARQLEndpoint>
 {
-	SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm );
 }

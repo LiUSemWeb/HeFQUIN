@@ -2,10 +2,15 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.SolMapRetrievalInterface;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 
-public interface SolMapRetrievalProcessor extends RequestProcessor
+public interface SolMapRetrievalProcessor<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
+          extends RequestProcessor<ReqType,MemberType>
 {
+	/**
+	 * Assumes that fm has a {@link SolMapRetrievalInterface}.
+	 */
 	@Override
-	SolMapsResponse performRequest( final DataRetrievalRequest req, final FederationMember fm );
+	SolMapsResponse performRequest( ReqType req, MemberType fm );
 }
