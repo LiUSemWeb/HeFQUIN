@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.queryplan.executable.IntermediateResultBlock;
 public class GenericIntermediateResultBlockImpl
                       implements IntermediateResultBlock
 {
-	protected final List<SolutionMapping> elements = new ArrayList<SolutionMapping>();
+	protected final List<SolutionMapping> elements = new ArrayList<>();
 
 	@Override
 	public int size() {
@@ -20,6 +20,11 @@ public class GenericIntermediateResultBlockImpl
 	@Override
 	public Iterator<SolutionMapping> iterator() {
 		return elements.iterator();
+	}
+
+	@Override
+	public List<SolutionMapping> ArrayList() {
+		return this.elements;
 	}
 
 	public void add( SolutionMapping element ) {
