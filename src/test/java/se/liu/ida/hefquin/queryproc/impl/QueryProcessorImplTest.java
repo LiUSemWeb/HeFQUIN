@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryFactory;
@@ -18,7 +19,17 @@ import org.junit.Test;
 import se.liu.ida.hefquin.EngineTestBase;
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
+import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
+import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.impl.BlockingFederationAccessManagerImpl;
+import se.liu.ida.hefquin.federation.access.impl.jenaimpl.JenaBasedSPARQLRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.query.Query;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedSPARQLGraphPattern;
@@ -159,6 +170,44 @@ public class QueryProcessorImplTest extends EngineTestBase
 		assertEquals( "http://example.org/o2", sm1.get(varZ).getURI() );
 
 		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void liveTestWithDBpedia() {
+		if ( ! skipLiveWebTests ) {
+			// setting up
+			final String dbpediaURL = "http://dbpedia.org/sparql";
+			final String queryString = "SELECT * WHERE {"
+					+ "SERVICE <" + dbpediaURL + "> { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }"
+					+ "}";
+
+			final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+			fedCat.addMember( dbpediaURL, new SPARQLEndpointForTest(dbpediaURL) );
+
+			final SPARQLRequestProcessor reqProcSPARQL = new JenaBasedSPARQLRequestProcessor();
+			final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
+				@Override public TriplesResponse performRequest(TriplePatternRequest req, TPFServer fm) { return null; }
+				@Override public TriplesResponse performRequest(TriplePatternRequest req, BRTPFServer fm) { return null; }
+			};
+			final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
+				@Override public TriplesResponse performRequest(BindingsRestrictedTriplePatternRequest req, BRTPFServer fm) { return null; }
+			};
+			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF);
+
+			// executing the tested method
+			final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+			// checking
+			assertTrue( it.hasNext() );
+
+			final Binding b = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+			final Var var = Var.alloc("o");
+			assertEquals( 1, b.size() );
+			assertTrue( b.contains(var) );
+
+			final Node n = b.get(var);
+			assertTrue( n.isLiteral() );
+		}
 	}
 
 
