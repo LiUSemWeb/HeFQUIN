@@ -39,8 +39,14 @@ public class TriplesResponseImpl
 		this.triples = triples;
 	}
 
+	@Override
 	public Iterator<Triple> getIterator() {
 		return triples.iterator();
+	}
+
+	@Override
+	public int getSize() {
+		return triples.size();
 	}
 
 }

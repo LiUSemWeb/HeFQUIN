@@ -9,11 +9,11 @@ import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
@@ -80,17 +80,17 @@ public class TestUtils
 		}
 
 		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
+		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
 			return null;
 		}
 
 		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
+		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
 			return null;
 		}
 
 		@Override
-		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
+		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
 			return null;
 		}
 	}

@@ -22,9 +22,9 @@ import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.BlockingFederationAccessManagerImpl;
 import se.liu.ida.hefquin.federation.access.impl.jenaimpl.JenaBasedSPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
@@ -186,11 +186,11 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 			final SPARQLRequestProcessor reqProcSPARQL = new JenaBasedSPARQLRequestProcessor();
 			final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
-				@Override public TriplesResponse performRequest(TriplePatternRequest req, TPFServer fm) { return null; }
-				@Override public TriplesResponse performRequest(TriplePatternRequest req, BRTPFServer fm) { return null; }
+				@Override public TPFResponse performRequest(TPFRequest req, TPFServer fm) { return null; }
+				@Override public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) { return null; }
 			};
 			final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-				@Override public TriplesResponse performRequest(BindingsRestrictedTriplePatternRequest req, BRTPFServer fm) { return null; }
+				@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { return null; }
 			};
 			final FederationAccessManager fedAccessMgr = new BlockingFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF);
 

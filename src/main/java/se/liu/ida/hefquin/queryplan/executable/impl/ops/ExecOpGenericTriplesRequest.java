@@ -11,6 +11,15 @@ import se.liu.ida.hefquin.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
+/**
+ * Base class for implementations of request operators with
+ * requests that return triples and that can be performed as
+ * is. The latter means that such requests do not have to be
+ * broken into multiple requests as would be the case when
+ * interacting with, e.g., a TPF server which employs paging.
+ * For interactions with TPF servers, there is a different
+ * base class: {@link ExecOpGenericTriplePatternRequestWithTPF}.
+ */
 public abstract class ExecOpGenericTriplesRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends ExecOpGenericRequest<ReqType,MemberType>
 {

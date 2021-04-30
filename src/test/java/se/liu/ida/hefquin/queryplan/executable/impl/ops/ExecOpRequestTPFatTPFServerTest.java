@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.data.jenaimpl.JenaBasedTripleUtils;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
@@ -34,11 +35,11 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest() );
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final SolutionMapping sm1 = it.next();

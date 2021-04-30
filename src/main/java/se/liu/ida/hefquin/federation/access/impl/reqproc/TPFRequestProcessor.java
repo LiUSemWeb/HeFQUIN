@@ -2,10 +2,13 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 
-public interface TPFRequestProcessor extends TriplesRetrievalProcessor<TriplePatternRequest,TPFServer>
+public interface TPFRequestProcessor extends TriplesRetrievalProcessor<TPFRequest,TPFServer>
 {
-	TriplesResponse performRequest( TriplePatternRequest req, BRTPFServer fm );
+	@Override
+	TPFResponse performRequest( TPFRequest req, TPFServer fm );
+
+	TPFResponse performRequest( TPFRequest req, BRTPFServer fm );
 }
