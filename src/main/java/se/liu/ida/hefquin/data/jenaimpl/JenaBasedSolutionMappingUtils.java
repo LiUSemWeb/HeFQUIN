@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.data.jenaimpl;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -106,6 +107,28 @@ public class JenaBasedSolutionMappingUtils
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
 		return new JenaBasedSolutionMapping( BindingUtils.merge(b1,b2) );
+	}
+
+	/**
+	 * Restricts the given solution mapping to the given set of variables.
+	 * Hence, the returned solution mapping will be compatible to the solution
+	 * mapping given as input, but it will be defined only for the variables
+	 * that are in the intersection of the given set of variables and the
+	 * set of variables for which the given solution mapping is defined.
+	 */
+	public static JenaBasedSolutionMapping restrict( final JenaBasedSolutionMapping sm, final Set<Var> vars ) {
+		final Binding input = sm.asJenaBinding();
+		final Iterator<Var> it = input.vars();
+		final BindingMap output = BindingFactory.create();
+
+		while ( it.hasNext() ) {
+			final Var var = it.next();
+			if ( vars.contains(var) ) {
+				output.add( var, input.get(var) );
+			}
+		}
+
+		return new JenaBasedSolutionMapping(output);
 	}
 
 }

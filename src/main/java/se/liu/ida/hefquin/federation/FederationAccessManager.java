@@ -1,18 +1,18 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 
 public interface FederationAccessManager
 {
 	SolMapsResponse performRequest( SPARQLRequest req, SPARQLEndpoint fm );
 
-	TriplesResponse performRequest( TriplePatternRequest req, TPFServer fm );
+	TPFResponse performRequest( TPFRequest req, TPFServer fm );
 
-	TriplesResponse performRequest( TriplePatternRequest req, BRTPFServer fm );
+	TPFResponse performRequest( TPFRequest req, BRTPFServer fm );
 
-	TriplesResponse performRequest( BindingsRestrictedTriplePatternRequest req, BRTPFServer fm );
+	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm );
 }

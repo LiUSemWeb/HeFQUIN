@@ -21,17 +21,22 @@ import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFInterface;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.TPFInterface;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedTriplePattern;
@@ -54,13 +59,22 @@ public abstract class EngineTestBase
 		}
 
 		public TriplesResponse performRequest( final TriplePatternRequest req ) {
-			final org.apache.jena.graph.Triple jenaTP = ( (JenaBasedTriplePattern) req.getQueryPattern() ).asTriple();
+			final List<Triple> result = getMatchingTriples(req);
+			return new TriplesResponseImpl( result, this, req, new Date() );
+		}
+
+		protected List<Triple> getMatchingTriples( final TriplePatternRequest req ) {
+			return getMatchingTriples( (JenaBasedTriplePattern) req.getQueryPattern() );
+		}
+
+		protected List<Triple> getMatchingTriples( final JenaBasedTriplePattern tp ) {
+			final org.apache.jena.graph.Triple jenaTP = tp.asTriple();
 			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
 			final List<Triple> result = new ArrayList<>();
 			while ( it.hasNext() ) {
 				result.add( new JenaBasedTriple(it.next()) );
 			}
-			return new TriplesResponseImpl( result, this, req, new Date() );
+			return result;
 		}
 	}
 
@@ -88,6 +102,11 @@ public abstract class EngineTestBase
 
 		@Override
 		public TPFInterface getInterface() { return iface; }
+
+		public TPFResponse performRequest( final TPFRequest req ) {
+			final List<Triple> result = getMatchingTriples(req);
+			return new TPFResponseForTest(result, this, req);
+		}
 	}
 
 
@@ -101,7 +120,12 @@ public abstract class EngineTestBase
 		@Override
 		public BRTPFInterface getInterface() { return iface; }
 
-		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
+		public TPFResponse performRequest( final TPFRequest req ) {
+			final List<Triple> result = getMatchingTriples(req);
+			return new TPFResponseForTest(result, this, req);
+		}
+
+		public TPFResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
 			// The implementation in this method is not particularly efficient,
 			// but it is sufficient for the purpose of unit tests.
 			final org.apache.jena.graph.Triple jenaTP = ( (JenaBasedTriplePattern) req.getTriplePattern() ).asTriple();
@@ -132,8 +156,21 @@ public abstract class EngineTestBase
 					}
 				}
 			}
-			return new TriplesResponseImpl( result, this, req, new Date() );
+			return new TPFResponseForTest(result, this, req);
 		}
+	}
+
+
+	protected static class TPFResponseForTest extends TPFResponseImpl
+	{
+		public TPFResponseForTest( final List<Triple> matchingTriples,
+		                           final FederationMember fm,
+		                           final DataRetrievalRequest req ) {
+			super( matchingTriples, new ArrayList<Triple>(), fm, req, new Date() );
+		}
+
+		@Override
+		public Boolean isLastPage() { return true; }
 	}
 
 
@@ -176,9 +213,9 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final TPFServer fm ) {
+		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
+				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
 			}
 			else {
 				return ( (TPFServerForTest) fm ).performRequest(req);
@@ -186,9 +223,9 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public TriplesResponse performRequest( final TriplePatternRequest req, final BRTPFServer fm ) {
+		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
+				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
 			}
 			else {
 				return ( (BRTPFServerForTest) fm ).performRequest(req);
@@ -196,9 +233,9 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public TriplesResponse performRequest( final BindingsRestrictedTriplePatternRequest req, final BRTPFServer fm ) {
+		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
-				return new TriplesResponseImpl( itTriplesForResponse.next(), fm, req, new Date() );
+				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
 			}
 			else {
 				return ( (BRTPFServerForTest) fm ).performRequest(req);

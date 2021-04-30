@@ -10,6 +10,7 @@ import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.data.SolutionMapping;
@@ -49,6 +50,16 @@ public class JenaBasedQueryPatternUtils
 			tps.add( new JenaBasedTriplePattern(tp.asTriple()) );
 		}
 		return new JenaBasedBGP(tps);
+	}
+
+	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
+		return getVariablesInPattern( (JenaBasedTriplePattern) tp );
+	}
+
+	public static Set<Var> getVariablesInPattern( final JenaBasedTriplePattern tp ) {
+		final Set<Var> result = new HashSet<>();
+		Vars.addVarsFromTriple( result, tp.asTriple() );
+		return result;
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

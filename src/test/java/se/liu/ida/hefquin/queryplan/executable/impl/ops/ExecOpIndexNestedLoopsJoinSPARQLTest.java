@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
+import se.liu.ida.hefquin.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
@@ -54,14 +55,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final ExecOpIndexNestedLoopsJoinSPARQL op = new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -112,14 +113,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final ExecOpIndexNestedLoopsJoinSPARQL op = new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -164,14 +165,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final ExecOpIndexNestedLoopsJoinSPARQL op = new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -208,14 +209,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final ExecOpIndexNestedLoopsJoinSPARQL op = new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertFalse( it.hasNext() );
 	}
@@ -239,14 +240,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 
 		final ExecOpIndexNestedLoopsJoinSPARQL op = new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertFalse( it.hasNext() );
 	}

@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
+/**
+ * Base class for implementations of request operators.
+ */
 public abstract class ExecOpGenericRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 implements NullaryExecutableOp
 {

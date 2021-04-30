@@ -39,8 +39,14 @@ public class SolMapsResponseImpl
 		this.solMaps = solMaps;
 	}
 
+	@Override
 	public Iterator<SolutionMapping> getIterator() {
 		return solMaps.iterator();
+	}
+
+	@Override
+	public int getSize() {
+		return solMaps.size();
 	}
 
 }

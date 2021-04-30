@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.federation.FederationAccessManager;
 import se.liu.ida.hefquin.query.TriplePattern;
 import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
+import se.liu.ida.hefquin.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.queryproc.ExecutionContext;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 
         final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-        final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
+        final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
         final BRTPFServer fm = new BRTPFServerForTest();
 
 
@@ -65,7 +66,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         op.process(input, sink, execCxt);
         op.concludeExecution(sink, execCxt);
 
-        final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+        final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
         final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -120,14 +121,14 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-        final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
+        final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
         final BRTPFServer fm = new ExecOpTestBase.BRTPFServerForTest();
 
         final ExecOpBindJoinBRTPF op = new ExecOpBindJoinBRTPF(tp, fm);
         op.process(input, sink, execCxt);
         op.concludeExecution(sink, execCxt);
 
-        final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+        final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
         final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -171,7 +172,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-        final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
+        final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
         final BRTPFServer fm = new ExecOpTestBase.BRTPFServerForTest();
 
         final ExecOpBindJoinBRTPF op = new ExecOpBindJoinBRTPF(tp, fm);
@@ -179,7 +180,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         op.process(input, sink, execCxt);
         op.concludeExecution(sink, execCxt);
 
-        final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+        final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
         final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -215,14 +216,14 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-        final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
+        final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
         final BRTPFServer fm = new ExecOpTestBase.BRTPFServerForTest();
 
         final ExecOpBindJoinBRTPF op = new ExecOpBindJoinBRTPF(tp, fm);
         op.process(input, sink, execCxt);
         op.concludeExecution(sink, execCxt);
 
-        final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+        final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertFalse( it.hasNext() );
     }
@@ -246,7 +247,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
 
         final FederationAccessManager fedAccessMgr = new ExecOpTestBase.FederationAccessManagerForTest(null, Arrays.asList(lResp1,lResp2).iterator());
         final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
-        final ExecOpTestBase.IntermediateResultElementSinkForTest sink = new ExecOpTestBase.IntermediateResultElementSinkForTest();
+        final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
         final BRTPFServer fm = new ExecOpTestBase.BRTPFServerForTest();
 
         final ExecOpBindJoinBRTPF op = new ExecOpBindJoinBRTPF(tp, fm);
@@ -254,7 +255,7 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         op.process(input, sink, execCxt);
         op.concludeExecution(sink, execCxt);
 
-        final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+        final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertFalse( it.hasNext() );
     }
