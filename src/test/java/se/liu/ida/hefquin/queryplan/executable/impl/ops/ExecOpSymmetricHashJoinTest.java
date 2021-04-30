@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
+import se.liu.ida.hefquin.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 
 import java.util.Iterator;
 
@@ -40,12 +41,14 @@ public class ExecOpSymmetricHashJoinTest extends ExecOpTestBase
 				var2, NodeFactory.createURI("http://example.org/y2"),
 				var3, NodeFactory.createURI("http://example.org/z3")) );
 
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final ExecOpSymmetricHashJoin op = new ExecOpSymmetricHashJoin();
-		op.process(input1, input2, sink);
+		op.preprocess(input1, input2, sink);
+		op.processBlockFromChild1(input1, sink, null);
+		op.processBlockFromChild2(input2, sink, null);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -95,12 +98,14 @@ public class ExecOpSymmetricHashJoinTest extends ExecOpTestBase
 				var2, NodeFactory.createURI("http://example.org/y2"),
 				var3, NodeFactory.createURI("http://example.org/z2")) );
 
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final ExecOpSymmetricHashJoin op = new ExecOpSymmetricHashJoin();
-		op.process(input1, input2, sink);
+		op.preprocess(input1, input2, sink);
+		op.processBlockFromChild1(input1, sink, null);
+		op.processBlockFromChild2(input2, sink, null);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
@@ -137,26 +142,14 @@ public class ExecOpSymmetricHashJoinTest extends ExecOpTestBase
 				var2, NodeFactory.createURI("http://example.org/y1"),
 				var3, NodeFactory.createURI("http://example.org/z1")) );
 
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final ExecOpSymmetricHashJoin op = new ExecOpSymmetricHashJoin();
-		op.process(input1, input2, sink);
+		op.preprocess(input1, input2, sink);
+		op.processBlockFromChild1(input1, sink, null);
+		op.processBlockFromChild2(input2, sink, null);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
-
-		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
-		assertEquals( 3, b1.size() );
-		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
-		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
-		assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
-
-		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
-		assertEquals( 3, b2.size() );
-		assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
-		assertEquals( "http://example.org/y1", b2.get(var2).getURI() );
-		assertEquals( "http://example.org/z1", b2.get(var3).getURI() );
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertFalse( it.hasNext() );
 	}
@@ -174,12 +167,14 @@ public class ExecOpSymmetricHashJoinTest extends ExecOpTestBase
 				var2, NodeFactory.createURI("http://example.org/y1"),
 				var3, NodeFactory.createURI("http://example.org/z1")) );
 
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final ExecOpSymmetricHashJoin op = new ExecOpSymmetricHashJoin();
-		op.process(input1, input2, sink);
+		op.preprocess(input1, input2, sink);
+		op.processBlockFromChild1(input1, sink, null);
+		op.processBlockFromChild2(input2, sink, null);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertFalse( it.hasNext() );
 	}
@@ -197,12 +192,14 @@ public class ExecOpSymmetricHashJoinTest extends ExecOpTestBase
 
 		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
 
-		final IntermediateResultElementSinkForTest sink = new IntermediateResultElementSinkForTest();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final ExecOpSymmetricHashJoin op = new ExecOpSymmetricHashJoin();
-		op.process(input1, input2, sink);
+		op.preprocess(input1, input2, sink);
+		op.processBlockFromChild1(input1, sink, null);
+		op.processBlockFromChild2(input2, sink, null);
 
-		final Iterator<SolutionMapping> it = sink.getSolMapsIter();
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertFalse( it.hasNext() );
 	}
