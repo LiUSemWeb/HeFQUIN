@@ -66,7 +66,16 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		final LogicalOpTPAdd rootOp = (LogicalOpTPAdd) plan.getRootOperator();
 		assertTrue( rootOp.getFederationMember() instanceof BRTPFServer );
-		assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", rootOp.getTP() );
+
+		final Triple firstTP = ((JenaBasedTriplePattern) rootOp.getTP()).asTriple();
+		final boolean firstPredicateWasP1;
+		if ( firstTP.getPredicate().getURI().equals("http://example.org/p1") ) {
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", rootOp.getTP() );
+			firstPredicateWasP1 = true;
+		} else {
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", rootOp.getTP() );
+			firstPredicateWasP1 = false;
+		}
 
 		final LogicalPlan subplan = plan.getSubPlan(0); 
 		assertEquals( 0, subplan.numberOfSubPlans() );
@@ -77,7 +86,11 @@ public class SourcePlannerImplTest extends EngineTestBase
 		assertTrue( subRootOp.getRequest() instanceof TriplePatternRequest );
 
 		final TriplePatternRequest req = (TriplePatternRequest) subRootOp.getRequest();
-		assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", req );
+		if ( firstPredicateWasP1 ) {
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", req );
+		} else {
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", req );
+		}
 	}
 
 	@Test
