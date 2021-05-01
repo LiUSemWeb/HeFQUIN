@@ -38,7 +38,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	}
 
 	@Override
-	public NullaryExecutableOp createExecOp() {
+	public NullaryExecutableOp createExecOp( final ExpectedVariables ... inputVars ) {
 		final ReqType req = lop.getRequest();
 		final MemberType fm = lop.getFederationMember();
 		if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {

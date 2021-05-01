@@ -7,8 +7,13 @@ public interface PhysicalOperator
 	 * this physical operator. The implementation of this method
 	 * has to create a new {@link ExecutableOperator} object each
 	 * time it is called.
+	 *
+	 * The number of {@link ExpectedVariables} objects passed as
+	 * arguments to this method must be in line with the degree of
+	 * this operator (e.g., for a unary operator, exactly one such
+	 * object must be passed).
 	 */
-	ExecutableOperator createExecOp();
+	ExecutableOperator createExecOp( ExpectedVariables ... inputVars );
 
 	/**
 	 * Returns the variables that can be expected in the solution

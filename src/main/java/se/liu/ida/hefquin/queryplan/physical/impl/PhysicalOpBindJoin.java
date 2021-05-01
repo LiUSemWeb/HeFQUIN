@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.queryplan.logical.UnaryLogicalOp;
@@ -19,7 +20,7 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
     }
 
     @Override
-    public UnaryExecutableOp createExecOp()
+    public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
     {
         if ( lop instanceof LogicalOpTPAdd ) {
             final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;

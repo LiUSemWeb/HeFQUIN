@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
@@ -23,7 +24,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp()
+	public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
 	{
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
