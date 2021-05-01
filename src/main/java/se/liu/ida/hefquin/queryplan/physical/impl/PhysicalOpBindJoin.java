@@ -2,31 +2,21 @@ package se.liu.ida.hefquin.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.queryplan.physical.UnaryPhysicalOpForLogicalOp;
-//import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpBindJoinSPARQL;
 
-public class PhysicalOpBindJoin implements UnaryPhysicalOpForLogicalOp
+public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 {
-    protected final UnaryLogicalOp lop;
-
     /**
      * The given logical operator is expected to be of one of the following
      * two types: {@link LogicalOpTPAdd} or {@link LogicalOpBGPAdd}.
      */
-    public PhysicalOpBindJoin(final UnaryLogicalOp lop ) {
-        assert lop != null;
-        assert (lop instanceof LogicalOpBGPAdd) || (lop instanceof LogicalOpTPAdd);
-        this.lop = lop;
+    public PhysicalOpBindJoin( final UnaryLogicalOp lop ) {
+        super(lop);
     }
-
-    @Override
-    public UnaryLogicalOp getLogicalOperator() { return lop; }
 
     @Override
     public UnaryExecutableOp createExecOp()

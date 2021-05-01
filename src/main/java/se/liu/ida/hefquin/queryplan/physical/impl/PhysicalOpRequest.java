@@ -1,5 +1,10 @@
 package se.liu.ida.hefquin.queryplan.physical.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
@@ -8,6 +13,7 @@ import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternReque
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
 import se.liu.ida.hefquin.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
@@ -49,6 +55,16 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		}
 		else
 			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 0;
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return lop.getRequest().getExpectedVariables(); }
+			@Override public Set<Var> getPossibleVariables() { return new HashSet<>(); }
+		};
 	}
 
 }

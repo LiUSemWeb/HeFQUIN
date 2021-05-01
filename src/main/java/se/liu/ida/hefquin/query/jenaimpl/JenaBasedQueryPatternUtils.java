@@ -12,6 +12,7 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.PatternVars;
 
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.data.jenaimpl.JenaBasedSolutionMapping;
@@ -60,6 +61,26 @@ public class JenaBasedQueryPatternUtils
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp.asTriple() );
 		return result;
+	}
+
+	public static Set<Var> getVariablesInPattern( final BGP bgp ) {
+		return getVariablesInPattern( (JenaBasedBGP) bgp );
+	}
+
+	public static Set<Var> getVariablesInPattern( final JenaBasedBGP bgp ) {
+		final Set<Var> result = new HashSet<>();
+		for ( final JenaBasedTriplePattern tp : bgp.getTriplePatterns() ) {
+			result.addAll( getVariablesInPattern(tp) );
+		}
+		return result;
+	}
+
+	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern pattern ) {
+		return getVariablesInPattern( (JenaBasedSPARQLGraphPattern) pattern );
+	}
+
+	public static Set<Var> getVariablesInPattern( final JenaBasedSPARQLGraphPattern pattern ) {
+		return new HashSet<>( PatternVars.vars(pattern.asElement()) );
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

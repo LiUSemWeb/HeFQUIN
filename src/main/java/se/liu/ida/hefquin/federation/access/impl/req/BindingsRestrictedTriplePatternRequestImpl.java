@@ -2,9 +2,12 @@ package se.liu.ida.hefquin.federation.access.impl.req;
 
 import java.util.Set;
 
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.data.SolutionMapping;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.query.TriplePattern;
+import se.liu.ida.hefquin.query.jenaimpl.JenaBasedQueryPatternUtils;
 
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest
 {
@@ -27,6 +30,11 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 
 	public Set<SolutionMapping> getSolutionMappings() {
 		return solMaps;
+	}
+
+	@Override
+	public Set<Var> getExpectedVariables() {
+		return JenaBasedQueryPatternUtils.getVariablesInPattern(tp);
 	}
 
 }
