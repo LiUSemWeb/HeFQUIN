@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -38,11 +38,11 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
 
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
-			certainVars.addAll( JenaBasedQueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
+			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
 		}
 		else if ( lop instanceof LogicalOpBGPAdd ) {
 			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
-			certainVars.addAll( JenaBasedQueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
+			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
 		}
 		else
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );

@@ -6,7 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 
 public class BGPRequestImpl implements BGPRequest
 {
@@ -24,7 +24,7 @@ public class BGPRequestImpl implements BGPRequest
 
 	@Override
 	public Set<Var> getExpectedVariables() {
-		return JenaBasedQueryPatternUtils.getVariablesInPattern(bgp);
+		return QueryPatternUtils.getVariablesInPattern(bgp);
 	}
 
 }

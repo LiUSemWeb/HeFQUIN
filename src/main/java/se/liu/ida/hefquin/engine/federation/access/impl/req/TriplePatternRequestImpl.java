@@ -6,7 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 
 public class TriplePatternRequestImpl implements TriplePatternRequest
 {
@@ -23,7 +23,7 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 
 	@Override
 	public Set<Var> getExpectedVariables() {
-		return JenaBasedQueryPatternUtils.getVariablesInPattern(tp);
+		return QueryPatternUtils.getVariablesInPattern(tp);
 	}
 
 }

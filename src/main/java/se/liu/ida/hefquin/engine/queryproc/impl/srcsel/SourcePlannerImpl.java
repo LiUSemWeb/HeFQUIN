@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.jenaimpl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -159,11 +159,11 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	protected LogicalPlan createPlanForBGP( final PathBlock pattern, final FederationMember fm ) {
-		return createPlanForBGP( JenaBasedQueryPatternUtils.createBGP(pattern), fm );
+		return createPlanForBGP( QueryPatternUtils.createBGP(pattern), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BasicPattern pattern, final FederationMember fm ) {
-		return createPlanForBGP( JenaBasedQueryPatternUtils.createBGP(pattern), fm );
+		return createPlanForBGP( QueryPatternUtils.createBGP(pattern), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {

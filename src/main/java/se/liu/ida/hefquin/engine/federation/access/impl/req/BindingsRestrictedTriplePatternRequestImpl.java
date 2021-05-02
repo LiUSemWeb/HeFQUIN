@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest
 {
@@ -34,7 +34,7 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 
 	@Override
 	public Set<Var> getExpectedVariables() {
-		return JenaBasedQueryPatternUtils.getVariablesInPattern(tp);
+		return QueryPatternUtils.getVariablesInPattern(tp);
 	}
 
 }

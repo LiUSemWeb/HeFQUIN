@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -33,7 +33,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 	}
 
 	protected TriplePatternRequest createRequest( final SolutionMapping inputSolMap ) {
-		final TriplePattern tp = JenaBasedQueryPatternUtils.applySolMapToTriplePattern(inputSolMap, query);
+		final TriplePattern tp = QueryPatternUtils.applySolMapToTriplePattern(inputSolMap, query);
 		return new TriplePatternRequestImpl(tp);
 	}
 

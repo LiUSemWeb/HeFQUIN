@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
-public class JenaBasedQueryPatternUtils
+public class QueryPatternUtils
 {
 	public static BGP createBGP( final BasicPattern pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();

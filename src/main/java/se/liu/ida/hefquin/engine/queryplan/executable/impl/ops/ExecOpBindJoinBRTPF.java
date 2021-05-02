@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -29,7 +29,7 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
         this.tp = tp;
         this.fm = fm;
 
-        varsInTP = JenaBasedQueryPatternUtils.getVariablesInPattern(tp);
+        varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
 
 	@Override

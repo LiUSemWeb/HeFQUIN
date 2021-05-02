@@ -6,7 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 
 public class SPARQLRequestImpl implements SPARQLRequest
 {
@@ -25,7 +25,7 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	public Set<Var> getExpectedVariables() {
 		// Attention: this implementation may not be entirely correct;
 		// not all variables in the pattern may be certain variables.
-		return JenaBasedQueryPatternUtils.getVariablesInPattern(pattern);
+		return QueryPatternUtils.getVariablesInPattern(pattern);
 	}
 
 }

@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
 
 public class ExecOpIndexNestedLoopsJoinSPARQL extends ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
@@ -17,7 +17,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends ExecOpGenericIndexNestedLo
 
 	@Override
 	protected SPARQLRequest createRequest( final SolutionMapping sm ) {
-		final SPARQLGraphPattern pattern = JenaBasedQueryPatternUtils.applySolMapToGraphPattern(sm, query);
+		final SPARQLGraphPattern pattern = QueryPatternUtils.applySolMapToGraphPattern(sm, query);
 		return new SPARQLRequestImpl(pattern);
 	}
 
