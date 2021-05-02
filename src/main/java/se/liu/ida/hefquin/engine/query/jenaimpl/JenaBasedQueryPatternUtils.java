@@ -21,10 +21,6 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class JenaBasedQueryPatternUtils
 {
-	public static TriplePatternImpl createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
-		return new TriplePatternImpl( new org.apache.jena.graph.Triple(s,p,o) );
-	}
-
 	public static BGPImpl createJenaBasedBGP( final BasicPattern pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<Triple> it = pattern.iterator();
@@ -136,7 +132,7 @@ public class JenaBasedQueryPatternUtils
 		if ( unchanged ) {
 			return tp;
 		} else {
-			return createJenaBasedTriplePattern(s,p,o);
+			return new TriplePatternImpl(s,p,o);
 		}
 	}
 

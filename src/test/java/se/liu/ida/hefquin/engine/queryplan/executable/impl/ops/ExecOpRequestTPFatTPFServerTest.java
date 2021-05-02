@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -30,7 +30,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(s,p,v);
+		final TriplePattern tp = new TriplePatternImpl(s,p,v);
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest() );

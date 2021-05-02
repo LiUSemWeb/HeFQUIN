@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.jenaimpl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -41,7 +41,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 				var2, NodeFactory.createURI("http://example.org/y2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var2,p,var3);
+		final TriplePattern tp = new TriplePatternImpl(var2,p,var3);
 
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
@@ -101,7 +101,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 				var1, NodeFactory.createURI("http://example.org/x2"),
 				var2, NodeFactory.createURI("http://example.org/y2")) );
 
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var1,var2,var3);
+		final TriplePattern tp = new TriplePatternImpl(var1,var2,var3);
 
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
@@ -151,7 +151,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var2,p,var3);
+		final TriplePattern tp = new TriplePatternImpl(var2,p,var3);
 
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
@@ -199,7 +199,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var1,p,var2);
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
 
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
@@ -232,7 +232,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var1,p,var2);
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
 
 		final List<SolutionMapping> lResp1 = Arrays.asList();
 		final List<SolutionMapping> lResp2 = Arrays.asList();
