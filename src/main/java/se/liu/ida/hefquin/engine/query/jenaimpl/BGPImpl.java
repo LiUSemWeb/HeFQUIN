@@ -6,11 +6,11 @@ import java.util.Set;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
-public class JenaBasedBGP implements BGP
+public class BGPImpl implements BGP
 {
 	private final Set<TriplePattern> tps;
 
-	public JenaBasedBGP( final Set<TriplePattern> tps ) {
+	public BGPImpl( final Set<TriplePattern> tps ) {
 		assert tps != null;
 		this.tps = tps;
 	}

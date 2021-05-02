@@ -21,17 +21,17 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class JenaBasedQueryPatternUtils
 {
-	public static JenaBasedTriplePattern createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
-		return new JenaBasedTriplePattern( new org.apache.jena.graph.Triple(s,p,o) );
+	public static TriplePatternImpl createJenaBasedTriplePattern( final Node s, final Node p, final Node o ) {
+		return new TriplePatternImpl( new org.apache.jena.graph.Triple(s,p,o) );
 	}
 
-	public static JenaBasedBGP createJenaBasedBGP( final BasicPattern pattern ) {
+	public static BGPImpl createJenaBasedBGP( final BasicPattern pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<Triple> it = pattern.iterator();
 		while ( it.hasNext() ) {
-			tps.add( new JenaBasedTriplePattern(it.next()) );
+			tps.add( new TriplePatternImpl(it.next()) );
 		}
-		return new JenaBasedBGP(tps);
+		return new BGPImpl(tps);
 	}
 
 	/**
@@ -39,7 +39,7 @@ public class JenaBasedQueryPatternUtils
 	 * patterns (but only triple patterns). If it does, this methods throws an
 	 * {@link IllegalArgumentException}.
 	 */
-	public static JenaBasedBGP createJenaBasedBGP( final PathBlock pattern ) {
+	public static BGPImpl createJenaBasedBGP( final PathBlock pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<TriplePath> it = pattern.iterator();
 		while ( it.hasNext() ) {
@@ -47,9 +47,9 @@ public class JenaBasedQueryPatternUtils
 			if ( ! tp.isTriple() ) {
 				throw new IllegalArgumentException( "the given PathBlock contains a property path pattern (" + tp.toString() + ")" );
 			}
-			tps.add( new JenaBasedTriplePattern(tp.asTriple()) );
+			tps.add( new TriplePatternImpl(tp.asTriple()) );
 		}
-		return new JenaBasedBGP(tps);
+		return new BGPImpl(tps);
 	}
 
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
@@ -59,10 +59,10 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final BGP bgp ) {
-		return getVariablesInPattern( (JenaBasedBGP) bgp );
+		return getVariablesInPattern( (BGPImpl) bgp );
 	}
 
-	public static Set<Var> getVariablesInPattern( final JenaBasedBGP bgp ) {
+	public static Set<Var> getVariablesInPattern( final BGPImpl bgp ) {
 		final Set<Var> result = new HashSet<>();
 		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 			result.addAll( getVariablesInPattern(tp) );
@@ -91,7 +91,7 @@ public class JenaBasedQueryPatternUtils
 	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		boolean unchanged = true;
-		for ( final TriplePattern tp : ((JenaBasedBGP)bgp).getTriplePatterns() ) {
+		for ( final TriplePattern tp : ((BGPImpl)bgp).getTriplePatterns() ) {
 			final TriplePattern tp2 = applySolMapToTriplePattern(sm, tp);
 			tps.add(tp2);
 			if ( tp2 != tp ) {
@@ -102,7 +102,7 @@ public class JenaBasedQueryPatternUtils
 		if ( unchanged ) {
 			return bgp;
 		} else {
-			return new JenaBasedBGP(tps);
+			return new BGPImpl(tps);
 		}
 	}
 

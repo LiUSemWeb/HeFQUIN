@@ -5,11 +5,11 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
-public class JenaBasedTriplePattern implements TriplePattern
+public class TriplePatternImpl implements TriplePattern
 {
 	protected final Triple jenaObj;
 
-	public JenaBasedTriplePattern( final Triple jenaObject ) {
+	public TriplePatternImpl( final Triple jenaObject ) {
 		assert jenaObject != null;
 		this.jenaObj = jenaObject;
 	}

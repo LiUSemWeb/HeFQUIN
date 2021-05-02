@@ -13,7 +13,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedTriple;
+import se.liu.ida.hefquin.engine.data.jenaimpl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -71,7 +71,7 @@ public abstract class EngineTestBase
 			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
 			final List<Triple> result = new ArrayList<>();
 			while ( it.hasNext() ) {
-				result.add( new JenaBasedTriple(it.next()) );
+				result.add( new TripleImpl(it.next()) );
 			}
 			return result;
 		}
@@ -150,7 +150,7 @@ public abstract class EngineTestBase
 				final org.apache.jena.graph.Triple t = it.next();
 				for ( final org.apache.jena.graph.Triple patternForTest : patternsForTest ) {
 					if ( patternForTest.matches(t) ) {
-						result.add( new JenaBasedTriple(t) );
+						result.add( new TripleImpl(t) );
 						break;
 					}
 				}
