@@ -6,7 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 
 public class SPARQLRequestImpl implements SPARQLRequest
 {

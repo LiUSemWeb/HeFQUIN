@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest
 {

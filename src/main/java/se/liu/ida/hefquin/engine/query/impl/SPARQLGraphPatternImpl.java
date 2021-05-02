@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.query.jenaimpl;
+package se.liu.ida.hefquin.engine.query.impl;
 
 import org.apache.jena.sparql.syntax.Element;
 

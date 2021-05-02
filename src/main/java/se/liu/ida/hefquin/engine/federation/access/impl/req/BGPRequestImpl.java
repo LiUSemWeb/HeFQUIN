@@ -6,7 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 
 public class BGPRequestImpl implements BGPRequest
 {

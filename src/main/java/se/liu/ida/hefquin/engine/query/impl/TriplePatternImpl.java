@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.query.jenaimpl;
+package se.liu.ida.hefquin.engine.query.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;

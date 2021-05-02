@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.query.jenaimpl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.query.jenaimpl;
+package se.liu.ida.hefquin.engine.query.impl;
 
 import java.util.HashSet;
 import java.util.Iterator;

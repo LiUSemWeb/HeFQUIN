@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestPro
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.query.jenaimpl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
