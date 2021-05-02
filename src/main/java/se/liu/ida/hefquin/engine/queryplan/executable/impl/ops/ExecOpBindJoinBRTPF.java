@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -62,10 +61,9 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 
 	protected BindingsRestrictedTriplePatternRequest createRequest( final IntermediateResultBlock input ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
-		final Iterator<SolutionMapping> it = input.iterator();
-		while ( it.hasNext() ) {
-			final JenaBasedSolutionMapping sm = (JenaBasedSolutionMapping) it.next();
-			restrictedSolMaps.add( JenaBasedSolutionMappingUtils.restrict(sm, varsInTP) );
+		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+			final JenaBasedSolutionMapping jbsm = (JenaBasedSolutionMapping) sm;
+			restrictedSolMaps.add( JenaBasedSolutionMappingUtils.restrict(jbsm, varsInTP) );
 		}
 		return new BindingsRestrictedTriplePatternRequestImpl( tp, restrictedSolMaps );
 	}
@@ -87,9 +85,8 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			final JenaBasedSolutionMapping smFromRequest = (JenaBasedSolutionMapping) solMapFromRequest;
-			final Iterator<SolutionMapping> it = input.iterator();
-			while ( it.hasNext() ) {
-				final JenaBasedSolutionMapping smFromInput = (JenaBasedSolutionMapping) it.next();
+			for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+				final JenaBasedSolutionMapping smFromInput = (JenaBasedSolutionMapping) sm;
 				if ( JenaBasedSolutionMappingUtils.compatible(smFromRequest,smFromInput) ) {
 					outputSink.send( JenaBasedSolutionMappingUtils.merge(smFromRequest,smFromInput) );
 				}

@@ -24,14 +24,14 @@ public class ResultBlockIterOverResultElementIterTest
 		final IntermediateResultBlock b1 = blockIter.next();
 		assertEquals( 2, b1.size() );
 
-		final Iterator<SolutionMapping> b1Iter = b1.iterator();
+		final Iterator<SolutionMapping> b1Iter = b1.getSolutionMappings().iterator();
 		assertEquals( sm1, b1Iter.next() );
 		assertEquals( sm2, b1Iter.next() );
 
 		final IntermediateResultBlock b2 = blockIter.next();
 		assertEquals( 1, b2.size() );
 
-		final Iterator<SolutionMapping> b2Iter = b2.iterator();
+		final Iterator<SolutionMapping> b2Iter = b2.getSolutionMappings().iterator();
 		assertEquals( sm3, b2Iter.next() );
 
 		assertFalse( blockIter.hasNext() );
@@ -48,7 +48,7 @@ public class ResultBlockIterOverResultElementIterTest
 		final IntermediateResultBlock b1 = blockIter.next();
 		assertEquals( 2, b1.size() );
 
-		final Iterator<SolutionMapping> b1Iter = b1.iterator();
+		final Iterator<SolutionMapping> b1Iter = b1.getSolutionMappings().iterator();
 		assertEquals( sm1, b1Iter.next() );
 		assertEquals( sm2, b1Iter.next() );
 
@@ -56,7 +56,7 @@ public class ResultBlockIterOverResultElementIterTest
 		final IntermediateResultBlock b2 = blockIter.next();
 		assertEquals( 1, b2.size() );
 
-		final Iterator<SolutionMapping> b2Iter = b2.iterator();
+		final Iterator<SolutionMapping> b2Iter = b2.getSolutionMappings().iterator();
 		assertEquals( sm3, b2Iter.next() );
 
 		assertFalse( blockIter.hasNext() );

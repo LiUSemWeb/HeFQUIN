@@ -113,7 +113,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		                     final IntermediateResultElementSink sink,
 		                     final ExecutionContext execCxt )
 		{
-			final Iterator<SolutionMapping> it = input.iterator();
+			final Iterator<SolutionMapping> it = input.getSolutionMappings().iterator();
 			while ( it.hasNext() ) {
 				final String token = it.next().toString() + "ok";
 				sink.send( TestUtils.createSolutionMappingForTests(token) );

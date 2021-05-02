@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -21,7 +19,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTriplesRequests<Query
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> fetchSolutionMappings(
+	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt )
 	{
@@ -34,5 +32,5 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTriplesRequests<Query
 
 	protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
-	protected abstract Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
+	protected abstract Iterable<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
 }

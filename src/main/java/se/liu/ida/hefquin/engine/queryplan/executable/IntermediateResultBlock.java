@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
 public interface IntermediateResultBlock
@@ -14,6 +12,6 @@ public interface IntermediateResultBlock
 	/**
 	 * Returns an iterator over the intermediate result elements in this block.
 	 */
-	Iterator<SolutionMapping> iterator();
+	Iterable<SolutionMapping> getSolutionMappings();
 	
 }

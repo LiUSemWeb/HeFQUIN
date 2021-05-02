@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -20,13 +18,13 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<Query
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> fetchSolutionMappings(
+	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt )
 	{
 		final ReqType req = createRequest(sm);
 		final SolMapsResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
-		return resp.getSolutionMappings().iterator();
+		return resp.getSolutionMappings();
 	}
 
 	protected abstract ReqType createRequest( final SolutionMapping sm );

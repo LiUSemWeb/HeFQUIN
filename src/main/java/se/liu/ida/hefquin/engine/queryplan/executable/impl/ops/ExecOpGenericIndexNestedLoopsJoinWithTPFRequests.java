@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
@@ -19,14 +17,14 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> fetchSolutionMappings(
+	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping inputSolMap,
 			final ExecutionContext execCxt )
 	{
 		final MaterializingIntermediateResultElementSink reqSink = new MaterializingIntermediateResultElementSink();
 		createRequestOperator(inputSolMap).execute(reqSink, execCxt);
 
-		return reqSink.getMaterializedIntermediateResult().iterator();
+		return reqSink.getMaterializedIntermediateResult();
 	}
 
 	protected NullaryExecutableOp createRequestOperator( final SolutionMapping inputSolMap ) {

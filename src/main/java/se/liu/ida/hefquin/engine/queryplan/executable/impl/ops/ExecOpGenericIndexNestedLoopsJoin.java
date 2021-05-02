@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -38,9 +36,8 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt)
 	{
-		final Iterator<SolutionMapping> it = input.iterator();
-		while ( it.hasNext() ) {
-			process( it.next(), sink, execCxt );
+		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+			process( sm, sink, execCxt );
 		}
 	}
 
@@ -57,14 +54,13 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt)
 	{
-		final Iterator<? extends SolutionMapping> it = fetchSolutionMappings(sm, execCxt);
-		while ( it.hasNext() ) {
-			final SolutionMapping out = JenaBasedSolutionMappingUtils.merge( sm, it.next() );
+		for ( final SolutionMapping fetchedSM : fetchSolutionMappings(sm,execCxt) ) {
+			final SolutionMapping out = JenaBasedSolutionMappingUtils.merge( sm, fetchedSM );
 			sink.send(out);
 		}
 	}
 
-	protected abstract Iterator<? extends SolutionMapping> fetchSolutionMappings(
+	protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt );
 

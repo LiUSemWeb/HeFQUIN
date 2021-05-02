@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -18,8 +17,8 @@ public class GenericIntermediateResultBlockImpl
 	}
 
 	@Override
-	public Iterator<SolutionMapping> iterator() {
-		return elements.iterator();
+	public Iterable<SolutionMapping> getSolutionMappings() {
+		return elements;
 	}
 
 	public void add( SolutionMapping element ) {

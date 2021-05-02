@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
@@ -8,10 +11,6 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType extends FederationMember>
         implements UnaryExecutableOp
@@ -40,20 +39,15 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
             final IntermediateResultElementSink sink,
             final ExecutionContext execCxt)
     {
-        final Iterator<SolutionMapping> it = input.iterator();
         final Set<SolutionMapping> solMaps = new HashSet<>();
-        while ( it.hasNext() ) {
-            solMaps.add( it.next());
+        for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+            solMaps.add(sm);
         }
 
-        final Iterator<? extends SolutionMapping> outIt = fetchSolutionMappings(solMaps, execCxt);
-
-        JenaBasedSolutionMapping inSolM, outSolM;
-        while ( outIt.hasNext() ) {
-            outSolM= (JenaBasedSolutionMapping) outIt.next();
-            final Iterator<SolutionMapping> inIt = input.iterator();
-            while(inIt.hasNext()){
-                inSolM= (JenaBasedSolutionMapping) inIt.next();
+        for ( final SolutionMapping fetchedSM : fetchSolutionMappings(solMaps,execCxt) ) {
+            final JenaBasedSolutionMapping outSolM = (JenaBasedSolutionMapping) fetchedSM;
+            for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+                final JenaBasedSolutionMapping inSolM= (JenaBasedSolutionMapping) sm;
 
                 if(inSolM.isCompatibleWith(outSolM)){
                     final SolutionMapping SolM = JenaBasedSolutionMappingUtils.merge(inSolM, outSolM);
@@ -71,7 +65,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
         // nothing to be done here
     }
 
-    protected abstract Iterator<? extends SolutionMapping> fetchSolutionMappings(
+    protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
             final Set<SolutionMapping> solMaps,
             final ExecutionContext execCxt );
 }
