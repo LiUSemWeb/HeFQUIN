@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access.impl.jenaimpl;
+package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +16,6 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 
 public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
