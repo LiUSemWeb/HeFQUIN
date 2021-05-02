@@ -15,7 +15,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.PatternVars;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -90,11 +89,10 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
-		final JenaBasedSolutionMapping jbsm = (JenaBasedSolutionMapping) sm;
 		final Set<TriplePattern> tps = new HashSet<>();
 		boolean unchanged = true;
 		for ( final TriplePattern tp : ((JenaBasedBGP)bgp).getTriplePatterns() ) {
-			final TriplePattern tp2 = applySolMapToTriplePattern(jbsm, tp);
+			final TriplePattern tp2 = applySolMapToTriplePattern(sm, tp);
 			tps.add(tp2);
 			if ( tp2 != tp ) {
 				unchanged = false;
@@ -109,10 +107,6 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static TriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {
-		return applySolMapToTriplePattern( (JenaBasedSolutionMapping) sm, tp );
-	}
-
-	public static TriplePattern applySolMapToTriplePattern( final JenaBasedSolutionMapping sm, final TriplePattern tp ) {
 		final Binding b = sm.asJenaBinding();
 		boolean unchanged = true;
 

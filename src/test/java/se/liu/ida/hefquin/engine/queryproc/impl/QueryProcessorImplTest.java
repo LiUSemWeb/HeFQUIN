@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -72,7 +71,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		// checking
 		assertTrue( it.hasNext() );
 
-		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		final Binding sm1 = it.next().asJenaBinding();
 		assertEquals( 2, sm1.size() );
 		final Var varX = Var.alloc("x");
 		final Var varY = Var.alloc("y");
@@ -111,7 +110,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		// checking
 		assertTrue( it.hasNext() );
 
-		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		final Binding sm1 = it.next().asJenaBinding();
 		assertEquals( 3, sm1.size() );
 		final Var varX = Var.alloc("x");
 		final Var varY = Var.alloc("y");
@@ -157,7 +156,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		// checking
 		assertTrue( it.hasNext() );
 
-		final Binding sm1 = ((JenaBasedSolutionMapping) it.next()).asJenaBinding();
+		final Binding sm1 = it.next().asJenaBinding();
 		assertEquals( 3, sm1.size() );
 		final Var varX = Var.alloc("x");
 		final Var varY = Var.alloc("y");
@@ -200,7 +199,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 			// checking
 			assertTrue( it.hasNext() );
 
-			final Binding b = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+			final Binding b = it.next().asJenaBinding();
 			final Var var = Var.alloc("o");
 			assertEquals( 1, b.size() );
 			assertTrue( b.contains(var) );

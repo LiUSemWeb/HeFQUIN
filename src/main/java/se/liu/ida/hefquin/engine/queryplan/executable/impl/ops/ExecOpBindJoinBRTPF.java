@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -62,8 +61,7 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 	protected BindingsRestrictedTriplePatternRequest createRequest( final IntermediateResultBlock input ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			final JenaBasedSolutionMapping jbsm = (JenaBasedSolutionMapping) sm;
-			restrictedSolMaps.add( JenaBasedSolutionMappingUtils.restrict(jbsm, varsInTP) );
+			restrictedSolMaps.add( JenaBasedSolutionMappingUtils.restrict(sm, varsInTP) );
 		}
 		return new BindingsRestrictedTriplePatternRequestImpl( tp, restrictedSolMaps );
 	}
@@ -79,14 +77,12 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 		}
 
 		@Override
-		public void send( final SolutionMapping solMapFromRequest ) {
+		public void send( final SolutionMapping smFromRequest ) {
 			// TODO: this implementation is very inefficient
 			// We need an implementation of IntermediateResultBlock that can
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
-			final JenaBasedSolutionMapping smFromRequest = (JenaBasedSolutionMapping) solMapFromRequest;
-			for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-				final JenaBasedSolutionMapping smFromInput = (JenaBasedSolutionMapping) sm;
+			for ( final SolutionMapping smFromInput : input.getSolutionMappings() ) {
 				if ( JenaBasedSolutionMappingUtils.compatible(smFromRequest,smFromInput) ) {
 					outputSink.send( JenaBasedSolutionMappingUtils.merge(smFromRequest,smFromInput) );
 				}

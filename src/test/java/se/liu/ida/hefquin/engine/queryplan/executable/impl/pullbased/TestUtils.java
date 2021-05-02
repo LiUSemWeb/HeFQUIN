@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.sparql.engine.binding.Binding;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -51,6 +53,9 @@ public class TestUtils
 
 		@Override
 		public String toString() { return token; }
+
+		@Override
+		public Binding asJenaBinding() { throw new UnsupportedOperationException(); }
 	}
 
 	public static class ResultElementIteratorForTests implements ResultElementIterator

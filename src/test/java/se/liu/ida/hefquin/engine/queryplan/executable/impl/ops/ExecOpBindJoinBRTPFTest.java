@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedTripleUtils;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
@@ -38,10 +37,10 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1) );
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y2) );
 
@@ -70,21 +69,21 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
-        final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b1 = it.next().asJenaBinding();
         assertEquals( 3, b1.size() );
         assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
         assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
         assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
         assertTrue( it.hasNext() );
-        final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b2 = it.next().asJenaBinding();
         assertEquals( 3, b2.size() );
         assertEquals( "http://example.org/x1", b2.get(var1).getURI() );
         assertEquals( "http://example.org/y1", b2.get(var2).getURI() );
         assertEquals( "http://example.org/z2", b2.get(var3).getURI() );
 
         assertTrue( it.hasNext() );
-        final Binding b3 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b3 = it.next().asJenaBinding();
         assertEquals( 3, b3.size() );
         assertEquals( "http://example.org/x2", b3.get(var1).getURI() );
         assertEquals( "http://example.org/y2", b3.get(var2).getURI() );
@@ -104,10 +103,10 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1) );
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y2) );
 
@@ -132,14 +131,14 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
-        final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b1 = it.next().asJenaBinding();
         assertEquals( 3, b1.size() );
         assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
         assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
         assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
         assertTrue( it.hasNext() );
-        final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b2 = it.next().asJenaBinding();
         assertEquals( 3, b2.size() );
         assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
         assertEquals( "http://example.org/y2", b2.get(var2).getURI() );
@@ -157,9 +156,9 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node x2 = NodeFactory.createURI("http://example.org/x2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x1) );
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, x2) );
 
         final Node p = NodeFactory.createURI("http://example.org/p");
@@ -184,14 +183,14 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
         assertTrue( it.hasNext() );
-        final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b1 = it.next().asJenaBinding();
         assertEquals( 3, b1.size() );
         assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
         assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
         assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
         assertTrue( it.hasNext() );
-        final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+        final Binding b2 = it.next().asJenaBinding();
         assertEquals( 3, b2.size() );
         assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
         assertEquals( "http://example.org/y1", b2.get(var2).getURI() );
@@ -235,9 +234,9 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Var var2 = Var.alloc("v2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, NodeFactory.createURI("http://example.org/x1")) );
-        input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
                 var1, NodeFactory.createURI("http://example.org/x2")) );
 
         final Node p = NodeFactory.createURI("http://example.org/p");

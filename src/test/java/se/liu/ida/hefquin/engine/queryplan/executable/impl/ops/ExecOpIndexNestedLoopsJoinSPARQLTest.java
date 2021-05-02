@@ -15,7 +15,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -34,10 +33,10 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Var var3 = Var.alloc("v3");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1"),
 				var2, NodeFactory.createURI("http://example.org/y1")) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2"),
 				var2, NodeFactory.createURI("http://example.org/y2")) );
 
@@ -48,10 +47,10 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 		final List<SolutionMapping> lResp1 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var3, z1),
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var3, z2) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var3, z1),
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var3, z2) );
 		final List<SolutionMapping> lResp2 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var3, z3) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var3, z3) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -65,21 +64,21 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
 		assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 		assertEquals( "http://example.org/x1", b2.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b2.get(var2).getURI() );
 		assertEquals( "http://example.org/z2", b2.get(var3).getURI() );
 
 		assertTrue( it.hasNext() );
-		final Binding b3 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b3 = it.next().asJenaBinding();
 		assertEquals( 3, b3.size() );
 		assertEquals( "http://example.org/x2", b3.get(var1).getURI() );
 		assertEquals( "http://example.org/y2", b3.get(var2).getURI() );
@@ -95,10 +94,10 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Var var3 = Var.alloc("v3");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1"),
 				var2, NodeFactory.createURI("http://example.org/y1")) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2"),
 				var2, NodeFactory.createURI("http://example.org/y2")) );
 
@@ -107,9 +106,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final List<SolutionMapping> lResp1 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var3, z1) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var3, z1) );
 		final List<SolutionMapping> lResp2 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var3, z2) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var3, z2) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -123,14 +122,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
 		assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 		assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
 		assertEquals( "http://example.org/y2", b2.get(var2).getURI() );
@@ -146,9 +145,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Var var3 = Var.alloc("v3");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
@@ -159,9 +158,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final List<SolutionMapping> lResp1 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var2, y1, var3, z1) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var2, y1, var3, z1) );
 		final List<SolutionMapping> lResp2 = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var2, y2, var3, z2) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var2, y2, var3, z2) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp1,lResp2).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -175,14 +174,14 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
 		assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 		assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
 		assertEquals( "http://example.org/y2", b2.get(var2).getURI() );
@@ -205,7 +204,7 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final List<SolutionMapping> lResp = Arrays.asList(
-				(SolutionMapping) JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var2, y1, var3, z1) );
+				(SolutionMapping) JenaBasedSolutionMappingUtils.createSolutionMapping(var2, y1, var3, z1) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(Arrays.asList(lResp).iterator(), null);
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -227,9 +226,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends ExecOpTestBase
 		final Var var2 = Var.alloc("v2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");

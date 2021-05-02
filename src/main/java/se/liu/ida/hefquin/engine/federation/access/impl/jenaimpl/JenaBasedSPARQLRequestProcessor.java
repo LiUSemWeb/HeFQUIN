@@ -48,7 +48,7 @@ public class JenaBasedSPARQLRequestProcessor implements SPARQLRequestProcessor
 
 		@Override
 		public void accept( final QuerySolution s ) {
-			solMaps.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(s) );
+			solMaps.add( JenaBasedSolutionMappingUtils.createSolutionMapping(s) );
 		}
 		
 	} // end of MySolutionConsumer

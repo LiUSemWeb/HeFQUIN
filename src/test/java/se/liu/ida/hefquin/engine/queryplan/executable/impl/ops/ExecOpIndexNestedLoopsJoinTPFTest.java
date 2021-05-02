@@ -16,7 +16,6 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -45,10 +44,10 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, x2,
 				var2, y2) );
 
@@ -62,7 +61,7 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
@@ -77,7 +76,7 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		}
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 		assertEquals( "http://example.org/x1", b2.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b2.get(var2).getURI() );
@@ -89,7 +88,7 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		}
 
 		assertTrue( it.hasNext() );
-		final Binding b3 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b3 = it.next().asJenaBinding();
 		assertEquals( 3, b3.size() );
 		assertEquals( "http://example.org/x2", b3.get(var1).getURI() );
 		assertEquals( "http://example.org/y2", b3.get(var2).getURI() );
@@ -112,10 +111,10 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, x2,
 				var2, y2) );
 
@@ -128,14 +127,14 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 		assertEquals( "http://example.org/x1", b1.get(var1).getURI() );
 		assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
 		assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 		assertEquals( "http://example.org/x2", b2.get(var1).getURI() );
 		assertEquals( "http://example.org/y2", b2.get(var2).getURI() );
@@ -159,8 +158,8 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var1, x1) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(var1, x2) );
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(var1, x1) );
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(var1, x2) );
 
 		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var2,p,var3);
 
@@ -171,19 +170,19 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
 
 		assertTrue( it.hasNext() );
-		final Binding b1 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 3, b1.size() );
 
 		assertTrue( it.hasNext() );
-		final Binding b2 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 3, b2.size() );
 
 		assertTrue( it.hasNext() );
-		final Binding b3 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b3 = it.next().asJenaBinding();
 		assertEquals( 3, b3.size() );
 
 		assertTrue( it.hasNext() );
-		final Binding b4 = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+		final Binding b4 = it.next().asJenaBinding();
 		assertEquals( 3, b4.size() );
 
 		assertFalse( it.hasNext() );
@@ -216,9 +215,9 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Var var2 = Var.alloc("v2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
-		input.add( JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");

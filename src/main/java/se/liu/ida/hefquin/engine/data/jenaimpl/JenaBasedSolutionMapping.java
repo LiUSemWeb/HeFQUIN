@@ -13,12 +13,8 @@ public class JenaBasedSolutionMapping implements SolutionMapping
 		this.jenaObj = jenaObject;
 	}
 
+	@Override
 	public Binding asJenaBinding() {
 		return jenaObj;
 	}
-
-	public boolean isCompatibleWith( final JenaBasedSolutionMapping other ) {
-		return JenaBasedSolutionMappingUtils.compatible(this, other);
-	}
-
 }

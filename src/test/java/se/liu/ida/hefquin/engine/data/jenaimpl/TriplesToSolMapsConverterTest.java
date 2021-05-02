@@ -207,9 +207,7 @@ public class TriplesToSolMapsConverterTest
 			assertTrue( it.hasNext() );
 
 			final SolutionMapping sm = it.next();
-			assertTrue( sm instanceof JenaBasedSolutionMapping );
-
-			final Binding b = ( (JenaBasedSolutionMapping) sm ).asJenaBinding();
+			final Binding b = sm.asJenaBinding();
 			assertEquals( 1, b.size() );
 
 			verifyOneVar( b, v, s );
@@ -222,10 +220,7 @@ public class TriplesToSolMapsConverterTest
 	protected void verifyOneSolMap( final Iterator<? extends SolutionMapping> it, final Var[] vars, final Node[] expectedNodes ) {
 		assertTrue( it.hasNext() );
 
-		final SolutionMapping sm = it.next();
-		assertTrue( sm instanceof JenaBasedSolutionMapping );
-
-		final Binding b = ( (JenaBasedSolutionMapping) sm ).asJenaBinding();
+		final Binding b = it.next().asJenaBinding();
 		assertEquals( vars.length, b.size() );
 
 		for( int i = 0; i < vars.length; ++i ) {

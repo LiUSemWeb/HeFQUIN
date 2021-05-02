@@ -13,7 +13,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedTriple;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -132,7 +131,7 @@ public abstract class EngineTestBase
 
 			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
 			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
-				final Binding b = ((JenaBasedSolutionMapping) sm).asJenaBinding();
+				final Binding b = sm.asJenaBinding();
 				final Node s = ( jenaTP.getSubject().isVariable() )
 						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
 						: null;

@@ -47,7 +47,7 @@ public class TriplesToSolMapsConverter
 		}
 	}
 
-	protected static abstract class ConvertingIterBase implements Iterator<JenaBasedSolutionMapping>
+	protected static abstract class ConvertingIterBase implements Iterator<SolutionMapping>
 	{
 		protected final Iterator<Triple> it;
 
@@ -62,11 +62,11 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		public JenaBasedSolutionMapping next() {
+		public SolutionMapping next() {
 			return convert( it.next() );
 		}
 
-		protected abstract JenaBasedSolutionMapping convert( final Triple t );
+		protected abstract SolutionMapping convert( final Triple t );
 	}
 
 	protected static class ConvertingIterEmpty extends ConvertingIterBase
@@ -76,8 +76,8 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping();
+		protected SolutionMapping convert( final Triple t ) {
+			return JenaBasedSolutionMappingUtils.createSolutionMapping();
 		}
 	}
 
@@ -93,8 +93,8 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping( var, getRelevantNode(t) );
+		protected SolutionMapping convert( final Triple t ) {
+			return JenaBasedSolutionMappingUtils.createSolutionMapping( var, getRelevantNode(t) );
 		}
 
 		protected abstract Node getRelevantNode( final Triple t );
@@ -151,8 +151,8 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping( var1, getRelevantNode1(t), var2, getRelevantNode2(t) );
+		protected SolutionMapping convert( final Triple t ) {
+			return JenaBasedSolutionMappingUtils.createSolutionMapping( var1, getRelevantNode1(t), var2, getRelevantNode2(t) );
 		}
 
 		protected abstract Node getRelevantNode1( final Triple t );
@@ -226,9 +226,9 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final Triple t ) {
+		protected SolutionMapping convert( final Triple t ) {
 			final org.apache.jena.graph.Triple tt = t.asJenaTriple();
-			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
+			return JenaBasedSolutionMappingUtils.createSolutionMapping(
 					var1, tt.getSubject(),
 					var2, tt.getPredicate(),
 					var3, tt.getObject() );

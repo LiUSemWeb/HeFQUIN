@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedTripleUtils;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -42,17 +41,13 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
 
 		assertTrue( it.hasNext() );
-		final SolutionMapping sm1 = it.next();
-		assertTrue( sm1 instanceof JenaBasedSolutionMapping );
-		final Binding b1 = ( (JenaBasedSolutionMapping) sm1 ).asJenaBinding();
+		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 1, b1.size() );
 		assertTrue( b1.contains(v) );
 		assertEquals( "http://example.org/o1", b1.get(v).getURI() );
 
 		assertTrue( it.hasNext() );
-		final SolutionMapping sm2 = it.next();
-		assertTrue( sm2 instanceof JenaBasedSolutionMapping );
-		final Binding b2 = ( (JenaBasedSolutionMapping) sm2 ).asJenaBinding();
+		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 1, b2.size() );
 		assertTrue( b2.contains(v) );
 		assertEquals( "http://example.org/o2", b2.get(v).getURI() );

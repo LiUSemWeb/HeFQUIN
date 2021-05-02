@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMapping;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
@@ -46,7 +45,7 @@ public class JenaBasedSPARQLRequestProcessorTest extends EngineTestBase
 			final Iterator<SolutionMapping> it = resp.getSolutionMappings().iterator();
 			assertTrue( it.hasNext() );
 
-			final Binding b = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();
+			final Binding b = it.next().asJenaBinding();
 			final Var var = Var.alloc("o");
 			assertEquals( 1, b.size() );
 			assertTrue( b.contains(var) );
