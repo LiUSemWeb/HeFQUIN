@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.jenaimpl.SPARQLGraphPatternImpl;
 
 public class JenaBasedSPARQLRequestProcessorTest extends EngineTestBase
 {
@@ -28,7 +28,7 @@ public class JenaBasedSPARQLRequestProcessorTest extends EngineTestBase
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
-			final SPARQLGraphPattern pattern = new JenaBasedSPARQLGraphPattern( QueryFactory.create(queryString).getQueryPattern() );
+			final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 			final SPARQLRequest req = new SPARQLRequestImpl(pattern);
 
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");

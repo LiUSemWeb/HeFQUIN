@@ -26,7 +26,7 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.jenaimpl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -99,7 +99,7 @@ public class SourcePlannerImpl implements SourcePlanner
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request. 
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( new JenaBasedSPARQLGraphPattern(pattern) );
+			final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(pattern) );
 			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
 			return new LogicalPlanWithNullaryRootImpl(op);
 		}

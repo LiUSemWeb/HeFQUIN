@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.jenaimpl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -139,7 +139,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 	protected LogicalPlan createLogicalPlan( final String queryString,
 	                                         final FederationCatalog fedCat ) {
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(fedCat);
-		final Query query = new JenaBasedSPARQLGraphPattern( QueryFactory.create(queryString).getQueryPattern() );
+		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 		return sourcePlanner.createSourceAssignment(query);
 	}
 
