@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequest
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
@@ -55,7 +56,7 @@ public class SourcePlannerImpl implements SourcePlanner
 		// (i.e., not "SERVICE var {...}"). Therefore, all that this
 		// implementation here does is to convert the given query
 		// pattern into a logical plan.
-		final Element pattern = ( (JenaBasedSPARQLGraphPattern) query ).asElement();
+		final Element pattern = ( (SPARQLGraphPattern) query ).asJenaElement();
 		return createPlan(pattern);
 	}
 

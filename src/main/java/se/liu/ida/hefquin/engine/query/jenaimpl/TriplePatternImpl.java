@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.query.jenaimpl;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -12,6 +13,11 @@ public class TriplePatternImpl implements TriplePattern
 	public TriplePatternImpl( final Triple jenaObject ) {
 		assert jenaObject != null;
 		this.jenaObj = jenaObject;
+	}
+
+	@Override
+	public Element asJenaElement() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

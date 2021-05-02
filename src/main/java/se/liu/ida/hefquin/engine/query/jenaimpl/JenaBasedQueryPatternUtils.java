@@ -71,11 +71,7 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern pattern ) {
-		return getVariablesInPattern( (JenaBasedSPARQLGraphPattern) pattern );
-	}
-
-	public static Set<Var> getVariablesInPattern( final JenaBasedSPARQLGraphPattern pattern ) {
-		return new HashSet<>( PatternVars.vars(pattern.asElement()) );
+		return new HashSet<>( PatternVars.vars(pattern.asJenaElement()) );
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

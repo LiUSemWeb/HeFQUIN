@@ -13,7 +13,8 @@ public class JenaBasedSPARQLGraphPattern implements SPARQLGraphPattern
 		this.jenaPatternElement = jenaPatternElement;
 	}
 
-	public Element asElement() {
+	@Override
+	public Element asJenaElement() {
 		return jenaPatternElement;
 	}
 

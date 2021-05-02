@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
 
 public class JenaBasedSPARQLRequestProcessor implements SPARQLRequestProcessor
 {
@@ -27,7 +26,7 @@ public class JenaBasedSPARQLRequestProcessor implements SPARQLRequestProcessor
 		final Query query = QueryFactory.create();
 		query.setQuerySelectType();
 		query.setQueryResultStar(true);
-		query.setQueryPattern( ((JenaBasedSPARQLGraphPattern) req.getQueryPattern()).asElement() );
+		query.setQueryPattern( req.getQueryPattern().asJenaElement() );
 
 		final MySolutionConsumer sink = new MySolutionConsumer();
 
