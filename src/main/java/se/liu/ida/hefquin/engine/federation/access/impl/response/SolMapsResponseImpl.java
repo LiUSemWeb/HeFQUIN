@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.response;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -40,8 +39,8 @@ public class SolMapsResponseImpl
 	}
 
 	@Override
-	public Iterator<SolutionMapping> getIterator() {
-		return solMaps.iterator();
+	public Iterable<SolutionMapping> getSolutionMappings() {
+		return solMaps;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<Query
 	{
 		final ReqType req = createRequest(sm);
 		final SolMapsResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
-		return resp.getIterator();
+		return resp.getSolutionMappings().iterator();
 	}
 
 	protected abstract ReqType createRequest( final SolutionMapping sm );

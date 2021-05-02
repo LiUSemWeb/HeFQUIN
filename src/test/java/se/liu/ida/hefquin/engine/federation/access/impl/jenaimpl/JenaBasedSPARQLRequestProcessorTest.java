@@ -43,7 +43,7 @@ public class JenaBasedSPARQLRequestProcessorTest extends EngineTestBase
 			assertEquals( fm, resp.getFederationMember() );
 			assertEquals( req, resp.getRequest() );
 
-			final Iterator<SolutionMapping> it = resp.getIterator();
+			final Iterator<SolutionMapping> it = resp.getSolutionMappings().iterator();
 			assertTrue( it.hasNext() );
 
 			final Binding b = ( (JenaBasedSolutionMapping) it.next() ).asJenaBinding();

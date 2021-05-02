@@ -1,15 +1,13 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
 public interface SolMapsResponse extends DataRetrievalResponse
 {
-	Iterator<SolutionMapping> getIterator();
+	Iterable<SolutionMapping> getSolutionMappings();
 
 	/**
-	 * Returns the number of triples that are returned by the {@link #getIterator()}. 
+	 * Returns the number of triples that are returned by {@link #getSolutionMappings()}. 
 	 */
 	int getSize();
 }

@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -22,9 +20,8 @@ public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalR
 	                     final ExecutionContext execCxt )
 	{
 		final SolMapsResponse response = performRequest( execCxt.getFederationAccessMgr() );
-		final Iterator<SolutionMapping> it = response.getIterator();
-		while ( it.hasNext() ) {
-			sink.send( it.next() );
+		for ( SolutionMapping sm : response.getSolutionMappings() ) {
+			sink.send( sm );
 		}
 	}
 
