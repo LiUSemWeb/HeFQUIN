@@ -192,7 +192,7 @@ public class TriplesToSolMapsConverterTest
 		final Node o = NodeFactory.createURI("http://example.org/o");
 		final Var v = Var.alloc("v");
 
-		final Triple t = JenaBasedTripleUtils.createTriple(s,p,o);
+		final Triple t = new TripleImpl(s,p,o);
 		final List<Triple> l = new ArrayList<>();
 		final int n = 4;
 		for ( int i = 0; i < n; ++i ) {
@@ -241,7 +241,7 @@ public class TriplesToSolMapsConverterTest
 	}
 
 	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Node tS, final Node tP, final Node tO, final TriplePattern tp ) {
-		return createIteratorForTests( JenaBasedTripleUtils.createTriple(tS,tP,tO), tp );
+		return createIteratorForTests( new TripleImpl(tS,tP,tO), tp );
 	}
 
 	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Triple t, final TriplePattern tp ) {

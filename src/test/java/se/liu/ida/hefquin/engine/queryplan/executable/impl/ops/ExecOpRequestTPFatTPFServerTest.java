@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedTripleUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
@@ -62,10 +62,10 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Node o1 = NodeFactory.createURI("http://example.org/o1");
-		l.add( JenaBasedTripleUtils.createTriple(s,p,o1) );
+		l.add( new TripleImpl(s,p,o1) );
 
 		final Node o2 = NodeFactory.createURI("http://example.org/o2");
-		l.add( JenaBasedTripleUtils.createTriple(s,p,o2) );
+		l.add( new TripleImpl(s,p,o2) );
 
 		return new ExecutionContext( new FederationAccessManagerForTest(null,l) );
 	}
