@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access.impl.jenaimpl;
+package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
