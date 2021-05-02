@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.jenaimpl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -37,10 +37,10 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1) );
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y2) );
 
@@ -103,10 +103,10 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1) );
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y2) );
 
@@ -156,9 +156,9 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Node x2 = NodeFactory.createURI("http://example.org/x2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x1) );
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x2) );
 
         final Node p = NodeFactory.createURI("http://example.org/p");
@@ -232,9 +232,9 @@ public class ExecOpBindJoinBRTPFTest extends ExecOpTestBase
         final Var var2 = Var.alloc("v2");
 
         final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, NodeFactory.createURI("http://example.org/x1")) );
-        input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+        input.add( SolutionMappingUtils.createSolutionMapping(
                 var1, NodeFactory.createURI("http://example.org/x2")) );
 
         final Node p = NodeFactory.createURI("http://example.org/p");

@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -55,7 +55,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 			final ExecutionContext execCxt)
 	{
 		for ( final SolutionMapping fetchedSM : fetchSolutionMappings(sm,execCxt) ) {
-			final SolutionMapping out = JenaBasedSolutionMappingUtils.merge( sm, fetchedSM );
+			final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
 			sink.send(out);
 		}
 	}

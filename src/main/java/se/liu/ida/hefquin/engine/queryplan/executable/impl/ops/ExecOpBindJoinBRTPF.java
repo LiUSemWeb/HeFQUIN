@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
@@ -61,7 +61,7 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 	protected BindingsRestrictedTriplePatternRequest createRequest( final IntermediateResultBlock input ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			restrictedSolMaps.add( JenaBasedSolutionMappingUtils.restrict(sm, varsInTP) );
+			restrictedSolMaps.add( SolutionMappingUtils.restrict(sm, varsInTP) );
 		}
 		return new BindingsRestrictedTriplePatternRequestImpl( tp, restrictedSolMaps );
 	}
@@ -83,8 +83,8 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : input.getSolutionMappings() ) {
-				if ( JenaBasedSolutionMappingUtils.compatible(smFromRequest,smFromInput) ) {
-					outputSink.send( JenaBasedSolutionMappingUtils.merge(smFromRequest,smFromInput) );
+				if ( SolutionMappingUtils.compatible(smFromRequest,smFromInput) ) {
+					outputSink.send( SolutionMappingUtils.merge(smFromRequest,smFromInput) );
 				}
 			}
 		}

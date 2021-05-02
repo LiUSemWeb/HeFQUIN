@@ -13,7 +13,7 @@ import org.apache.jena.sparql.engine.binding.BindingUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
-public class JenaBasedSolutionMappingUtils
+public class SolutionMappingUtils
 {
 	/**
 	 * Creates an empty solution mapping.

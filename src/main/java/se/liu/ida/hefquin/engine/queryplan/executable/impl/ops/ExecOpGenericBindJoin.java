@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -45,8 +45,8 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
 
         for ( final SolutionMapping fetchedSM : fetchSolutionMappings(solMaps,execCxt) ) {
             for ( final SolutionMapping inputSM : input.getSolutionMappings() ) {
-                if(JenaBasedSolutionMappingUtils.compatible(inputSM, fetchedSM)){
-                    final SolutionMapping mergedSM = JenaBasedSolutionMappingUtils.merge(inputSM, fetchedSM);
+                if(SolutionMappingUtils.compatible(inputSM, fetchedSM)){
+                    final SolutionMapping mergedSM = SolutionMappingUtils.merge(inputSM, fetchedSM);
                     sink.send(mergedSM);
                 }
             }

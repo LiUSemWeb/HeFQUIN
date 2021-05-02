@@ -77,7 +77,7 @@ public class TriplesToSolMapsConverter
 
 		@Override
 		protected SolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createSolutionMapping();
+			return SolutionMappingUtils.createSolutionMapping();
 		}
 	}
 
@@ -94,7 +94,7 @@ public class TriplesToSolMapsConverter
 
 		@Override
 		protected SolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createSolutionMapping( var, getRelevantNode(t) );
+			return SolutionMappingUtils.createSolutionMapping( var, getRelevantNode(t) );
 		}
 
 		protected abstract Node getRelevantNode( final Triple t );
@@ -152,7 +152,7 @@ public class TriplesToSolMapsConverter
 
 		@Override
 		protected SolutionMapping convert( final Triple t ) {
-			return JenaBasedSolutionMappingUtils.createSolutionMapping( var1, getRelevantNode1(t), var2, getRelevantNode2(t) );
+			return SolutionMappingUtils.createSolutionMapping( var1, getRelevantNode1(t), var2, getRelevantNode2(t) );
 		}
 
 		protected abstract Node getRelevantNode1( final Triple t );
@@ -228,7 +228,7 @@ public class TriplesToSolMapsConverter
 		@Override
 		protected SolutionMapping convert( final Triple t ) {
 			final org.apache.jena.graph.Triple tt = t.asJenaTriple();
-			return JenaBasedSolutionMappingUtils.createSolutionMapping(
+			return SolutionMappingUtils.createSolutionMapping(
 					var1, tt.getSubject(),
 					var2, tt.getPredicate(),
 					var3, tt.getObject() );

@@ -16,7 +16,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -44,10 +44,10 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x2,
 				var2, y2) );
 
@@ -111,10 +111,10 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x2,
 				var2, y2) );
 
@@ -158,8 +158,8 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(var1, x1) );
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(var1, x2) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
 
 		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern(var2,p,var3);
 
@@ -215,9 +215,9 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends ExecOpTestBase
 		final Var var2 = Var.alloc("v2");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
-		input.add( JenaBasedSolutionMappingUtils.createSolutionMapping(
+		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");

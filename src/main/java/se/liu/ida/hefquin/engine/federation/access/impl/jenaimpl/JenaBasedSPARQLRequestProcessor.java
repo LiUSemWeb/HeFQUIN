@@ -12,7 +12,7 @@ import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.jenaimpl.JenaBasedSolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.jenaimpl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
@@ -48,7 +48,7 @@ public class JenaBasedSPARQLRequestProcessor implements SPARQLRequestProcessor
 
 		@Override
 		public void accept( final QuerySolution s ) {
-			solMaps.add( JenaBasedSolutionMappingUtils.createSolutionMapping(s) );
+			solMaps.add( SolutionMappingUtils.createSolutionMapping(s) );
 		}
 		
 	} // end of MySolutionConsumer
