@@ -29,7 +29,7 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples ) {
+	protected Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples ) {
 		return TriplesToSolMapsConverter.convert( itTriples, req.getTriplePattern() );
 	}
 }

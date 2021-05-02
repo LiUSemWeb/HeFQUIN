@@ -25,7 +25,7 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
 
 	@Override
 	protected void consumeResponse( final TPFResponse response, final IntermediateResultElementSink sink ) {
-		consumeMatchingTriples( response.getPayloadIterator(), sink );
+		consumeMatchingTriples( response.getPayload(), sink );
 	}
 
 	@Override
@@ -43,12 +43,12 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
 		return ( response.getPayloadSize() == 0 );
 	}
 
-	protected void consumeMatchingTriples( final Iterator<Triple> itTriples, final IntermediateResultElementSink sink ) {
+	protected void consumeMatchingTriples( final Iterable<Triple> itTriples, final IntermediateResultElementSink sink ) {
 		final Iterator<? extends SolutionMapping> itSolMaps = convert( itTriples );
 		while ( itSolMaps.hasNext() ) {
 			sink.send( itSolMaps.next() );
 		}
 	}
 
-	protected abstract Iterator<? extends SolutionMapping> convert( Iterator<? extends Triple> itTriples );
+	protected abstract Iterator<? extends SolutionMapping> convert( Iterable<? extends Triple> itTriples );
 }

@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import java.util.Iterator;
-
 import se.liu.ida.hefquin.engine.data.Triple;
 
 public interface TPFResponse extends TriplesResponse
@@ -11,10 +9,10 @@ public interface TPFResponse extends TriplesResponse
 	 * contained in the given TPF response, this method here returns an
 	 * iterator only over the matching triples that have been requested.
 	 */
-	Iterator<Triple> getPayloadIterator();
+	Iterable<Triple> getPayload();
 
 	/**
-	 * Returns the number of triples that are returned by the {@link #getPayloadIterator()}. 
+	 * Returns the number of triples that are returned by {@link #getPayload()}. 
 	 */
 	int getPayloadSize();
 
@@ -22,10 +20,10 @@ public interface TPFResponse extends TriplesResponse
 	 * Returns an iterator over all metadata triples contained in the
 	 * given TPF response.
 	 */
-	Iterator<Triple> getMetadataIterator();
+	Iterable<Triple> getMetadata();
 
 	/**
-	 * Returns the number of triples that are returned by the {@link #getMetadataIterator()}. 
+	 * Returns the number of triples that are returned by {@link #getMetadata()}. 
 	 */
 	int getMetadataSize();
 

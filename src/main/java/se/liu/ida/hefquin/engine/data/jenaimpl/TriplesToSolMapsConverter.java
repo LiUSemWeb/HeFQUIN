@@ -12,6 +12,11 @@ import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
 
 public class TriplesToSolMapsConverter
 {
+
+	public static Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final TriplePattern tp ) {
+		return convert( itTriples.iterator(), tp );
+	}
+
 	public static Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples, final TriplePattern tp ) {
 		@SuppressWarnings("unchecked")
 		final Iterator<JenaBasedTriple> itJTriples = (Iterator<JenaBasedTriple>) itTriples;

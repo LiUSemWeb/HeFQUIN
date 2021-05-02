@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.response;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.data.Triple;
@@ -60,8 +59,8 @@ public class TPFResponseImpl
 	}
 
 	@Override
-	public Iterator<Triple> getPayloadIterator() {
-		return matchingTriples.iterator();
+	public Iterable<Triple> getPayload() {
+		return matchingTriples;
 	}
 
 	@Override
@@ -70,8 +69,8 @@ public class TPFResponseImpl
 	}
 
 	@Override
-	public Iterator<Triple> getMetadataIterator() {
-		return metadataTriples.iterator();
+	public Iterable<Triple> getMetadata() {
+		return metadataTriples;
 	}
 
 	@Override
