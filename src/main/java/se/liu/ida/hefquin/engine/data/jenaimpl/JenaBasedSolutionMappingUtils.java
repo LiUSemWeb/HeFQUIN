@@ -21,7 +21,7 @@ public class JenaBasedSolutionMappingUtils
 	public static SolutionMapping createSolutionMapping()
 	{
 		final Binding b = BindingFactory.binding();
-		return new JenaBasedSolutionMapping(b);
+		return new SolutionMappingImpl(b);
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class JenaBasedSolutionMappingUtils
 	 */
 	public static SolutionMapping createSolutionMapping( final QuerySolution s )
 	{
-		return new JenaBasedSolutionMapping( BindingUtils.asBinding(s) );
+		return new SolutionMappingImpl( BindingUtils.asBinding(s) );
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class JenaBasedSolutionMappingUtils
 			final Var var, final Node node )
 	{
 		final Binding b = BindingFactory.binding(var, node);
-		return new JenaBasedSolutionMapping(b);
+		return new SolutionMappingImpl(b);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class JenaBasedSolutionMappingUtils
 		final BindingMap b = BindingFactory.create();
 		b.add(var1, node1);
 		b.add(var2, node2);
-		return new JenaBasedSolutionMapping(b);
+		return new SolutionMappingImpl(b);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class JenaBasedSolutionMappingUtils
 		b.add(var1, node1);
 		b.add(var2, node2);
 		b.add(var3, node3);
-		return new JenaBasedSolutionMapping(b);
+		return new SolutionMappingImpl(b);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class JenaBasedSolutionMappingUtils
 	public static SolutionMapping merge( final SolutionMapping m1, final SolutionMapping m2 ) {
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
-		return new JenaBasedSolutionMapping( BindingUtils.merge(b1,b2) );
+		return new SolutionMappingImpl( BindingUtils.merge(b1,b2) );
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class JenaBasedSolutionMappingUtils
 			}
 		}
 
-		return new JenaBasedSolutionMapping(output);
+		return new SolutionMappingImpl(output);
 	}
 
 }

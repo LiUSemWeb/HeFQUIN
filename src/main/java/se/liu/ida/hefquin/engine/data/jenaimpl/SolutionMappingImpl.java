@@ -4,11 +4,11 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
-public class JenaBasedSolutionMapping implements SolutionMapping
+public class SolutionMappingImpl implements SolutionMapping
 {
 	protected final Binding jenaObj;
 
-	public JenaBasedSolutionMapping( final Binding jenaObject ) {
+	public SolutionMappingImpl( final Binding jenaObject ) {
 		assert jenaObject != null;
 		this.jenaObj = jenaObject;
 	}
