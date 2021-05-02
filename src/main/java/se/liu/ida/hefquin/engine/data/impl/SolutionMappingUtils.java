@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.data.jenaimpl;
+package se.liu.ida.hefquin.engine.data.impl;
 
 import java.util.Iterator;
 import java.util.Set;
