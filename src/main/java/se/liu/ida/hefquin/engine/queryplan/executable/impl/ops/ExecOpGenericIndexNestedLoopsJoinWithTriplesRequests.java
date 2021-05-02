@@ -27,12 +27,12 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTriplesRequests<Query
 	{
 		final ReqType req = createRequest(sm);
 		final TriplesResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
-		return convert( resp.getIterator(), req );
+		return convert( resp.getTriples(), req );
 	}
 
 	protected abstract ReqType createRequest( final SolutionMapping sm );
 
 	protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
-	protected abstract Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples, final ReqType req );
+	protected abstract Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
 }

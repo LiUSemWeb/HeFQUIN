@@ -33,7 +33,7 @@ public abstract class ExecOpGenericTriplesRequest<ReqType extends DataRetrievalR
 	{
 		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
 
-		final Iterator<? extends SolutionMapping> it = convert( response.getIterator() );
+		final Iterator<? extends SolutionMapping> it = convert( response.getTriples() );
 		while ( it.hasNext() ) {
 			sink.send( it.next() );
 		}
@@ -41,6 +41,6 @@ public abstract class ExecOpGenericTriplesRequest<ReqType extends DataRetrievalR
 
 	protected abstract TriplesResponse performRequest( final FederationAccessManager fedAccessMgr );
 
-	protected abstract Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples );
+	protected abstract Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples );
 
 }

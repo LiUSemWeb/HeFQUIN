@@ -27,12 +27,12 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
     {
         final ReqType req = createRequest(solMaps);
         final TriplesResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
-        return convert( resp.getIterator(), req );
+        return convert( resp.getTriples(), req );
     }
 
     protected abstract ReqType createRequest(final Set<SolutionMapping> solMaps);
 
     protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
-    protected abstract Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples, final ReqType req );
+    protected abstract Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
 }

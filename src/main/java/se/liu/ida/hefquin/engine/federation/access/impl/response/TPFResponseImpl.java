@@ -4,12 +4,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.atlas.iterator.Iter;
-
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.utils.ConcatenatingIterable;
 
 public class TPFResponseImpl
                     extends DataRetrievalResponseBase
@@ -51,8 +50,8 @@ public class TPFResponseImpl
 	}
 
 	@Override
-	public Iterator<Triple> getIterator() {
-		return Iter.concat( matchingTriples.iterator(), metadataTriples.iterator() );
+	public Iterable<Triple> getTriples() {
+		return new ConcatenatingIterable<Triple>(matchingTriples, metadataTriples);
 	}
 
 	@Override

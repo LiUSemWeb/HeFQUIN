@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.data.Triple;
 public interface TPFResponse extends TriplesResponse
 {
 	/**
-	 * While {@link #getIterator()} returns an iterator over all triples
+	 * While {@link #getTriples()} returns an iterator over all triples
 	 * contained in the given TPF response, this method here returns an
 	 * iterator only over the matching triples that have been requested.
 	 */
