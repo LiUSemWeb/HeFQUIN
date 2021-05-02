@@ -50,5 +50,5 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
 		}
 	}
 
-	protected abstract Iterator<? extends SolutionMapping> convert( Iterable<? extends Triple> itTriples );
+	protected abstract Iterator<? extends SolutionMapping> convert( Iterable<Triple> itTriples );
 }

@@ -27,7 +27,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTPF<MemberType extend
 	}
 
 	@Override
-	protected Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples ) {
+	protected Iterator<? extends SolutionMapping> convert( final Iterable<Triple> itTriples ) {
 		return TriplesToSolMapsConverter.convert( itTriples, req.getQueryPattern() );
 	}
 }

@@ -13,14 +13,11 @@ import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
 public class TriplesToSolMapsConverter
 {
 
-	public static Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final TriplePattern tp ) {
+	public static Iterator<? extends SolutionMapping> convert( final Iterable<Triple> itTriples, final TriplePattern tp ) {
 		return convert( itTriples.iterator(), tp );
 	}
 
-	public static Iterator<? extends SolutionMapping> convert( final Iterator<? extends Triple> itTriples, final TriplePattern tp ) {
-		@SuppressWarnings("unchecked")
-		final Iterator<JenaBasedTriple> itJTriples = (Iterator<JenaBasedTriple>) itTriples;
-
+	public static Iterator<? extends SolutionMapping> convert( final Iterator<Triple> itTriples, final TriplePattern tp ) {
 		final org.apache.jena.graph.Triple jTP = ( (JenaBasedTriplePattern) tp ).asTriple();
 		final String s = ( Var.isVar(jTP.getSubject()) ) ? jTP.getSubject().getName() : null;
 		final String p = ( Var.isVar(jTP.getPredicate()) ) ? jTP.getPredicate().getName() : null;
@@ -29,33 +26,33 @@ public class TriplesToSolMapsConverter
 		if ( s != null ) {
 			if ( p != null && ! p.equals(s) ) {
 				if ( o != null && ! o.equals(s) && ! o.equals(p) ) {
-					return new ConvertingIterSPO( itJTriples, (JenaBasedTriplePattern) tp );
+					return new ConvertingIterSPO( itTriples, (JenaBasedTriplePattern) tp );
 				} else {
-					return new ConvertingIterSP( itJTriples, Var.alloc(jTP.getSubject()), Var.alloc(jTP.getPredicate()) );
+					return new ConvertingIterSP( itTriples, Var.alloc(jTP.getSubject()), Var.alloc(jTP.getPredicate()) );
 				}
 			} else if ( o != null && ! o.equals(s) ) {
-				return new ConvertingIterSO( itJTriples, Var.alloc(jTP.getSubject()), Var.alloc(jTP.getObject()) );
+				return new ConvertingIterSO( itTriples, Var.alloc(jTP.getSubject()), Var.alloc(jTP.getObject()) );
 			} else {
-				return new ConvertingIterS( itJTriples, Var.alloc(jTP.getSubject()) );
+				return new ConvertingIterS( itTriples, Var.alloc(jTP.getSubject()) );
 			}
 		} else if ( p != null ) {
 			if ( o != null && ! o.equals(p) ) {
-				return new ConvertingIterPO( itJTriples, Var.alloc(jTP.getPredicate()), Var.alloc(jTP.getObject()) );
+				return new ConvertingIterPO( itTriples, Var.alloc(jTP.getPredicate()), Var.alloc(jTP.getObject()) );
 			} else {
-				return new ConvertingIterP( itJTriples, Var.alloc(jTP.getPredicate()) );
+				return new ConvertingIterP( itTriples, Var.alloc(jTP.getPredicate()) );
 			}
 		} else if ( o != null ) {
-			return new ConvertingIterO( itJTriples, Var.alloc(jTP.getObject()) );
+			return new ConvertingIterO( itTriples, Var.alloc(jTP.getObject()) );
 		} else {
-			return new ConvertingIterEmpty( itJTriples );
+			return new ConvertingIterEmpty( itTriples );
 		}
 	}
 
 	protected static abstract class ConvertingIterBase implements Iterator<JenaBasedSolutionMapping>
 	{
-		protected final Iterator<JenaBasedTriple> it;
+		protected final Iterator<Triple> it;
 
-		protected ConvertingIterBase( final Iterator<JenaBasedTriple> it ) {
+		protected ConvertingIterBase( final Iterator<Triple> it ) {
 			assert it != null;
 			this.it = it;
 		}
@@ -70,17 +67,17 @@ public class TriplesToSolMapsConverter
 			return convert( it.next() );
 		}
 
-		protected abstract JenaBasedSolutionMapping convert( final JenaBasedTriple t );
+		protected abstract JenaBasedSolutionMapping convert( final Triple t );
 	}
 
 	protected static class ConvertingIterEmpty extends ConvertingIterBase
 	{
-		protected ConvertingIterEmpty( final Iterator<JenaBasedTriple> it ) {
+		protected ConvertingIterEmpty( final Iterator<Triple> it ) {
 			super(it);
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final JenaBasedTriple t ) {
+		protected JenaBasedSolutionMapping convert( final Triple t ) {
 			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping();
 		}
 	}
@@ -89,7 +86,7 @@ public class TriplesToSolMapsConverter
 	{
 		protected final Var var;
 
-		protected ConvertingIterBase1( final Iterator<JenaBasedTriple> it, final Var var ) {
+		protected ConvertingIterBase1( final Iterator<Triple> it, final Var var ) {
 			super(it);
 
 			assert var != null;
@@ -97,45 +94,45 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final JenaBasedTriple t ) {
+		protected JenaBasedSolutionMapping convert( final Triple t ) {
 			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping( var, getRelevantNode(t) );
 		}
 
-		protected abstract Node getRelevantNode( final JenaBasedTriple t );
+		protected abstract Node getRelevantNode( final Triple t );
 	}
 
 	protected static class ConvertingIterS extends ConvertingIterBase1
 	{
-		public ConvertingIterS( final Iterator<JenaBasedTriple> it, final Var var ) {
+		public ConvertingIterS( final Iterator<Triple> it, final Var var ) {
 			super(it, var);
 		}
 
 		@Override
-		protected Node getRelevantNode( final JenaBasedTriple t ) {
+		protected Node getRelevantNode( final Triple t ) {
 			return t.asJenaTriple().getSubject();
 		}
 	}
 
 	protected static class ConvertingIterP extends ConvertingIterBase1
 	{
-		public ConvertingIterP( final Iterator<JenaBasedTriple> it, final Var var ) {
+		public ConvertingIterP( final Iterator<Triple> it, final Var var ) {
 			super(it, var);
 		}
 
 		@Override
-		protected Node getRelevantNode( final JenaBasedTriple t ) {
+		protected Node getRelevantNode( final Triple t ) {
 			return t.asJenaTriple().getPredicate();
 		}
 	}
 
 	protected static class ConvertingIterO extends ConvertingIterBase1
 	{
-		public ConvertingIterO( final Iterator<JenaBasedTriple> it, final Var var ) {
+		public ConvertingIterO( final Iterator<Triple> it, final Var var ) {
 			super(it, var);
 		}
 
 		@Override
-		protected Node getRelevantNode( final JenaBasedTriple t ) {
+		protected Node getRelevantNode( final Triple t ) {
 			return t.asJenaTriple().getObject();
 		}
 	}
@@ -145,7 +142,7 @@ public class TriplesToSolMapsConverter
 		protected final Var var1;
 		protected final Var var2;
 
-		protected ConvertingIterBase2( final Iterator<JenaBasedTriple> it, final Var var1, final Var var2 ) {
+		protected ConvertingIterBase2( final Iterator<Triple> it, final Var var1, final Var var2 ) {
 			super(it);
 
 			assert var1 != null;
@@ -155,62 +152,62 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final JenaBasedTriple t ) {
+		protected JenaBasedSolutionMapping convert( final Triple t ) {
 			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping( var1, getRelevantNode1(t), var2, getRelevantNode2(t) );
 		}
 
-		protected abstract Node getRelevantNode1( final JenaBasedTriple t );
+		protected abstract Node getRelevantNode1( final Triple t );
 
-		protected abstract Node getRelevantNode2( final JenaBasedTriple t );
+		protected abstract Node getRelevantNode2( final Triple t );
 	}
 
 	protected static class ConvertingIterSP extends ConvertingIterBase2
 	{
-		public ConvertingIterSP( final Iterator<JenaBasedTriple> it, final Var var1, final Var var2 ) {
+		public ConvertingIterSP( final Iterator<Triple> it, final Var var1, final Var var2 ) {
 			super(it, var1, var2);
 		}
 
 		@Override
-		protected Node getRelevantNode1( final JenaBasedTriple t ) {
+		protected Node getRelevantNode1( final Triple t ) {
 			return t.asJenaTriple().getSubject();
 		}
 
 		@Override
-		protected Node getRelevantNode2( final JenaBasedTriple t ) {
+		protected Node getRelevantNode2( final Triple t ) {
 			return t.asJenaTriple().getPredicate();
 		}
 	}
 
 	protected static class ConvertingIterSO extends ConvertingIterBase2
 	{
-		public ConvertingIterSO( final Iterator<JenaBasedTriple> it, final Var var1, final Var var2 ) {
+		public ConvertingIterSO( final Iterator<Triple> it, final Var var1, final Var var2 ) {
 			super(it, var1, var2);
 		}
 
 		@Override
-		protected Node getRelevantNode1( final JenaBasedTriple t ) {
+		protected Node getRelevantNode1( final Triple t ) {
 			return t.asJenaTriple().getSubject();
 		}
 
 		@Override
-		protected Node getRelevantNode2( final JenaBasedTriple t ) {
+		protected Node getRelevantNode2( final Triple t ) {
 			return t.asJenaTriple().getObject();
 		}
 	}
 
 	protected static class ConvertingIterPO extends ConvertingIterBase2
 	{
-		public ConvertingIterPO( final Iterator<JenaBasedTriple> it, final Var var1, final Var var2 ) {
+		public ConvertingIterPO( final Iterator<Triple> it, final Var var1, final Var var2 ) {
 			super(it, var1, var2);
 		}
 
 		@Override
-		protected Node getRelevantNode1( final JenaBasedTriple t ) {
+		protected Node getRelevantNode1( final Triple t ) {
 			return t.asJenaTriple().getPredicate();
 		}
 
 		@Override
-		protected Node getRelevantNode2( final JenaBasedTriple t ) {
+		protected Node getRelevantNode2( final Triple t ) {
 			return t.asJenaTriple().getObject();
 		}
 	}
@@ -221,7 +218,7 @@ public class TriplesToSolMapsConverter
 		protected final Var var2;
 		protected final Var var3;
 
-		protected ConvertingIterSPO( final Iterator<JenaBasedTriple> it, JenaBasedTriplePattern tp ) {
+		protected ConvertingIterSPO( final Iterator<Triple> it, JenaBasedTriplePattern tp ) {
 			super(it);
 
 			var1 = Var.alloc( tp.asTriple().getSubject() );
@@ -230,7 +227,7 @@ public class TriplesToSolMapsConverter
 		}
 
 		@Override
-		protected JenaBasedSolutionMapping convert( final JenaBasedTriple t ) {
+		protected JenaBasedSolutionMapping convert( final Triple t ) {
 			final org.apache.jena.graph.Triple tt = t.asJenaTriple();
 			return JenaBasedSolutionMappingUtils.createJenaBasedSolutionMapping(
 					var1, tt.getSubject(),

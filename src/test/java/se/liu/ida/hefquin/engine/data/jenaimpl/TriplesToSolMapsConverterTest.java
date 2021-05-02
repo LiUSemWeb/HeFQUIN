@@ -15,6 +15,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
@@ -192,8 +193,8 @@ public class TriplesToSolMapsConverterTest
 		final Node o = NodeFactory.createURI("http://example.org/o");
 		final Var v = Var.alloc("v");
 
-		final JenaBasedTriple t = JenaBasedTripleUtils.createJenaBasedTriple(s,p,o);
-		final List<JenaBasedTriple> l = new ArrayList<>();
+		final Triple t = JenaBasedTripleUtils.createTriple(s,p,o);
+		final List<Triple> l = new ArrayList<>();
 		final int n = 4;
 		for ( int i = 0; i < n; ++i ) {
 			l.add(t);
@@ -246,20 +247,20 @@ public class TriplesToSolMapsConverterTest
 	}
 
 	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Node tS, final Node tP, final Node tO, final TriplePattern tp ) {
-		return createIteratorForTests( JenaBasedTripleUtils.createJenaBasedTriple(tS,tP,tO), tp );
+		return createIteratorForTests( JenaBasedTripleUtils.createTriple(tS,tP,tO), tp );
 	}
 
-	protected Iterator<? extends SolutionMapping> createIteratorForTests( final JenaBasedTriple t, final TriplePattern tp ) {
-		final List<JenaBasedTriple> l = new ArrayList<>();
+	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Triple t, final TriplePattern tp ) {
+		final List<Triple> l = new ArrayList<>();
 		l.add(t);
 		return createIteratorForTests( l, tp );
 	}
 
-	protected Iterator<? extends SolutionMapping> createIteratorForTests( final List<JenaBasedTriple> l, final TriplePattern tp ) {
+	protected Iterator<? extends SolutionMapping> createIteratorForTests( final List<Triple> l, final TriplePattern tp ) {
 		return createIteratorForTests( l.iterator(), tp );
 	}
 
-	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Iterator<JenaBasedTriple> it, final TriplePattern tp ) {
+	protected Iterator<? extends SolutionMapping> createIteratorForTests( final Iterator<Triple> it, final TriplePattern tp ) {
 		return TriplesToSolMapsConverter.convert(it, tp);
 	}
 

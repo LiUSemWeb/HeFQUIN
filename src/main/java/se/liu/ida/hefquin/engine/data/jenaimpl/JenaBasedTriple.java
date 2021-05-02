@@ -11,6 +11,7 @@ public class JenaBasedTriple implements Triple
 		this.jenaObj = jenaObject;
 	}
 
+	@Override
 	public org.apache.jena.graph.Triple asJenaTriple() {
 		return jenaObj;
 	}
