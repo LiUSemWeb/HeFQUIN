@@ -46,7 +46,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	}
 
 	@Override
-	public Iterator<SolutionMapping> getJoinPartners( final SolutionMapping sm )
+	public Iterable<SolutionMapping> getJoinPartners( final SolutionMapping sm )
 			throws UnsupportedOperationException
 	{
 		// TODO Auto-generated method stub
@@ -54,7 +54,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	}
 
 	@Override
-	public Iterator<SolutionMapping> findSolutionMappings( final Var var, final Node value )
+	public Iterable<SolutionMapping> findSolutionMappings( final Var var, final Node value )
 			throws UnsupportedOperationException
 	{
 		// TODO Auto-generated method stub
@@ -62,7 +62,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	}
 
 	@Override
-	public Iterator<SolutionMapping> findSolutionMappings(
+	public Iterable<SolutionMapping> findSolutionMappings(
 			final Var var1, final Node value1,
 			final Var var2, final Node value2 )
 					throws UnsupportedOperationException
@@ -72,7 +72,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	}
 
 	@Override
-	public Iterator<SolutionMapping> findSolutionMappings(
+	public Iterable<SolutionMapping> findSolutionMappings(
 			final Var var1, final Node value1,
 			final Var var2, final Node value2,
 			final Var var3, final Node value3 )

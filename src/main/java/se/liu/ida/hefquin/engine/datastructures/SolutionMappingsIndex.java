@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.datastructures;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
@@ -29,7 +28,7 @@ public interface SolutionMappingsIndex extends Collection<SolutionMapping>
 	 * case an {@link UnsupportedOperationException} will be thrown if the
 	 * method is called with an unsupported variable.
 	 */
-	Iterator<SolutionMapping> getJoinPartners( SolutionMapping sm )
+	Iterable<SolutionMapping> getJoinPartners( SolutionMapping sm )
 			throws UnsupportedOperationException;
 
 	/**
@@ -45,7 +44,7 @@ public interface SolutionMappingsIndex extends Collection<SolutionMapping>
 	 * mapping that is defined only for the given variable and that maps this
 	 * variable to the given value. 
 	 */
-	Iterator<SolutionMapping> findSolutionMappings( Var var, Node value )
+	Iterable<SolutionMapping> findSolutionMappings( Var var, Node value )
 			throws UnsupportedOperationException;
 
 	/**
@@ -56,7 +55,7 @@ public interface SolutionMappingsIndex extends Collection<SolutionMapping>
 	 * Hence, this method is a two-variables version of the
 	 * method {@link #findSolutionMappings(Var, Node)}. 
 	 */
-	Iterator<SolutionMapping> findSolutionMappings( Var var1, Node value1,
+	Iterable<SolutionMapping> findSolutionMappings( Var var1, Node value1,
 	                                                Var var2, Node value2 )
 			throws UnsupportedOperationException;
 
@@ -64,7 +63,7 @@ public interface SolutionMappingsIndex extends Collection<SolutionMapping>
 	 * This method is a three-variables version of the
 	 * method {@link #findSolutionMappings(Var, Node)}. 
 	 */
-	Iterator<SolutionMapping> findSolutionMappings( Var var1, Node value1,
+	Iterable<SolutionMapping> findSolutionMappings( Var var1, Node value1,
 	                                                Var var2, Node value2,
 	                                                Var var3, Node value3 )
 			throws UnsupportedOperationException;
