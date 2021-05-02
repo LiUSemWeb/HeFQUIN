@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.BlockingFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.jenaimpl.JenaBasedSPARQLRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.jenaimpl.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
@@ -183,7 +183,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 			final FederationCatalogForTest fedCat = new FederationCatalogForTest();
 			fedCat.addMember( dbpediaURL, new SPARQLEndpointForTest(dbpediaURL) );
 
-			final SPARQLRequestProcessor reqProcSPARQL = new JenaBasedSPARQLRequestProcessor();
+			final SPARQLRequestProcessor reqProcSPARQL = new SPARQLRequestProcessorImpl();
 			final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
 				@Override public TPFResponse performRequest(TPFRequest req, TPFServer fm) { return null; }
 				@Override public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) { return null; }

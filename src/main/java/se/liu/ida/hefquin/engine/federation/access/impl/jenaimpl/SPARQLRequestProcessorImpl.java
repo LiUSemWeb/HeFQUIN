@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 
-public class JenaBasedSPARQLRequestProcessor implements SPARQLRequestProcessor
+public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 {
 	@Override
 	public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {

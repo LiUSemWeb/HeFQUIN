@@ -33,7 +33,7 @@ public class JenaBasedSPARQLRequestProcessorTest extends EngineTestBase
 
 			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
 
-			final SPARQLRequestProcessor recProc = new JenaBasedSPARQLRequestProcessor();
+			final SPARQLRequestProcessor recProc = new SPARQLRequestProcessorImpl();
 
 			// executing the tested method
 			final SolMapsResponse resp = recProc.performRequest(req, fm);
