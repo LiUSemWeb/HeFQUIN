@@ -159,11 +159,11 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	protected LogicalPlan createPlanForBGP( final PathBlock pattern, final FederationMember fm ) {
-		return createPlanForBGP( JenaBasedQueryPatternUtils.createJenaBasedBGP(pattern), fm );
+		return createPlanForBGP( JenaBasedQueryPatternUtils.createBGP(pattern), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BasicPattern pattern, final FederationMember fm ) {
-		return createPlanForBGP( JenaBasedQueryPatternUtils.createJenaBasedBGP(pattern), fm );
+		return createPlanForBGP( JenaBasedQueryPatternUtils.createBGP(pattern), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {

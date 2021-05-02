@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class JenaBasedQueryPatternUtils
 {
-	public static BGPImpl createJenaBasedBGP( final BasicPattern pattern ) {
+	public static BGP createBGP( final BasicPattern pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<Triple> it = pattern.iterator();
 		while ( it.hasNext() ) {
@@ -35,7 +35,7 @@ public class JenaBasedQueryPatternUtils
 	 * patterns (but only triple patterns). If it does, this methods throws an
 	 * {@link IllegalArgumentException}.
 	 */
-	public static BGPImpl createJenaBasedBGP( final PathBlock pattern ) {
+	public static BGP createBGP( final PathBlock pattern ) {
 		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<TriplePath> it = pattern.iterator();
 		while ( it.hasNext() ) {
