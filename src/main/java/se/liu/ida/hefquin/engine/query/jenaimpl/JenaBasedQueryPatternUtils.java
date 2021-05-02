@@ -27,7 +27,7 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static JenaBasedBGP createJenaBasedBGP( final BasicPattern pattern ) {
-		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<Triple> it = pattern.iterator();
 		while ( it.hasNext() ) {
 			tps.add( new JenaBasedTriplePattern(it.next()) );
@@ -41,7 +41,7 @@ public class JenaBasedQueryPatternUtils
 	 * {@link IllegalArgumentException}.
 	 */
 	public static JenaBasedBGP createJenaBasedBGP( final PathBlock pattern ) {
-		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		final Set<TriplePattern> tps = new HashSet<>();
 		final Iterator<TriplePath> it = pattern.iterator();
 		while ( it.hasNext() ) {
 			final TriplePath tp = it.next();
@@ -54,12 +54,8 @@ public class JenaBasedQueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
-		return getVariablesInPattern( (JenaBasedTriplePattern) tp );
-	}
-
-	public static Set<Var> getVariablesInPattern( final JenaBasedTriplePattern tp ) {
 		final Set<Var> result = new HashSet<>();
-		Vars.addVarsFromTriple( result, tp.asTriple() );
+		Vars.addVarsFromTriple( result, tp.asJenaTriple() );
 		return result;
 	}
 
@@ -69,7 +65,7 @@ public class JenaBasedQueryPatternUtils
 
 	public static Set<Var> getVariablesInPattern( final JenaBasedBGP bgp ) {
 		final Set<Var> result = new HashSet<>();
-		for ( final JenaBasedTriplePattern tp : bgp.getTriplePatterns() ) {
+		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 			result.addAll( getVariablesInPattern(tp) );
 		}
 		return result;
@@ -95,10 +91,10 @@ public class JenaBasedQueryPatternUtils
 
 	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
 		final JenaBasedSolutionMapping jbsm = (JenaBasedSolutionMapping) sm;
-		final Set<JenaBasedTriplePattern> tps = new HashSet<>();
+		final Set<TriplePattern> tps = new HashSet<>();
 		boolean unchanged = true;
-		for ( final JenaBasedTriplePattern tp : ((JenaBasedBGP)bgp).getTriplePatterns() ) {
-			final JenaBasedTriplePattern tp2 = applySolMapToTriplePattern(jbsm, tp);
+		for ( final TriplePattern tp : ((JenaBasedBGP)bgp).getTriplePatterns() ) {
+			final TriplePattern tp2 = applySolMapToTriplePattern(jbsm, tp);
 			tps.add(tp2);
 			if ( tp2 != tp ) {
 				unchanged = false;
@@ -112,15 +108,15 @@ public class JenaBasedQueryPatternUtils
 		}
 	}
 
-	public static JenaBasedTriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {
-		return applySolMapToTriplePattern( (JenaBasedSolutionMapping) sm, (JenaBasedTriplePattern) tp );
+	public static TriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {
+		return applySolMapToTriplePattern( (JenaBasedSolutionMapping) sm, tp );
 	}
 
-	public static JenaBasedTriplePattern applySolMapToTriplePattern( final JenaBasedSolutionMapping sm, final JenaBasedTriplePattern tp ) {
+	public static TriplePattern applySolMapToTriplePattern( final JenaBasedSolutionMapping sm, final TriplePattern tp ) {
 		final Binding b = sm.asJenaBinding();
 		boolean unchanged = true;
 
-		Node s = tp.asTriple().getSubject();
+		Node s = tp.asJenaTriple().getSubject();
 		if ( Var.isVar(s) ) {
 			final Var var = Var.alloc(s);
 			if ( b.contains(var) ) {
@@ -129,7 +125,7 @@ public class JenaBasedQueryPatternUtils
 			}
 		}
 
-		Node p = tp.asTriple().getPredicate();
+		Node p = tp.asJenaTriple().getPredicate();
 		if ( Var.isVar(p) ) {
 			final Var var = Var.alloc(p);
 			if ( b.contains(var) ) {
@@ -138,7 +134,7 @@ public class JenaBasedQueryPatternUtils
 			}
 		}
 
-		Node o = tp.asTriple().getObject();
+		Node o = tp.asJenaTriple().getObject();
 		if ( Var.isVar(o) ) {
 			final Var var = Var.alloc(o);
 			if ( b.contains(var) ) {
@@ -150,7 +146,7 @@ public class JenaBasedQueryPatternUtils
 		if ( unchanged ) {
 			return tp;
 		} else {
-			return new JenaBasedTriplePattern( new org.apache.jena.graph.Triple(s,p,o) );
+			return createJenaBasedTriplePattern(s,p,o);
 		}
 	}
 

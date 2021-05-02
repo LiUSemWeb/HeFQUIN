@@ -39,7 +39,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponse
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public abstract class EngineTestBase
 {
@@ -64,11 +64,11 @@ public abstract class EngineTestBase
 		}
 
 		protected List<Triple> getMatchingTriples( final TriplePatternRequest req ) {
-			return getMatchingTriples( (JenaBasedTriplePattern) req.getQueryPattern() );
+			return getMatchingTriples( req.getQueryPattern() );
 		}
 
-		protected List<Triple> getMatchingTriples( final JenaBasedTriplePattern tp ) {
-			final org.apache.jena.graph.Triple jenaTP = tp.asTriple();
+		protected List<Triple> getMatchingTriples( final TriplePattern tp ) {
+			final org.apache.jena.graph.Triple jenaTP = tp.asJenaTriple();
 			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
 			final List<Triple> result = new ArrayList<>();
 			while ( it.hasNext() ) {
@@ -128,7 +128,7 @@ public abstract class EngineTestBase
 		public TPFResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
 			// The implementation in this method is not particularly efficient,
 			// but it is sufficient for the purpose of unit tests.
-			final org.apache.jena.graph.Triple jenaTP = ( (JenaBasedTriplePattern) req.getTriplePattern() ).asTriple();
+			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
 
 			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
 			for ( final SolutionMapping sm : req.getSolutionMappings() ) {

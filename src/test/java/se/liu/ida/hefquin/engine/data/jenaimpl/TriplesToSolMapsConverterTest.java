@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedQueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
 
 public class TriplesToSolMapsConverterTest
 {
@@ -200,7 +199,7 @@ public class TriplesToSolMapsConverterTest
 			l.add(t);
 		}
 
-		final JenaBasedTriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern( v, p, o );
+		final TriplePattern tp = JenaBasedQueryPatternUtils.createJenaBasedTriplePattern( v, p, o );
 
 		final Iterator<? extends SolutionMapping> it = createIteratorForTests( l, tp );
 

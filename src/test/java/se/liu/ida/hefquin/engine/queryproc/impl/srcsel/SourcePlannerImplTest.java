@@ -15,7 +15,6 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedSPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -67,7 +66,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		final LogicalOpTPAdd rootOp = (LogicalOpTPAdd) plan.getRootOperator();
 		assertTrue( rootOp.getFederationMember() instanceof BRTPFServer );
 
-		final Triple firstTP = ((JenaBasedTriplePattern) rootOp.getTP()).asTriple();
+		final Triple firstTP = rootOp.getTP().asJenaTriple();
 		final boolean firstPredicateWasP1;
 		if ( firstTP.getPredicate().getURI().equals("http://example.org/p1") ) {
 			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", rootOp.getTP() );
@@ -159,11 +158,10 @@ public class SourcePlannerImplTest extends EngineTestBase
 	                                                 final String expectedPredicateURI,
 	                                                 final String expectedObjectVarName,
 	                                                 final TriplePattern actualTriplePattern ) {
-		assertTrue( actualTriplePattern instanceof JenaBasedTriplePattern );
 		assertEqualTriplePatternsVUV( expectedSubjectVarName,
 		                              expectedPredicateURI,
 		                              expectedObjectVarName,
-		                              ((JenaBasedTriplePattern) actualTriplePattern).asTriple() );
+		                              actualTriplePattern.asJenaTriple() );
 	}
 
 	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,

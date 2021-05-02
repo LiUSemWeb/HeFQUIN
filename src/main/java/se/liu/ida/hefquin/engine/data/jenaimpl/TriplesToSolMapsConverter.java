@@ -8,7 +8,6 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.jenaimpl.JenaBasedTriplePattern;
 
 public class TriplesToSolMapsConverter
 {
@@ -18,7 +17,7 @@ public class TriplesToSolMapsConverter
 	}
 
 	public static Iterator<? extends SolutionMapping> convert( final Iterator<Triple> itTriples, final TriplePattern tp ) {
-		final org.apache.jena.graph.Triple jTP = ( (JenaBasedTriplePattern) tp ).asTriple();
+		final org.apache.jena.graph.Triple jTP = tp.asJenaTriple();
 		final String s = ( Var.isVar(jTP.getSubject()) ) ? jTP.getSubject().getName() : null;
 		final String p = ( Var.isVar(jTP.getPredicate()) ) ? jTP.getPredicate().getName() : null;
 		final String o = ( Var.isVar(jTP.getObject()) ) ? jTP.getObject().getName() : null;
@@ -26,7 +25,7 @@ public class TriplesToSolMapsConverter
 		if ( s != null ) {
 			if ( p != null && ! p.equals(s) ) {
 				if ( o != null && ! o.equals(s) && ! o.equals(p) ) {
-					return new ConvertingIterSPO( itTriples, (JenaBasedTriplePattern) tp );
+					return new ConvertingIterSPO( itTriples, tp );
 				} else {
 					return new ConvertingIterSP( itTriples, Var.alloc(jTP.getSubject()), Var.alloc(jTP.getPredicate()) );
 				}
@@ -218,12 +217,12 @@ public class TriplesToSolMapsConverter
 		protected final Var var2;
 		protected final Var var3;
 
-		protected ConvertingIterSPO( final Iterator<Triple> it, JenaBasedTriplePattern tp ) {
+		protected ConvertingIterSPO( final Iterator<Triple> it, TriplePattern tp ) {
 			super(it);
 
-			var1 = Var.alloc( tp.asTriple().getSubject() );
-			var2 = Var.alloc( tp.asTriple().getPredicate() );
-			var3 = Var.alloc( tp.asTriple().getObject() );
+			var1 = Var.alloc( tp.asJenaTriple().getSubject() );
+			var2 = Var.alloc( tp.asJenaTriple().getPredicate() );
+			var3 = Var.alloc( tp.asJenaTriple().getObject() );
 		}
 
 		@Override

@@ -14,7 +14,8 @@ public class JenaBasedTriplePattern implements TriplePattern
 		this.jenaObj = jenaObject;
 	}
 
-	public Triple asTriple() {
+	@Override
+	public Triple asJenaTriple() {
 		return jenaObj;
 	}
 
