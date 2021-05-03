@@ -10,9 +10,12 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.engine.binding.BindingMap;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -30,13 +33,11 @@ import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.TriplesResponseImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -57,11 +58,6 @@ public abstract class EngineTestBase
 			this.data = data;
 		}
 
-		public TriplesResponse performRequest( final TriplePatternRequest req ) {
-			final List<Triple> result = getMatchingTriples(req);
-			return new TriplesResponseImpl( result, this, req, new Date() );
-		}
-
 		protected List<Triple> getMatchingTriples( final TriplePatternRequest req ) {
 			return getMatchingTriples( req.getQueryPattern() );
 		}
@@ -75,20 +71,60 @@ public abstract class EngineTestBase
 			}
 			return result;
 		}
+
+		protected List<SolutionMapping> getSolutions( final TriplePatternRequest req ) {
+			return getSolutions( req.getQueryPattern() );
+		}
+
+		protected List<SolutionMapping> getSolutions( final TriplePattern tp ) {
+			final List<Triple> triples = getMatchingTriples(tp);
+			final List<SolutionMapping> result = new ArrayList<>();
+			for ( final Triple t : triples ) {
+				final BindingMap b = BindingFactory.create();
+				if ( tp.asJenaTriple().getSubject().isVariable() ) {
+					b.add( Var.alloc(tp.asJenaTriple().getSubject()), t.asJenaTriple().getSubject() );
+				}
+				if ( tp.asJenaTriple().getPredicate().isVariable() ) {
+					b.add( Var.alloc(tp.asJenaTriple().getPredicate()), t.asJenaTriple().getPredicate() );
+				}
+				if ( tp.asJenaTriple().getObject().isVariable() ) {
+					b.add( Var.alloc(tp.asJenaTriple().getObject()), t.asJenaTriple().getObject() );
+				}
+				result.add( new SolutionMappingImpl(b) );
+			}
+			return result;
+		}
 	}
 
-	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
+	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
 		final SPARQLEndpointInterface iface;
 
-		public SPARQLEndpointForTest() { this("http://example.org/sparql"); }
+		public SPARQLEndpointForTest() { this("http://example.org/sparql", null); }
 
-		public SPARQLEndpointForTest( final String ifaceURL ) {
+		public SPARQLEndpointForTest( final String ifaceURL ) { this(ifaceURL, null); }
+
+		public SPARQLEndpointForTest( final Graph data ) { this("http://example.org/sparql", data); }
+
+		public SPARQLEndpointForTest( final String ifaceURL, final Graph data ) {
+			super(data);
 			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
 		}
 
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
+
+		public SolMapsResponse performRequest( final SPARQLRequest req ) {
+			final List<SolutionMapping> result;
+			if ( req instanceof TriplePatternRequest ) {
+				result = getSolutions( (TriplePatternRequest) req);
+			}
+			else {
+				result = getSolutions( (TriplePattern) req.getQueryPattern() );
+			}
+
+			return new SolMapsResponseImpl( result, this, req, new Date() );
+		}
 	}
 
 
@@ -208,7 +244,12 @@ public abstract class EngineTestBase
 
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			return new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
+			if ( itSolMapsForResponse != null ) {
+				return new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
+			}
+			else {
+				return ( (SPARQLEndpointForTest) fm ).performRequest(req);
+			}
 		}
 
 		@Override
