@@ -1,56 +1,99 @@
 package se.liu.ida.hefquin.engine.datastructures.impl;
 
-import java.util.Iterator;
+import java.util.*;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
+import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 {
+	protected final Map<List<Node>, List<SolutionMapping>> map = new HashMap<>();
+	protected final Set<Var> joinVariables;
+
+	public SolutionMappingsHashTable(final ExpectedVariables... inputVars){
+		assert inputVars.length == 2;
+		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables());
+		certainVars.retainAll( inputVars[1].getCertainVariables() );
+
+		this.joinVariables = certainVars;
+	}
+
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return map.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return map.isEmpty();
 	}
 
 	@Override
 	public boolean contains( final Object o ) {
-		// TODO Auto-generated method stub
-		return false;
+		return map.containsKey(o);
 	}
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		final List<SolutionMapping> solMap = new ArrayList<>();
+		Iterator<List<SolutionMapping>> li = map.values().iterator();
+		while(li.hasNext()){
+			solMap.addAll(li.next());
+		}
+		return solMap.iterator();
 	}
 
 	@Override
 	public boolean add( final SolutionMapping e ) {
-		// TODO Auto-generated method stub
-		return false;
+		final Binding solMapBinding = e.asJenaBinding();
+		final List<Node> valKeyL = new ArrayList<>();
+
+		for (Var v : joinVariables) {
+			valKeyL.add(solMapBinding.get(v));
+		}
+
+		final List<SolutionMapping> solMapList = new ArrayList<>();
+		if (map.containsKey(valKeyL)) {
+			solMapList.addAll(map.get(valKeyL));
+		}
+		solMapList.add(e);
+
+		map.put(valKeyL, solMapList);
+		return true;
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		map.clear();
 	}
 
 	@Override
 	public Iterable<SolutionMapping> getJoinPartners( final SolutionMapping sm )
 			throws UnsupportedOperationException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		final Binding solMapBinding = sm.asJenaBinding();
+		final List<Node> valKeyL = new ArrayList<>();
+		List<SolutionMapping> matchingSolMaps = new ArrayList<>();
+
+		for (Var v : joinVariables) {
+			valKeyL.add(solMapBinding.get(v));
+		}
+
+		if (! valKeyL.isEmpty()){
+			matchingSolMaps = map.get(valKeyL);
+		} else {
+			// If no join variables exist in the given solution mapping, then all solution mappings (in the hash table) are join partners
+			Iterator<List<SolutionMapping>> li = map.values().iterator();
+			while(li.hasNext()){
+				matchingSolMaps.addAll(li.next());
+			}
+		}
+
+		return matchingSolMaps;
 	}
 
 	@Override
