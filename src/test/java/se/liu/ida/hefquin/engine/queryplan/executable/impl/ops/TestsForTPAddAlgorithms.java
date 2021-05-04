@@ -240,6 +240,58 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
+	protected void _tpWithEmptySolutionMappingAsInput() {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node s2 = NodeFactory.createURI("http://example.org/s2");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+
+		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		input.add( SolutionMappingUtils.createSolutionMapping() ); // empty solution mapping
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(s1,p,o1) );
+		dataForMember.add( Triple.create(s2,p,o1) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+
+		// checking
+		final Set<Binding> result = new HashSet<>();
+
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+
+		assertFalse( it.hasNext() );
+
+		boolean b1Found = false;
+		boolean b2Found = false;
+		for ( final Binding b : result ) {
+			assertEquals( 2, b.size() );
+			assertEquals( "http://example.org/o1", b.get(var2).getURI() );
+
+			if ( b.get(var1).getURI().equals("http://example.org/s1") ) {
+				b1Found = true;
+			}
+			else if ( b.get(var1).getURI().equals("http://example.org/s2") ) {
+				b2Found = true;
+			}
+			else {
+				fail( "Unexpected URI for ?v1: " + b.get(var1).getURI() );
+			}
+		}
+
+		assertTrue(b1Found);
+		assertTrue(b2Found);
+	}
+
 	protected void _tpWithEmptyResponses() {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
