@@ -101,7 +101,6 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertTrue(b1Found);
 		assertTrue(b2Found);
 		assertTrue(b3Found);
-
 	}
 
 	protected void _joinWithTwoJoinVariables() {
