@@ -11,6 +11,9 @@ public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
     public void joinWithTwoJoinVariables() { _joinWithTwoJoinVariables(); }
 
     @Test
+    public void joinWithTwoJoinVariables_noJoinPartner() { _joinWithTwoJoinVariables_noJoinPartner(); }
+
+    @Test
     public void joinWithoutJoinVariable() { _joinWithoutJoinVariable(); }
 
     @Test

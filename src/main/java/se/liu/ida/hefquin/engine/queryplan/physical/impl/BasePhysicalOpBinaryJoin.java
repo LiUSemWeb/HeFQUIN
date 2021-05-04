@@ -9,11 +9,11 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpForLogicalOp
+public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpJoin lop;
 
-	protected BasePhysicalOpBinaryInputJoin( final LogicalOpJoin lop ) {
+	protected BasePhysicalOpBinaryJoin(final LogicalOpJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -22,18 +22,16 @@ public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpF
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		final Set<Var> certainVarsL = new HashSet<>( inputVars[0].getCertainVariables());
-		final Set<Var> possibleVarsL = new HashSet<>( inputVars[0].getPossibleVariables() );
+		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables());
+		final Set<Var> possibleVars = new HashSet<>( inputVars[0].getPossibleVariables() );
 
-		final Set<Var> certainVarsR = new HashSet<>( inputVars[1].getCertainVariables());
-		final Set<Var> possibleVarsR = new HashSet<>( inputVars[1].getPossibleVariables() );
-
-		certainVarsL.addAll( inputVars[1].getCertainVariables() );
-		possibleVarsL.addAll(possibleVarsR);
+		certainVars.addAll( inputVars[1].getCertainVariables() );
+		possibleVars.addAll(inputVars[1].getPossibleVariables());
+		possibleVars.removeAll(certainVars);
 
 		return new ExpectedVariables() {
-			@Override public Set<Var> getCertainVariables() { return certainVarsL;}
-			@Override public Set<Var> getPossibleVariables() { return possibleVarsL;}
+			@Override public Set<Var> getCertainVariables() { return certainVars;}
+			@Override public Set<Var> getPossibleVariables() { return possibleVars;}
 		};
 	}
 
