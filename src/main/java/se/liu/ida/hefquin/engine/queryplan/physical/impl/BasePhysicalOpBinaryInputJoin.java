@@ -20,7 +20,7 @@ public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpF
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
 		final Set<Var> certainVarsL = new HashSet<>( inputVars[0].getCertainVariables());
