@@ -13,6 +13,9 @@ public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
 
     @Override
     public int preferredInputBlockSize() {
+        // Since this algorithm processes the input solution mappings
+        // sequentially (one at a time), and input block size of 1 may
+        // reduce the response time of the overall execution process.
         return 1;
     }
 
