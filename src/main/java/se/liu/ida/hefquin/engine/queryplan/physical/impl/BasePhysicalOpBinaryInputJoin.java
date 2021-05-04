@@ -28,7 +28,7 @@ public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpF
 		final Set<Var> certainVarsR = new HashSet<>( inputVars[1].getCertainVariables());
 		final Set<Var> possibleVarsR = new HashSet<>( inputVars[1].getPossibleVariables() );
 
-		certainVarsL.addAll(certainVarsR);
+		certainVarsL.addAll( inputVars[1].getCertainVariables() );
 		possibleVarsL.addAll(possibleVarsR);
 
 		return new ExpectedVariables() {
