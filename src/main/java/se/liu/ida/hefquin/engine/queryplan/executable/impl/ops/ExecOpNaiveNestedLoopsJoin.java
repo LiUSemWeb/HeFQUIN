@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import java.util.ArrayList;
 
 public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
-    protected final ArrayList<SolutionMapping> inputLHS = new ArrayList<>();
+    protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
     @Override
     public int preferredInputBlockSize() {
