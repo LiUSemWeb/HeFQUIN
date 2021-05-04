@@ -20,11 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -182,8 +178,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
-		// TODO implement convertJoin (for which we need some physical operator for join)
-		throw new UnsupportedOperationException();
+		return new PhysicalOpNaiveNestedLoopsJoin(lop);
 	}
 
 	protected BinaryPhysicalOp convertUnion( final LogicalOpUnion lop ) {
