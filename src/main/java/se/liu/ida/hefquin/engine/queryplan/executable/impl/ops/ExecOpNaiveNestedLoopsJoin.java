@@ -37,7 +37,7 @@ public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void processBlockFromChild2(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    public void processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         for ( final SolutionMapping smR : input.getSolutionMappings() ) {
             for ( final SolutionMapping smL : inputLHS ) {
                 if ( SolutionMappingUtils.compatible(smL,smR) ) {
