@@ -5,9 +5,7 @@ import org.junit.Test;
 public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
 
     @Test
-    public void joinWithOneJoinVariable() {
-        _joinWithOneJoinVariable();
-    }
+    public void joinWithOneJoinVariable() { _joinWithOneJoinVariable(); }
 
     @Test
     public void joinWithTwoJoinVariables() { _joinWithTwoJoinVariables(); }
