@@ -13,7 +13,7 @@ public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpF
 {
 	protected final LogicalOpJoin lop;
 
-	protected BasePhysicalOpBinaryInputJoin(LogicalOpJoin lop) {
+	protected BasePhysicalOpBinaryInputJoin( final LogicalOpJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
