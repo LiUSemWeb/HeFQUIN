@@ -8,6 +8,7 @@ public class ExecOpBinaryUnionTest extends TestsForUnionAlgorithms<SPARQLEndpoin
 	
 	@Test
 	public void testSimpleUnion(){
-		_testSimpleUnion();	
+		_testSimpleUnion();
 	}
+
 }
