@@ -29,6 +29,11 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 	}
 
 	@Test
+	public void tpWithEmptySolutionMappingAsInput() {
+		_tpWithEmptySolutionMappingAsInput();
+	}
+
+	@Test
 	public void tpWithEmptyResponses() {
 		_tpWithEmptyResponses();
 	}

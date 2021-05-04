@@ -29,6 +29,11 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 	}
 
 	@Test
+	public void tpWithEmptySolutionMappingAsInput() {
+		_tpWithEmptySolutionMappingAsInput();
+	}
+
+	@Test
 	public void tpWithEmptyResponses() {
 		_tpWithEmptyResponses();
 	}

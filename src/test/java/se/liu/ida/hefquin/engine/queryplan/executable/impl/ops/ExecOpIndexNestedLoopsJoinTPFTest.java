@@ -29,6 +29,11 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	}
 
 	@Test
+	public void tpWithEmptySolutionMappingAsInput() {
+		_tpWithEmptySolutionMappingAsInput();
+	}
+
+	@Test
 	public void tpWithEmptyResponses() {
 		_tpWithEmptyResponses();
 	}
