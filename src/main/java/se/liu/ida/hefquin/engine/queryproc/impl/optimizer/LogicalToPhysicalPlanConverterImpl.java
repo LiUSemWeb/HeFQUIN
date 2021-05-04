@@ -178,7 +178,6 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
-		// TODO implement convertJoin (for which we need some physical operator for join)
 		return new PhysicalOpNaiveNestedLoopsJoin(lop);
 	}
 
