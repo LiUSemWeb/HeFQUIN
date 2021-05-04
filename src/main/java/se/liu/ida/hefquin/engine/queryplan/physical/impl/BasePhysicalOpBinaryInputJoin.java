@@ -11,11 +11,10 @@ import java.util.Set;
 
 public abstract class BasePhysicalOpBinaryInputJoin implements BinaryPhysicalOpForLogicalOp
 {
-	protected final BinaryLogicalOp lop;
+	protected final LogicalOpJoin lop;
 
-	protected BasePhysicalOpBinaryInputJoin(BinaryLogicalOp lop) {
+	protected BasePhysicalOpBinaryInputJoin(LogicalOpJoin lop) {
 		assert lop != null;
-		assert (lop instanceof LogicalOpJoin);
 		this.lop = lop;
 	}
 

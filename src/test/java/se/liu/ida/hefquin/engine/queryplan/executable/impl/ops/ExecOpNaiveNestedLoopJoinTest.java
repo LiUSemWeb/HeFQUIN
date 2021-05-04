@@ -21,6 +21,12 @@ public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
     @Test
     public void joinWithEmptyInput2() { _joinWithEmptyInput2(); }
 
+    @Test
+    public void joinWithEmptySolutionMapping1() { _joinWithEmptySolutionMapping1(); }
+
+    @Test
+    public void joinWithEmptySolutionMapping2() { _joinWithEmptySolutionMapping2(); }
+
     @Override
     protected BinaryExecutableOp createExecOpForTest() {
         return new ExecOpNaiveNestedLoopsJoin( );

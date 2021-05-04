@@ -254,6 +254,65 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
+	protected void _joinWithEmptySolutionMapping1() {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+
+		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		input1.add(SolutionMappingUtils.createSolutionMapping());
+
+		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x1,
+				var2, y1) );
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x2,
+				var2, y2) );
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2);
+
+		assertTrue( it.hasNext() );
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 2, b1.size() );
+
+		assertTrue( it.hasNext() );
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 2, b2.size() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	protected void _joinWithEmptySolutionMapping2() {
+		final Var var1 = Var.alloc("v1");
+
+		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var1, NodeFactory.createURI("http://example.org/x1")) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var1, NodeFactory.createURI("http://example.org/x2")) );
+
+		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		input2.add(SolutionMappingUtils.createSolutionMapping());
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2);
+
+		//assertFalse( it.hasNext() );
+		assertTrue( it.hasNext() );
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 1, b1.size() );
+
+		assertTrue( it.hasNext() );
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 1, b2.size() );
+
+		assertFalse( it.hasNext() );
+	}
+
 	protected Iterator<SolutionMapping> runTest(
 			final IntermediateResultBlock input1,
 			final IntermediateResultBlock input2)

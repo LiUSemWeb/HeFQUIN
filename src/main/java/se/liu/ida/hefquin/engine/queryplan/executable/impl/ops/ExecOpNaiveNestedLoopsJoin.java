@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
     protected final List<SolutionMapping> inputLHS = new ArrayList<>();

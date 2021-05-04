@@ -7,16 +7,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 
 public class PhysicalOpNaiveNestedLoopsJoin extends BasePhysicalOpBinaryInputJoin {
-    public PhysicalOpNaiveNestedLoopsJoin(BinaryLogicalOp lop) {
+    public PhysicalOpNaiveNestedLoopsJoin(LogicalOpJoin lop) {
         super(lop);
     }
 
     @Override
     public BinaryExecutableOp createExecOp(ExpectedVariables... inputVars) {
-        if ( lop instanceof LogicalOpJoin) {
-            return new ExecOpNaiveNestedLoopsJoin();
-        }
-        else
-            throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+        return new ExecOpNaiveNestedLoopsJoin();
     }
 }
