@@ -23,7 +23,8 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+
 		// perhaps this should be offered as the default implementation in the interface.
 		
 		assert inputVars.length == 2;
