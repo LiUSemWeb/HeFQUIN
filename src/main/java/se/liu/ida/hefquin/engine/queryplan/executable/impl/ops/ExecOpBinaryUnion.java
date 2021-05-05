@@ -10,7 +10,7 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 	@Override
 	public int preferredInputBlockSize() {
 		// Since this algorithm processes the input solution mappings
-		// sequentially (one at a time), and input block size of 1 may
+		// sequentially (one at a time), an input block size of 1 may
 		// reduce the response time of the overall execution process.
 		return 1;
 	}
@@ -22,7 +22,7 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 
 	@Override
 	public void processBlockFromChild1(final IntermediateResultBlock input, final IntermediateResultElementSink sink,
-			ExecutionContext execCxt) {
+			final ExecutionContext execCxt) {
 		for (final SolutionMapping sm : input.getSolutionMappings())
 			sink.send(sm);
 	}
@@ -34,7 +34,7 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 
 	@Override
 	public void processBlockFromChild2(final IntermediateResultBlock input, final IntermediateResultElementSink sink,
-			ExecutionContext execCxt) {
+			final ExecutionContext execCxt) {
 		for (final SolutionMapping sm : input.getSolutionMappings())
 			sink.send(sm);
 	}

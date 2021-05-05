@@ -16,13 +16,13 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	
 	protected final LogicalOpUnion lop;
 
-	protected PhysicalOpBinaryUnion(final LogicalOpUnion lop) {
+	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		// perhaps this should be offered as the default implementation in the interface.
 		
 		assert inputVars.length == 2;
@@ -41,7 +41,7 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	}
 
 	@Override
-	public BinaryExecutableOp createExecOp(ExpectedVariables... inputVars) {
+	public BinaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
 		return new ExecOpBinaryUnion();
 	}
 
