@@ -10,4 +10,15 @@ public class ExecOpBinaryUnionTest extends TestsForUnionAlgorithms<SPARQLEndpoin
 	public void testSimpleUnion(){
 		_testSimpleUnion();
 	}
+	
+	@Test
+	public void testUnboundUnion() {
+		_testUnboundUnion();
+	}
+	
+	@Test
+	public void testKeepUnionDuplicates() {
+		_testKeepUnionDuplicates();
+	}
+	
 }
