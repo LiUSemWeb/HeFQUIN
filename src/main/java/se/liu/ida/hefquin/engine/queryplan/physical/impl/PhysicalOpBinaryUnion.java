@@ -23,15 +23,15 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		// perhaps this should be offered as the default implementation in the interface.
-		
 		assert inputVars.length == 2;
 
 		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables());
 		final Set<Var> possibleVars = new HashSet<>( inputVars[0].getPossibleVariables() );
 
-		certainVars.addAll(inputVars[1].getCertainVariables());
+		certainVars.retainAll(inputVars[1].getCertainVariables());
 		possibleVars.addAll(inputVars[1].getPossibleVariables());
+		possibleVars.addAll(inputVars[0].getCertainVariables());
+		possibleVars.addAll(inputVars[1].getCertainVariables());
 		possibleVars.removeAll(certainVars);
 
 		return new ExpectedVariables() {
