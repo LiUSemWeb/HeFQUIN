@@ -10,5 +10,5 @@ public class ExecOpBinaryUnionTest extends TestsForUnionAlgorithms<SPARQLEndpoin
 	public void testSimpleUnion(){
 		_testSimpleUnion();	
 	}
-	
+
 }
