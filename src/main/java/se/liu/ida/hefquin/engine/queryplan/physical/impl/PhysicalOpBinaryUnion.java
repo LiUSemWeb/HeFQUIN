@@ -42,7 +42,8 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	}
 
 	@Override
-	public BinaryExecutableOp createExecOp(ExpectedVariables... inputVars) {
+	public BinaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+
 		return new ExecOpBinaryUnion();
 	}
 
