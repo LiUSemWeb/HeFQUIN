@@ -23,7 +23,8 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 
 	@Override
 	public void processBlockFromChild1(final IntermediateResultBlock input, final IntermediateResultElementSink sink,
-			ExecutionContext execCxt) {
+			final ExecutionContext execCxt) {
+
 		for (final SolutionMapping sm : input.getSolutionMappings())
 			sink.send(sm);
 	}
