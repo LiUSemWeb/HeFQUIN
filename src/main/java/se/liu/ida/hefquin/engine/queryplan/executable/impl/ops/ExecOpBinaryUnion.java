@@ -9,14 +9,8 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 
 	@Override
 	public int preferredInputBlockSize() {
-<<<<<<< HEAD
 		// Since this algorithm processes the input solution mappings
 		// sequentially (one at a time), an input block size of 1 may
-=======
-		// Since this algorithm processes the input solution mappings
-		// sequentially (one at a time), an input block size of 1 may
-
->>>>>>> Update src/main/java/se/liu/ida/hefquin/engine/queryplan/executable/impl/ops/ExecOpBinaryUnion.java
 		// reduce the response time of the overall execution process.
 		return 1;
 	}
