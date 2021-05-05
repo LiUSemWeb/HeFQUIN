@@ -86,7 +86,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		if (! valKeyL.isEmpty()){
 			matchingSolMaps = map.get(valKeyL);
 		} else {
-			// If no join variables exist in the given solution mapping, then all solution mappings (in the hash table) are join partners
+			// If no join variable exists in the given solution mapping, then all solution mappings (in the hash table) are join partners
 			Iterator<List<SolutionMapping>> li = map.values().iterator();
 			while(li.hasNext()){
 				matchingSolMaps.addAll(li.next());
@@ -100,18 +100,35 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	public Iterable<SolutionMapping> findSolutionMappings( final Var var, final Node value )
 			throws UnsupportedOperationException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		final List<Node> valKeyL = new ArrayList<>();
+
+		if ( joinVariables.size() == 1 && joinVariables.contains(var) ){
+			valKeyL.add(value);
+			final List<SolutionMapping> solMaps = map.get(valKeyL);
+			return solMaps;
+		}
+		else{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override
 	public Iterable<SolutionMapping> findSolutionMappings(
 			final Var var1, final Node value1,
 			final Var var2, final Node value2 )
-					throws UnsupportedOperationException
+			throws UnsupportedOperationException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		final List<Node> valKeyL = new ArrayList<>();
+
+		if ( joinVariables.size() == 2 && joinVariables.contains(var1) && joinVariables.contains(var2) ){
+			valKeyL.add(value1);
+			valKeyL.add(value2);
+			final List<SolutionMapping> solMaps = map.get(valKeyL);
+			return solMaps;
+		}
+		else{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override
@@ -119,10 +136,20 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var1, final Node value1,
 			final Var var2, final Node value2,
 			final Var var3, final Node value3 )
-					throws UnsupportedOperationException
+			throws UnsupportedOperationException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		final List<Node> valKeyL = new ArrayList<>();
+
+		if( joinVariables.size() == 3 && joinVariables.contains(var1) && joinVariables.contains(var2) && joinVariables.contains(var3) ){
+			valKeyL.add(value1);
+			valKeyL.add(value2);
+			valKeyL.add(value3);
+			final List<SolutionMapping> solMaps = map.get(valKeyL);
+			return solMaps;
+		}
+		else{
+			throw new IllegalArgumentException();
+		}
 	}
 
 }
