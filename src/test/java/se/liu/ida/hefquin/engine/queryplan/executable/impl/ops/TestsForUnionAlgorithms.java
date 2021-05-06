@@ -216,6 +216,70 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertTrue(b2Found);
 		assertEquals(2, b3Found);
 	}
+	
+	protected void _testKeepUnionDuplicatesFromSameMember() {
+		final Var x = Var.alloc("x");
+		final Var y = Var.alloc("y");
+		
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node x3 = NodeFactory.createURI("http://example.org/x3");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+		final Node y3 = NodeFactory.createURI("http://example.org/y3");
+		
+		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		input1.add( SolutionMappingUtils.createSolutionMapping(x, x1, y, y1) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(x, x3, y, y3) );
+		
+		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
+		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
+		
+		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		
+		final List<Binding> result = new ArrayList<>();
+	
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+	
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+	
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+		
+		assertTrue( it.hasNext() );
+		result.add( it.next().asJenaBinding() );
+	
+		assertFalse( it.hasNext() );
+	
+		boolean b1Found = false;
+		boolean b2Found = false;
+		int b3Found = 0;
+		
+		for ( final Binding b : result ) {
+			assertEquals(2, b.size());
+			if (b.get(x).getURI().equals("http://example.org/x1")) {
+				assertEquals("http://example.org/y1", b.get(y).getURI());
+				b1Found = true;
+			}
+			else if (b.get(x).getURI().equals("http://example.org/x3")) {
+				assertEquals("http://example.org/y3", b.get(y).getURI());
+				b2Found = true;
+			} 
+			else if (b.get(x).getURI().equals("http://example.org/x2")) {
+				assertEquals("http://example.org/y2", b.get(y).getURI());
+				b3Found++;
+			}
+			else {
+				fail("Unexpected URI for ?x: " + b.get(x).getURI());
+			}
+		}
+		assertTrue(b1Found);
+		assertTrue(b2Found);
+		assertEquals(2, b3Found);
+	}
 
 	protected Iterator<SolutionMapping> runTest( final IntermediateResultBlock input1,
  			final IntermediateResultBlock input2 ) {

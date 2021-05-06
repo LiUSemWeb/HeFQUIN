@@ -18,6 +18,11 @@ public class ExecOpBinaryUnionTest extends TestsForUnionAlgorithms {
 	public void testKeepUnionDuplicates() {
 		_testKeepUnionDuplicates();
 	}
+	
+	@Test
+	public void testKeepUnionDuplicatesFromSameMember() {
+		_testKeepUnionDuplicatesFromSameMember();
+	}
 
 	@Override
 	protected BinaryExecutableOp createExecOpForTest() {
