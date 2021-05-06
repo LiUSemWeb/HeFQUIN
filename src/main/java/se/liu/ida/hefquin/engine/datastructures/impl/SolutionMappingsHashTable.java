@@ -7,19 +7,15 @@ import org.apache.jena.sparql.core.Var;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 {
 	protected final Map<List<Node>, List<SolutionMapping>> map = new HashMap<>();
 	protected final Set<Var> joinVariables;
 
-	public SolutionMappingsHashTable(final ExpectedVariables... inputVars){
-		assert inputVars.length == 2;
-		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables());
-		certainVars.retainAll( inputVars[1].getCertainVariables() );
-
-		this.joinVariables = certainVars;
+	public SolutionMappingsHashTable(final Set<Var> joinVariables){
+		this.joinVariables = joinVariables;
 	}
 
 	@Override
@@ -34,6 +30,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public boolean contains( final Object o ) {
+		// TODO
 		return map.containsKey(o);
 	}
 
@@ -49,20 +46,16 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public boolean add( final SolutionMapping e ) {
-		final Binding solMapBinding = e.asJenaBinding();
-		final List<Node> valKeyL = new ArrayList<>();
+		final List<Node> valKeys = getVarKeys(e);
 
-		for (Var v : joinVariables) {
-			valKeyL.add(solMapBinding.get(v));
+		if (map.containsKey(valKeys)) {
+			map.get(valKeys).add(e);
 		}
-
-		final List<SolutionMapping> solMapList = new ArrayList<>();
-		if (map.containsKey(valKeyL)) {
-			solMapList.addAll(map.get(valKeyL));
+		else {
+			final List<SolutionMapping> solMapList = new ArrayList<>();
+			solMapList.add(e);
+			map.put(valKeys, solMapList);
 		}
-		solMapList.add(e);
-
-		map.put(valKeyL, solMapList);
 		return true;
 	}
 
@@ -75,34 +68,36 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	public Iterable<SolutionMapping> getJoinPartners( final SolutionMapping sm )
 			throws UnsupportedOperationException
 	{
-		final Binding solMapBinding = sm.asJenaBinding();
-		final List<Node> valKeyL = new ArrayList<>();
+		final List<Node> valKeys = getVarKeys(sm);
+		final List<SolutionMapping> joinPartner = new ArrayList<>();
 		List<SolutionMapping> matchingSolMaps = new ArrayList<>();
 
-		for (Var v : joinVariables) {
-			valKeyL.add(solMapBinding.get(v));
+		if (!valKeys.isEmpty() && valKeys.size() == joinVariables.size()){
+			matchingSolMaps = map.get(valKeys);
 		}
-
-		if (! valKeyL.isEmpty()){
-			matchingSolMaps = map.get(valKeyL);
-		} else {
-			// If no join variable exists in the given solution mapping, then all solution mappings (in the hash table) are join partners
+		else {
 			final Iterator<List<SolutionMapping>> li = map.values().iterator();
 			while(li.hasNext()){
 				matchingSolMaps.addAll(li.next());
 			}
 		}
 
-		return matchingSolMaps;
+		if (matchingSolMaps != null) {
+			for (SolutionMapping matchSolM : matchingSolMaps) {
+				if (SolutionMappingUtils.compatible(sm, matchSolM)) {
+					joinPartner.add(matchSolM);
+				}
+			}
+		}
+		return joinPartner;
 	}
 
 	@Override
 	public Iterable<SolutionMapping> findSolutionMappings( final Var var, final Node value )
 			throws UnsupportedOperationException
 	{
-		final List<Node> valKeyL = new ArrayList<>();
-
 		if ( joinVariables.size() == 1 && joinVariables.contains(var) ){
+			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value);
 			final List<SolutionMapping> solMaps = map.get(valKeyL);
 			return solMaps;
@@ -118,9 +113,8 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var2, final Node value2 )
 			throws UnsupportedOperationException
 	{
-		final List<Node> valKeyL = new ArrayList<>();
-
 		if ( joinVariables.size() == 2 && joinVariables.contains(var1) && joinVariables.contains(var2) ){
+			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
 			valKeyL.add(value2);
 			final List<SolutionMapping> solMaps = map.get(valKeyL);
@@ -138,9 +132,8 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var3, final Node value3 )
 			throws UnsupportedOperationException
 	{
-		final List<Node> valKeyL = new ArrayList<>();
-
 		if( joinVariables.size() == 3 && joinVariables.contains(var1) && joinVariables.contains(var2) && joinVariables.contains(var3) ){
+			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
 			valKeyL.add(value2);
 			valKeyL.add(value3);
@@ -152,4 +145,18 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		}
 	}
 
+	public List<Node> getVarKeys(final SolutionMapping e){
+		final Binding solMapBinding = e.asJenaBinding();
+		final List<Node> valKeys = new ArrayList<>();
+
+		for (Var v : joinVariables) {
+			if ( !solMapBinding.contains(v) ){
+				throw new IllegalArgumentException();
+			}
+			else {
+				valKeys.add(solMapBinding.get(v));
+			}
+		}
+		return valKeys;
+	}
 }
