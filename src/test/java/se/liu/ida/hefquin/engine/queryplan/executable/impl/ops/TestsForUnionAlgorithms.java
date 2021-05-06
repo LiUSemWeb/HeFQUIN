@@ -139,7 +139,7 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 					fail("Unexpected URI for ?x: " + b.get(x).getURI());
 				}
 			}
-			else if (b.get(y) != null && b.get(y).getURI().equals("http://example.org/y1")) {
+			else if ( b.contains(y) && b.get(y).getURI().equals("http://example.org/y1") ) {
 				assertEquals(1, b.size());
 				b4Found = true;
 			}
