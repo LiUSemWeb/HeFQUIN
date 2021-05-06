@@ -50,17 +50,17 @@ public class SolutionMappingsHashTableTest {
                 var1, x2,
                 var2, y3) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsCertain1.add(var2);
         varsCertain1.add(var3);
 
-        Set<Var> varsCertain2 = new HashSet<>();
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
         varsCertain2.add(var1);
         varsCertain2.add(var2);
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -101,7 +101,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
+        final List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             matchSolMapR.add(solMHashTable1.getJoinPartners(smR));
         }
@@ -183,18 +183,18 @@ public class SolutionMappingsHashTableTest {
                 var1, x3,
                 var2, y3) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsCertain1.add(var1);
         varsCertain1.add(var2);
 
-        Set<Var> varsCertain2 = new HashSet<>();
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
         varsCertain2.add(var1);
         varsCertain2.add(var2);
         varsCertain2.add(var3);
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -237,7 +237,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
+        final List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             matchSolMapR.add(solMHashTable1.getJoinPartners(smR));
         }
@@ -316,19 +316,19 @@ public class SolutionMappingsHashTableTest {
                 var1, x2,
                 var2, y3) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
         varsCertain1.add(var2);
         varsCertain1.add(var3);
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsPossible1.add(var5);
 
-        Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
         varsCertain2.add(var1);
         varsCertain2.add(var2);
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
         varsPossible2.add(var4);
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -369,7 +369,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
+        final List<Iterable<SolutionMapping>> matchSolMapR = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             matchSolMapR.add(solMHashTable1.getJoinPartners(smR));
         }
@@ -449,19 +449,19 @@ public class SolutionMappingsHashTableTest {
                 var1, x2,
                 var2, y3) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
         varsCertain1.add(var2);
         varsCertain1.add(var3);
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsPossible1.add(var1);
 
-        Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
         varsCertain2.add(var1);
         varsCertain2.add(var2);
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
         varsPossible2.add(var3);
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -555,16 +555,16 @@ public class SolutionMappingsHashTableTest {
                 var2, y2,
                 var3, z2) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsCertain1.add(var1);
 
-        Set<Var> varsCertain2 = new HashSet<>();
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
         varsCertain2.add(var2);
         varsCertain2.add(var3);
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -587,7 +587,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<SolutionMapping> matchResult = new ArrayList<>();
+        final List<SolutionMapping> matchResult = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             final Iterable<SolutionMapping> matchSolMapR = solMHashTable1.getJoinPartners(smR);
             if (matchSolMapR != null) {
@@ -630,17 +630,17 @@ public class SolutionMappingsHashTableTest {
                 var2, y2,
                 var3, z2) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
         varsCertain1.add(var1);
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsPossible1.add(var4);
 
-        Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
         varsCertain2.add(var2);
         varsCertain2.add(var3);
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -663,7 +663,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<SolutionMapping> matchResult = new ArrayList<>();
+        final List<SolutionMapping> matchResult = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             final Iterable<SolutionMapping> matchSolMapR = solMHashTable1.getJoinPartners(smR);
             if (matchSolMapR != null){
@@ -705,17 +705,17 @@ public class SolutionMappingsHashTableTest {
                 var2, y2,
                 var3, z2) );
 
-        Set<Var> varsCertain1 = new HashSet<>();
+        final Set<Var> varsCertain1 = new HashSet<>();
         varsCertain1.add(var1);
-        Set<Var> varsPossible1 = new HashSet<>();
+        final Set<Var> varsPossible1 = new HashSet<>();
         varsPossible1.add(var2);
 
-        Set<Var> varsCertain2 = new HashSet<>();
+        final Set<Var> varsCertain2 = new HashSet<>();
         varsCertain2.add(var2);
         varsCertain2.add(var3);
-        Set<Var> varsPossible2 = new HashSet<>();
+        final Set<Var> varsPossible2 = new HashSet<>();
 
-        ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+        final ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
 
         // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable1 = new SolutionMappingsHashTable(inputVars);
@@ -738,7 +738,7 @@ public class SolutionMappingsHashTableTest {
 
         //----------------------------
         // getJoinPartners of Input2
-        List<SolutionMapping> matchResult = new ArrayList<>();
+        final List<SolutionMapping> matchResult = new ArrayList<>();
         for ( final SolutionMapping smR : input2.getSolutionMappings() ) {
             final Iterable<SolutionMapping> matchSolMapR = solMHashTable1.getJoinPartners(smR);
             if (matchSolMapR != null){

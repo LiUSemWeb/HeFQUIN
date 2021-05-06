@@ -40,7 +40,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	@Override
 	public Iterator<SolutionMapping> iterator() {
 		final List<SolutionMapping> solMap = new ArrayList<>();
-		Iterator<List<SolutionMapping>> li = map.values().iterator();
+		final Iterator<List<SolutionMapping>> li = map.values().iterator();
 		while(li.hasNext()){
 			solMap.addAll(li.next());
 		}
@@ -87,7 +87,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			matchingSolMaps = map.get(valKeyL);
 		} else {
 			// If no join variable exists in the given solution mapping, then all solution mappings (in the hash table) are join partners
-			Iterator<List<SolutionMapping>> li = map.values().iterator();
+			final Iterator<List<SolutionMapping>> li = map.values().iterator();
 			while(li.hasNext()){
 				matchingSolMaps.addAll(li.next());
 			}
