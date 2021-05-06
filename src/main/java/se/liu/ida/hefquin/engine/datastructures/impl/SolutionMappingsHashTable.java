@@ -11,6 +11,10 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 {
+	// Having List<Node> as key type for the hash table is probably
+	// not the best choice in terms of efficiency. However, it will have
+	// to do for the moment.
+	// TODO: can this be made more efficient?
 	protected final Map<List<Node>, List<SolutionMapping>> map = new HashMap<>();
 	protected final Set<Var> joinVariables;
 
@@ -36,6 +40,11 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
+		// The following implementation of this method is inefficient because,
+		// each time it is called, it creates and populates a list of solution
+		// mappings by iterating over the content of this index. However,
+		// for a thread-safe implementation, we may have to live with this.
+		// TODO: is there a more efficient way to implement this method?
 		final List<SolutionMapping> solMap = new ArrayList<>();
 		final Iterator<List<SolutionMapping>> li = map.values().iterator();
 		while(li.hasNext()){
