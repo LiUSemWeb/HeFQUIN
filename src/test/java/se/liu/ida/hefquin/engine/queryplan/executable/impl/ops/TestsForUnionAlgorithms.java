@@ -19,6 +19,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 
@@ -134,10 +135,16 @@ public class TestsForUnionAlgorithms extends ExecOpTestBase {
 					assertEquals("http://example.org/y3", b.get(y).getURI());
 					b3Found = true;
 				}
+				else {
+					fail("Unexpected URI for ?x: " + b.get(x).getURI());
+				}
 			}
 			else if (b.get(y) != null && b.get(y).getURI().equals("http://example.org/y1")) {
 				assertEquals(1, b.size());
 				b4Found = true;
+			}
+			else {
+				fail("Unexpected URI for ?y: " + b.get(y).getURI());
 			}
 		}
 		assertTrue(b1Found);
@@ -200,6 +207,9 @@ public class TestsForUnionAlgorithms extends ExecOpTestBase {
 			else if (b.get(x).getURI().equals("http://example.org/x2")) {
 				assertEquals("http://example.org/y2", b.get(y).getURI());
 				b3Found++;
+			}
+			else {
+				fail("Unexpected URI for ?x: " + b.get(x).getURI());
 			}
 		}
 		assertTrue(b1Found);
