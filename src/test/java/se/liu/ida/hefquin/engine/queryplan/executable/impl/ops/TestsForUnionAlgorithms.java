@@ -118,7 +118,7 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		boolean b4Found = false;
 		
 		for ( final Binding b : result ) {
-			if (b.get(x) != null) {
+			if ( b.contains(x) ) {
 				if (b.get(x).getURI().equals("http://example.org/x1")) {
 					assertEquals(1, b.size());
 					b1Found = true;
