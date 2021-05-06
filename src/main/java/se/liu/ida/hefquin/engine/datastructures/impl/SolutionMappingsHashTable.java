@@ -43,6 +43,11 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
+		// The following implementation of this method is inefficient because,
+		// each time it is called, it creates and populates a list of solution
+		// mappings by iterating over the content of this index. However,
+		// for a thread-safe implementation, we may have to live with this.
+		// TODO: is there a more efficient way to implement this method?
 		final List<SolutionMapping> solMap = new ArrayList<>();
 		final Iterator<List<SolutionMapping>> li = map.values().iterator();
 		while(li.hasNext()){
