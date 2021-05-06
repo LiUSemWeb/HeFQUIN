@@ -11,6 +11,10 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 {
+	// Having List<Node> as key type for the hash table is probably
+	// not the best choice in terms of efficiency. However, it will have
+	// to do for the moment.
+	// TODO: can this be made more efficient?
 	protected final Map<List<Node>, List<SolutionMapping>> map = new HashMap<>();
 	protected final Set<Var> joinVariables;
 
