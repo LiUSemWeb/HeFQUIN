@@ -207,8 +207,8 @@ public class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertEquals(2, b3Found);
 	}
 
-	private Iterator<SolutionMapping> runTest(GenericIntermediateResultBlockImpl input1,
-			GenericIntermediateResultBlockImpl input2) {
+	protected Iterator<SolutionMapping> runTest( final IntermediateResultBlock input1,
+ 			final IntermediateResultBlock input2 ) {
 		
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		
