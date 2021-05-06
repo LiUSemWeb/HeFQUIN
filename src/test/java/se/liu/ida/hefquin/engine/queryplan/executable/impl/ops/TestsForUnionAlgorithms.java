@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 
-public class TestsForUnionAlgorithms<MemberType extends FederationMember> extends ExecOpTestBase{
+public class TestsForUnionAlgorithms extends ExecOpTestBase {
 
 	protected void _testSimpleUnion() {
 		final Var x = Var.alloc("x");
