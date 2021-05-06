@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 
-public class TestsForUnionAlgorithms extends ExecOpTestBase {
+public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 
 	protected void _testSimpleUnion() {
 		final Var x = Var.alloc("x");
@@ -222,10 +222,12 @@ public class TestsForUnionAlgorithms extends ExecOpTestBase {
 		
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		
-		final BinaryExecutableOp op= new ExecOpBinaryUnion();
+		final BinaryExecutableOp op = createExecOpForTest();
 		op.processBlockFromChild1(input1, sink, null);
 		op.processBlockFromChild2(input2, sink, null);
 		return sink.getMaterializedIntermediateResult().iterator();
 	}
+
+	protected abstract BinaryExecutableOp createExecOpForTest() ;
 	
 }
