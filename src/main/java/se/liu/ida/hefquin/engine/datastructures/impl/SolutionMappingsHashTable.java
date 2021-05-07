@@ -154,7 +154,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		final Binding solMapBinding = e.asJenaBinding();
 		final List<Node> valKeys = new ArrayList<>();
 
-		for (Var v : joinVariables) {
+		for ( final Var v : joinVariables ) {
 			final Node n = solMapBinding.get(v);
 			if ( n == null ){
 				throw new IllegalArgumentException();
