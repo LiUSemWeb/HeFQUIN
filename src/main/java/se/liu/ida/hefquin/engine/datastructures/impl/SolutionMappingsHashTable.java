@@ -124,8 +124,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
 			valKeyL.add(value2);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return  map.get(valKeyL);
 		}
 		else{
 			throw new IllegalArgumentException();
