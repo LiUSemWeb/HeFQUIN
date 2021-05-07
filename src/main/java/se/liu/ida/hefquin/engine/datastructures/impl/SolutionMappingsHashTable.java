@@ -146,7 +146,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			return map.get(valKeyL);
 		}
 		else{
-			throw new IllegalArgumentException();
+			throw new UnsupportedOperationException();
 		}
 	}
 
