@@ -57,14 +57,13 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	public boolean add( final SolutionMapping e ) {
 		final List<Node> valKeys = getVarKeys(e);
 
-		if (map.containsKey(valKeys)) {
-			map.get(valKeys).add(e);
-		}
-		else {
-			final List<SolutionMapping> solMapList = new ArrayList<>();
-			solMapList.add(e);
+		List<SolutionMapping> solMapList = map.get(valKeys);
+		if ( solMapList == null) {
+			solMapList = new ArrayList<>();
 			map.put(valKeys, solMapList);
 		}
+
+		solMapList.add(e);
 		return true;
 	}
 
@@ -85,7 +84,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			matchingSolMaps = map.get(valKeys);
 		}
 		else {
-			final Iterator<List<SolutionMapping>> li = map.values().iterator();
+			final Iterator<SolutionMapping> li = iterator();
 			while(li.hasNext()){
 				matchingSolMaps.addAll(li.next());
 			}
@@ -108,11 +107,10 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		if ( joinVariables.size() == 1 && joinVariables.contains(var) ){
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return map.get(valKeyL);
 		}
 		else{
-			throw new IllegalArgumentException();
+			throw new UnsupportedOperationException();
 		}
 	}
 
@@ -126,11 +124,10 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
 			valKeyL.add(value2);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return  map.get(valKeyL);
 		}
 		else{
-			throw new IllegalArgumentException();
+			throw new UnsupportedOperationException();
 		}
 	}
 
@@ -146,25 +143,23 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			valKeyL.add(value1);
 			valKeyL.add(value2);
 			valKeyL.add(value3);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return map.get(valKeyL);
 		}
 		else{
-			throw new IllegalArgumentException();
+			throw new UnsupportedOperationException();
 		}
 	}
 
-	public List<Node> getVarKeys(final SolutionMapping e){
+	protected List<Node> getVarKeys(final SolutionMapping e){
 		final Binding solMapBinding = e.asJenaBinding();
 		final List<Node> valKeys = new ArrayList<>();
 
-		for (Var v : joinVariables) {
-			if ( !solMapBinding.contains(v) ){
+		for ( final Var v : joinVariables ) {
+			final Node n = solMapBinding.get(v);
+			if ( n == null ){
 				throw new IllegalArgumentException();
 			}
-			else {
-				valKeys.add(solMapBinding.get(v));
-			}
+			valKeys.add(n);
 		}
 		return valKeys;
 	}
