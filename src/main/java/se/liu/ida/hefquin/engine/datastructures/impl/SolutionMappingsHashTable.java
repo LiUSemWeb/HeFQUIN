@@ -57,14 +57,13 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	public boolean add( final SolutionMapping e ) {
 		final List<Node> valKeys = getVarKeys(e);
 
-		if (map.containsKey(valKeys)) {
-			map.get(valKeys).add(e);
-		}
-		else {
-			final List<SolutionMapping> solMapList = new ArrayList<>();
-			solMapList.add(e);
+		List<SolutionMapping> solMapList = map.get(valKeys);
+		if ( solMapList == null) {
+			solMapList = new ArrayList<>();
 			map.put(valKeys, solMapList);
 		}
+
+		solMapList.add(e);
 		return true;
 	}
 
