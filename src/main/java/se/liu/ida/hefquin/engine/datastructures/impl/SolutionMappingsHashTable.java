@@ -107,8 +107,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		if ( joinVariables.size() == 1 && joinVariables.contains(var) ){
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return map.get(valKeyL);
 		}
 		else{
 			throw new UnsupportedOperationException();
