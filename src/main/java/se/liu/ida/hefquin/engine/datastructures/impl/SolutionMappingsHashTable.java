@@ -111,7 +111,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			return solMaps;
 		}
 		else{
-			throw new IllegalArgumentException();
+			throw new UnsupportedOperationException();
 		}
 	}
 
