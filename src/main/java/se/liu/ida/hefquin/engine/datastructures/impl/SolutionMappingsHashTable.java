@@ -143,8 +143,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			valKeyL.add(value1);
 			valKeyL.add(value2);
 			valKeyL.add(value3);
-			final List<SolutionMapping> solMaps = map.get(valKeyL);
-			return solMaps;
+			return map.get(valKeyL);
 		}
 		else{
 			throw new IllegalArgumentException();
