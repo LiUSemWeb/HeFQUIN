@@ -150,7 +150,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		}
 	}
 
-	public List<Node> getVarKeys(final SolutionMapping e){
+	protected List<Node> getVarKeys(final SolutionMapping e){
 		final Binding solMapBinding = e.asJenaBinding();
 		final List<Node> valKeys = new ArrayList<>();
 
