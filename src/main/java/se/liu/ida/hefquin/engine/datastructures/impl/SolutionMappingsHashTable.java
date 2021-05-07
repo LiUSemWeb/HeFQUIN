@@ -155,12 +155,11 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		final List<Node> valKeys = new ArrayList<>();
 
 		for (Var v : joinVariables) {
-			if ( !solMapBinding.contains(v) ){
+			final Node n = solMapBinding.get(v);
+			if ( n == null ){
 				throw new IllegalArgumentException();
 			}
-			else {
-				valKeys.add(solMapBinding.get(v));
-			}
+			valKeys.add(n);
 		}
 		return valKeys;
 	}
