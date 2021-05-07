@@ -24,11 +24,13 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public int size() {
+		// TODO
 		return map.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
+		// TODO
 		return map.isEmpty();
 	}
 
@@ -69,6 +71,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public void clear() {
+		// TODO
 		map.clear();
 	}
 
@@ -77,24 +80,22 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			throws UnsupportedOperationException
 	{
 		final List<Node> valKeys = getVarKeys(sm);
-		final List<SolutionMapping> joinPartner = new ArrayList<>();
-		List<SolutionMapping> matchingSolMaps = new ArrayList<>();
-
+		Iterator<SolutionMapping> matchingSolMaps;
 		if (!valKeys.isEmpty() && valKeys.size() == joinVariables.size()){
-			matchingSolMaps = map.get(valKeys);
+			matchingSolMaps = map.containsKey(valKeys)? map.get(valKeys).iterator() : null;
+		}
+		else if(valKeys.isEmpty()){
+			matchingSolMaps = iterator();
 		}
 		else {
-			final Iterator<SolutionMapping> li = iterator();
-			while(li.hasNext()){
-				matchingSolMaps.addAll(li.next());
-			}
+			throw new IllegalStateException();
 		}
 
-		if (matchingSolMaps != null) {
-			for (SolutionMapping matchSolM : matchingSolMaps) {
-				if (SolutionMappingUtils.compatible(sm, matchSolM)) {
-					joinPartner.add(matchSolM);
-				}
+		final List<SolutionMapping> joinPartner = new ArrayList<>();
+		while (matchingSolMaps != null && matchingSolMaps.hasNext()) {
+			final SolutionMapping matchSolM = matchingSolMaps.next();
+			if (SolutionMappingUtils.compatible(sm, matchSolM)) {
+				joinPartner.add(matchSolM);
 			}
 		}
 		return joinPartner;
@@ -120,6 +121,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var2, final Node value2 )
 			throws UnsupportedOperationException
 	{
+		// TODO
 		if ( joinVariables.size() == 2 && joinVariables.contains(var1) && joinVariables.contains(var2) ){
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
@@ -138,6 +140,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var3, final Node value3 )
 			throws UnsupportedOperationException
 	{
+		// TODO
 		if( joinVariables.size() == 3 && joinVariables.contains(var1) && joinVariables.contains(var2) && joinVariables.contains(var3) ){
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value1);
