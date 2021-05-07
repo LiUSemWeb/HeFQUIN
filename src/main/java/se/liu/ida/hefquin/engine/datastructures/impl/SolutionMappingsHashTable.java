@@ -84,7 +84,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			matchingSolMaps = map.get(valKeys);
 		}
 		else {
-			final Iterator<List<SolutionMapping>> li = map.values().iterator();
+			final Iterator<SolutionMapping> li = iterator();
 			while(li.hasNext()){
 				matchingSolMaps.addAll(li.next());
 			}
