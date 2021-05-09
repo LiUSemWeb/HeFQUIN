@@ -26,4 +26,11 @@ public class MaterializingQueryResultSinkImpl implements QueryResultSink
 	public Iterator<SolutionMapping> getSolMapsIter() {
 		return l.iterator();
 	}
+
+	/**
+	 * Returns the size of the materialized result. 
+	 */
+	public int size() {
+		return l.size();
+	}
 }

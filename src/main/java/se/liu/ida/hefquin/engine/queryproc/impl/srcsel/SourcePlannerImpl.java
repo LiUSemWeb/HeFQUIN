@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
@@ -57,7 +58,10 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp ) {
-		if ( jenaOp instanceof OpJoin ) {
+		if ( jenaOp instanceof OpSequence ) {
+			return createPlanForSequence( (OpSequence) jenaOp );
+		}
+		else if ( jenaOp instanceof OpJoin ) {
 			return createPlanForJoin( (OpJoin) jenaOp );
 		}
 		else if ( jenaOp instanceof OpUnion ) {
@@ -69,6 +73,24 @@ public class SourcePlannerImpl implements SourcePlanner
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
+	}
+
+	protected LogicalPlan createPlanForSequence( final OpSequence jenaOp ) {
+		if ( jenaOp.size() == 0 ) {
+			throw new IllegalArgumentException( "empty sequence of operators" );
+		}
+
+		// convert the sequence of Op objects into a left-deep join tree
+		final Iterator<Op> it = jenaOp.iterator();
+		LogicalPlan currentSubPlan = createPlan( it.next() );
+		while ( it.hasNext() ) {
+			currentSubPlan = new LogicalPlanWithBinaryRootImpl(
+					new LogicalOpJoin(),
+					currentSubPlan,
+					createPlan(it.next()) );
+		}
+
+		return currentSubPlan;
 	}
 
 	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp ) {
