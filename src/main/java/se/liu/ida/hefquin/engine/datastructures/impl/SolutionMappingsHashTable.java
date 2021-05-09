@@ -80,7 +80,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			throws UnsupportedOperationException
 	{
 		final List<Node> valKeys = getVarKeys(sm);
-		Iterator<SolutionMapping> matchingSolMaps;
+		final Iterator<SolutionMapping> matchingSolMaps;
 		if (!valKeys.isEmpty() && valKeys.size() == joinVariables.size()){
 			final List<SolutionMapping> l = map.get(valKeys);
 			matchingSolMaps = (l != null) ? l.iterator() : null;
