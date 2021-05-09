@@ -18,9 +18,9 @@ public class QueryProcessorImpl implements QueryProcessor
 	protected final QueryPlanCompiler planCompiler;
 	protected final ExecutionEngine execEngine;
 
-	QueryProcessorImpl( final QueryPlanner planner,
-			            final QueryPlanCompiler planCompiler,
-			            final ExecutionEngine execEngine ) {
+	public QueryProcessorImpl( final QueryPlanner planner,
+	                           final QueryPlanCompiler planCompiler,
+	                           final ExecutionEngine execEngine ) {
 		assert planner != null;
 		assert planCompiler != null;
 		assert execEngine != null;

@@ -16,7 +16,7 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	
 	protected final LogicalOpUnion lop;
 
-	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
+	public PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}

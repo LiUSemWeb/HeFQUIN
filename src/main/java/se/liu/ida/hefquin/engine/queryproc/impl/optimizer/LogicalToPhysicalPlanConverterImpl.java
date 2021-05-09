@@ -182,8 +182,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	protected BinaryPhysicalOp convertUnion( final LogicalOpUnion lop ) {
-		// TODO implement convertUnion (for which we need some physical operator for union) 
-		throw new UnsupportedOperationException();
+		return new PhysicalOpBinaryUnion(lop);
 	}
 
 }

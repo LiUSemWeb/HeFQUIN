@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -19,6 +20,11 @@ public class BGPImpl implements BGP
 
 	@Override
 	public Element asJenaElement() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Op asJenaOp() {
 		throw new UnsupportedOperationException();
 	}
 
