@@ -1,16 +1,13 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.PathBlock;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementService;
-import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -29,11 +26,10 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
@@ -56,110 +52,85 @@ public class SourcePlannerImpl implements SourcePlanner
 		// (i.e., not "SERVICE var {...}"). Therefore, all that this
 		// implementation here does is to convert the given query
 		// pattern into a logical plan.
-		final Element pattern = ( (SPARQLGraphPattern) query ).asJenaElement();
-		return createPlan(pattern);
+		final Op jenaOp = ( (SPARQLGraphPattern) query ).asJenaOp();
+		return createPlan(jenaOp);
 	}
 
-	protected LogicalPlan createPlan( final Element pattern ) {
-		if ( pattern instanceof ElementService ) {
-			return createPlanForServicePattern( (ElementService) pattern ); 
+	protected LogicalPlan createPlan( final Op jenaOp ) {
+		if ( jenaOp instanceof OpJoin ) {
+			return createPlanForJoin( (OpJoin) jenaOp );
 		}
-		else if ( pattern instanceof ElementGroup ) {
-			final ElementGroup group = (ElementGroup) pattern;
-			final int groupSize = group.size();
-
-			if ( groupSize == 0 ) {
-				throw new IllegalArgumentException( "empty group pattern" );
-			}
-
-			// create a left-deep join tree for group patterns
-			LogicalPlan currentSubPlan = createPlan( group.get(0) );
-			for ( int i = 1; i < groupSize; ++i ) {
-				currentSubPlan = new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
-				                                                    currentSubPlan,
-				                                                    createPlan(group.get(i)) );
-			}
-			return currentSubPlan;
+		else if ( jenaOp instanceof OpUnion ) {
+			return createPlanForUnion( (OpUnion) jenaOp );
+		}
+		else if ( jenaOp instanceof OpService ) {
+			return createPlanForServicePattern( (OpService) jenaOp ); 
 		}
 		else {
-			throw new IllegalArgumentException( "unsupported type of query pattern: " + pattern.getClass().getName() );
+			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
 	}
 
-	protected LogicalPlan createPlanForServicePattern( final ElementService pattern ) {
-		if ( pattern.getServiceNode().isVariable() ) {
+	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp ) {
+		return new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
+		                                          createPlan(jenaOp.getLeft()),
+		                                          createPlan(jenaOp.getRight()) );
+	}
+
+	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp ) {
+		return new LogicalPlanWithBinaryRootImpl( new LogicalOpUnion(),
+		                                          createPlan(jenaOp.getLeft()),
+		                                          createPlan(jenaOp.getRight()) );
+	}
+
+	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp ) {
+		if ( jenaOp.getService().isVariable() ) {
 			throw new IllegalArgumentException( "unsupported SERVICE pattern" );
 		}
 
-		final FederationMember fm = fedCat.getFederationMemberByURI( pattern.getServiceNode().getURI() );
-		return createPlan( pattern.getElement(), fm );
+		final FederationMember fm = fedCat.getFederationMemberByURI( jenaOp.getService().getURI() );
+		return createPlan( jenaOp.getSubOp(), fm );
 	}
 
-	protected LogicalPlan createPlan( final Element pattern, final FederationMember fm ) {
+	protected LogicalPlan createPlan( final Op jenaOp, final FederationMember fm ) {
 		// If the federation member has a SPARQL endpoint interface, then
 		// we can simply wrap the whole query pattern in a single request. 
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(pattern) );
+			final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(jenaOp) );
 			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
 			return new LogicalPlanWithNullaryRootImpl(op);
 		}
 
 		// For all federation members with other types of interfaces,
 		// the pattern must be broken into smaller parts.
-		if ( pattern instanceof ElementGroup ) {
-			return createPlanForGroupPattern( (ElementGroup) pattern, fm );
+		if ( jenaOp instanceof OpJoin ) {
+			return createPlanForJoin( (OpJoin) jenaOp, fm );
 		}
-		else if ( pattern instanceof ElementUnion ) {
-			return createPlanForUnionPattern( (ElementUnion) pattern, fm );
+		else if ( jenaOp instanceof OpUnion ) {
+			return createPlanForUnion( (OpUnion) jenaOp, fm );
 		}
-		else if ( pattern instanceof ElementPathBlock ) {
-			return createPlanForBGP( ((ElementPathBlock) pattern).getPattern(), fm );
+		else if ( jenaOp instanceof OpBGP ) {
+			return createPlanForBGP( (OpBGP) jenaOp, fm );
 		}
 		else {
-			throw new IllegalArgumentException( "unsupported type of query pattern: " + pattern.getClass().getName() );
+			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
 	}
 
-	protected LogicalPlan createPlanForGroupPattern( final ElementGroup group, final FederationMember fm ) {
-		if ( group.size() == 0 ) {
-			throw new IllegalArgumentException( "empty group pattern" );
-		}
-
-		// create a left-deep join tree for group patterns
-		final Iterator<Element> it = group.getElements().iterator();
-		LogicalPlan currentSubPlan = createPlan( it.next(), fm );
-		while ( it.hasNext() ) {
-			currentSubPlan = new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
-			                                                    currentSubPlan,
-			                                                    createPlan(it.next(),fm) );
-		}
-		return currentSubPlan;
+	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp, final FederationMember fm ) {
+		return new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
+		                                          createPlan(jenaOp.getLeft(),fm),
+		                                          createPlan(jenaOp.getRight(),fm) );
 	}
 
-	protected LogicalPlan createPlanForUnionPattern( final ElementUnion pattern, final FederationMember fm ) {
-		// create multiway union operator for a union pattern
-		final List<LogicalPlan> subPlans = new ArrayList<>();
-		final Iterator<Element> it = pattern.getElements().iterator();
-		while ( it.hasNext() ) {
-			final LogicalPlan subPlan = createPlan( it.next(), fm );
-			subPlans.add(subPlan);
-		}
-
-		if ( subPlans.size() == 0 ) {
-			throw new IllegalArgumentException( "empty union pattern" );
-		}
-
-		// If there was only one subpattern in the union pattern,
-		// then there is no need to create the union operator.
-		if ( subPlans.size() == 1 ) {
-			return subPlans.get(0);
-		}
-
-		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayUnion(), subPlans );
+	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp, final FederationMember fm ) {
+		return new LogicalPlanWithBinaryRootImpl( new LogicalOpUnion(),
+		                                          createPlan(jenaOp.getLeft(),fm),
+		                                          createPlan(jenaOp.getRight(),fm) );
 	}
 
-	protected LogicalPlan createPlanForBGP( final PathBlock pattern, final FederationMember fm ) {
-		return createPlanForBGP( QueryPatternUtils.createBGP(pattern), fm );
+	protected LogicalPlan createPlanForBGP( final OpBGP pattern, final FederationMember fm ) {
+		return createPlanForBGP( pattern.getPattern(), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BasicPattern pattern, final FederationMember fm ) {

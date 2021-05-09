@@ -6,13 +6,13 @@ import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.syntax.PatternVars;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -67,7 +67,7 @@ public class QueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern pattern ) {
-		return new HashSet<>( PatternVars.vars(pattern.asJenaElement()) );
+		return OpVars.fixedVars( pattern.asJenaOp() );
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {
