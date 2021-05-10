@@ -1,36 +1,32 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 
-public class PhysicalOpVALUESBindJoin implements UnaryPhysicalOpForLogicalOp {
-	
-	protected final BinaryLogicalOp lop;
-	
-	protected PhysicalOpVALUESBindJoin( final BinaryLogicalOp lop) {
-		assert lop != null;
-		this.lop = lop;
-	}
+public class PhysicalOpVALUESBindJoin extends BasePhysicalOpSingleInputJoin {
 
-	@Override
-	public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
-		// TODO Auto-generated method stub
-		return null;
+	protected PhysicalOpVALUESBindJoin(UnaryLogicalOp lop) {
+		super(lop);
 	}
 
 	@Override
 	public UnaryExecutableOp createExecOp(ExpectedVariables... inputVars) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if ( lop instanceof LogicalOpTPAdd ) {
+			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
+			final FederationMember fm = tpAdd.getFederationMember();
 
-	@Override
-	public UnaryLogicalOp getLogicalOperator() {
-		// TODO Auto-generated method stub
-		return null;
+			if ( fm instanceof SPARQLEndpoint )
+				return new ExecOpBindJoinSPARQLwithVALUES( tpAdd.getTP(), (SPARQLEndpoint) fm );
+			else
+				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+		}
+		else
+			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 	}
 
 }
