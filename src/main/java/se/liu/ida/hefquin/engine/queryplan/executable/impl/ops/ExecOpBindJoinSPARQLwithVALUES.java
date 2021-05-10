@@ -8,6 +8,7 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.Table;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.table.TableData;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -39,8 +40,8 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 		for (SolutionMapping s : solMaps) {
 			bindings.add(s.asJenaBinding());
 		}
-		Table table = new TableData(new ArrayList<Var>(varsInTP), null);
-		Op op = OpSequence.create( OpTable.create(table), query.asJenaOp());
+		Table table = new TableData(new ArrayList<Var>(varsInTP), bindings);
+		Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
 		SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		SolMapsResponse response = execCxt.getFederationAccessMgr().performRequest(request, fm);
