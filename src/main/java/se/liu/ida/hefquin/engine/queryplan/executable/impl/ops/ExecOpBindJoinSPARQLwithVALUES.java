@@ -40,7 +40,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 		for (SolutionMapping s : solMaps) {
 			bindings.add(s.asJenaBinding());
 		}
-		Table table = new TableData(new ArrayList<Var>(varsInTP), bindings);
+		final Table table = new TableData(new ArrayList<Var>(varsInTP), bindings);
 		Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
 		SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		SPARQLRequest request = new SPARQLRequestImpl(pattern);
