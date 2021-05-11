@@ -102,9 +102,9 @@ public abstract class EngineTestBase
 			final List<SolutionMapping> results = new ArrayList<>();
 			final QueryIterator qIter = Algebra.exec(pattern.asJenaOp(), data);
 			while ( qIter.hasNext() ){
-	            final Binding b = qIter.nextBinding() ;
-	            results.add(new SolutionMappingImpl(b));
-	        }
+				final Binding b = qIter.nextBinding() ;
+				results.add(new SolutionMappingImpl(b));
+			}
 			return results;	
 		}
 		

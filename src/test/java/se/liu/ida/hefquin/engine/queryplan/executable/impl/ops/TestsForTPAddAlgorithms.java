@@ -216,7 +216,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue( it.hasNext() );
 		final Binding b4 = it.next().asJenaBinding();
 		assertEquals( 3, b4.size() );
-		
+
 		assertFalse( it.hasNext() );
 	}
 
