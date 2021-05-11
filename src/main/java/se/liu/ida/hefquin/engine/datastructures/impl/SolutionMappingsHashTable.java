@@ -91,9 +91,8 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public void clear() {
-		final Iterator<List<SolutionMapping>> liValue = map.values().iterator();
-		while( liValue.hasNext() ){
-			liValue.next().clear();
+		for ( final List<SolutionMapping> l : map.values() ) {
+			l.clear();
 		}
 		map.clear();
 	}
