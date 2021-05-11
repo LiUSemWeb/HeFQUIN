@@ -98,9 +98,9 @@ public abstract class EngineTestBase
 			return result;
 		}
 		
-		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern tp ) {
+		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern pattern ) {
 			final List<SolutionMapping> results = new ArrayList<>();
-			final QueryIterator qIter = Algebra.exec(tp.asJenaOp(), data);
+			final QueryIterator qIter = Algebra.exec(pattern.asJenaOp(), data);
 			for ( ; qIter.hasNext() ; )
 	        {
 	            final Binding b = qIter.nextBinding() ;
