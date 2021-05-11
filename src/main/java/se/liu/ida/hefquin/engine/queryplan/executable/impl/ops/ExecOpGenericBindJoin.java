@@ -38,12 +38,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
             final IntermediateResultElementSink sink,
             final ExecutionContext execCxt)
     {
-        final Set<SolutionMapping> solMaps = new HashSet<>();
-        for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-            solMaps.add(sm);
-        }
-
-        for ( final SolutionMapping fetchedSM : fetchSolutionMappings(solMaps,execCxt) ) {
+        for ( final SolutionMapping fetchedSM : fetchSolutionMappings( input.getSolutionMappings(), execCxt) ) {
             for ( final SolutionMapping inputSM : input.getSolutionMappings() ) {
                 if(SolutionMappingUtils.compatible(inputSM, fetchedSM)){
                     final SolutionMapping mergedSM = SolutionMappingUtils.merge(inputSM, fetchedSM);
@@ -62,6 +57,6 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
     }
 
     protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
-            final Set<SolutionMapping> solMaps,
+            final Iterable<SolutionMapping> solMaps,
             final ExecutionContext execCxt );
 }
