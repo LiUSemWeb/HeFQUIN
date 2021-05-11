@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingMap;
@@ -39,6 +41,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public abstract class EngineTestBase
@@ -94,6 +97,18 @@ public abstract class EngineTestBase
 			}
 			return result;
 		}
+		
+		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern tp ) {
+			final List<SolutionMapping> results = new ArrayList<>();
+			final QueryIterator qIter = Algebra.exec(tp.asJenaOp(), data);
+			for ( ; qIter.hasNext() ; )
+	        {
+	            final Binding b = qIter.nextBinding() ;
+	            results.add(new SolutionMappingImpl(b));
+	        }
+			return results;	
+		}
+		
 	}
 
 	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
@@ -119,12 +134,14 @@ public abstract class EngineTestBase
 			if ( req instanceof TriplePatternRequest ) {
 				result = getSolutions( (TriplePatternRequest) req);
 			}
-			else {
+			else if (req.getQueryPattern() instanceof TriplePattern) {
 				result = getSolutions( (TriplePattern) req.getQueryPattern() );
+			} else {
+				result = getSolutions(req.getQueryPattern());
 			}
-
 			return new SolMapsResponseImpl( result, this, req, new Date() );
 		}
+
 	}
 
 
