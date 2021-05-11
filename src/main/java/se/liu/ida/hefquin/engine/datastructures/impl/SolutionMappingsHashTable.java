@@ -51,16 +51,13 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			return false;
 		}
 
-		boolean contain = false;
-		if( !map.isEmpty() ){
-			final Iterator<List<SolutionMapping>> li = map.values().iterator();
-			while( li.hasNext() ){
-				if( li.next().contains((SolutionMapping) o) ){
-					contain = true;
-				}
+		final SolutionMapping sm = (SolutionMapping) o;
+		for ( final List<SolutionMapping> li : map.values() ) {
+			if ( l.contains(sm) ) {
+				return true;
 			}
 		}
-		return contain;
+		return false;
 	}
 
 	@Override
