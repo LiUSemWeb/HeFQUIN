@@ -14,6 +14,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
@@ -26,11 +27,13 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint>{
 
-	protected final List<Var> varsInTP;
+	protected final Set<Var> varsInTP;
+	protected final List<Var> varsInTPAsList;
 	
 	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>(QueryPatternUtils.getVariablesInPattern(query));
+		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInTPAsList = new ArrayList<>(varsInTP);
 	}
 
 	@Override
@@ -38,9 +41,9 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 			final ExecutionContext execCxt) {
 		final List<Binding> bindings = new ArrayList<Binding>();
 		for (SolutionMapping s : solMaps) {
-			bindings.add(s.asJenaBinding());
+			bindings.add( SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding() );
 		}
-		final Table table = new TableData(varsInTP, bindings);
+		final Table table = new TableData(varsInTPAsList, bindings);
 		final Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
