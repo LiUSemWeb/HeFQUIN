@@ -30,29 +30,20 @@ public class SolutionMappingsHashTableTest {
         final Node z2 = NodeFactory.createURI("http://example.org/z2");
         final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
-        final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(var2);
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var2, y1,
                 var3, z1) );
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var2, y1,
                 var3, z2) );
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var2, y2,
                 var3, z3) );
 
-        final Set<Var> inputVars = new HashSet<>();
-        inputVars.add(var2);
-
-        // Build SolutionMappingsHashTable for input1
-        final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(inputVars);
-        for ( final SolutionMapping sm : input1.getSolutionMappings() ) {
-            solMHashTable.add(sm);
-        }
-
         //------------------
         // Checking SolutionMappingsHashTable
-        assertEquals( 2, solMHashTable.size() );
+        assertEquals( 3, solMHashTable.size() );
         final Iterator<SolutionMapping> it = solMHashTable.iterator();
         assertTrue( it.hasNext() );
         final Binding b1 = it.next().asJenaBinding();
@@ -143,33 +134,24 @@ public class SolutionMappingsHashTableTest {
         final Node z1 = NodeFactory.createURI("http://example.org/z1");
         final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-        final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        // Create SolutionMappingsHashTable for input1
+        final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(var1, var2);
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1,
                 var3, z1) );
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x1,
                 var2, y1,
                 var3, z2) );
-        input1.add( SolutionMappingUtils.createSolutionMapping(
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y2,
                 var3, z2) );
 
-        final Set<Var> inputVars = new HashSet<>();
-        inputVars.add(var1);
-        inputVars.add(var2);
-
-        // Create SolutionMappingsHashTable for input1
-        final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(inputVars);
-        for ( final SolutionMapping smL : input1.getSolutionMappings() ) {
-            solMHashTable.add(smL);
-        }
-
         //------------------
         // Checking SolutionMappingsHashTable
-        assertEquals( 2, solMHashTable.size() );
+        assertEquals( 3, solMHashTable.size() );
 
         final Iterator<SolutionMapping> it = solMHashTable.iterator();
         assertTrue( it.hasNext() );
@@ -265,20 +247,13 @@ public class SolutionMappingsHashTableTest {
         final Node y1 = NodeFactory.createURI("http://example.org/y1");
         final Node z1 = NodeFactory.createURI("http://example.org/z1");
 
-        final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
-        input1.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
-        input1.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
-
         final Set<Var> inputVars = new HashSet<>();
-
-        // Create SolutionMappingsHashTable for input1
         final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(inputVars);
-        for ( final SolutionMapping smL : input1.getSolutionMappings() ) {
-            solMHashTable.add(smL);
-        }
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
+        solMHashTable.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
 
         // Key: NULL
-        assertEquals( 1, solMHashTable.size() );
+        assertEquals( 2, solMHashTable.size() );
         final Iterator<SolutionMapping> it = solMHashTable.iterator();
 
         assertTrue( it.hasNext() );
@@ -357,6 +332,7 @@ public class SolutionMappingsHashTableTest {
         input2.add( SolutionMappingUtils.createSolutionMapping(
                 var1, x2,
                 var2, y3) );
+
 
         final Set<Var> varsCertain1 = new HashSet<>();
         varsCertain1.add(var2);

@@ -16,28 +16,46 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	// to do for the moment.
 	// TODO: can this be made more efficient?
 	protected final Map<List<Node>, List<SolutionMapping>> map = new HashMap<>();
-	protected final Set<Var> joinVariables;
+	protected final Collection<Var> joinVariables;
 
-	public SolutionMappingsHashTable(final Set<Var> joinVariables){
+	public SolutionMappingsHashTable( final Set<Var> joinVariables ){
 		this.joinVariables = joinVariables;
+	}
+	public SolutionMappingsHashTable( final Var ... vars ) {
+		this.joinVariables = Arrays.asList(vars);
 	}
 
 	@Override
 	public int size() {
-		// TODO
-		return map.size();
+		int size = 0;
+		final Iterator<List<SolutionMapping>> li = map.values().iterator();
+		while( li.hasNext() ){
+			size = size + li.next().size();
+		}
+		return size;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO
-		return map.isEmpty();
+		return ! ( !map.isEmpty() && size()>0 );
 	}
 
 	@Override
 	public boolean contains( final Object o ) {
-		// TODO
-		return map.containsKey(o);
+		if( !(o instanceof SolutionMapping) ){
+			throw new IllegalArgumentException();
+		}
+
+		boolean contain = false;
+		if( !map.isEmpty() ){
+			final Iterator<List<SolutionMapping>> li = map.values().iterator();
+			while( li.hasNext() ){
+				if( li.next().contains((SolutionMapping) o) ){
+					contain = true;
+				}
+			}
+		}
+		return contain;
 	}
 
 	@Override
@@ -71,7 +89,10 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public void clear() {
-		// TODO
+		final Iterator<List<SolutionMapping>> liValue = map.values().iterator();
+		while( liValue.hasNext() ){
+			liValue.next().clear();
+		}
 		map.clear();
 	}
 
@@ -122,11 +143,19 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var2, final Node value2 )
 			throws UnsupportedOperationException
 	{
-		// TODO
 		if ( joinVariables.size() == 2 && joinVariables.contains(var1) && joinVariables.contains(var2) ){
 			final List<Node> valKeyL = new ArrayList<>();
-			valKeyL.add(value1);
-			valKeyL.add(value2);
+			for ( final Var v : joinVariables ) {
+				if( v.equals(var1) ){
+					valKeyL.add(value1);
+				}
+				else if( v.equals(var2) ){
+					valKeyL.add(value2);
+				}
+				else{
+					throw new IllegalArgumentException();
+				}
+			}
 			return  map.get(valKeyL);
 		}
 		else{
@@ -141,12 +170,22 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var3, final Node value3 )
 			throws UnsupportedOperationException
 	{
-		// TODO
 		if( joinVariables.size() == 3 && joinVariables.contains(var1) && joinVariables.contains(var2) && joinVariables.contains(var3) ){
 			final List<Node> valKeyL = new ArrayList<>();
-			valKeyL.add(value1);
-			valKeyL.add(value2);
-			valKeyL.add(value3);
+			for ( final Var v : joinVariables ) {
+				if( v.equals(var1) ){
+					valKeyL.add(value1);
+				}
+				else if( v.equals(var2) ){
+					valKeyL.add(value2);
+				}
+				else if( v.equals(var3) ){
+					valKeyL.add(value3);
+				}
+				else{
+					throw new IllegalArgumentException();
+				}
+			}
 			return map.get(valKeyL);
 		}
 		else{
