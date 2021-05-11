@@ -28,7 +28,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 
 	protected final Set<Var> varsInTP;
 	
-	public ExecOpBindJoinSPARQLwithVALUES(TriplePattern query, SPARQLEndpoint fm) {
+	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
 		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
 	}
