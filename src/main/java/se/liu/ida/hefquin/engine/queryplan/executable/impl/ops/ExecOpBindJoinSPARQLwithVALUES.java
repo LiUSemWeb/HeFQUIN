@@ -26,11 +26,11 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint>{
 
-	protected final Set<Var> varsInTP;
+	protected final List<Var> varsInTP;
 	
 	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInTP = new ArrayList<>(QueryPatternUtils.getVariablesInPattern(query));
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 		for (SolutionMapping s : solMaps) {
 			bindings.add(s.asJenaBinding());
 		}
-		final Table table = new TableData(new ArrayList<Var>(varsInTP), bindings);
+		final Table table = new TableData(varsInTP, bindings);
 		final Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
