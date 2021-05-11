@@ -181,6 +181,19 @@ public class SolutionMappingsHashTableTest {
             }
         }
 
+        // Checking solution mappings with (var2, y2, var1, x2), change order of var1 and var2
+        final Iterable<SolutionMapping> solMap3= solMHashTable.findSolutionMappings(var2, y2, var1, x2);
+        for(final SolutionMapping sm: solMap3){
+            final Binding bsm = sm.asJenaBinding();
+            if ( bsm.get(var3).getURI().equals("http://example.org/z2") ) {
+                assertEquals( "http://example.org/x2", bsm.get(var1).getURI() );
+                assertEquals( "http://example.org/y2", bsm.get(var2).getURI() );
+            }
+            else {
+                fail( "Unexpected URI for ?v3: " + bsm.get(var3).getURI() );
+            }
+        }
+
         //----------------------------
         // Probe
         // getJoinPartners of sm1: two join variables with two join partners

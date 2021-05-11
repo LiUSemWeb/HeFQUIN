@@ -53,7 +53,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 		final SolutionMapping sm = (SolutionMapping) o;
 		for ( final List<SolutionMapping> li : map.values() ) {
-			if ( l.contains(sm) ) {
+			if ( li.contains(sm) ) {
 				return true;
 			}
 		}
