@@ -48,7 +48,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	@Override
 	public boolean contains( final Object o ) {
 		if( !(o instanceof SolutionMapping) ){
-			throw new IllegalArgumentException();
+			return false;
 		}
 
 		boolean contain = false;
