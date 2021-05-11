@@ -39,7 +39,7 @@ public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<
 	}
 
 	@Override
-	protected SPARQLEndpoint createFedMemberForTest(Graph dataForMember) {
+	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
 		return new SPARQLEndpointForTest(dataForMember);
 	}
 
