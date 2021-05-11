@@ -154,7 +154,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 					valKeyL.add(value2);
 				}
 				else{
-					throw new IllegalArgumentException();
+					throw new IllegalStateException();
 				}
 			}
 			return  map.get(valKeyL);
