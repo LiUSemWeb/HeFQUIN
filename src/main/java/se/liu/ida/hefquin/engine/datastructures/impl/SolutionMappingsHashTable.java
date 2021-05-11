@@ -37,7 +37,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public boolean isEmpty() {
-		return ! ( !map.isEmpty() && size()>0 );
+		for ( final List<SolutionMapping> l : map.values() ) {
+			if ( ! l.isEmpty() ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
