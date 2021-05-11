@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,11 +40,11 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 	@Override
 	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(final Set<SolutionMapping> solMaps,
 			final ExecutionContext execCxt) {
-		final List<Binding> bindings = new ArrayList<Binding>();
+		final Set<Binding> bindings = new HashSet<Binding>();
 		for (SolutionMapping s : solMaps) {
 			bindings.add( SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding() );
 		}
-		final Table table = new TableData(varsInTPAsList, bindings);
+		final Table table = new TableData(varsInTPAsList, new ArrayList<>(bindings));
 		final Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
