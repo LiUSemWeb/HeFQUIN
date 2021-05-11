@@ -41,10 +41,10 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 			bindings.add(s.asJenaBinding());
 		}
 		final Table table = new TableData(new ArrayList<Var>(varsInTP), bindings);
-		Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
-		SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
-		SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		SolMapsResponse response = execCxt.getFederationAccessMgr().performRequest(request, fm);
+		final Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()));
+		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
+		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
+		final SolMapsResponse response = execCxt.getFederationAccessMgr().performRequest(request, fm);
 		return response.getSolutionMappings();
 	}
 
