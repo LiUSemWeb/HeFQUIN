@@ -21,7 +21,7 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
     }
 
     @Override
-    public Iterable<? extends SolutionMapping> fetchSolutionMappings( final Set<SolutionMapping> solMaps,
+    public Iterable<? extends SolutionMapping> fetchSolutionMappings( final Iterable<SolutionMapping> solMaps,
                                                                       final ExecutionContext execCxt )
     {
         final ReqType req = createRequest(solMaps);
@@ -29,7 +29,7 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
         return convert( resp.getTriples(), req );
     }
 
-    protected abstract ReqType createRequest(final Set<SolutionMapping> solMaps);
+    protected abstract ReqType createRequest(final Iterable<SolutionMapping> solMaps);
 
     protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
