@@ -34,8 +34,8 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 	}
 
 	@Override
-	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(Set<SolutionMapping> solMaps,
-			ExecutionContext execCxt) {
+	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(final Set<SolutionMapping> solMaps,
+			final ExecutionContext execCxt) {
 		List<Binding> bindings = new ArrayList<Binding>();
 		for (SolutionMapping s : solMaps) {
 			bindings.add(s.asJenaBinding());
