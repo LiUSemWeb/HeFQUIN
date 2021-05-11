@@ -101,8 +101,7 @@ public abstract class EngineTestBase
 		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern pattern ) {
 			final List<SolutionMapping> results = new ArrayList<>();
 			final QueryIterator qIter = Algebra.exec(pattern.asJenaOp(), data);
-			for ( ; qIter.hasNext() ; )
-	        {
+			while ( qIter.hasNext() ){
 	            final Binding b = qIter.nextBinding() ;
 	            results.add(new SolutionMappingImpl(b));
 	        }
