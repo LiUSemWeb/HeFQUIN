@@ -111,7 +111,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			matchingSolMaps = iterator();
 		}
 		else {
-			throw new IllegalStateException();
+			throw new  UnsupportedOperationException();
 		}
 
 		final List<SolutionMapping> joinPartner = new ArrayList<>();
