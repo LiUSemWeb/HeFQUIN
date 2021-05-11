@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 
 public class PhysicalOpVALUESBindJoin extends BasePhysicalOpSingleInputJoin {
 
-	protected PhysicalOpVALUESBindJoin(UnaryLogicalOp lop) {
+	public PhysicalOpVALUESBindJoin( final UnaryLogicalOp lop ) {
 		super(lop);
 	}
 
