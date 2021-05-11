@@ -8,9 +8,9 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 
-public class PhysicalOpVALUESBindJoin extends BasePhysicalOpSingleInputJoin {
+public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin {
 
-	public PhysicalOpVALUESBindJoin( final UnaryLogicalOp lop ) {
+	public PhysicalOpBindJoinWithVALUES( final UnaryLogicalOp lop ) {
 		super(lop);
 	}
 
