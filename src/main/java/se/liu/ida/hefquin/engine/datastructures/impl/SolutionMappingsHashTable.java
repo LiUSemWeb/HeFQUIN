@@ -103,7 +103,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	{
 		final List<Node> valKeys = getVarKeys(sm);
 		final Iterator<SolutionMapping> matchingSolMaps;
-		if (!valKeys.isEmpty() && valKeys.size() == joinVariables.size()){
+		if ( valKeys.size() == joinVariables.size() ) {
 			final List<SolutionMapping> l = map.get(valKeys);
 			matchingSolMaps = (l != null) ? l.iterator() : null;
 		}
