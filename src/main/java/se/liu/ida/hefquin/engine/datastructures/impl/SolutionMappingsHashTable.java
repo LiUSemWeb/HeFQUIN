@@ -20,7 +20,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	public SolutionMappingsHashTable( final Set<Var> joinVariables ){
 		if( joinVariables.isEmpty() ){
-			throw new UnsupportedOperationException();
+			throw new IllegalArgumentException();
 		}
 		else {
 			this.joinVariables = joinVariables;
