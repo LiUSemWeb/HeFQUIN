@@ -291,7 +291,7 @@ public class SolutionMappingsHashTableTest {
     public void hashTableWithEmptyInputVariable() {
 
         final Set<Var> inputVars = new HashSet<>();
-        assertThrows(UnsupportedOperationException.class,
+        assertThrows(IllegalArgumentException.class,
                 ()->{ new SolutionMappingsHashTable(inputVars); });
     }
 }
