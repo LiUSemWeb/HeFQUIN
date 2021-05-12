@@ -19,7 +19,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	protected final Collection<Var> joinVariables;
 
 	public SolutionMappingsHashTable( final Set<Var> joinVariables ){
-		this.joinVariables = joinVariables;
+		if( joinVariables.isEmpty() ){
+			throw new UnsupportedOperationException();
+		}
+		else {
+			this.joinVariables = joinVariables;
+		}
 	}
 	public SolutionMappingsHashTable( final Var ... vars ) {
 		this.joinVariables = Arrays.asList(vars);
@@ -51,10 +56,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			return false;
 		}
 
-		final SolutionMapping sm = (SolutionMapping) o;
+		final Binding b = ((SolutionMapping) o).asJenaBinding();
 		for ( final List<SolutionMapping> li : map.values() ) {
-			if ( li.contains(sm) ) {
-				return true;
+			for ( final SolutionMapping sm : li){
+				if ( sm.asJenaBinding().equals(b) ){
+					return true;
+				}
 			}
 		}
 		return false;
@@ -103,15 +110,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	{
 		final List<Node> valKeys = getVarKeys(sm);
 		final Iterator<SolutionMapping> matchingSolMaps;
-		if ( valKeys.size() == joinVariables.size() ) {
-			final List<SolutionMapping> l = map.get(valKeys);
-			matchingSolMaps = (l != null) ? l.iterator() : null;
-		}
-		else if(valKeys.isEmpty()){
+		if ( valKeys == null ){
 			matchingSolMaps = iterator();
 		}
 		else {
-			throw new  UnsupportedOperationException();
+			final List<SolutionMapping> l = map.get(valKeys);
+			matchingSolMaps = (l != null) ? l.iterator() : null;
 		}
 
 		final List<SolutionMapping> joinPartner = new ArrayList<>();
@@ -201,7 +205,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		for ( final Var v : joinVariables ) {
 			final Node n = solMapBinding.get(v);
 			if ( n == null ){
-				throw new IllegalArgumentException();
+				return null;
 			}
 			valKeys.add(n);
 		}
