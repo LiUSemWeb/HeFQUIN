@@ -6,6 +6,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
@@ -54,7 +55,19 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var2, y2,
 				var3, z3) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var1);
+		varsCertain1.add(var2);
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var2);
+		varsCertain2.add(var3);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -133,7 +146,20 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var2, y2,
 				var3, z2) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var1);
+		varsCertain1.add(var2);
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		varsCertain2.add(var2);
+		varsCertain2.add(var3);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -200,7 +226,20 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var2, y1,
 				var3, z2) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var1);
+		varsCertain1.add(var2);
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		varsCertain2.add(var2);
+		varsCertain2.add(var3);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		assertFalse( it.hasNext() );
 	}
@@ -230,7 +269,18 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var2, y2,
 				var3, z2) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var1);
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var2);
+		varsCertain2.add(var3);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -266,7 +316,17 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var2, y1,
 				var3, z1) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var2);
+		varsCertain2.add(var3);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		assertFalse( it.hasNext() );
 	}
@@ -283,7 +343,16 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 
 		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var1);
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		assertFalse( it.hasNext() );
 	}
@@ -308,7 +377,17 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 				var1, x2,
 				var2, y2) );
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		varsCertain2.add(var2);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -333,7 +412,16 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
 		input2.add(SolutionMappingUtils.createSolutionMapping());
 
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		Set<Var> varsCertain1 = new HashSet<>();
+		Set<Var> varsPossible1 = new HashSet<>();
+
+		Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		Set<Var> varsPossible2 = new HashSet<>();
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
 		//assertFalse( it.hasNext() );
 		assertTrue( it.hasNext() );
@@ -347,13 +435,32 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
+	protected ExpectedVariables[] getExpectedVariables(
+			final Set<Var> varsCertain1,
+			final Set<Var> varsPossible1,
+			final Set<Var> varsCertain2,
+			final Set<Var> varsPossible2)
+	{
+		final ExpectedVariables[] inputVars = new ExpectedVariables[2];
+		inputVars[0] = new ExpectedVariables() {
+			public Set<Var> getCertainVariables() { return varsCertain1;}
+			public Set<Var> getPossibleVariables() { return varsPossible1;}
+		};
+		inputVars[1] = new ExpectedVariables() {
+			public Set<Var> getCertainVariables() { return varsCertain2;}
+			public Set<Var> getPossibleVariables() { return varsPossible2;}
+		};
+		return inputVars;
+	}
+
 	protected Iterator<SolutionMapping> runTest(
 			final IntermediateResultBlock input1,
-			final IntermediateResultBlock input2)
+			final IntermediateResultBlock input2,
+			final ExpectedVariables... inputVars)
 	{
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
-		final BinaryExecutableOp op = createExecOpForTest();
+		final BinaryExecutableOp op = createExecOpForTest(inputVars);
 
 		op.processBlockFromChild1(input1, sink, null);
 		op.processBlockFromChild2(input2, sink, null);
@@ -361,5 +468,5 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		return sink.getMaterializedIntermediateResult().iterator();
 	}
 
-	protected abstract BinaryExecutableOp createExecOpForTest();
+	protected abstract BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars );
 }
