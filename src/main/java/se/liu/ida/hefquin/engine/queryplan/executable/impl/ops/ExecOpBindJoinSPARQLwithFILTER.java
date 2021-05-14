@@ -54,8 +54,6 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 			Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
 			Expr conjunction = null;
 			boolean firstConj = true;
-			//System.out.println(b.size());
-			//System.exit(0);
 			Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
 				final Var v = vars.next();
@@ -68,6 +66,8 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 					conjunction = new E_LogicalAnd(conjunction, expr);
 				}
 			}
+			if (conjunction == null)
+				continue;
 			if (firstDisj) {
 				disjunction = conjunction;
 				firstDisj = false;
