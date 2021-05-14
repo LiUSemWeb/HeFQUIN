@@ -4,6 +4,7 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
+import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -21,8 +22,14 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
         final Set<Var> joinVars = new HashSet<>( inputVars[0].getCertainVariables());
         joinVars.retainAll( inputVars[1].getCertainVariables() );
 
-        this.solMHashTableL = new SolutionMappingsHashTable(joinVars);
-        this.solMHashTableR = new SolutionMappingsHashTable(joinVars);
+        if (joinVars.size() == 1 ){
+            this.solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVars);
+            this.solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVars);
+        }
+        else{
+            this.solMHashTableL = new SolutionMappingsHashTable(joinVars);
+            this.solMHashTableR = new SolutionMappingsHashTable(joinVars);
+        }
     }
 
     @Override
