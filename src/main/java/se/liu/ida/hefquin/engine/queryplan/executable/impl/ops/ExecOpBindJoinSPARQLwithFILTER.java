@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -12,7 +13,6 @@ import org.apache.jena.sparql.expr.E_Equals;
 import org.apache.jena.sparql.expr.E_LogicalAnd;
 import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
 
@@ -28,11 +28,11 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpBindJoinSPARQLwiithFILTER extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
+public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
 	
 	protected final Set<Var> varsInTP;
 
-	public ExecOpBindJoinSPARQLwiithFILTER(TriplePattern query, SPARQLEndpoint fm) {
+	public ExecOpBindJoinSPARQLwithFILTER(TriplePattern query, SPARQLEndpoint fm) {
 		super(query, fm);
 		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
 	}
@@ -52,11 +52,13 @@ public class ExecOpBindJoinSPARQLwiithFILTER extends ExecOpGenericBindJoin<Tripl
 		boolean firstDisj = true;
 		for (final SolutionMapping s : solMaps) {
 			Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
-			final ExprList exprs = new ExprList();
 			Expr conjunction = null;
 			boolean firstConj = true;
-			while (b.vars().hasNext()) {
-				final Var v = b.vars().next();
+			//System.out.println(b.size());
+			//System.exit(0);
+			Iterator<Var> vars = b.vars(); 
+			while (vars.hasNext()) {
+				final Var v = vars.next();
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
 				if (firstConj) {
@@ -73,6 +75,7 @@ public class ExecOpBindJoinSPARQLwiithFILTER extends ExecOpGenericBindJoin<Tripl
 				disjunction = new E_LogicalOr(disjunction, conjunction);
 			}
 		}
+		if (disjunction == null) return new OpTriple(query.asJenaTriple());
 		return OpFilter.filter(disjunction, new OpTriple(query.asJenaTriple()));
 	}
 

@@ -45,7 +45,7 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 
 	@Override
 	protected UnaryExecutableOp createExecOpForTest(TriplePattern tp, SPARQLEndpoint fm) {
-		return new ExecOpBindJoinSPARQLwithVALUES(tp, fm);
+		return new ExecOpBindJoinSPARQLwithFILTER(tp, fm);
 	}
 
 }
