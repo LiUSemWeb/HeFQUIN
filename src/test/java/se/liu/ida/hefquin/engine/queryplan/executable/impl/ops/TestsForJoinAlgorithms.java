@@ -423,7 +423,6 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 
 		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
 
-		//assertFalse( it.hasNext() );
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
 		assertEquals( 1, b1.size() );
@@ -431,6 +430,160 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertTrue( it.hasNext() );
 		final Binding b2 = it.next().asJenaBinding();
 		assertEquals( 1, b2.size() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	protected void _joinWithOneJoinVariable_withPossibleVars_noOverlap() {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+		final Var var4 = Var.alloc("v4");
+		final Var var5 = Var.alloc("v5");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+		final Node y3 = NodeFactory.createURI("http://example.org/y3");
+		final Node z1 = NodeFactory.createURI("http://example.org/z1");
+		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+		final Node z3 = NodeFactory.createURI("http://example.org/z3");
+		final Node p1 = NodeFactory.createURI("http://example.org/p1");
+		final Node p2 = NodeFactory.createURI("http://example.org/p2");
+
+		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var2, y1,
+				var3, z1,
+				var5, p2) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var2, y1,
+				var3, z2) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var2, y2,
+				var3, z3) );
+
+		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x1,
+				var2, y1,
+				var4, p1) );
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x2,
+				var2, y3) );
+
+		final Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var2);
+		varsCertain1.add(var3);
+		final Set<Var> varsPossible1 = new HashSet<>();
+		varsPossible1.add(var5);
+
+		final Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		varsCertain2.add(var2);
+		final Set<Var> varsPossible2 = new HashSet<>();
+		varsPossible2.add(var4);
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
+
+		final Set<Binding> result = new HashSet<>();
+		assertTrue( it.hasNext() );
+		final Binding b1 = it.next().asJenaBinding();
+		assertEquals( 5, b1.size() );
+		result.add( b1 );
+
+		assertTrue( it.hasNext() );
+		final Binding b2 = it.next().asJenaBinding();
+		assertEquals( 4, b2.size() );
+		result.add( b2 );
+
+		assertFalse( it.hasNext() );
+
+
+
+		boolean b1Found = false;
+		boolean b2Found = false;
+		for ( final Binding b: result ) {
+			if ( b.get(var3).getURI().equals("http://example.org/z1") ) {
+				assertEquals( "http://example.org/x1", b.get(var1).getURI() );
+				assertEquals( "http://example.org/y1", b.get(var2).getURI() );
+				assertEquals( "http://example.org/p1", b.get(var4).getURI() );
+				assertEquals( "http://example.org/p2", b.get(var5).getURI() );
+				b1Found = true;
+			}
+			else if ( b.get(var3).getURI().equals("http://example.org/z2") ) {
+				assertEquals( "http://example.org/x1", b.get(var1).getURI() );
+				assertEquals( "http://example.org/y1", b.get(var2).getURI() );
+				assertEquals( "http://example.org/p1", b.get(var4).getURI() );
+				b2Found = true;
+			}
+			else {
+				fail( "Unexpected URI for ?v3: " + b.get(var3).getURI() );
+			}
+		}
+		assertTrue(b1Found);
+		assertTrue(b2Found);
+	}
+
+	protected void _joinWithOneJoinVariable_withPossibleVars_overlapped() {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+		final Var var4 = Var.alloc("v4");
+
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y1 = NodeFactory.createURI("http://example.org/y1");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+		final Node y3 = NodeFactory.createURI("http://example.org/y3");
+		final Node z1 = NodeFactory.createURI("http://example.org/z1");
+		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+		final Node z3 = NodeFactory.createURI("http://example.org/z3");
+		final Node p1 = NodeFactory.createURI("http://example.org/p1");
+
+		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var4, p1,
+				var2, y1,
+				var3, z1) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var2, y1,
+				var3, z2) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(
+				var2, y2,
+				var3, z3) );
+
+		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x1,
+				var2, y1,
+				var3, z1) );
+		input2.add( SolutionMappingUtils.createSolutionMapping(
+				var1, x2,
+				var2, y3) );
+
+		final Set<Var> varsCertain1 = new HashSet<>();
+		varsCertain1.add(var2);
+		varsCertain1.add(var3);
+		final Set<Var> varsPossible1 = new HashSet<>();
+		varsPossible1.add(var1);
+
+		final Set<Var> varsCertain2 = new HashSet<>();
+		varsCertain2.add(var1);
+		varsCertain2.add(var2);
+		final Set<Var> varsPossible2 = new HashSet<>();
+		varsPossible2.add(var3);
+
+		ExpectedVariables[] inputVars = getExpectedVariables(varsCertain1, varsPossible1, varsCertain2, varsPossible2);
+
+		final Iterator<SolutionMapping> it = runTest(input1, input2, inputVars);
+
+		assertTrue( it.hasNext() );
+		final Binding b = it.next().asJenaBinding();
+		assertEquals( 4, b.size() );
 
 		assertFalse( it.hasNext() );
 	}

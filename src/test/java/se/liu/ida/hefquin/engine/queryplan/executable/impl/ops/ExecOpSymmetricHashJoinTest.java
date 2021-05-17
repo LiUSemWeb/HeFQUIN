@@ -14,6 +14,12 @@ public class ExecOpSymmetricHashJoinTest extends TestsForJoinAlgorithms{
     @Test
     public void joinWithTwoJoinVariables_noJoinPartner() { _joinWithTwoJoinVariables_noJoinPartner(); }
 
+    @Test
+    public void joinWithOneJoinVariable_withPossibleVars_noOverlap() { _joinWithOneJoinVariable_withPossibleVars_noOverlap(); }
+
+    @Test
+    public void joinWithOneJoinVariable_withPossibleVars_overlapped() { _joinWithOneJoinVariable_withPossibleVars_overlapped(); }
+
     @Override
     protected BinaryExecutableOp createExecOpForTest(final ExpectedVariables... inputVars) {
         return new ExecOpSymmetricHashJoin(inputVars);
