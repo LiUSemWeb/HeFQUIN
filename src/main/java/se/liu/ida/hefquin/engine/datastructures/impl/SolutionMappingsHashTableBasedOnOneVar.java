@@ -21,7 +21,7 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
     }
 
     public SolutionMappingsHashTableBasedOnOneVar(final Var... vars) {
-        if (vars.length != 0) {
+        if (vars.length != 1) {
             throw new IllegalArgumentException();
         }
         this.joinVar = vars[0];
