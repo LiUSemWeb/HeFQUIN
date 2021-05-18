@@ -43,7 +43,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void processBlockFromChild1(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    public void processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt) {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
             solMHashTableL.add(smL);
 
@@ -56,7 +56,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
     @Override
     public void wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
-
+        // nothing to do here
     }
 
     @Override
@@ -73,6 +73,6 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
     @Override
     public void wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
-
+        // nothing to do here
     }
 }
