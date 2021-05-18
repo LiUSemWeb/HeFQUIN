@@ -30,14 +30,19 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
     @Override
     public boolean add( final SolutionMapping e ) {
         final Node valKeys = getVarKey(e);
-        List<SolutionMapping> solMapList = map.get(valKeys);
-        if ( solMapList == null) {
-            solMapList = new ArrayList<>();
-            map.put(valKeys, solMapList);
-        }
 
-        solMapList.add(e);
-        return true;
+        if (valKeys != null ){
+            List<SolutionMapping> solMapList = map.get(valKeys);
+            if ( solMapList == null) {
+                solMapList = new ArrayList<>();
+                map.put(valKeys, solMapList);
+            }
+            solMapList.add(e);
+            return true;
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -69,7 +74,11 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
             throws UnsupportedOperationException
     {
         if ( joinVar.equals(var) ){
-            return map.get(value);
+            List<SolutionMapping> solMapList = map.get(value);
+            if ( solMapList == null) {
+                solMapList = new ArrayList<>();
+            }
+            return solMapList;
         }
         else{
             throw new UnsupportedOperationException();

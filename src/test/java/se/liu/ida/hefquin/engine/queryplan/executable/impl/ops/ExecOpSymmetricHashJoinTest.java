@@ -22,6 +22,8 @@ public class ExecOpSymmetricHashJoinTest extends TestsForJoinAlgorithms{
 
     @Override
     protected BinaryExecutableOp createExecOpForTest(final ExpectedVariables... inputVars) {
-        return new ExecOpSymmetricHashJoin(inputVars);
+        assert inputVars.length == 2;
+
+        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1] );
     }
 }
