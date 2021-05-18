@@ -48,9 +48,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 	}
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
+		if (varsInTP.isEmpty()) return new OpTriple(query.asJenaTriple());
 		Expr disjunction = null;
 		for (final SolutionMapping s : solMaps) {
-			final Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
+			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
 			Expr conjunction = null;
 			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
@@ -71,7 +72,6 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 				disjunction = new E_LogicalOr(disjunction, conjunction);
 			}
 		}
-		if (disjunction == null) return new OpTriple(query.asJenaTriple());
 		return OpFilter.filter(disjunction, new OpTriple(query.asJenaTriple()));
 	}
 
