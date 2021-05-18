@@ -101,14 +101,13 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Restricts the given solution mapping to the given set of variables.
-	 * Hence, the returned solution mapping will be compatible to the solution
+	 * Restricts the given Jena binding to the given set of variables.
+	 * Hence, the returned binding will be compatible to the solution
 	 * mapping given as input, but it will be defined only for the variables
 	 * that are in the intersection of the given set of variables and the
-	 * set of variables for which the given solution mapping is defined.
+	 * set of variables for which the given binding is defined.
 	 */
-	public static SolutionMapping restrict( final SolutionMapping sm, final Set<Var> vars ) {
-		final Binding input = sm.asJenaBinding();
+	public static Binding restrict( final Binding input, final Set<Var> vars ) {
 		final Iterator<Var> it = input.vars();
 		final BindingMap output = BindingFactory.create();
 
@@ -118,8 +117,18 @@ public class SolutionMappingUtils
 				output.add( var, input.get(var) );
 			}
 		}
-
-		return new SolutionMappingImpl(output);
+		return output;
+	}
+	
+	/**
+	 * Restricts the given solution mapping to the given set of variables.
+	 * Hence, the returned solution mapping will be compatible to the solution
+	 * mapping given as input, but it will be defined only for the variables
+	 * that are in the intersection of the given set of variables and the
+	 * set of variables for which the given solution mapping is defined.
+	 */
+	public static SolutionMapping restrict( final SolutionMapping sm, final Set<Var> vars ) {
+		return new SolutionMappingImpl(restrict(sm.asJenaBinding(), vars));
 	}
 
 }
