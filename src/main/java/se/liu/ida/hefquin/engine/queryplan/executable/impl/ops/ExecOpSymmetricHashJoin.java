@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
+import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -26,6 +27,13 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
             final Var joinVar = joinVars.iterator().next();
             this.solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
             this.solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+        }
+        else if (joinVars.size() == 2){
+            final Var joinVar1 = joinVars.iterator().next();
+            final Var joinVar2 = joinVars.iterator().next();
+
+            this.solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+            this.solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
         }
         else{
             this.solMHashTableL = new SolutionMappingsHashTable(joinVars);
