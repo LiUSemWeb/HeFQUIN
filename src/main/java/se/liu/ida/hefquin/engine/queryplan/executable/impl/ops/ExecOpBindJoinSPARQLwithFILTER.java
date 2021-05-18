@@ -51,7 +51,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 		Expr disjunction = null;
 		boolean firstDisj = true;
 		for (final SolutionMapping s : solMaps) {
-			Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
+			final Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
 			Expr conjunction = null;
 			boolean firstConj = true;
 			final Iterator<Var> vars = b.vars(); 
