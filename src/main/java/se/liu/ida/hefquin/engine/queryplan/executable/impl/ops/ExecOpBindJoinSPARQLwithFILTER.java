@@ -47,7 +47,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 		return response.getSolutionMappings();
 	}
 
-	private Op createFilter(Iterable<SolutionMapping> solMaps) {
+	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
 		Expr disjunction = null;
 		boolean firstDisj = true;
 		for (final SolutionMapping s : solMaps) {
