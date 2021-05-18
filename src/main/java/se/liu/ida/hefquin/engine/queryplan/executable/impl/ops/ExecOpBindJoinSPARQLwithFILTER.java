@@ -54,7 +54,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 			Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
 			Expr conjunction = null;
 			boolean firstConj = true;
-			Iterator<Var> vars = b.vars(); 
+			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
 				final Var v = vars.next();
 				final Node uri = b.get(v);
