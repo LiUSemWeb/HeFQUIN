@@ -49,28 +49,24 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
 		Expr disjunction = null;
-		boolean firstDisj = true;
 		for (final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding();
 			Expr conjunction = null;
-			boolean firstConj = true;
 			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
 				final Var v = vars.next();
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
-				if (firstConj) {
+				if (conjunction == null) {
 					conjunction = expr;
-					firstConj = false;
 				} else {
 					conjunction = new E_LogicalAnd(conjunction, expr);
 				}
 			}
 			if (conjunction == null)
 				continue;
-			if (firstDisj) {
+			if (disjunction == null) {
 				disjunction = conjunction;
-				firstDisj = false;
 			} else {
 				disjunction = new E_LogicalOr(disjunction, conjunction);
 			}
