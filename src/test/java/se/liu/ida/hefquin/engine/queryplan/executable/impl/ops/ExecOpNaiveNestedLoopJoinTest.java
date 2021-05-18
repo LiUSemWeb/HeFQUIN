@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.junit.Test;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
 
@@ -29,7 +30,7 @@ public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
     public void joinWithEmptySolutionMapping2() { _joinWithEmptySolutionMapping2(); }
 
     @Override
-    protected BinaryExecutableOp createExecOpForTest() {
+    protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
         return new ExecOpNaiveNestedLoopsJoin( );
     }
 }

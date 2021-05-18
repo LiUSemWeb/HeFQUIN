@@ -86,14 +86,18 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 	public boolean add( final SolutionMapping e ) {
 		final List<Node> valKeys = getVarKeys(e);
 
-		List<SolutionMapping> solMapList = map.get(valKeys);
-		if ( solMapList == null) {
-			solMapList = new ArrayList<>();
-			map.put(valKeys, solMapList);
+		if ( valKeys != null ){
+			List<SolutionMapping> solMapList = map.get(valKeys);
+			if ( solMapList == null) {
+				solMapList = new ArrayList<>();
+				map.put(valKeys, solMapList);
+			}
+			solMapList.add(e);
+			return true;
 		}
-
-		solMapList.add(e);
-		return true;
+		else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	@Override
@@ -135,7 +139,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		if ( joinVariables.size() == 1 && joinVariables.contains(var) ){
 			final List<Node> valKeyL = new ArrayList<>();
 			valKeyL.add(value);
-			return map.get(valKeyL);
+
+			List<SolutionMapping> solMapList = map.get(valKeyL);
+			if ( solMapList == null) {
+				solMapList = new ArrayList<>();
+			}
+			return solMapList;
 		}
 		else{
 			throw new UnsupportedOperationException();
@@ -161,7 +170,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 					throw new IllegalStateException();
 				}
 			}
-			return  map.get(valKeyL);
+
+			List<SolutionMapping> solMapList = map.get(valKeyL);
+			if ( solMapList == null) {
+				solMapList = new ArrayList<>();
+			}
+			return solMapList;
 		}
 		else{
 			throw new UnsupportedOperationException();
@@ -191,7 +205,12 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 					throw new IllegalArgumentException();
 				}
 			}
-			return map.get(valKeyL);
+
+			List<SolutionMapping> solMapList = map.get(valKeyL);
+			if ( solMapList == null) {
+				solMapList = new ArrayList<>();
+			}
+			return solMapList;
 		}
 		else{
 			throw new UnsupportedOperationException();
