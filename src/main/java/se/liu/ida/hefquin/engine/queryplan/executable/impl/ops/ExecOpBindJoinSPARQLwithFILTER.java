@@ -32,7 +32,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 	
 	protected final Set<Var> varsInTP;
 
-	public ExecOpBindJoinSPARQLwithFILTER(TriplePattern query, SPARQLEndpoint fm) {
+	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
 		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
 	}
