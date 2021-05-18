@@ -56,7 +56,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
     @Override
     public void wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
-
+        // nothing to do here
     }
 
     @Override
