@@ -39,7 +39,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 
 	@Override
 	protected Iterable<? extends SolutionMapping> fetchSolutionMappings( final Iterable<SolutionMapping> solMaps,
-			ExecutionContext execCxt) {
+			final ExecutionContext execCxt) {
 		final Op op = createFilter(solMaps);
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
