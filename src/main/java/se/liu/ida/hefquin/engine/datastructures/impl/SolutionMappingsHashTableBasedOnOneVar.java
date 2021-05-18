@@ -12,19 +12,8 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
     protected final Map<Node, List<SolutionMapping>> map = new HashMap<>();
     protected final Var joinVar;
 
-    public SolutionMappingsHashTableBasedOnOneVar(final Set<Var> joinVariables) {
-        if (joinVariables.size() != 1){
-            throw new IllegalArgumentException();
-        }else {
-            this.joinVar = joinVariables.iterator().next();
-        }
-    }
-
-    public SolutionMappingsHashTableBasedOnOneVar(final Var... vars) {
-        if (vars.length != 1) {
-            throw new IllegalArgumentException();
-        }
-        this.joinVar = vars[0];
+    public SolutionMappingsHashTableBasedOnOneVar(final Var joinVar) {
+        this.joinVar = joinVar;
     }
 
     @Override
