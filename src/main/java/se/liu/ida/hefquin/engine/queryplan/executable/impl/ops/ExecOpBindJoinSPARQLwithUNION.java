@@ -48,7 +48,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 	}
 
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
-		Op tp = new OpTriple(query.asJenaTriple());
+		final Op tp = new OpTriple(query.asJenaTriple());
 		if (varsInTP.isEmpty()) return tp;
 		Op union = null;
 		for ( final SolutionMapping s : solMaps) {
