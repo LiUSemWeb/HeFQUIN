@@ -53,7 +53,11 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 		Op union = null;
 		for ( final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
-			if (b.size() == 0) continue;
+			// If the current solution mapping does not have any variables in common with
+			// the triple pattern of this operator, then every matching triple is a join partner
+			// for the current solution mapping. Hence, in this case, we may simply retrieve
+			// all matching triples (i.e., no need for putting together the UNION pattern).
+			if (b.size() == 0) return tp;
 			Expr conjunction = null;
 			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
