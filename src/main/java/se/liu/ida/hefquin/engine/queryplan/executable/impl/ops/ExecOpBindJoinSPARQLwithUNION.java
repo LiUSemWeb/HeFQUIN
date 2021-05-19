@@ -30,7 +30,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
 
-	private Set<Var> varsInTP;
+	protected Set<Var> varsInTP;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm) {
 		super(query, fm);
