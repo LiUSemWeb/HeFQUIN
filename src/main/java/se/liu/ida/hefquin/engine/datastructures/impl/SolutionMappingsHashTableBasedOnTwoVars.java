@@ -8,15 +8,69 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 import java.util.*;
 
-public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsHashTable{
-    protected final Map<Node, List<Node>> mapNN = new HashMap<>();
-    protected final Map<Node, List<SolutionMapping>> mapNS = new HashMap<>();
+public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsIndexBase{
+    protected final Map<Node, Map<Node, List<SolutionMapping>>> map = new HashMap<>();
     protected final Var joinVar1;
     protected final Var joinVar2;
 
     public SolutionMappingsHashTableBasedOnTwoVars( final Var joinVar1, final Var joinVar2 ) {
         this.joinVar1 = joinVar1;
         this.joinVar2 = joinVar2;
+    }
+
+    @Override
+    public int size() {
+        int size = 0;
+        for ( final Map<Node, List<SolutionMapping>> mapIn : map.values() ) {
+            for ( final List<SolutionMapping> li : mapIn.values() ){
+                size = size + li.size();
+            }
+        }
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for ( final Map<Node, List<SolutionMapping>> mapIn : map.values() ) {
+            for ( final List<SolutionMapping> li : mapIn.values()){
+                if ( ! li.isEmpty() ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if( !(o instanceof SolutionMapping) ){
+            return false;
+        }
+
+        final Binding b = ((SolutionMapping) o).asJenaBinding();
+        for ( final Map<Node, List<SolutionMapping>> mapIn : map.values() ) {
+            for (final List<SolutionMapping> li : mapIn.values()) {
+                for (final SolutionMapping sm : li) {
+                    if (sm.asJenaBinding().equals(b)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Iterator<SolutionMapping> iterator() {
+        final List<SolutionMapping> solMap = new ArrayList<>();
+
+        final Iterator<Map<Node, List<SolutionMapping>>> mapIn = map.values().iterator();
+        while( mapIn.hasNext() ){
+            for ( final List<SolutionMapping> l : mapIn.next().values()){
+                solMap.addAll(l);
+            }
+        }
+        return solMap.iterator();
     }
 
     @Override
@@ -28,22 +82,34 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsHas
         if (n1 == null || n2 == null){
             throw new IllegalArgumentException();
         }
-        else{
-            List<Node> varList = mapNN.get(n1);
-            if( varList == null){
-                varList = new ArrayList<>();
-                mapNN.put(n1, varList);
-            }
-            varList.add(n2);
 
-            List<SolutionMapping> solMapList = mapNS.get(n2);
+        final Map<Node, List<SolutionMapping>> mapIn = map.get(n1);
+        List<SolutionMapping> solMapList;
+        if( mapIn == null){
+            final Map<Node, List<SolutionMapping>> mapL = new HashMap<>();
+            solMapList = new ArrayList<>();
+            mapL.put(n2, solMapList);
+            map.put(n1, mapL);
+        }
+        else {
+            solMapList = mapIn.get(n2);
             if ( solMapList == null ){
                 solMapList = new ArrayList<>();
-                mapNS.put(n2, solMapList);
+                mapIn.put(n2, solMapList);
             }
-            solMapList.add(e);
-            return true;
         }
+        solMapList.add(e);
+        return true;
+    }
+
+    @Override
+    public void clear() {
+        for ( final Map<Node, List<SolutionMapping>> mapIn : map.values() ) {
+            for ( final List<SolutionMapping> li : mapIn.values() ) {
+                li.clear();
+            }
+        }
+        map.clear();
     }
 
     @Override
@@ -55,8 +121,12 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsHas
         final Node n2 = solMapBinding.get(joinVar2);
         Iterator<SolutionMapping> matchingSolMaps;
 
-        if ( n1 == null || n2 == null ){
+        if ( n1 == null ){
             matchingSolMaps = iterator();
+        }
+        else if (n2 == null){
+            final Map<Node, List<SolutionMapping>> mapIn = map.get(n1);
+            matchingSolMaps = iteratorInnerMap(mapIn);
         }
         else {
             final Iterable<SolutionMapping> l = findSolMappingList(n1, n2);
@@ -71,6 +141,12 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsHas
             }
         }
         return joinPartner;
+    }
+
+    @Override
+    public Iterable<SolutionMapping> findSolutionMappings(Var var, Node value)
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -99,20 +175,32 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsHas
         }
     }
 
+    @Override
+    public Iterable<SolutionMapping> findSolutionMappings(Var var1, Node value1, Var var2, Node value2, Var var3, Node value3)
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
     protected Iterable<SolutionMapping> findSolMappingList(
             final Node keyValue1, final Node keyValue2 )
             throws UnsupportedOperationException
     {
-        final List<Node> matchingNode = mapNN.get(keyValue1);
-        if (matchingNode == null) {
+        final Map<Node, List<SolutionMapping>> mapIn = map.get(keyValue1);
+        if (mapIn == null) {
             return null;
         }
-        else if(matchingNode.contains(keyValue2)){
-            List<SolutionMapping> solMapList = mapNS.get(keyValue2);
-            return solMapList;
+        final List<SolutionMapping> solMapList = mapIn.get(keyValue2);
+        if(solMapList == null){
+            return null;
         }
-        else{
-            throw new IllegalStateException();
+        return solMapList;
+    }
+
+    protected Iterator<SolutionMapping> iteratorInnerMap(final Map<Node, List<SolutionMapping>> mapIn) {
+        final List<SolutionMapping> solMap = new ArrayList<>();
+        for ( final List<SolutionMapping> l : mapIn.values()){
+            solMap.addAll(l);
         }
+        return solMap.iterator();
     }
 }

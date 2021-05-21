@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
+import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsIndexBase;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -16,8 +17,8 @@ import java.util.Set;
 
 public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
-    protected final SolutionMappingsHashTable solMHashTableL;
-    protected final SolutionMappingsHashTable solMHashTableR;
+    protected final SolutionMappingsIndexBase solMHashTableL;
+    protected final SolutionMappingsIndexBase solMHashTableR;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ){
         final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
