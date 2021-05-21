@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
@@ -12,8 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
@@ -30,8 +30,9 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
             this.solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
         }
         else if (joinVars.size() == 2){
-            final Var joinVar1 = joinVars.iterator().next();
-            final Var joinVar2 = joinVars.iterator().next();
+            final Iterator<Var> liVar = joinVars.iterator();
+            final Var joinVar1 = liVar.next();
+            final Var joinVar2 = liVar.next();
 
             this.solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
             this.solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
