@@ -14,6 +14,10 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
     protected final Var joinVar2;
 
     public SolutionMappingsHashTableBasedOnTwoVars( final Var joinVar1, final Var joinVar2 ) {
+        assert joinVar1 != null;
+        assert joinVar2 != null;
+        assert ! joinVar1.equals(joinVar2);
+
         this.joinVar1 = joinVar1;
         this.joinVar2 = joinVar2;
     }
