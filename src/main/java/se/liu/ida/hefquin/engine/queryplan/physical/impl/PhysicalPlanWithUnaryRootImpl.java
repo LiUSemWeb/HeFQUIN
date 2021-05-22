@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
@@ -23,6 +24,11 @@ public class PhysicalPlanWithUnaryRootImpl implements PhysicalPlanWithUnaryRoot
 	@Override
 	public UnaryPhysicalOp getRootOperator() {
 		return rootOp;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		return rootOp.getExpectedVariables( getSubPlan().getExpectedVariables() );
 	}
 
 	@Override
