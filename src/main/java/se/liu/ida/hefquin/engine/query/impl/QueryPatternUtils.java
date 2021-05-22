@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class QueryPatternUtils
 {
@@ -66,8 +67,39 @@ public class QueryPatternUtils
 		return result;
 	}
 
-	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern pattern ) {
-		return OpVars.fixedVars( pattern.asJenaOp() );
+	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
+		if ( pattern instanceof TriplePattern ) {
+			return new ExpectedVariables() {
+				@Override public Set<Var> getPossibleVariables() {
+					return new HashSet<>();
+				}
+
+				@Override public Set<Var> getCertainVariables() {
+					return getVariablesInPattern( (TriplePattern) pattern );
+				}
+			};
+		}
+		else if ( pattern instanceof BGP ) {
+			return new ExpectedVariables() {
+				@Override public Set<Var> getPossibleVariables() {
+					return new HashSet<>();
+				}
+
+				@Override public Set<Var> getCertainVariables() {
+					return getVariablesInPattern( (BGP) pattern );
+				}
+			};
+		}
+		else {
+			final Set<Var> certainVars = OpVars.fixedVars( pattern.asJenaOp() );
+			Set<Var> possibleVars = OpVars.visibleVars( pattern.asJenaOp() );
+			possibleVars.removeAll(certainVars);
+
+			return new ExpectedVariables() {
+				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+				@Override public Set<Var> getCertainVariables() { return certainVars; }
+			};
+		}
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

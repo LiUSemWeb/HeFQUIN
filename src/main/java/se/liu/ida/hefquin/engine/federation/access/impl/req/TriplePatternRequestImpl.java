@@ -1,12 +1,9 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class TriplePatternRequestImpl implements TriplePatternRequest
 {
@@ -22,8 +19,8 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 	}
 
 	@Override
-	public Set<Var> getExpectedVariables() {
-		return QueryPatternUtils.getVariablesInPattern(tp);
+	public ExpectedVariables getExpectedVariables() {
+		return QueryPatternUtils.getExpectedVariablesInPattern(tp);
 	}
 
 }
