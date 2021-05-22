@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -310,6 +311,37 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
 
 		assertFalse( it.hasNext() );
+	}
+	
+	protected void _tpWithSpuriousDuplicates() {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node s1 = NodeFactory.createURI("http://example.org/s1");
+		final Node s2 = NodeFactory.createURI("http://example.org/s2");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+		final Node o2 = NodeFactory.createURI("http://example.org/o2");
+		
+		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, o1) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(s1,p,o1) );
+		dataForMember.add( Triple.create(s2,p,o2) );
+		
+		System.out.println("duplicates");
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		
+		while (it.hasNext()) {
+			System.out.println(it.next().asJenaBinding());
+		}
+		
+		//assertThrows(IllegalArgumentException.class,  () -> {runTest(input, dataForMember, tp);});
 	}
 
 
