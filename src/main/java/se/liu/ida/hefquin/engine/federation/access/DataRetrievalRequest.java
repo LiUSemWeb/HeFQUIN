@@ -1,18 +1,25 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public interface DataRetrievalRequest
 {
 	/**
 	 * Returns the query variables for which this data retrieval request aims
-	 * to fetch data (if any). For instance, if this request is about fetching
-	 * triples that match a given triple pattern, then the variables of that
-	 * triple pattern would be returned. Note that the method may also return
-	 * null (which would be the case for types of data retrieval requests for
-	 * which this method is not applicable in any reasonable way).
+	 * to fetch data (if any), where some of these variables may be 'certain
+	 * variables' whereas others are 'possible variables'.
+	 *
+	 * For the distinction between these two types of variables, refer to
+	 * {@link ExpectedVariables#getCertainVariables()} and to
+	 * {@link ExpectedVariables#getPossibleVariables())}.
+	 *
+	 * For instance, if this request is about fetching triples that match a
+	 * given triple pattern, then the variables of that triple pattern would
+	 * be returned here as certain variables.
+	 *
+	 * Note that the method may also return null (which would be the case for
+	 * types of data retrieval requests for which this method is not applicable
+	 * in any reasonable way).
 	 */
-	Set<Var> getExpectedVariables();
+	ExpectedVariables getExpectedVariables();
 }

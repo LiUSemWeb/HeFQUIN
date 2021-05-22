@@ -10,6 +10,12 @@ public interface PhysicalPlan
 	PhysicalOperator getRootOperator();
 
 	/**
+	 * Returns the variables that can be expected in the
+	 * solution mappings produced by this plan.
+	 */
+	ExpectedVariables getExpectedVariables();
+
+	/**
 	 * Returns the number of sub-plans that this plan has
 	 * (considering sub-plans that are direct children of
 	 * the root operator of this plan).

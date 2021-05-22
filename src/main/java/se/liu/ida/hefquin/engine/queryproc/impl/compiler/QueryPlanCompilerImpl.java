@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
@@ -38,40 +37,37 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	protected ResultElementIterator compile( final PhysicalPlan qep,
 	                                         final ExecutionContext execCxt )
 	{
-		final ExecutableOperator execOp = qep.getRootOperator().createExecOp();
-
 		if ( qep.numberOfSubPlans() == 0 )
 		{
-			if ( ! (execOp  instanceof NullaryExecutableOp) )
-				throw new IllegalArgumentException();
-
-			final NullaryExecutableOp execOp0 = (NullaryExecutableOp) execOp;
-			return new ResultElementIterWithNullaryExecOp(execOp0, execCxt);
+			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp();
+			return new ResultElementIterWithNullaryExecOp(execOp, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 1 )
 		{
-			if ( ! (execOp  instanceof UnaryExecutableOp) )
-				throw new IllegalArgumentException();
+			final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-			final ResultElementIterator elmtIterSubPlan = compile(qep.getSubPlan(0), execCxt);
+			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( subPlan.getExpectedVariables() );
+
+			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
 			final ResultBlockIterator blockIterSubPlan = createBlockIterator( elmtIterSubPlan, execOp.preferredInputBlockSize() );
-
-			final UnaryExecutableOp execOp1 = (UnaryExecutableOp) execOp;
-			return new ResultElementIterWithUnaryExecOp(execOp1, blockIterSubPlan, execCxt);
+			return new ResultElementIterWithUnaryExecOp(execOp, blockIterSubPlan, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 2 )
 		{
-			if ( ! (execOp  instanceof BinaryExecutableOp) )
-				throw new IllegalArgumentException();
+			final PhysicalPlan subPlan1 = qep.getSubPlan(0);
+			final PhysicalPlan subPlan2 = qep.getSubPlan(1);
 
-			final ResultElementIterator elmtIterSubPlan1 = compile(qep.getSubPlan(0), execCxt);
+			final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
+					subPlan1.getExpectedVariables(),
+					subPlan2.getExpectedVariables() );
+
+			final ResultElementIterator elmtIterSubPlan1 = compile(subPlan1, execCxt);
 			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator( elmtIterSubPlan1, execOp.preferredInputBlockSize() );
 
-			final ResultElementIterator elmtIterSubPlan2 = compile(qep.getSubPlan(1), execCxt);
+			final ResultElementIterator elmtIterSubPlan2 = compile(subPlan2, execCxt);
 			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator( elmtIterSubPlan2, execOp.preferredInputBlockSize() );
 
-			final BinaryExecutableOp execOp2 = (BinaryExecutableOp) execOp;
-			return new ResultElementIterWithBinaryExecOp(execOp2, blockIterSubPlan1, blockIterSubPlan2, execCxt);
+			return new ResultElementIterWithBinaryExecOp(execOp, blockIterSubPlan1, blockIterSubPlan2, execCxt);
 		}
 		else
 		{

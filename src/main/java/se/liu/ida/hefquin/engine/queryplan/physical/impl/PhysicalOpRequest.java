@@ -1,10 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -61,10 +56,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 0;
 
-		return new ExpectedVariables() {
-			@Override public Set<Var> getCertainVariables() { return lop.getRequest().getExpectedVariables(); }
-			@Override public Set<Var> getPossibleVariables() { return new HashSet<>(); }
-		};
+		return lop.getRequest().getExpectedVariables();
 	}
 
 }
