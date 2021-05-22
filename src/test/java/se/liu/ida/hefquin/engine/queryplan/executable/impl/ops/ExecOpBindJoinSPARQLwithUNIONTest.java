@@ -44,7 +44,7 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 	public void tpWithEmptyResponses() {
 		_tpWithEmptyResponses();
 	}
-	
+
 	@Test
 	public void tpWithSpuriousDuplicates() {
 		_tpWithSpuriousDuplicates();
