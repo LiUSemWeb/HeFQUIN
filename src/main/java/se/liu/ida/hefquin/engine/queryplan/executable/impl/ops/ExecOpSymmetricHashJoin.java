@@ -1,13 +1,12 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
-import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsIndexBase;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -17,8 +16,8 @@ import java.util.*;
 
 public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
-    protected final SolutionMappingsIndexBase solMHashTableL;
-    protected final SolutionMappingsIndexBase solMHashTableR;
+    protected final SolutionMappingsIndex solMHashTableL;
+    protected final SolutionMappingsIndex solMHashTableR;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ){
         final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
