@@ -3,20 +3,21 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
+import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
 
-    protected final SolutionMappingsHashTable solMHashTableL;
-    protected final SolutionMappingsHashTable solMHashTableR;
+    protected final SolutionMappingsIndex solMHashTableL;
+    protected final SolutionMappingsIndex solMHashTableR;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ){
         final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
@@ -26,6 +27,14 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
             final Var joinVar = joinVars.iterator().next();
             this.solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
             this.solMHashTableR = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+        }
+        else if (joinVars.size() == 2){
+            final Iterator<Var> liVar = joinVars.iterator();
+            final Var joinVar1 = liVar.next();
+            final Var joinVar2 = liVar.next();
+
+            this.solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+            this.solMHashTableR = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
         }
         else{
             this.solMHashTableL = new SolutionMappingsHashTable(joinVars);
