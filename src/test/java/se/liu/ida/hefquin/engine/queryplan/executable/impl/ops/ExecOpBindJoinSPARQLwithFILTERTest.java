@@ -44,11 +44,6 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	public void tpWithEmptyResponses() {
 		_tpWithEmptyResponses();
 	}
-	
-	@Test
-	public void tpWithSpuriousDuplicates() {
-		_tpWithSpuriousDuplicates();
-	}
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest(Graph dataForMember) {
@@ -56,20 +51,9 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest(TriplePattern tp, SPARQLEndpoint fm) {
-		final LogicalOpTPAdd tpadd = new LogicalOpTPAdd(fm, tp);
-		final PhysicalOpBindJoinWithFILTER bindjoin = new PhysicalOpBindJoinWithFILTER(tpadd); 
-		return bindjoin.createExecOp(bindjoin.getExpectedVariables(new ExpectedVariables() {
-			@Override
-			public Set<Var> getPossibleVariables() {
-				return new HashSet<Var>();
-			}
-			
-			@Override
-			public Set<Var> getCertainVariables() {
-				return new HashSet<Var>();
-			}
-		}));
+	protected UnaryExecutableOp createExecOpForTest(TriplePattern tp, SPARQLEndpoint fm,
+													final ExpectedVariables expectedVariables) {
+		return new ExecOpBindJoinSPARQLwithFILTER(tp, fm);
 	}
 
 }

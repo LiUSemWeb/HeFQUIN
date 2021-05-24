@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
@@ -45,7 +46,8 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp, final SPARQLEndpoint fm ) {
+	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final SPARQLEndpoint fm,
+													final ExpectedVariables expectedVariables) {
 		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
 	}
 }

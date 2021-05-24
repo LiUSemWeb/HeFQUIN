@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
@@ -64,7 +65,20 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		dataForMember.add( Triple.create(y1,p,z2) );
 		dataForMember.add( Triple.create(y2,p,z3) );
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				Set<Var> set = new HashSet<>();
+				set.add(var1);
+				set.add(var2);
+				return set;
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -140,7 +154,20 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		dataForMember.add( Triple.create(x1,y1,z1) );
 		dataForMember.add( Triple.create(x2,y2,z2) );
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				Set<Var> set = new HashSet<>();
+				set.add(var1);
+				set.add(var2);
+				return set;
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -200,7 +227,19 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		dataForMember.add( Triple.create(y1,p,z1) );
 		dataForMember.add( Triple.create(y2,p,z2) );
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				Set<Var> set = new HashSet<>();
+				set.add(var1);
+				return set;
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -236,7 +275,17 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Graph dataForMember = GraphFactory.createGraphMem();
 		dataForMember.add( Triple.create(y1,p,z1) );
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				return new HashSet<>();
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		assertFalse( it.hasNext() );
 	}
@@ -259,7 +308,17 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		dataForMember.add( Triple.create(s1,p,o1) );
 		dataForMember.add( Triple.create(s2,p,o1) );
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				return new HashSet<>();
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -308,7 +367,19 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 		final Graph dataForMember = GraphFactory.createGraphMem();
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				Set<Var> set = new HashSet<>();
+				set.add(var1);
+				return set;
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		});
 
 		assertFalse( it.hasNext() );
 	}
@@ -332,16 +403,24 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Graph dataForMember = GraphFactory.createGraphMem();
 		dataForMember.add( Triple.create(s1,p,o1) );
 		dataForMember.add( Triple.create(s2,p,o2) );
-		
-		System.out.println("duplicates");
 
-		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp);
-		
-		while (it.hasNext()) {
-			System.out.println(it.next().asJenaBinding());
-		}
-		
-		//assertThrows(IllegalArgumentException.class,  () -> {runTest(input, dataForMember, tp);});
+		assertThrows(IllegalArgumentException.class,  () -> {
+			runTest(input, dataForMember, tp, new ExpectedVariables() {
+				@Override
+				public Set<Var> getCertainVariables() {
+					Set<Var> set = new HashSet<>();
+					set.add(var1);
+					return set;
+				}
+
+				@Override
+				public Set<Var> getPossibleVariables() {
+					Set<Var> set = new HashSet<>();
+					set.add(var2);
+					return set;
+				}
+			});
+		});
 	}
 
 
@@ -349,7 +428,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 	protected Iterator<SolutionMapping> runTest(
 			final IntermediateResultBlock input,
 			final Graph dataForMember,
-			final TriplePattern tp )
+			final TriplePattern tp,
+			final ExpectedVariables expectedVariables)
 	{
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
@@ -357,7 +437,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 		final MemberType fm = createFedMemberForTest(dataForMember);
 
-		final UnaryExecutableOp op = createExecOpForTest(tp, fm);
+		final UnaryExecutableOp op = createExecOpForTest(tp, fm, expectedVariables);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
@@ -366,5 +446,5 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	protected abstract MemberType createFedMemberForTest( Graph dataForMember );
 
-	protected abstract UnaryExecutableOp createExecOpForTest( TriplePattern tp, MemberType fm );
+	protected abstract UnaryExecutableOp createExecOpForTest(TriplePattern tp, MemberType fm, ExpectedVariables expectedVariables);
 }

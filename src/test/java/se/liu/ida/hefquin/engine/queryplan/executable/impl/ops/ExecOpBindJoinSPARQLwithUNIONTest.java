@@ -1,10 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.jena.graph.Graph;
-import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -56,20 +52,11 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp, final SPARQLEndpoint fm) {
+	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final SPARQLEndpoint fm,
+													final ExpectedVariables expectedVariables) {
 		final LogicalOpTPAdd tpadd = new LogicalOpTPAdd(fm, tp);
 		final PhysicalOpBindJoinWithUNION bindjoin = new PhysicalOpBindJoinWithUNION(tpadd); 
-		return bindjoin.createExecOp(bindjoin.getExpectedVariables(new ExpectedVariables() {
-			@Override
-			public Set<Var> getPossibleVariables() {
-				return new HashSet<Var>();
-			}
-			
-			@Override
-			public Set<Var> getCertainVariables() {
-				return new HashSet<Var>();
-			}
-		}));
+		return bindjoin.createExecOp(expectedVariables);
 	}
 
 }

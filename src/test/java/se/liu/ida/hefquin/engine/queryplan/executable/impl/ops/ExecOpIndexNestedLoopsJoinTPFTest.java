@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<TPFServer>
 {
@@ -45,7 +46,8 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp, final TPFServer fm ) {
+	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final TPFServer fm,
+													final ExpectedVariables expectedVariables) {
 		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm);
 	}
 }

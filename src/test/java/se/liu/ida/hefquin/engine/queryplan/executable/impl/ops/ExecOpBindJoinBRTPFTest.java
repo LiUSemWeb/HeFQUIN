@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer>
 {
@@ -45,7 +46,8 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp, final BRTPFServer fm ) {
+	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final BRTPFServer fm,
+													final ExpectedVariables expectedVariables) {
 		return new ExecOpBindJoinBRTPF(tp, fm);
 	}
 }
