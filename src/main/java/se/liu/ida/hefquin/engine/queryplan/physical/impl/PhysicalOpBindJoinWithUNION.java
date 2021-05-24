@@ -18,7 +18,7 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin {
 	public UnaryExecutableOp createExecOp(final ExpectedVariables... inputVars) {
 		for (final ExpectedVariables ev : inputVars) {
 			System.out.println(ev.getCertainVariables());
-			if (ev.getPossibleVariables().size() > 0) {
+			if ( ! ev.getPossibleVariables().isEmpty() ) {
 				throw new IllegalArgumentException("Illegal child operator for tpAdd. Possible variables should be empty.");
 			}
 		}
