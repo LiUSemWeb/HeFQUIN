@@ -16,6 +16,14 @@ public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin 
 
 	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+		assert  inputVars.length == 1;
+		if (! inputVars[0].getPossibleVariables().isEmpty()){
+			// The executable operator for this physical operator (i.e., ExecOpBindJoinSPARQLwithUNION)
+			// can work correctly only in cases in which all input solution mappings are for the exact
+			// same set of variables. This can be guaranteed only if the set of possible variables from
+			// the child operator is empty.
+			throw new IllegalArgumentException("Nonempty set of possible variables.");
+		}
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
 			final FederationMember fm = tpAdd.getFederationMember();
