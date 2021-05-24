@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -51,6 +52,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 		final Op tp = new OpTriple(query.asJenaTriple());
 		if (varsInTP.isEmpty()) return tp;
 		Op union = null;
+		Set<Expr> conjunctions = new HashSet<>();
 		for ( final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
 			// If the current solution mapping does not have any variables in common with
@@ -58,18 +60,22 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
 			if (b.size() == 0) return tp;
+			final Iterator<Var> vars = b.vars();
 			Expr conjunction = null;
-			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
 				final Var v = vars.next();
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
-				if (conjunction == null) {
+				if (conjunction == null){
 					conjunction = expr;
 				} else {
 					conjunction = new E_LogicalAnd(conjunction, expr);
 				}
 			}
+			conjunctions.add(conjunction);
+		}
+		if (conjunctions.isEmpty()) return tp;
+		for (final Expr conjunction : conjunctions) {
 			final Op filter = OpFilter.filter(conjunction, tp);
 			if (union == null) {
 				union = filter;
@@ -77,7 +83,6 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 				union = new OpUnion(union, filter);
 			}
 		}
-		if (union == null) return tp;
 		return union;
 	}
 
