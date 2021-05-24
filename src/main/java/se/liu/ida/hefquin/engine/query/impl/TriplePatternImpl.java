@@ -54,5 +54,10 @@ public class TriplePatternImpl implements TriplePattern
 
 		return n;
 	}
+	
+	@Override
+	public String toString() {
+		return this.asJenaTriple().toString();
+	}
 
 }

@@ -12,6 +12,10 @@ public class LogicalPlanWalker
 	public static void walk( final LogicalPlan plan, final LogicalPlanVisitor visitor ) {
 		new WalkerVisitor(visitor).walk(plan);
 	}
+	
+	public static void walkTopDown( final LogicalPlan plan, final LogicalPlanVisitor visitor ) {
+		new WalkerVisitor(visitor).walkTopDown(plan);
+	}
 
 	protected static class WalkerVisitor {
 		protected final LogicalPlanVisitor visitor;
@@ -26,6 +30,13 @@ public class LogicalPlanWalker
 				walk( plan.getSubPlan(i) );
 			}
 			plan.getRootOperator().visit(visitor);
+		}
+		
+		public void walkTopDown( final LogicalPlan plan) {
+			plan.getRootOperator().visit(visitor);
+			for (int i = 0; i < plan.numberOfSubPlans(); ++i ) {
+				walkTopDown( plan.getSubPlan(i) );
+			}
 		}
 
 	} // end of class WalkerVisitor 

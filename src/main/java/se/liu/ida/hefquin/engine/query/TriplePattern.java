@@ -14,5 +14,10 @@ public interface TriplePattern extends SPARQLGraphPattern
 	 * Returns the number of distinct variables in this triple pattern.
 	 */
 	int numberOfVars();
+	
+	/**
+	 * Returns a string representation of the triple
+	 */
+	public String toString();
 
 }
