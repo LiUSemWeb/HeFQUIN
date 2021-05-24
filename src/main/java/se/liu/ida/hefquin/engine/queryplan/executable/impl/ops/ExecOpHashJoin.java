@@ -58,7 +58,7 @@ public class ExecOpHashJoin implements BinaryExecutableOp {
     }
 
     @Override
-    public void wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    public void wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         // nothing to be done here
     }
 
