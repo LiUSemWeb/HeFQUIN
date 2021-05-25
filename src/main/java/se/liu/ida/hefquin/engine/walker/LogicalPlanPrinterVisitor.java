@@ -83,7 +83,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor {
 	}
 
 	@Override
-	public void visit(LogicalOpMultiwayJoin op) {
+	public void visit( final LogicalOpMultiwayJoin op ) {
 		addTabs();
 		builder.append("> mj ");
 		indentLevel++;
