@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class ExecOpHashJoin implements BinaryExecutableOp {
     protected final SolutionMappingsIndex solMHashTableL;
-    protected Boolean child1InputComplete = false;
+    protected boolean child1InputComplete = false;
 
     public ExecOpHashJoin(final ExpectedVariables inputVars1, final ExpectedVariables inputVars2) {
         final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
@@ -55,7 +55,6 @@ public class ExecOpHashJoin implements BinaryExecutableOp {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
             solMHashTableL.add(smL);
         }
-        wrapUpForChild1(sink, execCxt);
     }
 
     @Override
