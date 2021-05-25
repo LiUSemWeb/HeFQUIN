@@ -76,7 +76,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpUnion op) {
+	public void visit( final LogicalOpUnion op ) {
 		addTabs();
 		builder.append("> union\n");
 		indentLevel++;
