@@ -12,10 +12,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
-public class LogicalPlanPrinter {
-	
-	protected int indentLevel = 0;
-	protected StringBuilder builder = new StringBuilder();
+public class LogicalPlanPrinter extends PlanPrinter{
+
 	protected final LogicalPlanPrinterBeforeVisitor beforeVisitor = new LogicalPlanPrinterBeforeVisitor();
 	protected final LogicalPlanPrinterAfterVisitor afterVisitor = new LogicalPlanPrinterAfterVisitor();
 	
@@ -145,10 +143,5 @@ public class LogicalPlanPrinter {
 		public void visit(final LogicalOpMultiwayUnion op) {
 			indentLevel--;
 		}
-	}
-
-	protected void addTabs() {
-		for (int i = 0; i < indentLevel; i++)
-			builder.append("  ");
 	}
 }
