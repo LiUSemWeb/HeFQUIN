@@ -34,7 +34,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		//builder.append(op.getFederationMember().toString());
 		//builder.append(" ");
 		//builder.append(op.getRequest().toString());
-		builder.append("\n");
+		builder.append(System.lineSeparator());
 		if (indentLevel > 1)
 			indentLevel--;
 	}
@@ -47,7 +47,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		//builder.append(" ");
 		builder.append(op.getTP().toString());
 		//builder.append(")");
-		builder.append("\n");
+		builder.append(System.lineSeparator());
 		indentLevel++;
 	}
 
@@ -58,27 +58,32 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		//builder.append(op.getFederationMember().toString());
 		//builder.append(" ");
 		indentLevel++;
-		builder.append("> bgp");
+		builder.append("( bgp");
 		indentLevel++;
 		for(final TriplePattern tp : op.getBGP().getTriplePatterns()) {
-			builder.append("> tp ");
+			builder.append("( tp ");
 			builder.append(tp.toString());
-			builder.append("\n");
+			builder.append(")");
+			builder.append(System.lineSeparator());
 		}
+		builder.append(")");
+		builder.append(System.lineSeparator());
 		indentLevel--;
 	}
 
 	@Override
 	public void visit( final LogicalOpJoin op ) {
 		addTabs();
-		builder.append("> join\n");
+		builder.append("> join");
+		builder.append(System.lineSeparator());
 		indentLevel++;
 	}
 
 	@Override
 	public void visit( final LogicalOpUnion op ) {
 		addTabs();
-		builder.append("> union\n");
+		builder.append("> union");
+		builder.append(System.lineSeparator());
 		indentLevel++;
 	}
 
@@ -86,13 +91,15 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	public void visit( final LogicalOpMultiwayJoin op ) {
 		addTabs();
 		builder.append("> mj ");
+		builder.append(System.lineSeparator());
 		indentLevel++;
 	}
 
 	@Override
 	public void visit( final LogicalOpMultiwayUnion op ) {
 		addTabs();
-		builder.append("mu ");
+		builder.append("> mu ");
+		builder.append(System.lineSeparator());
 		indentLevel++;
 	}
 	
