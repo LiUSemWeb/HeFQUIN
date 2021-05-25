@@ -616,7 +616,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		final BinaryExecutableOp op = createExecOpForTest(inputVars);
 
 		op.processBlockFromChild1(input1, sink, null);
+		op.wrapUpForChild1(sink, null);
 		op.processBlockFromChild2(input2, sink, null);
+		op.wrapUpForChild2(sink, null);
 
 		return sink.getMaterializedIntermediateResult().iterator();
 	}
