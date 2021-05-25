@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.walker;
+package se.liu.ida.hefquin.engine.utils;
 
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
