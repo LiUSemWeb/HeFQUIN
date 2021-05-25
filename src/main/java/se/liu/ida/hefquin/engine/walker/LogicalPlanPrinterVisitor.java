@@ -90,7 +90,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpMultiwayUnion op) {
+	public void visit( final LogicalOpMultiwayUnion op ) {
 		addTabs();
 		builder.append("mu ");
 		indentLevel++;
