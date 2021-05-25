@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.data.impl;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -107,7 +108,7 @@ public class SolutionMappingUtils
 	 * that are in the intersection of the given set of variables and the
 	 * set of variables for which the given binding is defined.
 	 */
-	public static Binding restrict( final Binding input, final Set<Var> vars ) {
+	public static Binding restrict( final Binding input, final Collection<Var> vars ) {
 		final Iterator<Var> it = input.vars();
 		final BindingMap output = BindingFactory.create();
 
@@ -127,7 +128,7 @@ public class SolutionMappingUtils
 	 * that are in the intersection of the given set of variables and the
 	 * set of variables for which the given solution mapping is defined.
 	 */
-	public static SolutionMapping restrict( final SolutionMapping sm, final Set<Var> vars ) {
+	public static SolutionMapping restrict( final SolutionMapping sm, final Collection<Var> vars ) {
 		return new SolutionMappingImpl(restrict(sm.asJenaBinding(), vars));
 	}
 

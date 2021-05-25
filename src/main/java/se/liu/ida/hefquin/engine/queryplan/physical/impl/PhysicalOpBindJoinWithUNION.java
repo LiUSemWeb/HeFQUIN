@@ -3,19 +3,19 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithUNION;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 
-public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin {
+public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin {
 
-	public PhysicalOpBindJoinWithVALUES( final UnaryLogicalOp lop ) {
+	public PhysicalOpBindJoinWithUNION( final UnaryLogicalOp lop) {
 		super(lop);
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+	public UnaryExecutableOp createExecOp(final ExpectedVariables... inputVars) {
 		assert  inputVars.length == 1;
 		if (! inputVars[0].getPossibleVariables().isEmpty()){
 			// The executable operator for this physical operator (i.e., ExecOpBindJoinSPARQLwithUNION)
@@ -29,7 +29,7 @@ public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin 
 			final FederationMember fm = tpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpBindJoinSPARQLwithVALUES( tpAdd.getTP(), (SPARQLEndpoint) fm );
+				return new ExecOpBindJoinSPARQLwithUNION( tpAdd.getTP(), (SPARQLEndpoint) fm );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}

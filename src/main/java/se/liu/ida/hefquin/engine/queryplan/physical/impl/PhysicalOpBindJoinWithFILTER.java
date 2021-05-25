@@ -10,12 +10,16 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 
 public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin {
 
-	protected PhysicalOpBindJoinWithFILTER(UnaryLogicalOp lop) {
+	public PhysicalOpBindJoinWithFILTER(UnaryLogicalOp lop) {
 		super(lop);
 	}
 
 	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+		for (final ExpectedVariables ev : inputVars) {
+			System.out.println(ev.getCertainVariables());
+			System.out.println(ev.getPossibleVariables());
+		}
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
 			final FederationMember fm = tpAdd.getFederationMember();
