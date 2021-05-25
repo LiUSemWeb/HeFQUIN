@@ -415,7 +415,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 				@Override
 				public Set<Var> getPossibleVariables() {
-					Set<Var> set = new HashSet<>();
+					final Set<Var> set = new HashSet<>();
 					set.add(var2);
 					return set;
 				}
