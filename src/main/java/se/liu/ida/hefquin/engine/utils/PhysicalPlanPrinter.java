@@ -53,6 +53,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit(PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION) {
+            addTabs();
+            builder.append("> UNIONBindJoin ");
+            builder.append(System.lineSeparator());
+            indentLevel++;
+        }
+
+        @Override
         public void visit(final PhysicalOpNaiveNestedLoopsJoin op) {
             addTabs();
             builder.append("> naiveNestedLoop ");
@@ -64,6 +72,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
             addTabs();
             builder.append("> indexNestedLoop ");
+            builder.append(System.lineSeparator());
+            indentLevel++;
+        }
+
+        @Override
+        public void visit(PhysicalOpHashJoin physicalOpHashJoin) {
+            addTabs();
+            builder.append("> hashJoin ");
             builder.append(System.lineSeparator());
             indentLevel++;
         }
@@ -107,12 +123,22 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit(final PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION) {
+            indentLevel--;
+        }
+
+        @Override
         public void visit(final PhysicalOpNaiveNestedLoopsJoin op) {
             indentLevel--;
         }
 
         @Override
         public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit(PhysicalOpHashJoin physicalOpHashJoin) {
             indentLevel--;
         }
 

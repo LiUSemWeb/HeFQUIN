@@ -8,9 +8,11 @@ public interface PhysicalPlanVisitor {
     void visit(final PhysicalOpBindJoin op);
     void visit(final PhysicalOpBindJoinWithVALUES op);
     void visit(final PhysicalOpBindJoinWithFILTER op);
+    void visit(final PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION);
     void visit(final PhysicalOpNaiveNestedLoopsJoin op);
     void visit(final PhysicalOpIndexNestedLoopsJoin op);
 
+    void visit(final PhysicalOpHashJoin physicalOpHashJoin);
     void visit(final PhysicalOpSymmetricHashJoin op);
 
     void visit(final PhysicalOpBinaryUnion op);
