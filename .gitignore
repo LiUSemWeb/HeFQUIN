@@ -26,4 +26,8 @@ hs_err_pid*
 /.project
 /dependency-reduced-pom.xml
 *.iml
+<<<<<<< HEAD
 /.idea
+=======
+/.idea
+>>>>>>> 6e96eb9d74b6839c61a31117a25ad65797e00edd

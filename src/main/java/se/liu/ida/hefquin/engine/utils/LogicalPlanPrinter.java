@@ -22,7 +22,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 		LogicalPlanWalker.walk(plan, printer.beforeVisitor, printer.afterVisitor);
 		return printer.getString();
 	}
-
+	
 	private class LogicalPlanPrinterBeforeVisitor implements LogicalPlanVisitor {
 
 		@Override
