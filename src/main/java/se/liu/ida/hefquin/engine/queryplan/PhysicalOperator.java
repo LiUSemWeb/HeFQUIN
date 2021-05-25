@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan;
 
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
+
 public interface PhysicalOperator
 {
 	/**
@@ -25,4 +27,6 @@ public interface PhysicalOperator
 	 * must be passed).
 	 */
 	ExpectedVariables getExpectedVariables( ExpectedVariables ... inputVars );
+
+	void visit(final PhysicalPlanVisitor visitor);
 }

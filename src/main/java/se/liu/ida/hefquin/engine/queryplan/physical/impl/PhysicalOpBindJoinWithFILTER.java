@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPA
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin {
 
@@ -33,4 +34,8 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin 
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 	}
 
+	@Override
+	public void visit(final PhysicalPlanVisitor visitor) {
+		visitor.visit(this);
+	}
 }
