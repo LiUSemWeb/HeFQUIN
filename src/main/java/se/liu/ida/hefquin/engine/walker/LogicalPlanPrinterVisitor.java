@@ -12,12 +12,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
-public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
-	
+public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor {
+
 	protected int indentLevel = 0;
 	protected StringBuilder builder = new StringBuilder();
-	
-	static public String print( final LogicalPlan plan ) {
+
+	static public String print(final LogicalPlan plan) {
 		final LogicalPlanPrinterVisitor printer = new LogicalPlanPrinterVisitor();
 		LogicalPlanWalker.walkTopDown(plan, printer);
 		return printer.getString();
@@ -28,7 +28,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit( final LogicalOpRequest<?, ?> op ) {
+	public void visit(final LogicalOpRequest<?, ?> op) {
 		addTabs();
 		builder.append("> req");
 		//builder.append(op.getFederationMember().toString());
@@ -40,7 +40,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit( final LogicalOpTPAdd op ) {
+	public void visit(final LogicalOpTPAdd op) {
 		addTabs();
 		builder.append("> tpAdd ");
 		//builder.append(op.getFederationMember().toString());
@@ -60,7 +60,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		indentLevel++;
 		builder.append("> bgp");
 		indentLevel++;
-		for(final TriplePattern tp : op.getBGP().getTriplePatterns()) {
+		for (final TriplePattern tp : op.getBGP().getTriplePatterns()) {
 			builder.append("> tp ");
 			builder.append(tp.toString());
 			builder.append("\n");
@@ -95,10 +95,10 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		builder.append("mu ");
 		indentLevel++;
 	}
-	
+
 	protected void addTabs() {
-		for( int i=0; i<indentLevel; i++)
+		for (int i = 0; i < indentLevel; i++)
 			builder.append("  ");
 	}
-	
+
 }
