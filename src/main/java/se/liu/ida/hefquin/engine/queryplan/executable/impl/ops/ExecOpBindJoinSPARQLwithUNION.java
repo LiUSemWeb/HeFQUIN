@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
@@ -32,10 +30,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
 
 	protected Set<Var> varsInTP;
+	protected List<Var> varsInTPList;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm) {
 		super(query, fm);
 		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInTPList = new ArrayList<>(varsInTP);
 	}
 
 	@Override
@@ -51,7 +51,6 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
 		final Op tp = new OpTriple(query.asJenaTriple());
 		if (varsInTP.isEmpty()) return tp;
-		Op union = null;
 		Set<Expr> conjunctions = new HashSet<>();
 		for ( final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
@@ -60,10 +59,9 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
 			if (b.size() == 0) return tp;
-			final Iterator<Var> vars = b.vars();
 			Expr conjunction = null;
-			while (vars.hasNext()) {
-				final Var v = vars.next();
+			for (final Var v : varsInTPList){
+				if (! b.contains(v)) continue;
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
 				if (conjunction == null){
@@ -75,6 +73,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 			conjunctions.add(conjunction);
 		}
 		if (conjunctions.isEmpty()) return tp;
+		Op union = null;
 		for (final Expr conjunction : conjunctions) {
 			final Op filter = OpFilter.filter(conjunction, tp);
 			if (union == null) {
