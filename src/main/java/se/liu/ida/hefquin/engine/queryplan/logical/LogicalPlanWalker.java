@@ -9,25 +9,31 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
  */
 public class LogicalPlanWalker
 {
-	public static void walk( final LogicalPlan plan, final LogicalPlanVisitor visitor ) {
-		new WalkerVisitor(visitor).walk(plan);
+	public static void walk( final LogicalPlan plan, final LogicalPlanVisitor beforeVisitor,
+							 final LogicalPlanVisitor afterVisitor ) {
+		new LogicalWalkerVisitor(beforeVisitor, afterVisitor).walk(plan);
 	}
 
-	protected static class WalkerVisitor {
-		protected final LogicalPlanVisitor visitor;
+	protected static class LogicalWalkerVisitor {
+		protected final LogicalPlanVisitor beforeVisitor;
+		protected final LogicalPlanVisitor afterVisitor;
 
-		public WalkerVisitor( final LogicalPlanVisitor visitor ) {
-			assert visitor != null;
-			this.visitor = visitor;
+		public LogicalWalkerVisitor( final LogicalPlanVisitor beforeVisitor,
+							  final LogicalPlanVisitor afterVisitor ) {
+			this.beforeVisitor = beforeVisitor;
+			this.afterVisitor = afterVisitor;
 		}
 
 		public void walk( final LogicalPlan plan ) {
-			for (int i = 0; i < plan.numberOfSubPlans(); ++i ) {
+			if ( beforeVisitor != null ) {
+				plan.getRootOperator().visit(beforeVisitor);
+			}
+			for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
 				walk( plan.getSubPlan(i) );
 			}
-			plan.getRootOperator().visit(visitor);
+			if ( afterVisitor != null ) {
+				plan.getRootOperator().visit(afterVisitor);
+			}
 		}
-
-	} // end of class WalkerVisitor 
-
+	} // end of class WalkerVisitor
 }

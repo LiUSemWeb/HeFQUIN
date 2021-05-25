@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpHashJoin extends BasePhysicalOpBinaryJoin {
     public PhysicalOpHashJoin(final LogicalOpJoin lop) {
@@ -15,5 +16,10 @@ public class PhysicalOpHashJoin extends BasePhysicalOpBinaryJoin {
         assert inputVars.length == 2;
 
         return new ExecOpHashJoin( inputVars[0], inputVars[1] );
+    }
+
+    @Override
+    public void visit(final PhysicalPlanVisitor visitor) {
+        visitor.visit(this);
     }
 }
