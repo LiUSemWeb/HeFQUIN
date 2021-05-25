@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFa
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                        implements NullaryPhysicalOpForLogicalOp
@@ -57,6 +58,11 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		assert inputVars.length == 0;
 
 		return lop.getRequest().getExpectedVariables();
+	}
+
+	@Override
+	public void visit(final PhysicalPlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

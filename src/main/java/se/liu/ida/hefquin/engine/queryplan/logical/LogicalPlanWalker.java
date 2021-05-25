@@ -11,14 +11,14 @@ public class LogicalPlanWalker
 {
 	public static void walk( final LogicalPlan plan, final LogicalPlanVisitor beforeVisitor,
 							 final LogicalPlanVisitor afterVisitor ) {
-		new WalkerVisitor(beforeVisitor, afterVisitor).walk(plan);
+		new LogicalWalkerVisitor(beforeVisitor, afterVisitor).walk(plan);
 	}
 
-	protected static class WalkerVisitor {
+	protected static class LogicalWalkerVisitor {
 		protected final LogicalPlanVisitor beforeVisitor;
 		protected final LogicalPlanVisitor afterVisitor;
 
-		public WalkerVisitor( final LogicalPlanVisitor beforeVisitor,
+		public LogicalWalkerVisitor( final LogicalPlanVisitor beforeVisitor,
 							  final LogicalPlanVisitor afterVisitor ) {
 			this.beforeVisitor = beforeVisitor;
 			this.afterVisitor = afterVisitor;

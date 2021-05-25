@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 	
@@ -38,6 +39,11 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
 			@Override public Set<Var> getCertainVariables() { return certainVars;}
 			@Override public Set<Var> getPossibleVariables() { return possibleVars;}
 		};
+	}
+
+	@Override
+	public void visit(final PhysicalPlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
