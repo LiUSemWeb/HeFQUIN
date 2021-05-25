@@ -52,7 +52,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpBGPAdd op) {
+	public void visit( final LogicalOpBGPAdd op ) {
 		addTabs();
 		builder.append("> bgpAdd ");
 		//builder.append(op.getFederationMember().toString());
