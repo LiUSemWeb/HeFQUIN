@@ -157,7 +157,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
 			@Override
 			public Set<Var> getCertainVariables() {
-				Set<Var> set = new HashSet<>();
+				final Set<Var> set = new HashSet<>();
 				set.add(var1);
 				set.add(var2);
 				return set;
