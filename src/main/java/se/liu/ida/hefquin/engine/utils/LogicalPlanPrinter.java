@@ -23,10 +23,6 @@ public class LogicalPlanPrinter extends PlanPrinter{
 		return printer.getString();
 	}
 
-	private String getString() {
-		return builder.toString();
-	}
-
 	private class LogicalPlanPrinterBeforeVisitor implements LogicalPlanVisitor {
 
 		@Override

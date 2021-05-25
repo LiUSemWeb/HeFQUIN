@@ -16,10 +16,6 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         return printer.getString();
     }
 
-    private String getString() {
-        return builder.toString();
-    }
-
     private class PhysicalPlanPrinterBeforeVisitor implements PhysicalPlanVisitor {
         @Override
         public void visit(final PhysicalOpRequest<?, ?> op) {
