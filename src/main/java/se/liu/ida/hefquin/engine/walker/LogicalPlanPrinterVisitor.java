@@ -96,7 +96,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 		indentLevel++;
 	}
 	
-	private void addTabs() {
+	protected void addTabs() {
 		for( int i=0; i<indentLevel; i++)
 			builder.append("  ");
 	}
