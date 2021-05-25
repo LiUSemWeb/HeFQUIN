@@ -112,37 +112,37 @@ public class LogicalPlanPrinter {
 	private class LogicalPlanPrinterAfterVisitor implements LogicalPlanVisitor {
 
 		@Override
-		public void visit(LogicalOpRequest<?, ?> op) {
+		public void visit(final LogicalOpRequest<?, ?> op) {
 			//nothing to do here
 		}
 
 		@Override
-		public void visit(LogicalOpTPAdd op) {
+		public void visit(final LogicalOpTPAdd op) {
 			indentLevel--;
 		}
 
 		@Override
-		public void visit(LogicalOpBGPAdd op) {
+		public void visit(final LogicalOpBGPAdd op) {
 			indentLevel--;
 		}
 
 		@Override
-		public void visit(LogicalOpJoin op) {
+		public void visit(final LogicalOpJoin op) {
 			indentLevel--;
 		}
 
 		@Override
-		public void visit(LogicalOpUnion op) {
+		public void visit(final LogicalOpUnion op) {
 			indentLevel--;
 		}
 
 		@Override
-		public void visit(LogicalOpMultiwayJoin op) {
+		public void visit(final LogicalOpMultiwayJoin op) {
 			indentLevel--;
 		}
 
 		@Override
-		public void visit(LogicalOpMultiwayUnion op) {
+		public void visit(final LogicalOpMultiwayUnion op) {
 			indentLevel--;
 		}
 	}
