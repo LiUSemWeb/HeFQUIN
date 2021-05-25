@@ -17,7 +17,7 @@ public class LogicalPlanUtils
 	 */
 	static public boolean isSourceAssignment( final LogicalPlan plan ) {
 		final SourceAssignmentChecker v = new SourceAssignmentChecker();
-		LogicalPlanWalker.walk(plan, v);
+		LogicalPlanWalker.walk(plan, null, v);
 		return v.wasSourceAssignment();
 	}
 
