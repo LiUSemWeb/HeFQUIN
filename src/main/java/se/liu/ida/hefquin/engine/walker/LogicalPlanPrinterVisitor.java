@@ -17,7 +17,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	private int indentLevel = 0;
 	private StringBuilder builder = new StringBuilder();
 	
-	static public String print(LogicalPlan plan) {
+	static public String print( final LogicalPlan plan ) {
 		final LogicalPlanPrinterVisitor printer = new LogicalPlanPrinterVisitor();
 		LogicalPlanWalker.walkTopDown(plan, printer);
 		return printer.getString();
