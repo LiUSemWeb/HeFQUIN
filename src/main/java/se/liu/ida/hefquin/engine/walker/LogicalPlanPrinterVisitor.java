@@ -40,7 +40,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpTPAdd op) {
+	public void visit( final LogicalOpTPAdd op ) {
 		addTabs();
 		builder.append("> tpAdd ");
 		//builder.append(op.getFederationMember().toString());
