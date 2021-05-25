@@ -14,10 +14,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	
-	private int indentLevel = 0;
-	private StringBuilder builder = new StringBuilder();
+	protected int indentLevel = 0;
+	protected StringBuilder builder = new StringBuilder();
 	
-	static public String print(LogicalPlan plan) {
+	static public String print( final LogicalPlan plan ) {
 		final LogicalPlanPrinterVisitor printer = new LogicalPlanPrinterVisitor();
 		LogicalPlanWalker.walkTopDown(plan, printer);
 		return printer.getString();
@@ -28,7 +28,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpRequest<?, ?> op) {
+	public void visit( final LogicalOpRequest<?, ?> op ) {
 		addTabs();
 		builder.append("> req");
 		//builder.append(op.getFederationMember().toString());
@@ -40,7 +40,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpTPAdd op) {
+	public void visit( final LogicalOpTPAdd op ) {
 		addTabs();
 		builder.append("> tpAdd ");
 		//builder.append(op.getFederationMember().toString());
@@ -52,7 +52,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpBGPAdd op) {
+	public void visit( final LogicalOpBGPAdd op ) {
 		addTabs();
 		builder.append("> bgpAdd ");
 		//builder.append(op.getFederationMember().toString());
@@ -69,36 +69,35 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpJoin op) {
+	public void visit( final LogicalOpJoin op ) {
 		addTabs();
 		builder.append("> join\n");
 		indentLevel++;
 	}
 
 	@Override
-	public void visit(LogicalOpUnion op) {
+	public void visit( final LogicalOpUnion op ) {
 		addTabs();
 		builder.append("> union\n");
 		indentLevel++;
 	}
 
 	@Override
-	public void visit(LogicalOpMultiwayJoin op) {
+	public void visit( final LogicalOpMultiwayJoin op ) {
 		addTabs();
 		builder.append("> mj ");
 		indentLevel++;
 	}
 
 	@Override
-	public void visit(LogicalOpMultiwayUnion op) {
+	public void visit( final LogicalOpMultiwayUnion op ) {
 		addTabs();
 		builder.append("mu ");
 		indentLevel++;
 	}
 	
-	private void addTabs() {
+	protected void addTabs() {
 		for( int i=0; i<indentLevel; i++)
 			builder.append("  ");
 	}
-	
 }
