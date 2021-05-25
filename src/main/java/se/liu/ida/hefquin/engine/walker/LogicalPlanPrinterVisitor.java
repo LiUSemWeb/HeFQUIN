@@ -28,7 +28,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpRequest<?, ?> op) {
+	public void visit( final LogicalOpRequest<?, ?> op ) {
 		addTabs();
 		builder.append("> req");
 		//builder.append(op.getFederationMember().toString());
