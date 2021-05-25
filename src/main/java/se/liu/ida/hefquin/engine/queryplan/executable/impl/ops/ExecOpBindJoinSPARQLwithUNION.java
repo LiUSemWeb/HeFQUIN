@@ -29,13 +29,11 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
 
-	protected Set<Var> varsInTP;
-	protected List<Var> varsInTPList;
+	protected List<Var> varsInTP;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm) {
 		super(query, fm);
-		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
-		varsInTPList = new ArrayList<>(varsInTP);
+		varsInTP = new ArrayList<>(QueryPatternUtils.getVariablesInPattern(query));
 	}
 
 	@Override
@@ -60,7 +58,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoin<TripleP
 			// all matching triples (i.e., no need for putting together the UNION pattern).
 			if (b.size() == 0) return tp;
 			Expr conjunction = null;
-			for (final Var v : varsInTPList){
+			for (final Var v : varsInTP){
 				if (! b.contains(v)) continue;
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
