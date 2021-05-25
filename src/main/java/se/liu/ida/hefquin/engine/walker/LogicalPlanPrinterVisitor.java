@@ -14,8 +14,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	
-	private int indentLevel = 0;
-	private StringBuilder builder = new StringBuilder();
+	protected int indentLevel = 0;
+	protected StringBuilder builder = new StringBuilder();
 	
 	static public String print( final LogicalPlan plan ) {
 		final LogicalPlanPrinterVisitor printer = new LogicalPlanPrinterVisitor();
