@@ -18,6 +18,6 @@ public interface TriplePattern extends SPARQLGraphPattern
 	/**
 	 * Returns a string representation of the triple
 	 */
-	public String toString();
+	String toString();
 
 }
