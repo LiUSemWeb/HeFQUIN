@@ -69,7 +69,7 @@ public class LogicalPlanPrinterVisitor implements LogicalPlanVisitor{
 	}
 
 	@Override
-	public void visit(LogicalOpJoin op) {
+	public void visit( final LogicalOpJoin op ) {
 		addTabs();
 		builder.append("> join\n");
 		indentLevel++;
