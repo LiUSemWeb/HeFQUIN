@@ -17,10 +17,6 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin 
 
 	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
-		for (final ExpectedVariables ev : inputVars) {
-			System.out.println(ev.getCertainVariables());
-			System.out.println(ev.getPossibleVariables());
-		}
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
 			final FederationMember fm = tpAdd.getFederationMember();
