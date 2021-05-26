@@ -8,12 +8,59 @@ import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 import java.util.*;
 
-public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHashTable{
+public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsIndexBase
+{
     protected final Map<Node, List<SolutionMapping>> map = new HashMap<>();
     protected final Var joinVar;
 
     public SolutionMappingsHashTableBasedOnOneVar(final Var joinVar) {
         this.joinVar = joinVar;
+    }
+
+    @Override
+    public int size() {
+        int size = 0;
+        for ( final List<SolutionMapping> li : map.values() ) {
+        	size += li.size();
+        }
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+    	for ( final List<SolutionMapping> li : map.values() ) {
+    		if ( ! li.isEmpty() ) {
+    			return false;
+    		}
+    	}
+        return true;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if( !(o instanceof SolutionMapping) ){
+            return false;
+        }
+
+        final Binding b = ((SolutionMapping) o).asJenaBinding();
+        for ( final List<SolutionMapping> li : map.values() ) {
+                for (final SolutionMapping sm : li) {
+                    if (sm.asJenaBinding().equals(b)) {
+                        return true;
+                    }
+                }
+        }
+        return false;
+    }
+
+    @Override
+    public Iterator<SolutionMapping> iterator() {
+        final List<SolutionMapping> solMap = new ArrayList<>();
+
+        for ( final List<SolutionMapping> l : map.values() ) {
+        	solMap.addAll(l);
+        }
+        return solMap.iterator();
     }
 
     @Override
@@ -32,6 +79,14 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
         else {
             throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    public void clear() {
+    	for ( final List<SolutionMapping> li : map.values() ) {
+    		li.clear();
+    	}
+    	map.clear();
     }
 
     @Override
@@ -74,7 +129,24 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
         }
     }
 
-    protected Node getVarKey(final SolutionMapping e){
+    @Override
+    public Iterable<SolutionMapping> findSolutionMappings(
+    		final Var var1, final Node value1,
+    		final Var var2, final Node value2,
+    		final Var var3, final Node value3 )
+    				throws UnsupportedOperationException {
+    	throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterable<SolutionMapping> findSolutionMappings(
+    		final Var var1, final Node value1,
+    		final Var var2, final Node value2 )
+    				throws UnsupportedOperationException {
+    	throw new UnsupportedOperationException();
+    }
+
+    protected Node getVarKey( final SolutionMapping e ) {
         final Binding solMapBinding = e.asJenaBinding();
         final Node n = solMapBinding.get(joinVar);
         if ( n == null){
@@ -84,4 +156,5 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsHash
             return n;
         }
     }
+    
 }
