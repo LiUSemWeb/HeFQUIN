@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -18,6 +19,11 @@ public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
         // sequentially (one at a time), and input block size of 1 may
         // reduce the response time of the overall execution process.
         return 1;
+    }
+
+    @Override
+    public void visit(final ExecutablePlanVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

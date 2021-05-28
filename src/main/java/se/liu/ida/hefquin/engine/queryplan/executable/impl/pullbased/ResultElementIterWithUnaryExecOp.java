@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+import java.util.NoSuchElementException;
+
 public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 {
 	protected final MyOpRunnerThread opRunnerThread;
@@ -22,6 +24,17 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 	@Override
 	public UnaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
+	}
+
+	@Override
+	public int getArity() {
+		return 1;
+	}
+
+	@Override
+	public ResultElementIterator getSubIterator(final int i) throws NoSuchElementException {
+		if (i == 0) return opRunnerThread.inputIter.getElementIterator();
+		throw new NoSuchElementException("Unary execution plan does not have "+i+"-th sub iterator");
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint>{
@@ -52,4 +53,8 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoin<Triple
 		return response.getSolutionMappings();
 	}
 
+	@Override
+	public void visit(final ExecutablePlanVisitor visitor) {
+		visitor.visit(this);
+	}
 }

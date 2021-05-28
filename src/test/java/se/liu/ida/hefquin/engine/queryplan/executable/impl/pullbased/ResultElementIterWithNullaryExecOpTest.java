@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -95,6 +96,11 @@ public class ResultElementIterWithNullaryExecOpTest
 		@Override
 		public int preferredInputBlockSize() {
 			return 1;
+		}
+
+		@Override
+		public void visit(final ExecutablePlanVisitor visitor) {
+			// nothing to do here
 		}
 	}
 

@@ -1,23 +1,20 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.jena.sparql.engine.binding.Binding;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
+import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class TestUtils
 {
@@ -75,6 +72,21 @@ public class TestUtils
 
 		@Override
 		public SolutionMapping next() { return it.next(); }
+
+		@Override
+		public ExecutableOperator getOp() {
+			return null;
+		}
+
+		@Override
+		public int getArity() {
+			return 0;
+		}
+
+		@Override
+		public ResultElementIterator getSubIterator(final int i) throws NoSuchElementException {
+			return null;
+		}
 	}
 
 	protected static class FederationAccessManagerTestImpl implements FederationAccessManager

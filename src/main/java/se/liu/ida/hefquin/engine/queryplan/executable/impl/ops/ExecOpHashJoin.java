@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -43,6 +44,11 @@ public class ExecOpHashJoin implements BinaryExecutableOp {
     @Override
     public int preferredInputBlockSize() {
         return 1;
+    }
+
+    @Override
+    public void visit(final ExecutablePlanVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

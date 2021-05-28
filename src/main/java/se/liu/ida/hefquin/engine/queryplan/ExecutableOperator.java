@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan;
 
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
+
 public interface ExecutableOperator
 {
 	/**
@@ -10,4 +12,6 @@ public interface ExecutableOperator
 	 * hint but it does not have to use it.
 	 */
 	int preferredInputBlockSize();
+
+    void visit(ExecutablePlanVisitor visitor);
 }
