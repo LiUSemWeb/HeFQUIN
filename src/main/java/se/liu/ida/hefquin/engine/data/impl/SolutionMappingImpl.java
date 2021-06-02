@@ -17,4 +17,13 @@ public class SolutionMappingImpl implements SolutionMapping
 	public Binding asJenaBinding() {
 		return jenaObj;
 	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o instanceof SolutionMapping )
+			return SolutionMappingUtils.equals( this, (SolutionMapping) o );
+		else
+			return false;
+	}
+
 }

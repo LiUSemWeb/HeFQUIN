@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.data.impl;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -72,6 +71,15 @@ public class SolutionMappingUtils
 		b.add(var2, node2);
 		b.add(var3, node3);
 		return new SolutionMappingImpl(b);
+	}
+
+	/**
+	 * Returns true if the given solution mappings are equivalent; that
+	 * is, if they are defined for the exact same set of variables and
+	 * they are compatible.
+	 */
+	public static boolean equals( final SolutionMapping m1, final SolutionMapping m2 ) {
+		return BindingUtils.equals( m1.asJenaBinding(), m2.asJenaBinding() );		
 	}
 
 	/**
