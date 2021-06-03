@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
+package se.liu.ida.hefquin.engine.datastructures.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -7,7 +7,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
-import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 
 import java.util.*;
 
