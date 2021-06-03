@@ -8,6 +8,11 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
+/**
+ * This is an iterator of solution mappings that consumes another iterator
+ * and passes on only the solution mappings that have a given value for a
+ * given variable.
+ */
 public class SolutionMappingsIteratorWithOneVarFilter implements Iterator<SolutionMapping>
 {
 	protected final Iterator<SolutionMapping> input;

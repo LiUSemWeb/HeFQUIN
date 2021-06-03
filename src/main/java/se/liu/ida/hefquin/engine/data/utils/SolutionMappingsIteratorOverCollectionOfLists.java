@@ -7,6 +7,10 @@ import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
+/**
+ * This is an iterator over all solution mappings contained in a nested
+ * collection (more precisely, in lists contained in a collection).
+ */
 public class SolutionMappingsIteratorOverCollectionOfLists implements Iterator<SolutionMapping>
 {
 	final protected Iterator<List<SolutionMapping>> itBuckets;

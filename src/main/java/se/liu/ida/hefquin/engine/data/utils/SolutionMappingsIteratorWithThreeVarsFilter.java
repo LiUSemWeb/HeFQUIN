@@ -9,6 +9,11 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
+/**
+ * This is an iterator of solution mappings that consumes another iterator
+ * and passes on only the solution mappings that have given values for three
+ * variables.
+ */
 public class SolutionMappingsIteratorWithThreeVarsFilter implements Iterator<SolutionMapping>
 {
 	protected final Iterator<SolutionMapping> input;

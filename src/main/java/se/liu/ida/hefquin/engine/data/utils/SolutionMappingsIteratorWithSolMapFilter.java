@@ -6,6 +6,11 @@ import java.util.NoSuchElementException;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
+/**
+ * This is an iterator of solution mappings that consumes another iterator
+ * and passes on only the solution mappings that are compatible to a given
+ * solution mapping.
+ */
 public class SolutionMappingsIteratorWithSolMapFilter implements Iterator<SolutionMapping>
 {
 	protected final Iterator<SolutionMapping> input;

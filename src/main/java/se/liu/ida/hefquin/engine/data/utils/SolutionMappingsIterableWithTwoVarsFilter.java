@@ -7,6 +7,11 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
+/**
+ * This is an iterable of solution mappings that wraps another such iterable
+ * and that can be used to iterate over the subset of solution mappings that
+ * have given values for two variables.
+ */
 public class SolutionMappingsIterableWithTwoVarsFilter implements Iterable<SolutionMapping>
 {
 	protected final Iterable<SolutionMapping> input;
