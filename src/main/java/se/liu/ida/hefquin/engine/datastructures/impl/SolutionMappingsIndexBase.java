@@ -2,7 +2,13 @@ package se.liu.ida.hefquin.engine.datastructures.impl;
 
 import java.util.Collection;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithThreeVarsFilter;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
@@ -54,6 +60,42 @@ public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 	@Override
 	public <T> T[] toArray(T[] a) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Wraps a {@link SolutionMappingsIterableWithOneVarFilter}
+	 * around the output of {@link #getAllSolutionMappings()}.
+	 */
+	protected Iterable<SolutionMapping> findSolutionMappingsLastResort(
+			final Var var, final Node value )
+	{
+		final Iterable<SolutionMapping> it = getAllSolutionMappings();
+		return new SolutionMappingsIterableWithOneVarFilter(it, var, value);
+	}
+
+	/**
+	 * Wraps a {@link SolutionMappingsIterableWithTwoVarsFilter}
+	 * around the output of {@link #getAllSolutionMappings()}.
+	 */
+	protected Iterable<SolutionMapping> findSolutionMappingsLastResort(
+			final Var var1, final Node value1,
+			final Var var2, final Node value2 )
+	{
+		final Iterable<SolutionMapping> it = getAllSolutionMappings();
+		return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var2, value2);
+	}
+
+	/**
+	 * Wraps a {@link SolutionMappingsIterableWithThreeVarsFilter}
+	 * around the output of {@link #getAllSolutionMappings()}.
+	 */
+	protected Iterable<SolutionMapping> findSolutionMappingsLastResort(
+			final Var var1, final Node value1,
+			final Var var2, final Node value2,
+			final Var var3, final Node value3 )
+	{
+		final Iterable<SolutionMapping> it = getAllSolutionMappings();
+		return new SolutionMappingsIterableWithThreeVarsFilter(it, var1, value1, var2, value2, var3, value3);
 	}
 
 }

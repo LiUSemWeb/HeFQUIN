@@ -20,7 +20,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
     protected final SolutionMappingsIndex solMHashTableR;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ){
-        final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
+        final List<Var> joinVars = new ArrayList<>( inputVars1.getCertainVariables() );
         joinVars.retainAll( inputVars2.getCertainVariables() );
 
         if (joinVars.size() == 1 ){

@@ -2,12 +2,41 @@ package se.liu.ida.hefquin.engine.datastructures.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 
 import java.util.*;
 
+/**
+ * This is a hash table based implementation of {@link SolutionMappingsIndex}
+ * that can be used for indexes that are built on one query variable and that
+ * are meant to be used for cases in which adding and probing into the index
+ * may not happen concurrently.
+ *
+ * As mentioned above, this implementation assumes that adding and probing
+ * into the index may not happen concurrently. Based on this assumption,
+ * for every method that returns an {@link Iterable} of solution mappings,
+ * the {@link Iterable} that it returns is directly based on an internal
+ * data structure (rather than being a new {@link Iterable} into which the  
+ * solution mappings have been copied). For cases in which the assumption
+ * does not hold (i.e., cases in which adding and probing into the index
+ * may actually happen concurrently), an object of this class may simply
+ * be wrapped in a {@link SolutionMappingsIndexForMixedUsage} which then
+ * creates a new {@link Iterable} for every {@link Iterable} returned by
+ * this implementation. 
+ *
+ * Another assumption of this implementation is that the only variable
+ * relevant for index look-ups is the variable on which the index is built.
+ * In other words, the assumption is that the only variable that the solution
+ * mappings added to the index have in common with the solution mappings
+ * given to the method {@link #getJoinPartners(SolutionMapping)} is the
+ * variable on which the index is built. For cases in which this assumption
+ * does not hold, a {@link SolutionMappingsIndexWithPostMatching} can be
+ * used to wrap a {@link SolutionMappingsHashTableBasedOnOneVar}.
+ */
 public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsIndexBase
 {
     protected final Map<Node, List<SolutionMapping>> map = new HashMap<>();
@@ -37,30 +66,21 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsInde
     }
 
     @Override
-    public boolean contains(Object o) {
-        if( !(o instanceof SolutionMapping) ){
-            return false;
+    public boolean contains( final Object o ) {
+        if( o instanceof SolutionMapping ){
+            final SolutionMapping sm = (SolutionMapping) o;
+            for ( final SolutionMapping sm2 : getJoinPartners(sm)) {
+                if ( sm == sm2 || SolutionMappingUtils.equals(sm, sm2) )
+                    return true;
+            }
         }
 
-        final Binding b = ((SolutionMapping) o).asJenaBinding();
-        for ( final List<SolutionMapping> li : map.values() ) {
-                for (final SolutionMapping sm : li) {
-                    if (sm.asJenaBinding().equals(b)) {
-                        return true;
-                    }
-                }
-        }
         return false;
     }
 
     @Override
-    public Iterator<SolutionMapping> iterator() {
-        final List<SolutionMapping> solMap = new ArrayList<>();
-
-        for ( final List<SolutionMapping> l : map.values() ) {
-        	solMap.addAll(l);
-        }
-        return solMap.iterator();
+    public Iterable<SolutionMapping> getAllSolutionMappings() {
+        return new SolutionMappingsIterableOverCollectionOfLists( map.values() );
     }
 
     @Override
@@ -89,43 +109,62 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsInde
     	map.clear();
     }
 
+    /**
+     * This method assumes that the only variable that the given solution
+     * mapping has in common with the solution mappings in the index is the
+     * variable on which the index is built. For cases in which this assumption
+     * does not hold, the returned solution mappings are not actually join
+     * partners but only candidates for join partners; hence, they still need
+     * to be checked for compatibility with the given solution mapping. In
+     * cases in which he assumption is not guaranteed to hold, this index can
+     * be wrapped by a {@link SolutionMappingsIndexWithPostMatching} which
+     * takes care of the compatibility check. 
+     */
     @Override
     public Iterable<SolutionMapping> getJoinPartners( final SolutionMapping sm )
-            throws UnsupportedOperationException
     {
         final Node valKeys = getVarKey(sm);
-        final Iterator<SolutionMapping> matchingSolMaps;
         if ( valKeys == null ){
-            matchingSolMaps = iterator();
+            return getAllSolutionMappings();
         }
         else {
-            final List<SolutionMapping> l = map.get(valKeys);
-            matchingSolMaps = (l != null) ? l.iterator() : null;
+            return findSolutionMappings(joinVar, valKeys);
         }
-
-        final List<SolutionMapping> joinPartner = new ArrayList<>();
-        while (matchingSolMaps != null && matchingSolMaps.hasNext()) {
-            final SolutionMapping matchSolM = matchingSolMaps.next();
-            if (SolutionMappingUtils.compatible(sm, matchSolM)) {
-                joinPartner.add(matchSolM);
-            }
-        }
-        return joinPartner;
     }
 
     @Override
     public Iterable<SolutionMapping> findSolutionMappings( final Var var, final Node value )
-            throws UnsupportedOperationException
     {
-        if ( joinVar.equals(var) ){
-            List<SolutionMapping> solMapList = map.get(value);
+        if ( joinVar.equals(var) ) {
+            final List<SolutionMapping> solMapList = map.get(value);
+
+            // return an empty list if index look-up was unsuccessful
             if ( solMapList == null) {
-                solMapList = new ArrayList<>();
+                return Arrays.asList();
             }
+
             return solMapList;
         }
         else{
-            throw new UnsupportedOperationException();
+            return findSolutionMappingsLastResort(var, value);
+        }
+    }
+
+    @Override
+    public Iterable<SolutionMapping> findSolutionMappings(
+    		final Var var1, final Node value1,
+    		final Var var2, final Node value2 )
+    {
+        if ( joinVar.equals(var1) ) {
+            final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
+            return new SolutionMappingsIterableWithOneVarFilter(it, var2, value2);
+        }
+        else if ( joinVar.equals(var2) ) {
+            final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
+            return new SolutionMappingsIterableWithOneVarFilter(it, var1, value1);
+        }
+        else {
+            return findSolutionMappingsLastResort(var1, value1, var2, value2);
         }
     }
 
@@ -134,27 +173,27 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsInde
     		final Var var1, final Node value1,
     		final Var var2, final Node value2,
     		final Var var3, final Node value3 )
-    				throws UnsupportedOperationException {
-    	throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Iterable<SolutionMapping> findSolutionMappings(
-    		final Var var1, final Node value1,
-    		final Var var2, final Node value2 )
-    				throws UnsupportedOperationException {
-    	throw new UnsupportedOperationException();
+    {
+        if ( joinVar.equals(var1) ) {
+            final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
+            return new SolutionMappingsIterableWithTwoVarsFilter(it, var2, value2, var3, value3);
+        }
+        else if ( joinVar.equals(var2) ) {
+            final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
+            return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var3, value3);
+        }
+        else if ( joinVar.equals(var3) ) {
+            final Iterable<SolutionMapping> it = findSolutionMappings(var3, value3);
+            return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var2, value2);
+        }
+        else {
+            return findSolutionMappingsLastResort(var1, value1, var2, value2, var3, value3);
+        }
     }
 
     protected Node getVarKey( final SolutionMapping e ) {
-        final Binding solMapBinding = e.asJenaBinding();
-        final Node n = solMapBinding.get(joinVar);
-        if ( n == null){
-            return null;
-        }
-        else {
-            return n;
-        }
+        final Node n = e.asJenaBinding().get(joinVar);
+        return n; // may be null
     }
-    
+
 }

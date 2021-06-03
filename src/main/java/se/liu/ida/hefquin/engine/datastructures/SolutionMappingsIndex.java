@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.datastructures;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
@@ -67,4 +68,15 @@ public interface SolutionMappingsIndex extends Collection<SolutionMapping>
 	                                                Var var2, Node value2,
 	                                                Var var3, Node value3 )
 			throws UnsupportedOperationException;
+
+	/**
+	 * Returns all solution mappings currently in this index.
+	 */
+	Iterable<SolutionMapping> getAllSolutionMappings();
+
+	@Override
+	default Iterator<SolutionMapping> iterator() {
+		return getAllSolutionMappings().iterator();
+	}
+
 }

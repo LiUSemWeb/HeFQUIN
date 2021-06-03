@@ -12,16 +12,16 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 public class ExecOpHashJoin implements BinaryExecutableOp {
     protected final SolutionMappingsIndex solMHashTableL;
     protected boolean child1InputComplete = false;
 
     public ExecOpHashJoin(final ExpectedVariables inputVars1, final ExpectedVariables inputVars2) {
-        final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
+        final List<Var> joinVars = new ArrayList<>( inputVars1.getCertainVariables() );
         joinVars.retainAll( inputVars2.getCertainVariables() );
 
         if (joinVars.size() == 1 ){

@@ -183,7 +183,7 @@ public class SolutionMappingsHashTableTest {
 
         assertTrue( it.hasNext() );
         final Binding b3 = it.next().asJenaBinding();
-        assertEquals( 3, b2.size() );
+        assertEquals( 3, b3.size() );
 
         assertFalse( it.hasNext() );
 
@@ -290,8 +290,8 @@ public class SolutionMappingsHashTableTest {
     @Test
     public void hashTableWithEmptyInputVariable() {
 
-        final Set<Var> inputVars = new HashSet<>();
-        assertThrows(IllegalArgumentException.class,
+        final List<Var> inputVars = Arrays.asList(); // create an empty list
+        assertThrows(AssertionError.class,
                 ()->{ new SolutionMappingsHashTable(inputVars); });
     }
 }
