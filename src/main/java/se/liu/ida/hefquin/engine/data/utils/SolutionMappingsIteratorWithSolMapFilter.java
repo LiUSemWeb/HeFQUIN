@@ -25,6 +25,7 @@ public class SolutionMappingsIteratorWithSolMapFilter implements Iterator<Soluti
 
 	@Override
 	public boolean hasNext() {
+		nextOutputElement = null;
 		while ( nextOutputElement == null && input.hasNext() ) {
 			final SolutionMapping nextInputElement = input.next();
 			if ( SolutionMappingUtils.compatible(sm, nextInputElement) ) {
@@ -37,8 +38,8 @@ public class SolutionMappingsIteratorWithSolMapFilter implements Iterator<Soluti
 
 	@Override
 	public SolutionMapping next() {
-		if ( ! hasNext() )
-			throw new NoSuchElementException();
+		//if ( ! hasNext() )
+		//	throw new NoSuchElementException();
 
 		return nextOutputElement;
 	};
