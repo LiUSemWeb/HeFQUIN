@@ -69,9 +69,23 @@ public class SolutionMappingsHashTableTest {
             }
         }
 
-        // Find solution mappings with (var3, z3), UnsupportedOperationException
-        assertThrows(UnsupportedOperationException.class,
-                ()->{ solMHashTable.findSolutionMappings(var3, z3);});
+        // Find solution mappings with (var3, z3), getAllSolutionMappings()
+        Iterable<SolutionMapping> solMapVar3 = solMHashTable.findSolutionMappings(var3, z3);
+        final Iterator<SolutionMapping> itVar3 = solMapVar3.iterator();
+
+        assertTrue( itVar3.hasNext() );
+        final Binding bItVar31 = itVar3.next().asJenaBinding();
+        assertEquals( 2, bItVar31.size() );
+
+        assertTrue( itVar3.hasNext() );
+        final Binding bItVar32 = itVar3.next().asJenaBinding();
+        assertEquals( 2, bItVar32.size() );
+
+        assertTrue( itVar3.hasNext() );
+        final Binding bItVar33 = itVar3.next().asJenaBinding();
+        assertEquals( 2, bItVar33.size() );
+
+        assertFalse( itVar3.hasNext() );
 
         //----------------------------
         // Probe
@@ -276,7 +290,7 @@ public class SolutionMappingsHashTableTest {
 
         // getJoinPartners of sm5: do not contain complete join variables (compare with the sm4, this one needs double-check of compatible)
         final SolutionMapping sm5 = SolutionMappingUtils.createSolutionMapping(var1, x2);
-        Iterable<SolutionMapping> matchSolMap5 = solMHashTable.getJoinPartners(sm5);
+        Iterable<SolutionMapping> matchSolMap5 = new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm5);
         final Iterator<SolutionMapping> it5 = matchSolMap5.iterator();
         assertTrue( it5.hasNext() );
         final Binding bIt51 = it5.next().asJenaBinding();
