@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 
 public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {
@@ -31,5 +32,10 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 	@Override
 	protected Iterator<? extends SolutionMapping> convert( final Iterable<Triple> itTriples ) {
 		return TriplesToSolMapsConverter.convert( itTriples, req.getTriplePattern() );
+	}
+
+	@Override
+	public void visit(final ExecutablePlanVisitor visitor) {
+		visitor.visit(this);
 	}
 }

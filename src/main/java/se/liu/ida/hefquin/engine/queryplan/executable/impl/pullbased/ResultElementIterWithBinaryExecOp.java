@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+import java.util.NoSuchElementException;
+
 public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 {
 	protected final MyOpRunnerThread opRunnerThread;
@@ -25,6 +27,18 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 	@Override
 	public BinaryExecutableOp getOp() {
 		return opRunnerThread.getOp();
+	}
+
+	@Override
+	public int getArity() {
+		return 2;
+	}
+
+	@Override
+	public ResultElementIterator getSubIterator(final int i) throws NoSuchElementException {
+		if (i == 0) return opRunnerThread.inputIter1.getElementIterator();
+		if (i == 1) return opRunnerThread.inputIter2.getElementIterator();
+		throw new NoSuchElementException("Executable plan does not have an +"+i+"-th sub operation");
 	}
 
 	@Override

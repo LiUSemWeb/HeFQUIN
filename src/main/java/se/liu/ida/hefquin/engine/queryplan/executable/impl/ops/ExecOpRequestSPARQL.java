@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 
 public class ExecOpRequestSPARQL extends ExecOpGenericSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
 {
@@ -15,4 +16,8 @@ public class ExecOpRequestSPARQL extends ExecOpGenericSolMapsRequest<SPARQLReque
 		return fedAccessMgr.performRequest( req, fm );
 	}
 
+	@Override
+	public void visit(final ExecutablePlanVisitor visitor) {
+		visitor.visit(this);
+	}
 }

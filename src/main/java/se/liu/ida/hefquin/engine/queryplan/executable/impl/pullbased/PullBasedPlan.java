@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
+import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
+
+import java.util.NoSuchElementException;
 
 public class PullBasedPlan implements ExecutablePlan
 {
@@ -17,6 +20,16 @@ public class PullBasedPlan implements ExecutablePlan
 		while ( it.hasNext() ) {
 			resultSink.send( it.next() );
 		}
+	}
+
+	@Override
+	public ExecutableOperator getRootOperator() {
+		return it.getOp();
+	}
+
+	@Override
+	public ResultElementIterator getIterator() {
+		return it;
 	}
 
 }

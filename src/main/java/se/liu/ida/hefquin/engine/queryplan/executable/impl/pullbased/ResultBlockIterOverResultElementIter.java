@@ -51,4 +51,8 @@ public class ResultBlockIterOverResultElementIter implements ResultBlockIterator
 		return returnBlock;
 	}
 
+	@Override
+	public ResultElementIterator getElementIterator() {
+		return eIter;
+	}
 }

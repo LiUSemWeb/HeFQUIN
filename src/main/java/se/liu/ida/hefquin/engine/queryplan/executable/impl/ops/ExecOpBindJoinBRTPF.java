@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatte
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -37,6 +38,11 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 		// TODO the preferred input block size should depend on the brTPF server
 		// See: https://github.com/LiUSemWeb/HeFQUIN/issues/2
 		return 30;
+	}
+
+	@Override
+	public void visit(final ExecutablePlanVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override

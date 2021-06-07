@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanVisitor;
 
 public class ExecOpIndexNestedLoopsJoinBRTPF extends ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<BRTPFServer>
 {
@@ -15,4 +16,8 @@ public class ExecOpIndexNestedLoopsJoinBRTPF extends ExecOpGenericIndexNestedLoo
 		return new ExecOpRequestTPFatBRTPFServer(req, fm);
 	}
 
+	@Override
+	public void visit(final ExecutablePlanVisitor visitor) {
+		visitor.visit(this);
+	}
 }
