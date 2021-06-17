@@ -63,6 +63,10 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 		this( Arrays.asList(vars) );
 	}
 
+	public SolutionMappingsHashTable( final Set<Var> joinVariables ) {
+		this( new ArrayList<>(joinVariables) );
+	}
+
 	@Override
 	public int size() {
 		int size = 0;
