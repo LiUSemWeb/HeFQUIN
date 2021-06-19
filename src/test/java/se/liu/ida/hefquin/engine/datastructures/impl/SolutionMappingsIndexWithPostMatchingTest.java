@@ -7,7 +7,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
-import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 import java.util.*;
 
@@ -88,7 +87,7 @@ public class SolutionMappingsIndexWithPostMatchingTest {
 
         // getJoinPartners with post matching
         final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, x2);
-        Iterable<SolutionMapping> matchSolMap1 = new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm1);
+        final Iterable<SolutionMapping> matchSolMap1 = new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm1);
         final Iterator<SolutionMapping> it1 = matchSolMap1.iterator();
         assertTrue( it1.hasNext() );
         final Binding bIt1 = it1.next().asJenaBinding();
@@ -98,14 +97,14 @@ public class SolutionMappingsIndexWithPostMatchingTest {
 
         // getJoinPartners()
         final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var2, y2, var3, z1);
-        Iterable<SolutionMapping> matchSolMap2 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm2);
+        final Iterable<SolutionMapping> matchSolMap2 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm2);
         final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
 
         assertFalse( it2.hasNext() );
 
         // getJoinPartners()
         final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(var3, z1);
-        Iterable<SolutionMapping> matchSolMap3 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm3);
+        final Iterable<SolutionMapping> matchSolMap3 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm3);
         final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
         assertTrue( it3.hasNext() );
         final Binding bIt3 = it3.next().asJenaBinding();

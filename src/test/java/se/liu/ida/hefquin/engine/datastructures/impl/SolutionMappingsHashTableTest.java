@@ -76,7 +76,7 @@ public class SolutionMappingsHashTableTest {
         assertFalse( itVar2.hasNext() );
 
         // findSolutionMappings(var4, p): return all solution mappings
-        Iterable<SolutionMapping> solMapVar4 = solMHashTable.findSolutionMappings(var4, p);
+        final Iterable<SolutionMapping> solMapVar4 = solMHashTable.findSolutionMappings(var4, p);
         final Iterator<SolutionMapping> itVar4 = solMapVar4.iterator();
 
         assertTrue( itVar4.hasNext() );
@@ -156,7 +156,7 @@ public class SolutionMappingsHashTableTest {
         //----------------------------
         // getJoinPartners(): do not contain complete join variables; Return all solution mappings (if no post-matching)
         final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1);
-        Iterable<SolutionMapping> matchSolMap1 = solMHashTable.getJoinPartners(sm1);
+        final Iterable<SolutionMapping> matchSolMap1 = solMHashTable.getJoinPartners(sm1);
         final Iterator<SolutionMapping> it1 = matchSolMap1.iterator();
 
         assertTrue( it1.hasNext() );
@@ -175,7 +175,7 @@ public class SolutionMappingsHashTableTest {
 
         // getJoinPartners(): do not contain any join variable
         final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var4, z2);
-        Iterable<SolutionMapping> matchSolMap2 = solMHashTable.getJoinPartners(sm2);
+        final Iterable<SolutionMapping> matchSolMap2 = solMHashTable.getJoinPartners(sm2);
         final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
         assertTrue( it2.hasNext() );
         final Binding bIt21 = it2.next().asJenaBinding();
@@ -193,7 +193,7 @@ public class SolutionMappingsHashTableTest {
 
         // getJoinPartners(var2, y1, var1, x1, var3, z1): one join partner
         final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(var2, y1, var1, x1, var3, z1);
-        Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
+        final Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
         final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
 
         assertTrue( it3.hasNext() );

@@ -76,7 +76,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         assertFalse( itVar2.hasNext() );
 
         // findSolutionMappings(var3, z1): return one matching solution mapping (hash table is not built based on var3)
-        Iterable<SolutionMapping> solMapVar3 = solMHashTable.findSolutionMappings(var3, z1);
+        final Iterable<SolutionMapping> solMapVar3 = solMHashTable.findSolutionMappings(var3, z1);
         final Iterator<SolutionMapping> itVar3 = solMapVar3.iterator();
 
         assertTrue( itVar3.hasNext() );
@@ -140,7 +140,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         //----------------------------
         // getJoinPartners(): two join variables with two join partners
         final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1);
-        Iterable<SolutionMapping> matchSolMap1 = solMHashTable.getJoinPartners(sm1);
+        final Iterable<SolutionMapping> matchSolMap1 = solMHashTable.getJoinPartners(sm1);
 
         final Set<Binding> result = new HashSet<>();
         final Iterator<SolutionMapping> it1 = matchSolMap1.iterator();
@@ -170,19 +170,19 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
 
         // getJoinPartners(): two join variables but without join partner (case 1: subset matching)
         final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y2);
-        Iterable<SolutionMapping> matchSolMap2 = solMHashTable.getJoinPartners(sm2);
+        final Iterable<SolutionMapping> matchSolMap2 = solMHashTable.getJoinPartners(sm2);
         final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
         assertFalse( it2.hasNext() );
 
         // getJoinPartners(): two join variables but without join partner (case 2: no matching)
         final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(var1, x3, var2, y3);
-        Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
+        final Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
         final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
         assertFalse( it3.hasNext() );
 
         // getJoinPartners(): do not contain complete join variables. Return one solution mappings after filtering
         final SolutionMapping sm4 = SolutionMappingUtils.createSolutionMapping(var2, y2);
-        Iterable<SolutionMapping> matchSolMap4 = solMHashTable.getJoinPartners(sm4);
+        final Iterable<SolutionMapping> matchSolMap4 = solMHashTable.getJoinPartners(sm4);
         final Iterator<SolutionMapping> it4 = matchSolMap4.iterator();
         assertTrue( it4.hasNext() );
         final Binding bIt4 = it4.next().asJenaBinding();
@@ -192,7 +192,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
 
         // getJoinPartners(): do not contain complete join variables. Return (var1, x2, var2, y2, var3, z2) after filtering
         final SolutionMapping sm5 = SolutionMappingUtils.createSolutionMapping(var2, y2, var3, z1);
-        Iterable<SolutionMapping> matchSolMap5 = solMHashTable.getJoinPartners(sm5);
+        final Iterable<SolutionMapping> matchSolMap5 = solMHashTable.getJoinPartners(sm5);
         final Iterator<SolutionMapping> it5 = matchSolMap5.iterator();
 
         assertTrue( it5.hasNext() );
@@ -203,7 +203,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
 
         // getJoinPartners(): do not contain any join variable. Return all solution mappings if no postingMatching is applied.
         final SolutionMapping sm6 = SolutionMappingUtils.createSolutionMapping(var3, z1);
-        Iterable<SolutionMapping> matchSolMap6 = solMHashTable.getJoinPartners(sm6);
+        final Iterable<SolutionMapping> matchSolMap6 = solMHashTable.getJoinPartners(sm6);
         final Iterator<SolutionMapping> it6 = matchSolMap6.iterator();
         assertTrue( it6.hasNext() );
         final Binding bIt61 = it6.next().asJenaBinding();
