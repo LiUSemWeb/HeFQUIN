@@ -64,7 +64,9 @@ public class SolutionMappingsIteratorWithThreeVarsFilter implements Iterator<Sol
 		if ( ! hasNext() )
 			throw new NoSuchElementException();
 
-		return nextOutputElement;
+		final SolutionMapping output = nextOutputElement;
+		nextOutputElement = null;
+		return output;
 	};
 
 }

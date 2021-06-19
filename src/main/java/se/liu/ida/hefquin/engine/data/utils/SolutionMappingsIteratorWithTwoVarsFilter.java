@@ -58,7 +58,9 @@ public class SolutionMappingsIteratorWithTwoVarsFilter implements Iterator<Solut
 		if ( ! hasNext() )
 			throw new NoSuchElementException();
 
-		return nextOutputElement;
+		final SolutionMapping output = nextOutputElement;
+		nextOutputElement = null;
+		return output;
 	};
 
 }

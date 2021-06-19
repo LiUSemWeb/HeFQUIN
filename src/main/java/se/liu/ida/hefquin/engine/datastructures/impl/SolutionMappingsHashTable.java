@@ -209,8 +209,8 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 			final Var var3, final Node value3 )
 	{
 		final boolean c1 = joinVariables.contains(var1);
-		final boolean c2 = joinVariables.contains(var1);
-		final boolean c3 = joinVariables.contains(var1);
+		final boolean c2 = joinVariables.contains(var2);
+		final boolean c3 = joinVariables.contains(var3);
 
 		if ( joinVariables.size() == 1 ) {
 			if ( c1 ) {

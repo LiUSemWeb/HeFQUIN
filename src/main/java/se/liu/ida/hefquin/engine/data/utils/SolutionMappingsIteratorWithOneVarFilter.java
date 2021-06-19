@@ -45,7 +45,9 @@ public class SolutionMappingsIteratorWithOneVarFilter implements Iterator<Soluti
 		if ( ! hasNext() )
 			throw new NoSuchElementException();
 
-		return nextOutputElement;
+		final SolutionMapping output = nextOutputElement;
+		nextOutputElement = null;
+		return output;
 	};
 
 }
