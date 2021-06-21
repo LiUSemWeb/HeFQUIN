@@ -61,6 +61,9 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         assertTrue( itVar2.hasNext() );
         final Binding bItVar2 = itVar2.next().asJenaBinding();
         assertEquals( 3, bItVar2.size() );
+        assertEquals( "http://example.org/x2", bItVar2.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar2.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar2.get(solMaps.var3).getURI() );
 
         assertFalse( itVar2.hasNext() );
     }
@@ -77,6 +80,9 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         assertTrue( itVar3.hasNext() );
         final Binding bItVar3 = itVar3.next().asJenaBinding();
         assertEquals( 3, bItVar3.size() );
+        assertEquals( "http://example.org/x1", bItVar3.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bItVar3.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bItVar3.get(solMaps.var3).getURI() );
 
         assertFalse( itVar3.hasNext() );
     }
@@ -87,17 +93,17 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
         // findSolutionMappings(var1, x2, var2, y2): return one matching solution mapping (hash table is built based on (var1, var2))
-        final Iterable<SolutionMapping> solMapVar13= solMHashTable.findSolutionMappings(solMaps.var1, solMaps.x2, solMaps.var2, solMaps.y2);
-        for(final SolutionMapping sm: solMapVar13){
-            final Binding bsm = sm.asJenaBinding();
-            if ( bsm.get(solMaps.var3).getURI().equals("http://example.org/z2") ) {
-                assertEquals( "http://example.org/x2", bsm.get(solMaps.var1).getURI() );
-                assertEquals( "http://example.org/y2", bsm.get(solMaps.var2).getURI() );
-            }
-            else {
-                fail( "Unexpected URI for ?v3: " + bsm.get(solMaps.var3).getURI() );
-            }
-        }
+        final Iterable<SolutionMapping> solMapVar12= solMHashTable.findSolutionMappings(solMaps.var1, solMaps.x2, solMaps.var2, solMaps.y2);
+        final Iterator<SolutionMapping> itVar12 = solMapVar12.iterator();
+
+        assertTrue( itVar12.hasNext() );
+        final Binding bItVar12 = itVar12.next().asJenaBinding();
+        assertEquals( 3, bItVar12.size() );
+        assertEquals( "http://example.org/x2", bItVar12.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar12.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar12.get(solMaps.var3).getURI() );
+
+        assertFalse( itVar12.hasNext() );
     }
 
     @Test
@@ -107,16 +113,16 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
 
         // findSolutionMappings(var2, y2, var1, x2), change order of var1 and var2
         final Iterable<SolutionMapping> solMapVar21= solMHashTable.findSolutionMappings(solMaps.var2, solMaps.y2, solMaps.var1, solMaps.x2);
-        for(final SolutionMapping sm: solMapVar21){
-            final Binding bsm = sm.asJenaBinding();
-            if ( bsm.get(solMaps.var3).getURI().equals("http://example.org/z2") ) {
-                assertEquals( "http://example.org/x2", bsm.get(solMaps.var1).getURI() );
-                assertEquals( "http://example.org/y2", bsm.get(solMaps.var2).getURI() );
-            }
-            else {
-                fail( "Unexpected URI for ?v3: " + bsm.get(solMaps.var3).getURI() );
-            }
-        }
+        final Iterator<SolutionMapping> itVar21 = solMapVar21.iterator();
+
+        assertTrue( itVar21.hasNext() );
+        final Binding bItVar21 = itVar21.next().asJenaBinding();
+        assertEquals( 3, bItVar21.size() );
+        assertEquals( "http://example.org/x2", bItVar21.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar21.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar21.get(solMaps.var3).getURI() );
+
+        assertFalse( itVar21.hasNext() );
     }
 
     @Test
@@ -131,6 +137,9 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         assertTrue( itVar13.hasNext() );
         final Binding bItVar13 = itVar13.next().asJenaBinding();
         assertEquals( 3, bItVar13.size() );
+        assertEquals( "http://example.org/x1", bItVar13.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bItVar13.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bItVar13.get(solMaps.var3).getURI() );
 
         assertFalse( itVar13.hasNext() );
     }
@@ -147,6 +156,9 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         assertTrue( itVar123_1.hasNext() );
         final Binding bItVar123_1 = itVar123_1.next().asJenaBinding();
         assertEquals( 3, bItVar123_1.size() );
+        assertEquals( "http://example.org/x1", bItVar123_1.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bItVar123_1.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bItVar123_1.get(solMaps.var3).getURI() );
 
         assertFalse( itVar123_1.hasNext() );
     }
@@ -229,13 +241,16 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
-        // getJoinPartners(): do not contain complete join variables. Return one solution mappings after filtering
+        // getJoinPartners(): do not contain complete join variables.
         final SolutionMapping sm4 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2);
         final Iterable<SolutionMapping> matchSolMap4 = solMHashTable.getJoinPartners(sm4);
         final Iterator<SolutionMapping> it4 = matchSolMap4.iterator();
         assertTrue( it4.hasNext() );
         final Binding bIt4 = it4.next().asJenaBinding();
         assertEquals( 3, bIt4.size() );
+        assertEquals( "http://example.org/x2", bIt4.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bIt4.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bIt4.get(solMaps.var3).getURI() );
 
         assertFalse( it4.hasNext() );
     }
@@ -245,14 +260,18 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
-        // getJoinPartners(): do not contain complete join variables. Return (var1, x2, var2, y2, var3, z2) after filtering
+        // getJoinPartners(): do not contain complete join variables.
         final SolutionMapping sm5 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2, solMaps.var3, solMaps.z1);
         final Iterable<SolutionMapping> matchSolMap5 = solMHashTable.getJoinPartners(sm5);
         final Iterator<SolutionMapping> it5 = matchSolMap5.iterator();
 
+        // (var1, x2, var2, y2, var3, z2) is not an 'actual' join partner, which will be removed after post-matching
         assertTrue( it5.hasNext() );
         final Binding bIt5 = it5.next().asJenaBinding();
         assertEquals( 3, bIt5.size() );
+        assertEquals( "http://example.org/x2", bIt5.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bIt5.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bIt5.get(solMaps.var3).getURI() );
 
         assertFalse( it5.hasNext() );
     }

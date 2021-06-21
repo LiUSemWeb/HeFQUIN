@@ -19,6 +19,8 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest {
         assertTrue( it1.hasNext() );
         final Binding bIt1 = it1.next().asJenaBinding();
         assertEquals( 2, bIt1.size() );
+        assertEquals( "http://example.org/y1", bIt1.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bIt1.get(solMaps.var3).getURI() );
 
         assertFalse( it1.hasNext() );
     }
@@ -44,10 +46,14 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest {
         assertTrue( it3.hasNext() );
         final Binding bIt31 = it3.next().asJenaBinding();
         assertEquals( 2, bIt31.size() );
+        assertEquals( "http://example.org/y1", bIt31.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bIt31.get(solMaps.var3).getURI() );
 
         assertTrue( it3.hasNext() );
         final Binding bIt32 = it3.next().asJenaBinding();
         assertEquals( 2, bIt32.size() );
+        assertEquals("http://example.org/y1", bIt32.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z2", bIt32.get(solMaps.var3).getURI());
 
         assertFalse( it3.hasNext() );
     }
@@ -62,14 +68,20 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest {
         assertTrue( it4.hasNext() );
         final Binding bIt41 = it4.next().asJenaBinding();
         assertEquals( 2, bIt41.size() );
+        assertEquals( "http://example.org/y1", bIt41.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bIt41.get(solMaps.var3).getURI() );
 
         assertTrue( it4.hasNext() );
         final Binding bIt42 = it4.next().asJenaBinding();
         assertEquals( 2, bIt42.size() );
+        assertEquals("http://example.org/y1", bIt42.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z2", bIt42.get(solMaps.var3).getURI());
 
         assertTrue( it4.hasNext() );
         final Binding bIt43 = it4.next().asJenaBinding();
         assertEquals( 2, bIt43.size() );
+        assertEquals("http://example.org/y2", bIt43.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z3", bIt43.get(solMaps.var3).getURI());
 
         assertFalse( it4.hasNext() );
     }

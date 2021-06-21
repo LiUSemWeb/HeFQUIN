@@ -18,10 +18,14 @@ public class SolutionMappingsIterableWithOneVarFilterTest {
         assertTrue( it1.hasNext() );
         final Binding bIt1 = it1.next().asJenaBinding();
         assertEquals( 2, bIt1.size() );
+        assertEquals( "http://example.org/y1", bIt1.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bIt1.get(solMaps.var3).getURI() );
 
         assertTrue( it1.hasNext() );
         final Binding bIt2 = it1.next().asJenaBinding();
         assertEquals( 2, bIt2.size() );
+        assertEquals("http://example.org/y1", bIt2.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z2", bIt2.get(solMaps.var3).getURI());
 
         assertFalse( it1.hasNext() );
     }
@@ -47,14 +51,20 @@ public class SolutionMappingsIterableWithOneVarFilterTest {
         assertTrue( it3.hasNext() );
         final Binding bIt31 = it3.next().asJenaBinding();
         assertEquals( 2, bIt31.size() );
+        assertEquals( "http://example.org/y1", bIt31.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bIt31.get(solMaps.var3).getURI() );
 
         assertTrue( it3.hasNext() );
         final Binding bIt32 = it3.next().asJenaBinding();
         assertEquals( 2, bIt32.size() );
+        assertEquals("http://example.org/y1", bIt32.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z2", bIt32.get(solMaps.var3).getURI());
 
         assertTrue( it3.hasNext() );
         final Binding bIt33 = it3.next().asJenaBinding();
         assertEquals( 2, bIt33.size() );
+        assertEquals("http://example.org/y2", bIt33.get(solMaps.var2).getURI());
+        assertEquals("http://example.org/z3", bIt33.get(solMaps.var3).getURI());
 
         assertFalse( it3.hasNext() );
     }

@@ -62,6 +62,9 @@ public class SolutionMappingsHashTableTest {
         assertTrue( itVar2.hasNext() );
         final Binding bItVar2 = itVar2.next().asJenaBinding();
         assertEquals( 3, bItVar2.size() );
+        assertEquals( "http://example.org/x2", bItVar2.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar2.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar2.get(solMaps.var3).getURI() );
 
         assertFalse( itVar2.hasNext() );
     }
@@ -97,16 +100,32 @@ public class SolutionMappingsHashTableTest {
 
         // findSolutionMappings(var1, x1, var2, y1)
         final Iterable<SolutionMapping> solMap12= solMHashTable.findSolutionMappings(solMaps.var1, solMaps.x1, solMaps.var2, solMaps.y1);
-        final Iterator<SolutionMapping> itVar12 = solMap12.iterator();
-        assertTrue( itVar12.hasNext() );
-        final Binding bItVar121 = itVar12.next().asJenaBinding();
-        assertEquals( 3, bItVar121.size() );
 
-        assertTrue( itVar12.hasNext() );
-        final Binding bItVar122 = itVar12.next().asJenaBinding();
-        assertEquals( 3, bItVar122.size() );
+        final Set<Binding> result = new HashSet<>();
+        final Iterator<SolutionMapping> it1 = solMap12.iterator();
+        assertTrue( it1.hasNext() );
+        result.add( it1.next().asJenaBinding() );
 
-        assertFalse( itVar12.hasNext() );
+        assertTrue( it1.hasNext() );
+        result.add( it1.next().asJenaBinding() );
+
+        assertFalse( it1.hasNext() );
+
+        for ( final Binding b: result ) {
+            assertEquals( 3, b.size() );
+            if ( b.get(solMaps.var3).getURI().equals("http://example.org/z1") ) {
+                assertEquals( "http://example.org/x1", b.get(solMaps.var1).getURI() );
+                assertEquals( "http://example.org/y1", b.get(solMaps.var2).getURI() );
+
+            }
+            else if ( b.get(solMaps.var3).getURI().equals("http://example.org/z2") ) {
+                assertEquals( "http://example.org/x1", b.get(solMaps.var1).getURI() );
+                assertEquals( "http://example.org/y1", b.get(solMaps.var2).getURI() );
+            }
+            else {
+                fail( "Unexpected URI for ?v3: " + b.get(solMaps.var3).getURI() );
+            }
+        }
     }
 
     @Test
@@ -120,6 +139,9 @@ public class SolutionMappingsHashTableTest {
         assertTrue( itVar21.hasNext() );
         final Binding bItVar21 = itVar21.next().asJenaBinding();
         assertEquals( 3, bItVar21.size() );
+        assertEquals( "http://example.org/x2", bItVar21.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar21.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar21.get(solMaps.var3).getURI() );
 
         assertFalse( itVar21.hasNext() );
     }
@@ -129,12 +151,15 @@ public class SolutionMappingsHashTableTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // findSolutionMappings(var2, y2, var4, p): one matching solution mapping
+        // findSolutionMappings(var2, y2, var4, p)
         final Iterable<SolutionMapping> solMap24= solMHashTable.findSolutionMappings(solMaps.var2, solMaps.y2, solMaps.var4, solMaps.p);
         final Iterator<SolutionMapping> itVar24 = solMap24.iterator();
         assertTrue( itVar24.hasNext() );
         final Binding bItVar24 = itVar24.next().asJenaBinding();
         assertEquals( 3, bItVar24.size() );
+        assertEquals( "http://example.org/x2", bItVar24.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bItVar24.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bItVar24.get(solMaps.var3).getURI() );
 
         assertFalse( itVar24.hasNext() );
     }
@@ -144,12 +169,15 @@ public class SolutionMappingsHashTableTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // findSolutionMappings(var2, y1, var1, x1, var3, z1): one matching solution mapping
+        // findSolutionMappings(var2, y1, var1, x1, var3, z1)
         final Iterable<SolutionMapping> solMap213= solMHashTable.findSolutionMappings(solMaps.var2, solMaps.y1, solMaps.var1, solMaps.x1, solMaps.var3, solMaps.z1);
         final Iterator<SolutionMapping> itVar213 = solMap213.iterator();
         assertTrue( itVar213.hasNext() );
         final Binding bitVar213 = itVar213.next().asJenaBinding();
         assertEquals( 3, bitVar213.size() );
+        assertEquals( "http://example.org/x1", bitVar213.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bitVar213.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bitVar213.get(solMaps.var3).getURI() );
 
         assertFalse( itVar213.hasNext() );
     }
@@ -159,13 +187,16 @@ public class SolutionMappingsHashTableTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // findSolutionMappings(var2, y2, var1, x2, var4, p): one matching solution mapping
+        // findSolutionMappings(var2, y2, var1, x2, var4, p)
         final Iterable<SolutionMapping> solMap214= solMHashTable.findSolutionMappings(solMaps.var2, solMaps.y2, solMaps.var1, solMaps.x2, solMaps.var4, solMaps.p);
         final Iterator<SolutionMapping> itVar214 = solMap214.iterator();
 
         assertTrue( itVar214.hasNext() );
         final Binding bitVar214 = itVar214.next().asJenaBinding();
         assertEquals( 3, bitVar214.size() );
+        assertEquals( "http://example.org/x2", bitVar214.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y2", bitVar214.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z2", bitVar214.get(solMaps.var3).getURI() );
 
         assertFalse( itVar214.hasNext() );
     }
@@ -175,13 +206,16 @@ public class SolutionMappingsHashTableTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // findSolutionMappings(var2, y1, var1, x1, var3, z1, var4, p): one matching solution mapping
+        // findSolutionMappings(var2, y1, var1, x1, var3, z1, var4, p)
         final Iterable<SolutionMapping> solMap2134= solMHashTable.findSolutionMappings(solMaps.var2, solMaps.y1, solMaps.var1, solMaps.x1, solMaps.var3, solMaps.z1);
         final Iterator<SolutionMapping> itVar2134 = solMap2134.iterator();
 
         assertTrue( itVar2134.hasNext() );
         final Binding bitVar2134 = itVar2134.next().asJenaBinding();
         assertEquals( 3, bitVar2134.size() );
+        assertEquals( "http://example.org/x1", bitVar2134.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bitVar2134.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bitVar2134.get(solMaps.var3).getURI() );
 
         assertFalse( itVar2134.hasNext() );
     }
@@ -248,6 +282,9 @@ public class SolutionMappingsHashTableTest {
         assertTrue( it3.hasNext() );
         final Binding bit3 = it3.next().asJenaBinding();
         assertEquals( 3, bit3.size() );
+        assertEquals( "http://example.org/x1", bit3.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bit3.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bit3.get(solMaps.var3).getURI() );
 
         assertFalse( it3.hasNext() );
     }
