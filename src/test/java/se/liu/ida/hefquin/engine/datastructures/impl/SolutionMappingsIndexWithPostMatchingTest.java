@@ -15,7 +15,7 @@ public class SolutionMappingsIndexWithPostMatchingTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedOneVar();
 
-        // getJoinPartners of (var3, z3): find three solution mappings if without post matching
+        // getJoinPartners of (var3, z3): would find three solution mappings if without post matching
         final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(solMaps.var3, solMaps.z3);
         final Iterable<SolutionMapping> matchSolMap1 = new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm1);
         final Iterator<SolutionMapping> itVar1 = matchSolMap1.iterator();
@@ -34,7 +34,7 @@ public class SolutionMappingsIndexWithPostMatchingTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedOneVar();
 
-        // getJoinPartners of (var2, y1, var3, z2): find two solution mappings if without post matching
+        // getJoinPartners of (var2, y1, var3, z2): would find two solution mappings if without post matching
         final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y1, solMaps.var3, solMaps.z2);
         final Iterable<SolutionMapping> matchSolMap2 = new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm2);
         final Iterator<SolutionMapping> itVar2 = matchSolMap2.iterator();
@@ -53,20 +53,7 @@ public class SolutionMappingsIndexWithPostMatchingTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
-        // getJoinPartners of (var2, y2, var3, z1): find one solution mappings if without post matching
-        final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2, solMaps.var3, solMaps.z1);
-        final Iterable<SolutionMapping> matchSolMap2 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm2);
-        final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
-
-        assertFalse( it2.hasNext() );
-    }
-
-    @Test
-    public void hashTableWithTwoInputVariable_getJoinPartnersWithPostMatching2() {
-        final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
-        final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
-
-        // getJoinPartners of (var3, z1): find three solution mappings if without post matching
+        // getJoinPartners of (var3, z1): would find three solution mappings if without post matching
         final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(solMaps.var3, solMaps.z1);
         final Iterable<SolutionMapping> matchSolMap3 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm3);
         final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
@@ -81,11 +68,24 @@ public class SolutionMappingsIndexWithPostMatchingTest {
     }
 
     @Test
+    public void hashTableWithTwoInputVariable_getJoinPartnersWithPostMatching2() {
+        final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
+        final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
+
+        // getJoinPartners of (var2, y2, var3, z1): would find one solution mappings if without post matching
+        final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2, solMaps.var3, solMaps.z1);
+        final Iterable<SolutionMapping> matchSolMap2 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm2);
+        final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
+
+        assertFalse( it2.hasNext() );
+    }
+
+    @Test
     public void hashTableWithThreeInputVariable_getJoinPartnersWithPostMatching1() {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // getJoinPartners(): do not contain complete join variables; Find three solution mappings if no post-matching
+        // getJoinPartners(): would find three solution mappings if no post-matching
         final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(solMaps.var1, solMaps.x2);
         final Iterable<SolutionMapping> matchSolMap1 =  new SolutionMappingsIndexWithPostMatching(solMHashTable).getJoinPartners(sm1);
         final Iterator<SolutionMapping> it1 = matchSolMap1.iterator();

@@ -260,7 +260,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
-        // getJoinPartners(): do not contain complete join variables.
+        // getJoinPartners(): do not contain complete join variables. Find one join partner if not post matching
         final SolutionMapping sm5 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2, solMaps.var3, solMaps.z1);
         final Iterable<SolutionMapping> matchSolMap5 = solMHashTable.getJoinPartners(sm5);
         final Iterator<SolutionMapping> it5 = matchSolMap5.iterator();
@@ -281,7 +281,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedTwoVars();
 
-        // getJoinPartners(): do not contain any join variable. Return all solution mappings if no postingMatching is applied.
+        // getJoinPartners(): do not contain any join variable. Return all solution mappings if no post matching
         final SolutionMapping sm6 = SolutionMappingUtils.createSolutionMapping(solMaps.var3, solMaps.z1);
         final Iterable<SolutionMapping> matchSolMap6 = solMHashTable.getJoinPartners(sm6);
         final Iterator<SolutionMapping> it6 = matchSolMap6.iterator();

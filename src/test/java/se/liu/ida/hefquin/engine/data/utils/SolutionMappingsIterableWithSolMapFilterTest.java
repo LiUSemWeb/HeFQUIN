@@ -44,7 +44,7 @@ public class SolutionMappingsIterableWithSolMapFilterTest {
         final TestsForSolutionMappingsIterableWithFilter solMaps= new TestsForSolutionMappingsIterableWithFilter();
         final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y1, solMaps.var1, solMaps.x1);
 
-        // two solution mappings that are compatible with sm3 (var2, y1, var1, x1)
+        // two solution mappings that are compatible with sm3 (var2, y1, var1, x1).
         final Iterable<SolutionMapping> solMapAfterFilter3 = new SolutionMappingsIterableWithSolMapFilter( solMaps.getSolMapListWithTwoVar(), sm3 );
         final Iterator<SolutionMapping> it3 = solMapAfterFilter3.iterator();
 

@@ -225,8 +225,41 @@ public class SolutionMappingsHashTableTest {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // getJoinPartners(): do not contain complete join variables; Return all solution mappings (if no post-matching)
-        final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(solMaps.var1, solMaps.x1, solMaps.var2, solMaps.y1);
+        // getJoinPartners(var2, y1, var1, x1, var3, z1): one join partner
+        final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y1, solMaps.var1, solMaps.x1, solMaps.var3, solMaps.z1);
+        final Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
+        final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
+
+        assertTrue( it3.hasNext() );
+        final Binding bit3 = it3.next().asJenaBinding();
+        assertEquals( 3, bit3.size() );
+        assertEquals( "http://example.org/x1", bit3.get(solMaps.var1).getURI() );
+        assertEquals( "http://example.org/y1", bit3.get(solMaps.var2).getURI() );
+        assertEquals( "http://example.org/z1", bit3.get(solMaps.var3).getURI() );
+
+        assertFalse( it3.hasNext() );
+    }
+
+    @Test
+    public void hashTableWithThreeInputVariable_getJoinPartners2() {
+        final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
+        final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
+
+        // getJoinPartners(var2, y2, var1, x1, var3, z1): no join partner
+        final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y2, solMaps.var1, solMaps.x1, solMaps.var3, solMaps.z1);
+        final Iterable<SolutionMapping> matchSolMap = solMHashTable.getJoinPartners(sm);
+        final Iterator<SolutionMapping> it = matchSolMap.iterator();
+
+        assertFalse( it.hasNext() );
+    }
+
+    @Test
+    public void hashTableWithThreeInputVariable_getJoinPartners3() {
+        final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
+        final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
+
+        // getJoinPartners(): do not contain complete join variables. Return all solution mappings (if no post-matching)
+        final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(solMaps.var1, solMaps.x2);
         final Iterable<SolutionMapping> matchSolMap1 = solMHashTable.getJoinPartners(sm1);
         final Iterator<SolutionMapping> it1 = matchSolMap1.iterator();
 
@@ -246,11 +279,11 @@ public class SolutionMappingsHashTableTest {
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners2() {
+    public void hashTableWithThreeInputVariable_getJoinPartners4() {
         final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
         final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
 
-        // getJoinPartners(): do not contain any join variable
+        // getJoinPartners(): do not contain any join variable. Return all solution mappings (if no post-matching)
         final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(solMaps.var4, solMaps.z2);
         final Iterable<SolutionMapping> matchSolMap2 = solMHashTable.getJoinPartners(sm2);
         final Iterator<SolutionMapping> it2 = matchSolMap2.iterator();
@@ -267,26 +300,6 @@ public class SolutionMappingsHashTableTest {
         assertEquals( 3, bIt23.size() );
 
         assertFalse( it2.hasNext() );
-    }
-
-    @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners3() {
-        final TestsForSolutionMappingsIndex solMaps= new TestsForSolutionMappingsIndex();
-        final SolutionMappingsIndexBase solMHashTable = solMaps.createHashTableBasedThreeVars();
-
-        // getJoinPartners(var2, y1, var1, x1, var3, z1): one join partner
-        final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(solMaps.var2, solMaps.y1, solMaps.var1, solMaps.x1, solMaps.var3, solMaps.z1);
-        final Iterable<SolutionMapping> matchSolMap3 = solMHashTable.getJoinPartners(sm3);
-        final Iterator<SolutionMapping> it3 = matchSolMap3.iterator();
-
-        assertTrue( it3.hasNext() );
-        final Binding bit3 = it3.next().asJenaBinding();
-        assertEquals( 3, bit3.size() );
-        assertEquals( "http://example.org/x1", bit3.get(solMaps.var1).getURI() );
-        assertEquals( "http://example.org/y1", bit3.get(solMaps.var2).getURI() );
-        assertEquals( "http://example.org/z1", bit3.get(solMaps.var3).getURI() );
-
-        assertFalse( it3.hasNext() );
     }
 
     @Test
