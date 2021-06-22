@@ -3,42 +3,40 @@ package se.liu.ida.hefquin.engine.data.utils;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-public class SolutionMappingsIterableOverCollectionOfListsTest {
+public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForSolutionMappingsIterableWithFilter
+{
     @Test
     public void solMappingsIterableOverCollectionOfLists() {
         final Collection<List<SolutionMapping>> solMapCollection = new ArrayList<>();
-        final TestsForSolutionMappingsIterableWithFilter solMaps= new TestsForSolutionMappingsIterableWithFilter();
-        solMapCollection.add(solMaps.getSolMapListWithTwoVar());
+        solMapCollection.add( getSolMapListWithTwoVar() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterable<SolutionMapping> allSolMap = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection);
-        final Iterator<SolutionMapping> it3 = allSolMap.iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
 
-        assertTrue( it3.hasNext() );
-        final Binding bIt31 = it3.next().asJenaBinding();
-        assertEquals( 2, bIt31.size() );
-        assertEquals( "http://example.org/y1", bIt31.get(solMaps.var2).getURI() );
-        assertEquals( "http://example.org/z1", bIt31.get(solMaps.var3).getURI() );
+        assertTrue( it.hasNext() );
+        final Binding b1 = it.next().asJenaBinding();
+        assertEquals( 2, b1.size() );
+        assertEquals( "http://example.org/y1", b1.get(var2).getURI() );
+        assertEquals( "http://example.org/z1", b1.get(var3).getURI() );
 
-        assertTrue( it3.hasNext() );
-        final Binding bIt32 = it3.next().asJenaBinding();
-        assertEquals( 2, bIt32.size() );
-        assertEquals("http://example.org/y1", bIt32.get(solMaps.var2).getURI());
-        assertEquals("http://example.org/z2", bIt32.get(solMaps.var3).getURI());
+        assertTrue( it.hasNext() );
+        final Binding b2 = it.next().asJenaBinding();
+        assertEquals( 2, b2.size() );
+        assertEquals("http://example.org/y1", b2.get(var2).getURI());
+        assertEquals("http://example.org/z2", b2.get(var3).getURI());
 
-        assertTrue( it3.hasNext() );
-        final Binding bIt33 = it3.next().asJenaBinding();
-        assertEquals( 2, bIt33.size() );
-        assertEquals("http://example.org/y2", bIt33.get(solMaps.var2).getURI());
-        assertEquals("http://example.org/z3", bIt33.get(solMaps.var3).getURI());
+        assertTrue( it.hasNext() );
+        final Binding b3 = it.next().asJenaBinding();
+        assertEquals( 2, b3.size() );
+        assertEquals("http://example.org/y2", b3.get(var2).getURI());
+        assertEquals("http://example.org/z3", b3.get(var3).getURI());
 
-        assertFalse( it3.hasNext() );
+        assertFalse( it.hasNext() );
     }
 }
