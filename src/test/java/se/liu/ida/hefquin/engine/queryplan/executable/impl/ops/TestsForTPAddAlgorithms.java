@@ -19,7 +19,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.TriplePattern;

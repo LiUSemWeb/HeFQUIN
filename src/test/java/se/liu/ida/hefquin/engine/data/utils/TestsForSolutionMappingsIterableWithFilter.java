@@ -6,7 +6,6 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 import java.util.*;
 

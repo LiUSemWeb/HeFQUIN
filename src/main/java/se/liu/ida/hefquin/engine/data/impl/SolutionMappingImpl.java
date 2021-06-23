@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.data.impl;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 
 public class SolutionMappingImpl implements SolutionMapping
 {

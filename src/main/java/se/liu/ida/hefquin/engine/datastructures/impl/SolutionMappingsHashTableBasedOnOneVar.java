@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.datastructures.impl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;

@@ -5,7 +5,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 /**

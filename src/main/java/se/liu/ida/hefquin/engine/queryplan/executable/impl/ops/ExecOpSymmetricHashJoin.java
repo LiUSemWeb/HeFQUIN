@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 import se.liu.ida.hefquin.engine.datastructures.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;

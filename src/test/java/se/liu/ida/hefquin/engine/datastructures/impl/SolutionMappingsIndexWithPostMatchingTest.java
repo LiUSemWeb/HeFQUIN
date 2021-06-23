@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.datastructures.impl;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 
 import java.util.*;
 

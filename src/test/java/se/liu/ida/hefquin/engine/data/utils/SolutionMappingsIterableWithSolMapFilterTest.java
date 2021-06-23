@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.data.utils;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 
 import java.util.Iterator;
 
