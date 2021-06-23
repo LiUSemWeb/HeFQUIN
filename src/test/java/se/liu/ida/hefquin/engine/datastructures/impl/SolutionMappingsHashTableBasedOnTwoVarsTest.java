@@ -4,6 +4,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 import java.util.*;
 
@@ -11,9 +12,9 @@ import static org.junit.Assert.*;
 
 public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutionMappingsIndex {
     @Test
-    public void hashTableWithTwoInputVariable_basic() {
+    public void basic() {
         // test method: isEmpty(), contains(), add(), size(), clear()
-        final SolutionMappingsIndexBase solMHashTable = createHashTableBasedTwoVars();
+        final SolutionMappingsIndex solMHashTable = createHashTableBasedTwoVars();
 
         assertFalse(solMHashTable.isEmpty());
         assertEquals( 3, solMHashTable.size() );
@@ -27,7 +28,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getAllSolMaps() {
+    public void getAllSolMaps() {
         // test getAllSolutionMappings()
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getAllSolutionMappings().iterator();
 
@@ -47,7 +48,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings1() {
+    public void findSolutionMappings1() {
         // findSolutionMappings(var2, y2): one matching solution mapping
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var2, y2).iterator();
 
@@ -57,7 +58,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings2() {
+    public void findSolutionMappings2() {
         // findSolutionMappings(var3, z1): return one matching solution mapping (hash table is not built based on var3)
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var3, z1).iterator();
 
@@ -67,7 +68,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings3() {
+    public void findSolutionMappings3() {
         // findSolutionMappings(var1, x2, var2, y2): return one matching solution mapping (hash table is built based on (var1, var2))
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var1, x2, var2, y2).iterator();
 
@@ -87,7 +88,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings5() {
+    public void findSolutionMappings5() {
         // findSolutionMappings(var1, x1, var3, z1): return one matching solution mapping
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var1, x1, var3, z1).iterator();
 
@@ -97,7 +98,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings6() {
+    public void findSolutionMappings6() {
         // findSolutionMappings(var1, x1, var2, y1, var3, z1)
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var1, x1, var2, y1, var3, z1).iterator();
 
@@ -107,7 +108,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_findSolutionMappings7() {
+    public void findSolutionMappings7() {
         // findSolutionMappings(var1, x1, var2, y2, var3, z1): no matching solution mapping
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().findSolutionMappings(var1, x1, var2, y2, var3, z1).iterator();
 
@@ -115,7 +116,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners1() {
+    public void getJoinPartners1() {
         // getJoinPartners(): two join variables with two join partners
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y1);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();
@@ -147,7 +148,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners2() {
+    public void getJoinPartners2() {
         // getJoinPartners(): two join variables but without join partner (case 1: subset matching)
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x1, var2, y2);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();
@@ -157,7 +158,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners3() {
+    public void getJoinPartners3() {
         // getJoinPartners(): two join variables but without join partner (case 2: no matching)
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x3, var2, y3);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();
@@ -166,7 +167,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners4() {
+    public void getJoinPartners4() {
         // getJoinPartners(): do not contain complete join variables.
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var2, y2);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();
@@ -177,7 +178,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners5() {
+    public void getJoinPartners5() {
         // getJoinPartners(): do not contain complete join variables. Find one join partner if not post matching
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var2, y2, var3, z1);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();
@@ -189,7 +190,7 @@ public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutio
     }
 
     @Test
-    public void hashTableWithTwoInputVariable_getJoinPartners6() {
+    public void getJoinPartners6() {
         // getJoinPartners(): do not contain any join variable. Return all solution mappings if no post matching
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var3, z1);
         final Iterator<SolutionMapping> it = createHashTableBasedTwoVars().getJoinPartners(sm).iterator();

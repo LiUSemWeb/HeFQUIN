@@ -5,6 +5,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 import java.util.*;
 
@@ -12,9 +13,9 @@ import static org.junit.Assert.*;
 
 public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex {
     @Test
-    public void hashTableWithThreeInputVariable_basic() {
+    public void basic() {
         // test method: isEmpty(), contains(), add(), size(), clear()
-        final SolutionMappingsIndexBase solMHashTable = createHashTableBasedThreeVars();
+        final SolutionMappingsIndex solMHashTable = createHashTableBasedThreeVars();
 
         assertFalse(solMHashTable.isEmpty());
         assertEquals( 3, solMHashTable.size() );
@@ -28,7 +29,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getAllSolMaps() {
+    public void getAllSolMaps() {
         // test getAllSolutionMappings()
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().getAllSolutionMappings().iterator();
 
@@ -48,7 +49,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings1() {
+    public void findSolutionMappings1() {
         // findSolutionMappings(var2, y2): one matching solution mapping
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y2).iterator();
 
@@ -58,7 +59,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings2() {
+    public void findSolutionMappings2() {
         // findSolutionMappings(var4, p): return all solution mappings
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var4, p).iterator();
 
@@ -78,7 +79,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings3() {
+    public void findSolutionMappings3() {
         // findSolutionMappings(var1, x1, var2, y1)
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var1, x1, var2, y1).iterator();
 
@@ -109,7 +110,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings4() {
+    public void findSolutionMappings4() {
         // findSolutionMappings(var2, y2, var1, x2), change order of var1 and var2
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y2, var1, x2).iterator();
 
@@ -119,7 +120,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings5() {
+    public void findSolutionMappings5() {
         // findSolutionMappings(var2, y2, var4, p)
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y2, var4, p).iterator();
         assertHasNext( it, "http://example.org/x2", var1, "http://example.org/y2", var2, "http://example.org/z2", var3 );
@@ -128,7 +129,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings6() {
+    public void findSolutionMappings6() {
         // findSolutionMappings(var2, y1, var1, x1, var3, z1)
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y1, var1, x1, var3, z1).iterator();
         assertHasNext( it, "http://example.org/x1", var1, "http://example.org/y1", var2, "http://example.org/z1", var3 );
@@ -137,7 +138,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings7() {
+    public void findSolutionMappings7() {
         // findSolutionMappings(var2, y2, var1, x2, var4, p)
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y2, var1, x2, var4, p).iterator();
 
@@ -147,7 +148,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_findSolutionMappings8() {
+    public void findSolutionMappings8() {
         // findSolutionMappings(var2, y1, var1, x1, var3, z1, var4, p)
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().findSolutionMappings(var2, y1, var1, x1, var3, z1).iterator();
 
@@ -157,7 +158,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners1() {
+    public void getJoinPartners1() {
         // getJoinPartners(var2, y1, var1, x1, var3, z1): one join partner
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var2, y1, var1, x1, var3, z1);
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().getJoinPartners(sm).iterator();
@@ -168,7 +169,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners2() {
+    public void getJoinPartners2() {
         // getJoinPartners(var2, y2, var1, x1, var3, z1): no join partner
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var2, y2, var1, x1, var3, z1);
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().getJoinPartners(sm).iterator();
@@ -177,7 +178,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners3() {
+    public void getJoinPartners3() {
         // getJoinPartners(): do not contain complete join variables. Return all solution mappings (if no post-matching)
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var1, x2);
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().getJoinPartners(sm).iterator();
@@ -198,7 +199,7 @@ public class SolutionMappingsHashTableTest extends TestsForSolutionMappingsIndex
     }
 
     @Test
-    public void hashTableWithThreeInputVariable_getJoinPartners4() {
+    public void getJoinPartners4() {
         // getJoinPartners(): do not contain any join variable. Return all solution mappings (if no post-matching)
         final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(var4, z2);
         final Iterator<SolutionMapping> it = createHashTableBasedThreeVars().getJoinPartners(sm).iterator();

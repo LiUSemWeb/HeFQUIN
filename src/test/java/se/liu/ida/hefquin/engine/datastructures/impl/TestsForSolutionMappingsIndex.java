@@ -6,6 +6,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
+import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 /**
  * This is a class with helper functions for testing SolutionMappingsIndex
@@ -28,9 +29,9 @@ public abstract class TestsForSolutionMappingsIndex extends EngineTestBase
 	final Node z3 = NodeFactory.createURI("http://example.org/z3");
 	final Node p = NodeFactory.createURI("http://example.org/p");
 
-	protected SolutionMappingsIndexBase createHashTableBasedOneVar()
+	protected SolutionMappingsIndex createHashTableBasedOneVar()
 	{
-		final SolutionMappingsIndexBase solMHashTable = new SolutionMappingsHashTableBasedOnOneVar(var2);
+		final SolutionMappingsIndex solMHashTable = new SolutionMappingsHashTableBasedOnOneVar(var2);
 		solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
 				var3, z1) );
@@ -44,9 +45,9 @@ public abstract class TestsForSolutionMappingsIndex extends EngineTestBase
 		return solMHashTable;
 	}
 
-	protected SolutionMappingsIndexBase createHashTableBasedTwoVars()
+	protected SolutionMappingsIndex createHashTableBasedTwoVars()
 	{
-		final SolutionMappingsIndexBase solMHashTable = new SolutionMappingsHashTableBasedOnTwoVars(var1, var2);
+		final SolutionMappingsIndex solMHashTable = new SolutionMappingsHashTableBasedOnTwoVars(var1, var2);
 		solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,
@@ -63,9 +64,9 @@ public abstract class TestsForSolutionMappingsIndex extends EngineTestBase
 		return solMHashTable;
 	}
 
-	protected SolutionMappingsIndexBase createHashTableBasedThreeVars()
+	protected SolutionMappingsIndex createHashTableBasedThreeVars()
 	{
-		final SolutionMappingsHashTable solMHashTable = new SolutionMappingsHashTable(var1, var2, var3);
+		final SolutionMappingsIndex solMHashTable = new SolutionMappingsHashTable(var1, var2, var3);
 		solMHashTable.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,
