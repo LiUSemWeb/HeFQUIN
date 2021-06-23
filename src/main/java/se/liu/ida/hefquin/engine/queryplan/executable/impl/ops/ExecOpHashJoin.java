@@ -4,39 +4,49 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
-import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
-import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
-import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
+import se.liu.ida.hefquin.engine.datastructures.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ExecOpHashJoin implements BinaryExecutableOp {
-    protected final SolutionMappingsIndex solMHashTableL;
+public class ExecOpHashJoin implements BinaryExecutableOp
+{
+    protected final SolutionMappingsIndex index;
+
     protected boolean child1InputComplete = false;
 
-    public ExecOpHashJoin(final ExpectedVariables inputVars1, final ExpectedVariables inputVars2) {
-        final Set<Var> joinVars = new HashSet<>( inputVars1.getCertainVariables());
-        joinVars.retainAll( inputVars2.getCertainVariables() );
+    public ExecOpHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ) {
+    	// determine the certain join variables
+        final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 
-        if (joinVars.size() == 1 ){
-            final Var joinVar = joinVars.iterator().next();
-            this.solMHashTableL = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
+        // set up the core part of the index first; it is built on the certain join variables
+        final SolutionMappingsIndex index1;
+        if ( certainJoinVars.size() == 1 ) {
+            final Var joinVar = certainJoinVars.iterator().next();
+            index1 = new SolutionMappingsHashTableBasedOnOneVar(joinVar);
         }
-        else if (joinVars.size() == 2){
-            final Iterator<Var> liVar = joinVars.iterator();
+        else if ( certainJoinVars.size() == 2 ) {
+            final Iterator<Var> liVar = certainJoinVars.iterator();
             final Var joinVar1 = liVar.next();
             final Var joinVar2 = liVar.next();
-
-            this.solMHashTableL = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
+        	index1 = new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2);
         }
-        else{
-            this.solMHashTableL = new SolutionMappingsHashTable(joinVars);
+        else {
+            index1 = new SolutionMappingsHashTable(certainJoinVars);
+        }
+
+        // Check whether there are other variables that may be relevant for
+        // the join and, if so, set up the index to use post-matching.
+        final Set<Var> potentialJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables(inputVars1, inputVars2);
+        if ( ! potentialJoinVars.equals(certainJoinVars) ) {
+            index = new SolutionMappingsIndexWithPostMatching(index1);
+        } else {
+            index = index1;
         }
     }
 
@@ -53,7 +63,7 @@ public class ExecOpHashJoin implements BinaryExecutableOp {
     @Override
     public void processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
-            solMHashTableL.add(smL);
+            index.add(smL);
         }
     }
 
@@ -68,7 +78,7 @@ public class ExecOpHashJoin implements BinaryExecutableOp {
             throw new IllegalStateException();
         }
         for ( final SolutionMapping smR : input.getSolutionMappings() ) {
-            final Iterable<SolutionMapping> matchSolMapL = solMHashTableL.getJoinPartners(smR);
+            final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
             for ( final SolutionMapping smL : matchSolMapL ){
                 sink.send(SolutionMappingUtils.merge(smL, smR));
             }
