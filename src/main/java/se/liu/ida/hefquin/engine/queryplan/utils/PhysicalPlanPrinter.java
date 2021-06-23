@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.utils;
+package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
