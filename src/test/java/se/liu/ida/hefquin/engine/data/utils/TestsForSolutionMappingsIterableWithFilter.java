@@ -22,8 +22,8 @@ public class TestsForSolutionMappingsIterableWithFilter
 	final Var var2 = Var.alloc("v2");
 	final Var var3 = Var.alloc("v3");
 	final Var var4 = Var.alloc("v4");
-	final Var var5 = Var.alloc("v4");
-	final Var var6 = Var.alloc("v4");
+	final Var var5 = Var.alloc("v5");
+	final Var var6 = Var.alloc("v6");
 
 	final Node x1 = NodeFactory.createURI("http://example.org/x1");
 	final Node x2 = NodeFactory.createURI("http://example.org/x2");
