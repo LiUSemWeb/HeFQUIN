@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class SolutionMappingsIterableWithTwoVarsFilterTest extends TestsForSolutionMappingsIterableWithFilter
 {
     @Test
-    public void solutionMappingsIterableWithTwoVarsFilter_filterWithTwoVars_subset() {
+    public void filterWithTwoVars_subset() {
         // iterate over the subset of solution mappings that have (var2, y1, var3, z1)
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithTwoVarsFilter( getSolMapListWithTwoVar(), var2, y1, var3, z1 ).iterator();
 
@@ -20,7 +20,7 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest extends TestsForSolut
     }
 
     @Test
-    public void solutionMappingsIterableWithTwoVarsFilter_filterWithTwoVar_empty() {
+    public void filterWithTwoVar_empty() {
         // no solution mappings that having (var2, y2, var3, z1)
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithTwoVarsFilter( getSolMapListWithTwoVar(), var2, y2, var3, z1 ).iterator();
 
@@ -28,7 +28,7 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest extends TestsForSolut
     }
 
     @Test
-    public void solutionMappingsIterableWithTwoVarsFilter_filterWithOneOfTwoVars() {
+    public void filterWithOneOfTwoVars() {
         // (var1, p, var2, y1): iterate over the subset of solution mappings that have y1 for var2
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithTwoVarsFilter( getSolMapListWithTwoVar(), var1, p, var2, y1).iterator();
 
@@ -39,7 +39,7 @@ public class SolutionMappingsIterableWithTwoVarsFilterTest extends TestsForSolut
     }
 
     @Test
-    public void solutionMappingsIterableWithTwoVarsFilter_filterWithNonOfTwoVar() {
+    public void filterWithNonOfTwoVar() {
         // return all solution mappings: no solution mappings that have value for var1, var4
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithTwoVarsFilter( getSolMapListWithTwoVar(), var1, p, var4, p).iterator();
 

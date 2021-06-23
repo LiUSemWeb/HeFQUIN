@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class SolutionMappingsIterableWithOneVarFilterTest extends TestsForSolutionMappingsIterableWithFilter
 {
     @Test
-    public void solMappingsIterableWithOneVarFilter_subset() {
+    public void subset() {
         // iterate over the subset of solution mappings that y1 for var2
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithOneVarFilter( getSolMapListWithTwoVar(), var2, y1 ).iterator();
 
@@ -20,7 +20,7 @@ public class SolutionMappingsIterableWithOneVarFilterTest extends TestsForSoluti
     }
 
     @Test
-    public void solMappingsIterableWithOneVarFilter_noMatching() {
+    public void noMatch() {
         // no solution mappings that have p for var3
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithOneVarFilter( getSolMapListWithTwoVar(), var3, p ).iterator();
 
@@ -28,7 +28,7 @@ public class SolutionMappingsIterableWithOneVarFilterTest extends TestsForSoluti
     }
 
     @Test
-    public void solMappingsIterableWithOneVarFilter_all() {
+    public void all() {
         // return all solution mappings: no solution mappings that have value for var1
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithOneVarFilter( getSolMapListWithTwoVar(), var1, y1 ).iterator();
 

@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class SolutionMappingsIterableWithThreeVarsFilterTest extends TestsForSolutionMappingsIterableWithFilter
 {
     @Test
-    public void solutionMappingsIterableWithThreeVarsFilter_filterWithThreeVars_subset() {
+    public void filterWithThreeVars_subset() {
         // iterate over the subset of solution mappings that have (var3, z1, var1, x1, var2, y1)
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithThreeVarsFilter( getSolMapListWithThreeVar(), var3, z1, var1, x1, var2, y1 ).iterator();
 
@@ -19,7 +19,7 @@ public class SolutionMappingsIterableWithThreeVarsFilterTest extends TestsForSol
     }
 
     @Test
-    public void solutionMappingsIterableWithThreeVarsFilter_filterWithThreeVars_empty() {
+    public void filterWithThreeVars_empty() {
         // no solution mappings that having (var1, x2, var2, y1, var3, z2)
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithThreeVarsFilter( getSolMapListWithThreeVar(), var1, x2, var2, y1, var3, z2 ).iterator();
 
@@ -27,7 +27,7 @@ public class SolutionMappingsIterableWithThreeVarsFilterTest extends TestsForSol
     }
 
     @Test
-    public void solutionMappingsIterableWithThreeVarsFilter_filterWithTwoOfThreeVars_subset() {
+    public void filterWithTwoOfThreeVars_subset() {
         // (var2, y1, var1, x1, var4, p): filter based on subset of variables
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithThreeVarsFilter( getSolMapListWithThreeVar(), var2, y1, var1, x1, var4, p ).iterator();
 
@@ -38,7 +38,7 @@ public class SolutionMappingsIterableWithThreeVarsFilterTest extends TestsForSol
     }
 
     @Test
-    public void solutionMappingsIterableWithThreeVarsFilter_filterWithTwoOfThreeVars_empty() {
+    public void filterWithTwoOfThreeVars_empty() {
         // (var2, y1, var1, x2, var4, p): no solution mappings that having (var2, y1, var1, x2)
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithThreeVarsFilter( getSolMapListWithThreeVar(), var2, y1, var1, x2, var4, p).iterator();
 
@@ -46,7 +46,7 @@ public class SolutionMappingsIterableWithThreeVarsFilterTest extends TestsForSol
     }
 
     @Test
-    public void solutionMappingsIterableWithThreeVarsFilter_filterWithNoneOfThreeVars_all() {
+    public void filterWithNoneOfThreeVars_all() {
         // (var5, y1, var6, x2, var4, p): return all solution mappings: no solution mappings that have value for var4 or var5 or var6
         final Iterator<SolutionMapping> it = new SolutionMappingsIterableWithThreeVarsFilter( getSolMapListWithThreeVar(), var5, y1, var6, x2, var4, p ).iterator();
 
