@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.engine.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 

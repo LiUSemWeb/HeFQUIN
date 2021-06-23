@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.data.impl;
+package se.liu.ida.hefquin.engine.data.utils;
 
 import java.util.Iterator;
 
@@ -7,7 +7,6 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class TriplesToSolMapsConverter
