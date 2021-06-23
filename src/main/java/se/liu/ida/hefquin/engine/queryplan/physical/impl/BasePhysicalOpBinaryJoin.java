@@ -5,8 +5,8 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLogicalOp
@@ -22,11 +22,8 @@ public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLog
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables());
-		final Set<Var> possibleVars = new HashSet<>( inputVars[0].getPossibleVariables() );
-
-		certainVars.addAll( inputVars[1].getCertainVariables() );
-		possibleVars.addAll(inputVars[1].getPossibleVariables());
+		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(inputVars);
+		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(inputVars);
 		possibleVars.removeAll(certainVars);
 
 		return new ExpectedVariables() {
