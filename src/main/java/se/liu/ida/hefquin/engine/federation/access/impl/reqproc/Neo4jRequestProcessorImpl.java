@@ -10,9 +10,14 @@ import java.io.IOException;
 
 public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor{
     @Override
-    public SolMapsResponse performRequest(Neo4jRequest req, Neo4jServer fm) throws IOException {
+    public SolMapsResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
         final Neo4jConnection conn = Neo4jConnectionFactory.connect(fm.getInterface().getURL());
-        String result =  conn.executeQuery(req.getCypherQuery());
+        String result = null;
+        try {
+            result = conn.executeQuery(req.getCypherQuery());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return toMapping(result);
     }
 

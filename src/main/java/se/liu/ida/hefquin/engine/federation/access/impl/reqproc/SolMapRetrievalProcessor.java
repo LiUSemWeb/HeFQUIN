@@ -15,5 +15,5 @@ public interface SolMapRetrievalProcessor<ReqType extends DataRetrievalRequest, 
 	 * Assumes that fm has a {@link SolMapRetrievalInterface}.
 	 */
 	@Override
-	SolMapsResponse performRequest( ReqType req, MemberType fm ) throws IOException;
+	SolMapsResponse performRequest( ReqType req, MemberType fm );
 }
