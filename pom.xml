@@ -4,11 +4,11 @@
   <artifactId>HeFQUIN</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <properties>
-   <maven.compiler.source>1.8</maven.compiler.source>
-   <maven.compiler.target>1.8</maven.compiler.target> 
+  <!--properties>
+   <maven.compiler.source>1.11</maven.compiler.source>
+   <maven.compiler.target>1.11</maven.compiler.target>
    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  </properties-->
 
   <dependencies>
 <!--
@@ -38,12 +38,12 @@
 		<groupId>org.apache.jena</groupId>
 		<artifactId>apache-jena-libs</artifactId>
 		<type>pom</type>
-		<version>3.17.0</version>
+		<version>4.1.0</version>
 	</dependency>
 	<dependency>
 		<groupId>org.apache.jena</groupId>
 		<artifactId>jena-cmds</artifactId>
-		<version>3.17.0</version>
+		<version>4.1.0</version>
 	</dependency>
 <!--
 	<dependency>
@@ -122,8 +122,15 @@
           </execution>
         </executions>
       </plugin>
-
-   </plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.0</version>
+            <configuration>
+                <release>11</release>
+            </configuration>
+        </plugin>
+    </plugins>
   </build>
 
 </project>

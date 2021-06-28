@@ -15,6 +15,7 @@ import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.engine.binding.BindingMap;
 
@@ -115,7 +116,7 @@ public abstract class EngineTestBase
 			final List<Triple> triples = getMatchingTriples(tp);
 			final List<SolutionMapping> result = new ArrayList<>();
 			for ( final Triple t : triples ) {
-				final BindingMap b = BindingFactory.create();
+				final BindingBuilder b = BindingBuilder.create();
 				if ( tp.asJenaTriple().getSubject().isVariable() ) {
 					b.add( Var.alloc(tp.asJenaTriple().getSubject()), t.asJenaTriple().getSubject() );
 				}
@@ -125,7 +126,7 @@ public abstract class EngineTestBase
 				if ( tp.asJenaTriple().getObject().isVariable() ) {
 					b.add( Var.alloc(tp.asJenaTriple().getObject()), t.asJenaTriple().getObject() );
 				}
-				result.add( new SolutionMappingImpl(b) );
+				result.add( new SolutionMappingImpl(b.build()) );
 			}
 			return result;
 		}
