@@ -6,10 +6,7 @@ import java.util.Iterator;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.engine.binding.BindingMap;
-import org.apache.jena.sparql.engine.binding.BindingUtils;
+import org.apache.jena.sparql.engine.binding.*;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
@@ -30,7 +27,7 @@ public class SolutionMappingUtils
 	 */
 	public static SolutionMapping createSolutionMapping( final QuerySolution s )
 	{
-		return new SolutionMappingImpl( BindingUtils.asBinding(s) );
+		return new SolutionMappingImpl( BindingLib.asBinding(s) );
 	}
 
 	/**
@@ -52,10 +49,10 @@ public class SolutionMappingUtils
 			final Var var1, final Node node1,
 			final Var var2, final Node node2 )
 	{
-		final BindingMap b = BindingFactory.create();
+		final BindingBuilder b = BindingBuilder.create();
 		b.add(var1, node1);
 		b.add(var2, node2);
-		return new SolutionMappingImpl(b);
+		return new SolutionMappingImpl(b.build());
 	}
 
 	/**
@@ -67,11 +64,11 @@ public class SolutionMappingUtils
 			final Var var2, final Node node2,
 			final Var var3, final Node node3 )
 	{
-		final BindingMap b = BindingFactory.create();
+		final BindingBuilder b = BindingBuilder.create();
 		b.add(var1, node1);
 		b.add(var2, node2);
 		b.add(var3, node3);
-		return new SolutionMappingImpl(b);
+		return new SolutionMappingImpl(b.build());
 	}
 
 	/**
@@ -80,7 +77,7 @@ public class SolutionMappingUtils
 	 * they are compatible.
 	 */
 	public static boolean equals( final SolutionMapping m1, final SolutionMapping m2 ) {
-		return BindingUtils.equals( m1.asJenaBinding(), m2.asJenaBinding() );		
+		return BindingLib.equals( m1.asJenaBinding(), m2.asJenaBinding() );
 	}
 
 	/**
@@ -107,7 +104,7 @@ public class SolutionMappingUtils
 	public static SolutionMapping merge( final SolutionMapping m1, final SolutionMapping m2 ) {
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
-		return new SolutionMappingImpl( BindingUtils.merge(b1,b2) );
+		return new SolutionMappingImpl( BindingLib.merge(b1,b2) );
 	}
 
 	/**
@@ -119,7 +116,7 @@ public class SolutionMappingUtils
 	 */
 	public static Binding restrict( final Binding input, final Collection<Var> vars ) {
 		final Iterator<Var> it = input.vars();
-		final BindingMap output = BindingFactory.create();
+		final BindingBuilder output = BindingBuilder.create();
 
 		while ( it.hasNext() ) {
 			final Var var = it.next();
@@ -127,7 +124,7 @@ public class SolutionMappingUtils
 				output.add( var, input.get(var) );
 			}
 		}
-		return output;
+		return output.build();
 	}
 	
 	/**

@@ -223,7 +223,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpExtend opExtend)            { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
+	    //@Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
 
 	    @Override public void visit(OpList opList)                { unsupportedOpFound = true; }
 

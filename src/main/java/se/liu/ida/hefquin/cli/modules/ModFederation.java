@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jena.cmd.ArgDecl;
-import jena.cmd.CmdArgModule;
-import jena.cmd.CmdGeneral;
-import jena.cmd.ModBase;
+import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.cmd.CmdArgModule;
+import org.apache.jena.cmd.CmdGeneral;
+import org.apache.jena.cmd.ModBase;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;

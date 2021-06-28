@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.query.Syntax;
 
 import arq.cmdline.ModQueryIn;
-import jena.cmd.CmdGeneral;
 
 public class ModQuery extends ModQueryIn
 {

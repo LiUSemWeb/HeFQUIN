@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.cli;
 
+import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -14,7 +15,6 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
-import jena.cmd.TerminationException;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
