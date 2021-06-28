@@ -1,10 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jConnection;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
 
 import java.io.IOException;
 
@@ -15,8 +12,8 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor{
         String result = null;
         try {
             result = conn.executeQuery(req.getCypherQuery());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | IOException e) {
+            throw new Neo4JConnectionException("Neo4j server could not be reached.");
         }
         return toMapping(result);
     }

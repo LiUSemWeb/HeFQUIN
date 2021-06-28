@@ -1,14 +1,15 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import org.apache.http.client.methods.HttpPost;
-
 import java.net.URI;
+import java.net.http.HttpRequest;
 
 public class Neo4jConnectionFactory {
     static public Neo4jConnection connect(final String URL){
-        HttpPost request = new HttpPost(URL);
-        request.addHeader("Accept", "application/json;charset=UTF-8");
-        request.addHeader("Content-Type", "application/json");
+        HttpRequest.Builder request = HttpRequest.newBuilder(
+                URI.create(URL))
+                .header("Accept", "application/json;charset=UTF-8")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Basic c2ZlcnJhZGE6YWRtaW4=");
         return new Neo4jConnection(request);
     }
 }
