@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.federation;
 
 import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.StringRetrievalResponse;
+import se.liu.ida.hefquin.engine.federation.access.StringRetrievalResponse;
 
 public interface FederationAccessManager
 {
