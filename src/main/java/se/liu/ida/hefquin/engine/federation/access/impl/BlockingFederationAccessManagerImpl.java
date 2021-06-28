@@ -1,17 +1,8 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.*;
+import se.liu.ida.hefquin.engine.federation.access.*;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
 
 /**
  * A very simple {@link FederationAccessManager}
@@ -22,8 +13,9 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	public BlockingFederationAccessManagerImpl(
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
-			final BRTPFRequestProcessor reqProcBRTPF ) {
-		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF);
+			final BRTPFRequestProcessor reqProcBRTPF,
+			final Neo4jRequestProcessor reqProcNeo4j) {
+		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
 	}
 
 	@Override
@@ -44,6 +36,11 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	@Override
 	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm) {
 		return reqProcBRTPF.performRequest( req, fm );
+	}
+
+	@Override
+	public StringRetrievalResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
+		return reqProcNeo4j.performRequest(req, fm);
 	}
 
 }

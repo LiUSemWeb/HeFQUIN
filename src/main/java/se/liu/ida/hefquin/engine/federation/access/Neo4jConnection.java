@@ -12,7 +12,7 @@ public class Neo4jConnection {
         this.requestBuilder = request;
     }
 
-    public String executeQuery(String cypher) throws InterruptedException, IOException {
+    public String executeQuery(String cypher) {
         String data = "{\n" +
                 "  \"statements\" : [ {\n" +
                 "    \"statement\" : \""+cypher+"\",\n" +
@@ -22,7 +22,14 @@ public class Neo4jConnection {
 
         HttpRequest request = requestBuilder.POST(HttpRequest.BodyPublishers.ofString(data)).build();
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = null;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException e) {
+            throw new Neo4JConnectionException("Data could not be sent to the server");
+        } catch (InterruptedException e) {
+            throw new Neo4JConnectionException("Neo4j server could not be reached.");
+        }
         return response.body();
     }
 }

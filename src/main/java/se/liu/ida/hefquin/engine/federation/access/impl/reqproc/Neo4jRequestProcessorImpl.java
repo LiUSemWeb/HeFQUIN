@@ -10,11 +10,7 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor{
     public SolMapsResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
         final Neo4jConnection conn = Neo4jConnectionFactory.connect(fm.getInterface().getURL());
         String result = null;
-        try {
-            result = conn.executeQuery(req.getCypherQuery());
-        } catch (InterruptedException | IOException e) {
-            throw new Neo4JConnectionException("Neo4j server could not be reached.");
-        }
+        result = conn.executeQuery(req.getCypherQuery());
         return toMapping(result);
     }
 
