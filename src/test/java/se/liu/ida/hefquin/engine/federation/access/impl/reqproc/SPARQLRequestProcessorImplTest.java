@@ -18,12 +18,14 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 
 public class SPARQLRequestProcessorImplTest extends EngineTestBase
 {
 	@Test
-	public void testDBpedia() {
+	public void testDBpediaWithPattern() {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
@@ -51,6 +53,39 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 
 			final Node n = b.get(var);
 			assertTrue( n.isLiteral() );
+		}
+	}
+
+	@Test
+	public void testDBpediaWithQuery() {
+		if ( ! skipLiveWebTests ) {
+			// setting up
+			final String queryString = "SELECT (COUNT(*) AS ?c) WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
+			final SPARQLQuery query = new SPARQLQueryImpl( QueryFactory.create(queryString) );
+			final SPARQLRequest req = new SPARQLRequestImpl(query);
+
+			final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
+
+			final SPARQLRequestProcessor recProc = new SPARQLRequestProcessorImpl();
+
+			// executing the tested method
+			final SolMapsResponse resp = recProc.performRequest(req, fm);
+
+			// checking
+			assertEquals( fm, resp.getFederationMember() );
+			assertEquals( req, resp.getRequest() );
+
+			final Iterator<SolutionMapping> it = resp.getSolutionMappings().iterator();
+			assertTrue( it.hasNext() );
+
+			final Binding b = it.next().asJenaBinding();
+			final Var var = Var.alloc("c");
+			assertEquals( 1, b.size() );
+			assertTrue( b.contains(var) );
+
+			final Node n = b.get(var);
+			assertTrue( n.isLiteral() );
+			assertEquals( 1, n.getLiteralValue() );
 		}
 	}
 

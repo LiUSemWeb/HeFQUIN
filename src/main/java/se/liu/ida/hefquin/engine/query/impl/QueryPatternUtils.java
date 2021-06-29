@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
@@ -71,7 +73,7 @@ public class QueryPatternUtils
 		if ( pattern instanceof TriplePattern ) {
 			return new ExpectedVariables() {
 				@Override public Set<Var> getPossibleVariables() {
-					return new HashSet<>();
+					return Collections.emptySet();
 				}
 
 				@Override public Set<Var> getCertainVariables() {
@@ -82,7 +84,7 @@ public class QueryPatternUtils
 		else if ( pattern instanceof BGP ) {
 			return new ExpectedVariables() {
 				@Override public Set<Var> getPossibleVariables() {
-					return new HashSet<>();
+					return Collections.emptySet();
 				}
 
 				@Override public Set<Var> getCertainVariables() {
@@ -100,6 +102,15 @@ public class QueryPatternUtils
 				@Override public Set<Var> getCertainVariables() { return certainVars; }
 			};
 		}
+	}
+
+	public static ExpectedVariables getExpectedVariablesInQuery( final SPARQLQuery query ) {
+		final Set<Var> vars = new HashSet<>( query.asJenaQuery().getProjectVars() );
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getPossibleVariables() { return vars; }
+			@Override public Set<Var> getCertainVariables() { return Collections.emptySet(); }
+		};
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {
