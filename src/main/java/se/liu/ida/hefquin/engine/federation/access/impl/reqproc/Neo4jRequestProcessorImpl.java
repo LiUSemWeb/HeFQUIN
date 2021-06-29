@@ -9,7 +9,7 @@ import java.util.Date;
 public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor{
     @Override
     public StringRetrievalResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
-        final Neo4jConnection conn = Neo4jConnectionFactory.connect(fm.getInterface().getURL());
+        final Neo4jConnectionFactory.Neo4jConnection conn = Neo4jConnectionFactory.connect(fm.getInterface().getURL());
         final Date requestStartTime = new Date();
         String result = conn.executeQuery(req.getCypherQuery());
         return new StringResponseImpl(result, fm, req, requestStartTime);

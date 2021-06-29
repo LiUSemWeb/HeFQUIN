@@ -33,6 +33,6 @@ public class StringResponseImpl extends DataRetrievalResponseBase implements Str
 
     @Override
     public String getResponse() {
-        return null;
+        return this.response;
     }
 }
