@@ -93,7 +93,7 @@ public class TestUtils
 		}
 
 		@Override
-		public StringRetrievalResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
+		public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
 			return null;
 		}
 	}
