@@ -12,7 +12,8 @@ public class Neo4jConnectionFactory {
         return new Neo4jConnection(URL);
     }
 
-    public static class Neo4jConnection {
+    public static class Neo4jConnection
+    {
         protected final String URL;
 
         public Neo4jConnection( final String URL ) {
@@ -20,7 +21,15 @@ public class Neo4jConnectionFactory {
             this.URL = URL;
         }
 
-        public String executeQuery( final String cypher ) {
+        public String getURL() {
+            return URL;
+        }
+
+        public String execute( final Neo4jRequest req ) throws Neo4JConnectionException {
+            return executeQuery( req.toString() );
+        }
+
+        protected String executeQuery( final String cypher ) throws Neo4JConnectionException {
             final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +
@@ -40,10 +49,11 @@ public class Neo4jConnectionFactory {
                 final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 return response.body();
             } catch ( final IOException e ) {
-                throw new Neo4JConnectionException("Data could not be sent to the server");
+                throw new Neo4JConnectionException("Data could not be sent to the server", e, this);
             } catch ( final InterruptedException e ) {
-                throw new Neo4JConnectionException("Neo4j server could not be reached.");
+                throw new Neo4JConnectionException("Neo4j server could not be reached.", e, this);
             }
         }
     }
+
 }
