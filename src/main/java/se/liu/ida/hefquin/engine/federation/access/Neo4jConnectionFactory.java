@@ -15,7 +15,7 @@ public class Neo4jConnectionFactory {
     public static class Neo4jConnection {
         private String URL;
 
-        public Neo4jConnection(String URL) {
+        public Neo4jConnection( final String URL ) {
             assert URL != null;
             this.URL = URL;
         }
