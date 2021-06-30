@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
@@ -14,6 +15,8 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -49,6 +52,28 @@ public class QueryPatternUtils
 			tps.add( new TriplePatternImpl(tp.asTriple()) );
 		}
 		return new BGPImpl(tps);
+	}
+
+	public static Element convertToJenaElement( final SPARQLGraphPattern p ) {
+		if ( p instanceof TriplePattern ) {
+			final TriplePattern tp = (TriplePattern) p;
+
+			final ElementPathBlock e = new ElementPathBlock();
+			e.addTriple( tp.asJenaTriple() );
+			return e;
+		}
+		else if ( p instanceof BGP ) {
+			final BGP bgp = (BGP) p;
+
+			final ElementPathBlock e = new ElementPathBlock();
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				e.addTriple( tp.asJenaTriple() );
+			}
+			return e;
+		}
+		else {
+			return OpAsQuery.asQuery( p.asJenaOp() ).getQueryPattern();
+		}
 	}
 
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {

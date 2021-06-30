@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -19,18 +17,16 @@ public class SPARQLQueryImpl implements SPARQLQuery
 	}
 
 	public SPARQLQueryImpl( final SPARQLGraphPattern p ) {
-		this( p.asJenaOp() );
+		this( QueryPatternUtils.convertToJenaElement(p) );
 	}
 
-	public SPARQLQueryImpl( final Op jenaOp ) {
-		assert jenaOp != null;
-
-		final Element queryPattern = OpAsQuery.asQuery(jenaOp).getQueryPattern();
+	protected SPARQLQueryImpl( final Element jenaElement ) {
+		assert jenaElement != null;
 		
 		jenaQuery = QueryFactory.create();
 		jenaQuery.setQuerySelectType();
 		jenaQuery.setQueryResultStar(true);
-		jenaQuery.setQueryPattern( queryPattern );
+		jenaQuery.setQueryPattern( jenaElement );
 	}
 
 	@Override

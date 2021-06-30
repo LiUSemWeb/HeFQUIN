@@ -5,11 +5,9 @@ import java.util.Iterator;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.aggregate.AggregatorFactory;
-import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
@@ -24,6 +22,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestPro
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 
 /**
@@ -65,8 +64,7 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 
 		// set the WHERE clause of the query based on
 		// the graph pattern of the given request
-		final Element patternAsJenaElement = OpAsQuery.asQuery( pattern.asJenaOp() ).getQueryPattern();
-		countQuery.setQueryPattern(patternAsJenaElement);
+		countQuery.setQueryPattern( QueryPatternUtils.convertToJenaElement(pattern) );
 
 		// initialize the SELECT clause of the query
 		// (it needs to be a COUNT(*) without DISTINCT,
