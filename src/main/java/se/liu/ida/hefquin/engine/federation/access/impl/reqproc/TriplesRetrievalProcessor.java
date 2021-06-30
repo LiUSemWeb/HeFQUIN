@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplesResponse;
@@ -12,5 +13,5 @@ public interface TriplesRetrievalProcessor<ReqType extends DataRetrievalRequest,
 	 * Assumes that fm has a {@link TriplesRetrievalInterface}.
 	 */
 	@Override
-	TriplesResponse performRequest( ReqType req, MemberType fm );
+	TriplesResponse performRequest( ReqType req, MemberType fm ) throws FederationAccessException;
 }

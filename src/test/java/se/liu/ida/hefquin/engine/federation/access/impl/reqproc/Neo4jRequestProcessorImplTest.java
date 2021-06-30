@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.engine.federation.access.StringRetrievalResponse;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 public class Neo4jRequestProcessorImplTest extends EngineTestBase {
 
     @Test
-    public void testLocalhost() {
+    public void testLocalhost() throws FederationAccessException {
         if ( ! skipLiveWebTests ){
             final String cypherQuery = "MATCH (x)-[:DIRECTED]->(y) RETURN x, y";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);

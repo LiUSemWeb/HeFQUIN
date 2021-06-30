@@ -10,6 +10,7 @@ import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.aggregate.AggregatorFactory;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
@@ -51,7 +52,11 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 	}
 
 	@Override
-	public CardinalityResponse performCardinalityRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+	public CardinalityResponse performCardinalityRequest(
+			final SPARQLRequest req,
+			final SPARQLEndpoint fm )
+					throws FederationAccessException
+	{
 		// The idea of this implementation is to take the graph pattern of the
 		// given request, wrap it in a COUNT(*) query, and send that query as
 		// a request to the given endpoint.
@@ -76,7 +81,13 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 
 		// issue the query as a request
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl(countQuery) );
-		final SolMapsResponse smResp = performRequest(reqCount, fm);
+		final SolMapsResponse smResp;
+		try {
+			smResp = performRequest(reqCount, fm);
+		}
+		catch ( final FederationAccessException ex ) {
+			throw new FederationAccessException("Executing the count request caused an exception.", ex, req, fm);
+		}
 
 		// extract the COUNT value from the response
 		final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();

@@ -34,7 +34,7 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 			return fedAccessMgr.performRequest(req, fm);
 		}
 		catch ( final FederationAccessException ex ) {
-			throw new ExecOpExecutionException("An exception occurred when performing the given brTPF request.", ex, this);
+			throw new ExecOpExecutionException("An exception occurred when performing the request of this request operator.", ex, this);
 		}
 	}
 

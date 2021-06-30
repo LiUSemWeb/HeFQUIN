@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -33,7 +34,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
     public void process(
             final IntermediateResultBlock input,
             final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt)
+            final ExecutionContext execCxt) throws ExecOpExecutionException
     {
         for ( final SolutionMapping fetchedSM : fetchSolutionMappings( input.getSolutionMappings(), execCxt) ) {
             for ( final SolutionMapping inputSM : input.getSolutionMappings() ) {
@@ -53,7 +54,7 @@ public abstract class ExecOpGenericBindJoin<QueryType extends Query, MemberType 
         // nothing to be done here
     }
 
-    protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
+    protected abstract Iterable<SolutionMapping> fetchSolutionMappings(
             final Iterable<SolutionMapping> solMaps,
-            final ExecutionContext execCxt );
+            final ExecutionContext execCxt ) throws ExecOpExecutionException;
 }

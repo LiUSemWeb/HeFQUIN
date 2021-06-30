@@ -9,8 +9,6 @@ import se.liu.ida.hefquin.engine.federation.access.TriplesResponse;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.Set;
-
 public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends Query,
         MemberType extends FederationMember,
         ReqType extends DataRetrievalRequest>
@@ -21,7 +19,7 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
     }
 
     @Override
-    public Iterable<? extends SolutionMapping> fetchSolutionMappings( final Iterable<SolutionMapping> solMaps,
+    public Iterable<SolutionMapping> fetchSolutionMappings( final Iterable<SolutionMapping> solMaps,
                                                                       final ExecutionContext execCxt )
     {
         final ReqType req = createRequest(solMaps);
@@ -33,5 +31,5 @@ public abstract class ExecOpGenericBindJoinWithTriplesRequests<QueryType extends
 
     protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
-    protected abstract Iterable<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
+    protected abstract Iterable<SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
 }

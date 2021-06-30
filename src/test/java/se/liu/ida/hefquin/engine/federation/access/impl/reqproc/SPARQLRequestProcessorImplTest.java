@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
@@ -31,7 +32,7 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 public class SPARQLRequestProcessorImplTest extends EngineTestBase
 {
 	@Test
-	public void performRequestWithPatternOnDBpedia() {
+	public void performRequestWithPatternOnDBpedia() throws FederationAccessException {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
@@ -47,7 +48,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void performRequestWithTPOnDBpedia() {
+	public void performRequestWithTPOnDBpedia() throws FederationAccessException {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
@@ -65,7 +66,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void performRequestWithBGPOnDBpedia() {
+	public void performRequestWithBGPOnDBpedia() throws FederationAccessException {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
@@ -83,7 +84,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void performRequestWithQueryOnDBpedia() {
+	public void performRequestWithQueryOnDBpedia() throws FederationAccessException {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT (COUNT(*) AS ?c) WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
@@ -112,6 +113,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 
 	protected Iterator<SolutionMapping> performRequestOnDBpediaHelper(
 			final SPARQLRequest req )
+					throws FederationAccessException
 	{
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
 

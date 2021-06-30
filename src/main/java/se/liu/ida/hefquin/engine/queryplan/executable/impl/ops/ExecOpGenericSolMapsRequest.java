@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -17,7 +18,7 @@ public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalR
 
 	@Override
 	public void execute( final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt )
+	                     final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final SolMapsResponse response = performRequest( execCxt.getFederationAccessMgr() );
 		for ( SolutionMapping sm : response.getSolutionMappings() ) {
@@ -25,5 +26,6 @@ public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalR
 		}
 	}
 
-	abstract protected SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr );
+	protected abstract SolMapsResponse performRequest(
+			final FederationAccessManager fedAccessMgr ) throws ExecOpExecutionException;
 }

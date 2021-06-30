@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 
 public interface FederationAccessManager
 {
-	SolMapsResponse performRequest( SPARQLRequest req, SPARQLEndpoint fm );
+	SolMapsResponse performRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
 
 	/**
 	 * Requests the cardinality of the result of the given request.

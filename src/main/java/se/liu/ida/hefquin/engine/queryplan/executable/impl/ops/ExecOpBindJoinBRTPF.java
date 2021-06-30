@@ -52,7 +52,7 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 			reqOp.execute( new MyIntermediateResultElementSink(input,sink), execCxt );
 		}
 		catch ( final ExecOpExecutionException ex ) {
-			throw new ExecOpExecutionException("An exception occurred when executing a brTPF request operator to resolve a related bind join.", ex, this);
+			throw new ExecOpExecutionException("An exception occurred when executing a brTPF request operator created to resolve this bind join.", ex, this);
 		}
 	}
 

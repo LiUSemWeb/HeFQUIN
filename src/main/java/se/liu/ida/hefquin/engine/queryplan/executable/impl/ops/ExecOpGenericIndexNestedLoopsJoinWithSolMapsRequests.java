@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<QueryType extends Query,
@@ -20,7 +21,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<Query
 	@Override
 	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
-			final ExecutionContext execCxt )
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final ReqType req = createRequest(sm);
 		final SolMapsResponse resp = performRequest( req, execCxt.getFederationAccessMgr() );
@@ -29,5 +30,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<Query
 
 	protected abstract ReqType createRequest( final SolutionMapping sm );
 
-	protected abstract SolMapsResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
+	protected abstract SolMapsResponse performRequest( final ReqType req,
+	                                                   final FederationAccessManager fedAccessMgr )
+			throws ExecOpExecutionException;
 }

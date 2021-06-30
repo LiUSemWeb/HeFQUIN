@@ -19,27 +19,37 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+	public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
+			throws FederationAccessException
+	{
 		return reqProcSPARQL.performRequest( req, fm );
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
+	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm )
+			throws FederationAccessException
+	{
 		return reqProcTPF.performRequest( req, fm );
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
+	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm )
+			throws FederationAccessException
+	{
 		return reqProcTPF.performRequest( req, fm );
 	}
 
 	@Override
-	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm) {
+	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm)
+			throws FederationAccessException
+	{
 		return reqProcBRTPF.performRequest( req, fm );
 	}
 
 	@Override
-	public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
+	public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm )
+			throws FederationAccessException
+	{
 		return reqProcNeo4j.performRequest(req, fm);
 	}
 
