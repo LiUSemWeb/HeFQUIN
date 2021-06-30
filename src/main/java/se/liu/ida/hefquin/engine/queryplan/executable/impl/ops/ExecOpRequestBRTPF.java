@@ -6,11 +6,13 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 
 public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {
@@ -24,8 +26,16 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 	}
 
 	@Override
-	protected TPFResponse performRequest( final BRTPFRequest tpfReq, final FederationAccessManager fedAccessMgr ) {
-		return fedAccessMgr.performRequest( tpfReq, fm );
+	protected TPFResponse performRequest( final BRTPFRequest req,
+	                                      final FederationAccessManager fedAccessMgr )
+			throws ExecOpExecutionException
+	{
+		try {
+			return fedAccessMgr.performRequest(req, fm);
+		}
+		catch ( final FederationAccessException ex ) {
+			throw new ExecOpExecutionException("An exception occurred when performing the given brTPF request.", ex, this);
+		}
 	}
 
 	@Override

@@ -22,13 +22,14 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequest
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {
 	@Test
-	public void test() {
+	public void test() throws ExecOpExecutionException {
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");

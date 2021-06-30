@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
+import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -37,7 +38,9 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 public class FederationAccessManagerBaseTest extends EngineTestBase
 {
 	@Test
-	public void performCardinalityRequestWithPatternOnDBpediaSPARQLEndpoint() {
+	public void performCardinalityRequestWithPatternOnDBpediaSPARQLEndpoint()
+			throws FederationAccessException
+	{
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Toronto> <http://xmlns.com/foaf/0.1/name> ?o }";
@@ -49,7 +52,9 @@ public class FederationAccessManagerBaseTest extends EngineTestBase
 	}
 
 	@Test
-	public void performCardinalityRequestWithTPOnDBpediaSPARQLEndpoint() {
+	public void performCardinalityRequestWithTPOnDBpediaSPARQLEndpoint()
+			throws FederationAccessException
+	{
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Toronto");
@@ -63,7 +68,9 @@ public class FederationAccessManagerBaseTest extends EngineTestBase
 	}
 
 	@Test
-	public void performCardinalityRequestWithBGPOnDBpediaSPARQLEndpoint() {
+	public void performCardinalityRequestWithBGPOnDBpediaSPARQLEndpoint()
+			throws FederationAccessException
+	{
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Toronto");
@@ -81,7 +88,7 @@ public class FederationAccessManagerBaseTest extends EngineTestBase
 
 	protected void performCardinalityRequestOnDBpediaSPARQLEndpointHelper(
 			final SPARQLRequest req,
-			final int expectedCardinality )
+			final int expectedCardinality ) throws FederationAccessException
 	{
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
 

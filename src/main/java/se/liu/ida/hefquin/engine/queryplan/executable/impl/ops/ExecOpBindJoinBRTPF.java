@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatte
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -43,11 +44,16 @@ public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
 	public void process(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final BindingsRestrictedTriplePatternRequest req = createRequest(input);
 		final ExecOpRequestBRTPF reqOp = new ExecOpRequestBRTPF(req, fm);
-		reqOp.execute( new MyIntermediateResultElementSink(input,sink), execCxt );
+		try {
+			reqOp.execute( new MyIntermediateResultElementSink(input,sink), execCxt );
+		}
+		catch ( final ExecOpExecutionException ex ) {
+			throw new ExecOpExecutionException("An exception occurred when executing a brTPF request operator to resolve a related bind join.", ex, this);
+		}
 	}
 
 	@Override

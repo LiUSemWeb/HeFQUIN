@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -24,7 +25,7 @@ public abstract class ExecOpGenericRequestWithPaging<
 
 	@Override
 	public void execute( final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt )
+	                     final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		int pageNumber = 0;
 		boolean wasLastPage = false;
@@ -42,7 +43,7 @@ public abstract class ExecOpGenericRequestWithPaging<
 
 	protected abstract PageReqType createPageRequest( int pageNumber );
 
-	protected abstract PageRespType performRequest( PageReqType pageReq, FederationAccessManager fedAccessMgr );
+	protected abstract PageRespType performRequest( PageReqType pageReq, FederationAccessManager fedAccessMgr ) throws ExecOpExecutionException;
 
 	protected abstract void consumeResponse( PageRespType response, IntermediateResultElementSink sink );
 

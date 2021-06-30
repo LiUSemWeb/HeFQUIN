@@ -15,13 +15,13 @@ public interface FederationAccessManager
 	 * rather than a full {@link SPARQLQuery}. If it does not, then this
 	 * method throws an {@link IllegalArgumentException}.
 	 */
-	CardinalityResponse performCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm );
+	CardinalityResponse performCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
 
-	TPFResponse performRequest( TPFRequest req, TPFServer fm );
+	TPFResponse performRequest( TPFRequest req, TPFServer fm ) throws FederationAccessException;
 
-	TPFResponse performRequest( TPFRequest req, BRTPFServer fm );
+	TPFResponse performRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
-	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm );
+	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
-	StringRetrievalResponse performRequest( Neo4jRequest req, Neo4jServer fm );
+	StringRetrievalResponse performRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
 }
