@@ -39,7 +39,7 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public StringRetrievalResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
+	public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
 		return reqProcNeo4j.performRequest(req, fm);
 	}
 
