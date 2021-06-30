@@ -22,10 +22,11 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 
-	protected void _testSimpleUnion() {
+	protected void _testSimpleUnion() throws ExecutionException {
 		final Var x = Var.alloc("x");
 
 		final Node x1 = NodeFactory.createURI("http://example.org/x1");
@@ -75,7 +76,7 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertTrue(b3Found);
 	}
 	
-	protected void _testUnboundUnion() {
+	protected void _testUnboundUnion() throws ExecutionException {
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -153,7 +154,7 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertTrue(b4Found);
 	}
 	
-	protected void _testKeepUnionDuplicates() {
+	protected void _testKeepUnionDuplicates() throws ExecutionException {
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -217,7 +218,7 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertEquals(2, b3Found);
 	}
 	
-	protected void _testKeepUnionDuplicatesFromSameMember() {
+	protected void _testKeepUnionDuplicatesFromSameMember() throws ExecutionException {
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -282,8 +283,9 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 	}
 
 	protected Iterator<SolutionMapping> runTest( final IntermediateResultBlock input1,
- 			final IntermediateResultBlock input2 ) {
-		
+	                                             final IntermediateResultBlock input2 )
+			 throws ExecutionException
+	{
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		
 		final BinaryExecutableOp op = createExecOpForTest();

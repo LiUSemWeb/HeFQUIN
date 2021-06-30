@@ -1,47 +1,42 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.jena.graph.Graph;
-import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>{
 	
 	@Test
-	public void tpWithJoinOnObject() {
+	public void tpWithJoinOnObject() throws ExecutionException {
 		_tpWithJoinOnObject();
 	}
 
 	@Test
-	public void tpWithJoinOnSubjectAndObject() {
+	public void tpWithJoinOnSubjectAndObject() throws ExecutionException {
 		_tpWithJoinOnSubjectAndObject();
 	}
 
 	@Test
-	public void tpWithoutJoinVariable() {
+	public void tpWithoutJoinVariable() throws ExecutionException {
 		_tpWithoutJoinVariable();
 	}
 
 	@Test
-	public void tpWithEmptyInput() {
+	public void tpWithEmptyInput() throws ExecutionException {
 		_tpWithEmptyInput();
 	}
 
 	@Test
-	public void tpWithEmptySolutionMappingAsInput() {
+	public void tpWithEmptySolutionMappingAsInput() throws ExecutionException {
 		_tpWithEmptySolutionMappingAsInput();
 	}
 
 	@Test
-	public void tpWithEmptyResponses() {
+	public void tpWithEmptyResponses() throws ExecutionException {
 		_tpWithEmptyResponses();
 	}
 

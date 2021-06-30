@@ -2,32 +2,33 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
 
     @Test
-    public void joinWithOneJoinVariable() { _joinWithOneJoinVariable(); }
+    public void joinWithOneJoinVariable() throws ExecutionException { _joinWithOneJoinVariable(); }
 
     @Test
-    public void joinWithTwoJoinVariables() { _joinWithTwoJoinVariables(); }
+    public void joinWithTwoJoinVariables() throws ExecutionException { _joinWithTwoJoinVariables(); }
 
     @Test
-    public void joinWithTwoJoinVariables_noJoinPartner() { _joinWithTwoJoinVariables_noJoinPartner(); }
+    public void joinWithTwoJoinVariables_noJoinPartner() throws ExecutionException { _joinWithTwoJoinVariables_noJoinPartner(); }
 
     @Test
-    public void joinWithoutJoinVariable() { _joinWithoutJoinVariable(); }
+    public void joinWithoutJoinVariable() throws ExecutionException { _joinWithoutJoinVariable(); }
 
     @Test
-    public void joinWithEmptyInput1() { _joinWithEmptyInput1(); }
+    public void joinWithEmptyInput1() throws ExecutionException { _joinWithEmptyInput1(); }
 
     @Test
-    public void joinWithEmptyInput2() { _joinWithEmptyInput2(); }
+    public void joinWithEmptyInput2() throws ExecutionException { _joinWithEmptyInput2(); }
 
     @Test
-    public void joinWithEmptySolutionMapping1() { _joinWithEmptySolutionMapping1(); }
+    public void joinWithEmptySolutionMapping1() throws ExecutionException{ _joinWithEmptySolutionMapping1(); }
 
     @Test
-    public void joinWithEmptySolutionMapping2() { _joinWithEmptySolutionMapping2(); }
+    public void joinWithEmptySolutionMapping2() throws ExecutionException { _joinWithEmptySolutionMapping2(); }
 
     @Override
     protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {

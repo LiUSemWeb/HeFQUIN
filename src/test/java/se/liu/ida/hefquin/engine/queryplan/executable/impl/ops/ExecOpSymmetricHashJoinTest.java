@@ -2,23 +2,24 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpSymmetricHashJoinTest extends TestsForJoinAlgorithms{
 
     @Test
-    public void joinWithOneJoinVariable() { _joinWithOneJoinVariable(); }
+    public void joinWithOneJoinVariable() throws ExecutionException { _joinWithOneJoinVariable(); }
 
     @Test
-    public void joinWithTwoJoinVariables() { _joinWithTwoJoinVariables(); }
+    public void joinWithTwoJoinVariables() throws ExecutionException { _joinWithTwoJoinVariables(); }
 
     @Test
-    public void joinWithTwoJoinVariables_noJoinPartner() { _joinWithTwoJoinVariables_noJoinPartner(); }
+    public void joinWithTwoJoinVariables_noJoinPartner() throws ExecutionException { _joinWithTwoJoinVariables_noJoinPartner(); }
 
     @Test
-    public void joinWithOneJoinVariable_withPossibleVars_noOverlap() { _joinWithOneJoinVariable_withPossibleVars_noOverlap(); }
+    public void joinWithOneJoinVariable_withPossibleVars_noOverlap() throws ExecutionException { _joinWithOneJoinVariable_withPossibleVars_noOverlap(); }
 
     @Test
-    public void joinWithOneJoinVariable_withPossibleVars_overlapped() { _joinWithOneJoinVariable_withPossibleVars_overlapped(); }
+    public void joinWithOneJoinVariable_withPossibleVars_overlapped() throws ExecutionException { _joinWithOneJoinVariable_withPossibleVars_overlapped(); }
 
     @Override
     protected BinaryExecutableOp createExecOpForTest(final ExpectedVariables... inputVars) {

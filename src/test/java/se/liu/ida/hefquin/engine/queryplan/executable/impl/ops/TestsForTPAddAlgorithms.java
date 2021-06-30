@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 /**
  * This is an abstract class with tests for any algorithm that is
@@ -37,7 +38,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMember> extends ExecOpTestBase
 {
-	protected void _tpWithJoinOnObject() {
+	protected void _tpWithJoinOnObject() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -129,7 +130,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	}
 
-	protected void _tpWithJoinOnSubjectAndObject() {
+	protected void _tpWithJoinOnSubjectAndObject() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -205,7 +206,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue(b2Found);
 	}
 
-	protected void _tpWithoutJoinVariable() {
+	protected void _tpWithoutJoinVariable() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -261,7 +262,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _tpWithEmptyInput() {
+	protected void _tpWithEmptyInput() throws ExecutionException {
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
 
@@ -291,7 +292,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _tpWithEmptySolutionMappingAsInput() {
+	protected void _tpWithEmptySolutionMappingAsInput() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -353,7 +354,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue(b2Found);
 	}
 
-	protected void _tpWithEmptyResponses() {
+	protected void _tpWithEmptyResponses() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -430,7 +431,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final IntermediateResultBlock input,
 			final Graph dataForMember,
 			final TriplePattern tp,
-			final ExpectedVariables expectedVariables)
+			final ExpectedVariables expectedVariables) throws ExecutionException
 	{
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final ExecutionContext execCxt = new ExecutionContext() {

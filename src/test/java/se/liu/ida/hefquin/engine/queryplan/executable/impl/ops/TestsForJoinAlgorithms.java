@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,7 +24,7 @@ import static org.junit.Assert.*;
  */
 public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 {
-	protected void _joinWithOneJoinVariable() {
+	protected void _joinWithOneJoinVariable() throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -116,7 +117,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertTrue(b3Found);
 	}
 
-	protected void _joinWithTwoJoinVariables() {
+	protected void _joinWithTwoJoinVariables()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -196,7 +199,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertTrue(b2Found);
 	}
 
-	protected void _joinWithTwoJoinVariables_noJoinPartner() {
+	protected void _joinWithTwoJoinVariables_noJoinPartner()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -244,7 +249,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithoutJoinVariable() {
+	protected void _joinWithoutJoinVariable()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -301,7 +308,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptyInput1() {
+	protected void _joinWithEmptyInput1()
+			throws ExecutionException
+	{
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
 
@@ -331,7 +340,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptyInput2() {
+	protected void _joinWithEmptyInput2()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -357,7 +368,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptySolutionMapping1() {
+	protected void _joinWithEmptySolutionMapping1()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -400,7 +413,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithEmptySolutionMapping2() {
+	protected void _joinWithEmptySolutionMapping2()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 
 		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
@@ -434,7 +449,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _joinWithOneJoinVariable_withPossibleVars_noOverlap() {
+	protected void _joinWithOneJoinVariable_withPossibleVars_noOverlap()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -528,7 +545,9 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		assertTrue(b2Found);
 	}
 
-	protected void _joinWithOneJoinVariable_withPossibleVars_overlapped() {
+	protected void _joinWithOneJoinVariable_withPossibleVars_overlapped()
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -609,7 +628,7 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 	protected Iterator<SolutionMapping> runTest(
 			final IntermediateResultBlock input1,
 			final IntermediateResultBlock input2,
-			final ExpectedVariables... inputVars)
+			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 

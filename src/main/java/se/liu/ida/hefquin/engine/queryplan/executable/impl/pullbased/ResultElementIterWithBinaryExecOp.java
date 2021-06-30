@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 {
@@ -54,7 +55,7 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 		}
 
 		@Override
-		public void run() {
+		protected void _run() throws ExecutionException {
 			// Note, we do not need to check op.requiresCompleteChild1InputFirst()
 			// here because this implementation is anyways sending the complete
 			// intermediate result from input one first, before moving on to
@@ -69,8 +70,6 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 				op.processBlockFromChild2( inputIter2.next(), sink, execCxt );
 			}
 			op.wrapUpForChild2(sink, execCxt);
-
-			sink.close();
 		}
 
 	} // end of class OpRunnerThread

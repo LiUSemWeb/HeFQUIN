@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ResultElementIterWithNullaryExecOp extends ResultElementIterBase
 {
@@ -43,9 +44,8 @@ public class ResultElementIterWithNullaryExecOp extends ResultElementIterBase
 		}
 
 		@Override
-		public void run() {
+		protected void _run() throws ExecutionException {
 			op.execute(sink, execCxt);
-			sink.close();
 		}
 
 	} // end of class OpRunnerThread
