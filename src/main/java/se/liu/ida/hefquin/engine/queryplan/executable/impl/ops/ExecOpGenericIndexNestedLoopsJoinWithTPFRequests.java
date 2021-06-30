@@ -6,9 +6,9 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberType extends FederationMember>
                    extends ExecOpGenericIndexNestedLoopsJoin<TriplePattern,MemberType>
@@ -20,15 +20,15 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 	@Override
 	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping inputSolMap,
-			final ExecutionContext execCxt ) throws ExecutionException
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final MaterializingIntermediateResultElementSink reqSink = new MaterializingIntermediateResultElementSink();
 		final NullaryExecutableOp reqOp = createRequestOperator(inputSolMap);
 		try {
 			reqOp.execute(reqSink, execCxt);
 		}
-		catch ( final ExecutionException ex ) {
-			throw new ExecutionException("An exception occurred when executing a request operator to fetch solution mappings.", ex);
+		catch ( final ExecOpExecutionException ex ) {
+			throw new ExecOpExecutionException("An exception occurred when executing a request operator to fetch solution mappings.", ex, this);
 		}
 
 		return reqSink.getMaterializedIntermediateResult();

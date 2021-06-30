@@ -4,10 +4,10 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query, MemberType extends FederationMember>
                    implements UnaryExecutableOp
@@ -35,7 +35,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 	public void process(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) throws ExecutionException
+			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
 			process( sm, sink, execCxt );
@@ -53,7 +53,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 	protected void process(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) throws ExecutionException
+			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		for ( final SolutionMapping fetchedSM : fetchSolutionMappings(sm,execCxt) ) {
 			final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
@@ -63,6 +63,6 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 
 	protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
-			final ExecutionContext execCxt ) throws ExecutionException;
+			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 }
