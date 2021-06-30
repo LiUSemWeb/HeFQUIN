@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -33,15 +32,16 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 
 public class SourcePlannerImpl implements SourcePlanner
 {
-	protected final FederationCatalog fedCat;
+	protected final QueryProcContext ctxt;
 
-	public SourcePlannerImpl( final FederationCatalog fedCat ) {
-		assert fedCat != null;
-		this.fedCat = fedCat;
+	public SourcePlannerImpl( final QueryProcContext ctxt ) {
+		assert ctxt != null;
+		this.ctxt = ctxt;
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "unsupported SERVICE pattern" );
 		}
 
-		final FederationMember fm = fedCat.getFederationMemberByURI( jenaOp.getService().getURI() );
+		final FederationMember fm = ctxt.getFederationCatalog().getFederationMemberByURI( jenaOp.getService().getURI() );
 		return createPlan( jenaOp.getSubOp(), fm );
 	}
 

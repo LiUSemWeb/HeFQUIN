@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
@@ -432,7 +433,10 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final ExpectedVariables expectedVariables)
 	{
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final ExecutionContext execCxt = new ExecutionContext(fedAccessMgr);
+		final ExecutionContext execCxt = new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return null; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		final MemberType fm = createFedMemberForTest(dataForMember);

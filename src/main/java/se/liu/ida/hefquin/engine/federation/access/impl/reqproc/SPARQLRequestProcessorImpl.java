@@ -6,12 +6,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
-import org.apache.jena.sparql.algebra.OpAsQuery;
-import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
@@ -24,12 +21,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 {
 	@Override
 	public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-		final Element queryPattern = OpAsQuery.asQuery( req.getQueryPattern().asJenaOp() ).getQueryPattern();
-		final Query query = QueryFactory.create();
-		query.setQuerySelectType();
-		query.setQueryResultStar(true);
-		query.setQueryPattern( queryPattern );
-
+		final Query query = req.getQuery().asJenaQuery();
 		final MySolutionConsumer sink = new MySolutionConsumer();
 
 		final Date requestStartTime = new Date();

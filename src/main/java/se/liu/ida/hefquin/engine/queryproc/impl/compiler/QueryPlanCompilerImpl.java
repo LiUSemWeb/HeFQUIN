@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
@@ -17,14 +18,15 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class QueryPlanCompilerImpl implements QueryPlanCompiler
 {
-	protected final FederationAccessManager fedAccessMgr;
+	protected final QueryProcContext ctxt;
 
-	public QueryPlanCompilerImpl( final FederationAccessManager fedAccessMgr ) {
-		assert fedAccessMgr != null;
-		this.fedAccessMgr = fedAccessMgr;
+	public QueryPlanCompilerImpl( final QueryProcContext ctxt ) {
+		assert ctxt != null;
+		this.ctxt = ctxt;
 	}
 
 	@Override
@@ -76,7 +78,10 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	}
 
 	protected ExecutionContext createExecContext() {
-		return new ExecutionContext(fedAccessMgr);
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
+			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
+		};
 	}
 
 	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {

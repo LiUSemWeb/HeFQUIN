@@ -1,11 +1,13 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
@@ -13,10 +15,13 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
@@ -49,6 +54,28 @@ public class QueryPatternUtils
 		return new BGPImpl(tps);
 	}
 
+	public static Element convertToJenaElement( final SPARQLGraphPattern p ) {
+		if ( p instanceof TriplePattern ) {
+			final TriplePattern tp = (TriplePattern) p;
+
+			final ElementPathBlock e = new ElementPathBlock();
+			e.addTriple( tp.asJenaTriple() );
+			return e;
+		}
+		else if ( p instanceof BGP ) {
+			final BGP bgp = (BGP) p;
+
+			final ElementPathBlock e = new ElementPathBlock();
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				e.addTriple( tp.asJenaTriple() );
+			}
+			return e;
+		}
+		else {
+			return OpAsQuery.asQuery( p.asJenaOp() ).getQueryPattern();
+		}
+	}
+
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp.asJenaTriple() );
@@ -71,7 +98,7 @@ public class QueryPatternUtils
 		if ( pattern instanceof TriplePattern ) {
 			return new ExpectedVariables() {
 				@Override public Set<Var> getPossibleVariables() {
-					return new HashSet<>();
+					return Collections.emptySet();
 				}
 
 				@Override public Set<Var> getCertainVariables() {
@@ -82,7 +109,7 @@ public class QueryPatternUtils
 		else if ( pattern instanceof BGP ) {
 			return new ExpectedVariables() {
 				@Override public Set<Var> getPossibleVariables() {
-					return new HashSet<>();
+					return Collections.emptySet();
 				}
 
 				@Override public Set<Var> getCertainVariables() {
@@ -100,6 +127,15 @@ public class QueryPatternUtils
 				@Override public Set<Var> getCertainVariables() { return certainVars; }
 			};
 		}
+	}
+
+	public static ExpectedVariables getExpectedVariablesInQuery( final SPARQLQuery query ) {
+		final Set<Var> vars = new HashSet<>( query.asJenaQuery().getProjectVars() );
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getPossibleVariables() { return vars; }
+			@Override public Set<Var> getCertainVariables() { return Collections.emptySet(); }
+		};
 	}
 
 	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {

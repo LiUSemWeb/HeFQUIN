@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
+import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
@@ -19,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 
 public class SourcePlannerImplTest extends EngineTestBase
@@ -138,7 +140,12 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 	protected LogicalPlan createLogicalPlan( final String queryString,
 	                                         final FederationCatalog fedCat ) {
-		final SourcePlanner sourcePlanner = new SourcePlannerImpl(fedCat);
+		final QueryProcContext ctxt = new QueryProcContext() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
+		};
+
+		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 		return sourcePlanner.createSourceAssignment(query);
 	}

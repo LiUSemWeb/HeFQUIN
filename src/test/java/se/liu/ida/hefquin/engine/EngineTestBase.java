@@ -288,6 +288,14 @@ public abstract class EngineTestBase
 		}
 
 		@Override
+		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
+		                                                      final SPARQLEndpoint fm )
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
 		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
 			if ( itTriplesForResponse != null ) {
 				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );

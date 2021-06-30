@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.sparql.algebra.Op;
@@ -16,6 +18,10 @@ public class BGPImpl implements BGP
 	public BGPImpl( final Set<TriplePattern> tps ) {
 		assert tps != null;
 		this.tps = tps;
+	}
+
+	public BGPImpl( final TriplePattern ... tps ) {
+		this.tps = new HashSet<>( Arrays.asList(tps) );
 	}
 
 	@Override

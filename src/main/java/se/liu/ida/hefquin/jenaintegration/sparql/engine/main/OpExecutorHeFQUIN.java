@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
@@ -49,14 +50,20 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	protected OpExecutorHeFQUIN( final ExecutionContext execCxt ) {
 		super(execCxt);
 
-		final FederationCatalog fedCat = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
+		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
 
-		final LogicalToPhysicalPlanConverter l2p = new LogicalToPhysicalPlanConverterImpl();
-		final SourcePlanner srcPlanner = new SourcePlannerImpl(fedCat);
-		final QueryOptimizer optimizer = new QueryOptimizerImpl(l2p);
+		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+		};
+
+		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
+		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
-		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(fedAccessMgr);
+		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		qProc = new QueryProcessorImpl( planner, compiler, execEngine );
 	}

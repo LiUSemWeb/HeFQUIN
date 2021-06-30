@@ -9,13 +9,18 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class TestUtils
 {
 	public static ExecutionContext createExecContextForTests() {
-		return new ExecutionContext( new FederationAccessManagerTestImpl() );
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerTestImpl();
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return null; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
 	}
 
 	public static SolutionMapping createSolutionMappingForTests() {
@@ -74,6 +79,12 @@ public class TestUtils
 	{
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+			return null;
+		}
+
+		@Override
+		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
+		                                                      final SPARQLEndpoint fm ) {
 			return null;
 		}
 
