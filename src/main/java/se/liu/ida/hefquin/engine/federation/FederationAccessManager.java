@@ -1,11 +1,6 @@
 package se.liu.ida.hefquin.engine.federation;
 
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 
@@ -27,4 +22,6 @@ public interface FederationAccessManager
 	TPFResponse performRequest( TPFRequest req, BRTPFServer fm );
 
 	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm );
+
+	StringRetrievalResponse performRequest( Neo4jRequest req, Neo4jServer fm );
 }
