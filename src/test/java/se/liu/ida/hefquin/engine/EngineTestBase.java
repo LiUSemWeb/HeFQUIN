@@ -318,7 +318,7 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public StringRetrievalResponse performRequest(Neo4jRequest req, Neo4jServer fm) {
+		public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
 			return new Neo4jRequestProcessorImpl().performRequest(req, fm);
 		}
 	}
