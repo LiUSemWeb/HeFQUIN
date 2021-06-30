@@ -20,28 +20,28 @@ public class Neo4jConnectionFactory {
             this.URL = URL;
         }
 
-        public String executeQuery(String cypher) {
-            String data = "{\n" +
+        public String executeQuery( final String cypher ) {
+            final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +
                     "    \"parameters\" : {}\n" +
                     "  } ]\n" +
                     "}";
 
-            var request = HttpRequest.newBuilder(
+            final var request = HttpRequest.newBuilder(
                     URI.create(this.URL))
                     .header("Accept", "application/json;charset=UTF-8")
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(data))
                     .build();
 
-            HttpClient client = HttpClient.newHttpClient();
+            final HttpClient client = HttpClient.newHttpClient();
             try {
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 return response.body();
-            } catch (IOException e) {
+            } catch ( final IOException e ) {
                 throw new Neo4JConnectionException("Data could not be sent to the server");
-            } catch (InterruptedException e) {
+            } catch ( final InterruptedException e ) {
                 throw new Neo4JConnectionException("Neo4j server could not be reached.");
             }
         }
