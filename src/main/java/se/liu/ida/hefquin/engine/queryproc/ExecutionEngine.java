@@ -4,5 +4,6 @@ import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 
 public interface ExecutionEngine
 {
-	void execute( final ExecutablePlan plan, final QueryResultSink resultSink );
+	void execute( final ExecutablePlan plan, final QueryResultSink resultSink )
+			throws ExecutionException;
 }

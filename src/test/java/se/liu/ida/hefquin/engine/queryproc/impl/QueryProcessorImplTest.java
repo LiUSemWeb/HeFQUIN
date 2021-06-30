@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
@@ -33,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
@@ -228,7 +230,12 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 
-		qProc.processQuery(query, resultSink);
+		try {
+			qProc.processQuery(query, resultSink);
+		}
+		catch ( final QueryProcException ex ) {
+			fail( "unexpected exception with the following message: " + ex.getMessage() );
+		}
 
 		return resultSink.getSolMapsIter();
 	}

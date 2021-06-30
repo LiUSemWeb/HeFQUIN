@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
@@ -36,7 +37,9 @@ public class QueryProcessorImpl implements QueryProcessor
 
 	public ExecutionEngine getExecutionEngine() { return execEngine; }
 
-	public void processQuery( final Query query, final QueryResultSink resultSink ) {
+	public void processQuery( final Query query, final QueryResultSink resultSink )
+			throws QueryProcException
+	{
 		final PhysicalPlan qep = planner.createPlan(query);
 		final ExecutablePlan prg = planCompiler.compile(qep);
 		execEngine.execute(prg, resultSink);

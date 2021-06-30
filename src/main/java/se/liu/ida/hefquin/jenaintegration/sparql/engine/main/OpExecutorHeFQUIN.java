@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
 
+import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVisitorBase;
 import org.apache.jena.sparql.algebra.op.*;
@@ -22,6 +23,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
@@ -143,7 +145,14 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			}
 
 			final MaterializingQueryResultSinkImpl sink = new MaterializingQueryResultSinkImpl();
-			qProc.processQuery( new SPARQLGraphPatternImpl(opForStage), sink );
+
+			try {
+				qProc.processQuery( new SPARQLGraphPatternImpl(opForStage), sink );
+			}
+			catch ( final QueryProcException ex ) {
+				throw new QueryExecException("Processing the query operator using HeFQUIN failed.", ex);
+			}
+
 			return new WrappingQueryIterator( sink.getSolMapsIter() );
 		}
 	}
