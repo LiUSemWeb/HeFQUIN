@@ -24,7 +24,7 @@ public class Neo4jInterfaceImpl implements Neo4jInterface {
     }
 
     @Override
-    public boolean supportsRequest(DataRetrievalRequest req) {
+    public boolean supportsRequest( final DataRetrievalRequest req ) {
         return req instanceof Neo4jRequest;
     }
 
