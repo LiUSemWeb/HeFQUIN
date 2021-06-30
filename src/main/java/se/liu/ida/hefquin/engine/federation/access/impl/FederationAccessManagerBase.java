@@ -18,7 +18,7 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
-			Neo4jRequestProcessor reqProcNeo4j) {
+			final Neo4jRequestProcessor reqProcNeo4j ) {
 
 		assert reqProcSPARQL  != null;
 		assert reqProcTPF     != null;
