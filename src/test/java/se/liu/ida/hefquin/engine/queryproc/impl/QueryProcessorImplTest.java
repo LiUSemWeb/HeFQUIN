@@ -42,6 +42,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
@@ -214,10 +215,16 @@ public class QueryProcessorImplTest extends EngineTestBase
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) {
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
-		final SourcePlanner sourcePlanner = new SourcePlannerImpl(fedCat);
-		final QueryOptimizer optimizer = new QueryOptimizerImpl(l2pConverter);
+		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+		};
+
+		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
+		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
-		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(fedAccessMgr);
+		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();

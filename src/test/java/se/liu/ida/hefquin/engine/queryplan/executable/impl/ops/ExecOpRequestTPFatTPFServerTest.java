@@ -17,7 +17,9 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
+import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
@@ -67,7 +69,11 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node o2 = NodeFactory.createURI("http://example.org/o2");
 		l.add( new TripleImpl(s,p,o2) );
 
-		return new ExecutionContext( new FederationAccessManagerForTest(null,l) );
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, l);
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return null; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
 	}
 
 }

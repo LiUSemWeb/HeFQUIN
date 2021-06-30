@@ -17,13 +17,18 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class TestUtils
 {
 	public static ExecutionContext createExecContextForTests() {
-		return new ExecutionContext( new FederationAccessManagerTestImpl() );
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerTestImpl();
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return null; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
 	}
 
 	public static SolutionMapping createSolutionMappingForTests() {
