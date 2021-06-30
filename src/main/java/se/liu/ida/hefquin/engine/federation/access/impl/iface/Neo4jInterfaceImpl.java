@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 
 public class Neo4jInterfaceImpl implements Neo4jInterface {
 
-    final String url;
+    protected final String url;
 
     public Neo4jInterfaceImpl(final String url) {
         assert url != null;
