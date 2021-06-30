@@ -16,8 +16,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.engine.binding.BindingMap;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
@@ -31,6 +29,7 @@ import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
@@ -299,6 +298,14 @@ public abstract class EngineTestBase
 			else {
 				return ( (SPARQLEndpointForTest) fm ).performRequest(req);
 			}
+		}
+
+		@Override
+		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
+		                                                      final SPARQLEndpoint fm )
+		{
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 		@Override

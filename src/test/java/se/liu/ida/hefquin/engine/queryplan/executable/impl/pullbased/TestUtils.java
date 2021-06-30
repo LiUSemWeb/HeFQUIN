@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
@@ -81,6 +82,12 @@ public class TestUtils
 	{
 		@Override
 		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+			return null;
+		}
+
+		@Override
+		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
+		                                                      final SPARQLEndpoint fm ) {
 			return null;
 		}
 
