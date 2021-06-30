@@ -24,12 +24,10 @@ import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.StringResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -326,7 +324,10 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public StringRetrievalResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
+		public StringRetrievalResponse performRequest( final Neo4jRequest req,
+		                                               final Neo4jServer fm )
+				throws FederationAccessException
+		{
 			return new Neo4jRequestProcessorImpl().performRequest(req, fm);
 		}
 	}
