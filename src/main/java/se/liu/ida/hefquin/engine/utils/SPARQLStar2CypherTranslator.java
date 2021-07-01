@@ -69,7 +69,10 @@ public class SPARQLStar2CypherTranslator {
                 "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.%s AS %s UNION " +
                 "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.%s) " +
                 "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.%s AS %s";
-        final protected static String varVarVar = "";
+        final protected static String varVarVar = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
+                "RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s, nm(cpvar3) AS %s UNION " +
+                "MATCH (cpvar4) RETURN nm(cpvar4) AS %s, %s AS %s, labels(cpvar4) AS %s; " +
+                "MATCH (cpvar5) RETURN cpvar5 AS s UNION MATCH ()-[cpvar6]->() RETURN cpvar6 AS s";
 
         public static String getVarPropertyLiteral( final Node s, final Node p, final Node o ) {
             final String property = Configurations.unmapProperty(p.getURI());
@@ -104,7 +107,8 @@ public class SPARQLStar2CypherTranslator {
         }
 
         public static String getVarVarVar(Node s, Node p, Node o) {
-            return null;
+            return String.format(varVarVar, s.getName(), p.getName(), o.getName(),
+                    s.getName(), Configurations.LABEL_URI, p.getName(), o.getName());
         }
     }
 }

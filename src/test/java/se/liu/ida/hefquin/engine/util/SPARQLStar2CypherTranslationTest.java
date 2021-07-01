@@ -80,4 +80,16 @@ public class SPARQLStar2CypherTranslationTest {
                         "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.name AS o");
     }
 
+    @Test
+    public void testVarVarVar() {
+        final Triple t = new Triple(Var.alloc("s1"), Var.alloc("p"), Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
+                        "RETURN nm(cpvar1) AS s1, elm(cpvar2) AS p, nm(cpvar3) AS o UNION " +
+                        "MATCH (cpvar4) RETURN nm(cpvar4) AS s1, "+Configurations.LABEL_URI+
+                        " AS p, labels(cpvar4) AS o; " +
+                        "MATCH (cpvar5) RETURN cpvar5 AS s UNION MATCH ()-[cpvar6]->() RETURN cpvar6 AS s");
+    }
+
 }
