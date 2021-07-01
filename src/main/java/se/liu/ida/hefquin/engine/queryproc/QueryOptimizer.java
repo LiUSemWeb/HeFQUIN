@@ -5,5 +5,5 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
 public interface QueryOptimizer
 {
-	PhysicalPlan optimize( final LogicalPlan initialPlan );
+	PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException;
 }

@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 
 /**
@@ -27,7 +28,7 @@ public class QueryPlannerImpl implements QueryPlanner
 
 	public QueryOptimizer getOptimizer() { return optimizer; }
 
-	public PhysicalPlan createPlan( final Query query ) {
+	public PhysicalPlan createPlan( final Query query ) throws QueryPlanningException {
 		return optimizer.optimize( sourcePlanner.createSourceAssignment(query) );
 	}
 

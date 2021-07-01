@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 
 public class SourcePlannerImpl implements SourcePlanner
 {
@@ -45,7 +46,9 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	@Override
-	public LogicalPlan createSourceAssignment( final Query query ) {
+	public LogicalPlan createSourceAssignment( final Query query )
+			throws SourcePlanningException
+	{
 		// The current implementation here does not actually perform
 		// query decomposition and source selection but simply assumes
 		// queries with SERVICE clauses where, for the moment, all of

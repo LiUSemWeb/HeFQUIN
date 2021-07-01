@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterWithUnaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
@@ -30,7 +31,9 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	}
 
 	@Override
-	public ExecutablePlan compile( final PhysicalPlan qep ) {
+	public ExecutablePlan compile( final PhysicalPlan qep )
+			throws QueryCompilationException
+	{
 		final ExecutionContext execCxt = createExecContext();
 		final ResultElementIterator it = compile( qep, execCxt );
 		return new PullBasedPlan(it);

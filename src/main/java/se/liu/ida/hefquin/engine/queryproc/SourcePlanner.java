@@ -5,5 +5,5 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 
 public interface SourcePlanner
 {
-	LogicalPlan createSourceAssignment( final Query query );
+	LogicalPlan createSourceAssignment( final Query query ) throws SourcePlanningException;
 }

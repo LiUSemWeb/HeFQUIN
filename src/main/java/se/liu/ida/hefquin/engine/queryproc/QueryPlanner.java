@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
 public interface QueryPlanner
 {
-	PhysicalPlan createPlan( final Query query );
+	PhysicalPlan createPlan( final Query query ) throws QueryPlanningException;
 
 	SourcePlanner getSourcePlanner();
 
