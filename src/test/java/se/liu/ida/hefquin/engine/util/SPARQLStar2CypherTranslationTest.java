@@ -1,11 +1,9 @@
 package se.liu.ida.hefquin.engine.util;
 
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.graph.*;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.engine.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Configurations;
@@ -22,8 +20,10 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
-                "MATCH (cpvar1) WHERE cpvar1.name = 'Quentin Tarantino' RETURN nm(cpvar1) AS s UNION " +
-                        "MATCH ()-[cpvar2]->() WHERE cpvar2.name = 'Quentin Tarantino' RETURN elm(cpvar2) AS s");
+                "MATCH (cpvar1) WHERE cpvar1.name = 'Quentin Tarantino' " +
+                        "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3 UNION " +
+                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar2.name = 'Quentin Tarantino' " +
+                        "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3");
     }
 
     @Test
@@ -75,9 +75,9 @@ public class SPARQLStar2CypherTranslationTest {
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
                 "MATCH (cpvar1) WHERE EXISTS(cpvar1.name) " +
-                        "RETURN nm(cpvar1) AS s, cpvar1.name AS o UNION " +
-                        "MATCH ()-[cpvar2]->() WHERE EXISTS(cpvar2.name) " +
-                        "RETURN elm(cpvar2) AS s, cpvar2.name AS o");
+                        "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.name AS o UNION " +
+                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.name) " +
+                        "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.name AS o");
     }
 
 }

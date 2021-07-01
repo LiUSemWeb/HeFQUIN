@@ -57,23 +57,24 @@ public class SPARQLStar2CypherTranslator {
 
     private static class Translations {
 
-        final protected static String varPropLit = "MATCH (cpvar1) WHERE cpvar1.%s = '%s' RETURN nm(cpvar1) AS %s " +
-                                  "UNION MATCH ()-[cpvar2]->() WHERE cpvar2.%s = '%s' RETURN elm(cpvar2) AS %s";
+        final protected static String varPropLit = "MATCH (cpvar1) WHERE cpvar1.%s = '%s' " +
+                "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3 " +
+                "UNION MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar2.%s = '%s' " +
+                "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3";
         final protected static String varLabelClass = "MATCH (cpvar1) WHERE cpvar1:%s RETURN nm(cpvar1) AS %s";
-        final protected static String varRelURI = "MATCH (cpvar1)-[:%s]->(cpvar2) " +
-                                  "WHERE ID(cpvar2) = %s RETURN nm(cpvar1) AS %s";
+        final protected static String varRelURI = "MATCH (cpvar1)-[:%s]->(cpvar2) WHERE ID(cpvar2) = %s RETURN nm(cpvar1) AS %s";
         final protected static String varLabelVar = "MATCH (cpvar1) RETURN nm(cpvar1) AS %s, labels(cpvar1) AS %s";
         final protected static String varRelVar = "MATCH (cpvar1)-[:%s]->(cpvar2) RETURN nm(cpvar1) AS %s, nm(cpvar2) AS %s";
         final protected static String varPropVar = "MATCH (cpvar1) WHERE EXISTS(cpvar1.%s) " +
-                "RETURN nm(cpvar1) AS %s, cpvar1.%s AS %s UNION " +
-                "MATCH ()-[cpvar2]->() WHERE EXISTS(cpvar2.%s) " +
-                "RETURN elm(cpvar2) AS %s, cpvar2.%s AS %s";
+                "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.%s AS %s UNION " +
+                "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.%s) " +
+                "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.%s AS %s";
+        final protected static String varVarVar = "";
 
         public static String getVarPropertyLiteral( final Node s, final Node p, final Node o ) {
             final String property = Configurations.unmapProperty(p.getURI());
             final String literal = o.getLiteralValue().toString();
-            final String varName = s.getName();
-            return String.format(varPropLit, property, literal, varName, property, literal, varName);
+            return String.format(varPropLit, property, literal, property, literal);
         }
 
         public static String getVarLabelClass( final Node s, final Node p, final Node o ) {
@@ -98,10 +99,8 @@ public class SPARQLStar2CypherTranslator {
 
         public static String getVarPropertyVar( final Node s, final Node p, final Node o) {
             final String property = Configurations.unmapProperty(p.getURI());
-            final String subjectVar = s.getName();
             final String objectVar = o.getName();
-            return String.format(varPropVar, property, subjectVar, property, objectVar,
-                    property, subjectVar, property, objectVar);
+            return String.format(varPropVar, property, property, objectVar, property, property, objectVar);
         }
 
         public static String getVarVarVar(Node s, Node p, Node o) {
