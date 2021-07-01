@@ -39,6 +39,18 @@ public class SPARQLStar2CypherTranslator {
                     }
                 }
             }
+        } else if (pattern.numberOfVars() == 2) {
+            if (s.isVariable() && o.isVariable()) {
+                if (p.isURI() && p.getURI().equals(Configurations.LABEL_URI)) {
+                    return Translations.getVarLabelVar(s, p, o);
+                } else if (p.isURI() && p.getURI().startsWith(Configurations.RELATIONSHIP_MAPPING)) {
+                    return Translations.getVarRelationshipVar(s, p, o);
+                } else if (p.isURI() && p.getURI().startsWith(Configurations.PROPERTY_MAPPING)) {
+                    return Translations.getVarPropertyVar(s, p, o);
+                }
+            }
+        } else {
+            return Translations.getVarVarVar(s, p, o);
         }
         return null;
     }
@@ -50,6 +62,12 @@ public class SPARQLStar2CypherTranslator {
         final protected static String varLabelClass = "MATCH (cpvar1) WHERE cpvar1:%s RETURN nm(cpvar1) AS %s";
         final protected static String varRelURI = "MATCH (cpvar1)-[:%s]->(cpvar2) " +
                                   "WHERE ID(cpvar2) = %s RETURN nm(cpvar1) AS %s";
+        final protected static String varLabelVar = "MATCH (cpvar1) RETURN nm(cpvar1) AS %s, labels(cpvar1) AS %s";
+        final protected static String varRelVar = "MATCH (cpvar1)-[:%s]->(cpvar2) RETURN nm(cpvar1) AS %s, nm(cpvar2) AS %s";
+        final protected static String varPropVar = "MATCH (cpvar1) WHERE EXISTS(cpvar1.%s) " +
+                "RETURN nm(cpvar1) AS %s, cpvar1.%s AS %s UNION " +
+                "MATCH ()-[cpvar2]->() WHERE EXISTS(cpvar2.%s) " +
+                "RETURN elm(cpvar2) AS %s, cpvar2.%s AS %s";
 
         public static String getVarPropertyLiteral( final Node s, final Node p, final Node o ) {
             final String property = Configurations.unmapProperty(p.getURI());
@@ -63,10 +81,31 @@ public class SPARQLStar2CypherTranslator {
             return String.format(varLabelClass, clazz, s.getName());
         }
 
-        public static String getVarRelationshipURI( final Node s, final Node p, final Node o) {
+        public static String getVarRelationshipURI( final Node s, final Node p, final Node o ) {
             final String relationship = Configurations.unmapRelationship(p.getURI());
             final int nodeID = Configurations.unmapNode(o.getURI());
             return String.format(varRelURI, relationship, nodeID, s.getName());
+        }
+
+        public static String getVarLabelVar( final Node s, final Node p, final Node o ) {
+            return String.format(varLabelVar, s.getName(), o.getName());
+        }
+
+        public static String getVarRelationshipVar( final Node s, final Node p, final Node o ) {
+            final String relationship = Configurations.unmapRelationship(p.getURI());
+            return String.format(varRelVar, relationship, s.getName(), o.getName());
+        }
+
+        public static String getVarPropertyVar( final Node s, final Node p, final Node o) {
+            final String property = Configurations.unmapProperty(p.getURI());
+            final String subjectVar = s.getName();
+            final String objectVar = o.getName();
+            return String.format(varPropVar, property, subjectVar, property, objectVar,
+                    property, subjectVar, property, objectVar);
+        }
+
+        public static String getVarVarVar(Node s, Node p, Node o) {
+            return null;
         }
     }
 }

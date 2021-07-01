@@ -47,4 +47,37 @@ public class SPARQLStar2CypherTranslationTest {
                         "WHERE ID(cpvar2) = 22 RETURN nm(cpvar1) AS s");
     }
 
+    @Test
+    public void testVarLabelVar() {
+        final Triple t = new Triple(Var.alloc("s"),
+                NodeFactory.createURI(Configurations.LABEL_URI),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) RETURN nm(cpvar1) AS s, labels(cpvar1) AS o");
+    }
+
+    @Test
+    public void testVarRelationshipVar() {
+        final Triple t = new Triple(Var.alloc("s"),
+                NodeFactory.createURI(Configurations.RELATIONSHIP_MAPPING+"DIRECTED"),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) RETURN nm(cpvar1) AS s, nm(cpvar2) AS o");
+    }
+
+    @Test
+    public void testVarPropertyVar() {
+        final Triple t = new Triple(Var.alloc("s"),
+                NodeFactory.createURI(Configurations.PROPERTY_MAPPING+"name"),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE EXISTS(cpvar1.name) " +
+                        "RETURN nm(cpvar1) AS s, cpvar1.name AS o UNION " +
+                        "MATCH ()-[cpvar2]->() WHERE EXISTS(cpvar2.name) " +
+                        "RETURN elm(cpvar2) AS s, cpvar2.name AS o");
+    }
+
 }
