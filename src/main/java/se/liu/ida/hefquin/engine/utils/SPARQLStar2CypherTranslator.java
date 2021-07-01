@@ -36,8 +36,15 @@ public class SPARQLStar2CypherTranslator {
                     } else if (p.getURI().startsWith(Configurations.RELATIONSHIP_MAPPING)
                             && o.getURI().startsWith(Configurations.NODE_MAPPING)){
                         return Translations.getVarRelationshipURI(s, p, o);
+                    } else {
+                        throw new IllegalArgumentException("Predicate must be the label URI or the mapping of a Relationship." +
+                                "Object must be a literal or a class mapping");
                     }
+                } else {
+                    throw new IllegalArgumentException("Predicate must be an URI. Object must be a literal or an URI");
                 }
+            } else {
+                throw new IllegalArgumentException("Variables in the predicate are not permitted");
             }
         } else if (pattern.numberOfVars() == 2) {
             if (s.isVariable() && o.isVariable()) {
@@ -47,7 +54,11 @@ public class SPARQLStar2CypherTranslator {
                     return Translations.getVarRelationshipVar(s, p, o);
                 } else if (p.isURI() && p.getURI().startsWith(Configurations.PROPERTY_MAPPING)) {
                     return Translations.getVarPropertyVar(s, p, o);
+                } else {
+                    throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship or the label URI");
                 }
+            } else {
+                throw new IllegalArgumentException("Variables in the predicate are not permitted");
             }
         } else {
             return Translations.getVarVarVar(s, p, o);
