@@ -22,11 +22,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 
 public class SourcePlannerImplTest extends EngineTestBase
 {
 	@Test
-	public void oneTPFoneTriplePattern() {
+	public void oneTPFoneTriplePattern() throws SourcePlanningException {
 		// setup
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
@@ -50,7 +51,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void oneBRTPFtwoTriplePatterns() {
+	public void oneBRTPFtwoTriplePatterns() throws SourcePlanningException {
 		// setup
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p1> ?y; <http://example.org/p2> ?z }"
@@ -95,7 +96,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void twoBRTPFtwoTriplePatterns() {
+	public void twoBRTPFtwoTriplePatterns() throws SourcePlanningException {
 		// setup
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org/tpf1> { ?x <http://example.org/p1> ?y }"
@@ -139,7 +140,9 @@ public class SourcePlannerImplTest extends EngineTestBase
 	// --------- helper functions ---------
 
 	protected LogicalPlan createLogicalPlan( final String queryString,
-	                                         final FederationCatalog fedCat ) {
+	                                         final FederationCatalog fedCat )
+				throws SourcePlanningException
+	{
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
