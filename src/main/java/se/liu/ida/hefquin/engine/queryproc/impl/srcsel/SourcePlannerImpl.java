@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
@@ -25,13 +27,11 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -83,29 +83,24 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "empty sequence of operators" );
 		}
 
-		// convert the sequence of Op objects into a left-deep join tree
-		final Iterator<Op> it = jenaOp.iterator();
-		LogicalPlan currentSubPlan = createPlan( it.next() );
-		while ( it.hasNext() ) {
-			currentSubPlan = new LogicalPlanWithBinaryRootImpl(
-					new LogicalOpJoin(),
-					currentSubPlan,
-					createPlan(it.next()) );
+		// convert the sequence of Op objects into a multiway join
+		final List<LogicalPlan> subPlans = new ArrayList<>();
+		for ( final Op subOp : jenaOp.getElements() ) {
+			subPlans.add( createPlan(subOp) );
 		}
-
-		return currentSubPlan;
+		return mergeIntoMultiwayJoin(subPlans);
 	}
 
 	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp ) {
-		return new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
-		                                          createPlan(jenaOp.getLeft()),
-		                                          createPlan(jenaOp.getRight()) );
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+		return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp ) {
-		return new LogicalPlanWithBinaryRootImpl( new LogicalOpUnion(),
-		                                          createPlan(jenaOp.getLeft()),
-		                                          createPlan(jenaOp.getRight()) );
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+		return mergeIntoMultiwayUnion(leftSubPlan,rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp ) {
@@ -143,15 +138,15 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp, final FederationMember fm ) {
-		return new LogicalPlanWithBinaryRootImpl( new LogicalOpJoin(),
-		                                          createPlan(jenaOp.getLeft(),fm),
-		                                          createPlan(jenaOp.getRight(),fm) );
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
+		return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp, final FederationMember fm ) {
-		return new LogicalPlanWithBinaryRootImpl( new LogicalOpUnion(),
-		                                          createPlan(jenaOp.getLeft(),fm),
-		                                          createPlan(jenaOp.getRight(),fm) );
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
+		return mergeIntoMultiwayUnion(leftSubPlan,rightSubPlan);
 	}
 
 	protected LogicalPlan createPlanForBGP( final OpBGP pattern, final FederationMember fm ) {
@@ -173,7 +168,7 @@ public class SourcePlannerImpl implements SourcePlanner
 
 		// If the interface of the federation member does not support
 		// BGP requests (but triple pattern requests), then we create
-		// a chain of tpAdd operators.
+		// a multiway join of triple pattern request operators.
 
 		if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
 			throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
@@ -183,20 +178,65 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "the given BGP is empty" );
 		}
 
-		final Iterator<? extends TriplePattern> it = bgp.getTriplePatterns().iterator();
-
-		// first operator in the chain must be a request operator
-		final TriplePatternRequest req1 = new TriplePatternRequestImpl( it.next() );
-		final LogicalOpRequest<?,?> op1 = new LogicalOpRequest<>( fm, req1 );
-		LogicalPlan currentSubPlan = new LogicalPlanWithNullaryRootImpl(op1);
-
-		// add a tpAdd operator for each of the remaining triple patterns
-		while ( it.hasNext() ) {
-			final LogicalOpTPAdd op = new LogicalOpTPAdd( fm, it.next() );
-			currentSubPlan = new LogicalPlanWithUnaryRootImpl( op, currentSubPlan );
+		final List<LogicalPlan> subPlans = new ArrayList<>();
+		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+			final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
+			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
+			final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op);
+			subPlans.add( subPlan );
 		}
 
-		return currentSubPlan;
+		return mergeIntoMultiwayJoin(subPlans);
+	}
+
+	protected LogicalPlan mergeIntoMultiwayJoin( final LogicalPlan ... subPlans ) {
+		if ( subPlans.length == 1 ) {
+			return subPlans[0];
+		}
+
+		return mergeIntoMultiwayJoin( Arrays.asList(subPlans) );
+	}
+
+	protected LogicalPlan mergeIntoMultiwayJoin( final List<LogicalPlan> subPlans ) {
+		if ( subPlans.size() == 1 ) {
+			return subPlans.get(0);
+		}
+
+		final List<LogicalPlan> subPlansFlattened = new ArrayList<>();
+
+		for ( final LogicalPlan subPlan : subPlans ) {
+			if ( subPlan.getRootOperator() instanceof LogicalOpMultiwayJoin ) {
+				for ( int j = 0; j < subPlan.numberOfSubPlans(); ++j ) {
+					subPlansFlattened.add( subPlan.getSubPlan(j) );
+				}
+			}
+			else {
+				subPlansFlattened.add( subPlan );
+			}
+		}
+
+		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayJoin(), subPlansFlattened );
+	}
+
+	protected LogicalPlan mergeIntoMultiwayUnion( final LogicalPlan ... subPlans ) {
+		if ( subPlans.length == 1 ) {
+			return subPlans[0];
+		}
+
+		final List<LogicalPlan> subPlansFlattened = new ArrayList<>();
+
+		for ( int i = 0; i < subPlans.length; ++i ) {
+			if ( subPlans[i].getRootOperator() instanceof LogicalOpMultiwayUnion ) {
+				for ( int j = 0; j < subPlans[i].numberOfSubPlans(); ++j ) {
+					subPlansFlattened.add( subPlans[i].getSubPlan(j) );
+				}
+			}
+			else {
+				subPlansFlattened.add( subPlans[i] );
+			}
+		}
+
+		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayUnion(), subPlansFlattened );
 	}
 
 }

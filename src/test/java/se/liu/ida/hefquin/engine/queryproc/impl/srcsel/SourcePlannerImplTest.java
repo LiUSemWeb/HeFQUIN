@@ -17,9 +17,8 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -63,35 +62,41 @@ public class SourcePlannerImplTest extends EngineTestBase
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
 
 		// tests
-		assertEquals( 1, plan.numberOfSubPlans() );
-		assertTrue( plan.getRootOperator() instanceof LogicalOpTPAdd );
+		assertEquals( 2, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayJoin );
 
-		final LogicalOpTPAdd rootOp = (LogicalOpTPAdd) plan.getRootOperator();
-		assertTrue( rootOp.getFederationMember() instanceof BRTPFServer );
+		final LogicalPlan subplan1 = plan.getSubPlan(0); 
+		assertEquals( 0, subplan1.numberOfSubPlans() );
+		assertTrue( subplan1.getRootOperator() instanceof LogicalOpRequest<?,?> );
 
-		final Triple firstTP = rootOp.getTP().asJenaTriple();
+		final LogicalOpRequest<?,?> subRootOp1 = (LogicalOpRequest<?,?>) subplan1.getRootOperator();
+		assertTrue( subRootOp1.getFederationMember() instanceof BRTPFServer );
+		assertTrue( subRootOp1.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req1 = (TriplePatternRequest) subRootOp1.getRequest();
+		final TriplePattern tp1 = req1.getQueryPattern();
 		final boolean firstPredicateWasP1;
-		if ( firstTP.getPredicate().getURI().equals("http://example.org/p1") ) {
-			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", rootOp.getTP() );
+		if ( tp1.asJenaTriple().getPredicate().getURI().equals("http://example.org/p1") ) {
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", tp1 );
 			firstPredicateWasP1 = true;
 		} else {
-			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", rootOp.getTP() );
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", tp1 );
 			firstPredicateWasP1 = false;
 		}
 
-		final LogicalPlan subplan = plan.getSubPlan(0); 
-		assertEquals( 0, subplan.numberOfSubPlans() );
-		assertTrue( subplan.getRootOperator() instanceof LogicalOpRequest<?,?> );
+		final LogicalPlan subplan2 = plan.getSubPlan(1); 
+		assertEquals( 0, subplan2.numberOfSubPlans() );
+		assertTrue( subplan2.getRootOperator() instanceof LogicalOpRequest<?,?> );
 
-		final LogicalOpRequest<?,?> subRootOp = (LogicalOpRequest<?,?>) subplan.getRootOperator();
-		assertTrue( subRootOp.getFederationMember() instanceof BRTPFServer );
-		assertTrue( subRootOp.getRequest() instanceof TriplePatternRequest );
+		final LogicalOpRequest<?,?> subRootOp2 = (LogicalOpRequest<?,?>) subplan2.getRootOperator();
+		assertTrue( subRootOp2.getFederationMember() instanceof BRTPFServer );
+		assertTrue( subRootOp2.getRequest() instanceof TriplePatternRequest );
 
-		final TriplePatternRequest req = (TriplePatternRequest) subRootOp.getRequest();
+		final TriplePatternRequest req2 = (TriplePatternRequest) subRootOp2.getRequest();
 		if ( firstPredicateWasP1 ) {
-			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", req );
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", req2 );
 		} else {
-			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", req );
+			assertEqualTriplePatternsVUV( "x", "http://example.org/p1", "y", req2 );
 		}
 	}
 
@@ -111,7 +116,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		// tests
 		assertEquals( 2, plan.numberOfSubPlans() );
-		assertTrue( plan.getRootOperator() instanceof LogicalOpJoin );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayJoin );
 
 		final LogicalPlan subplan1 = plan.getSubPlan(0); 
 		assertEquals( 0, subplan1.numberOfSubPlans() );
