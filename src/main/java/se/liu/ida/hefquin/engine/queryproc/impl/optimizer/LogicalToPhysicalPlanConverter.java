@@ -5,5 +5,5 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
 public interface LogicalToPhysicalPlanConverter
 {
-	PhysicalPlan convert( LogicalPlan lp );
+	PhysicalPlan convert( LogicalPlan lp, boolean keepMultiwayJoins );
 }

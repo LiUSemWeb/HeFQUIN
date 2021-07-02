@@ -3,9 +3,11 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
@@ -18,16 +20,18 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
 	@Override
-	public PhysicalPlan convert( final LogicalPlan lp ) {
-		final List<PhysicalPlan> children = convertChildren(lp);
-		return createPhysicalPlan( lp.getRootOperator(), children );
+	public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
+		final List<PhysicalPlan> children = convertChildren(lp, keepMultiwayJoins);
+		return createPhysicalPlan( lp.getRootOperator(), children, keepMultiwayJoins );
 	}
 
 	/**
@@ -38,18 +42,21 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	 * the given logical plan. For logical plans that do not contain any
 	 * sub-plans, an empty list is returned.
 	 */
-	protected List<PhysicalPlan> convertChildren( final LogicalPlan lp ) {
+	protected List<PhysicalPlan> convertChildren( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
 		final List<PhysicalPlan> children = new ArrayList<PhysicalPlan>();
 		final int numChildren = lp.numberOfSubPlans();
 		if ( numChildren > 0 ) {
 			for ( int i = 0; i < numChildren; ++i ) {
-				children.add( convert(lp.getSubPlan(i)) );
+				children.add( convert(lp.getSubPlan(i), keepMultiwayJoins) );
 			}
 		}
 		return children;
 	}
 
-	protected PhysicalPlan createPhysicalPlan( final LogicalOperator lop, final List<PhysicalPlan> children ) {
+	protected PhysicalPlan createPhysicalPlan( final LogicalOperator lop,
+	                                           final List<PhysicalPlan> children,
+	                                           final boolean keepMultiwayJoins )
+	{
 		if ( lop instanceof NullaryLogicalOp ) {
 			if ( children.size() != 0 )
 				throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
@@ -72,7 +79,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			if ( children.size() < 1 )
 				throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
 
-			return createPhysicalPlanWithNaryRoot( (NaryLogicalOp) lop, children );
+			return createPhysicalPlanWithNaryRoot( (NaryLogicalOp) lop, children, keepMultiwayJoins );
 		}
 		else {
 			throw new IllegalArgumentException( "unknown logical operator: " + lop.getClass().getName() );
@@ -121,9 +128,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		return new PhysicalPlanWithBinaryRootImpl(pop, child1, child2);
 	}
 
-	protected PhysicalPlan createPhysicalPlanWithNaryRoot( final NaryLogicalOp lop, final List<PhysicalPlan> children ) {
+	protected PhysicalPlan createPhysicalPlanWithNaryRoot( final NaryLogicalOp lop,
+	                                                       final List<PhysicalPlan> children,
+	                                                       final boolean keepMultiwayJoins )
+	{
 		if ( lop instanceof LogicalOpMultiwayJoin ) {
-			return createPhysicalPlanForMultiwayJoin( (LogicalOpMultiwayJoin) lop, children );
+			return createPhysicalPlanForMultiwayJoin( (LogicalOpMultiwayJoin) lop, children, keepMultiwayJoins );
 		}
 		else if ( lop instanceof LogicalOpMultiwayUnion ) {
 			return createPhysicalPlanForMultiwayUnion( (LogicalOpMultiwayUnion) lop, children );
@@ -133,9 +143,20 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		}
 	}
 
-	protected PhysicalPlan createPhysicalPlanForMultiwayJoin( final LogicalOpMultiwayJoin lop, final List<PhysicalPlan> children ) {
+	protected PhysicalPlan createPhysicalPlanForMultiwayJoin( final LogicalOpMultiwayJoin lop,
+	                                                          final List<PhysicalPlan> children,
+	                                                          final boolean keepMultiwayJoins )
+	{
 		if ( children.size() == 1 ) {
 			return children.get(0);
+		}
+
+		if ( keepMultiwayJoins ) {
+			final NaryPhysicalOp pop = new BasePhysicalOpMultiwayJoin(lop) {
+				@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
+				@Override public NaryExecutableOp createExecOp(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+			};
+			return new PhysicalPlanWithNaryRootImpl(pop, children);
 		}
 
 		// As long as we do not have an actual algorithm for multiway joins,
@@ -178,7 +199,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
-		return new PhysicalOpNaiveNestedLoopsJoin(lop);
+		return new PhysicalOpSymmetricHashJoin(lop);
 	}
 
 	protected BinaryPhysicalOp convertUnion( final LogicalOpUnion lop ) {

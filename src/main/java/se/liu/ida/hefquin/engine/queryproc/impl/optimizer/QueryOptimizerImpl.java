@@ -18,7 +18,8 @@ public class QueryOptimizerImpl implements QueryOptimizer
 	public PhysicalPlan optimize( final LogicalPlan initialPlan )
 			throws QueryOptimizationException
 	{
-		final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan);
+		final boolean keepMultiwayJoins = false;
+		final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 		return initialPhysicalPlan;
 
 		// TODO implement query optimization
