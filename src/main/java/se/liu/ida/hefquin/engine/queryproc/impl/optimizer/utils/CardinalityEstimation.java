@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.federation.*;
@@ -32,9 +30,10 @@ public class CardinalityEstimation {
     public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
         if ( ppCardinalityTable.contains(pp) ){ return ppCardinalityTable.get(pp); }
 
-        assertEquals( 0, pp.numberOfSubPlans() );
         final PhysicalOperator lop = pp.getRootOperator();
-        assertTrue( lop instanceof PhysicalOpRequest );
+        if ( !(lop instanceof PhysicalOpRequest)){
+            throw new IllegalArgumentException();
+        }
 
         final DataRetrievalRequest req = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getRequest();
         final FederationMember fm = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getFederationMember();
@@ -62,9 +61,10 @@ public class CardinalityEstimation {
     public int getJoinCardinalityEstimation( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
         if ( ppCardinalityTable.contains(pp) ){ return ppCardinalityTable.get(pp); }
 
-        assertEquals( 2, pp.numberOfSubPlans() );
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        assertTrue( lop.getLogicalOperator() instanceof LogicalOpJoin );
+        if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin)){
+            throw new IllegalArgumentException();
+        }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
         final PhysicalPlan pp2 = pp.getSubPlan(1);
@@ -78,10 +78,11 @@ public class CardinalityEstimation {
     public int getTPAddCardinalityEstimation( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
         if (ppCardinalityTable.contains(pp)){ return ppCardinalityTable.get(pp); }
 
-        assertEquals( 1, pp.numberOfSubPlans() );
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        assert ( lop instanceof LogicalOpTPAdd );
+        if ( !(lop instanceof LogicalOpTPAdd)){
+            throw new IllegalArgumentException();
+        }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
         final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
@@ -95,10 +96,11 @@ public class CardinalityEstimation {
     public int getBGPAddCardinalityEstimation( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
         if ( ppCardinalityTable.contains(pp) ){ return ppCardinalityTable.get(pp); }
 
-        assertEquals( 1, pp.numberOfSubPlans() );
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        assert ( lop instanceof LogicalOpBGPAdd );
+        if ( !(lop instanceof LogicalOpBGPAdd)){
+            throw new IllegalArgumentException();
+        }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
         final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
