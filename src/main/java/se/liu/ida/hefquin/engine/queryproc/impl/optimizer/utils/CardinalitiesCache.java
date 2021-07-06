@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
 import java.util.*;
 
-public class PhysicalPlanCardinalityTable {
+public class CardinalitiesCache {
     protected final Map<PhysicalPlan, Integer> map = new HashMap<>();
 
     public boolean add ( final PhysicalPlan lp, final Integer card ) {
