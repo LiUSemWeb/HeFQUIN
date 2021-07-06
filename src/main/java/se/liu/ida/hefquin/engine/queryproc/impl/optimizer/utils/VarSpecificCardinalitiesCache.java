@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PhysicalPlanVarSpecificCardinalityTable {
+public class VarSpecificCardinalitiesCache {
     protected final Map<PhysicalPlan, Map<Var, Integer>> map = new HashMap<>();
 
     public boolean add ( final PhysicalPlan lop, final Var v, final Integer card ) {
@@ -34,15 +34,15 @@ public class PhysicalPlanVarSpecificCardinalityTable {
         return false;
     }
 
-    public int get ( final PhysicalPlan lop, final Var v ) {
+    public Integer get ( final PhysicalPlan lop, final Var v ) {
         if ( map.containsKey(lop) ){
             Map<Var, Integer> mapV = map.get(lop);
             if(mapV.containsKey(v)){
                 return mapV.get(v);
             }
-            throw new IllegalArgumentException();
+            return null;
         }
-        throw new IllegalArgumentException();
+        return null;
     }
 
 }

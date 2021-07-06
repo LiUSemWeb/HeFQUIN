@@ -24,8 +24,8 @@ import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import java.util.*;
 
 public class CardinalityEstimation {
-    protected final PhysicalPlanCardinalityTable ppCardinalityTable = new PhysicalPlanCardinalityTable();
-    protected final PhysicalPlanVarSpecificCardinalityTable ppVarCardinalityTable = new PhysicalPlanVarSpecificCardinalityTable();
+    protected final CardinalitiesCache ppCardinalityTable = new CardinalitiesCache();
+    protected final VarSpecificCardinalitiesCache ppVarCardinalityTable = new VarSpecificCardinalitiesCache();
 
     public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
         if ( ppCardinalityTable.contains(pp) ){ return ppCardinalityTable.get(pp); }
