@@ -56,7 +56,7 @@ public class WrappingDPAlgorithm {
             return children.get(0);
         }
 
-        DynamicProgramming dp= new DynamicProgramming( ctxt, children );
+        final DynamicProgramming dp= new DynamicProgramming( ctxt, children );
         return dp.optimizePhysicalPlanForMultiwayJoin();
     }
 }
