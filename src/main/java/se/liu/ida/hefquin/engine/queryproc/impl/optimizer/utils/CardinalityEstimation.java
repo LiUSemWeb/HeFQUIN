@@ -55,7 +55,7 @@ public class CardinalityEstimation {
             try {
                 resp = ctxt.getFederationAccessMgr().performCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
             } catch (FederationAccessException e) {
-                throw new QueryOptimizationException();
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of SPARQLRequest over SPARQLEndpoint", e);
             }
             cardinality = resp.getCardinality();
         } else if ( fm instanceof TPFServer && req instanceof TPFRequest ) {
@@ -63,7 +63,7 @@ public class CardinalityEstimation {
             try {
                 resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (TPFServer) fm );
             } catch (FederationAccessException e) {
-                throw new QueryOptimizationException();
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over TPFServer", e);
             }
             cardinality = resp.getCardinalityEstimate();
         } else if ( fm instanceof BRTPFServer && req instanceof TPFRequest ) {
@@ -71,7 +71,7 @@ public class CardinalityEstimation {
             try {
                 resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (BRTPFServer) fm );
             } catch (FederationAccessException e) {
-                throw new QueryOptimizationException();
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over BRTPFServer", e);
             }
             cardinality = resp.getCardinalityEstimate();
         } else if ( fm instanceof BRTPFServer && req instanceof BRTPFRequest ) {
@@ -79,7 +79,7 @@ public class CardinalityEstimation {
             try {
                 resp = ctxt.getFederationAccessMgr().performRequest( (BRTPFRequest) req, (BRTPFServer) fm );
             } catch (FederationAccessException e) {
-                throw new QueryOptimizationException();
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of BRTPFRequest over BRTPFServer", e);
             }
             cardinality = resp.getCardinalityEstimate();
         } else
@@ -189,7 +189,7 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    public int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws QueryOptimizationException {
+    protected int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws QueryOptimizationException {
         final Integer varCachedCard = varSpecificCardinalitiesCache.get(pp, v);
         if ( varCachedCard != null ) {
             return varCachedCard;
