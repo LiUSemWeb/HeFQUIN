@@ -10,7 +10,7 @@ public class VarSpecificCardinalitiesCache {
     protected final Map<PhysicalPlan, Map<Var, Integer>> map = new HashMap<>();
 
     public void add ( final PhysicalPlan lop, final Var v, final Integer card ) {
-        if (lop == null || v == null){
+        if ( lop == null || v == null ){
             throw new IllegalArgumentException();
         }
 
