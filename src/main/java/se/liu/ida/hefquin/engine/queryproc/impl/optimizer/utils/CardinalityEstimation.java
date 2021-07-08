@@ -28,7 +28,10 @@ public class CardinalityEstimation {
     protected final VarSpecificCardinalitiesCache ppVarCardinalityTable = new VarSpecificCardinalitiesCache();
 
     public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp, final FederationAccessManager mgr ) throws FederationAccessException {
-        if ( ppCardinalityTable.contains(pp) ){ return ppCardinalityTable.get(pp); }
+        final Integer cachedCard = ppCardinalityTable.get(pp);
+        if ( cachedCard != null ) {
+                return cachedCard;
+        }
 
         final PhysicalOperator lop = pp.getRootOperator();
         if ( !(lop instanceof PhysicalOpRequest)){
