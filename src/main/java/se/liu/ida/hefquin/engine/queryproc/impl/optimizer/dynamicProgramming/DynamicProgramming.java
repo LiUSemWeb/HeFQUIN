@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
 
-import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
@@ -23,17 +22,17 @@ public class DynamicProgramming {
         this.cardEstimate = new CardinalityEstimation(ctxt);
     }
 
-    public PhysicalPlan optimizePhysicalPlanForMultiwayJoin() throws QueryOptimizationException, FederationAccessException {
+    public PhysicalPlan optimizePhysicalPlanForMultiwayJoin() throws QueryOptimizationException {
         PhysicalPlan currentPlan = chooseFirstSubquery();
 
-        while (lpList.size() > 0){
+        while ( lpList.size() > 0 ){
             currentPlan = cardinalityTwoSubQueries(currentPlan);
         }
 
         return currentPlan;
     }
 
-    protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException, FederationAccessException {
+    protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException {
         PhysicalPlan firstPlan = lpList.get(0);
         int initialCost = cardEstimate.getCardinalityEstimationOfLeafNode(firstPlan );;
 
@@ -46,11 +45,11 @@ public class DynamicProgramming {
             }
         }
 
-        lpList.remove(firstPlan);
+        lpList.remove( firstPlan );
         return firstPlan;
     }
 
-    protected PhysicalPlan cardinalityTwoSubQueries(final PhysicalPlan currentPlan) throws QueryOptimizationException, FederationAccessException {
+    protected PhysicalPlan cardinalityTwoSubQueries(final PhysicalPlan currentPlan) throws QueryOptimizationException {
         PhysicalPlan newPlan = new PhysicalPlanWithBinaryRootImpl(convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(0));
         int initialCost = cardEstimate.getJoinCardinalityEstimation(newPlan );
 
@@ -58,7 +57,7 @@ public class DynamicProgramming {
             final PhysicalPlan lpCandidate = new PhysicalPlanWithBinaryRootImpl( convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(i));
 
             final int cost = cardEstimate.getJoinCardinalityEstimation( lpCandidate );
-            if (cost < initialCost){
+            if ( cost < initialCost ){
                 newPlan = lpCandidate;
                 initialCost = cost;
             }

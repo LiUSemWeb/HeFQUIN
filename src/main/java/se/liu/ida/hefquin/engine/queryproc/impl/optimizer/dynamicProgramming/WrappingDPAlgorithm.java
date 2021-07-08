@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
 
-import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -20,17 +19,17 @@ public class WrappingDPAlgorithm {
         this.ctxt = ctxt;
     }
 
-    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws FederationAccessException, QueryOptimizationException {
+    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 
-        return optimizePhysicalPlan(initialPhysicalPlan);
+        return optimizePhysicalPlan( initialPhysicalPlan );
     }
 
-    public PhysicalPlan optimizePhysicalPlan( final PhysicalPlan pp) throws FederationAccessException, QueryOptimizationException {
+    public PhysicalPlan optimizePhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        if ( lop instanceof LogicalOpMultiwayJoin) {
+        if ( lop instanceof LogicalOpMultiwayJoin ){
             final List<PhysicalPlan> children = findChildren(pp);
             return rewrite( children );
         }
@@ -39,25 +38,25 @@ public class WrappingDPAlgorithm {
         }
     }
 
-    public List<PhysicalPlan> findChildren( final PhysicalPlan pp ) throws FederationAccessException, QueryOptimizationException {
+    protected List<PhysicalPlan> findChildren( final PhysicalPlan pp ) throws QueryOptimizationException {
         final List<PhysicalPlan> children = new ArrayList<PhysicalPlan>();
         final int numChildren = pp.numberOfSubPlans();
-        if ( numChildren > 0 ) {
-            for ( int i = 0; i < numChildren; ++i ) {
-                children.add( optimizePhysicalPlan(pp.getSubPlan(i)) );
-            }
+
+        for ( int i = 0; i < numChildren; ++i ){
+            children.add( optimizePhysicalPlan(pp.getSubPlan(i)) );
         }
         return children;
     }
 
-    public PhysicalPlan rewrite( final List<PhysicalPlan> children ) throws QueryOptimizationException, FederationAccessException {
-        if ( children.size() < 1 )
+    public PhysicalPlan rewrite( final List<PhysicalPlan> children ) throws QueryOptimizationException {
+        if ( children.size() < 1 ){
             throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
+        }
         else if (children.size() == 1 ){
             return children.get(0);
         }
 
-        DynamicProgramming dp= new DynamicProgramming(ctxt, children);
+        DynamicProgramming dp= new DynamicProgramming( ctxt, children );
         return dp.optimizePhysicalPlanForMultiwayJoin();
     }
 }
