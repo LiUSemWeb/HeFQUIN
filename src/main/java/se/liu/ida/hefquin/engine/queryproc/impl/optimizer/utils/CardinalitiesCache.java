@@ -7,9 +7,8 @@ import java.util.*;
 public class CardinalitiesCache {
     protected final Map<PhysicalPlan, Integer> map = new HashMap<>();
 
-    public boolean add ( final PhysicalPlan lp, final Integer card ) {
+    public void add ( final PhysicalPlan lp, final Integer card ) {
         map.put( lp, card );
-        return true;
     }
 
     public boolean contains ( final PhysicalPlan lp ) {
