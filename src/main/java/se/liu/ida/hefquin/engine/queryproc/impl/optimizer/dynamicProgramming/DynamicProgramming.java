@@ -12,7 +12,7 @@ import java.util.*;
 
 public class DynamicProgramming extends CardinalityEstimation {
     protected final QueryProcContext ctxt;
-    protected List<PhysicalPlan> lpList;
+    protected final List<PhysicalPlan> lpList;
 
     public DynamicProgramming(final QueryProcContext ctxt, final List<PhysicalPlan> lpList) {
         assert ctxt != null;
@@ -71,4 +71,3 @@ public class DynamicProgramming extends CardinalityEstimation {
         return new PhysicalOpSymmetricHashJoin(lop);
     }
 }
-
