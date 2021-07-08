@@ -16,6 +16,7 @@ public class DynamicProgramming extends CardinalityEstimation {
 
     public DynamicProgramming(final QueryProcContext ctxt, final List<PhysicalPlan> lpList) {
         assert ctxt != null;
+        assert lpList.size() > 0;
         this.ctxt = ctxt;
         this.lpList = lpList;
     }
