@@ -4,8 +4,9 @@ import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 
 import java.util.ArrayList;
@@ -19,18 +20,18 @@ public class WrappingDPAlgorithm {
         this.ctxt = ctxt;
     }
 
-    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws FederationAccessException {
+    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws FederationAccessException, QueryOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 
         return optimizePhysicalPlan(initialPhysicalPlan);
     }
 
-    public PhysicalPlan optimizePhysicalPlan( final PhysicalPlan pp) throws FederationAccessException {
-        final List<PhysicalPlan> children = findChildren(pp);
+    public PhysicalPlan optimizePhysicalPlan( final PhysicalPlan pp) throws FederationAccessException, QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        if ( lop instanceof NaryLogicalOp ) {
+        if ( lop instanceof LogicalOpMultiwayJoin) {
+            final List<PhysicalPlan> children = findChildren(pp);
             return rewrite( children );
         }
         else {
@@ -38,7 +39,7 @@ public class WrappingDPAlgorithm {
         }
     }
 
-    public List<PhysicalPlan> findChildren( final PhysicalPlan pp ) throws FederationAccessException {
+    public List<PhysicalPlan> findChildren( final PhysicalPlan pp ) throws FederationAccessException, QueryOptimizationException {
         final List<PhysicalPlan> children = new ArrayList<PhysicalPlan>();
         final int numChildren = pp.numberOfSubPlans();
         if ( numChildren > 0 ) {
@@ -49,7 +50,7 @@ public class WrappingDPAlgorithm {
         return children;
     }
 
-    public PhysicalPlan rewrite( final List<PhysicalPlan> children ) throws FederationAccessException {
+    public PhysicalPlan rewrite( final List<PhysicalPlan> children ) throws QueryOptimizationException, FederationAccessException {
         if ( children.size() < 1 )
             throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
         else if (children.size() == 1 ){
