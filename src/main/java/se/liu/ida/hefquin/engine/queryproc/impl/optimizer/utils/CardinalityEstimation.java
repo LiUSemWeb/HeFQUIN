@@ -21,16 +21,16 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.*;
 
 public class CardinalityEstimation {
     protected final CardinalitiesCache cardinalitiesCache = new CardinalitiesCache();
     protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
-    protected final QueryOptimizationContext ctxt;
+    protected final QueryProcContext ctxt;
 
-    public CardinalityEstimation(QueryOptimizationContext ctxt) {
+    public CardinalityEstimation(QueryProcContext ctxt) {
         assert ctxt != null;
         this.ctxt = ctxt;
     }
