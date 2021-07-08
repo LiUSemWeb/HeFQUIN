@@ -14,7 +14,7 @@ public class DynamicProgramming {
     protected final List<PhysicalPlan> lpList;
     protected final CardinalityEstimation cardEstimate;
 
-    public DynamicProgramming(final QueryProcContext ctxt, final List<PhysicalPlan> lpList) {
+    public DynamicProgramming( final QueryProcContext ctxt, final List<PhysicalPlan> lpList ) {
         assert ctxt != null;
         assert lpList.size() > 0;
         this.ctxt = ctxt;
@@ -38,8 +38,8 @@ public class DynamicProgramming {
 
         for ( int i = 1; i < lpList.size(); ++i ){
             final PhysicalPlan nextPlan = lpList.get(i);
-            final int cost = cardEstimate.getCardinalityEstimationOfLeafNode(nextPlan );
-            if (cost < initialCost){
+            final int cost = cardEstimate.getCardinalityEstimationOfLeafNode( nextPlan );
+            if ( cost < initialCost ){
                 firstPlan = nextPlan;
                 initialCost = cost;
             }
@@ -49,12 +49,12 @@ public class DynamicProgramming {
         return firstPlan;
     }
 
-    protected PhysicalPlan cardinalityTwoSubQueries(final PhysicalPlan currentPlan) throws QueryOptimizationException {
-        PhysicalPlan newPlan = new PhysicalPlanWithBinaryRootImpl(convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(0));
+    protected PhysicalPlan cardinalityTwoSubQueries( final PhysicalPlan currentPlan ) throws QueryOptimizationException {
+        PhysicalPlan newPlan = new PhysicalPlanWithBinaryRootImpl(convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(0) );
         int initialCost = cardEstimate.getJoinCardinalityEstimation(newPlan );
 
         for ( int i = 1; i < lpList.size(); ++i ){
-            final PhysicalPlan lpCandidate = new PhysicalPlanWithBinaryRootImpl( convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(i));
+            final PhysicalPlan lpCandidate = new PhysicalPlanWithBinaryRootImpl( convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(i) );
 
             final int cost = cardEstimate.getJoinCardinalityEstimation( lpCandidate );
             if ( cost < initialCost ){
@@ -68,4 +68,5 @@ public class DynamicProgramming {
     protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
         return new PhysicalOpSymmetricHashJoin(lop);
     }
+
 }

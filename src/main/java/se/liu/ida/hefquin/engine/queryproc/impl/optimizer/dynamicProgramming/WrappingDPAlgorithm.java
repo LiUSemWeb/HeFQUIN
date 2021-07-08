@@ -21,7 +21,7 @@ public class WrappingDPAlgorithm {
 
     public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final boolean keepMultiwayJoins = true;
-        final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
+        final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
 
         return optimizePhysicalPlan( initialPhysicalPlan );
     }
@@ -49,14 +49,13 @@ public class WrappingDPAlgorithm {
     }
 
     public PhysicalPlan rewrite( final List<PhysicalPlan> children ) throws QueryOptimizationException {
-        if ( children.size() < 1 ){
-            throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
-        }
-        else if (children.size() == 1 ){
+        if ( children.size() == 1 ){
             return children.get(0);
-        }
-
-        final DynamicProgramming dp= new DynamicProgramming( ctxt, children );
-        return dp.optimizePhysicalPlanForMultiwayJoin();
+        } else if ( children.size() > 1 ){
+            final DynamicProgramming dp = new DynamicProgramming( ctxt, children );
+            return dp.optimizePhysicalPlanForMultiwayJoin();
+        } else
+            throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
     }
+
 }
