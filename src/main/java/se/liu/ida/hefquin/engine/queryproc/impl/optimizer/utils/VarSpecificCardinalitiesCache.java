@@ -9,8 +9,8 @@ import java.util.Map;
 public class VarSpecificCardinalitiesCache {
     protected final Map<PhysicalPlan, Map<Var, Integer>> map = new HashMap<>();
 
-    public boolean add ( final PhysicalPlan lop, final Var v, final Integer card ) {
-        if (lop == null || v == null){
+    public void add ( final PhysicalPlan lop, final Var v, final Integer card ) {
+        if ( lop == null || v == null ){
             throw new IllegalArgumentException();
         }
 
@@ -21,28 +21,15 @@ public class VarSpecificCardinalitiesCache {
             map.put(lop, mapV);
         }
         else mapIn.put(v, card);
-
-        return true;
     }
 
     public boolean contains ( final PhysicalPlan lop, final Var v ) {
-        if ( map.containsKey(lop) ){
-            Map<Var, Integer> mapV = map.get(lop);
-            if( mapV.containsKey(v) ){ return true; }
-            return false;
-        }
-        return false;
+        Map<Var, Integer> mapV = map.get(lop);
+        return mapV.containsKey(v);
     }
 
     public Integer get ( final PhysicalPlan lop, final Var v ) {
-        if ( map.containsKey(lop) ){
-            Map<Var, Integer> mapV = map.get(lop);
-            if(mapV.containsKey(v)){
-                return mapV.get(v);
-            }
-            return null;
-        }
-        return null;
+        Map<Var, Integer> mapV = map.get(lop);
+        return mapV.get(v);
     }
-
 }

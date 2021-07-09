@@ -35,14 +35,14 @@ public class CardinalityEstimation {
         this.ctxt = ctxt;
     }
 
-    public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws QueryOptimizationException, FederationAccessException {
+    public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperator lop = pp.getRootOperator();
-        if ( !(lop instanceof PhysicalOpRequest)){
+        if ( !(lop instanceof PhysicalOpRequest) ){
             throw new IllegalArgumentException();
         }
         
         final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ) {
+        if ( cachedCard != null ){
                 return cachedCard;
         }
 
@@ -50,17 +50,37 @@ public class CardinalityEstimation {
         final FederationMember fm = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getFederationMember();
 
         final int cardinality;
-        if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
-            final CardinalityResponse resp = ctxt.getFederationAccessMgr().performCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+        if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ){
+            final CardinalityResponse resp;
+            try {
+                resp = ctxt.getFederationAccessMgr().performCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+            } catch (FederationAccessException e) {
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of SPARQLRequest over SPARQLEndpoint", e);
+            }
             cardinality = resp.getCardinality();
-        } else if ( fm instanceof TPFServer && req instanceof TPFRequest ) {
-            final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (TPFServer) fm );
+        } else if ( fm instanceof TPFServer && req instanceof TPFRequest ){
+            final TPFResponse resp;
+            try {
+                resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (TPFServer) fm );
+            } catch (FederationAccessException e) {
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over TPFServer", e);
+            }
             cardinality = resp.getCardinalityEstimate();
-        } else if ( fm instanceof BRTPFServer && req instanceof TPFRequest ) {
-            final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (BRTPFServer) fm );
+        } else if ( fm instanceof BRTPFServer && req instanceof TPFRequest ){
+            final TPFResponse resp;
+            try {
+                resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (BRTPFServer) fm );
+            } catch (FederationAccessException e) {
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over BRTPFServer", e);
+            }
             cardinality = resp.getCardinalityEstimate();
-        } else if ( fm instanceof BRTPFServer && req instanceof BRTPFRequest ) {
-            final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+        } else if ( fm instanceof BRTPFServer && req instanceof BRTPFRequest ){
+            final TPFResponse resp;
+            try {
+                resp = ctxt.getFederationAccessMgr().performRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+            } catch (FederationAccessException e) {
+                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of BRTPFRequest over BRTPFServer", e);
+            }
             cardinality = resp.getCardinalityEstimate();
         } else
             throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
@@ -69,14 +89,14 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws FederationAccessException, QueryOptimizationException {
+    public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin)){
+        if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin) ){
             throw new IllegalArgumentException();
         }
 
         final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ) {
+        if ( cachedCard != null ){
             return cachedCard;
         }
 
@@ -89,15 +109,15 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws FederationAccessException, QueryOptimizationException {
+    public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        if ( !(lop instanceof LogicalOpTPAdd)){
+        if ( !(lop instanceof LogicalOpTPAdd) ){
             throw new IllegalArgumentException();
         }
 
         final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ) {
+        if ( cachedCard != null ){
             return cachedCard;
         }
 
@@ -110,15 +130,15 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws FederationAccessException, QueryOptimizationException {
+    public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        if ( !(lop instanceof LogicalOpBGPAdd)){
+        if ( !(lop instanceof LogicalOpBGPAdd) ){
             throw new IllegalArgumentException();
         }
 
         final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ) {
+        if ( cachedCard != null ){
             return cachedCard;
         }
 
@@ -131,7 +151,7 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    protected int joinCardinality( final PhysicalPlan pp1, final PhysicalPlan pp2 ) throws FederationAccessException, QueryOptimizationException {
+    protected int joinCardinality( final PhysicalPlan pp1, final PhysicalPlan pp2 ) throws QueryOptimizationException {
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( pp1.getExpectedVariables(), pp2.getExpectedVariables() );
         final Set<Var> possibleJoinVars = ExpectedVariablesUtils.unionOfAllVariables( pp1.getExpectedVariables(), pp2.getExpectedVariables() );
         possibleJoinVars.removeAll(certainJoinVars);
@@ -140,23 +160,21 @@ public class CardinalityEstimation {
         int cardinality = 0;
 
         if ( !certainJoinVars.isEmpty() ){
-            for ( final Var v : certainJoinVars ) {
+            for ( final Var v : certainJoinVars ){
                 int c1 = getCardinalityEstimationOfSpecificVar( pp1, v );
                 int c2 = getCardinalityEstimationOfSpecificVar( pp2, v );
                 int c = min(c1, c2);
                 cardinality = max(c, cardinality);
             }
-        }
-        else if ( !possibleJoinVars.isEmpty() ){
-            for ( final Var v : possibleJoinVars ) {
+        } else if ( !possibleJoinVars.isEmpty() ){
+            for ( final Var v : possibleJoinVars ){
                 int c1 = getCardinalityEstimationOfSpecificVar( pp1, v );
                 int c2 = getCardinalityEstimationOfSpecificVar( pp2, v );
                 int c = min(c1, c2);
                 cardinality = max(c, cardinality);
             }
-        }
-        else {
-            for ( final Var v : allCertainVars ) {
+        } else {
+            for ( final Var v : allCertainVars ){
                 int c ;
                 if ( pp1.getExpectedVariables().getCertainVariables().contains(v) ){
                     c = getCardinalityEstimationOfSpecificVar( pp1, v );
@@ -169,7 +187,7 @@ public class CardinalityEstimation {
         return cardinality;
     }
 
-    public int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws FederationAccessException, QueryOptimizationException {
+    protected int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws QueryOptimizationException {
         final Integer varCachedCard = varSpecificCardinalitiesCache.get(pp, v);
         if ( varCachedCard != null ) {
             return varCachedCard;
@@ -179,28 +197,24 @@ public class CardinalityEstimation {
         final LogicalOperator lop = pop.getLogicalOperator();
 
         int cardinality = 0;
-        if (lop instanceof LogicalOpRequest) {
+        if ( lop instanceof LogicalOpRequest ){
             cardinality = getCardinalityEstimationOfLeafNode(pp );
-        }
-        else if (lop instanceof LogicalOpTPAdd) {
+        } else if ( lop instanceof LogicalOpTPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
             final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd((LogicalOpTPAdd) lop);
 
             return joinCardinalityBasedOnVar( pp1, reqTP, v );
-        }
-        else if (lop instanceof LogicalOpBGPAdd){
+        } else if ( lop instanceof LogicalOpBGPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
             final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd)lop);
 
             return joinCardinalityBasedOnVar( pp1, reqBGP, v );
-        }
-        else if (lop instanceof LogicalOpJoin){
+        } else if ( lop instanceof LogicalOpJoin ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
             final PhysicalPlan pp2 = pp.getSubPlan(1);
 
             return joinCardinalityBasedOnVar( pp1, pp2, v );
-        }
-        else if (lop instanceof LogicalOpUnion){
+        } else if ( lop instanceof LogicalOpUnion ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
             final PhysicalPlan pp2 = pp.getSubPlan(1);
 
@@ -208,23 +222,25 @@ public class CardinalityEstimation {
             final int c2 = getCardinalityEstimationOfSpecificVar( pp2, v );
 
             cardinality = c1 + c2;
-        }
-        else
+        } else
             throw new IllegalArgumentException();
 
         varSpecificCardinalitiesCache.add(pp, v, cardinality);
         return cardinality;
     }
 
-    protected int joinCardinalityBasedOnVar( PhysicalPlan pp1, PhysicalPlan pp2, Var v ) throws FederationAccessException, QueryOptimizationException {
+    protected int joinCardinalityBasedOnVar( PhysicalPlan pp1, PhysicalPlan pp2, Var v ) throws QueryOptimizationException {
         final int cardinality;
         final int c1 = getCardinalityEstimationOfSpecificVar( pp1, v );
         final int c2 = getCardinalityEstimationOfSpecificVar( pp2, v );
 
         final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( pp1.getExpectedVariables(), pp2.getExpectedVariables() );
 
-        if ( allJoinVars.contains(v) ){ cardinality = min(c1, c2); }
-        else cardinality = c1 * c2;
+        if ( allJoinVars.contains(v) ){
+            cardinality = min(c1, c2);
+        } else {
+            cardinality = c1 * c2;
+        }
         return cardinality;
     }
 
@@ -233,16 +249,13 @@ public class CardinalityEstimation {
         final FederationMember fm = lop.getFederationMember();
 
         final DataRetrievalRequest req;
-        if ( fm instanceof SPARQLEndpoint ) {
+        if ( fm instanceof SPARQLEndpoint ){
             req = new TriplePatternRequestImpl( lop.getTP());
-        }
-        else if ( fm instanceof TPFServer ) {
+        } else if ( fm instanceof TPFServer ){
             req = new TPFRequestImpl(lop.getTP(), 0);
-        }
-        else if ( fm instanceof BRTPFServer ) {
+        } else if ( fm instanceof BRTPFServer ){
             req = new TPFRequestImpl(lop.getTP(), 0);
-        }
-        else
+        } else
             throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
@@ -255,10 +268,9 @@ public class CardinalityEstimation {
         final FederationMember fm = lop.getFederationMember();
 
         final DataRetrievalRequest req;
-        if ( fm.getInterface().supportsBGPRequests()) {
+        if ( fm.getInterface().supportsBGPRequests() ){
             req = new BGPRequestImpl( lop.getBGP());
-        }
-        else
+        } else
             throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
@@ -270,16 +282,13 @@ public class CardinalityEstimation {
     public PhysicalPlan formRequestBasedOnPattern( final SPARQLGraphPattern P, final FederationMember fm ){
         final DataRetrievalRequest req;
 
-        if ( fm instanceof SPARQLEndpoint) {
+        if ( fm instanceof SPARQLEndpoint ){
             req = new SPARQLRequestImpl( P );
-        }
-        else if ( fm instanceof TPFServer ) {
+        } else if ( fm instanceof TPFServer ){
             req = new TriplePatternRequestImpl((TriplePattern) P);
-        }
-        else if ( fm instanceof BRTPFServer ) {
+        } else if ( fm instanceof BRTPFServer ){
             req = new TriplePatternRequestImpl((TriplePattern) P);
-        }
-        else
+        } else
             throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
