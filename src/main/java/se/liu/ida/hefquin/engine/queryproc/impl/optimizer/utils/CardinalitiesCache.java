@@ -7,16 +7,16 @@ import java.util.*;
 public class CardinalitiesCache {
     protected final Map<PhysicalPlan, Integer> map = new HashMap<>();
 
-    public void add ( final PhysicalPlan lp, final Integer card ) {
-        map.put( lp, card );
+    public void add ( final PhysicalPlan pp, final Integer card ) {
+        map.put( pp, card );
     }
 
-    public boolean contains ( final PhysicalPlan lp ) {
-        return map.containsKey(lp);
+    public boolean contains ( final PhysicalPlan pp ) {
+        return map.containsKey(pp);
     }
 
-    public Integer get ( PhysicalPlan lp) {
-        return map.get(lp);
+    public Integer get ( PhysicalPlan pp) {
+        return map.get(pp);
     }
 
 }

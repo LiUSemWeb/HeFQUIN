@@ -27,6 +27,7 @@ import java.util.Set;
 
 public class CostOfRootOperator implements Metrics{
     protected final CardinalityEstimation cardEstimate;
+    protected final RootOperatorCostCache rootOperatorCostCache = new RootOperatorCostCache();
 
     public CostOfRootOperator( CardinalityEstimation cardEstimate ) {
         this.cardEstimate = cardEstimate;
@@ -34,25 +35,33 @@ public class CostOfRootOperator implements Metrics{
 
     @Override
     public int getNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        final PhysicalOperator pop = pp.getRootOperator();
+        final Integer cachedCost = rootOperatorCostCache.getNumberOfRequests(pp);
+        if ( cachedCost != null ){ return cachedCost; }
 
+        final PhysicalOperator pop = pp.getRootOperator();
+        final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin){
-            return getIntermediateResultsSize(pp.getSubPlan(0));
+            cost = getIntermediateResultsSize(pp.getSubPlan(0));
         } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES){
-            return 1;
+            cost = 1;
         } else if ( pop instanceof PhysicalOpRequest){
-            return 1;
+            cost = 1;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin){
-            return 0;
+            cost = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
+
+        rootOperatorCostCache.addNumberOfRequests(pp, cost);
+        return cost;
     }
 
     @Override
     public int getShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+        final Integer cachedCost = rootOperatorCostCache.getShippedRDFTermsForRequests(pp);
+        if ( cachedCost != null ){ return cachedCost; }
+
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-
         int numberOfTerms = 0;
         int intermediateResultSize = 0 ;
         int numberOfJoinVars = 0;
@@ -81,21 +90,27 @@ public class CostOfRootOperator implements Metrics{
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
         }
 
+        final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            return intermediateResultSize * (numberOfTerms + numberOfJoinVars);
+            cost = intermediateResultSize * (numberOfTerms + numberOfJoinVars);
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES || pop instanceof PhysicalOpBindJoin ){
-            return numberOfTerms + intermediateResultSize * numberOfJoinVars;
+            cost = numberOfTerms + intermediateResultSize * numberOfJoinVars;
         } else if ( pop instanceof PhysicalOpRequest ) {
-            return numberOfTerms;
+            cost = numberOfTerms;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            return 0;
+            cost = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
+
+        rootOperatorCostCache.addShippedRDFTermsForRequests(pp, cost);
+        return cost;
     }
 
     @Override
     public int getShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        //return 0;
+        final Integer cachedCost = rootOperatorCostCache.getShippedRDFVarsForRequests(pp);
+        if ( cachedCost != null ){ return cachedCost; }
+
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -127,34 +142,41 @@ public class CostOfRootOperator implements Metrics{
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
         }
 
+        final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            return intermediateResultSize * (numberOfVars - numberOfJoinVars);
+            cost = intermediateResultSize * (numberOfVars - numberOfJoinVars);
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER  || pop instanceof PhysicalOpBindJoin ){
-            return numberOfVars + intermediateResultSize * numberOfJoinVars;
+            cost = numberOfVars + intermediateResultSize * numberOfJoinVars;
         } else if ( pop instanceof PhysicalOpBindJoinWithVALUES ){
-            return numberOfVars + numberOfJoinVars;
+            cost = numberOfVars + numberOfJoinVars;
         } else if ( pop instanceof PhysicalOpRequest ) {
-            return numberOfVars;
+            cost = numberOfVars;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            return 0;
+            cost = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
+
+        rootOperatorCostCache.addShippedRDFVarsForRequests(pp, cost);
+        return cost;
     }
 
     @Override
     public int getShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
-        //return 0;
+        final Integer cachedCost = rootOperatorCostCache.getShippedRDFTermsForResponses(pp);
+        if ( cachedCost != null ){ return cachedCost; }
+
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
+        final int cost;
 
         if ( lop instanceof LogicalOpTPAdd ){
             final FederationMember fm = ((LogicalOpTPAdd) lop).getFederationMember();
 
             if ( fm instanceof SPARQLEndpoint){
                 final int numberOfVars = ((LogicalOpTPAdd) lop).getTP().numberOfVars();
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else if ( fm instanceof TPFServer || fm instanceof BRTPFServer){
-                return 3 * getIntermediateResultsSize(pp);
+                cost = 3 * getIntermediateResultsSize(pp);
             } else
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
@@ -163,7 +185,7 @@ public class CostOfRootOperator implements Metrics{
 
             if ( fm instanceof SPARQLEndpoint ){
                 final int numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
@@ -172,33 +194,39 @@ public class CostOfRootOperator implements Metrics{
 
             if ( req instanceof SPARQLRequest ){
                 final int numberOfVars = numberOfVarsOfBGP((BGP) ((SPARQLRequest) req).getQueryPattern());
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else if ( req instanceof TriplePatternRequest ){
                 final int numberOfVars = ((TriplePatternRequest) req).getQueryPattern().numberOfVars();
-                return 3 * numberOfVars;
+                cost = 3 * numberOfVars;
             } else
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
 
         } else if ( lop instanceof LogicalOpJoin){
-            return 0;
+            cost = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
+
+        rootOperatorCostCache.addShippedRDFTermsForResponses(pp, cost);
+        return cost;
     }
 
     @Override
     public int getShippedRDFVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
-        //return 0;
+        final Integer cachedCost = rootOperatorCostCache.getShippedRDFVarsForResponses(pp);
+        if ( cachedCost != null ){ return cachedCost; }
+
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
+        final int cost;
 
         if ( lop instanceof LogicalOpTPAdd ){
             final FederationMember fm = ((LogicalOpTPAdd) lop).getFederationMember();
 
             if ( fm instanceof SPARQLEndpoint ){
                 final int numberOfVars = ((LogicalOpTPAdd) lop).getTP().numberOfVars();
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ){
-                return 0;
+                cost = 0;
             } else
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
@@ -207,7 +235,7 @@ public class CostOfRootOperator implements Metrics{
 
             if ( fm instanceof SPARQLEndpoint ){
                 final int numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
@@ -216,34 +244,42 @@ public class CostOfRootOperator implements Metrics{
 
             if ( req instanceof SPARQLRequest ){
                 final int numberOfVars = numberOfVarsOfBGP((BGP) ((SPARQLRequest) req).getQueryPattern());
-                return numberOfVars * getIntermediateResultsSize(pp);
+                cost = numberOfVars * getIntermediateResultsSize(pp);
             } else if ( req instanceof TriplePatternRequest ){
-                return 0;
+                cost = 0;
             } else
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
 
         } else if ( lop instanceof LogicalOpJoin ){
-            return 0;
+            cost = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
+
+        rootOperatorCostCache.addShippedRDFVarsForResponses(pp, cost);
+        return cost;
     }
 
     @Override
     public int getIntermediateResultsSize(final PhysicalPlan pp) throws QueryOptimizationException {
+        final Integer cachedCost = rootOperatorCostCache.getIntermediateResultsSize(pp);
+        if ( cachedCost != null ){ return cachedCost; }
+
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
-        int cardinality = 0;
+        int cost = 0;
         if ( lop instanceof LogicalOpRequest ){
-            cardinality = cardEstimate.getCardinalityEstimationOfLeafNode( pp );
+            cost = cardEstimate.getCardinalityEstimationOfLeafNode( pp );
         } else if ( lop instanceof LogicalOpJoin ){
-            cardinality = cardEstimate.getJoinCardinalityEstimation( pp );
+            cost = cardEstimate.getJoinCardinalityEstimation( pp );
         } else if ( lop instanceof LogicalOpTPAdd ){
-            cardinality = cardEstimate.getTPAddCardinalityEstimation( pp );
+            cost = cardEstimate.getTPAddCardinalityEstimation( pp );
         } else if ( lop instanceof LogicalOpBGPAdd ){
-            cardinality = cardEstimate.getBGPAddCardinalityEstimation( pp);
+            cost = cardEstimate.getBGPAddCardinalityEstimation( pp);
         }
-        return cardinality;
+
+        rootOperatorCostCache.addIntermediateResultsSize(pp, cost);
+        return cost;
     }
 
     // helper functions
