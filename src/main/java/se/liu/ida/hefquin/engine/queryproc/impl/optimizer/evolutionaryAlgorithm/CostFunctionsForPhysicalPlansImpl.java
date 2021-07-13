@@ -11,109 +11,110 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         this.costFunctionForRoot = new CostFunctionsForRootOperatorsImpl(cardEstimate);
     }
 
+    @Override
     public CostOfPhysicalPlan getCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
 
-        final int numberOfRequests = getTotalNumberOfRequests(pp);
-        final int shippedRDFTermsForRequests = getTotalShippedRDFTermsForRequests(pp);
-        final int shippedRDFVarsForRequests = getTotalShippedRDFVarsForRequests(pp);
-        final int shippedRDFTermsForResponses = getTotalShippedRDFTermsForResponses(pp);
-        final int shippedRDFVarsForResponses = getTotalShippedVarsForResponses(pp);
-        final int getIntermediateResultsSize = getTotalIntermediateResultsSize(pp);
+        final int numberOfRequests = determineTotalNumberOfRequests(pp);
+        final int shippedRDFTermsForRequests = determineTotalShippedRDFTermsForRequests(pp);
+        final int shippedRDFVarsForRequests = determineTotalShippedVarsForRequests(pp);
+        final int shippedRDFTermsForResponses = determineTotalShippedRDFTermsForResponses(pp);
+        final int shippedRDFVarsForResponses = determineTotalShippedVarsForResponses(pp);
+        final int getIntermediateResultsSize = determineTotalIntermediateResultsSize(pp);
 
         return new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
     }
 
     @Override
-    public int getTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         if ( pp.numberOfSubPlans() == 0 ){
-            return costFunctionForRoot.getNumberOfRequests( pp );
+            return costFunctionForRoot.determineNumberOfRequests( pp );
         }
 
         int totalNumberOfRequests = 0;
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getNumberOfRequests( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineNumberOfRequests( pp.getSubPlan(i) );
             totalNumberOfRequests += costOfRootOp ;
-            getTotalNumberOfRequests( pp.getSubPlan(i) );
+            determineTotalNumberOfRequests( pp.getSubPlan(i) );
         }
 
         return totalNumberOfRequests;
     }
 
     @Override
-    public int getTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         if ( pp.numberOfSubPlans() == 0 ){
-            return costFunctionForRoot.getShippedRDFTermsForRequests( pp );
+            return costFunctionForRoot.determineShippedRDFTermsForRequests( pp );
         }
 
         int totalShippedRDFTermsForRequests = 0;
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getShippedRDFTermsForRequests( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineShippedRDFTermsForRequests( pp.getSubPlan(i) );
             totalShippedRDFTermsForRequests += costOfRootOp ;
-            getTotalShippedRDFTermsForRequests( pp.getSubPlan(i) );
+            determineTotalShippedRDFTermsForRequests( pp.getSubPlan(i) );
         }
 
         return totalShippedRDFTermsForRequests;
     }
 
     @Override
-    public int getTotalShippedRDFVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalShippedRDFVarsForRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedRDFVarsForRequests += costFunctionForRoot.getShippedRDFVarsForRequests( pp );
+            totalShippedRDFVarsForRequests += costFunctionForRoot.determineShippedVarsForRequests( pp );
         }
 
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getShippedRDFVarsForRequests( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineShippedVarsForRequests( pp.getSubPlan(i) );
             totalShippedRDFVarsForRequests += costOfRootOp ;
-            getTotalShippedRDFVarsForRequests( pp.getSubPlan(i) );
+            determineTotalShippedVarsForRequests( pp.getSubPlan(i) );
         }
 
         return totalShippedRDFVarsForRequests;
     }
 
     @Override
-    public int getTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalShippedRDFTermsForResponses = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedRDFTermsForResponses += costFunctionForRoot.getShippedRDFTermsForResponses( pp );
+            totalShippedRDFTermsForResponses += costFunctionForRoot.determineShippedRDFTermsForResponses( pp );
         }
 
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getShippedRDFTermsForResponses( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineShippedRDFTermsForResponses( pp.getSubPlan(i) );
             totalShippedRDFTermsForResponses += costOfRootOp ;
-            getTotalShippedRDFTermsForResponses( pp.getSubPlan(i) );
+            determineTotalShippedRDFTermsForResponses( pp.getSubPlan(i) );
         }
 
         return totalShippedRDFTermsForResponses;
     }
 
     @Override
-    public int getTotalShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalShippedVarsForResponses = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedVarsForResponses += costFunctionForRoot.getShippedRDFVarsForResponses( pp );
+            totalShippedVarsForResponses += costFunctionForRoot.determineShippedVarsForResponses( pp );
         }
 
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getShippedRDFVarsForResponses( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineShippedVarsForResponses( pp.getSubPlan(i) );
             totalShippedVarsForResponses += costOfRootOp ;
-            getTotalShippedVarsForResponses( pp.getSubPlan(i) );
+            determineTotalShippedVarsForResponses( pp.getSubPlan(i) );
         }
 
         return totalShippedVarsForResponses;
     }
 
     @Override
-    public int getTotalIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalIntermediateResultsSize = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalIntermediateResultsSize += costFunctionForRoot.getIntermediateResultsSize( pp );
+            totalIntermediateResultsSize += costFunctionForRoot.determineIntermediateResultsSize( pp );
         }
 
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.getIntermediateResultsSize( pp.getSubPlan(i) );
+            final int costOfRootOp = costFunctionForRoot.determineIntermediateResultsSize( pp.getSubPlan(i) );
             totalIntermediateResultsSize += costOfRootOp ;
-            getTotalIntermediateResultsSize( pp.getSubPlan(i) );
+            determineTotalIntermediateResultsSize( pp.getSubPlan(i) );
         }
         return totalIntermediateResultsSize;
     }

@@ -3,17 +3,17 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 public class CostOfPhysicalPlanImpl implements CostOfPhysicalPlan {
     protected final int numberOfRequests;
     protected final int shippedRDFTermsForRequests;
-    protected final int shippedRDFVarsForRequests;
+    protected final int shippedVarsForRequests;
     protected final int shippedRDFTermsForResponses;
-    protected final int shippedRDFVarsForResponses;
+    protected final int shippedVarsForResponses;
     protected final int getIntermediateResultsSize;
 
-    public CostOfPhysicalPlanImpl(int numberOfRequests, int shippedRDFTermsForRequests, int shippedRDFVarsForRequests, int shippedRDFTermsForResponses, int shippedRDFVarsForResponses, int getIntermediateResultsSize) {
+    public CostOfPhysicalPlanImpl(int numberOfRequests, int shippedRDFTermsForRequests, int shippedVarsForRequests, int shippedRDFTermsForResponses, int shippedVarsForResponses, int getIntermediateResultsSize) {
         this.numberOfRequests = numberOfRequests;
         this.shippedRDFTermsForRequests = shippedRDFTermsForRequests;
-        this.shippedRDFVarsForRequests = shippedRDFVarsForRequests;
+        this.shippedVarsForRequests = shippedVarsForRequests;
         this.shippedRDFTermsForResponses = shippedRDFTermsForResponses;
-        this.shippedRDFVarsForResponses = shippedRDFVarsForResponses;
+        this.shippedVarsForResponses = shippedVarsForResponses;
         this.getIntermediateResultsSize = getIntermediateResultsSize;
     }
 
@@ -28,8 +28,8 @@ public class CostOfPhysicalPlanImpl implements CostOfPhysicalPlan {
     }
 
     @Override
-    public int getShippedRDFVarsForRequests() {
-        return shippedRDFVarsForRequests;
+    public int getShippedVarsForRequests() {
+        return shippedVarsForRequests;
     }
 
     @Override
@@ -38,8 +38,8 @@ public class CostOfPhysicalPlanImpl implements CostOfPhysicalPlan {
     }
 
     @Override
-    public int getShippedRDFVarsForResponses() {
-        return shippedRDFVarsForResponses;
+    public int getShippedVarsForResponses() {
+        return shippedVarsForResponses;
     }
 
     @Override

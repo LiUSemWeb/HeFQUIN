@@ -6,11 +6,11 @@ public interface CostOfPhysicalPlan {
 
     int getShippedRDFTermsForRequests( ) ;
 
-    int getShippedRDFVarsForRequests( );
+    int getShippedVarsForRequests( );
 
     int getShippedRDFTermsForResponses( );
 
-    int getShippedRDFVarsForResponses( );
+    int getShippedVarsForResponses( );
 
     int getIntermediateResultsSize( );
 

@@ -29,8 +29,8 @@ public class CostModel {
         ArrayList<Double> weight= new ArrayList<Double>(Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 ));
 
         final double cost =  costOfPhysicalPlan.getNumberOfRequests() * weight.get(0) + costOfPhysicalPlan.getShippedRDFTermsForRequests() * weight.get(1)
-                + costOfPhysicalPlan.getShippedRDFVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
-                + costOfPhysicalPlan.getShippedRDFVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
+                + costOfPhysicalPlan.getShippedVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
+                + costOfPhysicalPlan.getShippedVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
 
         return cost;
     }
