@@ -4,17 +4,18 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
 public interface CostFunctionsForPhysicalPlans {
+    CostOfPhysicalPlan getCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalShippedVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalShippedVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalShippedVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException;
 
-    int getTotalIntermediateResultsSize( PhysicalPlan pp ) throws QueryOptimizationException;
+    int determineTotalIntermediateResultsSize( PhysicalPlan pp ) throws QueryOptimizationException;
 
 }
