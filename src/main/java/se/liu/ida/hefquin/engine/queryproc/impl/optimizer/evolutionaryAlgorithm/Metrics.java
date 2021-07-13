@@ -1,20 +1,19 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-
 public interface Metrics {
 
-    int getNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getNumberOfRequests( );
 
-    int getShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getShippedRDFTermsForRequests( ) ;
 
-    int getShippedRDFVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getShippedRDFVarsForRequests( );
 
-    int getShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getShippedRDFTermsForResponses( );
 
-    int getShippedRDFVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getShippedRDFVarsForResponses( );
 
-    int getIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException;
+    Integer getIntermediateResultsSize( );
+
+    Boolean isEmpty();
 
 }

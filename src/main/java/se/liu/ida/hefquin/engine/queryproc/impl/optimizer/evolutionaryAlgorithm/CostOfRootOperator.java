@@ -25,19 +25,14 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstim
 import java.util.Iterator;
 import java.util.Set;
 
-public class CostOfRootOperator implements Metrics{
+public class CostOfRootOperator {
     protected final CardinalityEstimation cardEstimate;
-    protected final RootOperatorCostCache rootOperatorCostCache = new RootOperatorCostCache();
 
     public CostOfRootOperator( CardinalityEstimation cardEstimate ) {
         this.cardEstimate = cardEstimate;
     }
 
-    @Override
     public int getNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getNumberOfRequests(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperator pop = pp.getRootOperator();
         final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin){
@@ -51,15 +46,10 @@ public class CostOfRootOperator implements Metrics{
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
-        rootOperatorCostCache.addNumberOfRequests(pp, cost);
         return cost;
     }
 
-    @Override
     public int getShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getShippedRDFTermsForRequests(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         int numberOfTerms = 0;
@@ -102,15 +92,10 @@ public class CostOfRootOperator implements Metrics{
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
-        rootOperatorCostCache.addShippedRDFTermsForRequests(pp, cost);
         return cost;
     }
 
-    @Override
     public int getShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getShippedRDFVarsForRequests(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -156,15 +141,10 @@ public class CostOfRootOperator implements Metrics{
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
-        rootOperatorCostCache.addShippedRDFVarsForRequests(pp, cost);
         return cost;
     }
 
-    @Override
     public int getShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getShippedRDFTermsForResponses(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         final int cost;
@@ -206,15 +186,10 @@ public class CostOfRootOperator implements Metrics{
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
-        rootOperatorCostCache.addShippedRDFTermsForResponses(pp, cost);
         return cost;
     }
 
-    @Override
     public int getShippedRDFVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getShippedRDFVarsForResponses(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         final int cost;
@@ -255,15 +230,10 @@ public class CostOfRootOperator implements Metrics{
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
-        rootOperatorCostCache.addShippedRDFVarsForResponses(pp, cost);
         return cost;
     }
 
-    @Override
     public int getIntermediateResultsSize(final PhysicalPlan pp) throws QueryOptimizationException {
-        final Integer cachedCost = rootOperatorCostCache.getIntermediateResultsSize(pp);
-        if ( cachedCost != null ){ return cachedCost; }
-
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -278,7 +248,6 @@ public class CostOfRootOperator implements Metrics{
             cost = cardEstimate.getBGPAddCardinalityEstimation( pp);
         }
 
-        rootOperatorCostCache.addIntermediateResultsSize(pp, cost);
         return cost;
     }
 
