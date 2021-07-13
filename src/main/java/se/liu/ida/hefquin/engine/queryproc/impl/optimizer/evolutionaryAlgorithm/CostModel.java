@@ -17,26 +17,19 @@ public class CostModel {
     }
 
     public Double wrapUpCostAsOneValue( final PhysicalPlan pp ) throws QueryOptimizationException {
-        final CostFunctionsForPhysicalPlansImpl costOfPhysicalPlan = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
-        CostOfPhysicalPlan metrics = physicalPlanCostCache.get(pp);
+        final CostFunctionsForPhysicalPlansImpl costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
 
-        if ( metrics == null ){
-            final int numberOfRequests = costOfPhysicalPlan.getTotalNumberOfRequests(pp);
-            final int shippedRDFTermsForRequests = costOfPhysicalPlan.getTotalShippedRDFTermsForRequests(pp);
-            final int shippedRDFVarsForRequests = costOfPhysicalPlan.getTotalShippedRDFVarsForRequests(pp);
-            final int shippedRDFTermsForResponses = costOfPhysicalPlan.getTotalShippedRDFTermsForResponses(pp);
-            final int shippedRDFVarsForResponses = costOfPhysicalPlan.getTotalShippedVarsForResponses(pp);
-            final int getIntermediateResultsSize = costOfPhysicalPlan.getTotalIntermediateResultsSize(pp);
-
-            metrics = new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
-            physicalPlanCostCache.add( pp,  metrics);
+        CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
+        if ( costOfPhysicalPlan == null ){
+            costOfPhysicalPlan = costFunctionsForPP.getCostOfPhysicalPlan( pp );
+            physicalPlanCostCache.add( pp,  costOfPhysicalPlan);
         }
 
         ArrayList<Double> weight= new ArrayList<Double>(Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 ));
 
-        final double cost =  metrics.getNumberOfRequests() * weight.get(0) + metrics.getShippedRDFTermsForRequests() * weight.get(1)
-                + metrics.getShippedRDFVarsForRequests() * weight.get(2) + metrics.getShippedRDFTermsForResponses() * weight.get(3)
-                + metrics.getShippedRDFVarsForResponses() * weight.get(4) + metrics.getIntermediateResultsSize() * weight.get(5);
+        final double cost =  costOfPhysicalPlan.getNumberOfRequests() * weight.get(0) + costOfPhysicalPlan.getShippedRDFTermsForRequests() * weight.get(1)
+                + costOfPhysicalPlan.getShippedRDFVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
+                + costOfPhysicalPlan.getShippedRDFVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
 
         return cost;
     }

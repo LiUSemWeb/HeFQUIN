@@ -5,20 +5,28 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
-    protected int totalNumberOfRequests = 0;
-    protected int totalShippedRDFTermsForRequests = 0;
-    protected int totalShippedRDFVarsForRequests = 0;
-    protected int totalShippedRDFTermsForResponses = 0;
-    protected int totalShippedVarsForResponses = 0;
-    protected int totalIntermediateResultsSize = 0;
     protected final CostFunctionsForRootOperatorsImpl costFunctionForRoot;
 
     public CostFunctionsForPhysicalPlansImpl(CardinalityEstimation cardEstimate) {
-        //super(cardEstimate);
         this.costFunctionForRoot = new CostFunctionsForRootOperatorsImpl(cardEstimate);
     }
 
+    public CostOfPhysicalPlan getCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
+
+        final int numberOfRequests = getTotalNumberOfRequests(pp);
+        final int shippedRDFTermsForRequests = getTotalShippedRDFTermsForRequests(pp);
+        final int shippedRDFVarsForRequests = getTotalShippedRDFVarsForRequests(pp);
+        final int shippedRDFTermsForResponses = getTotalShippedRDFTermsForResponses(pp);
+        final int shippedRDFVarsForResponses = getTotalShippedVarsForResponses(pp);
+        final int getIntermediateResultsSize = getTotalIntermediateResultsSize(pp);
+
+        final CostOfPhysicalPlan costOfPhysicalPlan = new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
+
+        return costOfPhysicalPlan;
+    }
+
     public int getTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalNumberOfRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalNumberOfRequests += costFunctionForRoot.getNumberOfRequests( pp );
         }
@@ -33,6 +41,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalShippedRDFTermsForRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedRDFTermsForRequests += costFunctionForRoot.getShippedRDFTermsForRequests( pp );
         }
@@ -47,6 +56,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalShippedRDFVarsForRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedRDFVarsForRequests += costFunctionForRoot.getShippedRDFVarsForRequests( pp );
         }
@@ -61,6 +71,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalShippedRDFTermsForResponses = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedRDFTermsForResponses += costFunctionForRoot.getShippedRDFTermsForResponses( pp );
         }
@@ -75,6 +86,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalShippedVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalShippedVarsForResponses = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedVarsForResponses += costFunctionForRoot.getShippedRDFVarsForResponses( pp );
         }
@@ -89,6 +101,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalIntermediateResultsSize( PhysicalPlan pp ) throws QueryOptimizationException {
+        int totalIntermediateResultsSize = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalIntermediateResultsSize += costFunctionForRoot.getIntermediateResultsSize( pp );
         }
