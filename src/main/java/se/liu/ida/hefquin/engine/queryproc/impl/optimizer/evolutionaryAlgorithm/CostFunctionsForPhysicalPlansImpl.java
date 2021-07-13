@@ -20,9 +20,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         final int shippedRDFVarsForResponses = getTotalShippedVarsForResponses(pp);
         final int getIntermediateResultsSize = getTotalIntermediateResultsSize(pp);
 
-        final CostOfPhysicalPlan costOfPhysicalPlan = new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
-
-        return costOfPhysicalPlan;
+        return new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
     }
 
     public int getTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
