@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstim
 public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
     protected final CostFunctionsForRootOperators costFunctionForRoot;
 
-    public CostFunctionsForPhysicalPlansImpl(CardinalityEstimation cardEstimate) {
+    public CostFunctionsForPhysicalPlansImpl( final CardinalityEstimation cardEstimate ) {
         this.costFunctionForRoot = new CostFunctionsForRootOperatorsImpl(cardEstimate);
     }
 
