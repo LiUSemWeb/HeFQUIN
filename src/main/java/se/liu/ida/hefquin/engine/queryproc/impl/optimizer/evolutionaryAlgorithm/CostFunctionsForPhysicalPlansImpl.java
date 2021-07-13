@@ -103,7 +103,8 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedVarsForResponses;
     }
 
-    public int getTotalIntermediateResultsSize( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getTotalIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalIntermediateResultsSize = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalIntermediateResultsSize += costFunctionForRoot.getIntermediateResultsSize( pp );
