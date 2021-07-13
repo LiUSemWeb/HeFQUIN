@@ -23,7 +23,8 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
     }
 
-    public int getTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         if ( pp.numberOfSubPlans() == 0 ){
             return costFunctionForRoot.getNumberOfRequests( pp );
         }
