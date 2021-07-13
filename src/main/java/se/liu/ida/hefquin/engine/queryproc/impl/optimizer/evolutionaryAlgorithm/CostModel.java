@@ -18,7 +18,7 @@ public class CostModel {
     }
 
     public Double wrapUpCostAsOneValue( final PhysicalPlan pp ) throws QueryOptimizationException {
-        final CostFunctionsForPhysicalPlansImpl costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
+        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
         if ( costOfPhysicalPlan == null ){
