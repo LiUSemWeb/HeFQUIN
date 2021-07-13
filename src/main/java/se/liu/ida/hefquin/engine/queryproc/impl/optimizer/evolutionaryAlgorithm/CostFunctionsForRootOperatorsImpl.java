@@ -35,19 +35,19 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
 
     public int getNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperator pop = pp.getRootOperator();
-        final int cost;
-        if ( pop instanceof PhysicalOpIndexNestedLoopsJoin){
-            cost = getIntermediateResultsSize(pp.getSubPlan(0));
-        } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES){
-            cost = 1;
-        } else if ( pop instanceof PhysicalOpRequest){
-            cost = 1;
-        } else if ( pop instanceof BasePhysicalOpBinaryJoin){
-            cost = 0;
-        } else
+        if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
+            return getIntermediateResultsSize(pp.getSubPlan(0));
+        } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES ) {
+            // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the bind-join requests.
+            return 1;
+        } else if ( pop instanceof PhysicalOpRequest ) {
+            // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the requests.
+            return 1;
+        } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
+            return 0;
+        } else {
             throw new IllegalArgumentException("Unsupported Physical Operator");
-
-        return cost;
+        }
     }
 
     public int getShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
