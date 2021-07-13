@@ -236,6 +236,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         return cost;
     }
 
+    @Override
     public int getIntermediateResultsSize(final PhysicalPlan pp) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
