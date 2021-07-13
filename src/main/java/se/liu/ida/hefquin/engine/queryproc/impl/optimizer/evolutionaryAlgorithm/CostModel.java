@@ -11,13 +11,14 @@ public class CostModel {
     protected final QueryProcContext ctxt;
     protected final PhysicalPlanCostCache physicalPlanCostCache;
 
-    public CostModel(QueryProcContext ctxt ) {
+    public CostModel( final QueryProcContext ctxt ) {
+        assert ctxt != null;
         this.ctxt = ctxt;
         this.physicalPlanCostCache = new PhysicalPlanCostCache();
     }
 
     public Double wrapUpCostAsOneValue( final PhysicalPlan pp ) throws QueryOptimizationException {
-        final CostFunctionsForPhysicalPlansImpl costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
+        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
         if ( costOfPhysicalPlan == null ){

@@ -28,28 +28,31 @@ import java.util.Set;
 public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
 
-    public CostFunctionsForRootOperatorsImpl(CardinalityEstimation cardEstimate ) {
+    public CostFunctionsForRootOperatorsImpl( final CardinalityEstimation cardEstimate ) {
+        assert cardEstimate != null;
         this.cardEstimate = cardEstimate;
     }
 
-    public int getNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperator pop = pp.getRootOperator();
-        final int cost;
-        if ( pop instanceof PhysicalOpIndexNestedLoopsJoin){
-            cost = getIntermediateResultsSize(pp.getSubPlan(0));
-        } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES){
-            cost = 1;
-        } else if ( pop instanceof PhysicalOpRequest){
-            cost = 1;
-        } else if ( pop instanceof BasePhysicalOpBinaryJoin){
-            cost = 0;
-        } else
+        if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
+            return getIntermediateResultsSize(pp.getSubPlan(0));
+        } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES ) {
+            // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the bind-join requests.
+            return 1;
+        } else if ( pop instanceof PhysicalOpRequest ) {
+            // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the requests.
+            return 1;
+        } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
+            return 0;
+        } else {
             throw new IllegalArgumentException("Unsupported Physical Operator");
-
-        return cost;
+        }
     }
 
-    public int getShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         int numberOfTerms = 0;
@@ -80,22 +83,20 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
         }
 
-        final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            cost = intermediateResultSize * (numberOfTerms + numberOfJoinVars);
+            return intermediateResultSize * (numberOfTerms + numberOfJoinVars);
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES || pop instanceof PhysicalOpBindJoin ){
-            cost = numberOfTerms + intermediateResultSize * numberOfJoinVars;
+            return numberOfTerms + intermediateResultSize * numberOfJoinVars;
         } else if ( pop instanceof PhysicalOpRequest ) {
-            cost = numberOfTerms;
+            return numberOfTerms;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            cost = 0;
+            return 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
-
-        return cost;
     }
 
-    public int getShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -144,7 +145,8 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         return cost;
     }
 
-    public int getShippedRDFTermsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         final int cost;
@@ -189,7 +191,8 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         return cost;
     }
 
-    public int getShippedRDFVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         final int cost;
@@ -233,6 +236,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         return cost;
     }
 
+    @Override
     public int getIntermediateResultsSize(final PhysicalPlan pp) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
