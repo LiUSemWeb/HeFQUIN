@@ -191,7 +191,8 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         return cost;
     }
 
-    public int getShippedRDFVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         final int cost;
