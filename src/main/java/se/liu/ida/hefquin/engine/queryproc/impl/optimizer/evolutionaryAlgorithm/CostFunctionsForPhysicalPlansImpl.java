@@ -38,7 +38,8 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalNumberOfRequests;
     }
 
-    public int getTotalShippedRDFTermsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalShippedRDFTermsForRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedRDFTermsForRequests += costFunctionForRoot.getShippedRDFTermsForRequests( pp );
