@@ -52,6 +52,42 @@ public class SPARQLStar2CypherTranslationTest {
     }
 
     @Test
+    public void testNodeLabelVar() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                NodeFactory.createURI(conf.getLabelIRI()),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE ID(cpvar1)=22 RETURN labels(cpvar1) AS o");
+    }
+
+    @Test
+    public void testNodePropVar() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                NodeFactory.createURI(conf.mapProperty("name")),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE ID(cpvar1)=22 AND EXISTS(cpvar1.name) RETURN cpvar1.name AS o");
+    }
+
+    @Test
+    public void testNodeRelVar() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) WHERE ID(cpvar1)=22 RETURN nm(cpvar2) AS o");
+    }
+
+    @Test
     public void testVarLabelVar() {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"),

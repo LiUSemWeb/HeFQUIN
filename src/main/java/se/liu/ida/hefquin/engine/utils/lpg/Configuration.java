@@ -4,6 +4,7 @@ package se.liu.ida.hefquin.engine.utils.lpg;
  * A class that contains the functions of an LPG2RDFstar configurations
  */
 public interface Configuration {
+
     String mapNode( final String node );
     String mapProperty( final String property );
     String mapRelationship( final String relationship );
