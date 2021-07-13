@@ -25,10 +25,10 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstim
 import java.util.Iterator;
 import java.util.Set;
 
-public class CostOfRootOperator {
+public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
 
-    public CostOfRootOperator( CardinalityEstimation cardEstimate ) {
+    public CostFunctionsForRootOperatorsImpl(CardinalityEstimation cardEstimate ) {
         this.cardEstimate = cardEstimate;
     }
 

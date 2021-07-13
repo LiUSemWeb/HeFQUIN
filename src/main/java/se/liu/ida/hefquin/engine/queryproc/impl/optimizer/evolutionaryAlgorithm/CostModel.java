@@ -17,19 +17,18 @@ public class CostModel {
     }
 
     public Double wrapUpCostAsOneValue( final PhysicalPlan pp ) throws QueryOptimizationException {
-        final CostOfPhysicalPlanImpl costOfPhysicalPlan = new CostOfPhysicalPlanImpl( new CardinalityEstimation(ctxt) );
-        Metrics metrics = physicalPlanCostCache.get(pp);
+        final CostFunctionsForPhysicalPlansImpl costOfPhysicalPlan = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
+        CostOfPhysicalPlan metrics = physicalPlanCostCache.get(pp);
 
-        if ( metrics.isEmpty() ){
-            final List<Integer> li = new ArrayList<>();
-            li.add( costOfPhysicalPlan.getTotalNumberOfRequests(pp) );
-            li.add( costOfPhysicalPlan.getTotalShippedRDFTermsForRequests(pp) );
-            li.add( costOfPhysicalPlan.getTotalShippedRDFVarsForRequests(pp) );
-            li.add( costOfPhysicalPlan.getTotalShippedRDFTermsForResponses(pp) );
-            li.add( costOfPhysicalPlan.getTotalShippedVarsForResponses(pp) );
-            li.add( costOfPhysicalPlan.getTotalIntermediateResultsSize(pp) );
+        if ( metrics == null ){
+            final int numberOfRequests = costOfPhysicalPlan.getTotalNumberOfRequests(pp);
+            final int shippedRDFTermsForRequests = costOfPhysicalPlan.getTotalShippedRDFTermsForRequests(pp);
+            final int shippedRDFVarsForRequests = costOfPhysicalPlan.getTotalShippedRDFVarsForRequests(pp);
+            final int shippedRDFTermsForResponses = costOfPhysicalPlan.getTotalShippedRDFTermsForResponses(pp);
+            final int shippedRDFVarsForResponses = costOfPhysicalPlan.getTotalShippedVarsForResponses(pp);
+            final int getIntermediateResultsSize = costOfPhysicalPlan.getTotalIntermediateResultsSize(pp);
 
-            metrics = new MetricsImpl(li);
+            metrics = new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
             physicalPlanCostCache.add( pp,  metrics);
         }
 
