@@ -33,7 +33,8 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
         this.cardEstimate = cardEstimate;
     }
 
-    public int getNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperator pop = pp.getRootOperator();
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
             return getIntermediateResultsSize(pp.getSubPlan(0));
