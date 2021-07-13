@@ -104,8 +104,14 @@ public class SPARQLStar2CypherTranslator {
                     throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship or " +
                             "the label URI");
                 }
-            } else {
-                throw new IllegalArgumentException("Variables in the predicate are not permitted");
+            } else if (s.isVariable() && p.isVariable()) {
+                if (o.isURI() && configuration.mapsToLabel(o.getURI())) {
+                    return Translations.getVarVarLabel(s, p, o, configuration);
+                } else if (o.isBlank() || (o.isURI() && configuration.mapsToNode(o.getURI()))) {
+                    return Translations.getVarVarNode(s, p, o, configuration);
+                } else if (o.isLiteral()) {
+                    return Translations.getVarVarLiteral(s, p, o, configuration);
+                }
             }
         } else {
             return Translations.getVarVarVar(s, p, o, configuration);
@@ -133,6 +139,13 @@ public class SPARQLStar2CypherTranslator {
                 "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.%s AS %s UNION " +
                 "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.%s) " +
                 "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.%s AS %s";
+        final protected static String varVarLabel   = "MATCH (cpvar1) WHERE cpvar1:%s RETURN nm(cpvar1) AS %s, %s AS %s";
+        final protected static String varVarNode    = "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar3)=%s RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s";
+        final protected static String varVarLit     = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
+                "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, " +
+                "[k IN KEYS(cpvar2) WHERE cpvar2[k]='%s' | pm(k)] AS %s UNION " +
+                "MATCH (cpvar4) RETURN nm(cpvar4) AS r1, '' AS r2, '' AS r3, " +
+                "[k IN KEYS(cpvar4) WHERE cpvar4[k]='%s' | pm(k)] AS %s";
         final protected static String varVarVar     = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
                 "RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s, nm(cpvar3) AS %s UNION " +
                 "MATCH (cpvar4) RETURN nm(cpvar4) AS %s, %s AS %s, labels(cpvar4) AS %s; " +
@@ -209,6 +222,22 @@ public class SPARQLStar2CypherTranslator {
             final String property = configuration.unmapProperty(p.getURI());
             final String objectVar = o.getName();
             return String.format(varPropVar, property, property, objectVar, property, property, objectVar);
+        }
+
+        public static String getVarVarLabel(final Node s, final Node p, final Node o,
+                                            final Configuration configuration) {
+            return String.format(varVarLabel, configuration.unmapLabel(o.getURI()), s.getName(),
+                    configuration.getLabelIRI(), p.getName());
+        }
+
+        public static String getVarVarNode(final Node s, final Node p, final Node o,
+                                           final Configuration configuration) {
+            return String.format(varVarNode, configuration.unmapNode(o.getURI()), s.getName(), p.getName());
+        }
+
+        public static String getVarVarLiteral(final Node s, final Node p, final Node o,
+                                              final Configuration configuration) {
+            return String.format(varVarLit, o.getLiteralValue(), p.getName(), o.getLiteralValue(), p.getName());
         }
 
         public static String getVarVarVar(final Node s, final Node p, final Node o,

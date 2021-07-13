@@ -161,6 +161,43 @@ public class SPARQLStar2CypherTranslationTest {
     }
 
     @Test
+    public void testVarVarLabel() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(Var.alloc("s"),
+                Var.alloc("p"),
+                NodeFactory.createURI(conf.mapLabel("Person")));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE cpvar1:Person RETURN nm(cpvar1) AS s, "+conf.getLabelIRI()+" AS p");
+    }
+
+    @Test
+    public void testVarVarNode() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(Var.alloc("s"),
+                Var.alloc("p"),
+                NodeFactory.createURI(conf.mapNode("22")));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar3)=22 RETURN nm(cpvar1) AS s, elm(cpvar2) AS p");
+    }
+
+    @Test
+    public void testVarVarLiteral() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(Var.alloc("s"),
+                Var.alloc("p"),
+                NodeFactory.createLiteral("The Matrix"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
+                        "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, " +
+                        "[k IN KEYS(cpvar2) WHERE cpvar2[k]='The Matrix' | pm(k)] AS p UNION " +
+                        "MATCH (cpvar4) RETURN nm(cpvar4) AS r1, '' AS r2, '' AS r3, " +
+                        "[k IN KEYS(cpvar4) WHERE cpvar4[k]='The Matrix' | pm(k)] AS p");
+    }
+
+    @Test
     public void testVarVarVar() {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s1"), Var.alloc("p"), Var.alloc("o"));
