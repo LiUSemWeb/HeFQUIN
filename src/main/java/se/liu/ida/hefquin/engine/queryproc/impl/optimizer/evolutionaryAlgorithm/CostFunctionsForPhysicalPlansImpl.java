@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
-    protected final CostFunctionsForRootOperatorsImpl costFunctionForRoot;
+    protected final CostFunctionsForRootOperators costFunctionForRoot;
 
     public CostFunctionsForPhysicalPlansImpl(CardinalityEstimation cardEstimate) {
         this.costFunctionForRoot = new CostFunctionsForRootOperatorsImpl(cardEstimate);
