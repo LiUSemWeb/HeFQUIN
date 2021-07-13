@@ -85,7 +85,8 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedRDFTermsForResponses;
     }
 
-    public int getTotalShippedVarsForResponses( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getTotalShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
         int totalShippedVarsForResponses = 0;
         if ( pp.numberOfSubPlans() == 0 ){
             totalShippedVarsForResponses += costFunctionForRoot.getShippedRDFVarsForResponses( pp );
