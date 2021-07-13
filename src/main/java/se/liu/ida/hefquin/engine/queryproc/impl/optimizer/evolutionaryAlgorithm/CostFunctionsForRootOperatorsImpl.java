@@ -95,7 +95,8 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             throw new IllegalArgumentException("Unsupported Physical Operator");
     }
 
-    public int getShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
+    @Override
+    public int getShippedRDFVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
