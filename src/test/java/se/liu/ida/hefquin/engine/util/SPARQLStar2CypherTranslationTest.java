@@ -88,6 +88,31 @@ public class SPARQLStar2CypherTranslationTest {
     }
 
     @Test
+    public void testNodeVarNode() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                Var.alloc("p"),
+                NodeFactory.createURI(conf.mapNode("23")));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=22 AND ID(cpvar3)=23 RETURN elm(cpvar2) AS p");
+    }
+
+    @Test
+    public void testNodeVarLiteral() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                Var.alloc("p"),
+                NodeFactory.createLiteral("Q. Tarantino"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE ID(cpvar1)=22 RETURN [k in KEYS(cpvar1) " +
+                        "WHERE cpvar1[k]='Q. Tarantino' | pm(k)] AS p");
+    }
+
+    @Test
     public void testVarLabelVar() {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"),
@@ -96,6 +121,18 @@ public class SPARQLStar2CypherTranslationTest {
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
                 "MATCH (cpvar1) RETURN nm(cpvar1) AS s, labels(cpvar1) AS o");
+    }
+
+    @Test
+    public void testNodeVarLabel() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                Var.alloc("p"),
+                NodeFactory.createURI(conf.mapLabel("Person")));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "RETURN "+ conf.getLabelIRI() + " AS p");
     }
 
     @Test

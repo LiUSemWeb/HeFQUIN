@@ -75,13 +75,24 @@ public class SPARQLStar2CypherTranslator {
                 } else if (p.isURI() && configuration.mapsToRelationship(p.getURI())
                         && (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))) {
                     return Translations.getNodeRelationshipVar(s, p, o, configuration);
+                } else {
+                    throw new IllegalArgumentException("Illegal values for subject and predicate");
                 }
             }
-            //else if (p.isVariable()) {
-
-            //}
-        }
-        else if (pattern.numberOfVars() == 2) {
+            else if (p.isVariable()) {
+                if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))
+                        && (o.isBlank() || (o.isURI() && configuration.mapsToNode(o.getURI())))) {
+                    return Translations.getNodeVarNode(s, p, o, configuration);
+                } else if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI()))) && o.isLiteral()) {
+                    return Translations.getNodeVarLiteral(s, p, o, configuration);
+                } else if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))
+                        && o.isURI() && configuration.mapsToLabel(o.getURI())) {
+                    return Translations.getNodeVarLabel(s, p, o, configuration);
+                } else {
+                    throw new IllegalArgumentException("Illegal values for subject and object");
+                }
+            }
+        } else if (pattern.numberOfVars() == 2) {
             if (s.isVariable() && o.isVariable()) {
                 if (p.isURI() && configuration.isLabelIRI(p.getURI())) {
                     return Translations.getVarLabelVar(s, p, o, configuration);
@@ -113,6 +124,9 @@ public class SPARQLStar2CypherTranslator {
         final protected static String nodeLabelVar  = "MATCH (cpvar1) WHERE ID(cpvar1)=%s RETURN labels(cpvar1) AS %s";
         final protected static String nodePropVar   = "MATCH (cpvar1) WHERE ID(cpvar1)=%s AND EXISTS(cpvar1.%s) RETURN cpvar1.%s AS %s";
         final protected static String nodeRelVar    = "MATCH (cpvar1)-[:%s]->(cpvar2) WHERE ID(cpvar1)=%s RETURN nm(cpvar2) AS %s";
+        final protected static String nodeVarNode   = "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=%s AND ID(cpvar3)=%s RETURN elm(cpvar2) AS %s";
+        final protected static String nodeVarLit    = "MATCH (cpvar1) WHERE ID(cpvar1)=%s RETURN [k in KEYS(cpvar1) WHERE cpvar1[k]='%s' | pm(k)] AS %s";
+        final protected static String nodeVarLabel  = "RETURN %s AS %s";
         final protected static String varLabelVar   = "MATCH (cpvar1) RETURN nm(cpvar1) AS %s, labels(cpvar1) AS %s";
         final protected static String varRelVar     = "MATCH (cpvar1)-[:%s]->(cpvar2) RETURN nm(cpvar1) AS %s, nm(cpvar2) AS %s";
         final protected static String varPropVar    = "MATCH (cpvar1) WHERE EXISTS(cpvar1.%s) " +
@@ -162,6 +176,23 @@ public class SPARQLStar2CypherTranslator {
                     configuration.unmapNode(s.getURI()), o.getName());
         }
 
+        public static String getNodeVarNode(final Node s, final Node p, final Node o,
+                                            final Configuration configuration) {
+            return String.format(nodeVarNode, configuration.unmapNode(s.getURI()),
+                    configuration.unmapNode(o.getURI()), p.getName());
+        }
+
+        public static String getNodeVarLiteral(final Node s, final Node p, final Node o,
+                                               final Configuration configuration) {
+            return String.format(nodeVarLit, configuration.unmapNode(s.getURI()),
+                    o.getLiteralValue(), p.getName());
+        }
+
+        public static String getNodeVarLabel(final Node s, final Node p, final Node o,
+                                             final Configuration configuration) {
+            return String.format(nodeVarLabel, configuration.getLabelIRI(), p.getName());
+        }
+
         public static String getVarLabelVar(final Node s, final Node p, final Node o,
                                             final Configuration configuration) {
             return String.format(varLabelVar, s.getName(), o.getName());
@@ -185,6 +216,7 @@ public class SPARQLStar2CypherTranslator {
             return String.format(varVarVar, s.getName(), p.getName(), o.getName(),
                     s.getName(), configuration.getLabelIRI(), p.getName(), o.getName());
         }
+
     }
 
     protected static class CypherVarGenerator {
