@@ -112,6 +112,10 @@ public class SPARQLStar2CypherTranslator {
                 } else if (o.isLiteral()) {
                     return Translations.getVarVarLiteral(s, p, o, configuration);
                 }
+            } else {
+                if (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI()))) {
+                    return Translations.getNodeVarVar(s, p, o, configuration);
+                }
             }
         } else {
             return Translations.getVarVarVar(s, p, o, configuration);
@@ -146,6 +150,13 @@ public class SPARQLStar2CypherTranslator {
                 "[k IN KEYS(cpvar2) WHERE cpvar2[k]='%s' | pm(k)] AS %s UNION " +
                 "MATCH (cpvar4) RETURN nm(cpvar4) AS r1, '' AS r2, '' AS r3, " +
                 "[k IN KEYS(cpvar4) WHERE cpvar4[k]='%s' | pm(k)] AS %s";
+        final protected static String nodeVarVar    = "MATCH (cpvar1) WHERE ID(cpvar1)=%s " +
+                "RETURN %s AS %s, labels(cpvar1) AS %s UNION " +
+                "MATCH (cpvar2) WHERE ID(cpvar2)=%s " +
+                "RETURN [k IN KEYS(cpvar2) | pm(k)] AS %s, " +
+                "[k in KEYS(cpvar2) | cpvar2[k]] AS %s UNION " +
+                "MATCH (cpvar3)-[cpvar4]->(cpvar5) WHERE ID(cpvar3)=%s " +
+                "RETURN elm(cpvar4) AS %s, nm(cpvar5) AS %s";
         final protected static String varVarVar     = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
                 "RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s, nm(cpvar3) AS %s UNION " +
                 "MATCH (cpvar4) RETURN nm(cpvar4) AS %s, %s AS %s, labels(cpvar4) AS %s; " +
@@ -238,6 +249,13 @@ public class SPARQLStar2CypherTranslator {
         public static String getVarVarLiteral(final Node s, final Node p, final Node o,
                                               final Configuration configuration) {
             return String.format(varVarLit, o.getLiteralValue(), p.getName(), o.getLiteralValue(), p.getName());
+        }
+
+        public static String getNodeVarVar(final Node s, final Node p, final Node o,
+                                           final Configuration configuration) {
+            String nodeID = configuration.unmapNode(s.getURI());
+            return String.format(nodeVarVar, nodeID, configuration.getLabelIRI(), p.getName(), o.getName(),
+                    nodeID, p.getName(), o.getName(), nodeID, p.getName(), o.getName());
         }
 
         public static String getVarVarVar(final Node s, final Node p, final Node o,

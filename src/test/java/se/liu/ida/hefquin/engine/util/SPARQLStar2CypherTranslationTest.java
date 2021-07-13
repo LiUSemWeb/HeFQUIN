@@ -198,6 +198,23 @@ public class SPARQLStar2CypherTranslationTest {
     }
 
     @Test
+    public void testNodeVarVar() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t = new Triple(NodeFactory.createURI(conf.mapNode("22")),
+                Var.alloc("p"),
+                Var.alloc("o"));
+        final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(translation,
+                "MATCH (cpvar1) WHERE ID(cpvar1)=22 " +
+                        "RETURN "+conf.getLabelIRI()+" AS p, labels(cpvar1) AS o UNION " +
+                        "MATCH (cpvar2) WHERE ID(cpvar2)=22 " +
+                        "RETURN [k IN KEYS(cpvar2) | pm(k)] AS p, " +
+                        "[k in KEYS(cpvar2) | cpvar2[k]] AS o UNION " +
+                        "MATCH (cpvar3)-[cpvar4]->(cpvar5) WHERE ID(cpvar3)=22 " +
+                        "RETURN elm(cpvar4) AS p, nm(cpvar5) AS o");
+    }
+
+    @Test
     public void testVarVarVar() {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s1"), Var.alloc("p"), Var.alloc("o"));
