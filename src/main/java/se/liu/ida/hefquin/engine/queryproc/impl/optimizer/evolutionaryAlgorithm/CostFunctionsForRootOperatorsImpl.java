@@ -83,19 +83,16 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
         }
 
-        final int cost;
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            cost = intermediateResultSize * (numberOfTerms + numberOfJoinVars);
+            return intermediateResultSize * (numberOfTerms + numberOfJoinVars);
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES || pop instanceof PhysicalOpBindJoin ){
-            cost = numberOfTerms + intermediateResultSize * numberOfJoinVars;
+            return numberOfTerms + intermediateResultSize * numberOfJoinVars;
         } else if ( pop instanceof PhysicalOpRequest ) {
-            cost = numberOfTerms;
+            return numberOfTerms;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            cost = 0;
+            return 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
-
-        return cost;
     }
 
     public int getShippedRDFVarsForRequests( PhysicalPlan pp ) throws QueryOptimizationException {
