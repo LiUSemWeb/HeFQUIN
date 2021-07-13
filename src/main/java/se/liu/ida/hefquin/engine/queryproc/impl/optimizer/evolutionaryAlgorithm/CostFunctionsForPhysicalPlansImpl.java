@@ -41,11 +41,11 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int getTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalShippedRDFTermsForRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedRDFTermsForRequests += costFunctionForRoot.getShippedRDFTermsForRequests( pp );
+            return costFunctionForRoot.getShippedRDFTermsForRequests( pp );
         }
 
+        int totalShippedRDFTermsForRequests = 0;
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
             final int costOfRootOp = costFunctionForRoot.getShippedRDFTermsForRequests( pp.getSubPlan(i) );
             totalShippedRDFTermsForRequests += costOfRootOp ;
