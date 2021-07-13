@@ -28,7 +28,8 @@ import java.util.Set;
 public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
 
-    public CostFunctionsForRootOperatorsImpl(CardinalityEstimation cardEstimate ) {
+    public CostFunctionsForRootOperatorsImpl( final CardinalityEstimation cardEstimate ) {
+        assert cardEstimate != null;
         this.cardEstimate = cardEstimate;
     }
 
