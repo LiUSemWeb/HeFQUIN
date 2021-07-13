@@ -24,11 +24,11 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     public int getTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalNumberOfRequests = 0;
         if ( pp.numberOfSubPlans() == 0 ){
-            totalNumberOfRequests += costFunctionForRoot.getNumberOfRequests( pp );
+            return costFunctionForRoot.getNumberOfRequests( pp );
         }
 
+        int totalNumberOfRequests = 0;
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
             final int costOfRootOp = costFunctionForRoot.getNumberOfRequests( pp.getSubPlan(i) );
             totalNumberOfRequests += costOfRootOp ;
