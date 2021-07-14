@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
 public interface CostFunctionsForPhysicalPlans {
 
-    CostOfPhysicalPlan getCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException;
+    CostOfPhysicalPlan determineCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException;
 
     int determineTotalNumberOfRequests( PhysicalPlan pp ) throws QueryOptimizationException;
 
