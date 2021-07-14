@@ -9,17 +9,17 @@ public class DefaultConfiguration implements Configuration {
     protected final String RELATIONSHIP_MAPPING = "http://example.org/relationship/";
     protected final String NODE_MAPPING = "http://example.org/node/";
 
-    public String unmapProperty( final String uri ) {
-        return uri.replaceAll(PROPERTY_MAPPING, "");
+    public String unmapProperty( final Node n ) {
+        return n.getURI().replaceAll(PROPERTY_MAPPING, "");
     }
 
-    public String unmapRelationship( final String uri ) {
-        return uri.replaceAll(RELATIONSHIP_MAPPING, "");
+    public String unmapRelationship( final Node n ) {
+        return n.getURI().replaceAll(RELATIONSHIP_MAPPING, "");
     }
 
     @Override
-    public String unmapLabel( final String label ) {
-        return label.replaceAll(CLASS_MAPPING, "");
+    public String unmapLabel( final Node n) {
+        return n.getURI().replaceAll(CLASS_MAPPING, "");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class DefaultConfiguration implements Configuration {
         return CLASS_MAPPING + label;
     }
 
-    public String unmapNode( final String uri ) {
-        return uri.replaceAll(NODE_MAPPING, "");
+    public String unmapNode( final Node n ) {
+        return n.getURI().replaceAll(NODE_MAPPING, "");
     }
 }

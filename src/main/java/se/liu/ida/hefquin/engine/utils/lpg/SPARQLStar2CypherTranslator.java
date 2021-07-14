@@ -149,51 +149,51 @@ public class SPARQLStar2CypherTranslator {
 
         public static String getVarPropertyLiteral(final Node s, final Node p, final Node o,
                                                    final Configuration configuration) {
-            final String property = configuration.unmapProperty(p.getURI());
+            final String property = configuration.unmapProperty(p);
             final String literal = o.getLiteralValue().toString();
             return String.format(varPropLit, property, literal, property, literal);
         }
 
         public static String getVarLabelClass(final Node s, final Node p, final Node o,
                                               final Configuration configuration) {
-            final String clazz = configuration.unmapLabel(o.getURI());
+            final String clazz = configuration.unmapLabel(o);
             return String.format(varLabelClass, clazz, s.getName());
         }
 
         public static String getVarRelationshipURI(final Node s, final Node p, final Node o,
                                                    final Configuration configuration) {
-            final String relationship = configuration.unmapRelationship(p.getURI());
-            final String nodeID = configuration.unmapNode(o.getURI());
+            final String relationship = configuration.unmapRelationship(p);
+            final String nodeID = configuration.unmapNode(o);
             return String.format(varRelURI, relationship, nodeID, s.getName());
         }
 
         public static String getNodeLabelVar(final Node s, final Node p, final Node o,
                                              final Configuration configuration) {
-            return String.format(nodeLabelVar, configuration.unmapNode(s.getURI()), o.getName());
+            return String.format(nodeLabelVar, configuration.unmapNode(s), o.getName());
         }
 
         public static String getNodePropertyVar(final Node s, final Node p, final Node o,
                                                 final Configuration configuration) {
-            final String property = configuration.unmapProperty(p.getURI());
-            return String.format(nodePropVar, configuration.unmapNode(s.getURI()), property,
+            final String property = configuration.unmapProperty(p);
+            return String.format(nodePropVar, configuration.unmapNode(s), property,
                     property, o.getName());
         }
 
         public static String getNodeRelationshipVar(final Node s, final Node p, final Node o,
                                                     final Configuration configuration) {
-            return String.format(nodeRelVar, configuration.unmapRelationship(p.getURI()),
-                    configuration.unmapNode(s.getURI()), o.getName());
+            return String.format(nodeRelVar, configuration.unmapRelationship(p),
+                    configuration.unmapNode(s), o.getName());
         }
 
         public static String getNodeVarNode(final Node s, final Node p, final Node o,
                                             final Configuration configuration) {
-            return String.format(nodeVarNode, configuration.unmapNode(s.getURI()),
-                    configuration.unmapNode(o.getURI()), p.getName());
+            return String.format(nodeVarNode, configuration.unmapNode(s),
+                    configuration.unmapNode(o), p.getName());
         }
 
         public static String getNodeVarLiteral(final Node s, final Node p, final Node o,
                                                final Configuration configuration) {
-            return String.format(nodeVarLit, configuration.unmapNode(s.getURI()),
+            return String.format(nodeVarLit, configuration.unmapNode(s),
                     o.getLiteralValue(), p.getName());
         }
 
@@ -209,26 +209,26 @@ public class SPARQLStar2CypherTranslator {
 
         public static String getVarRelationshipVar(final Node s, final Node p, final Node o,
                                                    final Configuration configuration) {
-            final String relationship = configuration.unmapRelationship(p.getURI());
+            final String relationship = configuration.unmapRelationship(p);
             return String.format(varRelVar, relationship, s.getName(), o.getName());
         }
 
         public static String getVarPropertyVar(final Node s, final Node p, final Node o,
                                                final Configuration configuration) {
-            final String property = configuration.unmapProperty(p.getURI());
+            final String property = configuration.unmapProperty(p);
             final String objectVar = o.getName();
             return String.format(varPropVar, property, property, objectVar, property, property, objectVar);
         }
 
         public static String getVarVarLabel(final Node s, final Node p, final Node o,
                                             final Configuration configuration) {
-            return String.format(varVarLabel, configuration.unmapLabel(o.getURI()), s.getName(),
+            return String.format(varVarLabel, configuration.unmapLabel(o), s.getName(),
                     configuration.getLabelIRI(), p.getName());
         }
 
         public static String getVarVarNode(final Node s, final Node p, final Node o,
                                            final Configuration configuration) {
-            return String.format(varVarNode, configuration.unmapNode(o.getURI()), s.getName(), p.getName());
+            return String.format(varVarNode, configuration.unmapNode(o), s.getName(), p.getName());
         }
 
         public static String getVarVarLiteral(final Node s, final Node p, final Node o,
@@ -238,7 +238,7 @@ public class SPARQLStar2CypherTranslator {
 
         public static String getNodeVarVar(final Node s, final Node p, final Node o,
                                            final Configuration configuration) {
-            String nodeID = configuration.unmapNode(s.getURI());
+            String nodeID = configuration.unmapNode(s);
             return String.format(nodeVarVar, nodeID, configuration.getLabelIRI(), p.getName(), o.getName(),
                     nodeID, p.getName(), o.getName(), nodeID, p.getName(), o.getName());
         }
