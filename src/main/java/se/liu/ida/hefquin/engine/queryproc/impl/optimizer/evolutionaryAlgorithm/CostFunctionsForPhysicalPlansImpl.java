@@ -26,15 +26,13 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
-        if ( pp.numberOfSubPlans() == 0 ){
-            return costFunctionForRoot.determineNumberOfRequests( pp );
-        }
+        int totalNumberOfRequests = costFunctionForRoot.determineNumberOfRequests( pp );
 
-        int totalNumberOfRequests = 0;
+        if ( pp.numberOfSubPlans() == 0 ){
+            return totalNumberOfRequests;
+        }
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineNumberOfRequests( pp.getSubPlan(i) );
-            totalNumberOfRequests += costOfRootOp ;
-            determineTotalNumberOfRequests( pp.getSubPlan(i) );
+            totalNumberOfRequests += determineTotalNumberOfRequests( pp.getSubPlan(i) );
         }
 
         return totalNumberOfRequests;
@@ -42,15 +40,13 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
-        if ( pp.numberOfSubPlans() == 0 ){
-            return costFunctionForRoot.determineShippedRDFTermsForRequests( pp );
-        }
+        int totalShippedRDFTermsForRequests = costFunctionForRoot.determineShippedRDFTermsForRequests( pp );
 
-        int totalShippedRDFTermsForRequests = 0;
+        if ( pp.numberOfSubPlans() == 0 ){
+            return totalShippedRDFTermsForRequests;
+        }
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineShippedRDFTermsForRequests( pp.getSubPlan(i) );
-            totalShippedRDFTermsForRequests += costOfRootOp ;
-            determineTotalShippedRDFTermsForRequests( pp.getSubPlan(i) );
+            totalShippedRDFTermsForRequests += determineTotalShippedRDFTermsForRequests( pp.getSubPlan(i) );
         }
 
         return totalShippedRDFTermsForRequests;
@@ -58,31 +54,27 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalShippedRDFVarsForRequests = 0;
+        int totalShippedVarsForRequests = costFunctionForRoot.determineShippedVarsForRequests( pp );
+
         if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedRDFVarsForRequests += costFunctionForRoot.determineShippedVarsForRequests( pp );
+            return totalShippedVarsForRequests;
         }
-
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineShippedVarsForRequests( pp.getSubPlan(i) );
-            totalShippedRDFVarsForRequests += costOfRootOp ;
-            determineTotalShippedVarsForRequests( pp.getSubPlan(i) );
+            totalShippedVarsForRequests += determineTotalShippedVarsForRequests( pp.getSubPlan(i) );
         }
 
-        return totalShippedRDFVarsForRequests;
+        return totalShippedVarsForRequests;
     }
 
     @Override
     public int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalShippedRDFTermsForResponses = 0;
-        if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedRDFTermsForResponses += costFunctionForRoot.determineShippedRDFTermsForResponses( pp );
-        }
+        int totalShippedRDFTermsForResponses = costFunctionForRoot.determineShippedRDFTermsForResponses( pp );
 
+        if ( pp.numberOfSubPlans() == 0 ){
+            return totalShippedRDFTermsForResponses;
+        }
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineShippedRDFTermsForResponses( pp.getSubPlan(i) );
-            totalShippedRDFTermsForResponses += costOfRootOp ;
-            determineTotalShippedRDFTermsForResponses( pp.getSubPlan(i) );
+            totalShippedRDFTermsForResponses += determineTotalShippedRDFTermsForResponses( pp.getSubPlan(i) );
         }
 
         return totalShippedRDFTermsForResponses;
@@ -90,15 +82,13 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalShippedVarsForResponses = 0;
-        if ( pp.numberOfSubPlans() == 0 ){
-            totalShippedVarsForResponses += costFunctionForRoot.determineShippedVarsForResponses( pp );
-        }
+        int totalShippedVarsForResponses = costFunctionForRoot.determineShippedVarsForResponses( pp );
 
+        if ( pp.numberOfSubPlans() == 0 ){
+            return totalShippedVarsForResponses;
+        }
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineShippedVarsForResponses( pp.getSubPlan(i) );
-            totalShippedVarsForResponses += costOfRootOp ;
-            determineTotalShippedVarsForResponses( pp.getSubPlan(i) );
+            totalShippedVarsForResponses += determineTotalShippedVarsForResponses( pp.getSubPlan(i) );
         }
 
         return totalShippedVarsForResponses;
@@ -106,15 +96,13 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException {
-        int totalIntermediateResultsSize = 0;
+        int totalIntermediateResultsSize = costFunctionForRoot.determineIntermediateResultsSize( pp );
         if ( pp.numberOfSubPlans() == 0 ){
-            totalIntermediateResultsSize += costFunctionForRoot.determineIntermediateResultsSize( pp );
+            return totalIntermediateResultsSize;
         }
 
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
-            final int costOfRootOp = costFunctionForRoot.determineIntermediateResultsSize( pp.getSubPlan(i) );
-            totalIntermediateResultsSize += costOfRootOp ;
-            determineTotalIntermediateResultsSize( pp.getSubPlan(i) );
+            totalIntermediateResultsSize += determineTotalIntermediateResultsSize( pp.getSubPlan(i) );
         }
         return totalIntermediateResultsSize;
     }
