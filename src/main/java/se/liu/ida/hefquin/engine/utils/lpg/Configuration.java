@@ -11,7 +11,7 @@ public interface Configuration {
     String mapProperty( final String property );
     String mapRelationship( final String relationship );
     String mapLabel( final String label );
-    
+
     String unmapNode( final Node n);
     String unmapProperty ( final Node n);
     String unmapRelationship ( final Node n );

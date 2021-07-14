@@ -22,9 +22,9 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
-                "MATCH (cpvar1) WHERE cpvar1.name = 'Quentin Tarantino' " +
+                "MATCH (cpvar1) WHERE cpvar1.name='Quentin Tarantino' " +
                         "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3 UNION " +
-                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar2.name = 'Quentin Tarantino' " +
+                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar3.name='Quentin Tarantino' " +
                         "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3");
     }
 
@@ -40,7 +40,7 @@ public class SPARQLStar2CypherTranslationTest {
     }
 
     @Test
-    public void testVarRelationshipURI() {
+    public void testVarRelationshipNode() {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"),
                 NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
@@ -156,8 +156,8 @@ public class SPARQLStar2CypherTranslationTest {
         assertEquals(translation,
                 "MATCH (cpvar1) WHERE EXISTS(cpvar1.name) " +
                         "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.name AS o UNION " +
-                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.name) " +
-                        "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.name AS o");
+                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE EXISTS(cpvar2.name) " +
+                        "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, cpvar2.name AS o");
     }
 
     @Test
@@ -184,7 +184,6 @@ public class SPARQLStar2CypherTranslationTest {
 
     @Test
     public void testVarVarLiteral() {
-        final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"),
                 Var.alloc("p"),
                 NodeFactory.createLiteral("The Matrix"));
@@ -193,8 +192,8 @@ public class SPARQLStar2CypherTranslationTest {
                 "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
                         "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, " +
                         "[k IN KEYS(cpvar2) WHERE cpvar2[k]='The Matrix' | pm(k)] AS p UNION " +
-                        "MATCH (cpvar4) RETURN nm(cpvar4) AS r1, '' AS r2, '' AS r3, " +
-                        "[k IN KEYS(cpvar4) WHERE cpvar4[k]='The Matrix' | pm(k)] AS p");
+                        "MATCH (cpvar1) RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, " +
+                        "[k IN KEYS(cpvar1) WHERE cpvar1[k]='The Matrix' | pm(k)] AS p");
     }
 
     @Test
@@ -207,11 +206,11 @@ public class SPARQLStar2CypherTranslationTest {
         assertEquals(translation,
                 "MATCH (cpvar1) WHERE ID(cpvar1)=22 " +
                         "RETURN "+conf.getLabelIRI()+" AS p, labels(cpvar1) AS o UNION " +
-                        "MATCH (cpvar2) WHERE ID(cpvar2)=22 " +
-                        "RETURN [k IN KEYS(cpvar2) | pm(k)] AS p, " +
-                        "[k in KEYS(cpvar2) | cpvar2[k]] AS o UNION " +
-                        "MATCH (cpvar3)-[cpvar4]->(cpvar5) WHERE ID(cpvar3)=22 " +
-                        "RETURN elm(cpvar4) AS p, nm(cpvar5) AS o");
+                        "MATCH (cpvar1) WHERE ID(cpvar1)=22 " +
+                        "RETURN [k IN KEYS(cpvar1) | pm(k)] AS p, " +
+                        "[k in KEYS(cpvar1) | cpvar1[k]] AS o UNION " +
+                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=22 " +
+                        "RETURN elm(cpvar2) AS p, nm(cpvar3) AS o");
     }
 
     @Test
@@ -222,9 +221,9 @@ public class SPARQLStar2CypherTranslationTest {
         assertEquals(translation,
                 "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
                         "RETURN nm(cpvar1) AS s1, elm(cpvar2) AS p, nm(cpvar3) AS o UNION " +
-                        "MATCH (cpvar4) RETURN nm(cpvar4) AS s1, "+ conf.getLabelIRI() +
-                        " AS p, labels(cpvar4) AS o; " +
-                        "MATCH (cpvar5) RETURN cpvar5 AS s UNION MATCH ()-[cpvar6]->() RETURN cpvar6 AS s");
+                        "MATCH (cpvar1) RETURN nm(cpvar1) AS s1, "+ conf.getLabelIRI() +
+                        " AS p, labels(cpvar1) AS o; " +
+                        "MATCH (cpvar1) RETURN cpvar1 AS s UNION MATCH ()-[cpvar2]->() RETURN cpvar2 AS s");
     }
 
 }

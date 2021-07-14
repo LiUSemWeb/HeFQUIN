@@ -19,13 +19,18 @@ public class SPARQLStar2CypherTranslator {
     final static private String EXISTS_CONDITION = "EXISTS(%s.%s)";
 
     public static String translate( final BGP bgp ) {
-        return translate(bgp, new DefaultConfiguration());
+        return translate(bgp, new DefaultConfiguration(), new CypherVarGenerator());
     }
 
-    public static String translate( final BGP bgp, final Configuration configuration ) {
+    public static String translate( final BGP bgp, final Configuration configuration) {
+        return translate(bgp, configuration, new CypherVarGenerator());
+    }
+
+    public static String translate( final BGP bgp, final Configuration configuration,
+                                    final CypherVarGenerator gen) {
         final Set<? extends TriplePattern> triples = bgp.getTriplePatterns();
         if (triples.size() == 1) {
-            return translateTriple((TriplePattern) triples.toArray()[0], configuration);
+            return translateTriple((TriplePattern) triples.toArray()[0], configuration, gen);
         }
         return translateBGP(bgp);
     }
@@ -38,7 +43,8 @@ public class SPARQLStar2CypherTranslator {
         return null;
     }
 
-    private static String translateTriple(final TriplePattern pattern, Configuration configuration) {
+    private static String translateTriple(final TriplePattern pattern, final Configuration configuration,
+                                          final CypherVarGenerator gen) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
         final Node p = b.getPredicate();
@@ -46,33 +52,33 @@ public class SPARQLStar2CypherTranslator {
         if (pattern.numberOfVars() == 1){
             if (s.isVariable()) {
                 if (configuration.mapsToProperty(p) && o.isLiteral()) {
-                    return Translations.getVarPropertyLiteral(s, p, o, configuration);
+                    return Translations.getVarPropertyLiteral(s, p, o, configuration, gen);
                 } else if (configuration.isLabelIRI(p) && configuration.mapsToLabel(o)) {
-                    return Translations.getVarLabelClass(s, p, o, configuration);
+                    return Translations.getVarLabelClass(s, p, o, configuration, gen);
                 } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(o)){
-                    return Translations.getVarRelationshipURI(s, p, o, configuration);
+                    return Translations.getVarRelationshipNode(s, p, o, configuration, gen);
                 } else {
                     throw new IllegalArgumentException("Illegal values for predicate and object");
                 }
             }
             else if (o.isVariable()) {
                 if (configuration.isLabelIRI(p) && configuration.mapsToNode(s)) {
-                    return Translations.getNodeLabelVar(s, p, o, configuration);
+                    return Translations.getNodeLabelVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToProperty(p) && configuration.mapsToNode(s)) {
-                    return Translations.getNodePropertyVar(s, p, o, configuration);
+                    return Translations.getNodePropertyVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(s)) {
-                    return Translations.getNodeRelationshipVar(s, p, o, configuration);
+                    return Translations.getNodeRelationshipVar(s, p, o, configuration, gen);
                 } else {
                     throw new IllegalArgumentException("Illegal values for subject and predicate");
                 }
             }
             else if (p.isVariable()) {
                 if (configuration.mapsToNode(s) && configuration.mapsToNode(o)) {
-                    return Translations.getNodeVarNode(s, p, o, configuration);
+                    return Translations.getNodeVarNode(s, p, o, configuration, gen);
                 } else if (configuration.mapsToNode(s) && o.isLiteral()) {
-                    return Translations.getNodeVarLiteral(s, p, o, configuration);
+                    return Translations.getNodeVarLiteral(s, p, o, configuration, gen);
                 } else if (configuration.mapsToNode(s) && configuration.mapsToLabel(o)) {
-                    return Translations.getNodeVarLabel(s, p, o, configuration);
+                    return Translations.getNodeVarLabel(s, p, o, configuration, gen);
                 } else {
                     throw new IllegalArgumentException("Illegal values for subject and object");
                 }
@@ -80,184 +86,223 @@ public class SPARQLStar2CypherTranslator {
         } else if (pattern.numberOfVars() == 2) {
             if (s.isVariable() && o.isVariable()) {
                 if (configuration.isLabelIRI(p)) {
-                    return Translations.getVarLabelVar(s, p, o, configuration);
+                    return Translations.getVarLabelVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToRelationship(p)) {
-                    return Translations.getVarRelationshipVar(s, p, o, configuration);
+                    return Translations.getVarRelationshipVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToProperty(p)) {
-                    return Translations.getVarPropertyVar(s, p, o, configuration);
+                    return Translations.getVarPropertyVar(s, p, o, configuration, gen);
                 } else {
                     throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship " +
                             "or the label URI");
                 }
             } else if (s.isVariable() && p.isVariable()) {
                 if (configuration.mapsToLabel(o)) {
-                    return Translations.getVarVarLabel(s, p, o, configuration);
+                    return Translations.getVarVarLabel(s, p, o, configuration, gen);
                 } else if (configuration.mapsToNode(o)) {
-                    return Translations.getVarVarNode(s, p, o, configuration);
+                    return Translations.getVarVarNode(s, p, o, configuration, gen);
                 } else if (o.isLiteral()) {
-                    return Translations.getVarVarLiteral(s, p, o, configuration);
+                    return Translations.getVarVarLiteral(s, p, o, configuration, gen);
                 }
             } else if(p.isVariable() && o.isVariable()) {
                 if (configuration.mapsToNode(s)) {
-                    return Translations.getNodeVarVar(s, p, o, configuration);
+                    return Translations.getNodeVarVar(s, p, o, configuration, gen);
                 }
             }
         } else {
-            return Translations.getVarVarVar(s, p, o, configuration);
+            return Translations.getVarVarVar(s, p, o, configuration, gen);
         }
         return null;
     }
 
     private static class Translations {
 
-        final protected static String varPropLit    = "MATCH (cpvar1) WHERE cpvar1.%s = '%s' " +
-                "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3 " +
-                "UNION MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar2.%s = '%s' " +
-                "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3";
-        final protected static String varLabelClass = "MATCH (cpvar1) WHERE cpvar1:%s RETURN nm(cpvar1) AS %s";
-        final protected static String varRelURI     = "MATCH (cpvar1)-[:%s]->(cpvar2) WHERE ID(cpvar2) = %s RETURN nm(cpvar1) AS %s";
-        final protected static String nodeLabelVar  = "MATCH (cpvar1) WHERE ID(cpvar1)=%s RETURN labels(cpvar1) AS %s";
-        final protected static String nodePropVar   = "MATCH (cpvar1) WHERE ID(cpvar1)=%s AND EXISTS(cpvar1.%s) RETURN cpvar1.%s AS %s";
-        final protected static String nodeRelVar    = "MATCH (cpvar1)-[:%s]->(cpvar2) WHERE ID(cpvar1)=%s RETURN nm(cpvar2) AS %s";
-        final protected static String nodeVarNode   = "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=%s AND ID(cpvar3)=%s RETURN elm(cpvar2) AS %s";
-        final protected static String nodeVarLit    = "MATCH (cpvar1) WHERE ID(cpvar1)=%s RETURN [k in KEYS(cpvar1) WHERE cpvar1[k]='%s' | pm(k)] AS %s";
+        final protected static String varPropLit    = "MATCH (%s) WHERE %s.%s='%s' " +
+                "RETURN nm(%s) AS r1, '' AS r2, '' AS r3 " +
+                "UNION MATCH (%s)-[%s]->(%s) WHERE %s.%s='%s' " +
+                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3";
+        final protected static String varLabelClass = "MATCH (%s) WHERE %s:%s RETURN nm(%s) AS %s";
+        final protected static String varRelNode    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s) = %s RETURN nm(%s) AS %s";
+        final protected static String nodeLabelVar  = "MATCH (%s) WHERE ID(%s)=%s RETURN labels(%s) AS %s";
+        final protected static String nodePropVar   = "MATCH (%s) WHERE ID(%s)=%s AND EXISTS(%s.%s) RETURN %s.%s AS %s";
+        final protected static String nodeRelVar    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s";
+        final protected static String nodeVarNode   = "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s AND ID(%s)=%s RETURN elm(%s) AS %s";
+        final protected static String nodeVarLit    = "MATCH (%s) WHERE ID(%s)=%s RETURN [k in KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s";
         final protected static String nodeVarLabel  = "RETURN %s AS %s";
-        final protected static String varLabelVar   = "MATCH (cpvar1) RETURN nm(cpvar1) AS %s, labels(cpvar1) AS %s";
-        final protected static String varRelVar     = "MATCH (cpvar1)-[:%s]->(cpvar2) RETURN nm(cpvar1) AS %s, nm(cpvar2) AS %s";
-        final protected static String varPropVar    = "MATCH (cpvar1) WHERE EXISTS(cpvar1.%s) " +
-                "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.%s AS %s UNION " +
-                "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE EXISTS(cpvar3.%s) " +
-                "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3, cpvar3.%s AS %s";
-        final protected static String varVarLabel   = "MATCH (cpvar1) WHERE cpvar1:%s RETURN nm(cpvar1) AS %s, %s AS %s";
-        final protected static String varVarNode    = "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar3)=%s RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s";
-        final protected static String varVarLit     = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
-                "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, " +
-                "[k IN KEYS(cpvar2) WHERE cpvar2[k]='%s' | pm(k)] AS %s UNION " +
-                "MATCH (cpvar4) RETURN nm(cpvar4) AS r1, '' AS r2, '' AS r3, " +
-                "[k IN KEYS(cpvar4) WHERE cpvar4[k]='%s' | pm(k)] AS %s";
-        final protected static String nodeVarVar    = "MATCH (cpvar1) WHERE ID(cpvar1)=%s " +
-                "RETURN %s AS %s, labels(cpvar1) AS %s UNION " +
-                "MATCH (cpvar2) WHERE ID(cpvar2)=%s " +
-                "RETURN [k IN KEYS(cpvar2) | pm(k)] AS %s, " +
-                "[k in KEYS(cpvar2) | cpvar2[k]] AS %s UNION " +
-                "MATCH (cpvar3)-[cpvar4]->(cpvar5) WHERE ID(cpvar3)=%s " +
-                "RETURN elm(cpvar4) AS %s, nm(cpvar5) AS %s";
-        final protected static String varVarVar     = "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
-                "RETURN nm(cpvar1) AS %s, elm(cpvar2) AS %s, nm(cpvar3) AS %s UNION " +
-                "MATCH (cpvar4) RETURN nm(cpvar4) AS %s, %s AS %s, labels(cpvar4) AS %s; " +
-                "MATCH (cpvar5) RETURN cpvar5 AS s UNION MATCH ()-[cpvar6]->() RETURN cpvar6 AS s";
+        final protected static String varLabelVar   = "MATCH (%s) RETURN nm(%s) AS %s, labels(%s) AS %s";
+        final protected static String varRelVar     = "MATCH (%s)-[:%s]->(%s) RETURN nm(%s) AS %s, nm(%s) AS %s";
+        final protected static String varPropVar    = "MATCH (%s) WHERE EXISTS(%s.%s) " +
+                "RETURN nm(%s) AS r1, '' AS r2, '' AS r3, %s.%s AS %s UNION " +
+                "MATCH (%s)-[%s]->(%s) WHERE EXISTS(%s.%s) " +
+                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3, %s.%s AS %s";
+        final protected static String varVarLabel   = "MATCH (%s) WHERE %s:%s RETURN nm(%s) AS %s, %s AS %s";
+        final protected static String varVarNode    = "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s, elm(%s) AS %s";
+        final protected static String varVarLit     = "MATCH (%s)-[%s]->(%s) " +
+                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3, " +
+                "[k IN KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s UNION " +
+                "MATCH (%s) RETURN nm(%s) AS r1, '' AS r2, '' AS r3, " +
+                "[k IN KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s";
+        final protected static String nodeVarVar    = "MATCH (%s) WHERE ID(%s)=%s " +
+                "RETURN %s AS %s, labels(%s) AS %s UNION " +
+                "MATCH (%s) WHERE ID(%s)=%s " +
+                "RETURN [k IN KEYS(%s) | pm(k)] AS %s, " +
+                "[k in KEYS(%s) | %s[k]] AS %s UNION " +
+                "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s " +
+                "RETURN elm(%s) AS %s, nm(%s) AS %s";
+        final protected static String varVarVar     = "MATCH (%s)-[%s]->(%s) " +
+                "RETURN nm(%s) AS %s, elm(%s) AS %s, nm(%s) AS %s UNION " +
+                "MATCH (%s) RETURN nm(%s) AS %s, %s AS %s, labels(%s) AS %s; " +
+                "MATCH (%s) RETURN %s AS s UNION MATCH ()-[%s]->() RETURN %s AS s";
 
         public static String getVarPropertyLiteral(final Node s, final Node p, final Node o,
-                                                   final Configuration configuration) {
+                                                   final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
             final String literal = o.getLiteralValue().toString();
-            return String.format(varPropLit, property, literal, property, literal);
+            final String svar = gen.getVarFor(s.getName());
+            final String xvar = gen.getAnonVar();
+            final String evar = gen.getAnonVar();
+            final String yvar = gen.getAnonVar();
+            return String.format(varPropLit, svar, svar, property, literal, svar,
+                    xvar, evar, yvar, evar, property, literal, xvar, evar, yvar);
         }
 
         public static String getVarLabelClass(final Node s, final Node p, final Node o,
-                                              final Configuration configuration) {
+                                              final Configuration configuration, final CypherVarGenerator gen) {
             final String clazz = configuration.unmapLabel(o);
-            return String.format(varLabelClass, clazz, s.getName());
+            final String svar = gen.getVarFor(s.getName());
+            return String.format(varLabelClass, svar, svar, clazz, svar, s.getName());
         }
 
-        public static String getVarRelationshipURI(final Node s, final Node p, final Node o,
-                                                   final Configuration configuration) {
+        public static String getVarRelationshipNode(final Node s, final Node p, final Node o,
+                                                    final Configuration configuration, final CypherVarGenerator gen) {
             final String relationship = configuration.unmapRelationship(p);
             final String nodeID = configuration.unmapNode(o);
-            return String.format(varRelURI, relationship, nodeID, s.getName());
+            final String svar = gen.getVarFor(s.getName());
+            final String ovar = gen.getAnonVar();
+            return String.format(varRelNode, svar, relationship, ovar, ovar, nodeID, svar, s.getName());
         }
 
         public static String getNodeLabelVar(final Node s, final Node p, final Node o,
-                                             final Configuration configuration) {
-            return String.format(nodeLabelVar, configuration.unmapNode(s), o.getName());
+                                             final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(o.getName());
+            return String.format(nodeLabelVar, svar, svar, configuration.unmapNode(s), svar, o.getName());
         }
 
         public static String getNodePropertyVar(final Node s, final Node p, final Node o,
-                                                final Configuration configuration) {
+                                                final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
-            return String.format(nodePropVar, configuration.unmapNode(s), property,
-                    property, o.getName());
+            final String var = gen.getAnonVar();
+            return String.format(nodePropVar, var, var, configuration.unmapNode(s), var, property,
+                    var, property, o.getName());
         }
 
         public static String getNodeRelationshipVar(final Node s, final Node p, final Node o,
-                                                    final Configuration configuration) {
-            return String.format(nodeRelVar, configuration.unmapRelationship(p),
-                    configuration.unmapNode(s), o.getName());
+                                                    final Configuration configuration, final CypherVarGenerator gen) {
+            final String xvar = gen.getAnonVar();
+            final String yvar = gen.getVarFor(o.getName());
+            return String.format(nodeRelVar, xvar, configuration.unmapRelationship(p), yvar, xvar,
+                    configuration.unmapNode(s), yvar, o.getName());
         }
 
         public static String getNodeVarNode(final Node s, final Node p, final Node o,
-                                            final Configuration configuration) {
-            return String.format(nodeVarNode, configuration.unmapNode(s),
-                    configuration.unmapNode(o), p.getName());
+                                            final Configuration configuration, final CypherVarGenerator gen) {
+            final String xvar = gen.getAnonVar();
+            final String evar = gen.getVarFor(p.getName());
+            final String yvar = gen.getAnonVar();
+            return String.format(nodeVarNode, xvar, evar, yvar, xvar, configuration.unmapNode(s),
+                    yvar, configuration.unmapNode(o), evar, p.getName());
         }
 
         public static String getNodeVarLiteral(final Node s, final Node p, final Node o,
-                                               final Configuration configuration) {
-            return String.format(nodeVarLit, configuration.unmapNode(s),
+                                               final Configuration configuration, final CypherVarGenerator gen) {
+            final String xvar = gen.getAnonVar();
+            return String.format(nodeVarLit, xvar, xvar, configuration.unmapNode(s), xvar, xvar,
                     o.getLiteralValue(), p.getName());
         }
 
         public static String getNodeVarLabel(final Node s, final Node p, final Node o,
-                                             final Configuration configuration) {
+                                             final Configuration configuration, final CypherVarGenerator gen) {
             return String.format(nodeVarLabel, configuration.getLabelIRI(), p.getName());
         }
 
         public static String getVarLabelVar(final Node s, final Node p, final Node o,
-                                            final Configuration configuration) {
-            return String.format(varLabelVar, s.getName(), o.getName());
+                                            final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(s.getName());
+            return String.format(varLabelVar, svar, svar, s.getName(), svar, o.getName());
         }
 
         public static String getVarRelationshipVar(final Node s, final Node p, final Node o,
-                                                   final Configuration configuration) {
+                                                   final Configuration configuration, final CypherVarGenerator gen) {
             final String relationship = configuration.unmapRelationship(p);
-            return String.format(varRelVar, relationship, s.getName(), o.getName());
+            final String svar = gen.getVarFor(s.getName());
+            final String ovar = gen.getVarFor(o.getName());
+            return String.format(varRelVar, svar, relationship, ovar, svar, s.getName(), ovar, o.getName());
         }
 
         public static String getVarPropertyVar(final Node s, final Node p, final Node o,
-                                               final Configuration configuration) {
+                                               final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
-            final String objectVar = o.getName();
-            return String.format(varPropVar, property, property, objectVar, property, property, objectVar);
+            final String svar = gen.getVarFor(s.getName());
+            final String evar = gen.getAnonVar();
+            final String ovar = gen.getVarFor(o.getName());
+            return String.format(varPropVar, svar, svar, property, svar, svar, property, o.getName(),
+                    svar, evar, ovar, evar, property, svar, evar, ovar, evar, property, o.getName());
         }
 
         public static String getVarVarLabel(final Node s, final Node p, final Node o,
-                                            final Configuration configuration) {
-            return String.format(varVarLabel, configuration.unmapLabel(o), s.getName(),
+                                            final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(s.getName());
+            return String.format(varVarLabel, svar, svar, configuration.unmapLabel(o), svar, s.getName(),
                     configuration.getLabelIRI(), p.getName());
         }
 
         public static String getVarVarNode(final Node s, final Node p, final Node o,
-                                           final Configuration configuration) {
-            return String.format(varVarNode, configuration.unmapNode(o), s.getName(), p.getName());
+                                           final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(s.getName());
+            final String pvar = gen.getVarFor(p.getName());
+            final String yvar = gen.getAnonVar();
+            return String.format(varVarNode, svar, pvar, yvar, yvar, configuration.unmapNode(o),
+                    svar, s.getName(), pvar, p.getName());
         }
 
         public static String getVarVarLiteral(final Node s, final Node p, final Node o,
-                                              final Configuration configuration) {
-            return String.format(varVarLit, o.getLiteralValue(), p.getName(), o.getLiteralValue(), p.getName());
+                                              final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(s.getName());
+            final String pvar = gen.getVarFor(p.getName());
+            final String yvar = gen.getAnonVar();
+            return String.format(varVarLit, svar, pvar, yvar, svar, pvar, yvar, pvar, pvar, o.getLiteralValue(),
+                    p.getName(), svar, svar, svar, svar, o.getLiteralValue(), p.getName());
         }
 
         public static String getNodeVarVar(final Node s, final Node p, final Node o,
-                                           final Configuration configuration) {
-            String nodeID = configuration.unmapNode(s);
-            return String.format(nodeVarVar, nodeID, configuration.getLabelIRI(), p.getName(), o.getName(),
-                    nodeID, p.getName(), o.getName(), nodeID, p.getName(), o.getName());
+                                           final Configuration configuration, final CypherVarGenerator gen) {
+            final String nodeID = configuration.unmapNode(s);
+            final String xvar = gen.getAnonVar();
+            final String pvar = gen.getVarFor(p.getName());
+            final String ovar = gen.getVarFor(o.getName());
+            return String.format(nodeVarVar, xvar, xvar, nodeID, configuration.getLabelIRI(), p.getName(),
+                    xvar, o.getName(), xvar, xvar, nodeID, xvar, p.getName(), xvar, xvar, o.getName(),
+                    xvar, pvar, ovar, xvar, nodeID, pvar, p.getName(), ovar, o.getName());
         }
 
         public static String getVarVarVar(final Node s, final Node p, final Node o,
-                                          final Configuration configuration) {
-            return String.format(varVarVar, s.getName(), p.getName(), o.getName(),
-                    s.getName(), configuration.getLabelIRI(), p.getName(), o.getName());
+                                          final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getVarFor(s.getName());
+            final String pvar = gen.getVarFor(p.getName());
+            final String ovar = gen.getVarFor(o.getName());
+            return String.format(varVarVar, svar, pvar, ovar, svar, s.getName(), pvar, p.getName(), ovar, o.getName(),
+                    svar, svar, s.getName(), configuration.getLabelIRI(), p.getName(), svar, o.getName(),
+                    svar, svar, pvar, pvar);
         }
 
     }
 
     protected static class CypherVarGenerator {
 
-        protected static final Map<String, String> varmap = new HashMap<>();
-        protected static final String VAR_PATTERN = "cpvar%d";
-        protected static int current = 1;
+        protected final Map<String, String> varmap = new HashMap<>();
+        protected final String VAR_PATTERN = "cpvar%d";
+        protected int current = 1;
 
-        public static String getVarFor( final String var ) {
+        public String getVarFor( final String var ) {
             if (varmap.containsKey(var))
                 return varmap.get(var);
             varmap.put(var, String.format(VAR_PATTERN, current));
@@ -265,7 +310,7 @@ public class SPARQLStar2CypherTranslator {
             return varmap.get(var);
         }
 
-        public static String getAnonVar() {
+        public String getAnonVar() {
             String var = String.format(VAR_PATTERN, current);
             current++;
             return var;
