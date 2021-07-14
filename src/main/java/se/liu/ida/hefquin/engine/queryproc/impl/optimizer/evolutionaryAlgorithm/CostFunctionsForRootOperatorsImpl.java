@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.ConstructRequestBasedOnUnaryOperator;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.Set;
 
 public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
+    protected final ConstructRequestBasedOnUnaryOperator helper = new ConstructRequestBasedOnUnaryOperator();
 
     public CostFunctionsForRootOperatorsImpl( final CardinalityEstimation cardEstimate ) {
         assert cardEstimate != null;
@@ -64,14 +66,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = helper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd){
             numberOfTerms = numberOfTermsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = helper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -114,14 +116,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = helper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd ){
             numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = helper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();

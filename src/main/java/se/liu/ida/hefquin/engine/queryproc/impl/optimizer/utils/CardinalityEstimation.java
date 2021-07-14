@@ -6,28 +6,23 @@ import static java.lang.Math.min;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.ConstructRequestBasedOnUnaryOperator;
 
 import java.util.*;
 
 public class CardinalityEstimation {
     protected final CardinalitiesCache cardinalitiesCache = new CardinalitiesCache();
     protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
+    protected final ConstructRequestBasedOnUnaryOperator helper = new ConstructRequestBasedOnUnaryOperator();
     protected final QueryProcContext ctxt;
 
     public CardinalityEstimation(QueryProcContext ctxt) {
@@ -122,7 +117,7 @@ public class CardinalityEstimation {
         }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
-        final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+        final PhysicalPlan reqTP = helper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
 
         final int cardinality = joinCardinality( pp1, reqTP );
         cardinalitiesCache.add( pp, cardinality );
@@ -143,7 +138,7 @@ public class CardinalityEstimation {
         }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
-        final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
+        final PhysicalPlan reqBGP = helper.formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
 
         final int cardinality = joinCardinality( pp1, reqBGP );
         cardinalitiesCache.add( pp, cardinality );
@@ -201,12 +196,12 @@ public class CardinalityEstimation {
             cardinality = getCardinalityEstimationOfLeafNode(pp );
         } else if ( lop instanceof LogicalOpTPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
-            final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd((LogicalOpTPAdd) lop);
+            final PhysicalPlan reqTP = helper.formRequestBasedOnTPofTPAdd((LogicalOpTPAdd) lop);
 
             return joinCardinalityBasedOnVar( pp1, reqTP, v );
         } else if ( lop instanceof LogicalOpBGPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
-            final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd)lop);
+            final PhysicalPlan reqBGP = helper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd)lop);
 
             return joinCardinalityBasedOnVar( pp1, reqBGP, v );
         } else if ( lop instanceof LogicalOpJoin ){
@@ -245,6 +240,7 @@ public class CardinalityEstimation {
     }
 
     // helper function
+    /*
     public PhysicalPlan formRequestBasedOnTPofTPAdd( final LogicalOpTPAdd lop ){
         final FederationMember fm = lop.getFederationMember();
 
@@ -296,5 +292,6 @@ public class CardinalityEstimation {
 
         return pp;
     }
+     */
 
 }
