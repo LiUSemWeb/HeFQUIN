@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.utils.lpg;
 
+import org.apache.jena.graph.Node;
+
 /**
  * A class that contains the functions of an LPG2RDFstar configurations
  */
@@ -14,11 +16,11 @@ public interface Configuration {
     String unmapRelationship ( final String iri );
     String unmapLabel( final String label );
 
-    boolean mapsToNode( final String iri );
-    boolean mapsToProperty( final String iri );
-    boolean mapsToRelationship( final String iri );
-    boolean mapsToLabel( final String label );
-    boolean isLabelIRI( final String iri );
+    boolean mapsToNode( final Node n);
+    boolean mapsToProperty( final Node n );
+    boolean mapsToRelationship( final Node n);
+    boolean mapsToLabel( final Node n);
+    boolean isLabelIRI( final Node n);
 
     String getLabelIRI();
 }

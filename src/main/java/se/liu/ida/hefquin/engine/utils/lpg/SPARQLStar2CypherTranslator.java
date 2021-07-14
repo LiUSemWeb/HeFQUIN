@@ -45,48 +45,33 @@ public class SPARQLStar2CypherTranslator {
         final Node o = b.getObject();
         if (pattern.numberOfVars() == 1){
             if (s.isVariable()) {
-                if (p.isURI() && o.isLiteral() && configuration.mapsToProperty(p.getURI())) {
+                if (configuration.mapsToProperty(p) && o.isLiteral()) {
                     return Translations.getVarPropertyLiteral(s, p, o, configuration);
-                }
-                else if (p.isURI() && (o.isURI() || o.isBlank())) {
-                    if (configuration.isLabelIRI(p.getURI()) && configuration.mapsToLabel(o.getURI())) {
-                        return Translations.getVarLabelClass(s, p, o, configuration);
-                    }
-                    else if (configuration.mapsToRelationship(p.getURI()) &&
-                            (o.isBlank() || configuration.mapsToNode(o.getURI()))){
-                        return Translations.getVarRelationshipURI(s, p, o, configuration);
-                    }
-                    else {
-                        throw new IllegalArgumentException("Predicate must be the label URI or the mapping of a " +
-                                "Relationship. Object must be a literal or a class mapping");
-                    }
-                }
-                else {
-                    throw new IllegalArgumentException("Predicate must be an URI. Object must be a literal or an URI");
+                } else if (configuration.isLabelIRI(p) && configuration.mapsToLabel(o)) {
+                    return Translations.getVarLabelClass(s, p, o, configuration);
+                } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(o)){
+                    return Translations.getVarRelationshipURI(s, p, o, configuration);
+                } else {
+                    throw new IllegalArgumentException("Illegal values for predicate and object");
                 }
             }
             else if (o.isVariable()) {
-                if (p.isURI() && configuration.isLabelIRI(p.getURI())
-                        && (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))) {
+                if (configuration.isLabelIRI(p) && configuration.mapsToNode(s)) {
                     return Translations.getNodeLabelVar(s, p, o, configuration);
-                } else if (p.isURI() && configuration.mapsToProperty(p.getURI())
-                        && (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))) {
+                } else if (configuration.mapsToProperty(p) && configuration.mapsToNode(s)) {
                     return Translations.getNodePropertyVar(s, p, o, configuration);
-                } else if (p.isURI() && configuration.mapsToRelationship(p.getURI())
-                        && (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))) {
+                } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(s)) {
                     return Translations.getNodeRelationshipVar(s, p, o, configuration);
                 } else {
                     throw new IllegalArgumentException("Illegal values for subject and predicate");
                 }
             }
             else if (p.isVariable()) {
-                if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))
-                        && (o.isBlank() || (o.isURI() && configuration.mapsToNode(o.getURI())))) {
+                if (configuration.mapsToNode(s) && configuration.mapsToNode(o)) {
                     return Translations.getNodeVarNode(s, p, o, configuration);
-                } else if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI()))) && o.isLiteral()) {
+                } else if (configuration.mapsToNode(s) && o.isLiteral()) {
                     return Translations.getNodeVarLiteral(s, p, o, configuration);
-                } else if ((s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI())))
-                        && o.isURI() && configuration.mapsToLabel(o.getURI())) {
+                } else if (configuration.mapsToNode(s) && configuration.mapsToLabel(o)) {
                     return Translations.getNodeVarLabel(s, p, o, configuration);
                 } else {
                     throw new IllegalArgumentException("Illegal values for subject and object");
@@ -94,26 +79,26 @@ public class SPARQLStar2CypherTranslator {
             }
         } else if (pattern.numberOfVars() == 2) {
             if (s.isVariable() && o.isVariable()) {
-                if (p.isURI() && configuration.isLabelIRI(p.getURI())) {
+                if (configuration.isLabelIRI(p)) {
                     return Translations.getVarLabelVar(s, p, o, configuration);
-                } else if (p.isURI() && configuration.mapsToRelationship(p.getURI())) {
+                } else if (configuration.mapsToRelationship(p)) {
                     return Translations.getVarRelationshipVar(s, p, o, configuration);
-                } else if (p.isURI() && configuration.mapsToProperty(p.getURI())) {
+                } else if (configuration.mapsToProperty(p)) {
                     return Translations.getVarPropertyVar(s, p, o, configuration);
                 } else {
-                    throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship or " +
-                            "the label URI");
+                    throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship " +
+                            "or the label URI");
                 }
             } else if (s.isVariable() && p.isVariable()) {
-                if (o.isURI() && configuration.mapsToLabel(o.getURI())) {
+                if (configuration.mapsToLabel(o)) {
                     return Translations.getVarVarLabel(s, p, o, configuration);
-                } else if (o.isBlank() || (o.isURI() && configuration.mapsToNode(o.getURI()))) {
+                } else if (configuration.mapsToNode(o)) {
                     return Translations.getVarVarNode(s, p, o, configuration);
                 } else if (o.isLiteral()) {
                     return Translations.getVarVarLiteral(s, p, o, configuration);
                 }
-            } else {
-                if (s.isBlank() || (s.isURI() && configuration.mapsToNode(s.getURI()))) {
+            } else if(p.isVariable() && o.isVariable()) {
+                if (configuration.mapsToNode(s)) {
                     return Translations.getNodeVarVar(s, p, o, configuration);
                 }
             }
