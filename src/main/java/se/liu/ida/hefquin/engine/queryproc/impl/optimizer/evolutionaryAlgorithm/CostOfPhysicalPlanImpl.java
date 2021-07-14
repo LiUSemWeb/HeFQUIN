@@ -8,7 +8,7 @@ public class CostOfPhysicalPlanImpl implements CostOfPhysicalPlan {
     protected final int shippedVarsForResponses;
     protected final int getIntermediateResultsSize;
 
-    public CostOfPhysicalPlanImpl(int numberOfRequests, int shippedRDFTermsForRequests, int shippedVarsForRequests, int shippedRDFTermsForResponses, int shippedVarsForResponses, int getIntermediateResultsSize) {
+    public CostOfPhysicalPlanImpl( final int numberOfRequests, final int shippedRDFTermsForRequests, final int shippedVarsForRequests, final int shippedRDFTermsForResponses, final int shippedVarsForResponses, final int getIntermediateResultsSize) {
         this.numberOfRequests = numberOfRequests;
         this.shippedRDFTermsForRequests = shippedRDFTermsForRequests;
         this.shippedVarsForRequests = shippedVarsForRequests;
