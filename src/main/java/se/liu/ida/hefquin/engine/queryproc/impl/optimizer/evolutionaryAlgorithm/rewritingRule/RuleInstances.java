@@ -7,7 +7,7 @@ public class RuleInstances {
     // Convert TPAdd to Join (category: D)
     // Convert to HashJoin
     public static Rule rule1 = new RuleConvertTPAddIndexNLJToHashJoin();
-    public static Rule rule2 = new RuleConvertTPAddBJFilterToHashJoin();
+    public static Rule rule2 = new RuleConvertTPAddBJFILTERToHashJoin();
     public static Rule rule3 = new RuleConvertTPAddBJUNIONToHashJoin();
     public static Rule rule4 = new RuleConvertTPAddBJVALUESToHashJoin();
     public static Rule rule5 = new RuleConvertTPAddBJToHashJoin();
