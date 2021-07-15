@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
 
-public abstract class ConvertTPAddToNaiveIndexNLJ extends ConvertTPAddToBinaryOperator {
+public abstract class ConvertTPAddToNaiveNLJ extends ConvertTPAddToBinaryOperator {
 
     @Override
     public BinaryPhysicalOp definePhysicalOperator(){

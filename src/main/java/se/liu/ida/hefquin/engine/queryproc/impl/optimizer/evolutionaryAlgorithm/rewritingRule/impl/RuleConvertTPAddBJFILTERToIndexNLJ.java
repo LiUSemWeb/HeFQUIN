@@ -2,9 +2,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.rewritingRule.ConvertTPAddToBindJoinWithVALUES;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.rewritingRule.ConvertTPAddToIndexNestedLoopJoin;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.rewritingRule.IdentifyPhysicalOperatorOfTPAdd;
 
-public class RuleConvertTPAddBindJoinWithFILTERToVALUES extends ConvertTPAddToBindJoinWithVALUES {
+public class RuleConvertTPAddBJFILTERToIndexNLJ extends ConvertTPAddToIndexNestedLoopJoin {
 
     @Override
     public Boolean canBeAppliedTo(PhysicalPlan pp) {

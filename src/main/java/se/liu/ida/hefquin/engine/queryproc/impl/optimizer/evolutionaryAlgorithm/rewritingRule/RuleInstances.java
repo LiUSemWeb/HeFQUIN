@@ -26,8 +26,18 @@ public class RuleInstances {
     public static Rule rule14 = new RuleConvertTPAddBJVALUESToNaiveIndexNLJ();
     public static Rule rule15 = new RuleConvertTPAddBJToNaiveIndexNLJ();
 
-    // Conversion of physical algorithm (category: C)
-    public static Rule rule16 = new RuleConvertTPAddBindJoinWithFILTERToVALUES();
+    // Conversion of physical algorithms (category: C)
+    // Convert TPAdd(IndexNLJ) to other physical algorithms
+    public static Rule rule16 = new RuleConvertTPAddIndexNLJToBindJoin();
+    public static Rule rule17 = new RuleConvertTPAddIndexNLJToBJFILTER();
+    public static Rule rule18 = new RuleConvertTPAddIndexNLJToBJUNION();
+    public static Rule rule19 = new RuleConvertTPAddIndexNLJToBJVALUES();
+
+    // Convert TPAdd(Bind Join) to TPAdd(IndexNLJ)
+    public static Rule rule20 = new RuleConvertTPAddBindJoinToIndexNLJ();
+    public static Rule rule21 = new RuleConvertTPAddBJFILTERToIndexNLJ();
+    public static Rule rule22 = new RuleConvertTPAddBJUNIONToIndexNLJ();
+    public static Rule rule23 = new RuleConvertTPAddBJVALUESToIndexNLJ();
 
     // Order tweaking of two TPAdd (category: B)
 
