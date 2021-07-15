@@ -48,7 +48,7 @@ public class SPARQLStar2CypherTranslationTest {
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
                 "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) " +
-                        "WHERE ID(cpvar2) = 22 RETURN nm(cpvar1) AS s");
+                        "WHERE ID(cpvar2)=22 RETURN nm(cpvar1) AS s");
     }
 
     @Test
@@ -216,14 +216,16 @@ public class SPARQLStar2CypherTranslationTest {
     @Test
     public void testVarVarVar() {
         final Configuration conf = new DefaultConfiguration();
-        final Triple t = new Triple(Var.alloc("s1"), Var.alloc("p"), Var.alloc("o"));
+        final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), Var.alloc("o"));
         final String translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(translation,
                 "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
-                        "RETURN nm(cpvar1) AS s1, elm(cpvar2) AS p, nm(cpvar3) AS o UNION " +
-                        "MATCH (cpvar1) RETURN nm(cpvar1) AS s1, "+ conf.getLabelIRI() +
-                        " AS p, labels(cpvar1) AS o; " +
-                        "MATCH (cpvar1) RETURN cpvar1 AS s UNION MATCH ()-[cpvar2]->() RETURN cpvar2 AS s");
+                        "RETURN nm(cpvar1) AS s, elm(cpvar2) AS p, nm(cpvar3) AS o UNION " +
+                        "MATCH (cpvar1) RETURN nm(cpvar1) AS s, "+conf.getLabelIRI()+" AS p, labels(cpvar1) AS o; " +
+                        "MATCH (cpvar1) RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, " +
+                        "[k IN KEYS(cpvar1) | pm(k)] AS p, [k IN KEYS(cpvar1) | cpvar1[k]] AS o UNION " +
+                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3)$ AS r3, " +
+                        "[k IN KEYS(cpvar2) | pm(k)] AS p, [k IN KEYS(cpvar2) | cpvar2[k]] AS o");
     }
 
 }

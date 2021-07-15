@@ -121,7 +121,7 @@ public class SPARQLStar2CypherTranslator {
                 "UNION MATCH (%s)-[%s]->(%s) WHERE %s.%s='%s' " +
                 "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3";
         final protected static String varLabelClass = "MATCH (%s) WHERE %s:%s RETURN nm(%s) AS %s";
-        final protected static String varRelNode    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s) = %s RETURN nm(%s) AS %s";
+        final protected static String varRelNode    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s";
         final protected static String nodeLabelVar  = "MATCH (%s) WHERE ID(%s)=%s RETURN labels(%s) AS %s";
         final protected static String nodePropVar   = "MATCH (%s) WHERE ID(%s)=%s AND EXISTS(%s.%s) RETURN %s.%s AS %s";
         final protected static String nodeRelVar    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s";
@@ -151,7 +151,10 @@ public class SPARQLStar2CypherTranslator {
         final protected static String varVarVar     = "MATCH (%s)-[%s]->(%s) " +
                 "RETURN nm(%s) AS %s, elm(%s) AS %s, nm(%s) AS %s UNION " +
                 "MATCH (%s) RETURN nm(%s) AS %s, %s AS %s, labels(%s) AS %s; " +
-                "MATCH (%s) RETURN %s AS s UNION MATCH ()-[%s]->() RETURN %s AS s";
+                "MATCH (%s) RETURN nm(%s) AS r1, '' AS r2, '' AS r3, " +
+                "[k IN KEYS(%s) | pm(k)] AS %s, [k IN KEYS(%s) | %s[k]] AS %s UNION " +
+                "MATCH (%s)-[%s]->(%s) RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s)$ AS r3, " +
+                "[k IN KEYS(%s) | pm(k)] AS %s, [k IN KEYS(%s) | %s[k]] AS %s";
 
         public static String getVarPropertyLiteral(final Node s, final Node p, final Node o,
                                                    final Configuration configuration, final CypherVarGenerator gen) {
@@ -291,7 +294,8 @@ public class SPARQLStar2CypherTranslator {
             final String ovar = gen.getVarFor(o.getName());
             return String.format(varVarVar, svar, pvar, ovar, svar, s.getName(), pvar, p.getName(), ovar, o.getName(),
                     svar, svar, s.getName(), configuration.getLabelIRI(), p.getName(), svar, o.getName(),
-                    svar, svar, pvar, pvar);
+                    svar, svar, svar, p.getName(), svar, svar, o.getName(), svar, pvar, ovar, svar, pvar, ovar, pvar,
+                    p.getName(), pvar, pvar, o.getName());
         }
 
     }
