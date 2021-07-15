@@ -2,13 +2,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 
-public abstract class ConvertTPAddToHashJoin extends ConvertTPAddToBinaryOperator {
+public abstract class ConvertTPAddToSymmetricHashJoin extends ConvertTPAddToBinaryOperator{
 
     @Override
     public BinaryPhysicalOp definePhysicalOperator(){
-        final PhysicalOpHashJoin popJoin = new PhysicalOpHashJoin( new LogicalOpJoin() );
+        final PhysicalOpSymmetricHashJoin popJoin = new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
 
         return popJoin;
     }
