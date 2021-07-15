@@ -15,14 +15,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.ConstructRequestBasedOnUnaryOperator;
 
 import java.util.*;
 
 public class CardinalityEstimation {
     protected final CardinalitiesCache cardinalitiesCache = new CardinalitiesCache();
     protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
-    protected final ConstructRequestBasedOnUnaryOperator helper = new ConstructRequestBasedOnUnaryOperator();
+    protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
     protected final QueryProcContext ctxt;
 
     public CardinalityEstimation(QueryProcContext ctxt) {
@@ -238,60 +237,5 @@ public class CardinalityEstimation {
         }
         return cardinality;
     }
-
-    // helper function
-    /*
-    public PhysicalPlan formRequestBasedOnTPofTPAdd( final LogicalOpTPAdd lop ){
-        final FederationMember fm = lop.getFederationMember();
-
-        final DataRetrievalRequest req;
-        if ( fm instanceof SPARQLEndpoint ){
-            req = new TriplePatternRequestImpl( lop.getTP());
-        } else if ( fm instanceof TPFServer ){
-            req = new TPFRequestImpl(lop.getTP(), 0);
-        } else if ( fm instanceof BRTPFServer ){
-            req = new TPFRequestImpl(lop.getTP(), 0);
-        } else
-            throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest(op) );
-
-        return pp;
-    }
-
-    public PhysicalPlan formRequestBasedOnBGPofBGPAdd( final LogicalOpBGPAdd lop ){
-        final FederationMember fm = lop.getFederationMember();
-
-        final DataRetrievalRequest req;
-        if ( fm.getInterface().supportsBGPRequests() ){
-            req = new BGPRequestImpl( lop.getBGP());
-        } else
-            throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl(new PhysicalOpRequest(op));
-
-        return pp;
-    }
-
-    public PhysicalPlan formRequestBasedOnPattern( final SPARQLGraphPattern P, final FederationMember fm ){
-        final DataRetrievalRequest req;
-
-        if ( fm instanceof SPARQLEndpoint ){
-            req = new SPARQLRequestImpl( P );
-        } else if ( fm instanceof TPFServer ){
-            req = new TriplePatternRequestImpl((TriplePattern) P);
-        } else if ( fm instanceof BRTPFServer ){
-            req = new TriplePatternRequestImpl((TriplePattern) P);
-        } else
-            throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest(op) );
-
-        return pp;
-    }
-     */
 
 }

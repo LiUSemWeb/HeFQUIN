@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -15,7 +15,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
 
-public class ConstructRequestBasedOnUnaryOperator {
+public class ConstructSubPPBasedOnUnaryOperator {
+
     public PhysicalPlan formRequestBasedOnTPofTPAdd(final LogicalOpTPAdd lop ){
         final FederationMember fm = lop.getFederationMember();
 
@@ -49,4 +50,5 @@ public class ConstructRequestBasedOnUnaryOperator {
 
         return pp;
     }
+
 }

@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.ConstructRequestBasedOnUnaryOperator;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.ConstructSubPPBasedOnUnaryOperator;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 import java.util.Iterator;
@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
-    protected final ConstructRequestBasedOnUnaryOperator helper = new ConstructRequestBasedOnUnaryOperator();
+    protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
 
     public CostFunctionsForRootOperatorsImpl( final CardinalityEstimation cardEstimate ) {
         assert cardEstimate != null;
