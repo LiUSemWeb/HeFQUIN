@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.query.CypherQuery;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UnionCypherQuery implements CypherQuery {
 
@@ -62,4 +63,10 @@ public class UnionCypherQuery implements CypherQuery {
     public boolean isUnionQuery() {
         return true;
     }
+
+    @Override
+    public String toString() {
+        return union.stream().map(CypherQuery::toString).collect(Collectors.joining(" UNION "));
+    }
+
 }

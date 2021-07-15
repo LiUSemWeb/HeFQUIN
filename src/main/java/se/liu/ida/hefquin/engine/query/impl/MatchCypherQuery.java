@@ -66,4 +66,23 @@ public class MatchCypherQuery implements CypherQuery {
     public boolean isUnionQuery() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if (matches.size()>0) {
+            builder.append(String.join(" ", matches));
+            builder.append("\n");
+        }
+        if (conditions.size()>0) {
+            builder.append("WHERE ");
+            builder.append(String.join(" AND ", conditions));
+            builder.append("\n");
+        }
+        if (returnExprs.size()>0) {
+            builder.append("RETURN ");
+            builder.append(String.join(", ", returnExprs));
+        }
+        return builder.toString();
+    }
 }
