@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public class IdentifyPhysicalOperatorOfTPAdd {
     protected final PhysicalOperatorForLogicalOperator pop;
 
-    IdentifyPhysicalOperatorOfTPAdd( final PhysicalPlan pp ){
+    public IdentifyPhysicalOperatorOfTPAdd(final PhysicalPlan pp){
         this.pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
     }
 
