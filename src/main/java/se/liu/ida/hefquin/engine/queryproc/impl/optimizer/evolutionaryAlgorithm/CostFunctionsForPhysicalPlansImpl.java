@@ -6,15 +6,13 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstim
 
 public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
     protected final CostFunctionsForRootOperators costFunctionForRoot;
-    // protected final PhysicalPlanCostCache physicalPlanCostCache;
 
     public CostFunctionsForPhysicalPlansImpl( final CardinalityEstimation cardEstimate ) {
         this.costFunctionForRoot = new CostFunctionsForRootOperatorsImpl(cardEstimate);
-        // this.physicalPlanCostCache = new PhysicalPlanCostCache();
     }
 
     @Override
-    public CostOfPhysicalPlan getCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public CostOfPhysicalPlan determineCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
 
         final int numberOfRequests = determineTotalNumberOfRequests(pp);
         final int shippedRDFTermsForRequests = determineTotalShippedRDFTermsForRequests(pp);
@@ -28,23 +26,13 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
 
     @Override
     public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
-        /*
-        CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
-        if ( costOfPhysicalPlan != null ){
-            return costOfPhysicalPlan.getNumberOfRequests();
-        }
-        */
         int totalNumberOfRequests = costFunctionForRoot.determineNumberOfRequests( pp );
         if ( pp.numberOfSubPlans() == 0 ){
             return totalNumberOfRequests;
         }
         for ( int i = 0; i < pp.numberOfSubPlans(); i++ ){
             totalNumberOfRequests += determineTotalNumberOfRequests( pp.getSubPlan(i) );
-            // totalNumberOfRequests += getCostOfPhysicalPlan( pp.getSubPlan(i) ).getNumberOfRequests();
         }
-        // TODO: How to add totalNumberOfRequests of (sub)PhysicalPlans to this cache?
-        // Perhaps move the cache checking and adding to method 'getCostOfPhysicalPlan'.
-        // In this case, call getCostOfPhysicalPlan within for loop.
 
         return totalNumberOfRequests;
     }

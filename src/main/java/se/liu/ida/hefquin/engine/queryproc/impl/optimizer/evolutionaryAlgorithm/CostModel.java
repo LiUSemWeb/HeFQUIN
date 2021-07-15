@@ -22,7 +22,7 @@ public class CostModel {
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
         if ( costOfPhysicalPlan == null ){
-            costOfPhysicalPlan = costFunctionsForPP.getCostOfPhysicalPlan( pp );
+            costOfPhysicalPlan = costFunctionsForPP.determineCostOfPhysicalPlan( pp );
             physicalPlanCostCache.add( pp,  costOfPhysicalPlan);
         }
 
