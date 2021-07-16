@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +13,11 @@ public class UnionCypherQuery implements CypherQuery {
 
     public UnionCypherQuery() {
         union = new HashSet<>();
+    }
+
+    public UnionCypherQuery(CypherQuery... queries) {
+        this();
+        union.addAll(Arrays.asList(queries));
     }
 
     @Override

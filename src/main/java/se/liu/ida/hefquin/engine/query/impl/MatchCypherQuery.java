@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,13 @@ public class MatchCypherQuery implements CypherQuery {
         matches = new HashSet<>();
         conditions = new HashSet<>();
         returnExprs = new HashSet<>();
+    }
+
+    public MatchCypherQuery(final String[] matches, final String[] conditions, final String[] returns) {
+        this();
+        this.matches.addAll(Arrays.asList(matches));
+        this.conditions.addAll(Arrays.asList(conditions));
+        this.returnExprs.addAll(Arrays.asList(returns));
     }
 
     @Override

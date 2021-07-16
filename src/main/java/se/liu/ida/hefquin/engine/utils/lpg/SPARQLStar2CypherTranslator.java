@@ -3,8 +3,12 @@ package se.liu.ida.hefquin.engine.utils.lpg;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.query.CypherQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.MatchCypherQuery;
+import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
 
+import java.net.IDN;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,22 +16,16 @@ import java.util.Set;
 
 public class SPARQLStar2CypherTranslator {
 
-    final static private String MATCH_PATTERN = "MATCH (%s)-[:%s]->(%s)";
-    final static private String NESTED_MATCH_PATTERN = "MATCH (%s)-[%s:%s {%s : '%s'}]->(%s)";
-    final static private String RETURN_PATTERN = "%s AS %s";
-    final static private String RETURN_LITERAL_PATTERN = "%s.%s AS %s";
-    final static private String EXISTS_CONDITION = "EXISTS(%s.%s)";
-
-    public static String translate( final BGP bgp ) {
+    public static CypherQuery translate(final BGP bgp ) {
         return translate(bgp, new DefaultConfiguration(), new CypherVarGenerator());
     }
 
-    public static String translate( final BGP bgp, final Configuration configuration) {
+    public static CypherQuery translate( final BGP bgp, final Configuration configuration) {
         return translate(bgp, configuration, new CypherVarGenerator());
     }
 
-    public static String translate( final BGP bgp, final Configuration configuration,
-                                    final CypherVarGenerator gen) {
+    public static CypherQuery translate(final BGP bgp, final Configuration configuration,
+                                        final CypherVarGenerator gen) {
         final Set<? extends TriplePattern> triples = bgp.getTriplePatterns();
         if (triples.size() == 1) {
             return translateTriple((TriplePattern) triples.toArray()[0], configuration, gen);
@@ -35,7 +33,7 @@ public class SPARQLStar2CypherTranslator {
         return translateBGP(bgp);
     }
 
-    private static String translateBGP( final BGP bgp ) {
+    private static CypherQuery translateBGP( final BGP bgp ) {
         final Set<String> matches = new HashSet<>();
         final Set<? extends TriplePattern> triples = bgp.getTriplePatterns();
         final Set<String> returns = new HashSet<>();
@@ -43,7 +41,7 @@ public class SPARQLStar2CypherTranslator {
         return null;
     }
 
-    private static String translateTriple(final TriplePattern pattern, final Configuration configuration,
+    private static CypherQuery translateTriple(final TriplePattern pattern, final Configuration configuration,
                                           final CypherVarGenerator gen) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
@@ -116,47 +114,23 @@ public class SPARQLStar2CypherTranslator {
 
     private static class Translations {
 
-        final protected static String varPropLit    = "MATCH (%s) WHERE %s.%s='%s' " +
-                "RETURN nm(%s) AS r1, '' AS r2, '' AS r3 " +
-                "UNION MATCH (%s)-[%s]->(%s) WHERE %s.%s='%s' " +
-                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3";
-        final protected static String varLabelClass = "MATCH (%s) WHERE %s:%s RETURN nm(%s) AS %s";
-        final protected static String varRelNode    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s";
-        final protected static String nodeLabelVar  = "MATCH (%s) WHERE ID(%s)=%s RETURN labels(%s) AS %s";
-        final protected static String nodePropVar   = "MATCH (%s) WHERE ID(%s)=%s AND EXISTS(%s.%s) RETURN %s.%s AS %s";
-        final protected static String nodeRelVar    = "MATCH (%s)-[:%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s";
-        final protected static String nodeVarNode   = "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s AND ID(%s)=%s RETURN elm(%s) AS %s";
-        final protected static String nodeVarLit    = "MATCH (%s) WHERE ID(%s)=%s RETURN [k in KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s";
-        final protected static String nodeVarLabel  = "RETURN %s AS %s";
-        final protected static String varLabelVar   = "MATCH (%s) RETURN nm(%s) AS %s, labels(%s) AS %s";
-        final protected static String varRelVar     = "MATCH (%s)-[:%s]->(%s) RETURN nm(%s) AS %s, nm(%s) AS %s";
-        final protected static String varPropVar    = "MATCH (%s) WHERE EXISTS(%s.%s) " +
-                "RETURN nm(%s) AS r1, '' AS r2, '' AS r3, %s.%s AS %s UNION " +
-                "MATCH (%s)-[%s]->(%s) WHERE EXISTS(%s.%s) " +
-                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3, %s.%s AS %s";
-        final protected static String varVarLabel   = "MATCH (%s) WHERE %s:%s RETURN nm(%s) AS %s, %s AS %s";
-        final protected static String varVarNode    = "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s RETURN nm(%s) AS %s, elm(%s) AS %s";
-        final protected static String varVarLit     = "MATCH (%s)-[%s]->(%s) " +
-                "RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s) AS r3, " +
-                "[k IN KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s UNION " +
-                "MATCH (%s) RETURN nm(%s) AS r1, '' AS r2, '' AS r3, " +
-                "[k IN KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s";
-        final protected static String nodeVarVar    = "MATCH (%s) WHERE ID(%s)=%s " +
-                "RETURN %s AS %s, labels(%s) AS %s UNION " +
-                "MATCH (%s) WHERE ID(%s)=%s " +
-                "RETURN [k IN KEYS(%s) | pm(k)] AS %s, " +
-                "[k in KEYS(%s) | %s[k]] AS %s UNION " +
-                "MATCH (%s)-[%s]->(%s) WHERE ID(%s)=%s " +
-                "RETURN elm(%s) AS %s, nm(%s) AS %s";
-        final protected static String varVarVar     = "MATCH (%s)-[%s]->(%s) " +
-                "RETURN nm(%s) AS %s, elm(%s) AS %s, nm(%s) AS %s UNION " +
-                "MATCH (%s) RETURN nm(%s) AS %s, %s AS %s, labels(%s) AS %s; " +
-                "MATCH (%s) RETURN nm(%s) AS r1, '' AS r2, '' AS r3, " +
-                "[k IN KEYS(%s) | pm(k)] AS %s, [k IN KEYS(%s) | %s[k]] AS %s UNION " +
-                "MATCH (%s)-[%s]->(%s) RETURN nm(%s) AS r1, elm(%s) AS r2, nm(%s)$ AS r3, " +
-                "[k IN KEYS(%s) | pm(k)] AS %s, [k IN KEYS(%s) | %s[k]] AS %s";
+        final static private String MATCH_EDGE              = "MATCH (%s)-[:%s]->(%s)";
+        final static private String MATCH_EDGE_VAR          = "MATCH (%s)-[%s]->(%s)";
+        final static private String MATCH_NODE              = "MATCH (%s)";
+        final static private String CONDITION_EXISTS        = "EXISTS(%s.%s)";
+        final static private String CONDITION_VALUE         = "%s.%s='%s'";
+        final static private String CONDITION_CLASS         = "%s:%s" ;
+        final static private String CONDITION_ID            = "ID(%s)=%s";
+        final static private String RETURN_PATTERN          = "%s AS %s";
+        final static private String RETURN_LITERAL_PATTERN  = "%s.%s AS %s";
+        final static private String RETURN_NODE_MAPPING     = "nm(%s) AS %s";
+        final static private String RETURN_EDGE_MAPPING     = "elm(%s) AS %s";
+        final static private String RETURN_LABELS           = "labels(%s) AS %s";
+        final private static String RETURN_KEYS             = "[k in KEYS(%s) | pm(k)] AS %s";
+        final private static String RETURN_KEYS_VALUES      = "[k in KEYS(%s) | %s[k]] AS %s";
+        final private static String RETURN_KEYS_WITH_VALUE  = "[k in KEYS(%s) WHERE %s[k]='%s' | pm(k)] AS %s";
 
-        public static String getVarPropertyLiteral(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarPropertyLiteral(final Node s, final Node p, final Node o,
                                                    final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
             final String literal = o.getLiteralValue().toString();
@@ -164,138 +138,234 @@ public class SPARQLStar2CypherTranslator {
             final String xvar = gen.getAnonVar();
             final String evar = gen.getAnonVar();
             final String yvar = gen.getAnonVar();
-            return String.format(varPropLit, svar, svar, property, literal, svar,
-                    xvar, evar, yvar, evar, property, literal, xvar, evar, yvar);
+            return new UnionCypherQuery(
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                            new String[]{String.format(CONDITION_VALUE, svar, property, literal)} ,
+                            new String[]{
+                                String.format(RETURN_NODE_MAPPING, svar, "r1"), "'' AS r2", "'' AS r3"} ),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE_VAR, xvar, evar, yvar)},
+                            new String[]{String.format(CONDITION_VALUE, evar, property, literal)},
+                            new String[]{
+                                String.format(RETURN_NODE_MAPPING, xvar, "r1"),
+                                String.format(RETURN_EDGE_MAPPING, evar, "r2"),
+                                String.format(RETURN_NODE_MAPPING, yvar, "r3")}));
         }
 
-        public static String getVarLabelClass(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarLabelClass(final Node s, final Node p, final Node o,
                                               final Configuration configuration, final CypherVarGenerator gen) {
             final String clazz = configuration.unmapLabel(o);
             final String svar = gen.getVarFor(s.getName());
-            return String.format(varLabelClass, svar, svar, clazz, svar, s.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                    new String[]{String.format(CONDITION_CLASS, svar, clazz)},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName())});
         }
 
-        public static String getVarRelationshipNode(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarRelationshipNode(final Node s, final Node p, final Node o,
                                                     final Configuration configuration, final CypherVarGenerator gen) {
             final String relationship = configuration.unmapRelationship(p);
             final String nodeID = configuration.unmapNode(o);
             final String svar = gen.getVarFor(s.getName());
             final String ovar = gen.getAnonVar();
-            return String.format(varRelNode, svar, relationship, ovar, ovar, nodeID, svar, s.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_EDGE, svar, relationship, ovar)},
+                    new String[]{String.format(CONDITION_ID, ovar, nodeID)},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName())});
         }
 
-        public static String getNodeLabelVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeLabelVar(final Node s, final Node p, final Node o,
                                              final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(o.getName());
-            return String.format(nodeLabelVar, svar, svar, configuration.unmapNode(s), svar, o.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                    new String[]{String.format(CONDITION_ID, svar, configuration.unmapNode(s))},
+                    new String[]{String.format(RETURN_LABELS, svar, o.getName())});
         }
 
-        public static String getNodePropertyVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodePropertyVar(final Node s, final Node p, final Node o,
                                                 final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
             final String var = gen.getAnonVar();
-            return String.format(nodePropVar, var, var, configuration.unmapNode(s), var, property,
-                    var, property, o.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, var)},
+                    new String[]{String.format(CONDITION_ID, var, configuration.unmapNode(s)),
+                        String.format(CONDITION_EXISTS, var, property)},
+                    new String[]{String.format(RETURN_LITERAL_PATTERN, var, property, o.getName())});
         }
 
-        public static String getNodeRelationshipVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeRelationshipVar(final Node s, final Node p, final Node o,
                                                     final Configuration configuration, final CypherVarGenerator gen) {
             final String xvar = gen.getAnonVar();
             final String yvar = gen.getVarFor(o.getName());
-            return String.format(nodeRelVar, xvar, configuration.unmapRelationship(p), yvar, xvar,
-                    configuration.unmapNode(s), yvar, o.getName());
+            return new MatchCypherQuery(
+                    new String[]{String.format(MATCH_EDGE, xvar, configuration.unmapRelationship(p), yvar)},
+                    new String[]{String.format(CONDITION_ID, xvar, configuration.unmapNode(s))},
+                    new String[]{String.format(RETURN_NODE_MAPPING, yvar, o.getName())});
         }
 
-        public static String getNodeVarNode(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeVarNode(final Node s, final Node p, final Node o,
                                             final Configuration configuration, final CypherVarGenerator gen) {
             final String xvar = gen.getAnonVar();
             final String evar = gen.getVarFor(p.getName());
             final String yvar = gen.getAnonVar();
-            return String.format(nodeVarNode, xvar, evar, yvar, xvar, configuration.unmapNode(s),
-                    yvar, configuration.unmapNode(o), evar, p.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_EDGE_VAR, xvar, evar, yvar)},
+                    new String[]{String.format(CONDITION_ID, xvar, configuration.unmapNode(s)),
+                            String.format(CONDITION_ID, yvar, configuration.unmapNode(o))},
+                    new String[]{String.format(RETURN_EDGE_MAPPING, evar, p.getName())});
         }
 
-        public static String getNodeVarLiteral(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeVarLiteral(final Node s, final Node p, final Node o,
                                                final Configuration configuration, final CypherVarGenerator gen) {
             final String xvar = gen.getAnonVar();
-            return String.format(nodeVarLit, xvar, xvar, configuration.unmapNode(s), xvar, xvar,
-                    o.getLiteralValue(), p.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, xvar)},
+                    new String[]{String.format(CONDITION_ID, xvar, configuration.unmapNode(s))},
+                    new String[]{String.format(RETURN_KEYS_WITH_VALUE, xvar, xvar, o.getLiteralValue(), p.getName())});
         }
 
-        public static String getNodeVarLabel(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeVarLabel(final Node s, final Node p, final Node o,
                                              final Configuration configuration, final CypherVarGenerator gen) {
-            return String.format(nodeVarLabel, configuration.getLabelIRI(), p.getName());
+            return new MatchCypherQuery(new String[]{}, new String[]{},
+                    new String[]{String.format(RETURN_PATTERN, configuration.getLabelIRI(), p.getName())});
         }
 
-        public static String getVarLabelVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarLabelVar(final Node s, final Node p, final Node o,
                                             final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(s.getName());
-            return String.format(varLabelVar, svar, svar, s.getName(), svar, o.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                    new String[]{},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                        String.format(RETURN_LABELS, svar, o.getName())});
         }
 
-        public static String getVarRelationshipVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarRelationshipVar(final Node s, final Node p, final Node o,
                                                    final Configuration configuration, final CypherVarGenerator gen) {
             final String relationship = configuration.unmapRelationship(p);
             final String svar = gen.getVarFor(s.getName());
             final String ovar = gen.getVarFor(o.getName());
-            return String.format(varRelVar, svar, relationship, ovar, svar, s.getName(), ovar, o.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_EDGE, svar, relationship, ovar)},
+                    new String[]{},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                            String.format(RETURN_NODE_MAPPING, ovar, o.getName())});
         }
 
-        public static String getVarPropertyVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarPropertyVar(final Node s, final Node p, final Node o,
                                                final Configuration configuration, final CypherVarGenerator gen) {
             final String property = configuration.unmapProperty(p);
             final String svar = gen.getVarFor(s.getName());
             final String evar = gen.getAnonVar();
             final String ovar = gen.getVarFor(o.getName());
-            return String.format(varPropVar, svar, svar, property, svar, svar, property, o.getName(),
-                    svar, evar, ovar, evar, property, svar, evar, ovar, evar, property, o.getName());
+            return new UnionCypherQuery(
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE_VAR, svar, evar, ovar)},
+                            new String[]{String.format(CONDITION_EXISTS, evar, property)},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                    String.format(RETURN_EDGE_MAPPING, evar, "r2"),
+                                    String.format(RETURN_NODE_MAPPING, ovar, "r3"),
+                                    String.format(RETURN_LITERAL_PATTERN, evar, property, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                            new String[]{String.format(CONDITION_EXISTS, svar, property)},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                    String.format(RETURN_PATTERN, "''", "r2"),
+                                    String.format(RETURN_PATTERN, "'", "r3"),
+                                    String.format(RETURN_LITERAL_PATTERN, svar, property, o.getName())})
+            );
         }
 
-        public static String getVarVarLabel(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarVarLabel(final Node s, final Node p, final Node o,
                                             final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(s.getName());
-            return String.format(varVarLabel, svar, svar, configuration.unmapLabel(o), svar, s.getName(),
-                    configuration.getLabelIRI(), p.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                    new String[]{String.format(CONDITION_CLASS, svar, configuration.unmapLabel(o))},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                            String.format(RETURN_PATTERN, configuration.getLabelIRI(), p.getName())});
         }
 
-        public static String getVarVarNode(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarVarNode(final Node s, final Node p, final Node o,
                                            final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(s.getName());
             final String pvar = gen.getVarFor(p.getName());
             final String yvar = gen.getAnonVar();
-            return String.format(varVarNode, svar, pvar, yvar, yvar, configuration.unmapNode(o),
-                    svar, s.getName(), pvar, p.getName());
+            return new MatchCypherQuery(new String[]{String.format(MATCH_EDGE_VAR, svar, pvar, yvar)},
+                    new String[]{String.format(CONDITION_ID, yvar, configuration.unmapNode(o))},
+                    new String[]{String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                            String.format(RETURN_EDGE_MAPPING, pvar, p.getName())});
         }
 
-        public static String getVarVarLiteral(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarVarLiteral(final Node s, final Node p, final Node o,
                                               final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(s.getName());
             final String pvar = gen.getVarFor(p.getName());
             final String yvar = gen.getAnonVar();
-            return String.format(varVarLit, svar, pvar, yvar, svar, pvar, yvar, pvar, pvar, o.getLiteralValue(),
-                    p.getName(), svar, svar, svar, svar, o.getLiteralValue(), p.getName());
+            return new UnionCypherQuery(
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE_VAR, svar, pvar, yvar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                String.format(RETURN_EDGE_MAPPING, pvar, "r2"),
+                                String.format(RETURN_NODE_MAPPING, yvar, "r3"),
+                                String.format(RETURN_KEYS_WITH_VALUE, pvar, pvar, o.getLiteralValue(), p.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                String.format(RETURN_PATTERN, "''", "r2"),
+                                String.format(RETURN_PATTERN, "''", "r3"),
+                                String.format(RETURN_KEYS_WITH_VALUE, svar, svar, o.getLiteralValue(), p.getName())})
+            );
         }
 
-        public static String getNodeVarVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getNodeVarVar(final Node s, final Node p, final Node o,
                                            final Configuration configuration, final CypherVarGenerator gen) {
             final String nodeID = configuration.unmapNode(s);
             final String xvar = gen.getAnonVar();
             final String pvar = gen.getVarFor(p.getName());
             final String ovar = gen.getVarFor(o.getName());
-            return String.format(nodeVarVar, xvar, xvar, nodeID, configuration.getLabelIRI(), p.getName(),
-                    xvar, o.getName(), xvar, xvar, nodeID, xvar, p.getName(), xvar, xvar, o.getName(),
-                    xvar, pvar, ovar, xvar, nodeID, pvar, p.getName(), ovar, o.getName());
+            return new UnionCypherQuery(
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, xvar)},
+                            new String[]{String.format(CONDITION_ID, xvar, nodeID)},
+                            new String[]{String.format(RETURN_PATTERN, configuration.getLabelIRI(), p.getName()),
+                                String.format(RETURN_LABELS, xvar, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, xvar)},
+                            new String[]{String.format(CONDITION_ID, xvar, nodeID)},
+                            new String[]{String.format(RETURN_KEYS, xvar, p.getName()),
+                                String.format(RETURN_KEYS_VALUES, xvar, xvar, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE, xvar, pvar, ovar)},
+                            new String[]{String.format(CONDITION_ID, xvar, nodeID)},
+                            new String[]{String.format(RETURN_EDGE_MAPPING, pvar, p.getName()),
+                                String.format(RETURN_NODE_MAPPING, ovar, o.getName())})
+            );
         }
 
-        public static String getVarVarVar(final Node s, final Node p, final Node o,
+        public static CypherQuery getVarVarVar(final Node s, final Node p, final Node o,
                                           final Configuration configuration, final CypherVarGenerator gen) {
             final String svar = gen.getVarFor(s.getName());
             final String pvar = gen.getVarFor(p.getName());
             final String ovar = gen.getVarFor(o.getName());
-            return String.format(varVarVar, svar, pvar, ovar, svar, s.getName(), pvar, p.getName(), ovar, o.getName(),
-                    svar, svar, s.getName(), configuration.getLabelIRI(), p.getName(), svar, o.getName(),
-                    svar, svar, svar, p.getName(), svar, svar, o.getName(), svar, pvar, ovar, svar, pvar, ovar, pvar,
-                    p.getName(), pvar, pvar, o.getName());
+            return new UnionCypherQuery(
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE, svar, pvar, ovar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_PATTERN, "''", "r1"),
+                                String.format(RETURN_PATTERN, "''", "r2"),
+                                String.format(RETURN_PATTERN, "''", "r3"),
+                                String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                                String.format(RETURN_EDGE_MAPPING, pvar, p.getName()),
+                                String.format(RETURN_NODE_MAPPING, ovar, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_PATTERN, "''", "r1"),
+                                String.format(RETURN_PATTERN, "''", "r2"),
+                                String.format(RETURN_PATTERN, "''", "r3"),
+                                String.format(RETURN_NODE_MAPPING, svar, s.getName()),
+                                String.format(RETURN_PATTERN, configuration.getLabelIRI(), p.getName()),
+                                String.format(RETURN_LABELS, svar, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_EDGE, svar, pvar, ovar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                String.format(RETURN_EDGE_MAPPING, pvar, "r2"),
+                                String.format(RETURN_NODE_MAPPING, ovar, "r3"),
+                                String.format(RETURN_KEYS, pvar, p.getName()),
+                                String.format(RETURN_KEYS_VALUES, pvar, pvar, o.getName())}),
+                    new MatchCypherQuery(new String[]{String.format(MATCH_NODE, svar)},
+                            new String[]{},
+                            new String[]{String.format(RETURN_NODE_MAPPING, svar, "r1"),
+                                String.format(RETURN_PATTERN, "''", "r2"),
+                                String.format(RETURN_PATTERN, "''", "r3"),
+                                String.format(RETURN_KEYS, svar, p.getName()),
+                                String.format(RETURN_KEYS_VALUES, svar, svar, o.getName())})
+            );
         }
 
     }
