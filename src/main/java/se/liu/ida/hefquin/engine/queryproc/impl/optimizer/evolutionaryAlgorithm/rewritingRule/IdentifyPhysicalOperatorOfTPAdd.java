@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public class IdentifyPhysicalOperatorOfTPAdd {
     protected final PhysicalOperatorForLogicalOperator pop;
 
-    public IdentifyPhysicalOperatorOfTPAdd(final PhysicalPlan pp){
+    public IdentifyPhysicalOperatorOfTPAdd( final PhysicalPlan pp ){
         this.pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
     }
 
@@ -27,7 +27,7 @@ public class IdentifyPhysicalOperatorOfTPAdd {
         return false;
     }
 
-    public Boolean matchTPAddBJFilter() {
+    public Boolean matchTPAddBJFILTER() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoinWithFILTER) ){
             return true;
         }
@@ -48,7 +48,7 @@ public class IdentifyPhysicalOperatorOfTPAdd {
         return false;
     }
 
-    public Boolean matchTPAddBJ() {
+    public Boolean matchTPAddBindJoin() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoin) ){
             return true;
         }

@@ -40,6 +40,22 @@ public class RuleInstances {
     public static Rule rule23 = new RuleConvertTPAddBJVALUESToIndexNLJ();
 
     // Order tweaking of two TPAdd (category: B)
+    public static Rule rule24 = new RuleChangeOrderOfTwoTPAddIndexNLJ();
+    public static Rule rule25 = new RuleChangeOrderOfTwoTPAddBindJoin();
+    public static Rule rule26 = new RuleChangeOrderOfTwoTPAddBJFILTER();
+    //public static Rule rule27 = new RuleChangeOrderOfTwoTPAddBJUNION();
+    //public static Rule rule28 = new RuleChangeOrderOfTwoTPAddBJVALUES();
+
+    public static Rule rule29 = new RuleChangeOrderOfTPAddBJFILTERAndIndexNLJ();
+    //public static Rule rule30 = new RuleChangeOrderOfTPAddBJUNIONAndTPAddIndexNLJ();
+    //public static Rule rule31 = new RuleChangeOrderOfTPAddBJVALUESAndTPAddIndexNLJ();
+    //public static Rule rule32 = new RuleChangeOrderOfTPAddBindJoinAndTPAddIndexNLJ();
+
+    //public static Rule rule33 = new RuleChangeOrderOfTPAddIndexNLJAndTPAddBindJoin();
+    //public static Rule rule34 = new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJFILTER();
+    //public static Rule rule35 = new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJUNION();
+    //public static Rule rule36 = new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJVALUES();
+
 
 
 }

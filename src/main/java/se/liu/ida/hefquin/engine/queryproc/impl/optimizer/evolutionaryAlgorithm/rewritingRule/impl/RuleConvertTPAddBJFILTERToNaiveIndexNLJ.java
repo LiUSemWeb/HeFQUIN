@@ -8,7 +8,7 @@ public class RuleConvertTPAddBJFILTERToNaiveIndexNLJ extends ConvertTPAddToNaive
 
     @Override
     public Boolean canBeAppliedTo( final PhysicalPlan pp ) {
-        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFilter();
+        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFILTER();
     }
 
 }

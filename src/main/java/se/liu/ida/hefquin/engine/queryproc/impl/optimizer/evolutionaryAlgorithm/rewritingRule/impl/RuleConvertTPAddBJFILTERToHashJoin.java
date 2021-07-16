@@ -8,7 +8,7 @@ public class RuleConvertTPAddBJFILTERToHashJoin extends ConvertTPAddToHashJoin {
 
     @Override
     public Boolean canBeAppliedTo( final PhysicalPlan pp ) {
-        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFilter();
+        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFILTER();
     }
 
 }

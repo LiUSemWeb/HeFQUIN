@@ -8,8 +8,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.
 public class RuleConvertTPAddBJFILTERToIndexNLJ extends ConvertTPAddToIndexNestedLoopJoin {
 
     @Override
-    public Boolean canBeAppliedTo(PhysicalPlan pp) {
-        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFilter();
+    public Boolean canBeAppliedTo( final PhysicalPlan pp ) {
+        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJFILTER();
     }
 
 }

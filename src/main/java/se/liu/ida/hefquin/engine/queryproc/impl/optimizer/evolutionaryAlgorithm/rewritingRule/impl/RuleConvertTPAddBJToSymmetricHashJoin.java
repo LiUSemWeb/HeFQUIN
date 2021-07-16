@@ -8,7 +8,7 @@ public class RuleConvertTPAddBJToSymmetricHashJoin extends ConvertTPAddToSymmetr
 
     @Override
     public Boolean canBeAppliedTo( final PhysicalPlan pp ) {
-        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJ();
+        return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBindJoin();
     }
 
 }
