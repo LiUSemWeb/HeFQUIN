@@ -324,7 +324,7 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public StringRetrievalResponse performRequest( final Neo4jRequest req,
+		public StringResponse performRequest( final Neo4jRequest req,
 		                                               final Neo4jServer fm )
 				throws FederationAccessException
 		{

@@ -9,7 +9,7 @@ import java.util.Date;
 public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
 {
     @Override
-    public StringRetrievalResponse performRequest( final Neo4jRequest req,
+    public StringResponse performRequest( final Neo4jRequest req,
                                                    final Neo4jServer fm )
             throws FederationAccessException
     {

@@ -1,5 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-public interface StringRetrievalResponse extends DataRetrievalResponse {
+public interface StringResponse extends DataRetrievalResponse {
     String getResponse();
 }

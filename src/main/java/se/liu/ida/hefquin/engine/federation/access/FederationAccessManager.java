@@ -26,5 +26,5 @@ public interface FederationAccessManager
 
 	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
-	StringRetrievalResponse performRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
+	StringResponse performRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
 }
