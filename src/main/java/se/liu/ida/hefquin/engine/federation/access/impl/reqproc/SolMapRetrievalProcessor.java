@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
-import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.SolMapRetrievalInterface;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 

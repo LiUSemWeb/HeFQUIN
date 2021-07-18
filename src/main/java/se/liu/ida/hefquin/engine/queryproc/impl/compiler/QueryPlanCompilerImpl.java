@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
-import se.liu.ida.hefquin.engine.federation.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;

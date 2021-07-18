@@ -1,6 +1,6 @@
-package se.liu.ida.hefquin.engine.federation;
+package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.FederationMember;
 
 public class FederationAccessException extends Exception
 {

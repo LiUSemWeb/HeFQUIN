@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.engine.federation.access.StringRetrievalResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;

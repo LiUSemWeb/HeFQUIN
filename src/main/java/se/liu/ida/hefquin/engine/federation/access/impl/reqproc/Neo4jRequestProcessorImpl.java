@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
-import se.liu.ida.hefquin.engine.federation.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.StringResponseImpl;
