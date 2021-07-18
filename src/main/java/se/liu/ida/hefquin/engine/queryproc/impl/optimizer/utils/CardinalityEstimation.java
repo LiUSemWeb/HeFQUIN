@@ -25,12 +25,14 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.*;
 
-public class CardinalityEstimation {
+public class CardinalityEstimation
+{
     protected final CardinalitiesCache cardinalitiesCache = new CardinalitiesCache();
     protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
+
     protected final QueryProcContext ctxt;
 
-    public CardinalityEstimation(QueryProcContext ctxt) {
+    public CardinalityEstimation( final QueryProcContext ctxt ) {
         assert ctxt != null;
         this.ctxt = ctxt;
     }
@@ -50,40 +52,30 @@ public class CardinalityEstimation {
         final FederationMember fm = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getFederationMember();
 
         final int cardinality;
-        if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ){
-            final CardinalityResponse resp;
-            try {
-                resp = ctxt.getFederationAccessMgr().performCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
-            } catch (FederationAccessException e) {
-                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of SPARQLRequest over SPARQLEndpoint", e);
+        try {
+            if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
+                final CardinalityResponse resp = ctxt.getFederationAccessMgr().performCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+                cardinality = resp.getCardinality();
             }
-            cardinality = resp.getCardinality();
-        } else if ( fm instanceof TPFServer && req instanceof TPFRequest ){
-            final TPFResponse resp;
-            try {
-                resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (TPFServer) fm );
-            } catch (FederationAccessException e) {
-                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over TPFServer", e);
+            else if ( fm instanceof TPFServer && req instanceof TPFRequest ) {
+                final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (TPFServer) fm );
+                cardinality = resp.getCardinalityEstimate();
             }
-            cardinality = resp.getCardinalityEstimate();
-        } else if ( fm instanceof BRTPFServer && req instanceof TPFRequest ){
-            final TPFResponse resp;
-            try {
-                resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (BRTPFServer) fm );
-            } catch (FederationAccessException e) {
-                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of TPFRequest over BRTPFServer", e);
+            else if ( fm instanceof BRTPFServer && req instanceof TPFRequest ) {
+                final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (TPFRequest) req, (BRTPFServer) fm );
+                cardinality = resp.getCardinalityEstimate();
             }
-            cardinality = resp.getCardinalityEstimate();
-        } else if ( fm instanceof BRTPFServer && req instanceof BRTPFRequest ){
-            final TPFResponse resp;
-            try {
-                resp = ctxt.getFederationAccessMgr().performRequest( (BRTPFRequest) req, (BRTPFServer) fm );
-            } catch (FederationAccessException e) {
-                throw new QueryOptimizationException("Exception occurred during performing cardinality estimate of BRTPFRequest over BRTPFServer", e);
+            else if ( fm instanceof BRTPFServer && req instanceof BRTPFRequest ) {
+                final TPFResponse resp = ctxt.getFederationAccessMgr().performRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+                cardinality = resp.getCardinalityEstimate();
             }
-            cardinality = resp.getCardinalityEstimate();
-        } else
-            throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
+            else {
+                throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
+            }
+        }
+        catch ( final FederationAccessException e ) {
+            throw new QueryOptimizationException("Performing a cardinality request caused an exception.", e);
+        }
 
         cardinalitiesCache.add( pp, cardinality );
         return cardinality;
@@ -259,7 +251,7 @@ public class CardinalityEstimation {
             throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest(op) );
+        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
 
         return pp;
     }
@@ -274,7 +266,7 @@ public class CardinalityEstimation {
             throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl(new PhysicalOpRequest(op));
+        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
 
         return pp;
     }
@@ -292,7 +284,7 @@ public class CardinalityEstimation {
             throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
 
         final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest(op) );
+        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
 
         return pp;
     }
