@@ -70,7 +70,22 @@ public class SPARQLStar2CypherTranslator {
             return translation;
         }
         if (pattern.numberOfVars() == 0) {
-            return null;
+            //These translations should only be used for nested triples.
+            if (configuration.mapsToNode(s)) {
+                if (configuration.mapsToProperty(p) && o.isLiteral()) {
+                    return Translations.getNodePropertyLiteral(s, p, o, configuration, gen);
+                } else if (configuration.isLabelIRI(p) && configuration.mapsToLabel(o)) {
+                    return Translations.getNodeLabelLabel(s, p, o, configuration, gen);
+                } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(o)) {
+                    return Translations.getNodeRelationshipNode(s, p, o, configuration, gen);
+                } else {
+                    throw new IllegalArgumentException("Predicate must be a property, relationship or the label IRI. " +
+                            "Object must be a literal, label or node respectively.");
+                }
+            }
+            else {
+                throw new IllegalArgumentException("IRIs in the subject position must map to a node");
+            }
         }
         if (pattern.numberOfVars() == 1){
             if (s.isVariable()) {
@@ -433,6 +448,37 @@ public class SPARQLStar2CypherTranslator {
             );
         }
 
+        public static CypherQuery getNodePropertyLiteral(final Node s, final Node p, final Node o,
+                                                         final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getAnonVar();
+            return CypherQueryBuilder.newBuilder()
+                    .match(String.format(MATCH_NODE, svar))
+                    .condition(String.format(CONDITION_ID, svar, configuration.unmapNode(s)))
+                    .condition(String.format(CONDITION_VALUE, svar, configuration.unmapProperty(p), o.getLiteralValue()))
+                    .build();
+        }
+
+        public static CypherQuery getNodeLabelLabel(final Node s, final Node p, final Node o,
+                                                    final Configuration configuration, final CypherVarGenerator gen) {
+            final String svar = gen.getAnonVar();
+            return CypherQueryBuilder.newBuilder()
+                    .match(String.format(MATCH_NODE, svar))
+                    .condition(String.format(CONDITION_ID, svar, configuration.unmapNode(s)))
+                    .condition(String.format(CONDITION_CLASS, svar,  configuration.unmapLabel(o)))
+                    .build();
+        }
+
+        public static CypherQuery getNodeRelationshipNode(final Node s, final Node p, final Node o,
+                                                          final Configuration configuration, final CypherVarGenerator gen) {
+            final String xvar = gen.getAnonVar();
+            final String evar = gen.getAnonVar();
+            final String yvar = gen.getAnonVar();
+            return CypherQueryBuilder.newBuilder()
+                    .match(String.format(MATCH_EDGE, xvar, evar, configuration.unmapRelationship(p), yvar))
+                    .condition(String.format(CONDITION_ID, xvar, configuration.unmapNode(s)))
+                    .condition(String.format(CONDITION_ID, yvar, configuration.unmapNode(o)))
+                    .build();
+        }
     }
 
     protected static class CypherVarGenerator {

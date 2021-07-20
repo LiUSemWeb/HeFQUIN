@@ -355,4 +355,23 @@ public class SPARQLStar2CypherTranslationTest {
                 .build(), translation);
     }
 
+    @Test
+    public void testNested2() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple tp = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
+                NodeFactory.createURI(conf.mapNode("23"))
+        );
+        final Triple t = new Triple(NodeFactory.createTripleNode(tp),
+                NodeFactory.createURI(conf.mapProperty("year")), Var.alloc("o"));
+        CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(CypherQueryBuilder.newBuilder().match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
+                .condition("EXISTS(cpvar2.year)")
+                .condition("ID(cpvar1)=22")
+                .condition("ID(cpvar3)=23")
+                .returns("cpvar2.year AS o")
+                .build(), translation);
+    }
+
 }
