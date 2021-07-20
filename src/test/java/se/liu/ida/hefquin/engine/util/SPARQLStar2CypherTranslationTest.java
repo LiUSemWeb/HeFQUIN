@@ -5,8 +5,10 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.query.CypherQuery;
+import se.liu.ida.hefquin.engine.query.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
 import se.liu.ida.hefquin.engine.utils.lpg.Configuration;
 import se.liu.ida.hefquin.engine.utils.lpg.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.utils.lpg.SPARQLStar2CypherTranslator;
@@ -22,11 +24,19 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapProperty("name")),
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE cpvar1.name='Quentin Tarantino' " +
-                        "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3 UNION " +
-                        "MATCH (cpvar2)-[cpvar3]->(cpvar4) WHERE cpvar3.name='Quentin Tarantino' " +
-                        "RETURN nm(cpvar2) AS r1, elm(cpvar3) AS r2, nm(cpvar4) AS r3");
+        assertEquals(new UnionCypherQuery(
+                CypherQueryBuilder.newBuilder()
+                        .match("MATCH (cpvar2)-[cpvar3]->(cpvar4)")
+                        .condition("cpvar3.name='Quentin Tarantino'")
+                        .returns("nm(cpvar2) AS r1")
+                        .returns("elm(cpvar3) AS r2")
+                        .returns("nm(cpvar4) AS r3").build(),
+                CypherQueryBuilder.newBuilder().match("MATCH (cpvar1)")
+                        .condition("cpvar1.name='Quentin Tarantino'")
+                        .returns("nm(cpvar1) AS r1")
+                        .returns("'' AS r2")
+                        .returns("'' AS r3")
+                        .build()), translation);
     }
 
     @Test
@@ -36,8 +46,10 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.getLabelIRI()),
                 NodeFactory.createURI(conf.mapLabel("Person")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE cpvar1:Person RETURN nm(cpvar1) AS s");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .condition("cpvar1:Person").returns("nm(cpvar1) AS s")
+                .build(), translation);
     }
 
     @Test
@@ -47,9 +59,11 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
                 NodeFactory.createURI(conf.mapNode("22")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) " +
-                        "WHERE ID(cpvar2)=22 RETURN nm(cpvar1) AS s");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                        .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
+                        .condition("ID(cpvar2)=22")
+                        .returns("nm(cpvar1) AS s")
+                .build(), translation);
     }
 
     @Test
@@ -60,8 +74,11 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.getLabelIRI()),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE ID(cpvar1)=22 RETURN labels(cpvar1) AS o");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .condition("ID(cpvar1)=22")
+                .returns("labels(cpvar1) AS o")
+                .build(), translation);
     }
 
     @Test
@@ -72,8 +89,12 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapProperty("name")),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE ID(cpvar1)=22 AND EXISTS(cpvar1.name) RETURN cpvar1.name AS o");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .condition("ID(cpvar1)=22")
+                .condition("EXISTS(cpvar1.name)")
+                .returns("cpvar1.name AS o")
+                .build(), translation);
     }
 
     @Test
@@ -84,8 +105,11 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) WHERE ID(cpvar1)=22 RETURN nm(cpvar2) AS o");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
+                .condition("ID(cpvar1)=22")
+                .returns("nm(cpvar2) AS o")
+                .build(), translation);
     }
 
     @Test
@@ -96,8 +120,12 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createURI(conf.mapNode("23")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=22 AND ID(cpvar3)=23 RETURN elm(cpvar2) AS p");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                .condition("ID(cpvar1)=22")
+                .condition("ID(cpvar3)=23")
+                .returns("elm(cpvar2) AS p")
+                .build(), translation);
     }
 
     @Test
@@ -108,9 +136,11 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createLiteral("Q. Tarantino"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE ID(cpvar1)=22 RETURN [k in KEYS(cpvar1) " +
-                        "WHERE cpvar1[k]='Q. Tarantino' | pm(k)] AS p");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .condition("ID(cpvar1)=22")
+                .returns("[k in KEYS(cpvar1) WHERE cpvar1[k]='Q. Tarantino' | pm(k)] AS p")
+                .build(), translation);
     }
 
     @Test
@@ -120,8 +150,11 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.getLabelIRI()),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) RETURN nm(cpvar1) AS s, labels(cpvar1) AS o");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .returns("nm(cpvar1) AS s")
+                .returns("labels(cpvar1) AS o")
+                .build(), translation);
     }
 
     @Test
@@ -132,8 +165,7 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createURI(conf.mapLabel("Person")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "RETURN "+ conf.getLabelIRI() + " AS p");
+        assertEquals(CypherQueryBuilder.newBuilder().returns(conf.getLabelIRI() + " AS p").build(), translation);
     }
 
     @Test
@@ -143,8 +175,11 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[:DIRECTED]->(cpvar2) RETURN nm(cpvar1) AS s, nm(cpvar2) AS o");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
+                .returns("nm(cpvar1) AS s")
+                .returns("nm(cpvar2) AS o")
+                .build(), translation);
     }
 
     @Test
@@ -154,11 +189,24 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapProperty("name")),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE EXISTS(cpvar1.name) " +
-                        "RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, cpvar1.name AS o UNION " +
-                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE EXISTS(cpvar2.name) " +
-                        "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, cpvar2.name AS o");
+        assertEquals(
+                new UnionCypherQuery(
+                CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .condition("EXISTS(cpvar1.name)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("'' AS r2")
+                                .returns("'' AS r3")
+                                .returns("cpvar1.name AS o").build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                                .condition("EXISTS(cpvar2.name)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("elm(cpvar2) AS r2")
+                                .returns("nm(cpvar3) AS r3")
+                                .returns("cpvar2.name AS o")
+                                .build()
+                ), translation);
     }
 
     @Test
@@ -168,8 +216,12 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createURI(conf.mapLabel("Person")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE cpvar1:Person RETURN nm(cpvar1) AS s, "+conf.getLabelIRI()+" AS p");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)")
+                .condition("cpvar1:Person")
+                .returns("nm(cpvar1) AS s")
+                .returns(conf.getLabelIRI()+" AS p")
+                .build(), translation);
     }
 
     @Test
@@ -179,8 +231,12 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createURI(conf.mapNode("22")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar3)=22 RETURN nm(cpvar1) AS s, elm(cpvar2) AS p");
+        assertEquals(CypherQueryBuilder.newBuilder()
+                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                .condition("ID(cpvar3)=22")
+                .returns("nm(cpvar1) AS s")
+                .returns("elm(cpvar2) AS p")
+                .build(), translation);
     }
 
     @Test
@@ -189,12 +245,23 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 NodeFactory.createLiteral("The Matrix"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
-                        "RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3) AS r3, " +
-                        "[k IN KEYS(cpvar2) WHERE cpvar2[k]='The Matrix' | pm(k)] AS p UNION " +
-                        "MATCH (cpvar1) RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, " +
-                        "[k IN KEYS(cpvar1) WHERE cpvar1[k]='The Matrix' | pm(k)] AS p");
+        assertEquals(
+                new UnionCypherQuery(
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("elm(cpvar2) AS r2")
+                                .returns("nm(cpvar3) AS r3")
+                                .returns("[k IN KEYS(cpvar2) WHERE cpvar2[k]='The Matrix' | pm(k)] AS p")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("'' AS r2")
+                                .returns("'' AS r3")
+                                .returns("[k IN KEYS(cpvar1) WHERE cpvar1[k]='The Matrix' | pm(k)] AS p")
+                                .build()
+                ), translation);
     }
 
     @Test
@@ -204,14 +271,27 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("p"),
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1) WHERE ID(cpvar1)=22 " +
-                        "RETURN "+conf.getLabelIRI()+" AS p, labels(cpvar1) AS o UNION " +
-                        "MATCH (cpvar1) WHERE ID(cpvar1)=22 " +
-                        "RETURN [k IN KEYS(cpvar1) | pm(k)] AS p, " +
-                        "[k in KEYS(cpvar1) | cpvar1[k]] AS o UNION " +
-                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) WHERE ID(cpvar1)=22 " +
-                        "RETURN elm(cpvar2) AS p, nm(cpvar3) AS o");
+        assertEquals(
+                new UnionCypherQuery(
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .condition("ID(cpvar1)=22")
+                                .returns(conf.getLabelIRI()+" AS p")
+                                .returns("labels(cpvar1) AS o")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .condition("ID(cpvar1)=22")
+                                .returns("[k IN KEYS(cpvar1) | pm(k)] AS p")
+                                .returns("[k IN KEYS(cpvar1) | cpvar1[k]] AS o")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                                .condition("ID(cpvar1)=22")
+                                .returns("elm(cpvar2) AS p")
+                                .returns("nm(cpvar3) AS o")
+                                .build()
+                ), translation);
     }
 
     @Test
@@ -219,14 +299,41 @@ public class SPARQLStar2CypherTranslationTest {
         final Configuration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
-        assertEquals(translation.toString(),
-                "MATCH (cpvar1)-[cpvar2]->(cpvar3) " +
-                        "RETURN nm(cpvar1) AS s, elm(cpvar2) AS p, nm(cpvar3) AS o UNION " +
-                        "MATCH (cpvar1) RETURN nm(cpvar1) AS s, "+conf.getLabelIRI()+" AS p, labels(cpvar1) AS o; " +
-                        "MATCH (cpvar1) RETURN nm(cpvar1) AS r1, '' AS r2, '' AS r3, " +
-                        "[k IN KEYS(cpvar1) | pm(k)] AS p, [k IN KEYS(cpvar1) | cpvar1[k]] AS o UNION " +
-                        "MATCH (cpvar1)-[cpvar2]->(cpvar3) RETURN nm(cpvar1) AS r1, elm(cpvar2) AS r2, nm(cpvar3)$ AS r3, " +
-                        "[k IN KEYS(cpvar2) | pm(k)] AS p, [k IN KEYS(cpvar2) | cpvar2[k]] AS o");
+        assertEquals(
+                new UnionCypherQuery(
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("'' AS r2")
+                                .returns("'' AS r3")
+                                .returns("elm(cpvar2) AS p")
+                                .returns("nm(cpvar3) AS o")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("'' AS r2")
+                                .returns("'' AS r3")
+                                .returns(conf.getLabelIRI()+" AS p")
+                                .returns("labels(cpvar1) AS o")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("'' AS r2")
+                                .returns("'' AS r3")
+                                .returns("[k IN KEYS(cpvar1) | pm(k)] AS p")
+                                .returns("[k IN KEYS(cpvar1) | cpvar1[k]] AS o")
+                                .build(),
+                        CypherQueryBuilder.newBuilder()
+                                .match("MATCH (cpvar1)-[cpvar2]->(cpvar3)")
+                                .returns("nm(cpvar1) AS r1")
+                                .returns("elm(cpvar2) AS r2")
+                                .returns("nm(cpvar3) AS r3")
+                                .returns("[k IN KEYS(cpvar2) | pm(k)] AS p")
+                                .returns("[k IN KEYS(cpvar2) | cpvar2[k]] AS o")
+                                .build()
+                ), translation);
     }
 
 }

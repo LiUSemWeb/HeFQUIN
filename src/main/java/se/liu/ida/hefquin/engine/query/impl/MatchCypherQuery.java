@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.query.CypherQuery;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class MatchCypherQuery implements CypherQuery {
@@ -92,5 +93,18 @@ public class MatchCypherQuery implements CypherQuery {
             builder.append(String.join(", ", returnExprs));
         }
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MatchCypherQuery)) return false;
+        MatchCypherQuery that = (MatchCypherQuery) o;
+        return matches.equals(that.matches) && conditions.equals(that.conditions) && returnExprs.equals(that.returnExprs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(matches, conditions, returnExprs);
     }
 }
