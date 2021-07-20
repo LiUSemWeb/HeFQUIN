@@ -139,7 +139,7 @@ public class SPARQLStar2CypherTranslationTest {
         assertEquals(CypherQueryBuilder.newBuilder()
                 .match("MATCH (cpvar1)")
                 .condition("ID(cpvar1)=22")
-                .returns("[k in KEYS(cpvar1) WHERE cpvar1[k]='Q. Tarantino' | pm(k)] AS p")
+                .returns("[k IN KEYS(cpvar1) WHERE cpvar1[k]='Q. Tarantino' | pm(k)] AS p")
                 .build(), translation);
     }
 
