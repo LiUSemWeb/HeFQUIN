@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-public interface ResponseProcessor
+public interface ResponseProcessor<RespType extends DataRetrievalResponse>
 {
-	void process( DataRetrievalResponse response ) throws ResponseProcessingException;
+	void process( RespType response ) throws ResponseProcessingException;
 }

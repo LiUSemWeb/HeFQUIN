@@ -19,38 +19,43 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
+	public void issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm, final ResponseProcessor<SolMapsResponse> respProc )
 			throws FederationAccessException
 	{
-		return reqProcSPARQL.performRequest( req, fm );
+		final SolMapsResponse response = reqProcSPARQL.performRequest(req, fm);
+		respProc.process(response);
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm )
+	public void issueRequest( final TPFRequest req, final TPFServer fm, final ResponseProcessor<TPFResponse> respProc )
 			throws FederationAccessException
 	{
-		return reqProcTPF.performRequest( req, fm );
+		final TPFResponse response = reqProcTPF.performRequest(req, fm);
+		respProc.process(response);
 	}
 
 	@Override
-	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm )
+	public void issueRequest( final TPFRequest req, final BRTPFServer fm, final ResponseProcessor<TPFResponse> respProc )
 			throws FederationAccessException
 	{
-		return reqProcTPF.performRequest( req, fm );
+		final TPFResponse response = reqProcTPF.performRequest(req, fm);
+		respProc.process(response);
 	}
 
 	@Override
-	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm)
+	public void issueRequest( final BRTPFRequest req, final BRTPFServer fm, final ResponseProcessor<TPFResponse> respProc )
 			throws FederationAccessException
 	{
-		return reqProcBRTPF.performRequest( req, fm );
+		final TPFResponse response = reqProcBRTPF.performRequest(req, fm);
+		respProc.process(response);
 	}
 
 	@Override
-	public StringResponse performRequest( final Neo4jRequest req, final Neo4jServer fm )
+	public void issueRequest( final Neo4jRequest req, final Neo4jServer fm, final ResponseProcessor<StringResponse> respProc )
 			throws FederationAccessException
 	{
-		return reqProcNeo4j.performRequest(req, fm);
+		final StringResponse response = reqProcNeo4j.performRequest(req, fm);
+		respProc.process(response);
 	}
 
 }

@@ -18,7 +18,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 	}
 
 	@Override
-	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
+	protected Iterable<SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping inputSolMap,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{

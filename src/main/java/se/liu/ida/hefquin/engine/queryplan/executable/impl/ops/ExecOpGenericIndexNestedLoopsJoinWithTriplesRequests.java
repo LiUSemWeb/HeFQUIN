@@ -19,7 +19,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTriplesRequests<Query
 	}
 
 	@Override
-	protected Iterable<? extends SolutionMapping> fetchSolutionMappings(
+	protected Iterable<SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt )
 	{
@@ -32,5 +32,5 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithTriplesRequests<Query
 
 	protected abstract TriplesResponse performRequest( final ReqType req, final FederationAccessManager fedAccessMgr );
 
-	protected abstract Iterable<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples, final ReqType req );
+	protected abstract Iterable<SolutionMapping> convert( final Iterable<Triple> itTriples, final ReqType req );
 }

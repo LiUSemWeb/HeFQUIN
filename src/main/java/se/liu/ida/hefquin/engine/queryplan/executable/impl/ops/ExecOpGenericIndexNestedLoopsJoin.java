@@ -61,7 +61,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoin<QueryType extends Query,
 		}
 	}
 
-	protected abstract Iterable<? extends SolutionMapping> fetchSolutionMappings(
+	protected abstract Iterable<SolutionMapping> fetchSolutionMappings(
 			final SolutionMapping sm,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 

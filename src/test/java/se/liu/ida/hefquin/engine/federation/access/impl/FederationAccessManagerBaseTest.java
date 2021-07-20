@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.engine.federation.access.ResponseProcessor;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.StringResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
@@ -106,13 +107,16 @@ public class FederationAccessManagerBaseTest extends EngineTestBase
 
 		final FederationAccessManager mgr = new BlockingFederationAccessManagerImpl(reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
 
-		// executing the tested method
-		final CardinalityResponse resp = mgr.performCardinalityRequest(req, fm);
+		final ResponseProcessor<CardinalityResponse> respProc = new ResponseProcessor<>() {
+			@Override
+			public void process( final CardinalityResponse response ) {
+				assertEquals( fm, response.getFederationMember() );
+				assertEquals( expectedCardinality, response.getCardinality() );
+			}
+		};
 
-		// checking
-		assertEquals( fm, resp.getFederationMember() );
-
-		assertEquals( expectedCardinality, resp.getCardinality() );
+		// executing the tested method, checking is done in the response processor
+		mgr.issueCardinalityRequest(req, fm, respProc);
 	}
 
 }

@@ -26,6 +26,7 @@ import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
@@ -276,59 +277,86 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			if ( itSolMapsForResponse != null ) {
-				return new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
-			}
-			else {
-				return ( (SPARQLEndpointForTest) fm ).performRequest(req);
-			}
-		}
-
-		@Override
-		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
-		                                                      final SPARQLEndpoint fm )
-		{
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
-			if ( itTriplesForResponse != null ) {
-				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
-			}
-			else {
-				return ( (TPFServerForTest) fm ).performRequest(req);
-			}
-		}
-
-		@Override
-		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
-			if ( itTriplesForResponse != null ) {
-				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
-			}
-			else {
-				return ( (BRTPFServerForTest) fm ).performRequest(req);
-			}
-		}
-
-		@Override
-		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
-			if ( itTriplesForResponse != null ) {
-				return new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
-			}
-			else {
-				return ( (BRTPFServerForTest) fm ).performRequest(req);
-			}
-		}
-
-		@Override
-		public StringResponse performRequest( final Neo4jRequest req,
-		                                               final Neo4jServer fm )
+		public void issueRequest( final SPARQLRequest req,
+		                          final SPARQLEndpoint fm,
+		                          final ResponseProcessor<SolMapsResponse> respProc )
 				throws FederationAccessException
 		{
-			return new Neo4jRequestProcessorImpl().performRequest(req, fm);
+			final SolMapsResponse response;
+			if ( itSolMapsForResponse != null ) {
+				response = new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
+			}
+			else {
+				response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
+			}
+			respProc.process(response);
+		}
+
+		@Override
+		public void issueCardinalityRequest( final SPARQLRequest req,
+		                                     final SPARQLEndpoint fm,
+		                                     final ResponseProcessor<CardinalityResponse> respProc )
+		{
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void issueRequest( final TPFRequest req,
+		                          final TPFServer fm,
+		                          final ResponseProcessor<TPFResponse> respProc )
+				throws FederationAccessException
+		{
+			final TPFResponse response;
+			if ( itTriplesForResponse != null ) {
+				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
+			}
+			else {
+				response = ( (TPFServerForTest) fm ).performRequest(req);
+			}
+			respProc.process(response);
+		}
+
+		@Override
+		public void issueRequest( final TPFRequest req,
+		                          final BRTPFServer fm,
+		                          final ResponseProcessor<TPFResponse> respProc )
+				throws FederationAccessException
+		{
+			final TPFResponse response;
+			if ( itTriplesForResponse != null ) {
+				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
+			}
+			else {
+				response = ( (BRTPFServerForTest) fm ).performRequest(req);
+			}
+			respProc.process(response);
+		}
+
+		@Override
+		public void issueRequest( final BRTPFRequest req,
+		                          final BRTPFServer fm,
+		                          final ResponseProcessor<TPFResponse> respProc )
+				throws FederationAccessException
+		{
+			final TPFResponse response;
+			if ( itTriplesForResponse != null ) {
+				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
+			}
+			else {
+				response = ( (BRTPFServerForTest) fm ).performRequest(req);
+			}
+			respProc.process(response);
+		}
+
+		@Override
+		public void issueRequest( final Neo4jRequest req,
+		                          final Neo4jServer fm,
+		                          final ResponseProcessor<StringResponse> respProc )
+				throws FederationAccessException
+		{
+			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
+			final StringResponse response = reqProc.performRequest(req, fm);
+			respProc.process(response);
 		}
 	}
 
