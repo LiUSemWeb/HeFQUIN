@@ -10,36 +10,28 @@ public class ResponseProcessingException extends FederationAccessException
 	
 	public ResponseProcessingException( final String message,
 	                                    final Throwable cause,
-	                                    final DataRetrievalResponse response,
-	                                    final DataRetrievalRequest request,
-	                                    final FederationMember fm ) {
-		super(message, cause, request, fm);
+	                                    final DataRetrievalResponse response ) {
+		super( message, cause, response.getRequest(), response.getFederationMember() );
 
 		this.response = response;
 	}
 	
 	public ResponseProcessingException( final String message,
-	                                    final DataRetrievalResponse response,
-	                                    final DataRetrievalRequest request,
-	                                    final FederationMember fm ) {
-		super(message, request, fm);
+	                                    final DataRetrievalResponse response ) {
+		super( message, response.getRequest(), response.getFederationMember() );
 
 		this.response = response;
 	}
 	
 	public ResponseProcessingException( final Throwable cause,
-	                                    final DataRetrievalResponse response,
-	                                    final DataRetrievalRequest request,
-	                                    final FederationMember fm ) {
-		super(cause, request, fm);
+	                                    final DataRetrievalResponse response ) {
+		super( cause, response.getRequest(), response.getFederationMember() );
 
 		this.response = response;
 	}
 	
-	public ResponseProcessingException( final DataRetrievalResponse response,
-	                                    final DataRetrievalRequest request,
-	                                    final FederationMember fm ) {
-		super(request, fm);
+	public ResponseProcessingException( final DataRetrievalResponse response ) {
+		super( response.getRequest(), response.getFederationMember() );
 
 		this.response = response;
 	}
