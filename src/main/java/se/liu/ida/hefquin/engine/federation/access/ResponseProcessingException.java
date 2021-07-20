@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-
 public class ResponseProcessingException extends FederationAccessException
 {
 	private static final long serialVersionUID = -1629191632416609651L;
