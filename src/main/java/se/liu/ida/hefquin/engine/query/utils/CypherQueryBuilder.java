@@ -1,5 +1,6 @@
-package se.liu.ida.hefquin.engine.query;
+package se.liu.ida.hefquin.engine.query.utils;
 
+import se.liu.ida.hefquin.engine.query.CypherQuery;
 import se.liu.ida.hefquin.engine.query.impl.MatchCypherQuery;
 
 public class CypherQueryBuilder {

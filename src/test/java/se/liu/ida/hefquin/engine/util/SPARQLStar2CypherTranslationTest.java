@@ -5,7 +5,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.query.CypherQuery;
-import se.liu.ida.hefquin.engine.query.CypherQueryBuilder;
+import se.liu.ida.hefquin.engine.query.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
@@ -60,8 +60,8 @@ public class SPARQLStar2CypherTranslationTest {
                 NodeFactory.createURI(conf.mapNode("22")));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(CypherQueryBuilder.newBuilder()
-                        .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
-                        .condition("ID(cpvar2)=22")
+                        .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
+                        .condition("ID(cpvar3)=22")
                         .returns("nm(cpvar1) AS s")
                 .build(), translation);
     }
@@ -106,9 +106,9 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(CypherQueryBuilder.newBuilder()
-                .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
+                .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
                 .condition("ID(cpvar1)=22")
-                .returns("nm(cpvar2) AS o")
+                .returns("nm(cpvar3) AS o")
                 .build(), translation);
     }
 
@@ -176,9 +176,9 @@ public class SPARQLStar2CypherTranslationTest {
                 Var.alloc("o"));
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
         assertEquals(CypherQueryBuilder.newBuilder()
-                .match("MATCH (cpvar1)-[:DIRECTED]->(cpvar2)")
+                .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
                 .returns("nm(cpvar1) AS s")
-                .returns("nm(cpvar2) AS o")
+                .returns("nm(cpvar3) AS o")
                 .build(), translation);
     }
 
@@ -334,6 +334,25 @@ public class SPARQLStar2CypherTranslationTest {
                                 .returns("[k IN KEYS(cpvar2) | cpvar2[k]] AS o")
                                 .build()
                 ), translation);
+    }
+
+    @Test
+    public void testNested1() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple tp = new Triple(
+                NodeFactory.createURI(conf.mapNode("22")),
+                NodeFactory.createURI(conf.mapRelationship("DIRECTED")),
+                Var.alloc("o1")
+        );
+        final Triple t = new Triple(NodeFactory.createTripleNode(tp),
+                NodeFactory.createURI(conf.mapProperty("year")), Var.alloc("o"));
+        CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t)));
+        assertEquals(CypherQueryBuilder.newBuilder().match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
+                .condition("EXISTS(cpvar2.year)")
+                .condition("ID(cpvar1)=22")
+                .returns("nm(cpvar3) AS o1")
+                .returns("cpvar2.year AS o")
+                .build(), translation);
     }
 
 }
