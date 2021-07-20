@@ -43,21 +43,24 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 
 	protected static class MyIntermediateResultElementSink implements IntermediateResultElementSink
 	{
-		protected final IntermediateResultElementSink parentSink;
+		protected final IntermediateResultElementSink outputSink;
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
 
-		public MyIntermediateResultElementSink( final IntermediateResultElementSink parentSink,
+		public MyIntermediateResultElementSink( final IntermediateResultElementSink outputSink,
 		                                        final IntermediateResultBlock input ) {
-			this.parentSink = parentSink;
+			this.outputSink = outputSink;
 			this.inputSolutionMappings = input.getSolutionMappings();
 		}
 
 		@Override
-		public void send( final SolutionMapping fetchedSM ) {
-			for ( final SolutionMapping inputSM : inputSolutionMappings ) {
-				if ( SolutionMappingUtils.compatible(inputSM, fetchedSM) ) {
-					final SolutionMapping mergedSM = SolutionMappingUtils.merge(inputSM, fetchedSM);
-					parentSink.send(mergedSM);
+		public void send( final SolutionMapping smFromRequest ) {
+			// TODO: this implementation is very inefficient
+			// We need an implementation of IntermediateResultBlock that can
+			// be used like an index.
+			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
+					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 				}
 			}
 		}
