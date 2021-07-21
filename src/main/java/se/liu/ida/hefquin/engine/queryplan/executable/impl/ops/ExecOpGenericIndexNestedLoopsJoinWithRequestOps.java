@@ -5,9 +5,20 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * Abstract base class to implement index nested loops joins by using request operators.
+ *
+ * Attention: by relying on request operators, this implementation can process all the
+ * solution mappings of any given {@link IntermediateResultBlock} only sequentially.
+ * That is, only after the first solution mapping has been processed (which includes
+ * executing the corresponding request that uses the solution mapping!), the algorithm
+ * proceeds to the next solution mapping. For an abstract base class that can process
+ * the solution mappings in parallel, use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
+ */
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
                                                     QueryType extends Query,
                                                     MemberType extends FederationMember>
@@ -18,6 +29,24 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 	}
 
 	@Override
+	public int preferredInputBlockSize() {
+		// Since this algorithm processes the input solution mappings
+		// sequentially (one at a time), an input block size of 1 may
+		// reduce the response time of the overall execution process.
+		return 1;
+	}
+
+	@Override
+	public void process(
+			final IntermediateResultBlock input,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt) throws ExecOpExecutionException
+	{
+		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+			process( sm, sink, execCxt );
+		}
+	}
+
 	protected void process(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,

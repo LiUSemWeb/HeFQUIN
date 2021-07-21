@@ -21,31 +21,35 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * Abstract base class to implement index nested loops joins by issuing
  * requests directly and, then, using response processors.
+ *
+ * In contrast to {@link ExecOpGenericIndexNestedLoopsJoinWithRequestOps}
+ * (which uses request operators and, thus, processes all solution mappings
+ * of any given {@link IntermediateResultBlock} sequentially, including the
+ * execution of the corresponding requests), this base class can process the
+ * solution mappings of any given {@link IntermediateResultBlock} in parallel
+ * by issuing all corresponding requests first and, then, dealing with the
+ * responses as they come in. 
  */
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
                             QueryType extends Query,
                             MemberType extends FederationMember,
                             ReqType extends DataRetrievalRequest,
                             RespType extends DataRetrievalResponse>
-                   implements UnaryExecutableOp
+             extends ExecOpGenericIndexNestedLoopsJoinBase<QueryType,MemberType>
 {
-	protected final QueryType query;
-	protected final MemberType fm;
-
 	public ExecOpGenericIndexNestedLoopsJoinWithRequests( final QueryType query, final MemberType fm ) {
-		assert query != null;
-		assert fm != null;
-
-		this.query = query;
-		this.fm = fm;
+		super(query, fm);
 	}
 
 	@Override
 	public int preferredInputBlockSize() {
 		// Since this algorithm processes the input solution mappings
-		// sequentially (one at a time), and input block size of 1 may
-		// reduce the response time of the overall execution process.
-		return 1;  
+		// in parallel, we should use an input block size with which
+		// we can leverage this parallelism. However, I am not sure
+		// yet what a good value is; it probably depends on various
+		// factors, including the load on the server and the degree
+		// of parallelism in the FederationAccessManager.
+		return 30;
 	}
 
 	@Override
@@ -79,17 +83,14 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 		}
 	}
 
-	@Override
-	public void concludeExecution(
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
-	{
-		// nothing to be done here
-	}
-
 	protected abstract ReqType createRequest( SolutionMapping sm );
+
 	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink );
+
 	protected abstract void issueRequest( ReqType req, MyResponseProcessor respProc, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
+
+
+	// ---- helper classes -----
 
 	protected abstract class MyResponseProcessor extends SynchronizedResponseProcessorBase<RespType>
 	{
