@@ -6,17 +6,17 @@ import java.util.List;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class TestUtils
+public class TestUtils extends EngineTestBase
 {
 	public static ExecutionContext createExecContextForTests() {
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerTestImpl();
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest ();
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
@@ -75,37 +75,4 @@ public class TestUtils
 		public SolutionMapping next() { return it.next(); }
 	}
 
-	protected static class FederationAccessManagerTestImpl implements FederationAccessManager
-	{
-		@Override
-		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			return null;
-		}
-
-		@Override
-		public CardinalityResponse performCardinalityRequest( final SPARQLRequest req,
-		                                                      final SPARQLEndpoint fm ) {
-			return null;
-		}
-
-		@Override
-		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
-			return null;
-		}
-
-		@Override
-		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
-			return null;
-		}
-
-		@Override
-		public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) {
-			return null;
-		}
-
-		@Override
-		public StringResponse performRequest( final Neo4jRequest req, final Neo4jServer fm ) {
-			return null;
-		}
-	}
 }

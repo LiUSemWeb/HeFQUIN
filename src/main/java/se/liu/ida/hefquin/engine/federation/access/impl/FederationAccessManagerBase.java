@@ -14,6 +14,8 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.ResponseProcessingException;
+import se.liu.ida.hefquin.engine.federation.access.ResponseProcessor;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
@@ -32,7 +34,7 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 	protected final SPARQLRequestProcessor    reqProcSPARQL;
 	protected final TPFRequestProcessor       reqProcTPF;
 	protected final BRTPFRequestProcessor     reqProcBRTPF;
-	protected final Neo4jRequestProcessor	    reqProcNeo4j;
+	protected final Neo4jRequestProcessor     reqProcNeo4j;
 
 	protected FederationAccessManagerBase(
 			final SPARQLRequestProcessor reqProcSPARQL,
@@ -52,9 +54,10 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 	}
 
 	@Override
-	public CardinalityResponse performCardinalityRequest(
+	public void issueCardinalityRequest(
 			final SPARQLRequest req,
-			final SPARQLEndpoint fm )
+			final SPARQLEndpoint fm,
+			final ResponseProcessor<CardinalityResponse> respProc )
 					throws FederationAccessException
 	{
 		// The idea of this implementation is to take the graph pattern of the
@@ -79,24 +82,45 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 		final Var countVar = Var.alloc("__hefquinCountVar");
 		countQuery.addResultVar(countVar, countExpr);
 
-		// issue the query as a request
+		// issue the query as a request, the response will then be processed by smRespProc
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl(countQuery) );
-		final SolMapsResponse smResp;
+		final ResponseProcessor<SolMapsResponse> smRespProc = new SolMapsResponseProcessorForCardinalityRequests(countVar, respProc);
 		try {
-			smResp = performRequest(reqCount, fm);
+			issueRequest(reqCount, fm, smRespProc);
 		}
 		catch ( final FederationAccessException ex ) {
-			throw new FederationAccessException("Executing the count request caused an exception.", ex, req, fm);
+			throw new FederationAccessException("Issuing the count request caused an exception.", ex, req, fm);
+		}
+	}
+
+
+	// ---------- HELPER CLASSES ----------
+
+	protected static class SolMapsResponseProcessorForCardinalityRequests
+			implements ResponseProcessor<SolMapsResponse>
+	{
+		protected final Var countVar;
+		protected final ResponseProcessor<CardinalityResponse> respProc;
+
+		public SolMapsResponseProcessorForCardinalityRequests(
+				final Var countVar,
+				final ResponseProcessor<CardinalityResponse> respProc ) {
+			this.countVar = countVar;
+			this.respProc = respProc;
 		}
 
-		// extract the COUNT value from the response
-		final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
-		final SolutionMapping sm = it.next();
-		final Node countValue = sm.asJenaBinding().get(countVar);
-		final int cardinality = ( (Integer) countValue.getLiteralValue() ).intValue();
+		@Override
+		public void process( final SolMapsResponse smResp ) throws ResponseProcessingException {
+			final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
+			final SolutionMapping sm = it.next();
+			final Node countValue = sm.asJenaBinding().get(countVar);
+			final int cardinality = ( (Integer) countValue.getLiteralValue() ).intValue();
 
-		// create the response object to be returned
-		return new CardinalityResponseImpl(smResp, reqCount, cardinality);
-	}
+			// create the response object to be returned
+			final CardinalityResponse cardResp = new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
+			respProc.process(cardResp);
+		}
+
+	} // end of helper class SolMapsResponseProcessorForCardinalityRequests
 
 }

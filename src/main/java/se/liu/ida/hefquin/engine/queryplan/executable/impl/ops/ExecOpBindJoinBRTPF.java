@@ -7,93 +7,34 @@ import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatte
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class ExecOpBindJoinBRTPF implements UnaryExecutableOp
+public class ExecOpBindJoinBRTPF extends ExecOpGenericBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
-    protected final TriplePattern tp;
-    protected final BRTPFServer fm;
     protected final Set<Var> varsInTP;
 
     public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm ) {
-        assert tp != null;
-        assert fm != null;
-
-        this.tp = tp;
-        this.fm = fm;
+        super(tp, fm);
 
         varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
 
 	@Override
-	public int preferredInputBlockSize() {
-		// TODO the preferred input block size should depend on the brTPF server
-		// See: https://github.com/LiUSemWeb/HeFQUIN/issues/2
-		return 30;
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
+		final BindingsRestrictedTriplePatternRequest req = createRequest(inputSolMaps);
+		return new ExecOpRequestBRTPF(req, fm);
 	}
 
-	@Override
-	public void process(
-			final IntermediateResultBlock input,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
-	{
-		final BindingsRestrictedTriplePatternRequest req = createRequest(input);
-		final ExecOpRequestBRTPF reqOp = new ExecOpRequestBRTPF(req, fm);
-		try {
-			reqOp.execute( new MyIntermediateResultElementSink(input,sink), execCxt );
-		}
-		catch ( final ExecOpExecutionException ex ) {
-			throw new ExecOpExecutionException("An exception occurred when executing a brTPF request operator created to resolve this bind join.", ex, this);
-		}
-	}
-
-	@Override
-	public void concludeExecution(
-            final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt )
-    {
-        // nothing to be done here
-    }
-
-	protected BindingsRestrictedTriplePatternRequest createRequest( final IntermediateResultBlock input ) {
+	protected BindingsRestrictedTriplePatternRequest createRequest( final Iterable<SolutionMapping> inputSolMaps ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
-		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+		for ( final SolutionMapping sm : inputSolMaps ) {
 			restrictedSolMaps.add( SolutionMappingUtils.restrict(sm, varsInTP) );
 		}
-		return new BindingsRestrictedTriplePatternRequestImpl( tp, restrictedSolMaps );
+		return new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSolMaps );
 	}
-
-	protected static class MyIntermediateResultElementSink implements IntermediateResultElementSink
-	{
-		protected final IntermediateResultBlock input;
-		protected final IntermediateResultElementSink outputSink;
-
-		public MyIntermediateResultElementSink( final IntermediateResultBlock input, final IntermediateResultElementSink outputSink ) {
-			this.input = input;
-			this.outputSink = outputSink;
-		}
-
-		@Override
-		public void send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of IntermediateResultBlock that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
-			for ( final SolutionMapping smFromInput : input.getSolutionMappings() ) {
-				if ( SolutionMappingUtils.compatible(smFromRequest,smFromInput) ) {
-					outputSink.send( SolutionMappingUtils.merge(smFromRequest,smFromInput) );
-				}
-			}
-		}
-	} // end of MyIntermediateResultElementSink
 
 }

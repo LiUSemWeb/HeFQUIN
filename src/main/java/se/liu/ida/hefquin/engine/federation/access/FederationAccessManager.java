@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 
 public interface FederationAccessManager
 {
-	SolMapsResponse performRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
+	void issueRequest( SPARQLRequest req, SPARQLEndpoint fm, ResponseProcessor<SolMapsResponse> respProc ) throws FederationAccessException;
 
 	/**
 	 * Requests the cardinality of the result of the given request.
@@ -18,13 +18,13 @@ public interface FederationAccessManager
 	 * rather than a full {@link SPARQLQuery}. If it does not, then this
 	 * method throws an {@link IllegalArgumentException}.
 	 */
-	CardinalityResponse performCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
+	void issueCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm, ResponseProcessor<CardinalityResponse> respProc ) throws FederationAccessException;
 
-	TPFResponse performRequest( TPFRequest req, TPFServer fm ) throws FederationAccessException;
+	void issueRequest( TPFRequest req, TPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
 
-	TPFResponse performRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+	void issueRequest( TPFRequest req, BRTPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
 
-	TPFResponse performRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+	void issueRequest( BRTPFRequest req, BRTPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
 
-	StringResponse performRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
+	void issueRequest( Neo4jRequest req, Neo4jServer fm, ResponseProcessor<StringResponse> respProc ) throws FederationAccessException;
 }

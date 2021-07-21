@@ -12,11 +12,11 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 public class TriplesToSolMapsConverter
 {
 
-	public static Iterator<? extends SolutionMapping> convert( final Iterable<Triple> itTriples, final TriplePattern tp ) {
+	public static Iterator<SolutionMapping> convert( final Iterable<Triple> itTriples, final TriplePattern tp ) {
 		return convert( itTriples.iterator(), tp );
 	}
 
-	public static Iterator<? extends SolutionMapping> convert( final Iterator<Triple> itTriples, final TriplePattern tp ) {
+	public static Iterator<SolutionMapping> convert( final Iterator<Triple> itTriples, final TriplePattern tp ) {
 		final org.apache.jena.graph.Triple jTP = tp.asJenaTriple();
 		final String s = ( Var.isVar(jTP.getSubject()) ) ? jTP.getSubject().getName() : null;
 		final String p = ( Var.isVar(jTP.getPredicate()) ) ? jTP.getPredicate().getName() : null;

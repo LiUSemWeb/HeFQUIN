@@ -19,19 +19,15 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<TriplePattern,SPARQLEndpoint> {
-	
+public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithRequestOps<TriplePattern,SPARQLEndpoint>
+{
 	protected final Set<Var> varsInTP;
 
 	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
@@ -40,22 +36,11 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoin<Triple
 	}
 
 	@Override
-	protected Iterable<SolutionMapping> fetchSolutionMappings(
-			final Iterable<SolutionMapping> solMaps,
-			final ExecutionContext execCxt )
-					throws ExecOpExecutionException
-	{
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Op op = createFilter(solMaps);
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		final SolMapsResponse response;
-		try {
-			response = execCxt.getFederationAccessMgr().performRequest(request, fm);
-		}
-		catch ( final FederationAccessException ex ) {
-			throw new ExecOpExecutionException("An exception occurred when executing a request issued by this bind join.", ex, this);
-		}
-		return response.getSolutionMappings();
+		return new ExecOpRequestSPARQL(request, fm);
 	}
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {

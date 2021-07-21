@@ -4,8 +4,6 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 
 public class ExecOpRequestSPARQL extends ExecOpGenericSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
 {
@@ -13,15 +11,9 @@ public class ExecOpRequestSPARQL extends ExecOpGenericSolMapsRequest<SPARQLReque
 		super( req, fm );
 	}
 
-	protected SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr )
-			throws ExecOpExecutionException
-	{
-		try {
-			return fedAccessMgr.performRequest( req, fm );
-		}
-		catch ( final FederationAccessException ex ) {
-			throw new ExecOpExecutionException("An exception occurred when performing the request of this request operator.", ex, this);
-		}
+	@Override
+	protected void issueRequest( final FederationAccessManager fedAccessMgr ) throws FederationAccessException {
+		fedAccessMgr.issueRequest(req, fm, this);
 	}
 
 }
