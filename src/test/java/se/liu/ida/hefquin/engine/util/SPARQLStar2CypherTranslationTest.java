@@ -4,6 +4,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.CypherQuery;
 import se.liu.ida.hefquin.engine.query.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
@@ -372,6 +373,54 @@ public class SPARQLStar2CypherTranslationTest {
                 .condition("ID(cpvar3)=23")
                 .returns("cpvar2.year AS o")
                 .build(), translation);
+    }
+
+    @Test
+    public void testBGPTranslation() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t1 = new Triple(
+                Var.alloc("m"), NodeFactory.createURI(conf.getLabelIRI()),
+                NodeFactory.createURI(conf.mapLabel("Movie"))
+        );
+        final Triple t2 = new Triple(
+                Var.alloc("p"), NodeFactory.createURI(conf.getLabelIRI()),
+                NodeFactory.createURI(conf.mapLabel("Person"))
+        );
+        final Triple t3 = new Triple(
+                Var.alloc("p"), NodeFactory.createURI(conf.mapProperty("name")),
+                NodeFactory.createLiteral("Q. Tarantino")
+        );
+        final Triple tp = new Triple(
+                Var.alloc("p"), NodeFactory.createURI(conf.mapRelationship("DIRECTED")), Var.alloc("m")
+        );
+        final Triple t4 = new Triple(
+                NodeFactory.createTripleNode(tp), NodeFactory.createURI(conf.mapProperty("retrievedFrom")),
+                NodeFactory.createLiteral("IMDB")
+        );
+        final Triple t5 = new Triple(
+                Var.alloc("m"), NodeFactory.createURI(conf.mapProperty("released")), Var.alloc("year")
+        );
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(t1),
+                new TriplePatternImpl(t2),
+                new TriplePatternImpl(t3),
+                new TriplePatternImpl(t4),
+                new TriplePatternImpl(t5)
+        );
+        assertEquals(
+                CypherQueryBuilder.newBuilder()
+                        .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
+                        .match("MATCH (cpvar1)") // this two are redundant
+                        .match("MATCH (cpvar3)")
+                        .condition("cpvar1:Person")
+                        .condition("cpvar3:Movie")
+                        .condition("cpvar1.name='Q. Tarantino'")
+                        .condition("cpvar2.retrievedFrom='IMDB'")
+                        .condition("EXISTS(cpvar3.released)")
+                        .returns("nm(cpvar1) AS p")
+                        .returns("nm(cpvar3) AS m")
+                        .returns("cpvar3.released AS year")
+                        .build(), SPARQLStar2CypherTranslator.translate(bgp));
     }
 
 }
