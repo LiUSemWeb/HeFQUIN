@@ -12,12 +12,13 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * Abstract base class to implement index nested loops joins by using request operators.
  *
- * Attention: by relying on request operators, this implementation can process all the
- * solution mappings of any given {@link IntermediateResultBlock} only sequentially.
- * That is, only after the first solution mapping has been processed (which includes
- * executing the corresponding request that uses the solution mapping!), the algorithm
- * proceeds to the next solution mapping. For an abstract base class that can process
- * the solution mappings in parallel, use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
+ * Attention: Executing the request operator is a blocking operation within the algorithm
+ * implemented by this class. Hence, by relying on request operators, this algorithm can
+ * process all the solution mappings of any given {@link IntermediateResultBlock} only
+ * sequentially. That is, only after the first solution mapping has been processed (which
+ * includes executing the corresponding request that uses the solution mapping!), the
+ * algorithm proceeds to the next solution mapping. For an abstract base class that can
+ * process the solution mappings in parallel, use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
  */
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
                                                     QueryType extends Query,

@@ -10,7 +10,17 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
- * Abstract base class to implements bind joins by using request operators.
+ * Abstract base class to implement bind joins by using request operators.
+ *
+ * Note that executing the request operator is a blocking operation within
+ * the algorithm implemented by this class. However, it does not matter
+ * because this bind join algorithm uses only one request for any given
+ * {@link IntermediateResultBlock}. Issuing the request directly (and then
+ * using a response processor) would also be blocking because we would have
+ * to wait for the response processor. Attention: things may look different
+ * if we have to do multiple requests per {@link IntermediateResultBlock},
+ * which may be the case if the block size is greater than what the
+ * server can/wants to handle.
  */
 public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Query,
                                                           MemberType extends FederationMember>
