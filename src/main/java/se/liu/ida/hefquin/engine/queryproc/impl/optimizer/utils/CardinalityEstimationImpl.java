@@ -6,37 +6,50 @@ import static java.lang.Math.min;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.*;
 
-public class CardinalityEstimationImpl
+public class CardinalityEstimationImpl implements CardinalityEstimation
 {
-    protected final CardinalitiesCache cardinalitiesCache = new CardinalitiesCache();
-    protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
-
+    protected final CardinalitiesCache cardinalitiesCache;
+    protected final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache;
     protected final QueryProcContext ctxt;
 
-    public CardinalityEstimationImpl( final QueryProcContext ctxt ) {
+    public CardinalityEstimationImpl( final CardinalitiesCache cardinalitiesCache,
+                                      final VarSpecificCardinalitiesCache varSpecificCardinalitiesCache,
+                                      final QueryProcContext ctxt ) {
         assert ctxt != null;
         this.ctxt = ctxt;
+
+        if ( cardinalitiesCache != null ) {
+            this.cardinalitiesCache = cardinalitiesCache;
+        }
+        else {
+            this.cardinalitiesCache = new CardinalitiesCache();
+        }
+
+        if ( varSpecificCardinalitiesCache != null ) {
+            this.varSpecificCardinalitiesCache = varSpecificCardinalitiesCache;
+        }
+        else {
+            this.varSpecificCardinalitiesCache = new VarSpecificCardinalitiesCache();
+        }
     }
 
+    public CardinalityEstimationImpl( final QueryProcContext ctxt ) {
+        this(null, null, ctxt);
+    }
+
+    @Override
     public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperator lop = pp.getRootOperator();
         if ( !(lop instanceof PhysicalOpRequest) ){
@@ -80,6 +93,7 @@ public class CardinalityEstimationImpl
         return cardinality;
     }
 
+    @Override
     public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin) ){
@@ -100,6 +114,7 @@ public class CardinalityEstimationImpl
         return cardinality;
     }
 
+    @Override
     public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
@@ -113,7 +128,7 @@ public class CardinalityEstimationImpl
         }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
-        final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+        final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
 
         final int cardinality = joinCardinality( pp1, reqTP );
         cardinalitiesCache.add( pp, cardinality );
@@ -121,6 +136,7 @@ public class CardinalityEstimationImpl
         return cardinality;
     }
 
+    @Override
     public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
@@ -134,7 +150,7 @@ public class CardinalityEstimationImpl
         }
 
         final PhysicalPlan pp1 = pp.getSubPlan(0);
-        final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
+        final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
 
         final int cardinality = joinCardinality( pp1, reqBGP );
         cardinalitiesCache.add( pp, cardinality );
@@ -192,12 +208,12 @@ public class CardinalityEstimationImpl
             cardinality = getCardinalityEstimationOfLeafNode(pp );
         } else if ( lop instanceof LogicalOpTPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
-            final PhysicalPlan reqTP = formRequestBasedOnTPofTPAdd((LogicalOpTPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd((LogicalOpTPAdd) lop);
 
             return joinCardinalityBasedOnVar( pp1, reqTP, v );
         } else if ( lop instanceof LogicalOpBGPAdd ){
             final PhysicalPlan pp1 = pp.getSubPlan(0);
-            final PhysicalPlan reqBGP = formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd)lop);
+            final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd)lop);
 
             return joinCardinalityBasedOnVar( pp1, reqBGP, v );
         } else if ( lop instanceof LogicalOpJoin ){
@@ -235,58 +251,6 @@ public class CardinalityEstimationImpl
         return cardinality;
     }
 
-    // helper function
-    public PhysicalPlan formRequestBasedOnTPofTPAdd( final LogicalOpTPAdd lop ){
-        final FederationMember fm = lop.getFederationMember();
-
-        final DataRetrievalRequest req;
-        if ( fm instanceof SPARQLEndpoint ){
-            req = new TriplePatternRequestImpl( lop.getTP());
-        } else if ( fm instanceof TPFServer ){
-            req = new TPFRequestImpl(lop.getTP(), 0);
-        } else if ( fm instanceof BRTPFServer ){
-            req = new TPFRequestImpl(lop.getTP(), 0);
-        } else
-            throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
-
-        return pp;
-    }
-
-    public PhysicalPlan formRequestBasedOnBGPofBGPAdd( final LogicalOpBGPAdd lop ){
-        final FederationMember fm = lop.getFederationMember();
-
-        final DataRetrievalRequest req;
-        if ( fm.getInterface().supportsBGPRequests() ){
-            req = new BGPRequestImpl( lop.getBGP());
-        } else
-            throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
-
-        return pp;
-    }
-
-    public PhysicalPlan formRequestBasedOnPattern( final SPARQLGraphPattern P, final FederationMember fm ){
-        final DataRetrievalRequest req;
-
-        if ( fm instanceof SPARQLEndpoint ){
-            req = new SPARQLRequestImpl( P );
-        } else if ( fm instanceof TPFServer ){
-            req = new TriplePatternRequestImpl((TriplePattern) P);
-        } else if ( fm instanceof BRTPFServer ){
-            req = new TriplePatternRequestImpl((TriplePattern) P);
-        } else
-            throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        final LogicalOpRequest<?,?> op = new LogicalOpRequest<>( fm, req );
-        final PhysicalPlan pp = new PhysicalPlanWithNullaryRootImpl( new PhysicalOpRequest<>(op) );
-
-        return pp;
-    }
 
 
 	protected abstract class MyCardinalityRequester<ReqType extends DataRetrievalRequest,

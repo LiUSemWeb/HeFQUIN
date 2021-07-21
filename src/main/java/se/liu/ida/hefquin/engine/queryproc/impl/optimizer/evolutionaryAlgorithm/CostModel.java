@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ public class CostModel {
     }
 
     public Double wrapUpCostAsOneValue( final PhysicalPlan pp ) throws QueryOptimizationException {
-        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimation(ctxt) );
+        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimationImpl(ctxt) );
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
         if ( costOfPhysicalPlan == null ){
