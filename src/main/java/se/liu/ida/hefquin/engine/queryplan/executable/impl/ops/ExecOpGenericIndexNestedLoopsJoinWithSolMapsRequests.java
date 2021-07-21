@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<QueryType extends Query,
                                                                            MemberType extends FederationMember,
                                                                            ReqType extends DataRetrievalRequest>
-                   extends ExecOpGenericIndexNestedLoopsJoin2<QueryType,MemberType,ReqType,SolMapsResponse>
+     extends ExecOpGenericIndexNestedLoopsJoinWithRequests<QueryType,MemberType,ReqType,SolMapsResponse>
 {
 	public ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query, final MemberType fm ) {
 		super( query, fm );

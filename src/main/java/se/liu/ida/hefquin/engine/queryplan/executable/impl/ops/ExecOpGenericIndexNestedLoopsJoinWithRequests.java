@@ -18,16 +18,21 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public abstract class ExecOpGenericIndexNestedLoopsJoin2<QueryType extends Query,
-                                                         MemberType extends FederationMember,
-                                                         ReqType extends DataRetrievalRequest,
-                                                         RespType extends DataRetrievalResponse>
+/**
+ * Abstract base class to implement index nested loops joins by issuing
+ * requests directly and, then, using response processors.
+ */
+public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
+                            QueryType extends Query,
+                            MemberType extends FederationMember,
+                            ReqType extends DataRetrievalRequest,
+                            RespType extends DataRetrievalResponse>
                    implements UnaryExecutableOp
 {
 	protected final QueryType query;
 	protected final MemberType fm;
 
-	public ExecOpGenericIndexNestedLoopsJoin2( final QueryType query, final MemberType fm ) {
+	public ExecOpGenericIndexNestedLoopsJoinWithRequests( final QueryType query, final MemberType fm ) {
 		assert query != null;
 		assert fm != null;
 
