@@ -34,12 +34,15 @@ public class SPARQLStar2CypherTranslator {
 
     private static CypherQuery translateBGP(final BGP bgp, final Configuration configuration,
                                             final CypherVarGenerator gen) {
-        final CypherQuery result = new MatchCypherQuery();
+        CypherQuery result = null;
         final Set<Node> certainNodes = new HashSet<>();
         findCertainNodes(bgp.getTriplePatterns(), certainNodes, configuration);
         for (final TriplePattern tp : bgp.getTriplePatterns()){
             final CypherQuery translation = translateTriple(tp, configuration, gen, certainNodes);
-            CypherQueryCombiner.combine(result, translation);
+            if (result == null)
+                result = translation;
+            else
+                result = result.combineWith(translation);
         }
         return result;
     }

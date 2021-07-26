@@ -47,6 +47,11 @@ public class MatchCypherQuery implements CypherQuery {
     }
 
     @Override
+    public Set<CypherQuery> getIntersect() {
+        throw new UnsupportedOperationException("Not an INTERSECT query");
+    }
+
+    @Override
     public void addMatchClause(final String match) {
         matches.add(match);
     }
@@ -74,6 +79,40 @@ public class MatchCypherQuery implements CypherQuery {
     @Override
     public boolean isUnionQuery() {
         return false;
+    }
+
+    @Override
+    public CypherQuery combineWith(final CypherQuery query) {
+        return query.combineWithMatch(this);
+    }
+
+    @Override
+    public CypherQuery combineWithMatch(final MatchCypherQuery query) {
+        CypherQuery result = new MatchCypherQuery();
+        for (final String match : query.getMatches()) {
+            result.addMatchClause(match);
+        }
+        for (final String cond : query.getConditions()) {
+            result.addConditionConjunction(cond);
+        }
+        for (final String ret : query.getReturnExprs()){
+            result.addReturnClause(ret);
+        }
+        for (final String match : this.getMatches()) {
+            result.addMatchClause(match);
+        }
+        for (final String cond : this.getConditions()) {
+            result.addConditionConjunction(cond);
+        }
+        for (final String ret : this.getReturnExprs()){
+            result.addReturnClause(ret);
+        }
+        return result;
+    }
+
+    @Override
+    public CypherQuery combineWithUnion(UnionCypherQuery query) {
+        throw new UnsupportedOperationException("Unable to combine a MATCH and a UNION query");
     }
 
     @Override

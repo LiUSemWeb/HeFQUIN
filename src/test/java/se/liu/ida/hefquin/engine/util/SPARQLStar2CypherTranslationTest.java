@@ -408,7 +408,7 @@ public class SPARQLStar2CypherTranslationTest {
                 new TriplePatternImpl(t4),
                 new TriplePatternImpl(t5)
         );
-        CypherQuery translation = SPARQLStar2CypherTranslator.translate(bgp);
+        final CypherQuery translation = SPARQLStar2CypherTranslator.translate(bgp);
         assertTrue(
                 translation.equals(CypherQueryBuilder.newBuilder()
                         .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
@@ -435,7 +435,34 @@ public class SPARQLStar2CypherTranslationTest {
                         .returns("nm(cpvar1) AS p")
                         .returns("nm(cpvar2) AS m")
                         .returns("cpvar2.released AS year")
+                        .build())
+                        || translation.equals(CypherQueryBuilder.newBuilder()
+                        .match("MATCH (cpvar2)-[cpvar3:DIRECTED]->(cpvar1)")
+                        .match("MATCH (cpvar1)") // this two are redundant
+                        .match("MATCH (cpvar2)")
+                        .condition("cpvar2:Person")
+                        .condition("cpvar1:Movie")
+                        .condition("cpvar2.name='Q. Tarantino'")
+                        .condition("cpvar3.retrievedFrom='IMDB'")
+                        .condition("EXISTS(cpvar1.released)")
+                        .returns("nm(cpvar2) AS p")
+                        .returns("nm(cpvar1) AS m")
+                        .returns("cpvar1.released AS year")
                         .build()));
+    }
+
+    @Test
+    public void testBGPTranslation2() {
+        final Configuration conf = new DefaultConfiguration();
+        final Triple t1 = new Triple(
+                Var.alloc("s"), NodeFactory.createURI(conf.mapProperty("name")), Var.alloc("name")
+        );
+        final Triple t2 = new Triple(
+                Var.alloc("s"), NodeFactory.createURI(conf.mapProperty("year")), Var.alloc("year")
+        );
+        final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t1),
+                new TriplePatternImpl(t2)));
+        System.out.println(translation);
     }
 
 }

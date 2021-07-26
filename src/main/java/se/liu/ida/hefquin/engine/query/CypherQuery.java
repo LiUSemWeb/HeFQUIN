@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.query;
 
+import se.liu.ida.hefquin.engine.query.impl.MatchCypherQuery;
+import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
+
 import java.util.Set;
 
 public interface CypherQuery {
@@ -9,6 +12,7 @@ public interface CypherQuery {
     Set<String> getConditions();
     Set<String> getReturnExprs();
     Set<CypherQuery> getUnion();
+    Set<CypherQuery> getIntersect();
 
     void addMatchClause(final String match);
     void addConditionConjunction(final String cond);
@@ -17,4 +21,8 @@ public interface CypherQuery {
 
     boolean isMatchQuery();
     boolean isUnionQuery();
+
+    CypherQuery combineWith(final CypherQuery query);
+    CypherQuery combineWithMatch(final MatchCypherQuery query);
+    CypherQuery combineWithUnion(final UnionCypherQuery query);
 }
