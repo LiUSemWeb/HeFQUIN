@@ -11,11 +11,7 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
 import se.liu.ida.hefquin.engine.query.utils.MatchVariableGetter;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class SPARQLStar2CypherTranslator {
 
@@ -31,7 +27,7 @@ public class SPARQLStar2CypherTranslator {
                                         final CypherVarGenerator gen) {
         final Set<? extends TriplePattern> triples = bgp.getTriplePatterns();
         if (triples.size() == 1) {
-            return translateTriple((TriplePattern) triples.toArray()[0], configuration, gen, false);
+            return translateTriple((TriplePattern) triples.toArray()[0], configuration, gen, new HashSet<>());
         }
         return translateBGP(bgp, configuration, gen);
     }
@@ -39,23 +35,40 @@ public class SPARQLStar2CypherTranslator {
     private static CypherQuery translateBGP(final BGP bgp, final Configuration configuration,
                                             final CypherVarGenerator gen) {
         final CypherQuery result = new MatchCypherQuery();
-        for (TriplePattern tp : bgp.getTriplePatterns().stream().sorted(Comparator.comparing(TriplePattern::toString))
-                .collect(Collectors.toList())){
-            final CypherQuery translation = translateTriple(tp, configuration, gen, true);
+        final Set<Node> certainNodes = new HashSet<>();
+        findCertainNodes(bgp.getTriplePatterns(), certainNodes, configuration);
+        for (final TriplePattern tp : bgp.getTriplePatterns()){
+            final CypherQuery translation = translateTriple(tp, configuration, gen, certainNodes);
             CypherQueryCombiner.combine(result, translation);
         }
         return result;
     }
 
+    private static void findCertainNodes(final Set<? extends TriplePattern> triplePatterns,
+                                           final Set<Node> certainNodes, final Configuration configuration) {
+        for (final TriplePattern tp : triplePatterns) {
+            final Triple b = tp.asJenaTriple();
+            final Node s = b.getSubject();
+            final Node p = b.getPredicate();
+            final Node o = b.getObject();
+            if (s.isVariable()) {
+                if (configuration.isLabelIRI(p) || configuration.mapsToLabel(o) || configuration.mapsToRelationship(p)
+                        || configuration.mapsToNode(o))
+                    certainNodes.add(s);
+            }
+            if (o.isVariable() && configuration.mapsToRelationship(p)) certainNodes.add(o);
+        }
+    }
+
     private static CypherQuery translateTriple(final TriplePattern pattern, final Configuration configuration,
-                                               final CypherVarGenerator gen, final boolean bgp) {
+                                               final CypherVarGenerator gen, final Set<Node> certainNodes) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
         final Node p = b.getPredicate();
         final Node o = b.getObject();
         if (s.isNodeTriple()) {
             final TriplePattern tp = new TriplePatternImpl(s.getTriple());
-            final CypherQuery translation = translateTriple(tp, configuration, gen, false);
+            final CypherQuery translation = translateTriple(tp, configuration, gen, certainNodes);
             final String evar = MatchVariableGetter.getEdgeVariable(translation);
             if (configuration.mapsToProperty(p) && o.isLiteral()) {
                 translation.addConditionConjunction(String.format(Translations.CONDITION_VALUE, evar,
@@ -95,7 +108,7 @@ public class SPARQLStar2CypherTranslator {
         if (pattern.numberOfVars() == 1){
             if (s.isVariable()) {
                 if (configuration.mapsToProperty(p) && o.isLiteral()) {
-                    return Translations.getVarPropertyLiteral(s, p, o, configuration, gen, bgp);
+                    return Translations.getVarPropertyLiteral(s, p, o, configuration, gen, certainNodes);
                 } else if (configuration.isLabelIRI(p) && configuration.mapsToLabel(o)) {
                     return Translations.getVarLabelClass(s, p, o, configuration, gen);
                 } else if (configuration.mapsToRelationship(p) && configuration.mapsToNode(o)){
@@ -133,7 +146,7 @@ public class SPARQLStar2CypherTranslator {
                 } else if (configuration.mapsToRelationship(p)) {
                     return Translations.getVarRelationshipVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToProperty(p)) {
-                    return Translations.getVarPropertyVar(s, p, o, configuration, gen, bgp);
+                    return Translations.getVarPropertyVar(s, p, o, configuration, gen, certainNodes);
                 } else {
                     throw new IllegalArgumentException("Predicate must be a mapping of a property or a relationship " +
                             "or the label URI");
@@ -144,15 +157,15 @@ public class SPARQLStar2CypherTranslator {
                 } else if (configuration.mapsToNode(o)) {
                     return Translations.getVarVarNode(s, p, o, configuration, gen);
                 } else if (o.isLiteral()) {
-                    return Translations.getVarVarLiteral(s, p, o, configuration, gen, bgp);
+                    return Translations.getVarVarLiteral(s, p, o, configuration, gen, certainNodes);
                 }
             } else if(p.isVariable() && o.isVariable()) {
                 if (configuration.mapsToNode(s)) {
-                    return Translations.getNodeVarVar(s, p, o, configuration, gen, bgp);
+                    return Translations.getNodeVarVar(s, p, o, configuration, gen, certainNodes);
                 }
             }
         } else {
-            return Translations.getVarVarVar(s, p, o, configuration, gen, bgp);
+            return Translations.getVarVarVar(s, p, o, configuration, gen, certainNodes);
         }
         throw new IllegalArgumentException("Malformed query pattern");
     }
@@ -177,11 +190,11 @@ public class SPARQLStar2CypherTranslator {
 
         public static CypherQuery getVarPropertyLiteral(final Node s, final Node p, final Node o,
                                                         final Configuration configuration, final CypherVarGenerator gen,
-                                                        final boolean bgp) {
+                                                        final Set<Node> certainNodes) {
             final String property = configuration.unmapProperty(p);
             final String literal = o.getLiteralValue().toString();
             final String svar = gen.getVarFor(s.getName());
-            if (bgp) {
+            if (certainNodes.contains(s)) {
                 return CypherQueryBuilder.newBuilder()
                         .match(String.format(MATCH_NODE, svar))
                         .condition(String.format(CONDITION_VALUE, svar, property, literal))
@@ -321,10 +334,10 @@ public class SPARQLStar2CypherTranslator {
 
         public static CypherQuery getVarPropertyVar(final Node s, final Node p, final Node o,
                                                     final Configuration configuration, final CypherVarGenerator gen,
-                                                    final boolean bgp) {
+                                                    final Set<Node> certainNodes) {
             final String property = configuration.unmapProperty(p);
             final String svar = gen.getVarFor(s.getName());
-            if (bgp) {
+            if (certainNodes.contains(s)) {
                 return CypherQueryBuilder.newBuilder()
                         .match(String.format(MATCH_NODE, svar))
                         .condition(String.format(CONDITION_EXISTS, svar, property))
@@ -380,9 +393,9 @@ public class SPARQLStar2CypherTranslator {
 
         public static CypherQuery getVarVarLiteral(final Node s, final Node p, final Node o,
                                                    final Configuration configuration, final CypherVarGenerator gen,
-                                                   final boolean bgp) {
+                                                   final Set<Node> certainNodes) {
             final String svar = gen.getVarFor(s.getName());
-            if (bgp) {
+            if (certainNodes.contains(s)) {
                 return CypherQueryBuilder.newBuilder()
                         .match(String.format(MATCH_NODE, svar))
                         .returns(String.format(RETURN_NODE_MAPPING, svar, s.getName()))
@@ -411,12 +424,12 @@ public class SPARQLStar2CypherTranslator {
 
         public static CypherQuery getNodeVarVar(final Node s, final Node p, final Node o,
                                                 final Configuration configuration, final CypherVarGenerator gen,
-                                                final boolean bgp) {
+                                                final Set<Node> certainNodes) {
             final String nodeID = configuration.unmapNode(s);
             final String xvar = gen.getAnonVar();
             final String pvar = gen.getVarFor(p.getName());
             final String ovar = gen.getVarFor(o.getName());
-            if (bgp){
+            if (certainNodes.contains(o)){
                 return CypherQueryBuilder.newBuilder()
                         .match(String.format(MATCH_EDGE_VAR, xvar, pvar, ovar))
                         .condition(String.format(CONDITION_ID, xvar, nodeID))
@@ -448,11 +461,11 @@ public class SPARQLStar2CypherTranslator {
 
         public static CypherQuery getVarVarVar(final Node s, final Node p, final Node o,
                                                final Configuration configuration, final CypherVarGenerator gen,
-                                               final boolean bgp) {
+                                               final Set<Node> certainNodes) {
             final String svar = gen.getVarFor(s.getName());
             final String pvar = gen.getVarFor(p.getName());
             final String ovar = gen.getVarFor(o.getName());
-            if (bgp) {
+            if (certainNodes.contains(s) && certainNodes.contains(o)) {
                 return CypherQueryBuilder.newBuilder()
                         .match(String.format(MATCH_EDGE_VAR, svar, pvar, ovar))
                         .returns(String.format(RETURN_NODE_MAPPING, svar, s.getName()))

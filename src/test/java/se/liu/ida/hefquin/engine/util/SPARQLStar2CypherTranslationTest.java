@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.utils.lpg.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.utils.lpg.SPARQLStar2CypherTranslator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SPARQLStar2CypherTranslationTest {
 
@@ -407,8 +408,9 @@ public class SPARQLStar2CypherTranslationTest {
                 new TriplePatternImpl(t4),
                 new TriplePatternImpl(t5)
         );
-        assertEquals(
-                CypherQueryBuilder.newBuilder()
+        CypherQuery translation = SPARQLStar2CypherTranslator.translate(bgp);
+        assertTrue(
+                translation.equals(CypherQueryBuilder.newBuilder()
                         .match("MATCH (cpvar1)-[cpvar2:DIRECTED]->(cpvar3)")
                         .match("MATCH (cpvar1)") // this two are redundant
                         .match("MATCH (cpvar3)")
@@ -420,7 +422,20 @@ public class SPARQLStar2CypherTranslationTest {
                         .returns("nm(cpvar1) AS p")
                         .returns("nm(cpvar3) AS m")
                         .returns("cpvar3.released AS year")
-                        .build(), SPARQLStar2CypherTranslator.translate(bgp));
+                        .build())
+                        || translation.equals(CypherQueryBuilder.newBuilder()
+                        .match("MATCH (cpvar1)-[cpvar3:DIRECTED]->(cpvar2)")
+                        .match("MATCH (cpvar1)") // this two are redundant
+                        .match("MATCH (cpvar2)")
+                        .condition("cpvar1:Person")
+                        .condition("cpvar2:Movie")
+                        .condition("cpvar1.name='Q. Tarantino'")
+                        .condition("cpvar3.retrievedFrom='IMDB'")
+                        .condition("EXISTS(cpvar2.released)")
+                        .returns("nm(cpvar1) AS p")
+                        .returns("nm(cpvar2) AS m")
+                        .returns("cpvar2.released AS year")
+                        .build()));
     }
 
 }
