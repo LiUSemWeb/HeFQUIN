@@ -88,7 +88,27 @@ public class UnionCypherQuery implements CypherQuery {
 
     @Override
     public CypherQuery combineWithUnion(final UnionCypherQuery query) {
-        return null;
+        if (this.union.size() != 2 || query.union.size() != 2){
+            throw new IllegalStateException("Only unions with size two can be combined");
+        }
+        CypherQuery res1 = null;
+        CypherQuery res2 = null;
+        for (final CypherQuery q1 : this.union){
+            for (final CypherQuery q2 : query.union){
+                if (q1.isCompatibleWith(q2)){
+                    if (res1 == null)
+                        res1 = q1.combineWith(q2);
+                    else
+                        res2 = q1.combineWith(q2);
+                }
+            }
+        }
+        return new UnionCypherQuery(res1, res2);
+    }
+
+    @Override
+    public boolean isCompatibleWith(final CypherQuery query) {
+        return false;
     }
 
     @Override
