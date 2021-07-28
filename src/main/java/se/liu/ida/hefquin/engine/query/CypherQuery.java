@@ -25,6 +25,4 @@ public interface CypherQuery {
     CypherQuery combineWith(final CypherQuery query);
     CypherQuery combineWithMatch(final MatchCypherQuery query);
     CypherQuery combineWithUnion(final UnionCypherQuery query);
-
-    boolean isCompatibleWith(final CypherQuery query);
 }

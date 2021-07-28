@@ -14,9 +14,6 @@ public class MatchCypherQuery implements CypherQuery {
     final protected Set<String> conditions;
     final protected Set<String> returnExprs;
 
-    final protected Pattern MATCH_EDGE = Pattern.compile("MATCH \\([\\w\\s]*\\)-\\[[\\w\\s:]*\\]->\\([\\w\\s]*\\)");
-    final protected Pattern MATCH_NODE = Pattern.compile("MATCH \\([\\w\\s]*\\)");
-
     public MatchCypherQuery() {
         matches = new HashSet<>();
         conditions = new HashSet<>();
@@ -57,7 +54,16 @@ public class MatchCypherQuery implements CypherQuery {
 
     @Override
     public void addMatchClause(final String match) {
-        matches.add(match);
+        if (!addsRedundantClause(match))
+            matches.add(match);
+    }
+
+    private boolean addsRedundantClause(final String match) {
+        for (final String m : matches){
+            if (m.contains(match) || match.contains(m))
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -116,38 +122,19 @@ public class MatchCypherQuery implements CypherQuery {
 
     @Override
     public CypherQuery combineWithUnion(UnionCypherQuery query) {
-        throw new UnsupportedOperationException("Unable to combine a MATCH and a UNION query");
-    }
-
-    @Override
-    public boolean isCompatibleWith(final CypherQuery query) {
-        if (query.isMatchQuery()){
-            return areMatchesCompatible(matches, query.getMatches());
+        final Set<CypherQuery> result = new HashSet<>();
+        for (final CypherQuery q : query.union) {
+            result.add(q.combineWithMatch(this));
         }
-        return false;
-    }
-
-    private boolean areMatchesCompatible(final Set<String> matches1, final Set<String> matches2) {
-        if(matches1.size() != matches2.size()) return false;
-        for (final String s1: matches1) {
-            boolean found = false;
-            for (final String s2 : matches2){
-                if (MATCH_EDGE.matcher(s1).matches() && MATCH_EDGE.matcher(s2).matches() ||
-                        MATCH_NODE.matcher(s1).matches() && MATCH_NODE.matcher(s2).matches()) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) return false;
-        }
-        return true;
+        return new UnionCypherQuery(result);
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (matches.size()>0) {
-            builder.append(String.join(" ", matches));
+            builder.append("MATCH ");
+            builder.append(String.join(" MATCH ", matches));
             builder.append("\n");
         }
         if (conditions.size()>0) {

@@ -2,10 +2,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnionCypherQuery implements CypherQuery {
@@ -19,6 +16,10 @@ public class UnionCypherQuery implements CypherQuery {
     public UnionCypherQuery(CypherQuery... queries) {
         this();
         union.addAll(Arrays.asList(queries));
+    }
+
+    public UnionCypherQuery(Set<CypherQuery> result) {
+        this.union = result;
     }
 
     @Override
@@ -83,32 +84,22 @@ public class UnionCypherQuery implements CypherQuery {
 
     @Override
     public CypherQuery combineWithMatch(final MatchCypherQuery query) {
-        throw new UnsupportedOperationException("Unable to combine a MATCH and a UNION query");
+        final Set<CypherQuery> result = new HashSet<>();
+        for (final CypherQuery q : this.union) {
+            result.add(q.combineWith(query));
+        }
+        return new UnionCypherQuery(result);
     }
 
     @Override
     public CypherQuery combineWithUnion(final UnionCypherQuery query) {
-        if (this.union.size() != 2 || query.union.size() != 2){
-            throw new IllegalStateException("Only unions with size two can be combined");
-        }
-        CypherQuery res1 = null;
-        CypherQuery res2 = null;
-        for (final CypherQuery q1 : this.union){
-            for (final CypherQuery q2 : query.union){
-                if (q1.isCompatibleWith(q2)){
-                    if (res1 == null)
-                        res1 = q1.combineWith(q2);
-                    else
-                        res2 = q1.combineWith(q2);
-                }
+        final Set<CypherQuery> result = new HashSet<>();
+        for (final CypherQuery q1 : this.union) {
+            for (final CypherQuery q2 : query.union) {
+                result.add(q1.combineWith(q2));
             }
         }
-        return new UnionCypherQuery(res1, res2);
-    }
-
-    @Override
-    public boolean isCompatibleWith(final CypherQuery query) {
-        return false;
+        return new UnionCypherQuery(result);
     }
 
     @Override

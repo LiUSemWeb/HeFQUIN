@@ -175,9 +175,9 @@ public class SPARQLStar2CypherTranslator {
 
     private static class Translations {
 
-        final static private String MATCH_EDGE              = "MATCH (%s)-[%s:%s]->(%s)";
-        final static private String MATCH_EDGE_VAR          = "MATCH (%s)-[%s]->(%s)";
-        final static private String MATCH_NODE              = "MATCH (%s)";
+        final static private String MATCH_EDGE              = "(%s)-[%s:%s]->(%s)";
+        final static private String MATCH_EDGE_VAR          = "(%s)-[%s]->(%s)";
+        final static private String MATCH_NODE              = "(%s)";
         final static private String CONDITION_EXISTS        = "EXISTS(%s.%s)";
         final static private String CONDITION_VALUE         = "%s.%s='%s'";
         final static private String CONDITION_CLASS         = "%s:%s" ;
