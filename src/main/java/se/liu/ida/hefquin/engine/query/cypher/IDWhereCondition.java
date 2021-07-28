@@ -2,12 +2,12 @@ package se.liu.ida.hefquin.engine.query.cypher;
 
 import java.util.Objects;
 
-public class IDWhereCondition {
+public class IDWhereCondition implements WhereCondition{
 
     private final CypherVar var;
-    private final int nodeID;
+    private final String nodeID;
 
-    public IDWhereCondition(CypherVar var, int nodeID) {
+    public IDWhereCondition(CypherVar var, String nodeID) {
         assert var!= null;
         this.var = var;
         this.nodeID = nodeID;
@@ -17,7 +17,7 @@ public class IDWhereCondition {
         return var;
     }
 
-    public int getNodeID() {
+    public String getNodeID() {
         return nodeID;
     }
 
@@ -31,7 +31,7 @@ public class IDWhereCondition {
         if (this == o) return true;
         if (!(o instanceof IDWhereCondition)) return false;
         IDWhereCondition that = (IDWhereCondition) o;
-        return nodeID == that.nodeID && var.equals(that.var);
+        return nodeID.equals(that.nodeID) && var.equals(that.var);
     }
 
     @Override

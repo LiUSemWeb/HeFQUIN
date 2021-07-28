@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
+import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
+import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,17 +26,17 @@ public class UnionCypherQuery implements CypherQuery {
     }
 
     @Override
-    public Set<String> getMatches() {
+    public Set<MatchClause> getMatches() {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 
     @Override
-    public Set<String> getConditions() {
+    public Set<WhereCondition> getConditions() {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 
     @Override
-    public Set<String> getReturnExprs() {
+    public Set<ReturnStatement> getReturnExprs() {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 
@@ -48,17 +51,17 @@ public class UnionCypherQuery implements CypherQuery {
     }
 
     @Override
-    public void addMatchClause(final String match) {
+    public void addMatchClause(final MatchClause match) {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 
     @Override
-    public void addConditionConjunction(final String cond) {
+    public void addConditionConjunction(final WhereCondition cond) {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 
     @Override
-    public void addReturnClause(final String ret) {
+    public void addReturnClause(final ReturnStatement ret) {
         throw new UnsupportedOperationException("Not a MATCH query");
     }
 

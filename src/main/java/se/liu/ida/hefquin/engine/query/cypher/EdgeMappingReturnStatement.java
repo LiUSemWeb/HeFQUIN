@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.query.cypher;
 
 import java.util.Objects;
 
-public class EdgeMappingReturnStatement {
+public class EdgeMappingReturnStatement implements ReturnStatement{
     private final CypherVar edge;
     private final String alias;
 

@@ -1,17 +1,20 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
+import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
+import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MatchCypherQuery implements CypherQuery {
 
-    final protected Set<String> matches;
-    final protected Set<String> conditions;
-    final protected Set<String> returnExprs;
+    final protected Set<MatchClause> matches;
+    final protected Set<WhereCondition> conditions;
+    final protected Set<ReturnStatement> returnExprs;
 
     public MatchCypherQuery() {
         matches = new HashSet<>();
@@ -19,25 +22,18 @@ public class MatchCypherQuery implements CypherQuery {
         returnExprs = new HashSet<>();
     }
 
-    public MatchCypherQuery(final String[] matches, final String[] conditions, final String[] returns) {
-        this();
-        this.matches.addAll(Arrays.asList(matches));
-        this.conditions.addAll(Arrays.asList(conditions));
-        this.returnExprs.addAll(Arrays.asList(returns));
-    }
-
     @Override
-    public Set<String> getMatches() {
+    public Set<MatchClause> getMatches() {
         return matches;
     }
 
     @Override
-    public Set<String> getConditions() {
+    public Set<WhereCondition> getConditions() {
         return conditions;
     }
 
     @Override
-    public Set<String> getReturnExprs() {
+    public Set<ReturnStatement> getReturnExprs() {
         return returnExprs;
     }
 
@@ -52,26 +48,26 @@ public class MatchCypherQuery implements CypherQuery {
     }
 
     @Override
-    public void addMatchClause(final String match) {
+    public void addMatchClause(final MatchClause match) {
         if (!addsRedundantClause(match))
             matches.add(match);
     }
 
-    private boolean addsRedundantClause(final String match) {
-        for (final String m : matches){
-            if (m.contains(match) || match.contains(m))
+    private boolean addsRedundantClause(final MatchClause match) {
+        for (final MatchClause m : matches){
+            if (m.isRedundantWith(match))
                 return true;
         }
         return false;
     }
 
     @Override
-    public void addConditionConjunction(final String cond) {
+    public void addConditionConjunction(final WhereCondition cond) {
         conditions.add(cond);
     }
 
     @Override
-    public void addReturnClause(final String ret) {
+    public void addReturnClause(final ReturnStatement ret) {
         returnExprs.add(ret);
     }
 
@@ -98,22 +94,22 @@ public class MatchCypherQuery implements CypherQuery {
     @Override
     public CypherQuery combineWithMatch(final MatchCypherQuery query) {
         CypherQuery result = new MatchCypherQuery();
-        for (final String match : query.getMatches()) {
+        for (final MatchClause match : query.getMatches()) {
             result.addMatchClause(match);
         }
-        for (final String cond : query.getConditions()) {
+        for (final WhereCondition cond : query.getConditions()) {
             result.addConditionConjunction(cond);
         }
-        for (final String ret : query.getReturnExprs()){
+        for (final ReturnStatement ret : query.getReturnExprs()){
             result.addReturnClause(ret);
         }
-        for (final String match : this.getMatches()) {
+        for (final MatchClause match : this.getMatches()) {
             result.addMatchClause(match);
         }
-        for (final String cond : this.getConditions()) {
+        for (final WhereCondition cond : this.getConditions()) {
             result.addConditionConjunction(cond);
         }
-        for (final String ret : this.getReturnExprs()){
+        for (final ReturnStatement ret : this.getReturnExprs()){
             result.addReturnClause(ret);
         }
         return result;
@@ -132,18 +128,17 @@ public class MatchCypherQuery implements CypherQuery {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (matches.size()>0) {
-            builder.append("MATCH ");
-            builder.append(String.join(" MATCH ", matches));
+            builder.append(matches.stream().map(Objects::toString).collect(Collectors.joining("\n")));
             builder.append("\n");
         }
         if (conditions.size()>0) {
             builder.append("WHERE ");
-            builder.append(String.join(" AND ", conditions));
+            builder.append(conditions.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
             builder.append("\n");
         }
         if (returnExprs.size()>0) {
             builder.append("RETURN ");
-            builder.append(String.join(", ", returnExprs));
+            builder.append(returnExprs.stream().map(Objects::toString).collect(Collectors.joining(", ")));
         }
         return builder.toString();
     }

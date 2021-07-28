@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.query.cypher;
 
 import java.util.Objects;
 
-public class ClassWhereCondition {
+public class ClassWhereCondition implements WhereCondition{
     private final CypherVar var;
     private final String clazz;
 

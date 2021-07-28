@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
-public class LabelsReturnStatement {
+import java.util.Objects;
+
+public class LabelsReturnStatement implements ReturnStatement{
     private final CypherVar node;
     private final String alias;
 
@@ -21,5 +23,18 @@ public class LabelsReturnStatement {
     @Override
     public String toString() {
         return "labels(" + node.getName() + ")" + (alias != null? " AS " + alias : "");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LabelsReturnStatement)) return false;
+        LabelsReturnStatement that = (LabelsReturnStatement) o;
+        return node.equals(that.node) && Objects.equals(alias, that.alias);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node, alias);
     }
 }

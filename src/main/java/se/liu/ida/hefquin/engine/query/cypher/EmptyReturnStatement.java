@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.query.cypher;
 
 import java.util.Objects;
 
-public class EmptyReturnStatement {
+public class EmptyReturnStatement implements ReturnStatement{
     private final String alias;
 
     public EmptyReturnStatement(final String alias) {

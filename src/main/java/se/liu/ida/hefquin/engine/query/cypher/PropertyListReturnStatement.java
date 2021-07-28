@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.query.cypher;
 
 import java.util.Objects;
 
-public class PropertyListReturnStatement {
+public class PropertyListReturnStatement implements ReturnStatement{
     private final CypherVar var;
     private final String alias;
     private final String innerVar;
