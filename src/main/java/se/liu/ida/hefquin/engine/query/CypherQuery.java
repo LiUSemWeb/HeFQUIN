@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.query;
 
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
 import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
 import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
@@ -28,4 +29,6 @@ public interface CypherQuery {
     CypherQuery combineWith(final CypherQuery query);
     CypherQuery combineWithMatch(final MatchCypherQuery query);
     CypherQuery combineWithUnion(final UnionCypherQuery query);
+
+    Set<CypherVar> getMatchVars();
 }

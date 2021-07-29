@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class ClassWhereCondition implements WhereCondition{
     private final CypherVar var;
@@ -37,5 +39,10 @@ public class ClassWhereCondition implements WhereCondition{
     @Override
     public int hashCode() {
         return Objects.hash(var, clazz);
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.singleton(var);
     }
 }

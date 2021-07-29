@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class ValueReturnStatement implements ReturnStatement{
     private final String value;
@@ -36,5 +38,10 @@ public class ValueReturnStatement implements ReturnStatement{
     @Override
     public int hashCode() {
         return Objects.hash(value, alias);
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.emptySet();
     }
 }

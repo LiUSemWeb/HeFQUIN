@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class EdgeMatchClause implements MatchClause{
     protected final CypherVar sourceNode;
@@ -72,5 +74,14 @@ public class EdgeMatchClause implements MatchClause{
             return sourceNode.equals(that.node) || targetNode.equals(that.node);
         }
         return false;
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        final Set<CypherVar> vars = new HashSet<>();
+        vars.add(sourceNode);
+        vars.add(targetNode);
+        if (edge != null) vars.add(edge);
+        return vars;
     }
 }

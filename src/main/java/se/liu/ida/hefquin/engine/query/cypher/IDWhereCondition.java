@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class IDWhereCondition implements WhereCondition{
 
@@ -37,5 +39,10 @@ public class IDWhereCondition implements WhereCondition{
     @Override
     public int hashCode() {
         return Objects.hash(var, nodeID);
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.singleton(var);
     }
 }

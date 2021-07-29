@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
 import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
 import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
@@ -103,6 +104,11 @@ public class UnionCypherQuery implements CypherQuery {
             }
         }
         return new UnionCypherQuery(result);
+    }
+
+    @Override
+    public Set<CypherVar> getMatchVars() {
+        return union.stream().map(CypherQuery::getMatchVars).flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     @Override

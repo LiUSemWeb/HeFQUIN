@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class NodeMatchClause implements MatchClause{
 
@@ -22,6 +25,11 @@ public class NodeMatchClause implements MatchClause{
             return node.equals(that.sourceNode) || node.equals(that.targetNode);
         }
         return false;
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.singleton(node);
     }
 
     @Override

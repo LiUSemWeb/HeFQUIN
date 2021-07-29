@@ -65,12 +65,18 @@ public class MatchCypherQuery implements CypherQuery {
 
     @Override
     public void addConditionConjunction(final WhereCondition cond) {
-        conditions.add(cond);
+        if (compatibleVars(cond.getVars(), getMatchVars()))
+            conditions.add(cond);
+    }
+
+    private boolean compatibleVars(Set<CypherVar> inVars, Set<CypherVar> currentVars) {
+        return currentVars.containsAll(inVars);
     }
 
     @Override
     public void addReturnClause(final ReturnStatement ret) {
-        returnExprs.add(ret);
+        if (compatibleVars(ret.getVars(), getMatchVars()))
+            returnExprs.add(ret);
     }
 
     @Override
@@ -124,6 +130,15 @@ public class MatchCypherQuery implements CypherQuery {
             result.add(q.combineWithMatch(this));
         }
         return new UnionCypherQuery(result);
+    }
+
+    @Override
+    public Set<CypherVar> getMatchVars() {
+        final Set<CypherVar> result = new HashSet<>();
+        for (final MatchClause m : matches){
+            result.addAll(m.getVars());
+        }
+        return result;
     }
 
     @Override

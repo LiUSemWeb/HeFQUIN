@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class PropertyListReturnStatement implements ReturnStatement{
     private final CypherVar var;
@@ -43,5 +45,10 @@ public class PropertyListReturnStatement implements ReturnStatement{
     @Override
     public int hashCode() {
         return Objects.hash(var, alias, innerVar);
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.singleton(var);
     }
 }

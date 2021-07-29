@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.query.cypher;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class NodeMappingReturnStatement implements ReturnStatement{
     private final CypherVar node;
@@ -36,5 +38,10 @@ public class NodeMappingReturnStatement implements ReturnStatement{
     @Override
     public int hashCode() {
         return Objects.hash(node, alias);
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Collections.singleton(node);
     }
 }
