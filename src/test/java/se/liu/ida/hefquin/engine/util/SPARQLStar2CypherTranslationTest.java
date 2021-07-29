@@ -467,7 +467,28 @@ public class SPARQLStar2CypherTranslationTest {
         );
         final CypherQuery translation = SPARQLStar2CypherTranslator.translate(new BGPImpl(new TriplePatternImpl(t1),
                 new TriplePatternImpl(t2)));
-        System.out.println(translation);
+        assertEquals(new UnionCypherQuery(
+                CypherQueryBuilder.newBuilder()
+                        .match(new NodeMatchClause(v1))
+                        .condition(new EXISTSWhereCondition(v1, "name"))
+                        .condition(new EXISTSWhereCondition(v1, "year"))
+                        .returns(new NodeMappingReturnStatement(v1, "r1"))
+                        .returns(new EmptyReturnStatement("r2"))
+                        .returns(new EmptyReturnStatement("r3"))
+                        .returns(new LiteralReturnStatement(v1, "name", "name"))
+                        .returns(new LiteralReturnStatement(v1, "year", "year"))
+                        .build(),
+                CypherQueryBuilder.newBuilder()
+                        .match(new EdgeMatchClause(v1, v3, v2, null))
+                        .condition(new EXISTSWhereCondition(v2, "name"))
+                        .condition(new EXISTSWhereCondition(v2, "year"))
+                        .returns(new NodeMappingReturnStatement(v1, "r1"))
+                        .returns(new EdgeMappingReturnStatement(v2, "r2"))
+                        .returns(new NodeMappingReturnStatement(v3, "r3"))
+                        .returns(new LiteralReturnStatement(v2, "name", "name"))
+                        .returns(new LiteralReturnStatement(v2, "year", "year"))
+                        .build()
+        ), translation);
     }
 
 }

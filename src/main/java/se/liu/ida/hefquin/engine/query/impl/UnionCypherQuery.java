@@ -103,7 +103,24 @@ public class UnionCypherQuery implements CypherQuery {
                 result.add(q1.combineWith(q2));
             }
         }
+        removeMalformed(result);
         return new UnionCypherQuery(result);
+    }
+
+    private void removeMalformed(final Set<CypherQuery> queries) {
+        final List<CypherQuery> toRemove = new LinkedList<>();
+        for (final CypherQuery q : queries) {
+            final List<String> seenAliases = new ArrayList<>();
+            for (final ReturnStatement r : q.getReturnExprs()) {
+                if (seenAliases.contains(r.getAlias())){
+                    toRemove.add(q);
+                    break;
+                } else {
+                    seenAliases.add(r.getAlias());
+                }
+            }
+        }
+        toRemove.forEach(queries::remove);
     }
 
     @Override

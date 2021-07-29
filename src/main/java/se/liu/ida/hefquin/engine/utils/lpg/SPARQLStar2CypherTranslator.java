@@ -191,8 +191,8 @@ public class SPARQLStar2CypherTranslator {
                         .build();
             }
             final CypherVar xvar = gen.getAnonVar();
-            final CypherVar evar = gen.getAnonVar();
-            final CypherVar yvar = gen.getAnonVar();
+            final CypherVar evar = gen.getAnonVar(xvar, 2);
+            final CypherVar yvar = gen.getAnonVar(xvar, 3);
             return new UnionCypherQuery(
                     CypherQueryBuilder.newBuilder()
                             .match(new NodeMatchClause(svar))
@@ -335,15 +335,15 @@ public class SPARQLStar2CypherTranslator {
                         .returns(new LiteralReturnStatement(svar, property, o.getName()))
                         .build();
             }
-            final CypherVar evar = gen.getAnonVar();
-            final CypherVar ovar = gen.getVarFor(o.getName());
+            final CypherVar evar = gen.getAnonVar(svar, 2);
+            final CypherVar yvar = gen.getAnonVar(svar, 3);
             return new UnionCypherQuery(
                     CypherQueryBuilder.newBuilder()
-                            .match(new EdgeMatchClause(svar, ovar, evar, null))
+                            .match(new EdgeMatchClause(svar, yvar, evar, null))
                             .condition(new EXISTSWhereCondition(evar, property))
                             .returns(new NodeMappingReturnStatement(svar, "r1"))
                             .returns(new EdgeMappingReturnStatement(evar, "r2"))
-                            .returns(new NodeMappingReturnStatement(ovar, "r3"))
+                            .returns(new NodeMappingReturnStatement(yvar, "r3"))
                             .returns(new LiteralReturnStatement(evar, property, o.getName()))
                             .build(),
                     CypherQueryBuilder.newBuilder()
@@ -393,7 +393,7 @@ public class SPARQLStar2CypherTranslator {
                         .build();
             }
             final CypherVar pvar = gen.getVarFor(p.getName());
-            final CypherVar yvar = gen.getAnonVar();
+            final CypherVar yvar = gen.getAnonVar(svar, 2);
             return new UnionCypherQuery(
                     CypherQueryBuilder.newBuilder()
                             .match(new EdgeMatchClause(svar, yvar, pvar, null))
@@ -550,6 +550,10 @@ public class SPARQLStar2CypherTranslator {
             String var = String.format(VAR_PATTERN, current);
             current++;
             return new CypherVar(var);
+        }
+
+        public CypherVar getAnonVar(CypherVar xvar, int i) {
+            return getVarFor(xvar.getName() + i);
         }
     }
 }
