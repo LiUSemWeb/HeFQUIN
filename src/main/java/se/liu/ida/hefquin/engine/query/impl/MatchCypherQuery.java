@@ -1,9 +1,7 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
 import se.liu.ida.hefquin.engine.query.CypherQuery;
-import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
-import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
-import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
+import se.liu.ida.hefquin.engine.query.cypher.*;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -49,16 +47,20 @@ public class MatchCypherQuery implements CypherQuery {
 
     @Override
     public void addMatchClause(final MatchClause match) {
-        if (!addsRedundantClause(match))
-            matches.add(match);
-    }
-
-    private boolean addsRedundantClause(final MatchClause match) {
-        for (final MatchClause m : matches){
-            if (m.isRedundantWith(match))
-                return true;
+        matches.add(match);
+        final Set<MatchClause> redundant = new HashSet<>();
+        for (final MatchClause m1 : matches) {
+            if (m1 instanceof EdgeMatchClause) {
+                for (final MatchClause m2 : matches) {
+                    if (m2 instanceof NodeMatchClause) {
+                        if (m1.isRedundantWith(m2)) {
+                            redundant.add(m2);
+                        }
+                    }
+                }
+            }
         }
-        return false;
+        matches.removeAll(redundant);
     }
 
     @Override
