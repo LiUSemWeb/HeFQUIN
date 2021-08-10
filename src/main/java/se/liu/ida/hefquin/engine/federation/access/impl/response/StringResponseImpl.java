@@ -2,11 +2,11 @@ package se.liu.ida.hefquin.engine.federation.access.impl.response;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.StringRetrievalResponse;
+import se.liu.ida.hefquin.engine.federation.access.StringResponse;
 
 import java.util.Date;
 
-public class StringResponseImpl extends DataRetrievalResponseBase implements StringRetrievalResponse {
+public class StringResponseImpl extends DataRetrievalResponseBase implements StringResponse {
 
     protected final String response;
 

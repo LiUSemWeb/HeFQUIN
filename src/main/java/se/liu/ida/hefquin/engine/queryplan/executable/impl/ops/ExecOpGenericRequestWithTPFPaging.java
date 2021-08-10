@@ -44,11 +44,11 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
 	}
 
 	protected void consumeMatchingTriples( final Iterable<Triple> itTriples, final IntermediateResultElementSink sink ) {
-		final Iterator<? extends SolutionMapping> itSolMaps = convert( itTriples );
+		final Iterator<SolutionMapping> itSolMaps = convert( itTriples );
 		while ( itSolMaps.hasNext() ) {
 			sink.send( itSolMaps.next() );
 		}
 	}
 
-	protected abstract Iterator<? extends SolutionMapping> convert( Iterable<Triple> itTriples );
+	protected abstract Iterator<SolutionMapping> convert( Iterable<Triple> itTriples );
 }
