@@ -1,9 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimateProcessingException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimateProcessor;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 
@@ -21,8 +22,8 @@ public class CostModelImpl implements CostModel
     }
 
     public void initiateCostEstimation( final PhysicalPlan pp,
-                              final CostEstimateProcessor ceProc )
-            throws QueryOptimizationException
+                                        final CostEstimateProcessor ceProc )
+            throws CostEstimationException
     {
         final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimationImpl(ctxt) );
 
@@ -38,7 +39,12 @@ public class CostModelImpl implements CostModel
                 + costOfPhysicalPlan.getShippedVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
                 + costOfPhysicalPlan.getShippedVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
 
-        ceProc.process(cost, pp);
+        try {
+            ceProc.process(cost, pp);
+        }
+        catch ( final CostEstimateProcessingException e ) {
+            throw new CostEstimationException("Processing the determined cost estimate cause an exception.", e, pp);
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
 public interface CostModel
 {
@@ -15,5 +14,5 @@ public interface CostModel
 	 * code that uses this method has to check (and perhaps wait) that the
 	 * given processor has been called and has completed its task.
 	 */
-	void initiateCostEstimation( PhysicalPlan p, CostEstimateProcessor ceProc ) throws QueryOptimizationException;
+	void initiateCostEstimation( PhysicalPlan p, CostEstimateProcessor ceProc ) throws CostEstimationException;
 }
