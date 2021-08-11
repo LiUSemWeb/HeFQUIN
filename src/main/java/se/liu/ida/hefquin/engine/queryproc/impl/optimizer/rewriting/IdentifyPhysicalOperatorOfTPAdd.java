@@ -12,7 +12,7 @@ public class IdentifyPhysicalOperatorOfTPAdd {
         this.pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
     }
 
-    public Boolean matchTPAdd() {
+    public boolean matchTPAdd() {
         final LogicalOpTPAdd lop = (LogicalOpTPAdd) pop.getLogicalOperator();
         if ( lop instanceof LogicalOpTPAdd ){
             return true;
@@ -20,35 +20,35 @@ public class IdentifyPhysicalOperatorOfTPAdd {
         return false;
     }
 
-    public Boolean matchTPAddIndexNLJ() {
+    public boolean matchTPAddIndexNLJ() {
         if( matchTPAdd() && (pop instanceof PhysicalOpIndexNestedLoopsJoin) ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJFILTER() {
+    public boolean matchTPAddBJFILTER() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoinWithFILTER) ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJUNION() {
+    public boolean matchTPAddBJUNION() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoinWithUNION) ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJVALUES() {
+    public boolean matchTPAddBJVALUES() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoinWithVALUES) ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBindJoin() {
+    public boolean matchTPAddBindJoin() {
         if( matchTPAdd() && ( pop instanceof PhysicalOpBindJoin) ){
             return true;
         }

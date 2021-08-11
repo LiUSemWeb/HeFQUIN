@@ -11,35 +11,35 @@ public class IdentifyPhysicalOperatorOfTwoTPAdd {
         this.popOfSubquery = new IdentifyPhysicalOperatorOfTPAdd(pp.getSubPlan(0));
     }
 
-    public Boolean matchTwoTPAddIndexNLJ() {
+    public boolean matchTwoTPAddIndexNLJ() {
         if ( popOfTPAdd.matchTPAddIndexNLJ() && popOfSubquery.matchTPAddIndexNLJ() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTwoTPAddBindJoin() {
+    public boolean matchTwoTPAddBindJoin() {
         if ( popOfTPAdd.matchTPAddBindJoin() && popOfSubquery.matchTPAddBindJoin() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTwoTPAddBindJoinFILTER() {
+    public boolean matchTwoTPAddBindJoinFILTER() {
         if ( popOfTPAdd.matchTPAddBJFILTER() && popOfSubquery.matchTPAddBJFILTER() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTwoTPAddBindJoinUNION() {
+    public boolean matchTwoTPAddBindJoinUNION() {
         if ( popOfTPAdd.matchTPAddBJUNION() && popOfSubquery.matchTPAddBJUNION() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTwoTPAddBindJoinVALUES() {
+    public boolean matchTwoTPAddBindJoinVALUES() {
         if ( popOfTPAdd.matchTPAddBJVALUES() && popOfSubquery.matchTPAddBJVALUES() ){
             return true;
         }
@@ -47,56 +47,56 @@ public class IdentifyPhysicalOperatorOfTwoTPAdd {
     }
 
     // Mixed of bind join and (index) nested loop join
-    public Boolean matchTPAddBindJoinAndTPAddIndexNLJ() {
+    public boolean matchTPAddBindJoinAndTPAddIndexNLJ() {
         if ( popOfTPAdd.matchTPAddBindJoin() && popOfSubquery.matchTPAddIndexNLJ() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJFILTERAndTPAddIndexNLJ() {
+    public boolean matchTPAddBJFILTERAndTPAddIndexNLJ() {
         if ( popOfTPAdd.matchTPAddBJFILTER() && popOfSubquery.matchTPAddIndexNLJ() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJUNIONAndTPAddIndexNLJ() {
+    public boolean matchTPAddBJUNIONAndTPAddIndexNLJ() {
         if ( popOfTPAdd.matchTPAddBJUNION() && popOfSubquery.matchTPAddIndexNLJ() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddBJVALUESAndTPAddIndexNLJ() {
+    public boolean matchTPAddBJVALUESAndTPAddIndexNLJ() {
         if ( popOfTPAdd.matchTPAddBJVALUES() && popOfSubquery.matchTPAddIndexNLJ() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddIndexNLJAndTPAddBindJoin() {
+    public boolean matchTPAddIndexNLJAndTPAddBindJoin() {
         if ( popOfTPAdd.matchTPAddIndexNLJ() && popOfSubquery.matchTPAddBindJoin() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddIndexNLJAndTPAddBJFILTER() {
+    public boolean matchTPAddIndexNLJAndTPAddBJFILTER() {
         if ( popOfTPAdd.matchTPAddIndexNLJ() && popOfSubquery.matchTPAddBJFILTER() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddIndexNLJAndTPAddBJUNION() {
+    public boolean matchTPAddIndexNLJAndTPAddBJUNION() {
         if ( popOfTPAdd.matchTPAddIndexNLJ() && popOfSubquery.matchTPAddBJUNION() ){
             return true;
         }
         return false;
     }
 
-    public Boolean matchTPAddIndexNLJAndTPAddBJVALUES() {
+    public boolean matchTPAddIndexNLJAndTPAddBJVALUES() {
         if ( popOfTPAdd.matchTPAddIndexNLJ() && popOfSubquery.matchTPAddBJVALUES() ){
             return true;
         }

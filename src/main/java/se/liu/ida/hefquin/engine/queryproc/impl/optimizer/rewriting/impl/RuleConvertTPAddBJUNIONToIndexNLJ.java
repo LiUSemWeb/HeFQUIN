@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhys
 public class RuleConvertTPAddBJUNIONToIndexNLJ extends ConvertTPAddToIndexNestedLoopJoin {
 
     @Override
-    public Boolean canBeAppliedTo( final PhysicalPlan pp ) {
+    public boolean canBeAppliedTo( final PhysicalPlan pp ) {
         return new IdentifyPhysicalOperatorOfTPAdd(pp).matchTPAddBJUNION();
     }
 
