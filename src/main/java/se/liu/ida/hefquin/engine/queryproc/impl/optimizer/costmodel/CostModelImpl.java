@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimateProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 
@@ -19,7 +20,10 @@ public class CostModelImpl implements CostModel
         this.physicalPlanCostCache = new PhysicalPlanCostCache();
     }
 
-    public double estimateCost( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public void initiateCostEstimation( final PhysicalPlan pp,
+                              final CostEstimateProcessor ceProc )
+            throws QueryOptimizationException
+    {
         final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimationImpl(ctxt) );
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
@@ -34,7 +38,7 @@ public class CostModelImpl implements CostModel
                 + costOfPhysicalPlan.getShippedVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
                 + costOfPhysicalPlan.getShippedVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
 
-        return cost;
+        ceProc.process(cost, pp);
     }
 
 }
