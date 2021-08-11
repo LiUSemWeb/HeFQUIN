@@ -17,21 +17,23 @@ public class CardinalityEstimationException extends QueryOptimizationException
 	                                       final Throwable cause,
 	                                       final PhysicalPlan plan ) {
 		super(message, cause);
-
 		this.plan = plan;
 	}
 
 	public CardinalityEstimationException( final String message,
 	                                       final PhysicalPlan plan ) {
 		super(message);
-
 		this.plan = plan;
 	}
 
 	public CardinalityEstimationException( final Throwable cause,
 	                                       final PhysicalPlan plan ) {
 		super(cause);
+		this.plan = plan;
+	}
 
+	public CardinalityEstimationException( final PhysicalPlan plan ) {
+		super();
 		this.plan = plan;
 	}
 

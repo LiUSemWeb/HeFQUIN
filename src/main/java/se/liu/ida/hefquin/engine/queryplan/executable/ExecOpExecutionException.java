@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
+/**
+ * An exception that occurred during the execution of a specific operator.
+ */
 public class ExecOpExecutionException extends ExecutionException
 {
 	private static final long serialVersionUID = 3285677866147516456L;

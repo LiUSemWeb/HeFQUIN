@@ -17,21 +17,23 @@ public class CostEstimationException extends QueryOptimizationException
 	                                final Throwable cause,
 	                                final PhysicalPlan plan ) {
 		super(message, cause);
-
 		this.plan = plan;
 	}
 
 	public CostEstimationException( final String message,
 	                                final PhysicalPlan plan ) {
 		super(message);
-
 		this.plan = plan;
 	}
 
 	public CostEstimationException( final Throwable cause,
 	                                final PhysicalPlan plan ) {
 		super(cause);
+		this.plan = plan;
+	}
 
+	public CostEstimationException( final PhysicalPlan plan ) {
+		super();
 		this.plan = plan;
 	}
 

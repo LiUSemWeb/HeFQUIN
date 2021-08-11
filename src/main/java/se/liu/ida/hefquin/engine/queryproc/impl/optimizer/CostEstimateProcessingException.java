@@ -42,6 +42,14 @@ public class CostEstimateProcessingException extends QueryOptimizationException
 		this.plan = plan;
 	}
 
+	public CostEstimateProcessingException( final double estimatedCost,
+	                                        final PhysicalPlan plan ) {
+		super();
+
+		this.estimatedCost = estimatedCost;
+		this.plan = plan;
+	}
+
 	/**
 	 * Returns the estimated cost for which the processing failed with this exception.
 	 */
