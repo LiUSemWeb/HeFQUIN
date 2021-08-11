@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.*;
@@ -50,7 +49,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws CardinalityEstimationException {
         final PhysicalOperator lop = pp.getRootOperator();
         if ( !(lop instanceof PhysicalOpRequest) ){
             throw new IllegalArgumentException();
@@ -86,7 +85,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             cardinality = cr.getCardinality();
         }
         catch ( final FederationAccessException e ) {
-            throw new QueryOptimizationException("Performing a cardinality request caused an exception.", e);
+            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, pp);
         }
 
         cardinalitiesCache.add( pp, cardinality );
@@ -94,7 +93,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin) ){
             throw new IllegalArgumentException();
@@ -115,7 +114,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         if ( !(lop instanceof LogicalOpTPAdd) ){
@@ -137,7 +136,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         if ( !(lop instanceof LogicalOpBGPAdd) ){
@@ -158,7 +157,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         return cardinality;
     }
 
-    protected int joinCardinality( final PhysicalPlan pp1, final PhysicalPlan pp2 ) throws QueryOptimizationException {
+    protected int joinCardinality( final PhysicalPlan pp1, final PhysicalPlan pp2 ) throws CardinalityEstimationException {
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( pp1.getExpectedVariables(), pp2.getExpectedVariables() );
         final Set<Var> possibleJoinVars = ExpectedVariablesUtils.unionOfAllVariables( pp1.getExpectedVariables(), pp2.getExpectedVariables() );
         possibleJoinVars.removeAll(certainJoinVars);
@@ -194,7 +193,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         return cardinality;
     }
 
-    protected int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws QueryOptimizationException {
+    protected int getCardinalityEstimationOfSpecificVar( final PhysicalPlan pp, final Var v ) throws CardinalityEstimationException {
         final Integer varCachedCard = varSpecificCardinalitiesCache.get(pp, v);
         if ( varCachedCard != null ) {
             return varCachedCard;
@@ -236,7 +235,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         return cardinality;
     }
 
-    protected int joinCardinalityBasedOnVar( PhysicalPlan pp1, PhysicalPlan pp2, Var v ) throws QueryOptimizationException {
+    protected int joinCardinalityBasedOnVar( PhysicalPlan pp1, PhysicalPlan pp2, Var v ) throws CardinalityEstimationException {
         final int cardinality;
         final int c1 = getCardinalityEstimationOfSpecificVar( pp1, v );
         final int c2 = getCardinalityEstimationOfSpecificVar( pp2, v );
