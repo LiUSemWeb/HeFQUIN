@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
+/**
+ * An exception that occurred during query optimization.
+ */
 public class QueryOptimizationException extends QueryPlanningException
 {
 	private static final long serialVersionUID = -2107515540797606242L;

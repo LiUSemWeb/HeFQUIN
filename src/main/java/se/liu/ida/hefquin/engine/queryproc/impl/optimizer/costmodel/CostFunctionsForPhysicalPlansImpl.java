@@ -1,7 +1,7 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
@@ -12,7 +12,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public CostOfPhysicalPlan determineCostOfPhysicalPlan( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public CostOfPhysicalPlan determineCostOfPhysicalPlan( final PhysicalPlan pp ) throws CostEstimationException {
 
         final int numberOfRequests = determineTotalNumberOfRequests(pp);
         final int shippedRDFTermsForRequests = determineTotalShippedRDFTermsForRequests(pp);
@@ -25,7 +25,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalNumberOfRequests = costFunctionForRoot.determineNumberOfRequests( pp );
         if ( pp.numberOfSubPlans() == 0 ){
             return totalNumberOfRequests;
@@ -38,7 +38,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedRDFTermsForRequests = costFunctionForRoot.determineShippedRDFTermsForRequests( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -52,7 +52,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedVarsForRequests = costFunctionForRoot.determineShippedVarsForRequests( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -66,7 +66,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedRDFTermsForResponses = costFunctionForRoot.determineShippedRDFTermsForResponses( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -80,7 +80,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedVarsForResponses = costFunctionForRoot.determineShippedVarsForResponses( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -94,7 +94,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws CostEstimationException {
         int totalIntermediateResultsSize = costFunctionForRoot.determineIntermediateResultsSize( pp );
         if ( pp.numberOfSubPlans() == 0 ){
             return totalIntermediateResultsSize;

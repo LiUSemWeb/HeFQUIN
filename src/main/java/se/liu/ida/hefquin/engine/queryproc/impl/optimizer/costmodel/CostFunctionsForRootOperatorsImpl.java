@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -19,8 +19,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationHelper;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -34,7 +36,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineNumberOfRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException {
         final PhysicalOperator pop = pp.getRootOperator();
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
             return determineIntermediateResultsSize(pp.getSubPlan(0));
@@ -52,7 +54,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineShippedRDFTermsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
         int numberOfTerms = 0;
@@ -64,14 +66,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd){
             numberOfTerms = numberOfTermsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -101,7 +103,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineShippedVarsForRequests( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -114,14 +116,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd ){
             numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = cardEstimate.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -154,7 +156,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineShippedRDFTermsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -198,7 +200,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineShippedVarsForResponses( final PhysicalPlan pp ) throws QueryOptimizationException {
+    public int determineShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
@@ -241,20 +243,25 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineIntermediateResultsSize(final PhysicalPlan pp) throws QueryOptimizationException {
+    public int determineIntermediateResultsSize(final PhysicalPlan pp) throws CostEstimationException {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
-        if ( lop instanceof LogicalOpRequest ){
-            return cardEstimate.getCardinalityEstimationOfLeafNode( pp );
-        } else if ( lop instanceof LogicalOpJoin ){
-            return cardEstimate.getJoinCardinalityEstimation( pp );
-        } else if ( lop instanceof LogicalOpTPAdd ){
-            return cardEstimate.getTPAddCardinalityEstimation( pp );
-        } else if ( lop instanceof LogicalOpBGPAdd ){
-            return cardEstimate.getBGPAddCardinalityEstimation( pp);
-        } else
-            throw new IllegalArgumentException("Unsupported Logical Operator");
+        try {
+            if ( lop instanceof LogicalOpRequest ){
+                return cardEstimate.getCardinalityEstimationOfLeafNode( pp );
+            } else if ( lop instanceof LogicalOpJoin ){
+                return cardEstimate.getJoinCardinalityEstimation( pp );
+            } else if ( lop instanceof LogicalOpTPAdd ){
+                return cardEstimate.getTPAddCardinalityEstimation( pp );
+            } else if ( lop instanceof LogicalOpBGPAdd ){
+                return cardEstimate.getBGPAddCardinalityEstimation( pp);
+            } else
+                throw new IllegalArgumentException("Unsupported Logical Operator");
+        }
+        catch ( final CardinalityEstimationException e ) {
+            throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, pp);
+        }
     }
 
     // helper functions

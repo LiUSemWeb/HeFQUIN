@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ public class DynamicProgramming {
         assert lpList.size() > 0;
         this.ctxt = ctxt;
         this.lpList = lpList;
-        this.cardEstimate = new CardinalityEstimation(ctxt);
+        this.cardEstimate = new CardinalityEstimationImpl(ctxt);
     }
 
     public PhysicalPlan optimizePhysicalPlanForMultiwayJoin() throws QueryOptimizationException {
