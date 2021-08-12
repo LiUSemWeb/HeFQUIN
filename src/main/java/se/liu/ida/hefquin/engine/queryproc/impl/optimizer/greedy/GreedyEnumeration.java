@@ -9,23 +9,20 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
 public class GreedyEnumeration {
-    protected final QueryProcContext ctxt;
     protected final List<PhysicalPlan> lpList;
-    protected final CardinalityEstimation cardEstimate;
+    protected final CostModel costModel;
 
-    public GreedyEnumeration( final QueryProcContext ctxt, final PhysicalPlan[] subplans ) {
+    public GreedyEnumeration( final QueryOptimizationContext ctxt, final PhysicalPlan[] subplans ) {
         assert ctxt != null;
         assert subplans.length > 0;
 
-        this.ctxt = ctxt;
         this.lpList = Arrays.asList(subplans);
-        this.cardEstimate = new CardinalityEstimationImpl(ctxt);
+        this.costModel = ctxt.getCostModel();
     }
 
     public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
@@ -39,19 +36,18 @@ public class GreedyEnumeration {
     }
 
     protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException {
-        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, lpList);
+        final double[] costs = CostEstimationUtils.getEstimates(costModel, lpList);
 
-        PhysicalPlan bestPlan = lpList.get(0);
-        int costOfBestPlan = costs[0];
+        int indexOfBestPlan = 0;
 
         for ( int i = 1; i < lpList.size(); ++i ){
-            if ( costOfBestPlan > costs[i] ){
-            	bestPlan = lpList.get(i);
-                costOfBestPlan = costs[i];
+            if ( costs[indexOfBestPlan] > costs[i] ){
+            	indexOfBestPlan = i;
             }
         }
 
-        lpList.remove(bestPlan);
+        final PhysicalPlan bestPlan = lpList.get(indexOfBestPlan);
+        lpList.remove(indexOfBestPlan);
         return bestPlan;
     }
 
@@ -59,7 +55,7 @@ public class GreedyEnumeration {
             throws QueryOptimizationException
     {
         final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
-        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, nextPossiblePlans);
+        final double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans);
 
         int indexOfBestPlan = 0;
 
