@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
 
 import java.util.List;
 
@@ -13,12 +13,12 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstim
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
-public class DynamicProgramming {
+public class GreedyEnumeration {
     protected final QueryProcContext ctxt;
     protected final List<PhysicalPlan> lpList;
     protected final CardinalityEstimation cardEstimate;
 
-    public DynamicProgramming( final QueryProcContext ctxt, final List<PhysicalPlan> lpList ) {
+    public GreedyEnumeration( final QueryProcContext ctxt, final List<PhysicalPlan> lpList ) {
         assert ctxt != null;
         assert lpList.size() > 0;
         this.ctxt = ctxt;

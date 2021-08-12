@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
@@ -11,10 +11,10 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationConte
 import java.util.ArrayList;
 import java.util.List;
 
-public class WrappingDPAlgorithm {
+public class GreedyQueryOptimizer {
     protected final QueryOptimizationContext ctxt;
 
-    public WrappingDPAlgorithm( final QueryOptimizationContext ctxt ) {
+    public GreedyQueryOptimizer( final QueryOptimizationContext ctxt ) {
         assert ctxt != null;
         this.ctxt = ctxt;
     }
@@ -52,7 +52,7 @@ public class WrappingDPAlgorithm {
         if ( children.size() == 1 ){
             return children.get(0);
         } else if ( children.size() > 1 ){
-            final DynamicProgramming dp = new DynamicProgramming( ctxt, children );
+            final GreedyEnumeration dp = new GreedyEnumeration( ctxt, children );
             return dp.optimizePhysicalPlanForMultiwayJoin();
         } else
             throw new IllegalArgumentException( "unexpected number of sub-plans: " + children.size() );
