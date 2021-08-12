@@ -51,12 +51,12 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getCardinalityEstimation( final PhysicalPlan plan )
+    public CompletableFuture<Integer> initiateCardinalityEstimation( final PhysicalPlan plan )
     		throws CardinalityEstimationException
     {
         final Integer cachedCard = cardinalitiesCache.get(plan);
         if ( cachedCard != null ) {
-            return cachedCard;
+            return CompletableFuture.completedFuture(cachedCard);
         }
 
         final int result;
@@ -78,7 +78,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         }
 
         cardinalitiesCache.add(plan, result);
-        return result;
+        return CompletableFuture.completedFuture(result);
     }
 
     protected int getCardinalityEstimationOfLeafNode( final PhysicalPlan plan ) throws CardinalityEstimationException {

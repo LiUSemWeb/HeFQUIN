@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationExceptio
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationHelper;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -247,7 +248,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     		throws CostEstimationException
     {
         try {
-        	return cardEstimate.getCardinalityEstimation(plan);
+        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0];
         }
         catch ( final CardinalityEstimationException e ) {
             throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, plan);

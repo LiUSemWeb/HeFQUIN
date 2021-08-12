@@ -1,14 +1,17 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryproc.*;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
-
-import java.util.*;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 public class DynamicProgramming {
     protected final QueryProcContext ctxt;
@@ -34,40 +37,51 @@ public class DynamicProgramming {
     }
 
     protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException {
-        PhysicalPlan firstPlan = lpList.get(0);
-        int initialCost = cardEstimate.getCardinalityEstimation(firstPlan);
+        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, lpList);
+
+        PhysicalPlan bestPlan = lpList.get(0);
+        int costOfBestPlan = costs[0];
 
         for ( int i = 1; i < lpList.size(); ++i ){
-            final PhysicalPlan nextPlan = lpList.get(i);
-            final int cost = cardEstimate.getCardinalityEstimation(nextPlan);
-            if ( cost < initialCost ){
-                firstPlan = nextPlan;
-                initialCost = cost;
+            if ( costOfBestPlan > costs[i] ){
+            	bestPlan = lpList.get(i);
+                costOfBestPlan = costs[i];
             }
         }
 
-        lpList.remove( firstPlan );
-        return firstPlan;
+        lpList.remove(bestPlan);
+        return bestPlan;
     }
 
-    protected PhysicalPlan cardinalityTwoSubQueries( final PhysicalPlan currentPlan ) throws QueryOptimizationException {
-        PhysicalPlan newPlan = new PhysicalPlanWithBinaryRootImpl(convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(0) );
-        int initialCost = cardEstimate.getCardinalityEstimation(newPlan);
+    protected PhysicalPlan cardinalityTwoSubQueries( final PhysicalPlan currentPlan )
+            throws QueryOptimizationException
+    {
+        final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
+        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, nextPossiblePlans);
+
+        int indexOfBestPlan = 0;
 
         for ( int i = 1; i < lpList.size(); ++i ){
-            final PhysicalPlan lpCandidate = new PhysicalPlanWithBinaryRootImpl( convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(i) );
-
-            final int cost = cardEstimate.getCardinalityEstimation(lpCandidate);
-            if ( cost < initialCost ){
-                newPlan = lpCandidate;
-                initialCost = cost;
+            if ( costs[indexOfBestPlan] > costs[i] ){
+                indexOfBestPlan = i;
             }
         }
-        return newPlan;
+
+        lpList.remove(indexOfBestPlan);
+        return nextPossiblePlans[indexOfBestPlan];
     }
 
-    protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
-        return new PhysicalOpSymmetricHashJoin(lop);
+    protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
+        final PhysicalPlan[] plans = new PhysicalPlan[ lpList.size() ];
+        for ( int i = 0; i < lpList.size(); ++i ) {
+            final BinaryPhysicalOp joinOp = createNewJoinOperator();
+            plans[i] = new PhysicalPlanWithBinaryRootImpl( joinOp, currentPlan, lpList.get(i) );
+        }
+        return plans;
+    }
+
+    protected BinaryPhysicalOp createNewJoinOperator() {
+        return new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
     }
 
 }
