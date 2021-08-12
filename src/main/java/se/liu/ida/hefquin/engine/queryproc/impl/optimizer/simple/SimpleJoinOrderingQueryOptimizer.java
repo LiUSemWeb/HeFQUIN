@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
@@ -9,12 +9,26 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 
-public class GreedyQueryOptimizer implements QueryOptimizer
+/**
+ * This class implements a simple query optimizer that focuses only
+ * on join ordering, for which it uses an enumeration algorithm to
+ * optimize any subplan that consists of a group of joins.
+ *
+ * The concrete enumeration algorithm to be used for this purpose is
+ * not hard-coded but, instead, can be specified by means of providing
+ * an implementation of {@link JoinPlanOptimizer}.
+ */
+public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
 {
+	protected final JoinPlanOptimizer joinPlanOptimizer;
     protected final QueryOptimizationContext ctxt;
 
-    public GreedyQueryOptimizer( final QueryOptimizationContext ctxt ) {
+    public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer,
+                                             final QueryOptimizationContext ctxt ) {
+        assert joinPlanOptimizer != null;
         assert ctxt != null;
+
+        this.joinPlanOptimizer = joinPlanOptimizer;
         this.ctxt = ctxt;
     }
 
@@ -29,7 +43,7 @@ public class GreedyQueryOptimizer implements QueryOptimizer
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
         if ( hasMultiwayJoinAsRoot(plan) ){
             final PhysicalPlan[] subplans = getOptimizedSubPlans(plan);
-            return determinePlanToJoinSubPlans( subplans );
+            return joinPlanOptimizer.determineJoinPlan(subplans);
         }
         else {
         	// TODO incorrect!! There may be multiway joins inside the subplans of the given plan.
@@ -44,17 +58,6 @@ public class GreedyQueryOptimizer implements QueryOptimizer
             children[i] = optimizePlan( plan.getSubPlan(i) );
         }
         return children;
-    }
-
-    public PhysicalPlan determinePlanToJoinSubPlans( final PhysicalPlan[] subplans ) throws QueryOptimizationException {
-        if ( subplans.length == 1 ){
-            return subplans[0];
-        } else if ( subplans.length > 1 ){
-            final GreedyEnumeration dp = new GreedyEnumeration( ctxt, subplans );
-            return dp.getResultingPlan();
-        } else {
-            throw new IllegalArgumentException( "unexpected number of sub-plans: " + subplans.length );
-        }
     }
 
     protected boolean hasMultiwayJoinAsRoot( final PhysicalPlan plan ) {
