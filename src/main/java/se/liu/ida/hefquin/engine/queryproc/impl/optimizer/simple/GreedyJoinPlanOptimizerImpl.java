@@ -3,15 +3,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
-public class GreedyJoinPlanOptimizerImpl implements JoinPlanOptimizer
+public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 {
 	protected final CostModel costModel;
 
@@ -21,19 +19,12 @@ public class GreedyJoinPlanOptimizerImpl implements JoinPlanOptimizer
 	}
 
 	@Override
-	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans )
-			throws QueryOptimizationException
-	{
-		// no need to use the enumeration algorithm if there is only one subplan
-		if ( subplans.size() == 1 ) {
-			return subplans.get(0);
-		}
-
-		return new GreedyEnumerationAlgorithm(subplans).getResultingPlan();
+	public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
+		return new GreedyEnumerationAlgorithm(subplans);
 	}
 
 
-	protected class GreedyEnumerationAlgorithm
+	protected class GreedyEnumerationAlgorithm implements EnumerationAlgorithm
 	{
 		protected final List<PhysicalPlan> subplans;
 
@@ -41,6 +32,7 @@ public class GreedyJoinPlanOptimizerImpl implements JoinPlanOptimizer
 			this.subplans = subplans;
 		}
 
+		@Override
 		public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
 			PhysicalPlan currentPlan = chooseFirstSubplan();
 
@@ -88,14 +80,10 @@ public class GreedyJoinPlanOptimizerImpl implements JoinPlanOptimizer
 		protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
 			final PhysicalPlan[] plans = new PhysicalPlan[ subplans.size() ];
 			for ( int i = 0; i < subplans.size(); ++i ) {
-				final BinaryPhysicalOp joinOp = createNewJoinOperator();
+				final BinaryPhysicalOp joinOp = EnumerationAlgorithm.createNewJoinOperator();
 				plans[i] = new PhysicalPlanWithBinaryRootImpl( joinOp, currentPlan, subplans.get(i) );
 			}
 			return plans;
-		}
-
-		protected BinaryPhysicalOp createNewJoinOperator() {
-			return new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
 		}
 	}
 
