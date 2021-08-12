@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
+import java.util.concurrent.CompletableFuture;
+
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -9,7 +11,15 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 
 public interface FederationAccessManager
 {
-	void issueRequest( SPARQLRequest req, SPARQLEndpoint fm, ResponseProcessor<SolMapsResponse> respProc ) throws FederationAccessException;
+	CompletableFuture<SolMapsResponse> issueRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
+
+	CompletableFuture<TPFResponse> issueRequest( TPFRequest req, TPFServer fm ) throws FederationAccessException;
+
+	CompletableFuture<TPFResponse> issueRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+
+	CompletableFuture<TPFResponse> issueRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+
+	CompletableFuture<StringResponse> issueRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
 
 	/**
 	 * Requests the cardinality of the result of the given request.
@@ -18,13 +28,11 @@ public interface FederationAccessManager
 	 * rather than a full {@link SPARQLQuery}. If it does not, then this
 	 * method throws an {@link IllegalArgumentException}.
 	 */
-	void issueCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm, ResponseProcessor<CardinalityResponse> respProc ) throws FederationAccessException;
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
 
-	void issueRequest( TPFRequest req, TPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( TPFRequest req, TPFServer fm ) throws FederationAccessException;
 
-	void issueRequest( TPFRequest req, BRTPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
-	void issueRequest( BRTPFRequest req, BRTPFServer fm, ResponseProcessor<TPFResponse> respProc ) throws FederationAccessException;
-
-	void issueRequest( Neo4jRequest req, Neo4jServer fm, ResponseProcessor<StringResponse> respProc ) throws FederationAccessException;
+	CompletableFuture<CardinalityResponse> issueCardinalityRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 }

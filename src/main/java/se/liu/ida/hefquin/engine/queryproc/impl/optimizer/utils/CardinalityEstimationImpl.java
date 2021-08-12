@@ -16,6 +16,8 @@ import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class CardinalityEstimationImpl implements CardinalityEstimation
 {
@@ -54,40 +56,49 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         if ( !(lop instanceof PhysicalOpRequest) ){
             throw new IllegalArgumentException();
         }
-        
+
         final Integer cachedCard = cardinalitiesCache.get(pp);
         if ( cachedCard != null ){
-                return cachedCard;
+            return cachedCard;
         }
 
         final DataRetrievalRequest req = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getRequest();
         final FederationMember fm = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getFederationMember();
 
-        final MyCardinalityRequester<? extends DataRetrievalRequest, ? extends FederationMember, ? extends DataRetrievalResponse> cr;
-        if ( req instanceof SPARQLRequest && fm instanceof SPARQLEndpoint ) {
-			cr = new MyCardinalityRequesterSPARQL( (SPARQLRequest) req, (SPARQLEndpoint) fm );
-		}
-		else if ( req instanceof TPFRequest && fm instanceof TPFServer ) {
-			cr = new MyCardinalityRequesterTPF( (TPFRequest) req, (TPFServer) fm );
-		}
-		else if ( req instanceof TPFRequest && fm instanceof BRTPFServer ) {
-			cr = new MyCardinalityRequesterBRTPF1( (TPFRequest) req, (BRTPFServer) fm );
-		}
-		else if ( req instanceof BRTPFRequest && fm instanceof BRTPFServer ) {
-			cr = new MyCardinalityRequesterBRTPF2( (BRTPFRequest) req, (BRTPFServer) fm );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
-		}
-
-        final int cardinality;
+        final CompletableFuture<CardinalityResponse> futureCR;
         try {
-            cardinality = cr.getCardinality();
+            if ( req instanceof SPARQLRequest && fm instanceof SPARQLEndpoint ) {
+                futureCR = ctxt.getFederationAccessMgr().issueCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+            }
+            else if ( req instanceof TPFRequest && fm instanceof TPFServer ) {
+                futureCR = ctxt.getFederationAccessMgr().issueCardinalityRequest( (TPFRequest) req, (TPFServer) fm );
+            }
+            else if ( req instanceof TPFRequest && fm instanceof BRTPFServer ) {
+                futureCR = ctxt.getFederationAccessMgr().issueCardinalityRequest( (TPFRequest) req, (BRTPFServer) fm );
+            }
+            else if ( req instanceof BRTPFRequest && fm instanceof BRTPFServer ) {
+                futureCR = ctxt.getFederationAccessMgr().issueCardinalityRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+            }
+            else {
+                throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
+            }
         }
         catch ( final FederationAccessException e ) {
+            throw new CardinalityEstimationException("Issuing a cardinality request caused an exception.", e, pp);
+        }
+
+        final CardinalityResponse cr;
+        try {
+            cr = futureCR.get();
+        }
+        catch ( final InterruptedException e ) {
+            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, pp);
+        }
+        catch ( final ExecutionException e ) {
             throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, pp);
         }
 
+        final int cardinality = cr.getCardinality();
         cardinalitiesCache.add( pp, cardinality );
         return cardinality;
     }
@@ -250,131 +261,5 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         return cardinality;
     }
 
-
-
-	protected abstract class MyCardinalityRequester<ReqType extends DataRetrievalRequest,
-	                                                MemberType extends FederationMember,
-	                                                RespType extends DataRetrievalResponse>
-			implements ResponseProcessor<RespType>
-	{
-		protected final ReqType req;
-		protected final MemberType fm;
-
-		protected Boolean isDone = false;
-		protected int cardinality = -1;
-
-		public MyCardinalityRequester( final ReqType req, final MemberType fm ) {
-			this.req = req;
-			this.fm  = fm;
-		}
-
-		public int getCardinality() throws FederationAccessException {
-			issueRequest();
-
-			synchronized (this) {
-				try {
-					while ( ! isDone ) {
-						this.wait();
-					}
-				}
-				catch ( final InterruptedException e ) {
-					throw new FederationAccessException("unexpected interruption of the receiving thread", e, req, fm);
-				}
-
-				return cardinality;
-			}
-		}
-
-		protected abstract void issueRequest() throws FederationAccessException;
-
-		protected abstract int extractCardinality( final RespType response );
-
-		@Override
-		public void process( final RespType response ) {
-			cardinality = extractCardinality(response);
-
-			synchronized (this) {
-				isDone = true;
-				this.notifyAll();
-			}
-		}
-
-	} // end of class MyCardinalityRequester
-
-	protected abstract class MyCardinalityRequesterBase1<ReqType extends DataRetrievalRequest,
-	                                                     MemberType extends FederationMember>
-			extends MyCardinalityRequester<ReqType,MemberType,CardinalityResponse>
-	{
-		public MyCardinalityRequesterBase1( final ReqType req, final MemberType fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected int extractCardinality( final CardinalityResponse response ) {
-			return response.getCardinality();
-		}
-	}
-
-	protected abstract class MyCardinalityRequesterBase2<ReqType extends DataRetrievalRequest,
-	                                                     MemberType extends FederationMember>
-			extends MyCardinalityRequester<ReqType,MemberType,TPFResponse>
-	{
-		public MyCardinalityRequesterBase2( final ReqType req, final MemberType fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected int extractCardinality( final TPFResponse response ) {
-			return response.getCardinalityEstimate();
-		}
-	}
-
-	protected class MyCardinalityRequesterSPARQL extends MyCardinalityRequesterBase1<SPARQLRequest,SPARQLEndpoint>
-	{
-		public MyCardinalityRequesterSPARQL( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected void issueRequest() throws FederationAccessException {
-			ctxt.getFederationAccessMgr().issueCardinalityRequest(req, fm, this);
-		}
-	}
-
-	protected class MyCardinalityRequesterTPF extends MyCardinalityRequesterBase2<TPFRequest,TPFServer>
-	{
-		public MyCardinalityRequesterTPF( final TPFRequest req, final TPFServer fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected void issueRequest() throws FederationAccessException {
-			ctxt.getFederationAccessMgr().issueRequest(req, fm, this);
-		}
-	}
-
-	protected class MyCardinalityRequesterBRTPF1 extends MyCardinalityRequesterBase2<TPFRequest,BRTPFServer>
-	{
-		public MyCardinalityRequesterBRTPF1( final TPFRequest req, final BRTPFServer fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected void issueRequest() throws FederationAccessException {
-			ctxt.getFederationAccessMgr().issueRequest(req, fm, this);
-		}
-	}
-
-	protected class MyCardinalityRequesterBRTPF2 extends MyCardinalityRequesterBase2<BRTPFRequest,BRTPFServer>
-	{
-		public MyCardinalityRequesterBRTPF2( final BRTPFRequest req, final BRTPFServer fm ) {
-			super(req, fm);
-		}
-
-		@Override
-		protected void issueRequest() throws FederationAccessException {
-			ctxt.getFederationAccessMgr().issueRequest(req, fm, this);
-		}
-	}
 
 }
