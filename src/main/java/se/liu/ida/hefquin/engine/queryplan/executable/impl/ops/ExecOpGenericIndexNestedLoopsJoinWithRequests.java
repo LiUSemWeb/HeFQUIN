@@ -1,7 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
@@ -10,8 +11,6 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.ResponseProcessingException;
-import se.liu.ida.hefquin.engine.federation.access.impl.SynchronizedResponseProcessorBase;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -58,28 +57,33 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
-		final List<MyResponseProcessor> respProcs = new ArrayList<>( input.size() );
+		final CompletableFuture<?>[] futures = new CompletableFuture[ input.size() ];
 
+		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+			// issue a request based on the current solution mapping
 			final ReqType req = createRequest(sm);
-			final MyResponseProcessor respProc = createResponseProcessor(sm, sink);
-			respProcs.add( respProc );
-
+			final CompletableFuture<RespType> futureResponse;
 			try {
-				issueRequest( req, respProc, execCxt.getFederationAccessMgr() );
+				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() ); 
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
 			}
+
+			// attach the processing of the response obtained for the request
+			final MyResponseProcessor respProc = createResponseProcessor(sm, sink);
+			futures[i] = futureResponse.thenAccept(respProc);
+			++i;
 		}
 
+		// wait for all the futures to be completed
 		try {
-			for ( final MyResponseProcessor respProc : respProcs ) {
-				respProc.waitUntilResponseIsProcessed();
-			}
-		}
-		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("unexpected interruption of the main executing thread of this operator while waiting for some of its response processors", e, this);
+			CompletableFuture.allOf(futures).get();
+		} catch (InterruptedException e) {
+			throw new ExecOpExecutionException("interruption of the futures that perform the requests and process the responses", e, this);
+		} catch (ExecutionException e) {
+			throw new ExecOpExecutionException("The execution of the futures that perform the requests and process the responses caused an exception.", e, this);
 		}
 	}
 
@@ -87,30 +91,31 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 
 	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink );
 
-	protected abstract void issueRequest( ReqType req, MyResponseProcessor respProc, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
+	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
 
 	// ---- helper classes -----
 
-	protected abstract class MyResponseProcessor extends SynchronizedResponseProcessorBase<RespType>
+	protected abstract class MyResponseProcessor implements Consumer<RespType>
 	{
 		protected final SolutionMapping sm;
 		protected final IntermediateResultElementSink sink;
 
-		public MyResponseProcessor( final SolutionMapping sm, final IntermediateResultElementSink sink ) {
+		public MyResponseProcessor( final SolutionMapping sm,
+		                            final IntermediateResultElementSink sink ) {
 			this.sm = sm;
 			this.sink = sink;
 		}
 
 		@Override
-		protected void _process( final RespType response ) throws ResponseProcessingException {
+		public void accept( final RespType response ) {
 			for ( final SolutionMapping fetchedSM : extractSolMaps(response) ) {
 				final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
 				sink.send(out);
 			}
 		}
 
-		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response ) throws ResponseProcessingException;
+		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response );
 	}
 
 }

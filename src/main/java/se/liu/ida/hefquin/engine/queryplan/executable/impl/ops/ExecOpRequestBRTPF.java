@@ -10,7 +10,9 @@ import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 
 public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {
@@ -25,11 +27,11 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 	}
 
 	@Override
-	protected void issuePageRequest( final BRTPFRequest req,
-	                                 final FederationAccessManager fedAccessMgr )
+	protected TPFResponse performPageRequest( final BRTPFRequest req,
+	                                          final FederationAccessManager fedAccessMgr )
 			throws FederationAccessException
 	{
-		fedAccessMgr.issueRequest(req, fm, this);
+		return FederationAccessUtils.performRequest(fedAccessMgr, req, fm);
 	}
 
 	@Override
