@@ -1,10 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,19 +13,19 @@ public class CostModelImpl implements CostModel
 {
 	protected static final List<Double> weights = Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 );
 
-    protected final QueryProcContext ctxt;
+    protected final CardinalityEstimation cardEstimation;
     protected final PhysicalPlanCostCache physicalPlanCostCache;
 
-    public CostModelImpl( final QueryProcContext ctxt ) {
-        assert ctxt != null;
-        this.ctxt = ctxt;
+    public CostModelImpl( final CardinalityEstimation cardEstimation ) {
+        assert cardEstimation != null;
+        this.cardEstimation = cardEstimation;
         this.physicalPlanCostCache = new PhysicalPlanCostCache();
     }
 
     public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan pp )
             throws CostEstimationException
     {
-        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimationImpl(ctxt) );
+        final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl(cardEstimation);
 
         CostOfPhysicalPlan costOfPhysicalPlan = physicalPlanCostCache.get(pp);
         if ( costOfPhysicalPlan == null ){

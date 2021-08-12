@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
@@ -30,10 +31,13 @@ import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
@@ -54,12 +58,20 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+
+		final QueryProcContext procCxt = new QueryProcContext() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
+
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
 
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+			@Override public CostModel getCostModel() { return costModel; }
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
