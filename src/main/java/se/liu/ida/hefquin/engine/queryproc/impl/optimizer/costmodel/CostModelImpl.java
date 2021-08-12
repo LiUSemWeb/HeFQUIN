@@ -2,16 +2,18 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimateProcessingException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimateProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CostModelImpl implements CostModel
 {
+	protected static final List<Double> weights = Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 );
+
     protected final QueryProcContext ctxt;
     protected final PhysicalPlanCostCache physicalPlanCostCache;
 
@@ -21,8 +23,7 @@ public class CostModelImpl implements CostModel
         this.physicalPlanCostCache = new PhysicalPlanCostCache();
     }
 
-    public void initiateCostEstimation( final PhysicalPlan pp,
-                                        final CostEstimateProcessor ceProc )
+    public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan pp )
             throws CostEstimationException
     {
         final CostFunctionsForPhysicalPlans costFunctionsForPP = new CostFunctionsForPhysicalPlansImpl( new CardinalityEstimationImpl(ctxt) );
@@ -33,18 +34,15 @@ public class CostModelImpl implements CostModel
             physicalPlanCostCache.add( pp,  costOfPhysicalPlan);
         }
 
-        ArrayList<Double> weight= new ArrayList<Double>(Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 ));
+        final double cost =
+                weights.get(0) * costOfPhysicalPlan.getNumberOfRequests()
+              + weights.get(1) * costOfPhysicalPlan.getShippedRDFTermsForRequests()
+              + weights.get(2) * costOfPhysicalPlan.getShippedVarsForRequests()
+              + weights.get(3) * costOfPhysicalPlan.getShippedRDFTermsForResponses()
+              + weights.get(4) * costOfPhysicalPlan.getShippedVarsForResponses()
+              + weights.get(5) * costOfPhysicalPlan.getIntermediateResultsSize();
 
-        final double cost =  costOfPhysicalPlan.getNumberOfRequests() * weight.get(0) + costOfPhysicalPlan.getShippedRDFTermsForRequests() * weight.get(1)
-                + costOfPhysicalPlan.getShippedVarsForRequests() * weight.get(2) + costOfPhysicalPlan.getShippedRDFTermsForResponses() * weight.get(3)
-                + costOfPhysicalPlan.getShippedVarsForResponses() * weight.get(4) + costOfPhysicalPlan.getIntermediateResultsSize() * weight.get(5);
-
-        try {
-            ceProc.process(cost, pp);
-        }
-        catch ( final CostEstimateProcessingException e ) {
-            throw new CostEstimationException("Processing the determined cost estimate cause an exception.", e, pp);
-        }
+        return CompletableFuture.completedFuture(cost);
     }
 
 }
