@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
 
+import java.util.Arrays;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -18,15 +19,16 @@ public class GreedyEnumeration {
     protected final List<PhysicalPlan> lpList;
     protected final CardinalityEstimation cardEstimate;
 
-    public GreedyEnumeration( final QueryProcContext ctxt, final List<PhysicalPlan> lpList ) {
+    public GreedyEnumeration( final QueryProcContext ctxt, final PhysicalPlan[] subplans ) {
         assert ctxt != null;
-        assert lpList.size() > 0;
+        assert subplans.length > 0;
+
         this.ctxt = ctxt;
-        this.lpList = lpList;
+        this.lpList = Arrays.asList(subplans);
         this.cardEstimate = new CardinalityEstimationImpl(ctxt);
     }
 
-    public PhysicalPlan optimizePhysicalPlanForMultiwayJoin() throws QueryOptimizationException {
+    public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
         PhysicalPlan currentPlan = chooseFirstSubquery();
 
         while ( lpList.size() > 0 ){
