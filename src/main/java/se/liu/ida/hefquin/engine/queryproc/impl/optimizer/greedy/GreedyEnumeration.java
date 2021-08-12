@@ -1,5 +1,6 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.dynamicProgramming;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
 
+import java.util.Arrays;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -8,25 +9,23 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
-public class DynamicProgramming {
-    protected final QueryProcContext ctxt;
+public class GreedyEnumeration {
     protected final List<PhysicalPlan> lpList;
-    protected final CardinalityEstimation cardEstimate;
+    protected final CostModel costModel;
 
-    public DynamicProgramming( final QueryProcContext ctxt, final List<PhysicalPlan> lpList ) {
+    public GreedyEnumeration( final QueryOptimizationContext ctxt, final PhysicalPlan[] subplans ) {
         assert ctxt != null;
-        assert lpList.size() > 0;
-        this.ctxt = ctxt;
-        this.lpList = lpList;
-        this.cardEstimate = new CardinalityEstimationImpl(ctxt);
+        assert subplans.length > 0;
+
+        this.lpList = Arrays.asList(subplans);
+        this.costModel = ctxt.getCostModel();
     }
 
-    public PhysicalPlan optimizePhysicalPlanForMultiwayJoin() throws QueryOptimizationException {
+    public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
         PhysicalPlan currentPlan = chooseFirstSubquery();
 
         while ( lpList.size() > 0 ){
@@ -37,19 +36,18 @@ public class DynamicProgramming {
     }
 
     protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException {
-        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, lpList);
+        final double[] costs = CostEstimationUtils.getEstimates(costModel, lpList);
 
-        PhysicalPlan bestPlan = lpList.get(0);
-        int costOfBestPlan = costs[0];
+        int indexOfBestPlan = 0;
 
         for ( int i = 1; i < lpList.size(); ++i ){
-            if ( costOfBestPlan > costs[i] ){
-            	bestPlan = lpList.get(i);
-                costOfBestPlan = costs[i];
+            if ( costs[indexOfBestPlan] > costs[i] ){
+            	indexOfBestPlan = i;
             }
         }
 
-        lpList.remove(bestPlan);
+        final PhysicalPlan bestPlan = lpList.get(indexOfBestPlan);
+        lpList.remove(indexOfBestPlan);
         return bestPlan;
     }
 
@@ -57,7 +55,7 @@ public class DynamicProgramming {
             throws QueryOptimizationException
     {
         final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
-        final int[] costs = CardinalityEstimationUtils.getEstimates(cardEstimate, nextPossiblePlans);
+        final double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans);
 
         int indexOfBestPlan = 0;
 
