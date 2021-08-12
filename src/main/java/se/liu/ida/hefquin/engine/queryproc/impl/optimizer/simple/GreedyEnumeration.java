@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
-import java.util.Arrays;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -10,19 +9,18 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHash
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
 public class GreedyEnumeration {
     protected final List<PhysicalPlan> lpList;
     protected final CostModel costModel;
 
-    public GreedyEnumeration( final QueryOptimizationContext ctxt, final PhysicalPlan[] subplans ) {
-        assert ctxt != null;
-        assert subplans.length > 0;
+    public GreedyEnumeration( final CostModel costModel, final List<PhysicalPlan> subplans ) {
+        assert costModel != null;
+        assert subplans.size() > 0;
 
-        this.lpList = Arrays.asList(subplans);
-        this.costModel = ctxt.getCostModel();
+        this.lpList = subplans;
+        this.costModel = costModel;
     }
 
     public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
