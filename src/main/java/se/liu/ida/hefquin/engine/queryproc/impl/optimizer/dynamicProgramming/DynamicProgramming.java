@@ -35,11 +35,11 @@ public class DynamicProgramming {
 
     protected PhysicalPlan chooseFirstSubquery() throws QueryOptimizationException {
         PhysicalPlan firstPlan = lpList.get(0);
-        int initialCost = cardEstimate.getCardinalityEstimationOfLeafNode(firstPlan );;
+        int initialCost = cardEstimate.getCardinalityEstimation(firstPlan);
 
         for ( int i = 1; i < lpList.size(); ++i ){
             final PhysicalPlan nextPlan = lpList.get(i);
-            final int cost = cardEstimate.getCardinalityEstimationOfLeafNode( nextPlan );
+            final int cost = cardEstimate.getCardinalityEstimation(nextPlan);
             if ( cost < initialCost ){
                 firstPlan = nextPlan;
                 initialCost = cost;
@@ -52,12 +52,12 @@ public class DynamicProgramming {
 
     protected PhysicalPlan cardinalityTwoSubQueries( final PhysicalPlan currentPlan ) throws QueryOptimizationException {
         PhysicalPlan newPlan = new PhysicalPlanWithBinaryRootImpl(convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(0) );
-        int initialCost = cardEstimate.getJoinCardinalityEstimation(newPlan );
+        int initialCost = cardEstimate.getCardinalityEstimation(newPlan);
 
         for ( int i = 1; i < lpList.size(); ++i ){
             final PhysicalPlan lpCandidate = new PhysicalPlanWithBinaryRootImpl( convertJoin( new LogicalOpJoin() ), currentPlan, lpList.get(i) );
 
-            final int cost = cardEstimate.getJoinCardinalityEstimation( lpCandidate );
+            final int cost = cardEstimate.getCardinalityEstimation(lpCandidate);
             if ( cost < initialCost ){
                 newPlan = lpCandidate;
                 initialCost = cost;

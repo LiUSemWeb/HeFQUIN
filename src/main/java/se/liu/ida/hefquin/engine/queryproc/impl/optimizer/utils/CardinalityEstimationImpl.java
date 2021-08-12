@@ -51,19 +51,40 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public int getCardinalityEstimationOfLeafNode( final PhysicalPlan pp ) throws CardinalityEstimationException {
-        final PhysicalOperator lop = pp.getRootOperator();
-        if ( !(lop instanceof PhysicalOpRequest) ){
-            throw new IllegalArgumentException();
-        }
-
-        final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ){
+    public int getCardinalityEstimation( final PhysicalPlan plan )
+    		throws CardinalityEstimationException
+    {
+        final Integer cachedCard = cardinalitiesCache.get(plan);
+        if ( cachedCard != null ) {
             return cachedCard;
         }
 
-        final DataRetrievalRequest req = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getRequest();
-        final FederationMember fm = ((PhysicalOpRequest<?, ?>) lop).getLogicalOperator().getFederationMember();
+        final int result;
+        final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
+        if ( rootOp instanceof LogicalOpRequest ){
+        	result = getCardinalityEstimationOfLeafNode(plan);
+        }
+        else if ( rootOp instanceof LogicalOpJoin ){
+        	result = getJoinCardinalityEstimation(plan);
+        }
+        else if ( rootOp instanceof LogicalOpTPAdd ){
+        	result = getTPAddCardinalityEstimation(plan);
+        }
+        else if ( rootOp instanceof LogicalOpBGPAdd ){
+        	result = getBGPAddCardinalityEstimation(plan);
+        }
+        else {
+            throw new IllegalArgumentException("The type of the root operator of the given plan is current not supported (" + rootOp.getClass().getName() + ").");
+        }
+
+        cardinalitiesCache.add(plan, result);
+        return result;
+    }
+
+    protected int getCardinalityEstimationOfLeafNode( final PhysicalPlan plan ) throws CardinalityEstimationException {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+        final DataRetrievalRequest req = ((PhysicalOpRequest<?, ?>) rootOp).getLogicalOperator().getRequest();
+        final FederationMember fm = ((PhysicalOpRequest<?, ?>) rootOp).getLogicalOperator().getFederationMember();
 
         final CompletableFuture<CardinalityResponse> futureCR;
         try {
@@ -84,7 +105,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             }
         }
         catch ( final FederationAccessException e ) {
-            throw new CardinalityEstimationException("Issuing a cardinality request caused an exception.", e, pp);
+            throw new CardinalityEstimationException("Issuing a cardinality request caused an exception.", e, plan);
         }
 
         final CardinalityResponse cr;
@@ -92,80 +113,37 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             cr = futureCR.get();
         }
         catch ( final InterruptedException e ) {
-            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, pp);
+            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, plan);
         }
         catch ( final ExecutionException e ) {
-            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, pp);
+            throw new CardinalityEstimationException("Performing a cardinality request caused an exception.", e, plan);
         }
 
-        final int cardinality = cr.getCardinality();
-        cardinalitiesCache.add( pp, cardinality );
-        return cardinality;
+        return cr.getCardinality();
     }
 
-    @Override
-    public int getJoinCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
-        final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        if ( !(lop.getLogicalOperator() instanceof LogicalOpJoin) ){
-            throw new IllegalArgumentException();
-        }
-
-        final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ){
-            return cachedCard;
-        }
-
-        final PhysicalPlan pp1 = pp.getSubPlan(0);
-        final PhysicalPlan pp2 = pp.getSubPlan(1);
-
-        final int cardinality = joinCardinality( pp1, pp2 );
-        cardinalitiesCache.add(pp, cardinality);
-
-        return cardinality;
+    protected int getJoinCardinalityEstimation( final PhysicalPlan plan )
+    		throws CardinalityEstimationException
+    {
+        return joinCardinality( plan.getSubPlan(0), plan.getSubPlan(1) );
     }
 
-    @Override
-    public int getTPAddCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
-        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        final LogicalOperator lop = pop.getLogicalOperator();
-        if ( !(lop instanceof LogicalOpTPAdd) ){
-            throw new IllegalArgumentException();
-        }
-
-        final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ){
-            return cachedCard;
-        }
-
-        final PhysicalPlan pp1 = pp.getSubPlan(0);
+    protected int getTPAddCardinalityEstimation( final PhysicalPlan plan )
+    		throws CardinalityEstimationException
+    {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
         final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
 
-        final int cardinality = joinCardinality( pp1, reqTP );
-        cardinalitiesCache.add( pp, cardinality );
-
-        return cardinality;
+        return joinCardinality( plan.getSubPlan(0), reqTP );
     }
 
-    @Override
-    public int getBGPAddCardinalityEstimation( final PhysicalPlan pp ) throws CardinalityEstimationException {
-        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        final LogicalOperator lop = pop.getLogicalOperator();
-        if ( !(lop instanceof LogicalOpBGPAdd) ){
-            throw new IllegalArgumentException();
-        }
-
-        final Integer cachedCard = cardinalitiesCache.get(pp);
-        if ( cachedCard != null ){
-            return cachedCard;
-        }
-
-        final PhysicalPlan pp1 = pp.getSubPlan(0);
+    protected int getBGPAddCardinalityEstimation( final PhysicalPlan plan )
+    		throws CardinalityEstimationException
+    {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
         final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) lop );
 
-        final int cardinality = joinCardinality( pp1, reqBGP );
-        cardinalitiesCache.add( pp, cardinality );
-
-        return cardinality;
+        return joinCardinality( plan.getSubPlan(0), reqBGP );
     }
 
     protected int joinCardinality( final PhysicalPlan pp1, final PhysicalPlan pp2 ) throws CardinalityEstimationException {

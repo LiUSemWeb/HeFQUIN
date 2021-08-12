@@ -243,24 +243,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineIntermediateResultsSize(final PhysicalPlan pp) throws CostEstimationException {
-        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
-        final LogicalOperator lop = pop.getLogicalOperator();
-
+    public int determineIntermediateResultsSize( final PhysicalPlan plan )
+    		throws CostEstimationException
+    {
         try {
-            if ( lop instanceof LogicalOpRequest ){
-                return cardEstimate.getCardinalityEstimationOfLeafNode( pp );
-            } else if ( lop instanceof LogicalOpJoin ){
-                return cardEstimate.getJoinCardinalityEstimation( pp );
-            } else if ( lop instanceof LogicalOpTPAdd ){
-                return cardEstimate.getTPAddCardinalityEstimation( pp );
-            } else if ( lop instanceof LogicalOpBGPAdd ){
-                return cardEstimate.getBGPAddCardinalityEstimation( pp);
-            } else
-                throw new IllegalArgumentException("Unsupported Logical Operator");
+        	return cardEstimate.getCardinalityEstimation(plan);
         }
         catch ( final CardinalityEstimationException e ) {
-            throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, pp);
+            throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, plan);
         }
     }
 
