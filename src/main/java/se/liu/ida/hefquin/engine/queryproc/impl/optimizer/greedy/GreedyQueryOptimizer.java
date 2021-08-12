@@ -27,12 +27,11 @@ public class GreedyQueryOptimizer implements QueryOptimizer
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
-        if ( hasMultiwayJoinAsRoot(plan) ){
+        if ( plan.numberOfSubPlans() > 0 ){
             final PhysicalPlan[] subplans = getOptimizedSubPlans(plan);
             return determinePlanToJoinSubPlans( subplans );
         }
         else {
-        	// TODO incorrect!! There may be multiway joins inside the subplans of the given plan.
             return plan;
         }
     }
@@ -55,11 +54,6 @@ public class GreedyQueryOptimizer implements QueryOptimizer
         } else {
             throw new IllegalArgumentException( "unexpected number of sub-plans: " + subplans.length );
         }
-    }
-
-    protected boolean hasMultiwayJoinAsRoot( final PhysicalPlan plan ) {
-        final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
-        return rootOp instanceof LogicalOpMultiwayJoin;
     }
 
 }
