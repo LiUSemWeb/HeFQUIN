@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
@@ -9,11 +9,11 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 
-public class GreedyQueryOptimizer implements QueryOptimizer
+public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
 {
     protected final QueryOptimizationContext ctxt;
 
-    public GreedyQueryOptimizer( final QueryOptimizationContext ctxt ) {
+    public SimpleJoinOrderingQueryOptimizer( final QueryOptimizationContext ctxt ) {
         assert ctxt != null;
         this.ctxt = ctxt;
     }

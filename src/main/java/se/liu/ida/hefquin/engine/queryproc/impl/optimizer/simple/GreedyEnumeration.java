@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.greedy;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import java.util.Arrays;
 import java.util.List;
