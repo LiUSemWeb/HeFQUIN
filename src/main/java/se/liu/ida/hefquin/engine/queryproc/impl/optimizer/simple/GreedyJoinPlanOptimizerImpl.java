@@ -44,7 +44,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		}
 
 		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
-			final double[] costs = CostEstimationUtils.getEstimates(costModel, subplans);
+			final Double[] costs = CostEstimationUtils.getEstimates(costModel, subplans);
 
 			int indexOfBestPlan = 0;
 
@@ -63,7 +63,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 				throws QueryOptimizationException
 		{
 			final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
-			final double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans);
+			final Double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans);
 
 			int indexOfBestPlan = 0;
 

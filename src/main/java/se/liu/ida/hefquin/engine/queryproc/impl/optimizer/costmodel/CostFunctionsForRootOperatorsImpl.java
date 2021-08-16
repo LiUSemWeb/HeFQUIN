@@ -248,7 +248,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     		throws CostEstimationException
     {
         try {
-        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0];
+        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0].intValue();
         }
         catch ( final CardinalityEstimationException e ) {
             throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, plan);
