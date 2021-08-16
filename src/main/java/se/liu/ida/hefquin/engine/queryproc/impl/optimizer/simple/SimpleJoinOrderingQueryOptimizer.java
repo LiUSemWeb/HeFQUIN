@@ -4,7 +4,13 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -41,13 +47,22 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
+        final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan);
+
         if ( hasMultiwayJoinAsRoot(plan) ){
-            final PhysicalPlan[] subplans = getOptimizedSubPlans(plan);
-            return joinPlanOptimizer.determineJoinPlan(subplans);
+            return joinPlanOptimizer.determineJoinPlan(optSubPlans);
+        }
+        else if ( plan.numberOfSubPlans() == 0){
+            return plan;
+        }
+        else if ( plan.numberOfSubPlans() == 1 ){
+            return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) plan.getRootOperator(), optSubPlans[0]);
+        }
+        else if ( plan.numberOfSubPlans() == 2 ){
+            return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) plan.getRootOperator(), optSubPlans[0], optSubPlans[1]);
         }
         else {
-        	// TODO incorrect!! There may be multiway joins inside the subplans of the given plan.
-            return plan;
+            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) plan.getRootOperator(), optSubPlans);
         }
     }
 
