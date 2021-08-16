@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
@@ -53,9 +52,6 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         if ( hasMultiwayJoinAsRoot(plan) ){
             return joinPlanOptimizer.determineJoinPlan(optSubPlans);
         }
-        else if ( hasMultiwayUnionAsRoot(plan) ){
-            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) plan.getRootOperator(), optSubPlans);
-        }
         else if ( plan.numberOfSubPlans() == 0){
             return plan;
         }
@@ -66,7 +62,7 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
             return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) plan.getRootOperator(), optSubPlans[0], optSubPlans[1]);
         }
         else {
-            throw new IllegalArgumentException( "unknown root operator: " + plan.getRootOperator().getClass().getName() );
+            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) plan.getRootOperator(), optSubPlans);
         }
     }
 
@@ -82,11 +78,6 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
     protected boolean hasMultiwayJoinAsRoot( final PhysicalPlan plan ) {
         final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
         return rootOp instanceof LogicalOpMultiwayJoin;
-    }
-
-    protected boolean hasMultiwayUnionAsRoot( final PhysicalPlan plan ) {
-        final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
-        return rootOp instanceof LogicalOpMultiwayUnion;
     }
 
 }
