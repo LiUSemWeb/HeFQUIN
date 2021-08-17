@@ -351,7 +351,7 @@ public abstract class EngineTestBase
 		@Override
 		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final SPARQLRequest req,
-				final SPARQLEndpoint fm )
+				final SPARQLEndpoint fm ) throws FederationAccessException
 		{
 			// TODO Auto-generated method stub
 			return null;
@@ -360,7 +360,7 @@ public abstract class EngineTestBase
 		@Override
 		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final TPFRequest req,
-				final TPFServer fm )
+				final TPFServer fm ) throws FederationAccessException
 		{
 			// TODO Auto-generated method stub
 			return null;
@@ -369,7 +369,7 @@ public abstract class EngineTestBase
 		@Override
 		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final TPFRequest req,
-				final BRTPFServer fm )
+				final BRTPFServer fm ) throws FederationAccessException
 		{
 			// TODO Auto-generated method stub
 			return null;
@@ -378,7 +378,7 @@ public abstract class EngineTestBase
 		@Override
 		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 				final BRTPFRequest req,
-				final BRTPFServer fm )
+				final BRTPFServer fm ) throws FederationAccessException
 		{
 			// TODO Auto-generated method stub
 			return null;
