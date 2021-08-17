@@ -94,6 +94,42 @@ public class QueryPatternUtils
 		return result;
 	}
 
+	/**
+	 * Returns the number of elements of the given triple pattern that are variables.
+	 */
+	public static int getNumberOfVarOccurrences( final TriplePattern tp ) {
+		final Triple jenaTP = tp.asJenaTriple();
+		int n = 0;
+		if ( jenaTP.getSubject().isVariable() )   { n += 1; }
+		if ( jenaTP.getPredicate().isVariable() ) { n += 1; }
+		if ( jenaTP.getObject().isVariable() )    { n += 1; }
+		return n;
+	}
+
+	/**
+	 * Returns the number of elements of the given triple pattern that are variables.
+	 */
+	public static int getNumberOfTermOccurrences( final TriplePattern tp ) {
+		final Triple jenaTP = tp.asJenaTriple();
+		int n = 0;
+		if ( ! jenaTP.getSubject().isVariable() )   { n += 1; }
+		if ( ! jenaTP.getPredicate().isVariable() ) { n += 1; }
+		if ( ! jenaTP.getObject().isVariable() )    { n += 1; }
+		return n;
+	}
+
+	public static int getNumberOfVarOccurrences( final BGP bgp ) {
+		int n = 0;
+		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+			n += getNumberOfVarOccurrences(tp);
+		}
+		return n;
+	}
+
+	public static int getNumberOfTermOccurrences( final BGP bgp ) {
+		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
+	}
+
 	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
 		if ( pattern instanceof TriplePattern ) {
 			return new ExpectedVariables() {
