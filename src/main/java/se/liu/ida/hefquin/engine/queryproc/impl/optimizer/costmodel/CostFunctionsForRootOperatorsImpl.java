@@ -19,10 +19,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationHelper;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 import java.util.Iterator;
@@ -67,14 +67,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd){
             numberOfTerms = numberOfTermsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -117,14 +117,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd ){
             numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -248,7 +248,7 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     		throws CostEstimationException
     {
         try {
-        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0];
+        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0].intValue();
         }
         catch ( final CardinalityEstimationException e ) {
             throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, plan);

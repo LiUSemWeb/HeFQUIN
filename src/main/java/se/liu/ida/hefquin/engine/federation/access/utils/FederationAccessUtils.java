@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -19,6 +20,7 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.StringResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 public class FederationAccessUtils
 {
@@ -26,7 +28,9 @@ public class FederationAccessUtils
 	                                                      final RequestMemberPair... pairs )
 			  throws FederationAccessException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[pairs.length];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<? extends DataRetrievalResponse>[] futures = new CompletableFuture[pairs.length];
+
 		for ( int i = 0; i < pairs.length; ++i ) {
 			final DataRetrievalRequest req = pairs[i].getRequest();
 			final FederationMember fm = pairs[i].getMember();
@@ -50,30 +54,58 @@ public class FederationAccessUtils
 			}
 		}
 
-		final DataRetrievalResponse[] result = new DataRetrievalResponse[pairs.length];
-		FederationAccessException ex = null;
-		for ( int i = 0; i < pairs.length; ++i ) {
-			if ( ex == null ) {
-				try {
-					result[i] = (DataRetrievalResponse) futures[i].get();
-				}
-				catch ( final InterruptedException e ) {
-					ex = new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", e, pairs[i].getRequest(), pairs[i].getMember() );
-				}
-				catch ( final ExecutionException e ) {
-					ex = new FederationAccessException("Getting the response to a data retrieval request caused an exception.", e, pairs[i].getRequest(), pairs[i].getMember() );
-				}
+		try {
+			return CompletableFutureUtils.getAll(futures, DataRetrievalResponse.class);
+		}
+		catch ( final CompletableFutureUtils.GetAllException ex ) {
+			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
+				throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
 			}
 			else {
-				futures[i].cancel(true);
+				throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+			}
+		}
+	}
+
+	public static CardinalityResponse[] performCardinalityRequests(
+			final FederationAccessManager fedAccessMgr,
+			final RequestMemberPair... pairs )
+					throws FederationAccessException
+	{
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[pairs.length];
+
+		for ( int i = 0; i < pairs.length; ++i ) {
+			final DataRetrievalRequest req = pairs[i].getRequest();
+			final FederationMember fm = pairs[i].getMember();
+			if ( req instanceof SPARQLRequest && fm instanceof SPARQLEndpoint ) {
+				futures[i] = fedAccessMgr.issueCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+			}
+			else if ( req instanceof TPFRequest && fm instanceof TPFServer ) {
+				futures[i] = fedAccessMgr.issueCardinalityRequest( (TPFRequest) req, (TPFServer) fm );
+			}
+			else if ( req instanceof TPFRequest && fm instanceof BRTPFServer ) {
+				futures[i] = fedAccessMgr.issueCardinalityRequest( (TPFRequest) req, (BRTPFServer) fm );
+			}
+			else if ( req instanceof BRTPFRequest && fm instanceof BRTPFServer ) {
+				futures[i] = fedAccessMgr.issueCardinalityRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+			}
+			else {
+				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
 			}
 		}
 
-		if ( ex != null ) {
-			throw ex;
+		try {
+			return CompletableFutureUtils.getAll(futures, CardinalityResponse.class);
 		}
-
-		return result;
+		catch ( final CompletableFutureUtils.GetAllException ex ) {
+			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
+				throw new FederationAccessException("Unexpected interruption when getting the response to a cardinality retrieval request.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+			}
+			else {
+				throw new FederationAccessException("Getting the response to a cardinality retrieval request caused an exception.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+			}
+		}
 	}
 
 	public static SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr,

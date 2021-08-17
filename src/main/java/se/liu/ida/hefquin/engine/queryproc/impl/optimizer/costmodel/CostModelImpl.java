@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
 
 import java.util.Arrays;
 import java.util.List;

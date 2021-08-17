@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -6,10 +6,8 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -20,21 +18,22 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullary
 
 public class CardinalityEstimationHelper
 {
-	public static PhysicalPlan formRequestBasedOnTPofTPAdd( final LogicalOpTPAdd lop ) {
+	public static PhysicalPlan formRequestPlan( final LogicalOpTPAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
+		final TriplePattern tp = lop.getTP();
 
 		final DataRetrievalRequest req;
-		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl( lop.getTP() );
-		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl( lop.getTP(), 0 );
-		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl( lop.getTP(), 0 );
+		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl(tp);
+		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp, 0);
+		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp, 0);
 		else {
-			throw new IllegalArgumentException("Unsupported federation member (type: " + fm.getClass().getName() + ").");
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 		}
 
 		return createRequestPlan(fm, req);
 	}
 
-	public static PhysicalPlan formRequestBasedOnBGPofBGPAdd( final LogicalOpBGPAdd lop ) {
+	public static PhysicalPlan formRequestPlan( final LogicalOpBGPAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
 
 		final DataRetrievalRequest req;
@@ -42,24 +41,14 @@ public class CardinalityEstimationHelper
 			req = new BGPRequestImpl( lop.getBGP() );
 		}
 		else {
-			throw new IllegalArgumentException("Unsupported federation member (type: " + fm.getClass().getName() + ").");
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 		}
 
 		return createRequestPlan(fm, req);
 	}
 
-	public static PhysicalPlan formRequestBasedOnPattern( final SPARQLGraphPattern p,
-	                                                      final FederationMember fm ) {
-		final DataRetrievalRequest req;
-		if      ( fm instanceof SPARQLEndpoint ) req = new SPARQLRequestImpl(p);
-		else if ( fm instanceof TPFServer )      req = new TriplePatternRequestImpl( (TriplePattern) p );
-		else if ( fm instanceof BRTPFServer )    req = new TriplePatternRequestImpl( (TriplePattern) p );
-		else {
-			throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-		}
 
-		return createRequestPlan(fm, req);
-	}
+	// ------- internal helper methods -------
 
 	protected static PhysicalPlan createRequestPlan( final FederationMember fm,
 	                                                 final DataRetrievalRequest req )

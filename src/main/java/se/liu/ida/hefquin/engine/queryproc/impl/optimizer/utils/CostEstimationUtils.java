@@ -3,11 +3,11 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 public class CostEstimationUtils
 {
@@ -17,7 +17,7 @@ public class CostEstimationUtils
 	 * The returned array contains as many values as plans are given to this
 	 * function, where the i-th value is for the i-th plan that is given.
 	 */
-	public static double[] getEstimates( final CostModel costModel,
+	public static Double[] getEstimates( final CostModel costModel,
 	                                     final PhysicalPlan... plans )
 			throws CostEstimationException
 	{
@@ -32,39 +32,28 @@ public class CostEstimationUtils
 	 * the given list, where the i-th value in the array is for the i-th
 	 * plan in the given list.
 	 */
-	public static double[] getEstimates( final CostModel costModel,
+	public static Double[] getEstimates( final CostModel costModel,
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[plans.size()];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<Double>[] futures = new CompletableFuture[plans.size()];
+
 		for ( int i = 0; i < plans.size(); ++i ) {
 			futures[i] = costModel.initiateCostEstimation( plans.get(i) );
 		}
 
-		final double[] costs = new double[plans.size()];
-		CostEstimationException ex = null;
-		for ( int i = 0; i < plans.size(); ++i ) {
-			if ( ex == null ) {
-				try {
-					costs[i] = (Double) futures[i].get();
-				}
-				catch ( final InterruptedException e ) {
-					ex = new CostEstimationException("Unexpected interruption when getting a cost estimate.", e, plans.get(i));
-				}
-				catch ( final ExecutionException e ) {
-					ex = new CostEstimationException("Getting a cost estimate caused an exception.", e, plans.get(i));
-				}
+		try {
+			return CompletableFutureUtils.getAll(futures, Double.class);
+		}
+		catch ( final CompletableFutureUtils.GetAllException ex ) {
+			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
+				throw new CostEstimationException("Unexpected interruption when getting a cost estimate.", ex.getCause(), plans.get(ex.i) );
 			}
 			else {
-				futures[i].cancel(true);
+				throw new CostEstimationException("Getting a cost estimate caused an exception.", ex.getCause(), plans.get(ex.i) );
 			}
 		}
-
-		if ( ex != null ) {
-			throw ex;
-		}
-
-		return costs;
 	}
 
 }
