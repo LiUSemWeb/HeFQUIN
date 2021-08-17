@@ -8,16 +8,4 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationExceptio
 public interface CostFunctionsForPhysicalPlans
 {
     CompletableFuture<CostOfPhysicalPlan> initiateCostEstimation( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalNumberOfRequests( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalShippedRDFTermsForRequests( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalShippedVarsForRequests( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalShippedRDFTermsForResponses( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalShippedVarsForResponses( PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineTotalIntermediateResultsSize( PhysicalPlan pp ) throws CostEstimationException;
 }

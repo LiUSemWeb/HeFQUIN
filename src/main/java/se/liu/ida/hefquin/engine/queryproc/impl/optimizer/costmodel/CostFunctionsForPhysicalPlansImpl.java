@@ -28,8 +28,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return CompletableFuture.completedFuture(result);
     }
 
-    @Override
-    public int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalNumberOfRequests = costFunctionForRoot.determineNumberOfRequests( pp );
         if ( pp.numberOfSubPlans() == 0 ){
             return totalNumberOfRequests;
@@ -41,8 +40,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalNumberOfRequests;
     }
 
-    @Override
-    public int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedRDFTermsForRequests = costFunctionForRoot.determineShippedRDFTermsForRequests( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -55,8 +53,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedRDFTermsForRequests;
     }
 
-    @Override
-    public int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedVarsForRequests = costFunctionForRoot.determineShippedVarsForRequests( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -69,8 +66,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedVarsForRequests;
     }
 
-    @Override
-    public int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedRDFTermsForResponses = costFunctionForRoot.determineShippedRDFTermsForResponses( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -83,8 +79,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedRDFTermsForResponses;
     }
 
-    @Override
-    public int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
         int totalShippedVarsForResponses = costFunctionForRoot.determineShippedVarsForResponses( pp );
 
         if ( pp.numberOfSubPlans() == 0 ){
@@ -97,8 +92,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         return totalShippedVarsForResponses;
     }
 
-    @Override
-    public int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws CostEstimationException {
+    protected int determineTotalIntermediateResultsSize( final PhysicalPlan pp ) throws CostEstimationException {
         int totalIntermediateResultsSize = costFunctionForRoot.determineIntermediateResultsSize( pp );
         if ( pp.numberOfSubPlans() == 0 ){
             return totalIntermediateResultsSize;
