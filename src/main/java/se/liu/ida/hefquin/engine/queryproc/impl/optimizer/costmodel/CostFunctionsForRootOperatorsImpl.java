@@ -20,13 +20,11 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOperators {
     protected final CardinalityEstimation cardEstimate;
@@ -37,42 +35,48 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
     }
 
     @Override
-    public int determineNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<Integer> determineNumberOfRequests( final PhysicalPlan pp ) {
         final PhysicalOperator pop = pp.getRootOperator();
+
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin ) {
-            return determineIntermediateResultsSize(pp.getSubPlan(0));
-        } else if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES ) {
+        	return determineIntermediateResultsSize(pp.getSubPlan(0));
+        }
+
+        final int result;
+        if ( pop instanceof PhysicalOpBindJoin || pop instanceof PhysicalOpBindJoinWithUNION || pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES ) {
             // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the bind-join requests.
-            return 1;
+        	result = 1;
         } else if ( pop instanceof PhysicalOpRequest ) {
             // TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the requests.
-            return 1;
+        	result = 1;
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            return 0;
+        	result = 0;
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
+        return CompletableFuture.completedFuture(result);
     }
 
     @Override
-    public int determineShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<Integer> determineShippedRDFTermsForRequests( final PhysicalPlan pp ) {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
-        int numberOfTerms = 0;
-        int intermediateResultSize = 0 ;
-        int numberOfJoinVars = 0;
+
+        final int numberOfTerms ;
+        final int numberOfJoinVars;
+        final CompletableFuture<Integer> futureIntResSize;
 
         if ( lop instanceof LogicalOpTPAdd){
             numberOfTerms = 3 - ((LogicalOpTPAdd) lop).getTP().numberOfVars();
             final PhysicalPlan subPP = pp.getSubPlan(0);
-            intermediateResultSize = determineIntermediateResultsSize(subPP);
+            futureIntResSize = determineIntermediateResultsSize(subPP);
 
             final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd){
             numberOfTerms = numberOfTermsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
-            intermediateResultSize = determineIntermediateResultsSize(subPP);
+            futureIntResSize = determineIntermediateResultsSize(subPP);
 
             final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
@@ -85,44 +89,51 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             } else{
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
             }
+            numberOfJoinVars = 0;    // irrelevant for request operators
+            futureIntResSize = null; // irrelevant for request operators
         } else if ( lop instanceof LogicalOpJoin){
             numberOfTerms = 0;
+            // TODO I added the following line to be able to use 'final' for
+            // this program variable. However, I wonder: shouldn't the number
+            // of join variables be determined here too?
+            numberOfJoinVars = 0;
+            futureIntResSize = null; // irrelevant for join operators
         } else{
             throw new IllegalArgumentException("Unsupported Logical Operator");
         }
 
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            return intermediateResultSize * (numberOfTerms + numberOfJoinVars);
+            return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms - numberOfJoinVars) );
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER || pop instanceof PhysicalOpBindJoinWithVALUES || pop instanceof PhysicalOpBindJoin ){
-            return numberOfTerms + intermediateResultSize * numberOfJoinVars;
+            return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
         } else if ( pop instanceof PhysicalOpRequest ) {
-            return numberOfTerms;
+            return CompletableFuture.completedFuture( numberOfTerms );
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            return numberOfTerms;
+            return CompletableFuture.completedFuture( numberOfTerms );
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
     }
 
     @Override
-    public int determineShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<Integer> determineShippedVarsForRequests( final PhysicalPlan pp ) {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
-        int numberOfVars = 0;
-        int intermediateResultSize = 0 ;
-        int numberOfJoinVars = 0;
+        final int numberOfVars;
+        final int numberOfJoinVars;
+        final CompletableFuture<Integer> futureIntResSize;
 
         if ( lop instanceof LogicalOpTPAdd ){
             numberOfVars = ((LogicalOpTPAdd) lop).getTP().numberOfVars();
             final PhysicalPlan subPP = pp.getSubPlan(0);
-            intermediateResultSize = determineIntermediateResultsSize(subPP);
+            futureIntResSize = determineIntermediateResultsSize(subPP);
 
             final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd ){
             numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
-            intermediateResultSize = determineIntermediateResultsSize(subPP);
+            futureIntResSize = determineIntermediateResultsSize(subPP);
 
             final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
@@ -135,124 +146,144 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             } else{
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
             }
+            numberOfJoinVars = 0;    // irrelevant for request operators
+            futureIntResSize = null; // irrelevant for request operators 
         } else if ( lop instanceof LogicalOpJoin){
             numberOfVars = 0;
+            // TODO I added the following line to be able to use 'final' for
+            // this program variable. However, I wonder: shouldn't the number
+            // of join variables be determined here too?
+            numberOfJoinVars = 0;
+            futureIntResSize = null; // irrelevant for join operators
         } else{
             throw new IllegalArgumentException("Unsupported Logical Operator");
         }
 
         if ( pop instanceof PhysicalOpIndexNestedLoopsJoin || pop instanceof PhysicalOpBindJoinWithUNION ){
-            return intermediateResultSize * (numberOfVars - numberOfJoinVars);
+            return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
         } else if ( pop instanceof PhysicalOpBindJoinWithFILTER  || pop instanceof PhysicalOpBindJoin ){
-            return numberOfVars + intermediateResultSize * numberOfJoinVars;
+            return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
         } else if ( pop instanceof PhysicalOpBindJoinWithVALUES ){
-            return numberOfVars + numberOfJoinVars;
+            return CompletableFuture.completedFuture( numberOfVars + numberOfJoinVars );
         } else if ( pop instanceof PhysicalOpRequest ) {
-            return numberOfVars;
+            return CompletableFuture.completedFuture( numberOfVars );
         } else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
-            return numberOfVars;
+            return CompletableFuture.completedFuture( numberOfVars );
         } else
             throw new IllegalArgumentException("Unsupported Physical Operator");
 
     }
 
     @Override
-    public int determineShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<Integer> determineShippedRDFTermsForResponses( final PhysicalPlan pp ) {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
         if ( lop instanceof LogicalOpTPAdd ){
             final FederationMember fm = ((LogicalOpTPAdd) lop).getFederationMember();
 
-            if ( fm instanceof SPARQLEndpoint){
+            if ( fm instanceof SPARQLEndpoint) {
                 final int numberOfVars = ((LogicalOpTPAdd) lop).getTP().numberOfVars();
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else if ( fm instanceof TPFServer || fm instanceof BRTPFServer){
-                return 3 * determineIntermediateResultsSize(pp);
-            } else
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            else if ( fm instanceof TPFServer || fm instanceof BRTPFServer) {
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> 3 * resSize );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        } else if ( lop instanceof LogicalOpBGPAdd ){
+            }
+        }
+        else if ( lop instanceof LogicalOpBGPAdd ) {
             final FederationMember fm = ((LogicalOpBGPAdd) lop).getFederationMember();
 
-            if ( fm instanceof SPARQLEndpoint ){
+            if ( fm instanceof SPARQLEndpoint ) {
                 final int numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        } else if ( lop instanceof LogicalOpRequest ){
+            }
+        }
+        else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
 
-            if ( req instanceof SPARQLRequest ){
+            if ( req instanceof SPARQLRequest ) {
                 final int numberOfVars = numberOfVarsOfBGP((BGP) ((SPARQLRequest) req).getQueryPattern());
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else if ( req instanceof TriplePatternRequest ){
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            else if ( req instanceof TriplePatternRequest ) {
                 final int numberOfVars = ((TriplePatternRequest) req).getQueryPattern().numberOfVars();
-                return 3 * numberOfVars;
-            } else
+                return CompletableFuture.completedFuture( 3 * numberOfVars );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
-
-        } else if ( lop instanceof LogicalOpJoin){
-            return 0;
-        } else
-            throw new IllegalArgumentException("Unsupported Physical Operator");
-
+            }
+        }
+        else if ( lop instanceof LogicalOpJoin ) {
+            return CompletableFuture.completedFuture( 0 );
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ").");
+        }
     }
 
     @Override
-    public int determineShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<Integer> determineShippedVarsForResponses( final PhysicalPlan pp ) {
         final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
         final LogicalOperator lop = pop.getLogicalOperator();
 
-        if ( lop instanceof LogicalOpTPAdd ){
+        if ( lop instanceof LogicalOpTPAdd ) {
             final FederationMember fm = ((LogicalOpTPAdd) lop).getFederationMember();
 
-            if ( fm instanceof SPARQLEndpoint ){
+            if ( fm instanceof SPARQLEndpoint ) {
                 final int numberOfVars = ((LogicalOpTPAdd) lop).getTP().numberOfVars();
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ){
-                return 0;
-            } else
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+                return CompletableFuture.completedFuture( 0 );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        } else if ( lop instanceof LogicalOpBGPAdd ){
+            }
+        }
+        else if ( lop instanceof LogicalOpBGPAdd ) {
             final FederationMember fm = ((LogicalOpBGPAdd) lop).getFederationMember();
 
-            if ( fm instanceof SPARQLEndpoint ){
+            if ( fm instanceof SPARQLEndpoint ) {
                 final int numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported federation member type: " + fm.getClass().getName() );
-
-        } else if ( lop instanceof LogicalOpRequest ){
+            }
+        }
+        else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
 
-            if ( req instanceof SPARQLRequest ){
+            if ( req instanceof SPARQLRequest ) {
                 final int numberOfVars = numberOfVarsOfBGP((BGP) ((SPARQLRequest) req).getQueryPattern());
-                return numberOfVars * determineIntermediateResultsSize(pp);
-            } else if ( req instanceof TriplePatternRequest ){
-                return 0;
-            } else
+                return determineIntermediateResultsSize(pp).thenApply( resSize -> numberOfVars * resSize );
+            }
+            // TODO There is a mistake here: every TriplePatternRequest is a SPARQLRequest;
+            // hence, the following else-if branch will never be used
+            else if ( req instanceof TriplePatternRequest ) {
+                return CompletableFuture.completedFuture( 0 );
+            }
+            else {
                 throw new IllegalArgumentException("Unsupported request type (" + req.getClass().getName() + ")");
-
-        } else if ( lop instanceof LogicalOpJoin ){
-            return 0;
-        } else
-            throw new IllegalArgumentException("Unsupported Physical Operator");
-
+            }
+        }
+        else if ( lop instanceof LogicalOpJoin ) {
+            return CompletableFuture.completedFuture( 0 );
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ").");
+        }
     }
 
     @Override
-    public int determineIntermediateResultsSize( final PhysicalPlan plan )
-    		throws CostEstimationException
-    {
-        try {
-        	return CardinalityEstimationUtils.getEstimates(cardEstimate, plan)[0].intValue();
-        }
-        catch ( final CardinalityEstimationException e ) {
-            throw new CostEstimationException("Performing cardinality estimation caused an exception.", e, plan);
-        }
+    public CompletableFuture<Integer> determineIntermediateResultsSize( final PhysicalPlan plan ) {
+    	return cardEstimate.initiateCardinalityEstimation(plan);
     }
 
     // helper functions
