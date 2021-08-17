@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;

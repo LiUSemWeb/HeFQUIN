@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality;
 
 import static java.lang.Math.min;
 
@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 
 public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinalityEstimation
 {

@@ -1,8 +1,9 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
 
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 /**
  * This interface represents cardinality estimators that can estimate

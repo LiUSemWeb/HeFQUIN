@@ -45,8 +45,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanC
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
 

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality;
 
 import java.util.concurrent.CompletableFuture;
 

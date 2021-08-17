@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 import java.util.*;

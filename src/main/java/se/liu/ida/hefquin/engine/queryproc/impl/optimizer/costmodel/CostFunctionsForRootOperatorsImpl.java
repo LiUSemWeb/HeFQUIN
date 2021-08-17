@@ -19,10 +19,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationHelper;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CardinalityEstimationUtils;
 
 import java.util.Iterator;
