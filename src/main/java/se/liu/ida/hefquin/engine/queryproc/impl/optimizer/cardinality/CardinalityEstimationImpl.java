@@ -5,9 +5,19 @@ import static java.lang.Math.min;
 
 import org.apache.jena.sparql.core.Var;
 
+import se.liu.ida.hefquin.engine.federation.BRTPFServer;
+import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.TPFServer;
+import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.access.utils.RequestMemberPair;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
@@ -123,7 +133,19 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 		@Override
 		public Integer get() {
-			final RequestMemberPair rm = new RequestMemberPair(reqOp);
+			final FederationMember fm = reqOp.getFederationMember();
+			DataRetrievalRequest req = reqOp.getRequest();
+			if ( fm instanceof TPFServer ) {
+				req = ensureTPFRequest( (TriplePatternRequest) req );
+			}
+			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+				req = ensureTPFRequest( (TriplePatternRequest) req );
+			}
+			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
+				req = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
+			}
+
+			final RequestMemberPair rm = new RequestMemberPair(req, fm);
 			final CardinalityResponse[] resps;
 			try {
 				resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, rm);
@@ -134,6 +156,25 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			return Integer.valueOf( resps[0].getCardinality() );
 		}
+
+		protected TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
+			if ( req instanceof TPFRequest ) {
+				return (TPFRequest) req;
+			}
+			else {
+				return new TPFRequestImpl(req.getQueryPattern(), 0);
+			}
+		}
+
+		protected BRTPFRequest ensureBRTPFRequest( final BindingsRestrictedTriplePatternRequest req ) {
+			if ( req instanceof BRTPFRequest ) {
+				return (BRTPFRequest) req;
+			}
+			else {
+				return new BRTPFRequestImpl(req.getTriplePattern(), req.getSolutionMappings(), 0);
+			}
+		}
+
 	}
 
 
