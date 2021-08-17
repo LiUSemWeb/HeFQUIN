@@ -22,6 +22,16 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * This class implements an approach to cardinality estimation that is based
+ * on the following two ideas: First, for leaf nodes in the given plans, which
+ * are request operators, the implementation issues cardinality requests to
+ * the respective federation members. Second, for joins, the implementation
+ * uses the join cardinality estimation approach from the Lusail paper, which
+ * is based on variable-specific cardinality estimates. To functionality to
+ * obtain the variable-specific cardinality estimates is implemented separately
+ * (see {@ink VarSpecificCardinalityEstimation}.
+ */
 public class CardinalityEstimationImpl implements CardinalityEstimation
 {
 	protected final Map<PhysicalPlan, CompletableFuture<Integer>> cache = new HashMap<>();

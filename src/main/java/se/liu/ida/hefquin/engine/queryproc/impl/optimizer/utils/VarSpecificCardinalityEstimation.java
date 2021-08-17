@@ -8,5 +8,12 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
 public interface VarSpecificCardinalityEstimation
 {
+	/**
+	 * Asynchronous method that initiates a process to estimate the
+	 * the variable-specific cardinality of the result that will be
+	 * produced by the given plan. The actual estimate can then be
+	 * obtained by using the <code>get()</code> method of the
+	 * returned CompletableFuture.
+	 */
 	CompletableFuture<Integer> initiateCardinalityEstimation( PhysicalPlan plan, Var v );
 }
