@@ -7,24 +7,19 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.ConstructSubPPBasedOnUnaryOperator;
 
-public abstract class ConvertTPAddToBinaryOperator implements Rule{
+public abstract class ConvertTPAddToBinaryOperator implements RewritingRule {
     protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
 
     @Override
-    public PhysicalPlan applyTo( final PhysicalPlan pp ) {
-        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
+    public PhysicalPlan applyTo( final PhysicalPlan plan, final PhysicalPlan[] subPlans ) {
+        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
         final LogicalOpTPAdd lop = (LogicalOpTPAdd) pop.getLogicalOperator();
 
         final BinaryPhysicalOp popJoin = definePhysicalOperator();
         final PhysicalPlan subqueryRequest = helper.formRequestBasedOnTPofTPAdd( lop );
-        final PhysicalPlan ppNew = new PhysicalPlanWithBinaryRootImpl( popJoin, subqueryRequest, pp.getSubPlan(0));
+        final PhysicalPlan ppNew = new PhysicalPlanWithBinaryRootImpl( popJoin, subqueryRequest, subPlans[0]);
 
         return ppNew;
-    }
-
-    @Override
-    public double getPriority() {
-        return 0.15;
     }
 
     public abstract BinaryPhysicalOp definePhysicalOperator();

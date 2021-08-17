@@ -5,6 +5,16 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.ConvertTPAdd
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhysicalOperatorOfTPAdd;
 
 public class RuleConvertTPAddIndexNLJToBindJoin extends ConvertTPAddToBindJoin {
+    double priority;
+
+    public RuleConvertTPAddIndexNLJToBindJoin( double priority ){
+        this.priority = priority;
+    }
+
+    @Override
+    public double getPriority() {
+        return priority;
+    }
 
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan pp ) {

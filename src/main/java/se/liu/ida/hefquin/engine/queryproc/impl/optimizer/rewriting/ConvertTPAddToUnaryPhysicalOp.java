@@ -6,22 +6,17 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
 
-public abstract class ConvertTPAddToUnaryPhysicalOp implements Rule{
+public abstract class ConvertTPAddToUnaryPhysicalOp implements RewritingRule{
 
     @Override
-    public PhysicalPlan applyTo(PhysicalPlan pp) {
-        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) pp.getRootOperator();
+    public PhysicalPlan applyTo(PhysicalPlan plan, final PhysicalPlan[] subPlans) {
+        final PhysicalOperatorForLogicalOperator pop = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
         final LogicalOpTPAdd lop = (LogicalOpTPAdd) pop.getLogicalOperator();
 
         final UnaryPhysicalOp popUnary = definePhysicalOperator( lop );
-        final PhysicalPlan ppNew = new PhysicalPlanWithUnaryRootImpl( popUnary, pp.getSubPlan(0));
+        final PhysicalPlan ppNew = new PhysicalPlanWithUnaryRootImpl( popUnary, subPlans[0]);
 
         return ppNew;
-    }
-
-    @Override
-    public double getPriority() {
-        return 0.2;
     }
 
     public abstract UnaryPhysicalOp definePhysicalOperator( final LogicalOpTPAdd lop );

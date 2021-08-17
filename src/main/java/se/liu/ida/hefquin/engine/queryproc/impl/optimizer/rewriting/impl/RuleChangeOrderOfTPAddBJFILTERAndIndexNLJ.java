@@ -5,6 +5,16 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.ChangeOrderO
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhysicalOperatorOfTwoTPAdd;
 
 public class RuleChangeOrderOfTPAddBJFILTERAndIndexNLJ extends ChangeOrderOfTPAddBJFILTERAndIndexNLJ {
+    double priority;
+
+    public RuleChangeOrderOfTPAddBJFILTERAndIndexNLJ( double priority ){
+        this.priority = priority;
+    }
+
+    @Override
+    public double getPriority() {
+        return priority;
+    }
 
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan pp ) {

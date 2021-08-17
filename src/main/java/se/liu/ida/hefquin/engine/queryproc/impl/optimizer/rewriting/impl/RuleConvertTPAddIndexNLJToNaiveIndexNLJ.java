@@ -5,6 +5,16 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.ConvertTPAdd
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhysicalOperatorOfTPAdd;
 
 public class RuleConvertTPAddIndexNLJToNaiveIndexNLJ extends ConvertTPAddToNaiveNLJ {
+    double priority;
+
+    public RuleConvertTPAddIndexNLJToNaiveIndexNLJ( double priority ){
+        this.priority = priority;
+    }
+
+    @Override
+    public double getPriority() {
+        return priority;
+    }
 
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan pp ) {
