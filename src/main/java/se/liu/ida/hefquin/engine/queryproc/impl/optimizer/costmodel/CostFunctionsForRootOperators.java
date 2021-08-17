@@ -1,20 +1,20 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
+import java.util.concurrent.CompletableFuture;
+
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 
-public interface CostFunctionsForRootOperators {
+public interface CostFunctionsForRootOperators
+{
+	CompletableFuture<Integer> determineNumberOfRequests( final PhysicalPlan pp );
 
-    int determineNumberOfRequests( final PhysicalPlan pp ) throws CostEstimationException;
+	CompletableFuture<Integer> determineShippedRDFTermsForRequests( final PhysicalPlan pp );
 
-    int determineShippedRDFTermsForRequests( final PhysicalPlan pp ) throws CostEstimationException;
+	CompletableFuture<Integer> determineShippedVarsForRequests( final PhysicalPlan pp );
 
-    int determineShippedVarsForRequests( final PhysicalPlan pp ) throws CostEstimationException;
+	CompletableFuture<Integer> determineShippedRDFTermsForResponses( final PhysicalPlan pp );
 
-    int determineShippedRDFTermsForResponses( final PhysicalPlan pp ) throws CostEstimationException;
+	CompletableFuture<Integer> determineShippedVarsForResponses( final PhysicalPlan pp );
 
-    int determineShippedVarsForResponses( final PhysicalPlan pp ) throws CostEstimationException;
-
-    int determineIntermediateResultsSize( final PhysicalPlan pp ) throws CostEstimationException;
-
+	CompletableFuture<Integer> determineIntermediateResultsSize( final PhysicalPlan pp );
 }
