@@ -89,11 +89,11 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             worker = new WorkerForJoins( plan.getSubPlan(0), plan.getSubPlan(1) );
         }
         else if ( rootOp instanceof LogicalOpTPAdd ) {
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) rootOp );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) rootOp );
             worker = new WorkerForJoins( plan.getSubPlan(0), reqTP );
         }
         else if ( rootOp instanceof LogicalOpBGPAdd ) {
-            final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd( (LogicalOpBGPAdd) rootOp );
+            final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) rootOp );
             worker = new WorkerForJoins( plan.getSubPlan(0), reqBGP );
         }
         else {

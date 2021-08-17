@@ -67,14 +67,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd){
             numberOfTerms = numberOfTermsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
@@ -117,14 +117,14 @@ public class CostFunctionsForRootOperatorsImpl implements CostFunctionsForRootOp
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnTPofTPAdd( (LogicalOpTPAdd) lop );
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpBGPAdd ){
             numberOfVars = numberOfVarsOfBGP(((LogicalOpBGPAdd) lop).getBGP());
             final PhysicalPlan subPP = pp.getSubPlan(0);
             intermediateResultSize = determineIntermediateResultsSize(subPP);
 
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestBasedOnBGPofBGPAdd((LogicalOpBGPAdd) lop);
+            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) lop );
             numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( subPP.getExpectedVariables(), reqTP.getExpectedVariables() ).size();
         } else if ( lop instanceof LogicalOpRequest ) {
             final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
