@@ -28,7 +28,9 @@ public class FederationAccessUtils
 	                                                      final RequestMemberPair... pairs )
 			  throws FederationAccessException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[pairs.length];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<? extends DataRetrievalResponse>[] futures = new CompletableFuture[pairs.length];
+
 		for ( int i = 0; i < pairs.length; ++i ) {
 			final DataRetrievalRequest req = pairs[i].getRequest();
 			final FederationMember fm = pairs[i].getMember();
@@ -53,7 +55,7 @@ public class FederationAccessUtils
 		}
 
 		try {
-			return (DataRetrievalResponse[]) CompletableFutureUtils.getAll(futures);
+			return CompletableFutureUtils.getAll(futures, DataRetrievalResponse.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
@@ -70,7 +72,9 @@ public class FederationAccessUtils
 			final RequestMemberPair... pairs )
 					throws FederationAccessException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[pairs.length];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[pairs.length];
+
 		for ( int i = 0; i < pairs.length; ++i ) {
 			final DataRetrievalRequest req = pairs[i].getRequest();
 			final FederationMember fm = pairs[i].getMember();
@@ -92,7 +96,7 @@ public class FederationAccessUtils
 		}
 
 		try {
-			return (CardinalityResponse[]) CompletableFutureUtils.getAll(futures);
+			return CompletableFutureUtils.getAll(futures, CardinalityResponse.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {

@@ -207,8 +207,11 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 		}
 
 		protected Integer getEstimateBasedOnJoinVars( final List<Var> joinVars ) {
-			final CompletableFuture<?>[] futures1 = new CompletableFuture[joinVars.size()];
-			final CompletableFuture<?>[] futures2 = new CompletableFuture[joinVars.size()];
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<Integer>[] futures1 = new CompletableFuture[joinVars.size()];
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<Integer>[] futures2 = new CompletableFuture[joinVars.size()];
+
 			for ( int i = 0; i < joinVars.size(); ++i ) {
 				futures1[i] = vsCardEstimator.initiateCardinalityEstimation(plan1, joinVars.get(i));
 				futures2[i] = vsCardEstimator.initiateCardinalityEstimation(plan2, joinVars.get(i));
@@ -216,7 +219,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			final Integer[] cardinalities1;
 			try {
-				cardinalities1 = (Integer[]) CompletableFutureUtils.getAll(futures1);
+				cardinalities1 = CompletableFutureUtils.getAll(futures1, Integer.class);
 			}
 			catch ( final CompletableFutureUtils.GetAllException ex ) {
 				for ( int i = 0; i < joinVars.size(); ++i ) {
@@ -232,7 +235,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			final Integer[] cardinalities2;
 			try {
-				cardinalities2 = (Integer[]) CompletableFutureUtils.getAll(futures2);
+				cardinalities2 = CompletableFutureUtils.getAll(futures2, Integer.class);
 			}
 			catch ( final CompletableFutureUtils.GetAllException ex ) {
 				if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
@@ -255,7 +258,9 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 		protected Integer getEstimateBasedOnAllCertainVars( final List<Var> vars ) {
 			// Note that this method is used only if the sets
 			// of all variables in the two plans are disjoint.
-			final CompletableFuture<?>[] futures = new CompletableFuture[vars.size()];
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<Integer>[] futures = new CompletableFuture[vars.size()];
+
 			for ( int i = 0; i < vars.size(); ++i ) {
 				final Var v = vars.get(i);
 				if ( plan1.getExpectedVariables().getCertainVariables().contains(v) ) {
@@ -268,7 +273,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			final Integer[] cardinalities;
 			try {
-				cardinalities = (Integer[]) CompletableFutureUtils.getAll(futures);
+				cardinalities = CompletableFutureUtils.getAll(futures, Integer.class);
 			}
 			catch ( final CompletableFutureUtils.GetAllException ex ) {
 				if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {

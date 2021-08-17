@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.utils;
 
+import java.lang.reflect.Array;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -18,11 +19,12 @@ public class CompletableFutureUtils
 	 * this exception indicates the index of the future that caused the
 	 * exception.
 	 */
-	public static Object[] getAll( final CompletableFuture<?>[] futures )
+	public static <T> T[] getAll( final CompletableFuture<? extends T>[] futures, Class<T> clazz )
 			throws GetAllException
 	{
-		final Object[] result = new Object[futures.length];
-
+		@SuppressWarnings("unchecked")
+		final T[] result =  (T[]) Array.newInstance(clazz, futures.length);
+		
 		GetAllException ex = null;
 
 		for ( int i = 0; i < futures.length; ++i ) {

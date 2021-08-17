@@ -45,13 +45,15 @@ public class CardinalityEstimationUtils
 	                                      final List<PhysicalPlan> plans )
 			throws CardinalityEstimationException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[plans.size()];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<Integer>[] futures = new CompletableFuture[plans.size()];
+
 		for ( int i = 0; i < plans.size(); ++i ) {
 			futures[i] = cardEstimate.initiateCardinalityEstimation( plans.get(i) );
 		}
 
 		try {
-			return (Integer[]) CompletableFutureUtils.getAll(futures);
+			return CompletableFutureUtils.getAll(futures, Integer.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {

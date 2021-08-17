@@ -36,13 +36,15 @@ public class CostEstimationUtils
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{
-		final CompletableFuture<?>[] futures = new CompletableFuture[plans.size()];
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<Double>[] futures = new CompletableFuture[plans.size()];
+
 		for ( int i = 0; i < plans.size(); ++i ) {
 			futures[i] = costModel.initiateCostEstimation( plans.get(i) );
 		}
 
 		try {
-			return (Double[]) CompletableFutureUtils.getAll(futures);
+			return CompletableFutureUtils.getAll(futures, Double.class);
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
