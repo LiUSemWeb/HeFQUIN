@@ -1,10 +1,13 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
+import java.util.concurrent.CompletableFuture;
+
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 
-public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans{
+public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysicalPlans
+{
     protected final CostFunctionsForRootOperators costFunctionForRoot;
 
     public CostFunctionsForPhysicalPlansImpl( final CardinalityEstimation cardEstimate ) {
@@ -12,7 +15,7 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
     }
 
     @Override
-    public CostOfPhysicalPlan determineCostOfPhysicalPlan( final PhysicalPlan pp ) throws CostEstimationException {
+    public CompletableFuture<CostOfPhysicalPlan> initiateCostEstimation( final PhysicalPlan pp ) throws CostEstimationException {
 
         final int numberOfRequests = determineTotalNumberOfRequests(pp);
         final int shippedRDFTermsForRequests = determineTotalShippedRDFTermsForRequests(pp);
@@ -21,7 +24,8 @@ public class CostFunctionsForPhysicalPlansImpl implements CostFunctionsForPhysic
         final int shippedRDFVarsForResponses = determineTotalShippedVarsForResponses(pp);
         final int getIntermediateResultsSize = determineTotalIntermediateResultsSize(pp);
 
-        return new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
+        final CostOfPhysicalPlan result = new CostOfPhysicalPlanImpl( numberOfRequests, shippedRDFTermsForRequests , shippedRDFVarsForRequests, shippedRDFTermsForResponses, shippedRDFVarsForResponses, getIntermediateResultsSize);
+        return CompletableFuture.completedFuture(result);
     }
 
     @Override
