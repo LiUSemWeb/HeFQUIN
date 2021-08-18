@@ -2,28 +2,46 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class CostModelImpl implements CostModel
 {
-	protected static final List<Double> weights = Arrays.asList( 0.2, 0.2, 0.2, 0.2, 0.2 );
-
-    protected final CostFunctionsForPhysicalPlans costFunctions;
+    protected final CostDimension[] dimensions;
 	protected final Map<PhysicalPlan, CompletableFuture<Double>> cache = new HashMap<>();
 
-    public CostModelImpl( final CardinalityEstimation cardEstimation ) {
-        costFunctions = new CostFunctionsForPhysicalPlansImpl(cardEstimation);
+    public CostModelImpl( final CostDimension[] dimensions ) {
+        assert dimensions.length > 0;
+        this.dimensions = dimensions;
     }
 
+    public CostModelImpl( final CardinalityEstimation cardEstimation ) {
+    	this( getDefaultDimensions(cardEstimation) );
+    }
+
+    public static CostDimension[] getDefaultDimensions( final CardinalityEstimation cardEstimation ) {
+        if ( dfltDimensions == null ) {
+            dfltDimensions = new CostDimension[] {
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfRequests(cardEstimation)) ),
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInRequests(cardEstimation)) ),
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInRequests(cardEstimation)) ),
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInResponses(cardEstimation)) ),
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInResponses(cardEstimation)) ),
+                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfProcessedSolMaps(cardEstimation)) )
+            };
+    	}
+
+        return dfltDimensions;
+    }
+
+	private static CostDimension[] dfltDimensions = null;
+
+
+	@Override
     public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan plan )
-            throws CostEstimationException
     {
         synchronized (cache) {
             // If we already have a CompletableFuture for the
@@ -55,21 +73,16 @@ public class CostModelImpl implements CostModel
     }
 
     protected CompletableFuture<Double> _initiateCostEstimation( final PhysicalPlan plan )
-            throws CostEstimationException
     {
-        final CompletableFuture<CostOfPhysicalPlan> futureCost = costFunctions.initiateCostEstimation(plan);
-        return futureCost.thenApply( cost -> aggregateCost(cost) );
-    }
+        CompletableFuture<Double> f = CompletableFuture.completedFuture( Double.valueOf(0) );
+        for ( int i = 0; i < dimensions.length; ++i ) {
+            final CostFunctionForPlan costFct = dimensions[i].costFct;
+            final int weight = dimensions[i].weight;
+            f = f.thenCombine( costFct.initiateCostEstimation(plan),
+                               (aggregate,costValue) -> aggregate + weight * costValue );
+        }
 
-    protected Double aggregateCost( final CostOfPhysicalPlan cost ) {
-        final double aggCost =
-                        weights.get(0) * cost.getNumberOfRequests()
-                      + weights.get(1) * cost.getShippedRDFTermsForRequests()
-                      + weights.get(2) * cost.getShippedVarsForRequests()
-                      + weights.get(3) * cost.getShippedRDFTermsForResponses()
-                      + weights.get(4) * cost.getShippedVarsForResponses()
-                      + weights.get(5) * cost.getIntermediateResultsSize();
-        return Double.valueOf(aggCost);
+        return f;
     }
 
 }
