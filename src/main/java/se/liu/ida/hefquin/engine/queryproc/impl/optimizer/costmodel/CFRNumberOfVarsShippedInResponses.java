@@ -56,12 +56,12 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 			}
 		}
 		else if ( lop instanceof LogicalOpRequest ) {
-			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 			final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint ) {
 				final SPARQLRequest req = (SPARQLRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
 				final int numberOfVars = QueryPatternUtils.getVariablesInPattern( req.getQueryPattern() ).size();
+				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
 			}
 			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer) {

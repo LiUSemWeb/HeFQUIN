@@ -70,6 +70,7 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 				return futureIntResSize.thenApply( intResSize -> 3 * intResSize );
 			}
 			else {
+				futureIntResSize.cancel(true);
 				throw createIllegalArgumentException(fm);
 			}
 		}
