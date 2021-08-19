@@ -6,10 +6,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
@@ -59,24 +56,19 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 			}
 		}
 		else if ( lop instanceof LogicalOpRequest ) {
-			final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
+			final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
-			// TODO: Check whether the the following is correct. I believe that
-			// this part should be defined in terms of the type of federation
-			// member and it should be similar to the case of LogicalOpTPAdd.
-
-			if ( req instanceof TriplePatternRequest ) {
-				return CompletableFuture.completedFuture(0);
-			}
-			else if ( req instanceof SPARQLRequest ) {
-				final SPARQLRequest sparqlReq = (SPARQLRequest) req;
-				// TODO: The following line is not correct. Not every SPARQLRequest contains a BGP.
-				final int numberOfVars = QueryPatternUtils.getVariablesInPattern( (BGP) sparqlReq.getQueryPattern() ).size();
+			if ( fm instanceof SPARQLEndpoint ) {
+				final SPARQLRequest req = (SPARQLRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
+				final int numberOfVars = QueryPatternUtils.getVariablesInPattern( req.getQueryPattern() ).size();
 				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
 			}
+			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer) {
+				return CompletableFuture.completedFuture(0);
+			}
 			else {
-				throw createIllegalArgumentException(req);
+				throw createIllegalArgumentException(fm);
 			}
 		}
 		else if ( lop instanceof LogicalOpJoin ) {
