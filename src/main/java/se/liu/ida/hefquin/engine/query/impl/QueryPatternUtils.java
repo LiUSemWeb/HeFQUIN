@@ -77,14 +77,15 @@ public class QueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
-		Set<Var> result = new HashSet<>();
-		if ( queryPattern instanceof TriplePattern) {
-			result = getVariablesInPattern( (TriplePattern) queryPattern );
+		if ( queryPattern instanceof TriplePattern ) {
+			return getVariablesInPattern( (TriplePattern) queryPattern );
 		}
-		else if ( queryPattern instanceof BGP) {
-			result = getVariablesInPattern( (BGP) queryPattern);
+		else if ( queryPattern instanceof BGP ) {
+			return getVariablesInPattern( (BGP) queryPattern );
 		}
-		return result;
+		else {
+			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
 	}
 
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
