@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
@@ -60,8 +59,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			}
 			else if ( req instanceof SPARQLRequest ) {
 				final SPARQLRequest sparqlReq = (SPARQLRequest) req;
-				// TODO: The following line is not correct. Not every SPARQLRequest contains a BGP.
-				numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences((BGP) sparqlReq.getQueryPattern());
+				numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences( sparqlReq.getQueryPattern() );
 			}
 			else {
 				throw createIllegalArgumentException(req);

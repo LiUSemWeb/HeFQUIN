@@ -142,6 +142,30 @@ public class QueryPatternUtils
 		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
 	}
 
+	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfVarOccurrences( (BGP) queryPattern );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
+	}
+
+	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfTermOccurrences( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfTermOccurrences( (BGP) queryPattern );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
+	}
+
 	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
 		if ( pattern instanceof TriplePattern ) {
 			return new ExpectedVariables() {
