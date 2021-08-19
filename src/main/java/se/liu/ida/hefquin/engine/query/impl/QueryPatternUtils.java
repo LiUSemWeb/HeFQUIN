@@ -76,6 +76,14 @@ public class QueryPatternUtils
 		}
 	}
 
+	/**
+	 * Returns the set of all variables that occur in the given graph pattern.
+	 *
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getVariablesInPattern(TriplePattern)}. Similarly,
+	 * if the given pattern is a {@link BGP}, this function returns the result
+	 * of {@link #getVariablesInPattern(BGP)}.
+	 */
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
 		if ( queryPattern instanceof TriplePattern ) {
 			return getVariablesInPattern( (TriplePattern) queryPattern );
@@ -95,10 +103,6 @@ public class QueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final BGP bgp ) {
-		return getVariablesInPattern( (BGPImpl) bgp );
-	}
-
-	public static Set<Var> getVariablesInPattern( final BGPImpl bgp ) {
 		final Set<Var> result = new HashSet<>();
 		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 			result.addAll( getVariablesInPattern(tp) );
@@ -142,6 +146,16 @@ public class QueryPatternUtils
 		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
 	}
 
+	/**
+	 * Returns the number of occurrences of variables in the given graph
+	 * pattern. If the same variable occurs multiple times, each occurrence
+	 * is counted.
+	 * 
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getNumberOfVarOccurrences(TriplePattern)}.
+	 * Similarly, if the given pattern is a {@link BGP}, this function
+	 * returns the result of {@link #getNumberOfVarOccurrences(BGP)}.
+	 */
 	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
@@ -154,6 +168,16 @@ public class QueryPatternUtils
 		}
 	}
 
+	/**
+	 * Returns the number of occurrences of RDF terms in the given graph
+	 * pattern. If the same term occurs multiple times, each occurrence
+	 * is counted.
+	 * 
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getNumberOfTermOccurrences(TriplePattern)}.
+	 * Similarly, if the given pattern is a {@link BGP}, this function
+	 * returns the result of {@link #getNumberOfTermOccurrences(BGP)}.
+	 */
 	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfTermOccurrences( (TriplePattern) queryPattern );
