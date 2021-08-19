@@ -76,6 +76,17 @@ public class QueryPatternUtils
 		}
 	}
 
+	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
+		Set<Var> result = new HashSet<>();
+		if ( queryPattern instanceof TriplePattern) {
+			result = getVariablesInPattern( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP) {
+			result = getVariablesInPattern( (BGP) queryPattern);
+		}
+		return result;
+	}
+
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp.asJenaTriple() );
