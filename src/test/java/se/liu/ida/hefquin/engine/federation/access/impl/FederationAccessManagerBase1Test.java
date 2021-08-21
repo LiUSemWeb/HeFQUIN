@@ -38,7 +38,7 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class FederationAccessManagerBaseTest extends EngineTestBase
+public class FederationAccessManagerBase1Test extends EngineTestBase
 {
 	@Test
 	public void performCardinalityRequestWithPatternOnDBpediaSPARQLEndpoint()

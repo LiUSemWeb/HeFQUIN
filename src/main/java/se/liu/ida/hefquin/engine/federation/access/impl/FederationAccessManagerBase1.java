@@ -34,7 +34,7 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
  * Abstract base class for implementations of the {@link FederationAccessManager}
  * interface that use request processors (see {@link RequestProcessor} etc).
  */
-public abstract class FederationAccessManagerBase implements FederationAccessManager
+public abstract class FederationAccessManagerBase1 implements FederationAccessManager
 {
 	static protected final Var countVar = Var.alloc("__hefquinCountVar");
 
@@ -43,7 +43,7 @@ public abstract class FederationAccessManagerBase implements FederationAccessMan
 	protected final BRTPFRequestProcessor     reqProcBRTPF;
 	protected final Neo4jRequestProcessor     reqProcNeo4j;
 
-	protected FederationAccessManagerBase(
+	protected FederationAccessManagerBase1(
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,

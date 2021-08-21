@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
  * A very simple {@link FederationAccessManager}
  * that simply blocks for each request.
  */
-public class BlockingFederationAccessManagerImpl extends FederationAccessManagerBase
+public class BlockingFederationAccessManagerImpl extends FederationAccessManagerBase1
 {
 	public BlockingFederationAccessManagerImpl(
 			final SPARQLRequestProcessor reqProcSPARQL,
