@@ -37,12 +37,14 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings() );
-		final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, input);
-		try {
-			reqOp.execute(mySink, execCxt);
-		}
-		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+		if ( reqOp != null ) {
+			final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, input);
+			try {
+				reqOp.execute(mySink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+			}
 		}
 	}
 

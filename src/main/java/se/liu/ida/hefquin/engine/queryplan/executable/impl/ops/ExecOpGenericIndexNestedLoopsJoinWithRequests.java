@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -63,6 +64,13 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
 			// issue a request based on the current solution mapping
 			final ReqType req = createRequest(sm);
+			if ( req == null ) {
+				// this may happen if the current solution mapping contains
+				// a blank node for any of the variables that is used when
+				// creating the request
+				continue;
+			}
+
 			final CompletableFuture<RespType> futureResponse;
 			try {
 				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() ); 
@@ -77,9 +85,20 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 			++i;
 		}
 
+		final CompletableFuture<?>[] futures2;
+		if ( i < futures.length ) {
+			// This case may occur if we have skipped any of the
+			// iteration steps of the previous loop because any
+			// of the requests created in the loop was null.
+			futures2 = Arrays.copyOf(futures, i);
+		}
+		else {
+			futures2 = futures;
+		}
+
 		// wait for all the futures to be completed
 		try {
-			CompletableFuture.allOf(futures).get();
+			CompletableFuture.allOf(futures2).get();
 		} catch (InterruptedException e) {
 			throw new ExecOpExecutionException("interruption of the futures that perform the requests and process the responses", e, this);
 		} catch (ExecutionException e) {

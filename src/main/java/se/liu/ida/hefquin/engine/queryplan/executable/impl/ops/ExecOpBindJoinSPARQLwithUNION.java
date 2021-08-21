@@ -37,6 +37,10 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Op op = createUnion(solMaps);
+		if ( op == null ) {
+			return null;
+		}
+
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm);
@@ -45,7 +49,9 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
 		final Op tp = new OpTriple(query.asJenaTriple());
 		if (varsInTP.isEmpty()) return tp;
-		Set<Expr> conjunctions = new HashSet<>();
+
+		final Set<Expr> conjunctions = new HashSet<>();
+		boolean conjunctionsMustBeNonEmpty = false;
 		for ( final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
 			// If the current solution mapping does not have any variables in common with
@@ -53,6 +59,12 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
 			if (b.size() == 0) return tp;
+
+			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
+				conjunctionsMustBeNonEmpty = true;
+				continue;
+			}
+
 			Expr conjunction = null;
 			for (final Var v : varsInTP){
 				if (! b.contains(v)) continue;
@@ -66,7 +78,11 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 			}
 			conjunctions.add(conjunction);
 		}
-		if (conjunctions.isEmpty()) return tp;
+
+		if ( conjunctions.isEmpty() ) {
+			return conjunctionsMustBeNonEmpty ? null : tp;
+		}
+
 		Op union = null;
 		for (final Expr conjunction : conjunctions) {
 			final Op filter = OpFilter.filter(conjunction, tp);

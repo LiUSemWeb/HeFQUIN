@@ -37,8 +37,16 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithReq
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Set<Binding> bindings = new HashSet<Binding>();
 		for ( final SolutionMapping s : solMaps ) {
-			bindings.add( SolutionMappingUtils.restrict(s, varsInTP).asJenaBinding() );
+			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInTP );
+			if ( ! SolutionMappingUtils.containsBlankNodes(b) ) {
+				bindings.add(b);
+			}
 		}
+
+		if ( bindings.isEmpty() ) {
+			return null;
+		}
+
 		final Table table = new TableData( varsInTP, new ArrayList<>(bindings) );
 		final Op op = OpSequence.create( OpTable.create(table), new OpTriple(query.asJenaTriple()) );
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);

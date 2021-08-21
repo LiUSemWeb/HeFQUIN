@@ -54,12 +54,14 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
-		final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, sm);
-		try {
-			reqOp.execute(mySink, execCxt);
-		}
-		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this index nested loops join caused an exception.", e, this);
+		if ( reqOp != null ) {
+			final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, sm);
+			try {
+				reqOp.execute(mySink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				throw new ExecOpExecutionException("Executing a request operator used by this index nested loops join caused an exception.", e, this);
+			}
 		}
 	}
 
