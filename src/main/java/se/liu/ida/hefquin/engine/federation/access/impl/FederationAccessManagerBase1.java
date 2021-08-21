@@ -38,28 +38,6 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 {
 	static protected final Var countVar = Var.alloc("__hefquinCountVar");
 
-	protected final SPARQLRequestProcessor    reqProcSPARQL;
-	protected final TPFRequestProcessor       reqProcTPF;
-	protected final BRTPFRequestProcessor     reqProcBRTPF;
-	protected final Neo4jRequestProcessor     reqProcNeo4j;
-
-	protected FederationAccessManagerBase1(
-			final SPARQLRequestProcessor reqProcSPARQL,
-			final TPFRequestProcessor reqProcTPF,
-			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j )
-	{
-		assert reqProcSPARQL  != null;
-		assert reqProcTPF     != null;
-		assert reqProcBRTPF   != null;
-		assert reqProcNeo4j	  != null;
-
-		this.reqProcSPARQL    = reqProcSPARQL;
-		this.reqProcTPF       = reqProcTPF;
-		this.reqProcBRTPF     = reqProcBRTPF;
-		this.reqProcNeo4j     = reqProcNeo4j;
-	}
-
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
 			final SPARQLRequest req,
