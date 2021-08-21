@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.query.QueryFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
@@ -33,73 +32,17 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.StringResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
 public class FederationAccessManagerBase1Test extends EngineTestBase
 {
 	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;
-
-	@Test
-	public void performCardinalityRequestWithPatternOnDBpediaSPARQLEndpoint()
-			throws FederationAccessException
-	{
-		if ( ! skipLiveWebTests ) {
-			// setting up
-			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Toronto> <http://xmlns.com/foaf/0.1/name> ?o }";
-			final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
-			final SPARQLRequest req = new SPARQLRequestImpl(pattern);
-
-			performCardinalityRequestOnDBpediaSPARQLEndpointHelper(req, 2);
-		}
-	}
-
-	@Test
-	public void performCardinalityRequestWithTPOnDBpediaSPARQLEndpoint()
-			throws FederationAccessException
-	{
-		if ( ! skipLiveWebTests ) {
-			// setting up
-			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Toronto");
-			final Node p = NodeFactory.createURI("http://xmlns.com/foaf/0.1/name");
-			final Node o = NodeFactory.createVariable("o");
-			final TriplePattern tp = new TriplePatternImpl(s,p,o);
-			final SPARQLRequest req = new TriplePatternRequestImpl(tp);
-
-			performCardinalityRequestOnDBpediaSPARQLEndpointHelper(req, 2);
-		}
-	}
-
-	@Test
-	public void performCardinalityRequestWithBGPOnDBpediaSPARQLEndpoint()
-			throws FederationAccessException
-	{
-		if ( ! skipLiveWebTests ) {
-			// setting up
-			final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Toronto");
-			final Node p = NodeFactory.createURI("http://xmlns.com/foaf/0.1/name");
-			final Node o = NodeFactory.createVariable("o");
-			final TriplePattern tp = new TriplePatternImpl(s,p,o);
-			final SPARQLRequest req = new BGPRequestImpl( new BGPImpl(tp) );
-
-			performCardinalityRequestOnDBpediaSPARQLEndpointHelper(req, 2);
-		}
-	}
 
 	@Test
 	public void performCardinalityRequestSPARQL()
@@ -205,41 +148,6 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 
 
 	// ------------ helper code ------------
-
-	protected void performCardinalityRequestOnDBpediaSPARQLEndpointHelper(
-			final SPARQLRequest req,
-			final int expectedCardinality ) throws FederationAccessException
-	{
-		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://dbpedia.org/sparql");
-
-		final SPARQLRequestProcessor reqProc = new SPARQLRequestProcessorImpl();
-		final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
-			@Override public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) { return null; }
-			@Override public TPFResponse performRequest(TPFRequest req, TPFServer fm) { return null; }
-		};
-		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { return null; }
-		};
-		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
-			@Override public StringResponse performRequest(Neo4jRequest req, Neo4jServer fm) { return null; }
-		};
-
-		final FederationAccessManager mgr = new BlockingFederationAccessManagerImpl(reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
-
-		// executing the tested method
-		final CompletableFuture<CardinalityResponse> futureResp = mgr.issueCardinalityRequest(req, fm);
-
-		final CardinalityResponse response;
-		try {
-			response = futureResp.get();
-		} catch (final InterruptedException | ExecutionException e) {
-			throw new FederationAccessException("Getting the response caused an exception.", e, req, fm);
-		} 
-
-		// checking the response
-		assertEquals( fm, response.getFederationMember() );
-		assertEquals( expectedCardinality, response.getCardinality() );
-	}
 
 	protected FederationAccessManager createMyFedAccessMgr( final int card ) {
 		return new MyFederationAccessManager(Integer.valueOf(card), SLEEP_MILLIES);
