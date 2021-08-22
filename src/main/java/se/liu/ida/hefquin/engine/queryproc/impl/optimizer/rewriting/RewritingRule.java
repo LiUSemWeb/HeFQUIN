@@ -6,7 +6,7 @@ public interface RewritingRule {
 
     boolean canBeAppliedTo( final PhysicalPlan plan );
 
-    PhysicalPlan applyTo( final PhysicalPlan plan, final PhysicalPlan[] subPlans );
+    PhysicalPlan applyTo( final PhysicalPlan plan );
 
     double getPriority();
 

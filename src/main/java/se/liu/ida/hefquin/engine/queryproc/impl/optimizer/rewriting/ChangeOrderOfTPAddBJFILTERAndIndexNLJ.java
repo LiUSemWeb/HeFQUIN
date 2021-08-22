@@ -9,16 +9,12 @@ public abstract class ChangeOrderOfTPAddBJFILTERAndIndexNLJ extends OrderTweakin
 
     @Override
     public UnaryPhysicalOp defineInnerPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpBindJoinWithFILTER popNewInner = new PhysicalOpBindJoinWithFILTER( lop );
-
-        return popNewInner;
+        return new PhysicalOpBindJoinWithFILTER( lop );
     }
 
     @Override
     public UnaryPhysicalOp defineRootPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpIndexNestedLoopsJoin popNewRoot = new PhysicalOpIndexNestedLoopsJoin( lop );
-
-        return popNewRoot;
+        return new PhysicalOpIndexNestedLoopsJoin( lop );
     }
 
 }

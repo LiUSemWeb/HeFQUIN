@@ -8,9 +8,7 @@ public abstract class ConvertTPAddToNaiveNLJ extends ConvertTPAddToBinaryOperato
 
     @Override
     public BinaryPhysicalOp definePhysicalOperator(){
-        final PhysicalOpNaiveNestedLoopsJoin popJoin = new PhysicalOpNaiveNestedLoopsJoin( new LogicalOpJoin() );
-
-        return popJoin;
+        return new PhysicalOpNaiveNestedLoopsJoin( new LogicalOpJoin() );
     }
 
 }

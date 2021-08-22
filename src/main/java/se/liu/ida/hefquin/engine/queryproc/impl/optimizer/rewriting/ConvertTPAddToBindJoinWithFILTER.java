@@ -8,9 +8,7 @@ public abstract class ConvertTPAddToBindJoinWithFILTER extends ConvertTPAddToUna
 
     @Override
     public UnaryPhysicalOp definePhysicalOperator( final LogicalOpTPAdd lop ){
-        final PhysicalOpBindJoinWithFILTER popBindJoinWithFILTER = new PhysicalOpBindJoinWithFILTER( lop );
-
-        return popBindJoinWithFILTER;
+        return new PhysicalOpBindJoinWithFILTER( lop );
     }
 
 }

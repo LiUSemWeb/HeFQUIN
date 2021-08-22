@@ -8,16 +8,12 @@ public abstract class ChangeOrderOfTwoTPAddIndexNLJ extends OrderTweakingOfTwoTP
 
     @Override
     public UnaryPhysicalOp defineInnerPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpIndexNestedLoopsJoin popNewInner = new PhysicalOpIndexNestedLoopsJoin( lop );
-
-        return popNewInner;
+        return new PhysicalOpIndexNestedLoopsJoin( lop );
     }
 
     @Override
     public UnaryPhysicalOp defineRootPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpIndexNestedLoopsJoin popNewRoot = new PhysicalOpIndexNestedLoopsJoin( lop );
-
-        return popNewRoot;
+        return new PhysicalOpIndexNestedLoopsJoin( lop );
     }
 
 }

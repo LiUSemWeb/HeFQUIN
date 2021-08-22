@@ -8,9 +8,7 @@ public abstract class ConvertTPAddToBindJoin extends ConvertTPAddToUnaryPhysical
 
     @Override
     public UnaryPhysicalOp definePhysicalOperator(final LogicalOpTPAdd lop ){
-        final PhysicalOpBindJoin popBindJoin = new PhysicalOpBindJoin( lop );
-
-        return popBindJoin;
+        return new PhysicalOpBindJoin( lop );
     }
 
 }

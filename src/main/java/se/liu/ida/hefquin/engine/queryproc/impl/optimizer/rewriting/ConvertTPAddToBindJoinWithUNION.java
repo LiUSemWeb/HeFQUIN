@@ -7,10 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithU
 public abstract class ConvertTPAddToBindJoinWithUNION extends ConvertTPAddToUnaryPhysicalOp{
 
     @Override
-    public UnaryPhysicalOp definePhysicalOperator(final LogicalOpTPAdd lop ){
-        final PhysicalOpBindJoinWithUNION popBindJoinWithUNION = new PhysicalOpBindJoinWithUNION( lop );
-
-        return popBindJoinWithUNION;
+    public UnaryPhysicalOp definePhysicalOperator( final LogicalOpTPAdd lop ){
+        return new PhysicalOpBindJoinWithUNION( lop );
     }
 
 }

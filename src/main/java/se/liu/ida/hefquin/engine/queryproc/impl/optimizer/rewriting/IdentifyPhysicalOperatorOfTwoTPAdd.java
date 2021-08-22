@@ -2,6 +2,11 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
+/**
+ * This class contains methods that identifying two ordered physical operators of a physical plan.
+ * It helps to check whether the physical plan can be applied to a rule.
+ */
+
 public class IdentifyPhysicalOperatorOfTwoTPAdd {
     protected final IdentifyPhysicalOperatorOfTPAdd popOfTPAdd;
     protected final IdentifyPhysicalOperatorOfTPAdd popOfSubquery;

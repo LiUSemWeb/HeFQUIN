@@ -8,9 +8,7 @@ public abstract class ConvertTPAddToSymmetricHashJoin extends ConvertTPAddToBina
 
     @Override
     public BinaryPhysicalOp definePhysicalOperator(){
-        final PhysicalOpSymmetricHashJoin popJoin = new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
-
-        return popJoin;
+        return new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
     }
 
 }

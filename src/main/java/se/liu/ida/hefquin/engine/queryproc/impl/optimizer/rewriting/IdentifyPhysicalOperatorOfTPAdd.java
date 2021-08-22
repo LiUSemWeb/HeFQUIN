@@ -5,6 +5,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
+/**
+ * This class contains methods that identifying the root physical operator of a physical plan.
+ * It helps to check whether the root physical operator a physical plan can be applied to a rule.
+ */
 public class IdentifyPhysicalOperatorOfTPAdd {
     protected final PhysicalOperatorForLogicalOperator pop;
 
@@ -13,8 +17,7 @@ public class IdentifyPhysicalOperatorOfTPAdd {
     }
 
     public boolean matchTPAdd() {
-        final LogicalOpTPAdd lop = (LogicalOpTPAdd) pop.getLogicalOperator();
-        if ( lop instanceof LogicalOpTPAdd ){
+        if ( pop.getLogicalOperator() instanceof LogicalOpTPAdd ){
             return true;
         }
         return false;

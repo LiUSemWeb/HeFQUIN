@@ -8,16 +8,12 @@ public abstract class ChangeOrderOfTwoTPAddBindJoin extends OrderTweakingOfTwoTP
 
     @Override
     public UnaryPhysicalOp defineInnerPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpBindJoin popNewInner = new PhysicalOpBindJoin( lop );
-
-        return popNewInner;
+        return new PhysicalOpBindJoin( lop );
     }
 
     @Override
     public UnaryPhysicalOp defineRootPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpBindJoin popNewRoot = new PhysicalOpBindJoin( lop );
-
-        return popNewRoot;
+        return new PhysicalOpBindJoin( lop );
     }
 
 }

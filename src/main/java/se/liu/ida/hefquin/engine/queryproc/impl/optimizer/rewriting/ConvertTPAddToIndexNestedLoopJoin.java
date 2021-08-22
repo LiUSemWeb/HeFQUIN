@@ -8,10 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLo
 public abstract class ConvertTPAddToIndexNestedLoopJoin extends ConvertTPAddToUnaryPhysicalOp{
 
     @Override
-    public UnaryPhysicalOp definePhysicalOperator(final LogicalOpTPAdd lop ){
-        final PhysicalOpIndexNestedLoopsJoin popIndexNLJ = new PhysicalOpIndexNestedLoopsJoin((UnaryLogicalOp) lop);
-
-        return popIndexNLJ;
+    public UnaryPhysicalOp definePhysicalOperator( final LogicalOpTPAdd lop ){
+        return new PhysicalOpIndexNestedLoopsJoin(lop);
     }
 
 }

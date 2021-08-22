@@ -10,7 +10,7 @@ public class ApplicableRules {
     RuleInstances rules = new RuleInstances();
     Set<RewritingRule> rulesForPlan = new HashSet<>();
 
-    public ApplicableRules( final PhysicalPlan plan){
+    public ApplicableRules( final PhysicalPlan plan ){
         rules.addRuleInstances();
         findApplicableRules( plan );
     }
@@ -22,7 +22,6 @@ public class ApplicableRules {
         for ( int i = 0; i < numChildren; ++i ) {
             findApplicableRules( plan.getSubPlan(i) );
         }
-
     }
 
     public Set<RewritingRule> findApplicableRulesForRootOp( final PhysicalPlan plan ){

@@ -8,15 +8,11 @@ public abstract class ChangeOrderOfTwoTPAddBJFILTER extends OrderTweakingOfTwoTP
 
     @Override
     public UnaryPhysicalOp defineInnerPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpBindJoinWithFILTER popNewInner = new PhysicalOpBindJoinWithFILTER( lop );
-
-        return popNewInner;
+        return new PhysicalOpBindJoinWithFILTER( lop );
     }
 
     @Override
     public UnaryPhysicalOp defineRootPop( final LogicalOpTPAdd lop ) {
-        final PhysicalOpBindJoinWithFILTER popNewRoot = new PhysicalOpBindJoinWithFILTER( lop );
-
-        return popNewRoot;
+        return new PhysicalOpBindJoinWithFILTER( lop );
     }
 }
