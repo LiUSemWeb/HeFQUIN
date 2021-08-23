@@ -9,18 +9,17 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNested
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoin
 {
-	/**
-	 * The given logical operator is expected to be of one of the following
-	 * two types: {@link LogicalOpTPAdd} or {@link LogicalOpBGPAdd}.
-	 */
-	public PhysicalOpIndexNestedLoopsJoin( final UnaryLogicalOp lop ) {
+	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPAdd lop ) {
+		super(lop);
+	}
+
+	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpBGPAdd lop ) {
 		super(lop);
 	}
 

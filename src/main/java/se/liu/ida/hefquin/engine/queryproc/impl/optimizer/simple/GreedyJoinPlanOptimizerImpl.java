@@ -4,7 +4,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
@@ -81,7 +81,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 			final PhysicalPlan[] plans = new PhysicalPlan[ subplans.size() ];
 			for ( int i = 0; i < subplans.size(); ++i ) {
 				final BinaryPhysicalOp joinOp = EnumerationAlgorithm.createNewJoinOperator();
-				plans[i] = new PhysicalPlanWithBinaryRootImpl( joinOp, currentPlan, subplans.get(i) );
+				plans[i] = PhysicalPlanFactory.createPlan( joinOp, currentPlan, subplans.get(i) );
 			}
 			return plans;
 		}

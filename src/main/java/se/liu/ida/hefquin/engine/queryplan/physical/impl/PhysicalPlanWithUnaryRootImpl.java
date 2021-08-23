@@ -6,14 +6,19 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class PhysicalPlanWithUnaryRootImpl implements PhysicalPlanWithUnaryRoot
 {
 	private final UnaryPhysicalOp rootOp;
 	private final PhysicalPlan subPlan;
 
-	public PhysicalPlanWithUnaryRootImpl( final UnaryPhysicalOp rootOp,
-	                                      final PhysicalPlan subPlan ) {
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 */
+	protected PhysicalPlanWithUnaryRootImpl( final UnaryPhysicalOp rootOp,
+	                                         final PhysicalPlan subPlan ) {
 		assert rootOp != null;
 		assert subPlan != null;
 

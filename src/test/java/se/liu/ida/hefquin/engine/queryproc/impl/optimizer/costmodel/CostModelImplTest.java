@@ -17,8 +17,7 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
@@ -142,10 +141,9 @@ public class CostModelImplTest extends EngineTestBase
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new TPFServerForTest();
 
-		final LogicalOpRequest<?,?>  lopReq = new LogicalOpRequest<>(fm, req);
-		final PhysicalOpRequest<?,?> popReq = new PhysicalOpRequest<>(lopReq);
+		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
 
-		return new PhysicalPlanWithNullaryRootImpl(popReq);
+		return PhysicalPlanFactory.createPlanWithRequest(reqOp);
 	}
 
 	/**

@@ -4,13 +4,8 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -55,14 +50,8 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         else if ( plan.numberOfSubPlans() == 0){
             return plan;
         }
-        else if ( plan.numberOfSubPlans() == 1 ){
-            return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) plan.getRootOperator(), optSubPlans[0]);
-        }
-        else if ( plan.numberOfSubPlans() == 2 ){
-            return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) plan.getRootOperator(), optSubPlans[0], optSubPlans[1]);
-        }
         else {
-            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) plan.getRootOperator(), optSubPlans);
+            return PhysicalPlanFactory.createPlan( plan.getRootOperator(), optSubPlans );
         }
     }
 

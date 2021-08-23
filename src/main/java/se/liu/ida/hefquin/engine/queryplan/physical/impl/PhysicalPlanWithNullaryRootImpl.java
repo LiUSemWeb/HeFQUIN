@@ -6,12 +6,17 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class PhysicalPlanWithNullaryRootImpl implements PhysicalPlanWithNullaryRoot
 {
 	private final NullaryPhysicalOp rootOp;
 
-	public PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp ) {
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 */
+	protected PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp ) {
 		assert rootOp != null;
 		this.rootOp = rootOp;
 	}

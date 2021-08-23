@@ -13,8 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class CardinalityEstimationHelper
 {
@@ -54,9 +53,7 @@ public class CardinalityEstimationHelper
 	                                                 final DataRetrievalRequest req )
 	{
 		final LogicalOpRequest<?,?>  lopReq = new LogicalOpRequest<>(fm, req);
-		final PhysicalOpRequest<?,?> popReq = new PhysicalOpRequest<>(lopReq);
-
-		return new PhysicalPlanWithNullaryRootImpl(popReq);
+		return PhysicalPlanFactory.createPlanWithRequest(lopReq);
 	}
 
 }

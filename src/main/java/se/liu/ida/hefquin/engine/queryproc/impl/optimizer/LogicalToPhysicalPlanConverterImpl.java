@@ -12,19 +12,14 @@ import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -87,45 +82,15 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	protected PhysicalPlan createPhysicalPlanWithNullaryRoot( final NullaryLogicalOp lop ) {
-		final NullaryPhysicalOp pop;
-		if ( lop instanceof LogicalOpRequest<?,?> ) {
-			pop = convertRequest( (LogicalOpRequest<?,?>) lop );
-		}
-		else {
-			throw new IllegalArgumentException( "unknown logical operator: " + lop.getClass().getName() );
-		}
-
-		return new PhysicalPlanWithNullaryRootImpl(pop);
+		return PhysicalPlanFactory.createPlan(lop);
 	}
 
 	protected PhysicalPlan createPhysicalPlanWithUnaryRoot( final UnaryLogicalOp lop, final PhysicalPlan child ) {
-		final UnaryPhysicalOp pop;
-		if ( lop instanceof LogicalOpTPAdd ) {
-			pop = convertTPAdd( (LogicalOpTPAdd) lop );
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			pop = convertBGPAdd( (LogicalOpBGPAdd) lop );
-		}
-		else {
-			throw new IllegalArgumentException( "unknown logical operator: " + lop.getClass().getName() );
-		}
-
-		return new PhysicalPlanWithUnaryRootImpl(pop, child);
+		return PhysicalPlanFactory.createPlan(lop, child);
 	}
 
 	protected PhysicalPlan createPhysicalPlanWithBinaryRoot( final BinaryLogicalOp lop, final PhysicalPlan child1, final PhysicalPlan child2 ) {
-		final BinaryPhysicalOp pop;
-		if ( lop instanceof LogicalOpJoin ) {
-			pop = convertJoin( (LogicalOpJoin) lop );
-		}
-		else if ( lop instanceof LogicalOpUnion ) {
-			pop = convertUnion( (LogicalOpUnion) lop );
-		}
-		else {
-			throw new IllegalArgumentException( "unknown logical operator: " + lop.getClass().getName() );
-		}
-
-		return new PhysicalPlanWithBinaryRootImpl(pop, child1, child2);
+		return PhysicalPlanFactory.createPlan(lop, child1, child2);
 	}
 
 	protected PhysicalPlan createPhysicalPlanWithNaryRoot( final NaryLogicalOp lop,
@@ -136,10 +101,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			return createPhysicalPlanForMultiwayJoin( (LogicalOpMultiwayJoin) lop, children, keepMultiwayJoins );
 		}
 		else if ( lop instanceof LogicalOpMultiwayUnion ) {
+			// TODO: remove this else-if branch, including the method that it
+			// calls, once we have a physical operator for multiway union 
 			return createPhysicalPlanForMultiwayUnion( (LogicalOpMultiwayUnion) lop, children );
 		}
 		else {
-			throw new IllegalArgumentException( "unknown logical operator: " + lop.getClass().getName() );
+			return PhysicalPlanFactory.createPlan(lop, children);
 		}
 	}
 
@@ -156,7 +123,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 				@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 				@Override public NaryExecutableOp createExecOp(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
 			};
-			return new PhysicalPlanWithNaryRootImpl(pop, children);
+			return PhysicalPlanFactory.createPlan(pop, children);
 		}
 
 		// As long as we do not have an actual algorithm for multiway joins,
@@ -184,26 +151,6 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		}
 
 		return currentSubPlan;
-	}
-
-	protected NullaryPhysicalOp convertRequest( final LogicalOpRequest<?,?> lop ) {
-		return new PhysicalOpRequest<>(lop);
-	}
-
-	protected UnaryPhysicalOp convertTPAdd( final LogicalOpTPAdd lop ) {
-		return new PhysicalOpBindJoin(lop);
-	}
-
-	protected UnaryPhysicalOp convertBGPAdd( final LogicalOpBGPAdd lop ) {
-		return new PhysicalOpBindJoin(lop);
-	}
-
-	protected BinaryPhysicalOp convertJoin( final LogicalOpJoin lop ) {
-		return new PhysicalOpSymmetricHashJoin(lop);
-	}
-
-	protected BinaryPhysicalOp convertUnion( final LogicalOpUnion lop ) {
-		return new PhysicalOpBinaryUnion(lop);
 	}
 
 }

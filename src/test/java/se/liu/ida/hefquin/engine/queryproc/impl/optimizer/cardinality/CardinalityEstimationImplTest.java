@@ -27,13 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 
 public class CardinalityEstimationImplTest extends EngineTestBase
@@ -244,10 +238,9 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationMember fm = new TPFServerForTest();
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 
-		final LogicalOpRequest<?,?>  lopReq = new LogicalOpRequest<>(fm, req);
-		final PhysicalOpRequest<?,?> popReq = new PhysicalOpRequest<>(lopReq);
+		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
 
-		return new PhysicalPlanWithNullaryRootImpl(popReq);
+		return PhysicalPlanFactory.createPlan(reqOp);
 	}
 
 	protected PhysicalPlan createJoinPlan( final int card1, final int card2 ) {
@@ -258,8 +251,8 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	protected PhysicalPlan createJoinPlan( final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
-		return new PhysicalPlanWithBinaryRootImpl(pop, subplan1, subplan2);
+		final LogicalOpJoin joinOp = new LogicalOpJoin();
+		return PhysicalPlanFactory.createPlan(joinOp, subplan1, subplan2);
 	}
 
 	protected PhysicalPlan createTPAddPlan( final int card1, final int card2 ) {
@@ -276,8 +269,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
 		final LogicalOpTPAdd tpAdd = new LogicalOpTPAdd(fm, tp);
-		return new PhysicalPlanWithUnaryRootImpl( new PhysicalOpBindJoin(tpAdd),
-		                                          subplan );
+		return PhysicalPlanFactory.createPlan(tpAdd, subplan);
 	}
 
 
