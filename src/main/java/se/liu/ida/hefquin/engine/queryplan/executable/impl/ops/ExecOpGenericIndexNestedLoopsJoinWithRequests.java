@@ -22,13 +22,11 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * Abstract base class to implement index nested loops joins by issuing
  * requests directly and, then, using response processors.
  *
- * In contrast to {@link ExecOpGenericIndexNestedLoopsJoinWithRequestOps}
- * (which uses request operators and, thus, processes all solution mappings
- * of any given {@link IntermediateResultBlock} sequentially, including the
- * execution of the corresponding requests), this base class can process the
- * solution mappings of any given {@link IntermediateResultBlock} in parallel
- * by issuing all corresponding requests first and, then, dealing with the
- * responses as they come in. 
+ * An alternative option to this base class is the abstract base class
+ * {@link ExecOpGenericIndexNestedLoopsJoinWithRequestOps} which relies
+ * on executable request operators rather than issuing requests directly.
+ * This option may come handy in cases in which a single request per 
+ * input solution mapping is not enough because of paging.
  */
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
                             QueryType extends Query,
