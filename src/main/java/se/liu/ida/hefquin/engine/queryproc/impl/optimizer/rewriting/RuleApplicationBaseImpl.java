@@ -10,10 +10,11 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRo
 
 public abstract class RuleApplicationBaseImpl implements RuleApplication{
     protected final PhysicalPlan[] subPlans;
-    protected int index;
+    protected RewritingRule rule;
 
-    public RuleApplicationBaseImpl( final PhysicalPlan[] subPlans ){
+    public RuleApplicationBaseImpl( final PhysicalPlan[] subPlans, final RewritingRule rule ){
         this.subPlans = subPlans;
+        this.rule = rule;
     }
 
     @Override
@@ -22,38 +23,48 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
     }
 
     @Override
-    public PhysicalPlan getResultingPlan() {
-        index = 0;
-        return constructPlan( subPlans[0] );
+    public RewritingRule getRule() {
+        return rule;
     }
 
-    protected PhysicalPlan constructPlan( final PhysicalPlan plan ) {
-        final PhysicalPlan[] newSubPlans = getRewrittenSubPlans(plan);
+    @Override
+    public PhysicalPlan getResultingPlan() {
+        final int numStep = subPlans.length;
+        PhysicalPlan rewrittenPlan = rewrittenSubPlan( subPlans[numStep-1] );
 
-        if( index == subPlans.length - 1)  {
-            return rewrittenSubPlan(plan);
+        for (int i = numStep-2; i >= 0; i--) {
+            rewrittenPlan = constructPlan( subPlans[i], rewrittenPlan, i );
         }
-        else if ( plan.numberOfSubPlans() == 0){
-            return plan;
+        return rewrittenPlan;
+    }
+
+    protected PhysicalPlan constructPlan( final PhysicalPlan parent, final PhysicalPlan rewrittenChild, final int indexOfPath) {
+
+        if ( parent.numberOfSubPlans() == 0){
+            return parent;
         }
-        else if ( plan.numberOfSubPlans() == 1 ){
-            return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) plan.getRootOperator(), newSubPlans[0]);
+        else if ( parent.numberOfSubPlans() == 1 ){
+            return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) parent.getRootOperator(), rewrittenChild);
         }
-        else if ( plan.numberOfSubPlans() == 2 ){
-            return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) plan.getRootOperator(), newSubPlans[0], newSubPlans[1]);
+        else if ( parent.numberOfSubPlans() == 2 ){
+            PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
+            return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) parent.getRootOperator(), newSubPlans[0], newSubPlans[1]);
         }
         else {
-            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) plan.getRootOperator(), newSubPlans);
+            PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
+            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) parent.getRootOperator(), newSubPlans);
         }
     }
 
-    protected PhysicalPlan[] getRewrittenSubPlans(final PhysicalPlan plan ) {
-        final int numChildren = plan.numberOfSubPlans();
+    protected PhysicalPlan[] getRewrittenSubPlans( final PhysicalPlan parent, final PhysicalPlan rewrittenChild, final int indexOfPath) {
+        final int numChildren = parent.numberOfSubPlans();
         final PhysicalPlan[] children = new PhysicalPlan[numChildren];
         for (int i = 0; i< numChildren; i++) {
-            index ++;
-            if ( index-i < subPlans.length ) {
-                children[i] = constructPlan( plan.getSubPlan(i) );
+            if ( parent.getSubPlan(0) == subPlans[indexOfPath+1]) {
+                children[i] = rewrittenChild;
+            }
+            else {
+                children[i] = parent.getSubPlan(i);
             }
         }
         return children;

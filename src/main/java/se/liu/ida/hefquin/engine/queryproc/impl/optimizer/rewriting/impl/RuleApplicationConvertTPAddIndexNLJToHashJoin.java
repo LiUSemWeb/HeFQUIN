@@ -11,16 +11,11 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRul
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicationBaseImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.ConstructSubPPBasedOnUnaryOperator;
 
-public class RuleAppliConvertTPAddIndexNLJToHashJoin extends RuleApplicationBaseImpl {
+public class RuleApplicationConvertTPAddIndexNLJToHashJoin extends RuleApplicationBaseImpl {
     protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
 
-    public RuleAppliConvertTPAddIndexNLJToHashJoin( final PhysicalPlan[] subPlans ) {
-        super(subPlans);
-    }
-
-    @Override
-    public RewritingRule getRule() {
-        return new RuleConvertTPAddIndexNLJToHashJoin( 0.15 );
+    public RuleApplicationConvertTPAddIndexNLJToHashJoin( final PhysicalPlan[] subPlans, final RewritingRule rule) {
+        super(subPlans, rule);
     }
 
     @Override

@@ -1,15 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.impl.RuleAppliConvertTPAddIndexNLJToHashJoin;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
 public abstract class RewritingRuleBaseImpl implements RewritingRule{
-    protected Set<RuleApplication> ruleApplications = new HashSet<>();
-    protected Stack<PhysicalPlan> subPlans = new Stack<>();
     protected double priority;
 
     public RewritingRuleBaseImpl( final double priority ) {
@@ -23,19 +20,26 @@ public abstract class RewritingRuleBaseImpl implements RewritingRule{
 
     @Override
     public Set<RuleApplication> determineAllPossibleApplications( final PhysicalPlan plan ) {
-        subPlans.push(plan);
+        return _determineAllPossibleApplications( plan, new HashSet<>(), new Stack<>() );
+    }
+
+    protected Set<RuleApplication> _determineAllPossibleApplications( final PhysicalPlan plan, final Set<RuleApplication> ruleApplications, final Stack<PhysicalPlan> currentPath ) {
+        currentPath.push(plan);
 
         if ( canBeAppliedTo(plan) ) {
-            ruleApplications.add( new RuleAppliConvertTPAddIndexNLJToHashJoin((PhysicalPlan[]) subPlans.toArray()) );
+            ruleApplications.add( createRuleApplication((PhysicalPlan[]) currentPath.toArray()));
         }
-
         final int numChildren = plan.numberOfSubPlans();
         for (int i = 0; i < numChildren; ++i) {
-            determineAllPossibleApplications( plan.getSubPlan(i) );
+            _determineAllPossibleApplications( plan.getSubPlan(i), ruleApplications, currentPath);
         }
+
+        currentPath.pop();
         return ruleApplications;
     }
 
     protected abstract boolean canBeAppliedTo( final PhysicalPlan plan );
+
+    protected abstract RuleApplication createRuleApplication( final PhysicalPlan[] currentPath );
 
 }
