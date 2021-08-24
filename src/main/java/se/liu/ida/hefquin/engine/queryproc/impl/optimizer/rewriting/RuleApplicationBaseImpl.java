@@ -53,7 +53,7 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
         for (int i = 0; i< numChildren; i++) {
             index ++;
             if ( index-i < subPlans.length ) {
-                children[i] = constructPlan( subPlans[index] );
+                children[i] = constructPlan( plan.getSubPlan(i) );
             }
         }
         return children;
