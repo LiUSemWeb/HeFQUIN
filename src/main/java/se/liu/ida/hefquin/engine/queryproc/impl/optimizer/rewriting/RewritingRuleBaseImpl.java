@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public abstract class RewritingRuleBaseImpl implements RewritingRule{
-    protected double priority;
+    protected final double priority;
 
     public RewritingRuleBaseImpl( final double priority ) {
         this.priority = priority;
