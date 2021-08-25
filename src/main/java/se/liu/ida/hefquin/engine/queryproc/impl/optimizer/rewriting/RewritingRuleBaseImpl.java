@@ -51,6 +51,6 @@ public abstract class RewritingRuleBaseImpl implements RewritingRule
 
     protected abstract boolean canBeAppliedTo( final PhysicalPlan plan );
 
-    protected abstract RuleApplication createRuleApplication( final PhysicalPlan[] currentPath );
+    protected abstract RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan );
 
 }
