@@ -47,7 +47,7 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
             return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) parent.getRootOperator(), rewrittenChild);
         }
         else if ( parent.numberOfSubPlans() == 2 ){
-            PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
+            final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
             return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) parent.getRootOperator(), newSubPlans[0], newSubPlans[1]);
         }
         else {
