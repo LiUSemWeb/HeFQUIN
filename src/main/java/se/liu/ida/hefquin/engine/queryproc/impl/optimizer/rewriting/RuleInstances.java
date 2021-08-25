@@ -15,7 +15,16 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddBJUNIONToHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJVALUESToHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJToHashJoin(0.15) );
+
+        // Convert TPAdd to Symmetric Hash Join
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToSymmetricHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJFILTERToSymmetricHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJUNIONToSymmetricHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJVALUESToSymmetricHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJToSymmetricHashJoin(0.15) );
+
         // TODO: more rules to be added
+
     }
 
 }
