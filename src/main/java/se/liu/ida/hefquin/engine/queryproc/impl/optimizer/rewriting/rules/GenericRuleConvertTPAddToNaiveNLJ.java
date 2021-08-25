@@ -6,20 +6,20 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public abstract class GenericRuleConvertTPAddToSymmetricHashJoin extends AbstractRewritingRuleImpl{
+public abstract class GenericRuleConvertTPAddToNaiveNLJ extends AbstractRewritingRuleImpl{
 
-    public GenericRuleConvertTPAddToSymmetricHashJoin( final double priority ) {
+    public GenericRuleConvertTPAddToNaiveNLJ( final double priority ) {
         super(priority);
     }
 
     @Override
-    protected RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan ) {
+    protected RuleApplication createRuleApplication(final PhysicalPlan[] pathToTargetPlan ) {
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
                 final PhysicalPlan reqPlan = PhysicalPlanFactory.extractRequestAsPlan((LogicalOpTPAdd) rootOp.getLogicalOperator());
-                return PhysicalPlanFactory.createPlanWithSymmetricHashJoin( reqPlan, plan.getSubPlan(0) );
+                return PhysicalPlanFactory.createPlanWithNaiveNLJ( reqPlan, plan.getSubPlan(0) );
             }
         };
     }

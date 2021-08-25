@@ -23,6 +23,13 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddBJVALUESToSymmetricHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJToSymmetricHashJoin(0.15) );
 
+        // Convert TPAdd to NaiveNLJ
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJFILTERToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJUNIONToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJVALUESToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBJToNaiveNLJ(0.15) );
+
         // TODO: more rules to be added
 
     }
