@@ -2,10 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhysicalOperatorOfTPAdd;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRuleBaseImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
@@ -32,10 +30,9 @@ public class RuleConvertTPAddIndexNLJToHashJoin extends RewritingRuleBaseImpl
         return new RuleApplicationBaseImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                final PhysicalOperatorForLogicalOperator popRoot = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-                final LogicalOpTPAdd lop = (LogicalOpTPAdd) popRoot.getLogicalOperator();
-                final PhysicalPlan subqueryRequest = CardinalityEstimationHelper.formRequestPlan(lop);
-                return PhysicalPlanFactory.createPlanWithHashJoin( subqueryRequest, plan.getSubPlan(0) );
+                final PhysicalOpIndexNestedLoopsJoin rootOp = (PhysicalOpIndexNestedLoopsJoin) plan.getRootOperator();
+                final PhysicalPlan reqPlan = PhysicalPlanFactory.extractRequestAsPlan(rootOp);
+                return PhysicalPlanFactory.createPlanWithHashJoin( reqPlan, plan.getSubPlan(0) );
             }
         };
     }

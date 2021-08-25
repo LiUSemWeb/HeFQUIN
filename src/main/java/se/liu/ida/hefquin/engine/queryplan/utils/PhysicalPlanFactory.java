@@ -2,8 +2,15 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -298,6 +305,70 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final NaryPhysicalOp rootOp,
 	                                       final List<PhysicalPlan> subplans ) {
 		return new PhysicalPlanWithNaryRootImpl(rootOp, subplans) {};
+	}
+
+
+	// --------- other special cases -----------
+
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpTPAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+		final TriplePattern tp = lop.getTP();
+
+		final DataRetrievalRequest req;
+		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl(tp);
+		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp, 0);
+		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp, 0);
+		else {
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		}
+
+		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpBGPAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+
+		final DataRetrievalRequest req;
+		if ( fm.getInterface().supportsBGPRequests() ) {
+			req = new BGPRequestImpl( lop.getBGP() );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		}
+
+		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoin pop ) {
+		return extractRequestAsPlan( pop.getLogicalOperator() );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithFILTER pop ) {
+		return extractRequestAsPlan( pop.getLogicalOperator() );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithUNION pop ) {
+		return extractRequestAsPlan( pop.getLogicalOperator() );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinWithVALUES pop ) {
+		return extractRequestAsPlan( pop.getLogicalOperator() );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpIndexNestedLoopsJoin pop ) {
+		return extractRequestAsPlan( pop.getLogicalOperator() );
+	}
+
+	protected static PhysicalPlan extractRequestAsPlan( final LogicalOperator lop ) {
+		if ( lop instanceof LogicalOpTPAdd ) {
+			return extractRequestAsPlan( (LogicalOpTPAdd) lop );
+		}
+		else if ( lop instanceof LogicalOpBGPAdd ) {
+			return extractRequestAsPlan( (LogicalOpBGPAdd) lop );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
+		}
 	}
 
 }

@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 
 public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinalityEstimation
@@ -76,11 +77,11 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			return cardEstimator.initiateCardinalityEstimation(plan);
 		}
 		else if ( rootOp instanceof LogicalOpTPAdd ) {
-			final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) rootOp );
+			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpTPAdd) rootOp );
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqTP, v );
 		}
 		else if ( rootOp instanceof LogicalOpBGPAdd ) {
-			final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) rootOp );
+			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqBGP, v );
 		}
 		else if ( rootOp instanceof LogicalOpJoin ) {

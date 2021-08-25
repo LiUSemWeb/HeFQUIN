@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
@@ -110,11 +111,11 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             worker = new WorkerForJoins( plan.getSubPlan(0), plan.getSubPlan(1) );
         }
         else if ( rootOp instanceof LogicalOpTPAdd ) {
-            final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpTPAdd) rootOp );
+            final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpTPAdd) rootOp );
             worker = new WorkerForJoins( plan.getSubPlan(0), reqTP );
         }
         else if ( rootOp instanceof LogicalOpBGPAdd ) {
-            final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestPlan( (LogicalOpBGPAdd) rootOp );
+            final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
             worker = new WorkerForJoins( plan.getSubPlan(0), reqBGP );
         }
         else {

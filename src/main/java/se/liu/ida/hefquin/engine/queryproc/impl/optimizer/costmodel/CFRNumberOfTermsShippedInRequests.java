@@ -13,8 +13,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
 
 public class CFRNumberOfTermsShippedInRequests extends CFRBase
 {
@@ -36,7 +36,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences( tpAdd.getTP() );
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan reqTP = CardinalityEstimationHelper.formRequestPlan(tpAdd);
+			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan(tpAdd);
 			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqTP).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
@@ -46,7 +46,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences( bgpAdd.getBGP() );
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan reqBGP = CardinalityEstimationHelper.formRequestPlan(bgpAdd);
+			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan(bgpAdd);
 			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
