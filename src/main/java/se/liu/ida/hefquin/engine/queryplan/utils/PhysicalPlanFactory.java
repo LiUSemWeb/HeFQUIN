@@ -163,11 +163,27 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a plan with a binary union as root operator.
 	 */
+	public static PhysicalPlan createPlanWithUnion( final PhysicalPlan subplan1,
+	                                                final PhysicalPlan subplan2 ) {
+		return createPlanWithUnion( new LogicalOpUnion(), subplan1, subplan2 );
+	}
+
+	/**
+	 * Creates a plan with a binary union as root operator.
+	 */
 	public static PhysicalPlan createPlanWithUnion( final LogicalOpUnion lop,
 	                                                final PhysicalPlan subplan1,
 	                                                final PhysicalPlan subplan2 ) {
 		final BinaryPhysicalOp pop = new PhysicalOpBinaryUnion(lop);
 		return createPlan(pop, subplan1, subplan2);
+	}
+
+	/**
+	 * Creates a plan with a hash join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithHashJoin( final PhysicalPlan subplan1,
+	                                                   final PhysicalPlan subplan2 ) {
+		return createPlanWithHashJoin( new LogicalOpJoin(), subplan1, subplan2 );
 	}
 
 	/**
@@ -183,11 +199,27 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a plan with a symmetric hash join as root operator.
 	 */
+	public static PhysicalPlan createPlanWithSymmetricHashJoin( final PhysicalPlan subplan1,
+	                                                            final PhysicalPlan subplan2 ) {
+		return createPlanWithSymmetricHashJoin( new LogicalOpJoin(), subplan1, subplan2 );
+	}
+
+	/**
+	 * Creates a plan with a symmetric hash join as root operator.
+	 */
 	public static PhysicalPlan createPlanWithSymmetricHashJoin( final LogicalOpJoin lop,
 	                                                            final PhysicalPlan subplan1,
 	                                                            final PhysicalPlan subplan2 ) {
 		final BinaryPhysicalOp pop = new PhysicalOpSymmetricHashJoin(lop);
 		return createPlan(pop, subplan1, subplan2);
+	}
+
+	/**
+	 * Creates a plan with a naive nested loops join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithNaiveNLJ( final PhysicalPlan subplan1,
+	                                                   final PhysicalPlan subplan2 ) {
+		return createPlanWithNaiveNLJ( new LogicalOpJoin(), subplan1, subplan2 );
 	}
 
 	/**
