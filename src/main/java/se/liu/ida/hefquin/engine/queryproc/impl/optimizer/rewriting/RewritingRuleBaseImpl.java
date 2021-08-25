@@ -10,6 +10,7 @@ public abstract class RewritingRuleBaseImpl implements RewritingRule{
     protected final double priority;
 
     public RewritingRuleBaseImpl( final double priority ) {
+        assert priority >= 0;
         this.priority = priority;
     }
 
