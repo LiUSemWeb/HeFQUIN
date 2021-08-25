@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 /**
  * This is a rewriting rule that convert a TPAdd(indexNLJ) operator to Hash Join.
  */
-public class RuleConvertTPAddIndexNLJToHashJoin extends RewritingRuleBaseImpl
+public class RuleConvertTPAddIndexNLJToHashJoin extends AbstractRewritingRuleImpl
 {
     public RuleConvertTPAddIndexNLJToHashJoin( final double priority ){
         super(priority);
@@ -18,13 +18,13 @@ public class RuleConvertTPAddIndexNLJToHashJoin extends RewritingRuleBaseImpl
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOperatorOfTPAdd.matchTPAddIndexNLJ(rootOp);
+        return IdentifyPhysicalOpUsedForTPAdd.isIndexNLJ(rootOp);
     }
 
     @Override
     protected RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan )
     {
-        return new RuleApplicationBaseImpl(pathToTargetPlan, this) {
+        return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOpIndexNestedLoopsJoin rootOp = (PhysicalOpIndexNestedLoopsJoin) plan.getRootOperator();

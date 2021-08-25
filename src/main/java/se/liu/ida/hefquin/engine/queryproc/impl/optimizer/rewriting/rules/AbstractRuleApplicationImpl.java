@@ -8,12 +8,12 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public abstract class RuleApplicationBaseImpl implements RuleApplication
+public abstract class AbstractRuleApplicationImpl implements RuleApplication
 {
     protected final PhysicalPlan[] pathToTargetSubPlan;
     protected final RewritingRule rule;
 
-    public RuleApplicationBaseImpl( final PhysicalPlan[] pathToTargetSubPlan,
+    public AbstractRuleApplicationImpl( final PhysicalPlan[] pathToTargetSubPlan,
                                     final RewritingRule rule ) {
         assert pathToTargetSubPlan.length > 0;
         assert rule != null;

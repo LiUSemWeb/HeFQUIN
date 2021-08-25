@@ -8,11 +8,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-public abstract class RewritingRuleBaseImpl implements RewritingRule
+public abstract class AbstractRewritingRuleImpl implements RewritingRule
 {
     protected final double priority;
 
-    public RewritingRuleBaseImpl( final double priority ) {
+    public AbstractRewritingRuleImpl( final double priority ) {
         assert priority >= 0;
         this.priority = priority;
     }
