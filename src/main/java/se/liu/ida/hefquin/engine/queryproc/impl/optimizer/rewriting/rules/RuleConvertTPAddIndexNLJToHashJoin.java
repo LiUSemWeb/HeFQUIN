@@ -4,10 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.IdentifyPhysicalOperatorOfTPAdd;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRuleBaseImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicationBaseImpl;
 
 /**
  * This is a rewriting rule that convert a TPAdd(indexNLJ) operator to Hash Join.

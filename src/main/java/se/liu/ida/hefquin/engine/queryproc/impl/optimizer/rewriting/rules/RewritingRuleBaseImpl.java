@@ -1,6 +1,7 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
 
 import java.util.HashSet;
 import java.util.Set;
