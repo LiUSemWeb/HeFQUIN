@@ -12,7 +12,9 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
     protected final PhysicalPlan[] subPlans;
     protected RewritingRule rule;
 
-    public RuleApplicationBaseImpl( final PhysicalPlan[] subPlans, final RewritingRule rule ){
+    public RuleApplicationBaseImpl( final PhysicalPlan[] subPlans, final RewritingRule rule ) {
+        assert subPlans.length > 0;
+        assert rule != null;
         this.subPlans = subPlans;
         this.rule = rule;
     }
