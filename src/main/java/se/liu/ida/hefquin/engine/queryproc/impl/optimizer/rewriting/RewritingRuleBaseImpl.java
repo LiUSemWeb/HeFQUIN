@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-public abstract class RewritingRuleBaseImpl implements RewritingRule{
+public abstract class RewritingRuleBaseImpl implements RewritingRule
+{
     protected final double priority;
 
     public RewritingRuleBaseImpl( final double priority ) {
@@ -21,22 +22,31 @@ public abstract class RewritingRuleBaseImpl implements RewritingRule{
 
     @Override
     public Set<RuleApplication> determineAllPossibleApplications( final PhysicalPlan plan ) {
-        return _determineAllPossibleApplications( plan, new HashSet<>(), new Stack<>() );
+        final Set<RuleApplication> collectedRuleApps = new HashSet<>();
+        collectAllPossibleApplications( plan, collectedRuleApps, new Stack<>() );
+        return collectedRuleApps;
     }
 
-    protected Set<RuleApplication> _determineAllPossibleApplications( final PhysicalPlan plan, final Set<RuleApplication> ruleApplications, final Stack<PhysicalPlan> currentPath ) {
-        currentPath.push(plan);
+    protected void collectAllPossibleApplications( final PhysicalPlan plan,
+                                                   final Set<RuleApplication> collectedRuleApps,
+                                                   final Stack<PhysicalPlan> currentPathFromRoot ) {
+        currentPathFromRoot.push(plan);
 
         if ( canBeAppliedTo(plan) ) {
-            ruleApplications.add( createRuleApplication((PhysicalPlan[]) currentPath.toArray()));
-        }
-        final int numChildren = plan.numberOfSubPlans();
-        for (int i = 0; i < numChildren; ++i) {
-            _determineAllPossibleApplications( plan.getSubPlan(i), ruleApplications, currentPath);
+            final PhysicalPlan[] pathToTargetPlan = (PhysicalPlan[]) currentPathFromRoot.toArray();
+            final RuleApplication app = createRuleApplication(pathToTargetPlan);
+            collectedRuleApps.add(app);
         }
 
-        currentPath.pop();
-        return ruleApplications;
+        // recursion to check also within all subplans
+        final int numChildren = plan.numberOfSubPlans();
+        for ( int i = 0; i < numChildren; ++i ) {
+            collectAllPossibleApplications( plan.getSubPlan(i),
+                                               collectedRuleApps,
+                                               currentPathFromRoot );
+        }
+
+        currentPathFromRoot.pop();
     }
 
     protected abstract boolean canBeAppliedTo( final PhysicalPlan plan );

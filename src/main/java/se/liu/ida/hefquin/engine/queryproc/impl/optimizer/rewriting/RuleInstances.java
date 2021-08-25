@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.impl.RuleConvertTPAddIndexNLJToHashJoin;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.RuleConvertTPAddIndexNLJToHashJoin;
 
 public class RuleInstances {
     Set<RewritingRule> ruleApplications = new HashSet<>();
