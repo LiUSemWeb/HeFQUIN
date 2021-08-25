@@ -14,12 +14,12 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.ConstructSubPPBa
 public class RuleApplicationConvertTPAddIndexNLJToHashJoin extends RuleApplicationBaseImpl {
     protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
 
-    public RuleApplicationConvertTPAddIndexNLJToHashJoin( final PhysicalPlan[] subPlans, final RewritingRule rule) {
-        super(subPlans, rule);
+    public RuleApplicationConvertTPAddIndexNLJToHashJoin( final PhysicalPlan[] currentPath, final RewritingRule rule) {
+        super( currentPath, rule );
     }
 
     @Override
-    protected PhysicalPlan rewrittenSubPlan( final PhysicalPlan plan ) {
+    protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
         final PhysicalOperatorForLogicalOperator popRoot = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
         final LogicalOpTPAdd lop = (LogicalOpTPAdd) popRoot.getLogicalOperator();
 

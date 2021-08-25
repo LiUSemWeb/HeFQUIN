@@ -9,19 +9,19 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNaryRoo
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
 
 public abstract class RuleApplicationBaseImpl implements RuleApplication{
-    protected final PhysicalPlan[] subPlans;
+    protected final PhysicalPlan[] pathToTargetSubPlan;
     protected RewritingRule rule;
 
-    public RuleApplicationBaseImpl( final PhysicalPlan[] subPlans, final RewritingRule rule ) {
-        assert subPlans.length > 0;
+    public RuleApplicationBaseImpl( final PhysicalPlan[] currentPath, final RewritingRule rule ) {
+        assert currentPath.length > 0;
         assert rule != null;
-        this.subPlans = subPlans;
+        this.pathToTargetSubPlan = currentPath;
         this.rule = rule;
     }
 
     @Override
     public PhysicalPlan getPlan() {
-        return subPlans[0];
+        return pathToTargetSubPlan[0];
     }
 
     @Override
@@ -31,38 +31,38 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
 
     @Override
     public PhysicalPlan getResultingPlan() {
-        final int numStep = subPlans.length;
-        PhysicalPlan rewrittenPlan = rewrittenSubPlan( subPlans[numStep-1] );
+        final int numSteps = pathToTargetSubPlan.length - 1;
+        PhysicalPlan rewrittenPlan = rewritePlan( pathToTargetSubPlan[numSteps] );
 
-        for (int i = numStep-2; i >= 0; i--) {
-            rewrittenPlan = constructPlan( subPlans[i], rewrittenPlan, i );
+        for (int i = numSteps-1; i >= 0; i--) {
+            rewrittenPlan = constructPlan( pathToTargetSubPlan[i], pathToTargetSubPlan[i+1], rewrittenPlan );
         }
         return rewrittenPlan;
     }
 
-    protected PhysicalPlan constructPlan( final PhysicalPlan parent, final PhysicalPlan rewrittenChild, final int indexOfPath) {
+    protected PhysicalPlan constructPlan( final PhysicalPlan parent, final PhysicalPlan originalChild, final PhysicalPlan rewrittenChild ) {
 
         if ( parent.numberOfSubPlans() == 0){
-            return parent;
+            throw new IllegalArgumentException(" Unexpected parent operator");
         }
         else if ( parent.numberOfSubPlans() == 1 ){
-            return new PhysicalPlanWithUnaryRootImpl((UnaryPhysicalOp) parent.getRootOperator(), rewrittenChild);
+            return new PhysicalPlanWithUnaryRootImpl( (UnaryPhysicalOp) parent.getRootOperator(), rewrittenChild );
         }
         else if ( parent.numberOfSubPlans() == 2 ){
-            final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
-            return new PhysicalPlanWithBinaryRootImpl((BinaryPhysicalOp) parent.getRootOperator(), newSubPlans[0], newSubPlans[1]);
+            final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, originalChild, rewrittenChild );
+            return new PhysicalPlanWithBinaryRootImpl( (BinaryPhysicalOp) parent.getRootOperator(), newSubPlans[0], newSubPlans[1] );
         }
         else {
-            final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, rewrittenChild, indexOfPath );
-            return new PhysicalPlanWithNaryRootImpl((NaryPhysicalOp) parent.getRootOperator(), newSubPlans);
+            final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, originalChild, rewrittenChild );
+            return new PhysicalPlanWithNaryRootImpl( (NaryPhysicalOp) parent.getRootOperator(), newSubPlans );
         }
     }
 
-    protected PhysicalPlan[] getRewrittenSubPlans( final PhysicalPlan parent, final PhysicalPlan rewrittenChild, final int indexOfPath) {
+    protected PhysicalPlan[] getRewrittenSubPlans( final PhysicalPlan parent, final PhysicalPlan originalChild, final PhysicalPlan rewrittenChild ) {
         final int numChildren = parent.numberOfSubPlans();
         final PhysicalPlan[] children = new PhysicalPlan[numChildren];
         for (int i = 0; i< numChildren; i++) {
-            if ( parent.getSubPlan(0) == subPlans[indexOfPath+1]) {
+            if ( parent.getSubPlan(i) == originalChild) {
                 children[i] = rewrittenChild;
             }
             else {
@@ -72,6 +72,6 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
         return children;
     }
 
-    protected abstract PhysicalPlan rewrittenSubPlan( final PhysicalPlan plan );
+    protected abstract PhysicalPlan rewritePlan( final PhysicalPlan plan );
 
 }
