@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -277,10 +278,10 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public void issueRequest( final SPARQLRequest req,
-		                          final SPARQLEndpoint fm,
-		                          final ResponseProcessor<SolMapsResponse> respProc )
-				throws FederationAccessException
+		public CompletableFuture<SolMapsResponse> issueRequest(
+				final SPARQLRequest req,
+				final SPARQLEndpoint fm )
+						throws FederationAccessException
 		{
 			final SolMapsResponse response;
 			if ( itSolMapsForResponse != null ) {
@@ -289,21 +290,12 @@ public abstract class EngineTestBase
 			else {
 				response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
 			}
-			respProc.process(response);
+			return CompletableFuture.completedFuture(response);
 		}
 
 		@Override
-		public void issueCardinalityRequest( final SPARQLRequest req,
-		                                     final SPARQLEndpoint fm,
-		                                     final ResponseProcessor<CardinalityResponse> respProc )
-		{
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void issueRequest( final TPFRequest req,
-		                          final TPFServer fm,
-		                          final ResponseProcessor<TPFResponse> respProc )
+		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
+		                                                    final TPFServer fm )
 				throws FederationAccessException
 		{
 			final TPFResponse response;
@@ -313,13 +305,12 @@ public abstract class EngineTestBase
 			else {
 				response = ( (TPFServerForTest) fm ).performRequest(req);
 			}
-			respProc.process(response);
+			return CompletableFuture.completedFuture(response);
 		}
 
 		@Override
-		public void issueRequest( final TPFRequest req,
-		                          final BRTPFServer fm,
-		                          final ResponseProcessor<TPFResponse> respProc )
+		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
+		                                                    final BRTPFServer fm )
 				throws FederationAccessException
 		{
 			final TPFResponse response;
@@ -329,13 +320,12 @@ public abstract class EngineTestBase
 			else {
 				response = ( (BRTPFServerForTest) fm ).performRequest(req);
 			}
-			respProc.process(response);
+			return CompletableFuture.completedFuture(response);
 		}
 
 		@Override
-		public void issueRequest( final BRTPFRequest req,
-		                          final BRTPFServer fm,
-		                          final ResponseProcessor<TPFResponse> respProc )
+		public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req,
+		                                                    final BRTPFServer fm )
 				throws FederationAccessException
 		{
 			final TPFResponse response;
@@ -345,18 +335,53 @@ public abstract class EngineTestBase
 			else {
 				response = ( (BRTPFServerForTest) fm ).performRequest(req);
 			}
-			respProc.process(response);
+			return CompletableFuture.completedFuture(response);
 		}
 
 		@Override
-		public void issueRequest( final Neo4jRequest req,
-		                          final Neo4jServer fm,
-		                          final ResponseProcessor<StringResponse> respProc )
+		public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req,
+		                                                       final Neo4jServer fm )
 				throws FederationAccessException
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
 			final StringResponse response = reqProc.performRequest(req, fm);
-			respProc.process(response);
+			return CompletableFuture.completedFuture(response);
+		}
+
+		@Override
+		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+				final SPARQLRequest req,
+				final SPARQLEndpoint fm ) throws FederationAccessException
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+				final TPFRequest req,
+				final TPFServer fm ) throws FederationAccessException
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+				final TPFRequest req,
+				final BRTPFServer fm ) throws FederationAccessException
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+				final BRTPFRequest req,
+				final BRTPFServer fm ) throws FederationAccessException
+		{
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 

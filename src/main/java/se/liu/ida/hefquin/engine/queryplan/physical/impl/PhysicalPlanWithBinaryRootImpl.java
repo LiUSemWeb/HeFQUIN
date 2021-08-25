@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithBinaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoot
 {
@@ -13,9 +14,13 @@ public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoo
 	private final PhysicalPlan subPlan1;
 	private final PhysicalPlan subPlan2;
 
-	public PhysicalPlanWithBinaryRootImpl( final BinaryPhysicalOp rootOp,
-	                                       final PhysicalPlan subPlan1,
-	                                       final PhysicalPlan subPlan2 ) {
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 */
+	protected PhysicalPlanWithBinaryRootImpl( final BinaryPhysicalOp rootOp,
+	                                          final PhysicalPlan subPlan1,
+	                                          final PhysicalPlan subPlan2 ) {
 		assert rootOp != null;
 		assert subPlan1 != null;
 		assert subPlan2 != null;

@@ -138,4 +138,27 @@ public class SolutionMappingUtils
 		return new SolutionMappingImpl(restrict(sm.asJenaBinding(), vars));
 	}
 
+	/**
+	 * Returns true if the given solution mapping
+	 * binds any of its variables to a blank node.
+	 */
+	public static boolean containsBlankNodes( final SolutionMapping sm ) {
+		return containsBlankNodes( sm.asJenaBinding() );
+	}
+
+	/**
+	 * Returns true if the given solution mapping
+	 * binds any of its variables to a blank node.
+	 */
+	public static boolean containsBlankNodes( final Binding b ) {
+		final Iterator<Var> it = b.vars();
+		while ( it.hasNext() ) {
+			if ( b.get(it.next()).isBlank() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }

@@ -76,6 +76,26 @@ public class QueryPatternUtils
 		}
 	}
 
+	/**
+	 * Returns the set of all variables that occur in the given graph pattern.
+	 *
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getVariablesInPattern(TriplePattern)}. Similarly,
+	 * if the given pattern is a {@link BGP}, this function returns the result
+	 * of {@link #getVariablesInPattern(BGP)}.
+	 */
+	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof TriplePattern ) {
+			return getVariablesInPattern( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			return getVariablesInPattern( (BGP) queryPattern );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
+	}
+
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp.asJenaTriple() );
@@ -83,15 +103,111 @@ public class QueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final BGP bgp ) {
-		return getVariablesInPattern( (BGPImpl) bgp );
-	}
-
-	public static Set<Var> getVariablesInPattern( final BGPImpl bgp ) {
 		final Set<Var> result = new HashSet<>();
 		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 			result.addAll( getVariablesInPattern(tp) );
 		}
 		return result;
+	}
+
+	/**
+	 * Returns the number of elements of the given triple pattern that are variables.
+	 */
+	public static int getNumberOfVarOccurrences( final TriplePattern tp ) {
+		final Triple jenaTP = tp.asJenaTriple();
+		int n = 0;
+		if ( jenaTP.getSubject().isVariable() )   { n += 1; }
+		if ( jenaTP.getPredicate().isVariable() ) { n += 1; }
+		if ( jenaTP.getObject().isVariable() )    { n += 1; }
+		return n;
+	}
+
+	/**
+	 * Returns the number of elements of the given triple pattern that are RDF terms.
+	 */
+	public static int getNumberOfTermOccurrences( final TriplePattern tp ) {
+		final Triple jenaTP = tp.asJenaTriple();
+		int n = 0;
+		if ( ! jenaTP.getSubject().isVariable() )   { n += 1; }
+		if ( ! jenaTP.getPredicate().isVariable() ) { n += 1; }
+		if ( ! jenaTP.getObject().isVariable() )    { n += 1; }
+		return n;
+	}
+
+	/**
+	 * Returns the number of elements of the given triple pattern that are blank nodes.
+	 */
+	public static int getNumberOfBNodeOccurrences( final TriplePattern tp ) {
+		final Triple jenaTP = tp.asJenaTriple();
+		int n = 0;
+		if ( ! jenaTP.getSubject().isBlank() )   { n += 1; }
+		if ( ! jenaTP.getPredicate().isBlank() ) { n += 1; }
+		if ( ! jenaTP.getObject().isBlank() )    { n += 1; }
+		return n;
+	}
+
+	public static int getNumberOfVarOccurrences( final BGP bgp ) {
+		int n = 0;
+		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+			n += getNumberOfVarOccurrences(tp);
+		}
+		return n;
+	}
+
+	public static int getNumberOfTermOccurrences( final BGP bgp ) {
+		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
+	}
+
+	public static int getNumberOfBNodeOccurrences( final BGP bgp ) {
+		int n = 0;
+		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+			n += getNumberOfBNodeOccurrences(tp);
+		}
+		return n;
+	}
+
+	/**
+	 * Returns the number of occurrences of variables in the given graph
+	 * pattern. If the same variable occurs multiple times, each occurrence
+	 * is counted.
+	 * 
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getNumberOfVarOccurrences(TriplePattern)}.
+	 * Similarly, if the given pattern is a {@link BGP}, this function
+	 * returns the result of {@link #getNumberOfVarOccurrences(BGP)}.
+	 */
+	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfVarOccurrences( (BGP) queryPattern );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
+	}
+
+	/**
+	 * Returns the number of occurrences of RDF terms in the given graph
+	 * pattern. If the same term occurs multiple times, each occurrence
+	 * is counted.
+	 * 
+	 * If the given pattern is a {@link TriplePattern}, this function returns
+	 * the result of {@link #getNumberOfTermOccurrences(TriplePattern)}.
+	 * Similarly, if the given pattern is a {@link BGP}, this function
+	 * returns the result of {@link #getNumberOfTermOccurrences(BGP)}.
+	 */
+	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfTermOccurrences( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfTermOccurrences( (BGP) queryPattern );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		}
 	}
 
 	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
@@ -138,7 +254,11 @@ public class QueryPatternUtils
 		};
 	}
 
-	public static SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm, final SPARQLGraphPattern pattern ) {
+	public static SPARQLGraphPattern applySolMapToGraphPattern(
+			final SolutionMapping sm,
+			final SPARQLGraphPattern pattern )
+					throws VariableByBlankNodeSubstitutionException
+	{
 		// TODO
 		if ( pattern instanceof TriplePattern )
 			return applySolMapToTriplePattern( sm, (TriplePattern) pattern );
@@ -148,7 +268,9 @@ public class QueryPatternUtils
 			throw new UnsupportedOperationException("TODO");
 	}
 
-	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp ) {
+	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp )
+			throws VariableByBlankNodeSubstitutionException
+	{
 		final Set<TriplePattern> tps = new HashSet<>();
 		boolean unchanged = true;
 		for ( final TriplePattern tp : ((BGPImpl)bgp).getTriplePatterns() ) {
@@ -166,7 +288,14 @@ public class QueryPatternUtils
 		}
 	}
 
-	public static TriplePattern applySolMapToTriplePattern( final SolutionMapping sm, final TriplePattern tp ) {
+	/**
+	 * Attention, this function throws an exception in all cases in which one
+	 * of the variables of the triple pattern would be replaced by a blank node.
+	 */
+	public static TriplePattern applySolMapToTriplePattern( final SolutionMapping sm,
+	                                                        final TriplePattern tp )
+			throws VariableByBlankNodeSubstitutionException
+	{
 		final Binding b = sm.asJenaBinding();
 		boolean unchanged = true;
 
@@ -176,6 +305,9 @@ public class QueryPatternUtils
 			if ( b.contains(var) ) {
 				s = b.get(var);
 				unchanged = false;
+				if ( s.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
 			}
 		}
 
@@ -185,6 +317,9 @@ public class QueryPatternUtils
 			if ( b.contains(var) ) {
 				p = b.get(var);
 				unchanged = false;
+				if ( p.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
 			}
 		}
 
@@ -192,8 +327,11 @@ public class QueryPatternUtils
 		if ( Var.isVar(o) ) {
 			final Var var = Var.alloc(o);
 			if ( b.contains(var) ) {
-				p = b.get(var);
+				o = b.get(var);
 				unchanged = false;
+				if ( o.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
 			}
 		}
 
@@ -202,6 +340,12 @@ public class QueryPatternUtils
 		} else {
 			return new TriplePatternImpl(s,p,o);
 		}
+	}
+
+
+	public static class VariableByBlankNodeSubstitutionException extends Exception
+	{
+		private static final long serialVersionUID = 3285677866147999456L;	
 	}
 
 }

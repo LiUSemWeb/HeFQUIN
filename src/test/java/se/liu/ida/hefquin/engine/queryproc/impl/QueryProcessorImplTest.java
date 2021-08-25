@@ -34,15 +34,19 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
 
@@ -214,11 +218,19 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) {
+		final QueryProcContext procCxt = new QueryProcContext() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+		};
+
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
+
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+			@Override public CostModel getCostModel() { return costModel; }
 		};
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);

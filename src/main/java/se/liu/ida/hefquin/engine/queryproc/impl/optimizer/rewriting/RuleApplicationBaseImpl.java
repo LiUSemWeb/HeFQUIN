@@ -4,9 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithNaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public abstract class RuleApplicationBaseImpl implements RuleApplication{
     protected final PhysicalPlan[] pathToTargetSubPlan;
@@ -40,21 +38,26 @@ public abstract class RuleApplicationBaseImpl implements RuleApplication{
         return rewrittenPlan;
     }
 
-    protected PhysicalPlan constructPlan( final PhysicalPlan parent, final PhysicalPlan originalChild, final PhysicalPlan rewrittenChild ) {
-
-        if ( parent.numberOfSubPlans() == 0){
-            throw new IllegalArgumentException(" Unexpected parent operator");
+    protected PhysicalPlan constructPlan( final PhysicalPlan parent,
+                                          final PhysicalPlan originalChild,
+                                          final PhysicalPlan rewrittenChild ) {
+        if ( parent.numberOfSubPlans() == 0 ) {
+            // this case should never occur
+            throw new IllegalArgumentException();
         }
-        else if ( parent.numberOfSubPlans() == 1 ){
-            return new PhysicalPlanWithUnaryRootImpl( (UnaryPhysicalOp) parent.getRootOperator(), rewrittenChild );
+        else if ( parent.numberOfSubPlans() == 1 ) {
+            final UnaryPhysicalOp rootOp = (UnaryPhysicalOp) parent.getRootOperator();
+            return PhysicalPlanFactory.createPlan(rootOp, rewrittenChild);
         }
         else if ( parent.numberOfSubPlans() == 2 ){
             final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, originalChild, rewrittenChild );
-            return new PhysicalPlanWithBinaryRootImpl( (BinaryPhysicalOp) parent.getRootOperator(), newSubPlans[0], newSubPlans[1] );
+            final BinaryPhysicalOp rootOp = (BinaryPhysicalOp) parent.getRootOperator();
+            return PhysicalPlanFactory.createPlan(rootOp, newSubPlans[0], newSubPlans[1]);
         }
         else {
             final PhysicalPlan[] newSubPlans = getRewrittenSubPlans( parent, originalChild, rewrittenChild );
-            return new PhysicalPlanWithNaryRootImpl( (NaryPhysicalOp) parent.getRootOperator(), newSubPlans );
+            final NaryPhysicalOp rootOp = (NaryPhysicalOp) parent.getRootOperator();
+            return PhysicalPlanFactory.createPlan(rootOp, newSubPlans);
         }
     }
 

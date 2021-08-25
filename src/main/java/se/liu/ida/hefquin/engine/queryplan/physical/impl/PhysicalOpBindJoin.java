@@ -5,20 +5,20 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 {
-    /**
-     * The given logical operator is expected to be of one of the following
-     * two types: {@link LogicalOpTPAdd} or {@link LogicalOpBGPAdd}.
-     */
-    public PhysicalOpBindJoin( final UnaryLogicalOp lop ) {
+    public PhysicalOpBindJoin( final LogicalOpTPAdd lop ) {
         super(lop);
     }
+
+    // not supported at the moment
+    //public PhysicalOpBindJoin( final LogicalOpBGPAdd lop ) {
+    //    super(lop);
+    //}
 
     @Override
     public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )

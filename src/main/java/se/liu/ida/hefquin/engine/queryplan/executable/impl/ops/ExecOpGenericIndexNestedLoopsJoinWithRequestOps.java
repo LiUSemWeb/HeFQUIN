@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -10,15 +14,14 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
- * Abstract base class to implement index nested loops joins by using request operators.
+ * Abstract base class to implement index nested loops joins by using request
+ * operators. The possibility to rely on a request operator is particularly
+ * useful in cases in which this operator implements paging, because the
+ * alternative would be the need to re-implement paging again in the nested
+ * loops join algorithm of potential subclasses of this base class. 
  *
- * Attention: Executing the request operator is a blocking operation within the algorithm
- * implemented by this class. Hence, by relying on request operators, this algorithm can
- * process all the solution mappings of any given {@link IntermediateResultBlock} only
- * sequentially. That is, only after the first solution mapping has been processed (which
- * includes executing the corresponding request that uses the solution mapping!), the
- * algorithm proceeds to the next solution mapping. For an abstract base class that can
- * process the solution mappings in parallel, use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
+ * For an abstract base class that issues requests directly (instead of using
+ * request operators), use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
  */
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
                                                     QueryType extends Query,
@@ -43,24 +46,65 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
+		@SuppressWarnings("unchecked")
+		final CompletableFuture<Void>[] futures = new CompletableFuture[input.size()];
+
+		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			process( sm, sink, execCxt );
+			final CompletableFuture<Void> f = initiateProcessing(sm, sink, execCxt);
+			if ( f == null ) {
+				// this may happen if the current solution mapping contains
+				// a blank node for any of the variables that is used when
+				// creating the request
+				continue;
+			}
+
+			futures[i] = f;
+			++i;
+		}
+
+		final CompletableFuture<Void>[] futures2;
+		if ( i < futures.length ) {
+			// This case may occur if we have skipped any of the
+			// iteration steps of the previous loop because any
+			// of the requests created in the loop was null.
+			futures2 = Arrays.copyOf(futures, i);
+		}
+		else {
+			futures2 = futures;
+		}
+
+		// wait for all the futures to be completed
+		try {
+			CompletableFuture.allOf(futures2).get();
+		}
+		catch ( final InterruptedException e ) {
+			throw new ExecOpExecutionException("interruption of the futures that run the executable operators", e, this);
+		}
+		catch ( final ExecutionException e ) {
+			throw new ExecOpExecutionException("The execution of the futures that run the executable operators.", e, this);
 		}
 	}
 
-	protected void process(
+	protected CompletableFuture<Void> initiateProcessing(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
+		if ( reqOp == null ) {
+			return null;
+		}
+
 		final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, sm);
-		try {
-			reqOp.execute(mySink, execCxt);
-		}
-		catch ( final ExecOpExecutionException e ) {
-			throw new ExecOpExecutionException("Executing a request operator used by this index nested loops join caused an exception.", e, this);
-		}
+		return CompletableFuture.runAsync( () -> {
+			try {
+				reqOp.execute(mySink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				throw new RuntimeException("Executing a request operator used by this index nested loops join caused an exception.", e);
+			}
+		});
 	}
 
 	protected abstract NullaryExecutableOp createExecutableRequestOperator( SolutionMapping sm );

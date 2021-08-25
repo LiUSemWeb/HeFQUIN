@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
@@ -8,7 +10,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
  * A very simple {@link FederationAccessManager}
  * that simply blocks for each request.
  */
-public class BlockingFederationAccessManagerImpl extends FederationAccessManagerBase
+public class BlockingFederationAccessManagerImpl extends FederationAccessManagerBase2
 {
 	public BlockingFederationAccessManagerImpl(
 			final SPARQLRequestProcessor reqProcSPARQL,
@@ -19,43 +21,43 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public void issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm, final ResponseProcessor<SolMapsResponse> respProc )
+	public CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
 			throws FederationAccessException
 	{
 		final SolMapsResponse response = reqProcSPARQL.performRequest(req, fm);
-		respProc.process(response);
+		return CompletableFuture.completedFuture(response);
 	}
 
 	@Override
-	public void issueRequest( final TPFRequest req, final TPFServer fm, final ResponseProcessor<TPFResponse> respProc )
+	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final TPFServer fm )
 			throws FederationAccessException
 	{
 		final TPFResponse response = reqProcTPF.performRequest(req, fm);
-		respProc.process(response);
+		return CompletableFuture.completedFuture(response);
 	}
 
 	@Override
-	public void issueRequest( final TPFRequest req, final BRTPFServer fm, final ResponseProcessor<TPFResponse> respProc )
+	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final BRTPFServer fm )
 			throws FederationAccessException
 	{
 		final TPFResponse response = reqProcTPF.performRequest(req, fm);
-		respProc.process(response);
+		return CompletableFuture.completedFuture(response);
 	}
 
 	@Override
-	public void issueRequest( final BRTPFRequest req, final BRTPFServer fm, final ResponseProcessor<TPFResponse> respProc )
+	public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req, final BRTPFServer fm )
 			throws FederationAccessException
 	{
 		final TPFResponse response = reqProcBRTPF.performRequest(req, fm);
-		respProc.process(response);
+		return CompletableFuture.completedFuture(response);
 	}
 
 	@Override
-	public void issueRequest( final Neo4jRequest req, final Neo4jServer fm, final ResponseProcessor<StringResponse> respProc )
+	public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req, final Neo4jServer fm )
 			throws FederationAccessException
 	{
 		final StringResponse response = reqProcNeo4j.performRequest(req, fm);
-		respProc.process(response);
+		return CompletableFuture.completedFuture(response);
 	}
 
 }

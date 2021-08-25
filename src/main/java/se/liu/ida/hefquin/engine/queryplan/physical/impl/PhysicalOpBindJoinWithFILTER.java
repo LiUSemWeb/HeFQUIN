@@ -5,14 +5,22 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin {
 
-	public PhysicalOpBindJoinWithFILTER(UnaryLogicalOp lop) {
+	public PhysicalOpBindJoinWithFILTER( final LogicalOpTPAdd lop ) {
 		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+	}
+
+	public PhysicalOpBindJoinWithFILTER( final LogicalOpBGPAdd lop ) {
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
 	@Override

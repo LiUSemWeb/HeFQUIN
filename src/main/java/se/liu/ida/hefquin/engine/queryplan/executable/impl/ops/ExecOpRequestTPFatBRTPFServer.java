@@ -4,7 +4,9 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 
 /**
  * Implementation of an operator to request a (complete) TPF from a brTPF server.
@@ -18,11 +20,11 @@ public class ExecOpRequestTPFatBRTPFServer extends ExecOpGenericTriplePatternReq
 	}
 
 	@Override
-	protected void issuePageRequest( final TPFRequest req,
-	                                 final FederationAccessManager fedAccessMgr )
+	protected TPFResponse performPageRequest( final TPFRequest req,
+	                                          final FederationAccessManager fedAccessMgr )
 			throws FederationAccessException
 	{
-		fedAccessMgr.issueRequest(req, fm, this);
+		return FederationAccessUtils.performRequest(fedAccessMgr, req, fm);
 	}
 
 }

@@ -8,19 +8,28 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class PhysicalPlanWithNaryRootImpl implements PhysicalPlanWithNaryRoot
 {
 	protected final NaryPhysicalOp rootOp;
 	protected final List<PhysicalPlan> subPlans;
 
-	public PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
-	                                     final PhysicalPlan... subPlans ) {
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 */
+	protected PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
+	                                        final PhysicalPlan... subPlans ) {
 		this( rootOp, Arrays.asList(subPlans) );
 	}
 
-	public PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
-	                                     final List<PhysicalPlan> subPlans ) {
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 */
+	protected PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
+	                                        final List<PhysicalPlan> subPlans ) {
 		assert rootOp != null;
 		assert subPlans != null;
 		assert ! subPlans.isEmpty();

@@ -26,14 +26,26 @@ public class ExecOpBindJoinBRTPF extends ExecOpGenericBindJoinWithRequestOps<Tri
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
 		final BindingsRestrictedTriplePatternRequest req = createRequest(inputSolMaps);
+		if ( req == null ) {
+			return null;
+		}
+
 		return new ExecOpRequestBRTPF(req, fm);
 	}
 
 	protected BindingsRestrictedTriplePatternRequest createRequest( final Iterable<SolutionMapping> inputSolMaps ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			restrictedSolMaps.add( SolutionMappingUtils.restrict(sm, varsInTP) );
+			final SolutionMapping sm2 = SolutionMappingUtils.restrict(sm, varsInTP);
+			if ( ! SolutionMappingUtils.containsBlankNodes(sm2) ) {
+				restrictedSolMaps.add(sm2);
+			}
 		}
+
+		if ( restrictedSolMaps.isEmpty() ) {
+			return null;
+		}
+
 		return new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSolMaps );
 	}
 

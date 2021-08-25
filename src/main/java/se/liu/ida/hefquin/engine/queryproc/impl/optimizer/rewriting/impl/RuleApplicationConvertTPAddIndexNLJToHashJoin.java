@@ -6,14 +6,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationHelper;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicationBaseImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.ConstructSubPPBasedOnUnaryOperator;
 
-public class RuleApplicationConvertTPAddIndexNLJToHashJoin extends RuleApplicationBaseImpl {
-    protected final ConstructSubPPBasedOnUnaryOperator helper = new ConstructSubPPBasedOnUnaryOperator();
-
+public class RuleApplicationConvertTPAddIndexNLJToHashJoin extends RuleApplicationBaseImpl
+{
     public RuleApplicationConvertTPAddIndexNLJToHashJoin( final PhysicalPlan[] currentPath, final RewritingRule rule) {
         super( currentPath, rule );
     }
@@ -24,8 +23,8 @@ public class RuleApplicationConvertTPAddIndexNLJToHashJoin extends RuleApplicati
         final LogicalOpTPAdd lop = (LogicalOpTPAdd) popRoot.getLogicalOperator();
 
         final BinaryPhysicalOp popJoin = new PhysicalOpHashJoin( new LogicalOpJoin() );
-        final PhysicalPlan subqueryRequest = helper.formRequestBasedOnTPofTPAdd( lop );
-        return new PhysicalPlanWithBinaryRootImpl( popJoin, subqueryRequest, plan.getSubPlan(0));
+        final PhysicalPlan subqueryRequest = CardinalityEstimationHelper.formRequestPlan(lop);
+        return PhysicalPlanFactory.createPlan( popJoin, subqueryRequest, plan.getSubPlan(0) );
     }
 
 }

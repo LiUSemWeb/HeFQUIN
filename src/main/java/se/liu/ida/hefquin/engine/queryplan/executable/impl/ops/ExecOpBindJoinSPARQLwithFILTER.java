@@ -38,6 +38,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Op op = createFilter(solMaps);
+		if ( op == null ) {
+			return null;
+		}
+
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm);
@@ -47,8 +51,14 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		if (varsInTP.isEmpty()) 
 			return new OpTriple(query.asJenaTriple());
 		Expr disjunction = null;
+		boolean mustHaveTheFilter = false;
 		for (final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
+			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
+				mustHaveTheFilter = true;
+				continue;
+			}
+
 			Expr conjunction = null;
 			final Iterator<Var> vars = b.vars(); 
 			while (vars.hasNext()) {
@@ -69,7 +79,11 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 				disjunction = new E_LogicalOr(disjunction, conjunction);
 			}
 		}
-		if (disjunction == null) return new OpTriple(query.asJenaTriple());
+
+		if ( disjunction == null ) {
+			return mustHaveTheFilter ? null : new OpTriple(query.asJenaTriple());
+		}
+
 		return OpFilter.filter(disjunction, new OpTriple(query.asJenaTriple()));
 	}
 
