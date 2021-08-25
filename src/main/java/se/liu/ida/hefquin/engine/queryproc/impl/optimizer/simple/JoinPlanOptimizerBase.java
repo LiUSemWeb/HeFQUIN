@@ -5,7 +5,7 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
 /**
@@ -33,7 +33,7 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 		PhysicalPlan getResultingPlan() throws QueryOptimizationException;
 
 		static BinaryPhysicalOp createNewJoinOperator() {
-			return new PhysicalOpSymmetricHashJoin( new LogicalOpJoin() );
+			return LogicalToPhysicalOpConverter.convert( LogicalOpJoin.getInstance() );
 		}
 	}
 

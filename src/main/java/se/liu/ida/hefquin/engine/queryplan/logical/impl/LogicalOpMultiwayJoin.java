@@ -5,6 +5,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
 public class LogicalOpMultiwayJoin implements NaryLogicalOp
 {
+	protected static LogicalOpMultiwayJoin singleton = new LogicalOpMultiwayJoin();
+
+	public static LogicalOpMultiwayJoin getInstance() { return singleton; }
+
+	protected LogicalOpMultiwayJoin() {}
+
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

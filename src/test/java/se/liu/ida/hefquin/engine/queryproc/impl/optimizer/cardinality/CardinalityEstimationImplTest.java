@@ -251,7 +251,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	protected PhysicalPlan createJoinPlan( final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		final LogicalOpJoin joinOp = new LogicalOpJoin();
+		final LogicalOpJoin joinOp = LogicalOpJoin.getInstance();
 		return PhysicalPlanFactory.createPlan(joinOp, subplan1, subplan2);
 	}
 

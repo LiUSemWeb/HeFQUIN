@@ -215,7 +215,8 @@ public class SourcePlannerImpl implements SourcePlanner
 			}
 		}
 
-		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayJoin(), subPlansFlattened );
+		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayJoin.getInstance(),
+		                                        subPlansFlattened );
 	}
 
 	protected LogicalPlan mergeIntoMultiwayUnion( final LogicalPlan ... subPlans ) {
@@ -236,7 +237,8 @@ public class SourcePlannerImpl implements SourcePlanner
 			}
 		}
 
-		return new LogicalPlanWithNaryRootImpl( new LogicalOpMultiwayUnion(), subPlansFlattened );
+		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(),
+		                                        subPlansFlattened );
 	}
 
 }

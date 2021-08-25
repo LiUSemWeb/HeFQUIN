@@ -165,7 +165,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithUnion( final PhysicalPlan subplan1,
 	                                                final PhysicalPlan subplan2 ) {
-		return createPlanWithUnion( new LogicalOpUnion(), subplan1, subplan2 );
+		return createPlanWithUnion( LogicalOpUnion.getInstance(), subplan1, subplan2 );
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithHashJoin( final PhysicalPlan subplan1,
 	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithHashJoin( new LogicalOpJoin(), subplan1, subplan2 );
+		return createPlanWithHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithSymmetricHashJoin( final PhysicalPlan subplan1,
 	                                                            final PhysicalPlan subplan2 ) {
-		return createPlanWithSymmetricHashJoin( new LogicalOpJoin(), subplan1, subplan2 );
+		return createPlanWithSymmetricHashJoin( LogicalOpJoin.getInstance(), subplan1, subplan2 );
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithNaiveNLJ( final PhysicalPlan subplan1,
 	                                                   final PhysicalPlan subplan2 ) {
-		return createPlanWithNaiveNLJ( new LogicalOpJoin(), subplan1, subplan2 );
+		return createPlanWithNaiveNLJ( LogicalOpJoin.getInstance(), subplan1, subplan2 );
 	}
 
 	/**

@@ -130,8 +130,10 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		// we simply convert this to a left-deep plan of binary joins.
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-			final LogicalOpJoin newRootOfLogicalPlan = new LogicalOpJoin();
-			currentSubPlan = createPhysicalPlanWithBinaryRoot( newRootOfLogicalPlan, currentSubPlan, children.get(i) );
+			currentSubPlan = createPhysicalPlanWithBinaryRoot(
+					LogicalOpJoin.getInstance(),
+					currentSubPlan,
+					children.get(i) );
 		}
 
 		return currentSubPlan;
@@ -146,8 +148,10 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		// we simply convert this to a left-deep plan of binary unions.
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-			final LogicalOpUnion newRootOfLogicalPlan = new LogicalOpUnion();
-			currentSubPlan = createPhysicalPlanWithBinaryRoot( newRootOfLogicalPlan, currentSubPlan, children.get(i) );
+			currentSubPlan = createPhysicalPlanWithBinaryRoot(
+					LogicalOpUnion.getInstance(),
+					currentSubPlan,
+					children.get(i) );
 		}
 
 		return currentSubPlan;
