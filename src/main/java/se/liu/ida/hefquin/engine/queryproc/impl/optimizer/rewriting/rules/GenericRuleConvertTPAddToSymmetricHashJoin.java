@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
@@ -16,8 +18,8 @@ public abstract class GenericRuleConvertTPAddToSymmetricHashJoin extends Abstrac
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                final PhysicalOpIndexNestedLoopsJoin rootOp = (PhysicalOpIndexNestedLoopsJoin) plan.getRootOperator();
-                final PhysicalPlan reqPlan = PhysicalPlanFactory.extractRequestAsPlan(rootOp);
+                final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
+                final PhysicalPlan reqPlan = PhysicalPlanFactory.extractRequestAsPlan((LogicalOpTPAdd) rootOp.getLogicalOperator());
                 return PhysicalPlanFactory.createPlanWithSymmetricHashJoin( reqPlan, plan.getSubPlan(0) );
             }
         };
