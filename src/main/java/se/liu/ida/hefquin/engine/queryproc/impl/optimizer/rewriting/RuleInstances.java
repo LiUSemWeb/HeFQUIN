@@ -43,7 +43,12 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddIndexNLJToBJUNION(0.2) );
         ruleApplications.add( new RuleConvertTPAddIndexNLJToBJVALUES(0.2) );
 
-
+        // Order tweaking of two TPAdd (category: B)
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAddIndexNLJ(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAddBindJoin(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJFILTER(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJUNION(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJVALUES(0.25) );
 
         // TODO: more rules to be added
 
