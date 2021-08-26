@@ -9,6 +9,7 @@ public class RuleInstances {
     Set<RewritingRule> ruleApplications = new HashSet<>();
 
     public void addRuleInstances() {
+        // Convert TPAdd to binary join (category: C)
         // Convert TPAdd to Hash Join
         ruleApplications.add( new RuleConvertTPAddIndexNLJToHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJFILTERToHashJoin(0.15) );
@@ -49,6 +50,16 @@ public class RuleInstances {
         ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJFILTER(0.25) );
         ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJUNION(0.25) );
         ruleApplications.add( new RuleChangeOrderOfTwoTPAddBJVALUES(0.25) );
+
+        ruleApplications.add( new RuleChangeOrderOfTPAddBindJoinAndTPAddIndexNLJ(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddBJFILTERAndIndexNLJ(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddBJUNIONAndTPAddIndexNLJ(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddBJVALUESAndTPAddIndexNLJ(0.25) );
+
+        ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBindJoin(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJFILTER(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJUNION(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJVALUES(0.25) );
 
         // TODO: more rules to be added
 
