@@ -61,8 +61,9 @@ public class RuleInstances {
         ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJUNION(0.25) );
         ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndTPAddBJVALUES(0.25) );
 
+        // Order tweaking of TPAdd and BGPAdd (category: B)
+        ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndBGPAddIndexNLJ(0.25) );
         // TODO: more rules to be added
-
     }
 
 }

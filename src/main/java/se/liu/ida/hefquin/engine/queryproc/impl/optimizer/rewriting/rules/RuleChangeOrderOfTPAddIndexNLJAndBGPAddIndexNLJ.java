@@ -3,9 +3,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
-public class RuleChangeOrderOfTPAddIndexNLJAndTPAddBindJoin extends GenericRuleChangeOrderOfTwoUnaryOp{
+public class RuleChangeOrderOfTPAddIndexNLJAndBGPAddIndexNLJ extends GenericRuleChangeOrderOfTwoUnaryOp{
 
-    public RuleChangeOrderOfTPAddIndexNLJAndTPAddBindJoin( final double priority ) {
+    public RuleChangeOrderOfTPAddIndexNLJAndBGPAddIndexNLJ( final double priority ) {
         super(priority);
     }
 
@@ -14,7 +14,7 @@ public class RuleChangeOrderOfTPAddIndexNLJAndTPAddBindJoin extends GenericRuleC
         final PhysicalOperator rootOp = plan.getRootOperator();
         if( IdentifyPhysicalOpUsedForTPAdd.isIndexNLJ(rootOp) ) {
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return IdentifyPhysicalOpUsedForTPAdd.isBindJoin(subRootOp);
+            return IdentifyPhysicalOpUsedForBGPAdd.isIndexNLJ(subRootOp);
         }
         return false;
     }
