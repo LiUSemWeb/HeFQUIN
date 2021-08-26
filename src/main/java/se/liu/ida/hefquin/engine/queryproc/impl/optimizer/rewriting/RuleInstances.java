@@ -73,7 +73,9 @@ public class RuleInstances {
 
         // Merge a tpAdd and a bgpAdd (with the same fm) into one bgpAdd (category: A), B' = B U {tp}
         ruleApplications.add( new RuleMergeTPAddIndexNLJAndBGPAddIndexNLJIntoBGPAdd(0.3) );
+        ruleApplications.add( new RuleMergeTPAddBJFILTERAndBGPAddIndexNLJIntoBGPAdd(0.3) );
         // TODO: more rules to be added
+
     }
 
 }
