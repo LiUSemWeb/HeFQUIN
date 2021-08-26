@@ -65,12 +65,14 @@ public class RuleInstances {
         ruleApplications.add( new RuleChangeOrderOfTPAddIndexNLJAndBGPAddIndexNLJ(0.25) );
         // TODO: more rules to be added
 
-        // Merge a TPAdd and a request (with the same fm) into one request (category: A), B' = B U {tp}
+        // Merge a TPAdd and a request (with the same fm) into one BGP request (category: A), B' = B U {tp}
         ruleApplications.add( new RuleMergeTPAddIndexNLJAndRequestIntoOneRequest(0.3) );
         ruleApplications.add( new RuleMergeTPAddBJFILTERAndRequestIntoOneRequest(0.3) );
         ruleApplications.add( new RuleMergeTPAddBJUNIONAndRequestIntoOneRequest(0.3) );
         ruleApplications.add( new RuleMergeTPAddBJVALUESAndRequestIntoOneRequest(0.3) );
 
+        // Merge a tpAdd and a bgpAdd (with the same fm) into one bgpAdd (category: A), B' = B U {tp}
+        ruleApplications.add( new RuleMergeTPAddIndexNLJAndBGPAddIndexNLJIntoBGPAdd(0.3) );
         // TODO: more rules to be added
     }
 
