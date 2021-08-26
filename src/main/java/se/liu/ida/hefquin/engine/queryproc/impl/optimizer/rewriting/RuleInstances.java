@@ -14,7 +14,7 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddBJFILTERToHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJUNIONToHashJoin(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJVALUESToHashJoin(0.15) );
-        ruleApplications.add( new RuleConvertTPAddBJToHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBindJoinToHashJoin(0.15) );
 
         // Convert TPAdd to Symmetric Hash Join
         ruleApplications.add( new RuleConvertTPAddIndexNLJToSymmetricHashJoin(0.15) );
@@ -28,7 +28,22 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddBJFILTERToNaiveNLJ(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJUNIONToNaiveNLJ(0.15) );
         ruleApplications.add( new RuleConvertTPAddBJVALUESToNaiveNLJ(0.15) );
-        ruleApplications.add( new RuleConvertTPAddBJToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddBindJoinToNaiveNLJ(0.15) );
+
+        // Conversion of physical algorithms of TPAdd (category: C)
+        // For TPAdd, convert other types of physical algorithm to IndexNLJ
+        ruleApplications.add( new RuleConvertTPAddBindJoinToIndexNLJ(0.2) );
+        ruleApplications.add( new RuleConvertTPAddBJFILTERToIndexNLJ(0.2) );
+        ruleApplications.add( new RuleConvertTPAddBJUNIONToIndexNLJ(0.2) );
+        ruleApplications.add( new RuleConvertTPAddBJVALUESToIndexNLJ(0.2) );
+
+        // For TPAdd, convert IndexNLJ to other types of physical algorithm
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToBindJoin(0.2) );
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToBJFILTER(0.2) );
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToBJUNION(0.2) );
+        ruleApplications.add( new RuleConvertTPAddIndexNLJToBJVALUES(0.2) );
+
+
 
         // TODO: more rules to be added
 

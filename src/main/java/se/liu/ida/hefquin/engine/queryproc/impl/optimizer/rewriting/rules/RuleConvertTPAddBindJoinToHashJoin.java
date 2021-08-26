@@ -3,9 +3,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
-public class RuleConvertTPAddBJToSymmetricHashJoin extends GenericRuleConvertTPAddToSymmetricHashJoin{
+public class RuleConvertTPAddBindJoinToHashJoin extends GenericRuleConvertTPAddToHashJoin{
 
-    public RuleConvertTPAddBJToSymmetricHashJoin( final double priority ) {
+    public RuleConvertTPAddBindJoinToHashJoin( final double priority ) {
         super(priority);
     }
 
