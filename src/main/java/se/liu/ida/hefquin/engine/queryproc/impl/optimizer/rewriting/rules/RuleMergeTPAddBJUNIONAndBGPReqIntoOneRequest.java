@@ -6,9 +6,9 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
-public class RuleMergeTPAddIndexNLJAndRequestIntoOneRequest extends GenericRuleMergeTPAddAndRequestIntoOneRequest{
+public class RuleMergeTPAddBJUNIONAndBGPReqIntoOneRequest extends GenericRuleMergeTPAddAndRequestIntoOneRequest{
 
-    public RuleMergeTPAddIndexNLJAndRequestIntoOneRequest( final double priority ) {
+    public RuleMergeTPAddBJUNIONAndBGPReqIntoOneRequest( final double priority ) {
         super(priority);
     }
 
@@ -16,13 +16,14 @@ public class RuleMergeTPAddIndexNLJAndRequestIntoOneRequest extends GenericRuleM
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
 
-        if( IdentifyPhysicalOpUsedForTPAdd.isIndexNLJ(rootOp) ) {
+        if( IdentifyPhysicalOpUsedForTPAdd.isBindJoinUNION(rootOp) ) {
             final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
             final FederationMember fm = rootLop.getFederationMember();
 
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return subqueryIsARequestWithSameFm( subRootOp, fm );
+            return subqueryIsBGPRequestWithSameFm( subRootOp, fm );
         }
+
         return false;
     }
 
