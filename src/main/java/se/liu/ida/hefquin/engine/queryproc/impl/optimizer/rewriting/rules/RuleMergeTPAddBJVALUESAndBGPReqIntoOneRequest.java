@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
-public class RuleMergeTPAddBJVALUESAndBGPReqIntoOneRequest extends GenericRuleMergeTPAddAndRequestIntoOneRequest {
+public class RuleMergeTPAddBJVALUESAndBGPReqIntoOneRequest extends GenericRuleMergeTPAddAndBGPReqIntoOneRequest {
 
     public RuleMergeTPAddBJVALUESAndBGPReqIntoOneRequest( final double priority ) {
         super(priority);
