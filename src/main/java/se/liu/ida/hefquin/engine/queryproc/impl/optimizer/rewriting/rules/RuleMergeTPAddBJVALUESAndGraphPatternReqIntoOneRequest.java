@@ -7,9 +7,9 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
-public class RuleMergeTPAddBJFILTERAndGraphPatternReqIntoOneRequest extends GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest{
+public class RuleMergeTPAddBJVALUESAndGraphPatternReqIntoOneRequest extends GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest{
 
-    public RuleMergeTPAddBJFILTERAndGraphPatternReqIntoOneRequest( final double priority ) {
+    public RuleMergeTPAddBJVALUESAndGraphPatternReqIntoOneRequest( final double priority ) {
         super(priority);
     }
 
@@ -17,7 +17,7 @@ public class RuleMergeTPAddBJFILTERAndGraphPatternReqIntoOneRequest extends Gene
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
 
-        if( IdentifyPhysicalOpUsedForTPAdd.isBindJoinFILTER(rootOp) ) {
+        if( IdentifyPhysicalOpUsedForTPAdd.isBindJoinVALUES(rootOp) ) {
             final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
             final FederationMember fm = rootLop.getFederationMember();
 
