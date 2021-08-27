@@ -76,8 +76,9 @@ public class RuleInstances {
         ruleApplications.add( new RuleMergeTPAddBJFILTERAndBGPAddIndexNLJIntoBGPAdd(0.3) );
         // TODO: more rules to be added
 
-        // Merge a tpAdd and a request (with the same fm: SPARQL endpoint) into one request (category: A),  (P AND tp)
+        // Merge a tpAdd and a graph pattern request (with the same fm: SPARQL endpoint) into one request (category: A),  (P AND tp)
         ruleApplications.add( new RuleMergeTPAddIndexNLJAndGraphPatternReqIntoOneRequest(0.3) );
+        ruleApplications.add( new RuleMergeTPAddBJFILTERAndGraphPatternReqIntoOneRequest(0.3) );
     }
 
 }
