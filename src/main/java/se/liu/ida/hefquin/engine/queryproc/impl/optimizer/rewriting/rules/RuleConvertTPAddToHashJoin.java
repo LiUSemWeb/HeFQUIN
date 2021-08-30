@@ -7,9 +7,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class GenericRuleConvertTPAddToHashJoin extends AbstractRewritingRuleImpl{
+public class RuleConvertTPAddToHashJoin extends AbstractRewritingRuleImpl{
 
-    public GenericRuleConvertTPAddToHashJoin( final double priority ) {
+    public RuleConvertTPAddToHashJoin( final double priority ) {
         super(priority);
     }
 

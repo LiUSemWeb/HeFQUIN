@@ -11,9 +11,9 @@ public class RuleInstances {
     public void addRuleInstances() {
 
         // Group 1. Convert TPAdd to binary join (category: C)
-        ruleApplications.add( new GenericRuleConvertTPAddToHashJoin(0.15) );
-        ruleApplications.add( new GenericRuleConvertTPAddToSymmetricHashJoin(0.15) );
-        ruleApplications.add( new GenericRuleConvertTPAddToNaiveNLJ(0.15) );
+        ruleApplications.add( new RuleConvertTPAddToHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddToSymmetricHashJoin(0.15) );
+        ruleApplications.add( new RuleConvertTPAddToNaiveNLJ(0.15) );
 
         // Group 2. Conversion of physical algorithms of TPAdd (category: C)
         // For TPAdd, convert other types of physical algorithm to IndexNLJ
@@ -31,22 +31,22 @@ public class RuleInstances {
 
         // Group 3. Order tweaking of two unary operator (category: B),
         // Equation (22)
-        ruleApplications.add( new GenericRuleChangeOrderOfTwoTPAdd(0.25) );
-        ruleApplications.add( new GenericRuleChangeOrderOfTPAddAndBGPAdd(0.25) );
-        ruleApplications.add( new GenericRuleChangeOrderOfTwoBGPAdd(0.25) );
-        ruleApplications.add( new GenericRuleChangeOrderOfBGPAddAndTPAdd(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoTPAdd(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTPAddAndBGPAdd(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfTwoBGPAdd(0.25) );
+        ruleApplications.add( new RuleChangeOrderOfBGPAddAndTPAdd(0.25) );
 
         // Group 5. Merge a TPAdd and a BGP request (with the same fm) into one request (category: A), B' = B U {tp}
         // Equation (13)
-        ruleApplications.add( new GenericRuleMergeTPAddAndBGPReqIntoOneRequest(0.3) );
+        ruleApplications.add( new RuleMergeTPAddAndBGPReqIntoOneRequest(0.3) );
 
         // Group 6. Merge a tpAdd and a bgpAdd (with the same fm) into one bgpAdd (category: A), B' = B U {tp}
         // Equation (14)
-        ruleApplications.add( new GenericRuleMergeTPAddAndBGPAddIntoBGPAdd(0.3) );
+        ruleApplications.add( new RuleMergeTPAddAndBGPAddIntoBGPAdd(0.3) );
 
         // Group 7. Merge a tpAdd and a graph pattern request (with the same fm: SPARQL endpoint) into one request (category: A),  (P AND tp)
         // Equation (20)
-        ruleApplications.add( new GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest(0.3) );
+        ruleApplications.add( new RuleMergeTPAddAndGraphPatternReqIntoOneRequest(0.3) );
 
         // TODO: more rules to be added
     }

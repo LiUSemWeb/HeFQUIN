@@ -3,18 +3,18 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
-public class GenericRuleChangeOrderOfTwoBGPAdd extends GenericRuleChangeOrderOfTwoUnaryOp{
+public class RuleChangeOrderOfTwoTPAdd extends GenericRuleChangeOrderOfTwoUnaryOp{
 
-    public GenericRuleChangeOrderOfTwoBGPAdd( final double priority ) {
+    public RuleChangeOrderOfTwoTPAdd( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if( IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(rootOp) ) {
+        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(subRootOp);
+            return IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(subRootOp);
         }
         return false;
     }

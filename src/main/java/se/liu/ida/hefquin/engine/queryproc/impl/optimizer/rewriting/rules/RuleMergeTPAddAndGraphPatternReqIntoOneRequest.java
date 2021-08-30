@@ -1,12 +1,14 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.query.SPARQLQuery;
+import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -16,11 +18,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-import java.util.Set;
+public class RuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewritingRuleImpl{
 
-public class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRuleImpl{
-
-    public GenericRuleMergeTPAddAndBGPReqIntoOneRequest( final double priority ) {
+    public RuleMergeTPAddAndGraphPatternReqIntoOneRequest( final double priority ) {
         super(priority);
     }
 
@@ -32,9 +32,13 @@ public class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewrit
             final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
             final FederationMember fm = rootLop.getFederationMember();
 
-            final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return subqueryIsBGPRequestWithSameFm( subRootOp, fm );
+            if ( fm instanceof SPARQLEndpoint) {
+                final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
+                return subqueryIsGraphPatternReqWithSameFm( subRootOp, fm );
+            }
+            return false;
         }
+
         return false;
     }
 
@@ -45,15 +49,16 @@ public class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewrit
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
                 final LogicalOpTPAdd lop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
-                final TriplePattern tp = lop.getTP();
+                final Triple tp = lop.getTP().asJenaTriple();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
-                final BGP bgp = ((BGPRequest) subRootLop.getRequest()).getQueryPattern();
-                final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
-                tps.add(tp);
+                final SPARQLQuery graphPattern = ((SPARQLRequest) subRootLop.getRequest()).getQuery();
+                final Element e = graphPattern.asJenaQuery().getQueryPattern();
+                // TODO: (P AND tp), TBD
+                ((ElementGroup) e).addTriplePattern(tp);
 
-                final DataRetrievalRequest newReq = new BGPRequestImpl( new BGPImpl(tps) );
+                final SPARQLRequestImpl newReq = new SPARQLRequestImpl( new SPARQLGraphPatternImpl( e ));
                 final FederationMember fm = lop.getFederationMember();
 
                 return PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
@@ -61,11 +66,11 @@ public class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewrit
         };
     }
 
-    static boolean subqueryIsBGPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
+    static boolean subqueryIsGraphPatternReqWithSameFm(final PhysicalOperator subRootOp, final FederationMember fm ) {
         if ( subRootOp instanceof PhysicalOpRequest) {
             final LogicalOpRequest subLop = (LogicalOpRequest) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
-            return ( subLop.getFederationMember() == fm ) && ( subLop.getRequest() instanceof BGPRequest);
+            return ( subLop.getFederationMember() == fm ) && ( subLop.getRequest() instanceof SPARQLRequest);
         }
         return false;
     }

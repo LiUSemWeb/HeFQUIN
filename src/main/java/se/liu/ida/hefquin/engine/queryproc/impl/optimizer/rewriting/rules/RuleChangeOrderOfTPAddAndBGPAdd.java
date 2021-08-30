@@ -3,9 +3,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 
-public class GenericRuleChangeOrderOfTPAddAndBGPAdd extends GenericRuleChangeOrderOfTwoUnaryOp{
+public class RuleChangeOrderOfTPAddAndBGPAdd extends GenericRuleChangeOrderOfTwoUnaryOp{
 
-    public GenericRuleChangeOrderOfTPAddAndBGPAdd( final double priority ) {
+    public RuleChangeOrderOfTPAddAndBGPAdd( final double priority ) {
         super(priority);
     }
 

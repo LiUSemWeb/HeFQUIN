@@ -15,9 +15,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 import java.util.Set;
 
-public class GenericRuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
+public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
 
-    public GenericRuleMergeTPAddAndBGPAddIntoBGPAdd( final double priority ) {
+    public RuleMergeTPAddAndBGPAddIntoBGPAdd( final double priority ) {
         super(priority);
     }
 
