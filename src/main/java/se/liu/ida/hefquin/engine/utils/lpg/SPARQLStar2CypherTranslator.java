@@ -81,6 +81,10 @@ public class SPARQLStar2CypherTranslator {
                         new EXISTSWhereCondition(evar, configuration.unmapProperty(p)));
                 translation.addReturnClause(
                         new LiteralReturnStatement(evar, configuration.unmapProperty(p), o.getName()));
+            } else if (p.isVariable() && o.isLiteral()){
+                translation.addReturnClause(
+                        new FilteredPropertiesReturnStatement(evar, p.getName(), o.getLiteralValue().toString())
+                );
             } else if (p.isVariable() && o.isVariable()) {
                 translation.addReturnClause(
                         new PropertyListReturnStatement(evar, p.getName()));
