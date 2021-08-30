@@ -1,14 +1,25 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
+import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public abstract class GenericRuleChangeOrderOfTwoUnaryOp extends AbstractRewritingRuleImpl{
+public class GenericRuleChangeOrderOfTwoTPAdd extends AbstractRewritingRuleImpl{
 
-    public GenericRuleChangeOrderOfTwoUnaryOp( final double priority ) {
+    public GenericRuleChangeOrderOfTwoTPAdd( final double priority ) {
         super(priority);
+    }
+
+    @Override
+    protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
+            final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
+            return IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(subRootOp);
+        }
+        return false;
     }
 
     @Override

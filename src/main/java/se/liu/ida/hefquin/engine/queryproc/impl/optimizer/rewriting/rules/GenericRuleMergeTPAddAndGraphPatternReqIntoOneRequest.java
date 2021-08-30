@@ -4,6 +4,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
@@ -17,10 +18,28 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public abstract class GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewritingRuleImpl{
+public class GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewritingRuleImpl{
 
     public GenericRuleMergeTPAddAndGraphPatternReqIntoOneRequest( final double priority ) {
         super(priority);
+    }
+
+    @Override
+    protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+
+        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
+            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+            final FederationMember fm = rootLop.getFederationMember();
+
+            if ( fm instanceof SPARQLEndpoint) {
+                final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
+                return subqueryIsGraphPatternReqWithSameFm( subRootOp, fm );
+            }
+            return false;
+        }
+
+        return false;
     }
 
     @Override

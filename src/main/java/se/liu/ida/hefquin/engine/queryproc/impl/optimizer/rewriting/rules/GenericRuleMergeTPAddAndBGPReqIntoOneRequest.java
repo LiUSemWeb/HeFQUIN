@@ -18,10 +18,24 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 import java.util.Set;
 
-public abstract class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRuleImpl{
+public class GenericRuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRuleImpl{
 
     public GenericRuleMergeTPAddAndBGPReqIntoOneRequest( final double priority ) {
         super(priority);
+    }
+
+    @Override
+    protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+
+        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
+            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+            final FederationMember fm = rootLop.getFederationMember();
+
+            final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
+            return subqueryIsBGPRequestWithSameFm( subRootOp, fm );
+        }
+        return false;
     }
 
     @Override

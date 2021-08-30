@@ -15,10 +15,24 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 import java.util.Set;
 
-public abstract class GenericRuleMergeTPAddAndBGPAddIndexNLJIntoBGPAdd extends AbstractRewritingRuleImpl{
+public class GenericRuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
 
-    public GenericRuleMergeTPAddAndBGPAddIndexNLJIntoBGPAdd( final double priority ) {
+    public GenericRuleMergeTPAddAndBGPAddIntoBGPAdd( final double priority ) {
         super(priority);
+    }
+
+    @Override
+    protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+
+        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
+            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+            final FederationMember fm = rootLop.getFederationMember();
+
+            final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
+            return subqueryIsBGPAddWithSameFm( subRootOp, fm );
+        }
+        return false;
     }
 
     @Override
@@ -42,8 +56,8 @@ public abstract class GenericRuleMergeTPAddAndBGPAddIndexNLJIntoBGPAdd extends A
         };
     }
 
-    static boolean subqueryIsBGPAddIndexNLJWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm) {
-        if ( IdentifyPhysicalOpUsedForBGPAdd.isIndexNLJ(subRootOp) ) {
+    static boolean subqueryIsBGPAddWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm) {
+        if ( IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(subRootOp) ) {
             final LogicalOpBGPAdd subLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
             return ( subLop.getFederationMember() == fm );
