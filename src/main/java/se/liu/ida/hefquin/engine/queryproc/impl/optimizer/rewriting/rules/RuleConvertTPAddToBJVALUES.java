@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
+import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
@@ -7,16 +9,21 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleConvertTPAddIndexNLJToBJUNION extends AbstractRewritingRuleImpl{
+public class RuleConvertTPAddToBJVALUES extends AbstractRewritingRuleImpl{
 
-    public RuleConvertTPAddIndexNLJToBJUNION( final double priority ) {
+    public RuleConvertTPAddToBJVALUES( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForTPAdd.isIndexNLJ(rootOp);
+        if ( IdentifyPhysicalOpUsedForTPAdd.isIndexNLJ(rootOp) ) {
+            final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator)rootOp).getLogicalOperator();
+            final FederationMember fm = tpAdd.getFederationMember();
+            return (fm instanceof SPARQLEndpoint);
+        }
+        else return ( IdentifyPhysicalOpUsedForTPAdd.isBindJoinFILTER(rootOp) || IdentifyPhysicalOpUsedForTPAdd.isBindJoinUNION(rootOp) );
     }
 
     @Override
@@ -26,9 +33,8 @@ public class RuleConvertTPAddIndexNLJToBJUNION extends AbstractRewritingRuleImpl
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
                 final LogicalOpTPAdd lop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
-                return PhysicalPlanFactory.createPlanWithBindJoinUNION( lop , plan.getSubPlan(0) );
+                return PhysicalPlanFactory.createPlanWithBindJoinVALUES( lop , plan.getSubPlan(0) );
             }
         };
     }
-
 }

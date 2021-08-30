@@ -61,7 +61,7 @@ public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRule
         };
     }
 
-    static boolean subqueryIsBGPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
+    protected boolean subqueryIsBGPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
         if ( subRootOp instanceof PhysicalOpRequest) {
             final LogicalOpRequest subLop = (LogicalOpRequest) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
