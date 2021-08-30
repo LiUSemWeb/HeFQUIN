@@ -29,13 +29,12 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertTPAddIndexNLJToBJVALUES(0.2) );
         // TODO: more rules to be added (conversion between different algorithms of bind join)
 
-        // Group 3. Order tweaking of two TPAdd (category: B),
+        // Group 3. Order tweaking of two unary operator (category: B),
         // Equation (22)
         ruleApplications.add( new GenericRuleChangeOrderOfTwoTPAdd(0.25) );
-
-        // Group 4. Order tweaking of TPAdd and BGPAdd (category: B).
-        // Equation (23)
         ruleApplications.add( new GenericRuleChangeOrderOfTPAddAndBGPAdd(0.25) );
+        ruleApplications.add( new GenericRuleChangeOrderOfTwoBGPAdd(0.25) );
+        ruleApplications.add( new GenericRuleChangeOrderOfBGPAddAndTPAdd(0.25) );
 
         // Group 5. Merge a TPAdd and a BGP request (with the same fm) into one request (category: A), B' = B U {tp}
         // Equation (13)
