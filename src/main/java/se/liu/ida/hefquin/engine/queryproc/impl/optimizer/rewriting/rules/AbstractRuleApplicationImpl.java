@@ -33,6 +33,11 @@ public abstract class AbstractRuleApplicationImpl implements RuleApplication
     }
 
     @Override
+    public double getWeight() {
+        return getRule().getPriority();
+    }
+
+    @Override
     public PhysicalPlan getResultingPlan() {
         final int numSteps = pathToTargetSubPlan.length - 1;
 

@@ -6,9 +6,14 @@ import java.util.Set;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.*;
 
 public class RuleInstances {
-    Set<RewritingRule> ruleApplications = new HashSet<>();
+    public Set<RewritingRule> ruleInstances;
 
-    public void addRuleInstances() {
+    public RuleInstances() {
+        this.ruleInstances = addRuleInstances();
+    }
+
+    protected Set<RewritingRule> addRuleInstances() {
+        final Set<RewritingRule> ruleApplications = new HashSet<>();
 
         // Group 1. Convert TPAdd to binary join (category: C)
         ruleApplications.add( new RuleConvertTPAddToHashJoin(0.15) );
@@ -42,6 +47,7 @@ public class RuleInstances {
         ruleApplications.add( new RuleMergeTPAddAndBGPAddIntoBGPAdd(0.3) );
 
         // TODO: more rules to be added
+        return ruleApplications;
     }
 
 }
