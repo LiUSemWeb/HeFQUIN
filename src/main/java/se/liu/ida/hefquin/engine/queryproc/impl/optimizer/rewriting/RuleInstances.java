@@ -53,7 +53,6 @@ public class RuleInstances {
         ruleApplications.add( new RuleConvertBGPAddToBJUNION(0.2) );
         ruleApplications.add( new RuleConvertBGPAddToBJVALUES(0.2) );
 
-         /*
         // Group 2.4. Merge two operators into one
         // Merge a bgpAdd and a BGP request (with the same fm) into one request (category: A), B' = B1 U B2
         // Equation (6)
@@ -69,6 +68,7 @@ public class RuleInstances {
         // Equation (7)
         ruleApplications.add( new RuleMergeTwoBGPAddIntoOneBGPAdd(0.3) );
 
+        /*
         // Group 2.5: divide one bgpAdd to multiple operators (category: E)
         ruleApplications.add( new RuleDivideBGPAddToMultiTPAdd(0.1) );
          */
