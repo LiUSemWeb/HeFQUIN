@@ -128,16 +128,17 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     protected PhysicalPlanWithCost findPlanWithSmallestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
-        PhysicalPlanWithCost optimalQuery = plansWithCost.get(0);
-        double min = optimalQuery.getWeight();
+        final PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
+        double min = bestPlan.getWeight();
 
         for ( int i = 1; i < plansWithCost.size(); i++) {
-            if ( plansWithCost.get(i).getWeight() <= min ) {
-                min = plansWithCost.get(i).getWeight();
-                optimalQuery = plansWithCost.get(i);
+            final PhysicalPlanWithCost p = plansWithCost.get(i);
+            if ( p.getWeight() <= min ) {
+                min = p.getWeight();
+                bestPlan = p;
             }
         }
-        return optimalQuery;
+        return bestPlan;
     }
 
 }
