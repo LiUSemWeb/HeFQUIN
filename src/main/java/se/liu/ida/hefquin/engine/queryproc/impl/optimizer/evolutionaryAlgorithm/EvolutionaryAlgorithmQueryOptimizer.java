@@ -73,7 +73,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     protected List<PhysicalPlanWithCost> generateTheNextGen( final List<PhysicalPlanWithCost> currentGen ) throws CostEstimationException {
-        List<PhysicalPlan> newCandidates = new ArrayList<>();
+        final List<PhysicalPlan> newCandidates = new ArrayList<>();
 
         while ( newCandidates.size() < nmCandidates ) {
             // pick a parent from the current generation
