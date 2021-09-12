@@ -25,7 +25,7 @@ public class RuleApplicationsOfPlan {
         }
 
         final Set<RuleApplication> ruleApps = new HashSet<>();
-        for ( RewritingRule rewritingRule : ruleIns.ruleInstances ) {
+        for ( final RewritingRule rewritingRule : ruleIns.ruleInstances ) {
             ruleApps.addAll( rewritingRule.determineAllPossibleApplications( plan ) );
         }
         cache.put(plan, ruleApps);
