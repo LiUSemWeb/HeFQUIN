@@ -51,7 +51,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     protected List<PhysicalPlanWithCost> generateTheFirstGen( final PhysicalPlan plan ) throws CostEstimationException {
-        List<PhysicalPlan> currentGen = new ArrayList<>();
+        final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
         // determine all rule applications for the initial plan
