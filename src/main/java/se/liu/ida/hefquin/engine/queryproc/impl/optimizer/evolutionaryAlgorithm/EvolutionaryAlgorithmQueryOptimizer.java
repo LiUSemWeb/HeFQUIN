@@ -119,9 +119,9 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
         Random rand = new Random();
         for ( int i = 0; i < nmSurvivors; i++ ) {
-            PhysicalPlanWithCost survivorWithCost = planWithCosts.get( rand.nextInt(planWithCosts.size()) );
-            currentGen.add( survivorWithCost );
-            planWithCosts.remove( survivorWithCost );
+            final PhysicalPlanWithCost survivor = planWithCosts.get( rand.nextInt(planWithCosts.size()) );
+            currentGen.add( survivor );
+            planWithCosts.remove( survivor );
         }
 
         return currentGen;
