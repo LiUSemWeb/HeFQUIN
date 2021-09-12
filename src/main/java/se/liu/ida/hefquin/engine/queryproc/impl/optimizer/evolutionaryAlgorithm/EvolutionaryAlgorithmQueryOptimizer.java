@@ -81,7 +81,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             final PhysicalPlan parent = ( planRandomizedSelect.pickOne( new HashSet<>(currentGen) )).getPlan();
 
             // determine all possible applications of rewriting rules for the parent plan
-            Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( parent );
+            final Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( parent );
 
             final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
             if ( ruleApps.size() > 0) {
