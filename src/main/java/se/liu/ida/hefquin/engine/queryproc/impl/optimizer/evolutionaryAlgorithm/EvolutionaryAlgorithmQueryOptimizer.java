@@ -55,7 +55,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         currentGen.add(plan);
 
         // determine all rule applications for the initial plan
-        Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( plan );
+        final Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( plan );
 
         // generate candidates for the first generation
         final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
