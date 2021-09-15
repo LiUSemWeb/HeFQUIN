@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
+
 /**
  * An exception that occurred during query optimization.
  */
@@ -21,6 +23,10 @@ public class QueryOptimizationException extends QueryPlanningException
 
 	public QueryOptimizationException() {
 		super();
+	}
+
+	public QueryOptimizationException( final String message, final CostEstimationException cause  ) {
+		super(message, cause);
 	}
 
 }

@@ -32,18 +32,4 @@ public class RuleApplicationsOfPlan {
         return ruleApps;
     }
 
-
-    public void removeRuleApplications( final PhysicalPlan plan, final RuleApplication ruleApplication )
-    {
-        final Set<RuleApplication> ruleApps = cache.get(plan);
-        ruleApps.remove(ruleApplication);
-
-        cache.replace(plan, ruleApps);
-    }
-
-    public void replaceRuleApplications( final PhysicalPlan plan, final Set<RuleApplication> ruleApps )
-    {
-        cache.replace( plan, ruleApps );
-    }
-
 }

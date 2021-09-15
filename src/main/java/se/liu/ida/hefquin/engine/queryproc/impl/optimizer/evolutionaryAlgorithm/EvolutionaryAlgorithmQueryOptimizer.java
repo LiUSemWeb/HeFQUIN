@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
@@ -15,81 +15,82 @@ import java.util.*;
 
 public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     protected final QueryOptimizationContext ctxt;
-    protected final CostModel costModel;
-    private final int nmCandidates;
-    private final int nmSurvivors;
-    private final int nmSteps;
-    protected final RuleApplicationsOfPlan ruleApplicationCache = new RuleApplicationsOfPlan( new RuleInstances() );
+    protected final int nmCandidates;
+    protected final int nmSurvivors;
+    protected final int nmSteps;
 
-    public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt, CostModel costModel,
+    protected final RandomizedSelection randomizedSelection = new RandomizedSelection<>();
+    protected final Random rand = new Random();
+
+    public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
                                                 final int nmCandidates, final int nmSurvivors, int nmSteps ) {
         assert ctxt != null;
+        assert (nmCandidates - nmSurvivors) > 0;
 
         this.ctxt = ctxt;
-        this.costModel = costModel;
         this.nmCandidates = nmCandidates;
         this.nmSurvivors = nmSurvivors;
         this.nmSteps = nmSteps;
     }
 
     @Override
-    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws CostEstimationException {
+    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
 
         return optimizePlan( initialPhysicalPlan );
     }
 
-    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws CostEstimationException {
+    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
+        final RuleApplicationsOfPlan ruleApplicationCache = new RuleApplicationsOfPlan( new RuleInstances() );
         // initialize the first generation
-        List<PhysicalPlanWithCost> currentGen = generateTheFirstGen( plan );
+        List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
 
-        // termination condition of optimizing the plan: number of generations
+        // TODO: extend this implementation with different sorts of termination criteria
+        // termination criteria: number of generations
         for ( int gen = 1; gen < nmSteps; gen++ ){
-            currentGen = generateTheNextGen( currentGen );
+            currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
         return findPlanWithSmallestCost(currentGen).getPlan();
     }
 
-    protected List<PhysicalPlanWithCost> generateTheFirstGen( final PhysicalPlan plan ) throws CostEstimationException {
+    protected List<PhysicalPlanWithCost> generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlan cache ) throws QueryOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
         // determine all rule applications for the initial plan
-        final Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( plan );
+        final Set<RuleApplication> ruleApps = cache.determineRuleApplications( plan );
 
         // generate candidates for the first generation
-        final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
-        while ( currentGen.size() < nmCandidates && ruleApps.size() > 0 ){
+        while ( (currentGen.size() < nmCandidates) && (ruleApps.size() > 0) ){
             // Pick one rule application based on priority, and apply the selected rule application to the initial plan
-            final RuleApplication ruleApplication = ruleRandomizedSelect.pickOne( ruleApps );
+            final RuleApplication ruleApplication = (RuleApplication) randomizedSelection.pickOne( ruleApps );
             currentGen.add( ruleApplication.getResultingPlan() );
 
             // remove the applied rule application from the set of rule applications
             ruleApps.remove( ruleApplication );
         }
-        ruleApplicationCache.replaceRuleApplications( plan, ruleApps);
 
         return annotatePlansWithCost(currentGen);
     }
 
-    protected List<PhysicalPlanWithCost> generateTheNextGen( final List<PhysicalPlanWithCost> currentGen ) throws CostEstimationException {
+    protected List<PhysicalPlanWithCost> generateNextGen( final List<PhysicalPlanWithCost> currentGen, final RuleApplicationsOfPlan cache ) throws QueryOptimizationException {
+        final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 
-        while ( newCandidates.size() < nmCandidates ) {
+        while ( newCandidates.size() < nmCandidates && parentSet.size() > 0 ) {
             // pick a parent from the current generation
-            final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
-            final PhysicalPlan parent = ( planRandomizedSelect.pickOne( new HashSet<>(currentGen) )).getPlan();
+            final PhysicalPlan parent = ( (PhysicalPlanWithCost)randomizedSelection.pickOne( parentSet ) ).getPlan() ;
 
             // determine all possible applications of rewriting rules for the parent plan
-            final Set<RuleApplication> ruleApps = ruleApplicationCache.determineRuleApplications( parent );
+            final Set<RuleApplication> ruleApps = cache.determineRuleApplications( parent );
 
-            final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
             if ( ruleApps.size() > 0) {
                 // Pick one rewriting rule based on priority
-                final RuleApplication ruleApplication = ruleRandomizedSelect.pickOne( ruleApps );
+                final RuleApplication ruleApplication = (RuleApplication) randomizedSelection.pickOne( ruleApps );
                 newCandidates.add( ruleApplication.getResultingPlan() );
-                ruleApplicationCache.removeRuleApplications( parent, ruleApplication );
+                ruleApps.remove(ruleApplication);
             }
+            parentSet.remove( parent );
         }
         currentGen.addAll( annotatePlansWithCost(newCandidates) );
 
@@ -97,8 +98,13 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return selectNextGenFromCandidates( currentGen );
     }
 
-    protected List<PhysicalPlanWithCost> annotatePlansWithCost( final List<PhysicalPlan> plans ) throws CostEstimationException {
-        final Double[] costs = CostEstimationUtils.getEstimates( costModel, plans );
+    protected List<PhysicalPlanWithCost> annotatePlansWithCost( final List<PhysicalPlan> plans ) throws QueryOptimizationException {
+        final Double[] costs;
+        try {
+            costs = CostEstimationUtils.getEstimates( ctxt.getCostModel(), plans );
+        } catch ( CostEstimationException e) {
+            throw new QueryOptimizationException("Unexpected exception when determining the cost for plans.", e);
+        }
 
         final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>();
         for ( int i = 0; i < plans.size(); i++ ) {
@@ -117,7 +123,6 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             planWithCosts.remove( planWithSmallestCost );
         }
 
-        Random rand = new Random();
         for ( int i = 0; i < nmSurvivors; i++ ) {
             final PhysicalPlanWithCost survivor = planWithCosts.get( rand.nextInt(planWithCosts.size()) );
             currentGen.add( survivor );
@@ -128,7 +133,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     protected PhysicalPlanWithCost findPlanWithSmallestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
-        final PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
+        PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
         double min = bestPlan.getWeight();
 
         for ( int i = 1; i < plansWithCost.size(); i++) {
