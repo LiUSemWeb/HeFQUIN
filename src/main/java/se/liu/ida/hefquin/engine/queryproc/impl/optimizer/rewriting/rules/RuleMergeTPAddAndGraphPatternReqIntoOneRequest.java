@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
@@ -48,25 +49,32 @@ public class RuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewr
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-                final LogicalOpTPAdd lop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
-                final Triple tp = lop.getTP().asJenaTriple();
+                final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
-                final SPARQLQuery graphPattern = ((SPARQLRequest) subRootLop.getRequest()).getQuery();
-                final Element e = graphPattern.asJenaQuery().getQueryPattern();
-                // TODO: (P AND tp), TBD
-                ((ElementGroup) e).addTriplePattern(tp);
 
-                final SPARQLRequestImpl newReq = new SPARQLRequestImpl( new SPARQLGraphPatternImpl( e ));
-                final FederationMember fm = lop.getFederationMember();
+                final SPARQLGraphPattern newGraphPattern = createNewGraphPattern( rootLop, subRootLop );
+                final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
+                final FederationMember fm = rootLop.getFederationMember();
 
                 return PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
             }
         };
     }
 
-    protected boolean subqueryIsGraphPatternReqWithSameFm(final PhysicalOperator subRootOp, final FederationMember fm ) {
+    protected SPARQLGraphPattern createNewGraphPattern( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest lopReq ) {
+        final Triple tp = lopTPAdd.getTP().asJenaTriple();
+
+        final SPARQLQuery graphPattern = ((SPARQLRequest) lopReq.getRequest()).getQuery();
+        final Element element = graphPattern.asJenaQuery().getQueryPattern();
+
+        ((ElementGroup) element).addTriplePattern(tp);
+
+        return new SPARQLGraphPatternImpl(element);
+    }
+
+    protected boolean subqueryIsGraphPatternReqWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
         if ( subRootOp instanceof PhysicalOpRequest) {
             final LogicalOpRequest subLop = (LogicalOpRequest) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 

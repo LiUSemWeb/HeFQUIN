@@ -44,22 +44,29 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final LogicalOpTPAdd rootOp = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
-                final TriplePattern tp = rootOp.getTP();
 
                 final PhysicalOperator subRootOp =  plan.getSubPlan(0).getRootOperator();
                 final LogicalOpBGPAdd subRootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
-                final BGP bgp = subRootLop.getBGP();
-                final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
-                tps.add(tp);
 
+                final BGP newBGP = createNewBGP( rootOp, subRootLop);
                 final FederationMember fm = rootOp.getFederationMember();
 
-                final LogicalOpBGPAdd logicalBGPAdd = new LogicalOpBGPAdd( fm, new BGPImpl(tps) );
+                final LogicalOpBGPAdd logicalBGPAdd = new LogicalOpBGPAdd( fm, newBGP );
                 final PhysicalOperator newRootOp = determinePhysicalOpOfRoot( subRootOp, logicalBGPAdd );
 
                 return PhysicalPlanFactory.createPlan( newRootOp, plan.getSubPlan(0).getSubPlan(0) );
             }
         };
+    }
+
+    protected BGP createNewBGP(final LogicalOpTPAdd lopTPAdd, final LogicalOpBGPAdd lopBGPAdd ) {
+        final TriplePattern tp = lopTPAdd.getTP();
+
+        final BGP bgp = lopBGPAdd.getBGP();
+        final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
+        tps.add(tp);
+
+        return new BGPImpl(tps);
     }
 
     protected boolean subqueryIsBGPAddWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm) {

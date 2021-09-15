@@ -28,7 +28,7 @@ public class RuleConvertBGPAddToBJVALUES extends AbstractRewritingRuleImpl{
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
                 final LogicalOpBGPAdd lop = (LogicalOpBGPAdd) rootOp.getLogicalOperator();
-                return PhysicalPlanFactory.createPlan( lop , plan.getSubPlan(0) );
+                return PhysicalPlanFactory.createPlanWithBindJoinVALUES( lop , plan.getSubPlan(0) );
             }
         };
     }

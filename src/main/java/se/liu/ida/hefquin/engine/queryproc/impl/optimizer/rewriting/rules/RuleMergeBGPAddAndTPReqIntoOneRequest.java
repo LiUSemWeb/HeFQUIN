@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
@@ -45,20 +44,27 @@ public class RuleMergeBGPAddAndTPReqIntoOneRequest extends AbstractRewritingRule
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-                final LogicalOpBGPAdd lop = (LogicalOpBGPAdd) rootOp.getLogicalOperator();
-                final Set<TriplePattern> tpsOfBGPAdd = (Set<TriplePattern>) lop.getBGP().getTriplePatterns();
+                final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
-                final TriplePattern tpOfReq = ((TriplePatternRequest) subRootLop.getRequest()).getQueryPattern();
-                tpsOfBGPAdd.add(tpOfReq);
 
-                final DataRetrievalRequest newReq = new BGPRequestImpl( new BGPImpl(tpsOfBGPAdd) );
-                final FederationMember fm = lop.getFederationMember();
+                final BGP newBGP = createNewBGP( rootLop, subRootLop );
+                final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );
+                final FederationMember fm = rootLop.getFederationMember();
 
                 return PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
             }
         };
+    }
+
+    protected BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest lopReq ) {
+        final Set<TriplePattern> tpsOfBGPAdd = (Set<TriplePattern>) lopBGPAdd.getBGP().getTriplePatterns();
+
+        final TriplePattern tpOfReq = ((TriplePatternRequest) lopReq.getRequest()).getQueryPattern();
+        tpsOfBGPAdd.add( tpOfReq );
+
+        return new BGPImpl(tpsOfBGPAdd);
     }
 
     protected boolean subqueryIsTPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {

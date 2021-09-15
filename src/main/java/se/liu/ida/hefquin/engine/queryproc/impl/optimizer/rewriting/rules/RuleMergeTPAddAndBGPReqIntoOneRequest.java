@@ -44,21 +44,28 @@ public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRule
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-                final LogicalOpTPAdd lop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
-                final TriplePattern tp = lop.getTP();
+                final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
-                final BGP bgp = ((BGPRequest) subRootLop.getRequest()).getQueryPattern();
-                final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
-                tps.add(tp);
 
-                final DataRetrievalRequest newReq = new BGPRequestImpl( new BGPImpl(tps) );
-                final FederationMember fm = lop.getFederationMember();
+                final BGP newBGP = createNewBGP(rootLop, subRootLop);
+                final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );
+                final FederationMember fm = rootLop.getFederationMember();
 
                 return PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
             }
         };
+    }
+
+    protected BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest lopReq ) {
+        final TriplePattern tp = lopTPAdd.getTP();
+
+        final BGP bgp = ((BGPRequest) lopReq.getRequest()).getQueryPattern();
+        final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
+        tps.add(tp);
+
+        return new BGPImpl(tps);
     }
 
     protected boolean subqueryIsBGPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
