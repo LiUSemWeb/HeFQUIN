@@ -68,10 +68,8 @@ public class RuleInstances {
         // Equation (7)
         ruleApplications.add( new RuleMergeTwoBGPAddIntoOneBGPAdd(0.3) );
 
-        /*
         // Group 2.5: divide one bgpAdd to multiple operators (category: E)
         ruleApplications.add( new RuleDivideBGPAddToMultiTPAdd(0.1) );
-         */
         // TODO: more rules to be added
     }
 
