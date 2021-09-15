@@ -7,7 +7,6 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
@@ -18,9 +17,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 import java.util.Set;
 
-public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
+public class RuleMergeTwoBGPAddIntoOneBGPAdd extends AbstractRewritingRuleImpl{
 
-    public RuleMergeTPAddAndBGPAddIntoBGPAdd( final double priority ) {
+    public RuleMergeTwoBGPAddIntoOneBGPAdd( final double priority ) {
         super(priority);
     }
 
@@ -28,8 +27,8 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
 
-        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
-            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+        if( IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(rootOp) ) {
+            final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
             final FederationMember fm = rootLop.getFederationMember();
 
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
@@ -39,34 +38,33 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
     }
 
     @Override
-    protected RuleApplication createRuleApplication(PhysicalPlan[] pathToTargetPlan) {
+    protected RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan ) {
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                final LogicalOpTPAdd rootOp = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
+                final PhysicalOperator rootOp = plan.getRootOperator();
+                final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
 
                 final PhysicalOperator subRootOp =  plan.getSubPlan(0).getRootOperator();
                 final LogicalOpBGPAdd subRootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
-                final BGP newBGP = createNewBGP( rootOp, subRootLop);
-                final FederationMember fm = rootOp.getFederationMember();
-
+                final BGP newBGP = createNewBGP(rootLop, subRootLop);
+                final FederationMember fm = rootLop.getFederationMember();
                 final LogicalOpBGPAdd logicalBGPAdd = new LogicalOpBGPAdd( fm, newBGP );
-                final PhysicalOperator newRootOp = determinePhysicalOpOfRoot( subRootOp, logicalBGPAdd );
+                final PhysicalOperator newRootOp = determinePhysicalOpOfRoot( rootOp, logicalBGPAdd );
 
                 return PhysicalPlanFactory.createPlan( newRootOp, plan.getSubPlan(0).getSubPlan(0) );
             }
         };
     }
 
-    protected BGP createNewBGP(final LogicalOpTPAdd lopTPAdd, final LogicalOpBGPAdd lopBGPAdd ) {
-        final TriplePattern tp = lopTPAdd.getTP();
+    protected BGP createNewBGP( final LogicalOpBGPAdd lopBGPAddOut, final LogicalOpBGPAdd lopBGPAddIn ) {
+        final Set<TriplePattern> tpsOfBGPAddOut = (Set<TriplePattern>) lopBGPAddOut.getBGP().getTriplePatterns();
 
-        final BGP bgp = lopBGPAdd.getBGP();
-        final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
-        tps.add(tp);
+        final Set<TriplePattern> tpsOfBGPAddIn = (Set<TriplePattern>) lopBGPAddIn.getBGP().getTriplePatterns();
+        tpsOfBGPAddOut.addAll(tpsOfBGPAddIn);
 
-        return new BGPImpl(tps);
+        return new BGPImpl(tpsOfBGPAddOut);
     }
 
     protected boolean subqueryIsBGPAddWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm) {
@@ -80,7 +78,7 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
 
     protected PhysicalOperator determinePhysicalOpOfRoot( final PhysicalOperator subRootOp, final LogicalOpBGPAdd logicalOpBGPAdd) {
 
-        if ( subRootOp instanceof  PhysicalOpIndexNestedLoopsJoin) {
+        if ( subRootOp instanceof PhysicalOpIndexNestedLoopsJoin) {
             return new PhysicalOpIndexNestedLoopsJoin( logicalOpBGPAdd );
         }
         else if ( subRootOp instanceof PhysicalOpBindJoinWithFILTER) {

@@ -9,8 +9,8 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -18,9 +18,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 import java.util.Set;
 
-public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRuleImpl{
+public class RuleMergeBGPAddAndBGPReqIntoOneRequest extends AbstractRewritingRuleImpl{
 
-    public RuleMergeTPAddAndBGPReqIntoOneRequest( final double priority ) {
+    public RuleMergeBGPAddAndBGPReqIntoOneRequest( final double priority ) {
         super(priority);
     }
 
@@ -28,8 +28,8 @@ public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRule
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
 
-        if( IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp) ) {
-            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+        if( IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(rootOp) ) {
+            final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
             final FederationMember fm = rootLop.getFederationMember();
 
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
@@ -44,7 +44,7 @@ public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRule
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-                final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
+                final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
@@ -58,21 +58,21 @@ public class RuleMergeTPAddAndBGPReqIntoOneRequest extends AbstractRewritingRule
         };
     }
 
-    protected BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest lopReq ) {
-        final TriplePattern tp = lopTPAdd.getTP();
+    protected BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest lopReq ) {
+        final Set<TriplePattern> tpsOfBGPAdd = (Set<TriplePattern>) lopBGPAdd.getBGP().getTriplePatterns();
 
-        final BGP bgp = ((BGPRequest) lopReq.getRequest()).getQueryPattern();
-        final Set<TriplePattern> tps = (Set<TriplePattern>) bgp.getTriplePatterns();
-        tps.add(tp);
+        final BGP bgpOfReq = ((BGPRequest) lopReq.getRequest()).getQueryPattern();
+        final Set<TriplePattern> tpsOfReq = (Set<TriplePattern>) bgpOfReq.getTriplePatterns();
+        tpsOfBGPAdd.addAll( tpsOfReq );
 
-        return new BGPImpl(tps);
+        return new BGPImpl(tpsOfBGPAdd);
     }
 
     protected boolean subqueryIsBGPRequestWithSameFm( final PhysicalOperator subRootOp, final FederationMember fm ) {
         if ( subRootOp instanceof PhysicalOpRequest) {
             final LogicalOpRequest subLop = (LogicalOpRequest) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
-            return ( subLop.getFederationMember() == fm ) && ( subLop.getRequest() instanceof BGPRequest);
+            return ( subLop.getFederationMember() == fm ) && ( subLop.getRequest() instanceof BGPRequest );
         }
         return false;
     }
