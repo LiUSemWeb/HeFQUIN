@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
-public interface RuleApplication
-{
+public interface RuleApplication extends RandomizedSelection.WeightedObject {
 	/**
 	 * Returns the actual rewriting rule to be applied.@return
 	 */
