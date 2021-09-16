@@ -38,10 +38,10 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
 
-        return optimizePlan( initialPhysicalPlan );
+        return optimize( initialPhysicalPlan );
     }
 
-    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
+    public PhysicalPlan optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
         final RuleApplicationsOfPlans ruleApplicationCache = new RuleApplicationsOfPlans( new RuleInstances() );
         // initialize the first generation
         List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
