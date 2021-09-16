@@ -19,7 +19,8 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     protected final int nmSurvivors;
     protected final int nmSteps;
 
-    protected final RandomizedSelection randomizedSelection = new RandomizedSelection<>();
+    protected final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
+    protected final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
     protected final Random rand = new Random();
 
     public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
@@ -41,7 +42,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
-        final RuleApplicationsOfPlan ruleApplicationCache = new RuleApplicationsOfPlan( new RuleInstances() );
+        final RuleApplicationsOfPlans ruleApplicationCache = new RuleApplicationsOfPlans( new RuleInstances() );
         // initialize the first generation
         List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
 
@@ -53,17 +54,17 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return findPlanWithSmallestCost(currentGen).getPlan();
     }
 
-    protected List<PhysicalPlanWithCost> generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlan cache ) throws QueryOptimizationException {
+    protected List<PhysicalPlanWithCost> generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
         // determine all rule applications for the initial plan
-        final Set<RuleApplication> ruleApps = cache.determineRuleApplications( plan );
+        final Set<RuleApplication> ruleApps = cache.getRuleApplications( plan );
 
         // generate candidates for the first generation
         while ( (currentGen.size() < nmCandidates) && (ruleApps.size() > 0) ){
             // Pick one rule application based on priority, and apply the selected rule application to the initial plan
-            final RuleApplication ruleApplication = (RuleApplication) randomizedSelection.pickOne( ruleApps );
+            final RuleApplication ruleApplication = ruleRandomizedSelect.pickOne( ruleApps );
             currentGen.add( ruleApplication.getResultingPlan() );
 
             // remove the applied rule application from the set of rule applications
@@ -73,24 +74,25 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return annotatePlansWithCost(currentGen);
     }
 
-    protected List<PhysicalPlanWithCost> generateNextGen( final List<PhysicalPlanWithCost> currentGen, final RuleApplicationsOfPlan cache ) throws QueryOptimizationException {
+    protected List<PhysicalPlanWithCost> generateNextGen( final List<PhysicalPlanWithCost> currentGen, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
         final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 
         while ( newCandidates.size() < nmCandidates && parentSet.size() > 0 ) {
             // pick a parent from the current generation
-            final PhysicalPlan parent = ( (PhysicalPlanWithCost)randomizedSelection.pickOne( parentSet ) ).getPlan() ;
+            final PhysicalPlan parent = planRandomizedSelect.pickOne( parentSet ) .getPlan() ;
 
             // determine all possible applications of rewriting rules for the parent plan
-            final Set<RuleApplication> ruleApps = cache.determineRuleApplications( parent );
-
+            final Set<RuleApplication> ruleApps = cache.getRuleApplications( parent );
             if ( ruleApps.size() > 0) {
                 // Pick one rewriting rule based on priority
-                final RuleApplication ruleApplication = (RuleApplication) randomizedSelection.pickOne( ruleApps );
+                final RuleApplication ruleApplication = ruleRandomizedSelect.pickOne( ruleApps );
                 newCandidates.add( ruleApplication.getResultingPlan() );
                 ruleApps.remove(ruleApplication);
             }
-            parentSet.remove( parent );
+            else {
+                parentSet.remove(parent);
+            }
         }
         currentGen.addAll( annotatePlansWithCost(newCandidates) );
 
@@ -103,7 +105,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         try {
             costs = CostEstimationUtils.getEstimates( ctxt.getCostModel(), plans );
         } catch ( final CostEstimationException e ) {
-            throw new QueryOptimizationException("Determining the cost for plans caused an exception.", e);
+            throw new QueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
         }
 
         final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>();

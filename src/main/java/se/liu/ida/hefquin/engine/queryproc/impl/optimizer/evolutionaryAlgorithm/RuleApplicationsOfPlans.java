@@ -10,15 +10,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class RuleApplicationsOfPlan {
+public class RuleApplicationsOfPlans {
     protected final RuleInstances ruleIns;
     protected final Map<PhysicalPlan, Set<RuleApplication>> cache = new HashMap<>();
 
-    public RuleApplicationsOfPlan( final RuleInstances ruleIns ) {
+    public RuleApplicationsOfPlans( final RuleInstances ruleIns ) {
         this.ruleIns = ruleIns;
     }
 
-    public Set<RuleApplication> determineRuleApplications( final PhysicalPlan plan )
+    public Set<RuleApplication> getRuleApplications( final PhysicalPlan plan )
     {
         if ( cache.containsKey(plan) ) {
             return cache.get(plan);

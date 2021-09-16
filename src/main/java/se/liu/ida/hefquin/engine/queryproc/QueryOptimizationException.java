@@ -25,8 +25,4 @@ public class QueryOptimizationException extends QueryPlanningException
 		super();
 	}
 
-	public QueryOptimizationException( final String message, final CostEstimationException cause  ) {
-		super(message, cause);
-	}
-
 }
