@@ -102,7 +102,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates( ctxt.getCostModel(), plans );
-        } catch ( CostEstimationException e) {
+        } catch ( final CostEstimationException e ) {
             throw new QueryOptimizationException("Unexpected exception when determining the cost for plans.", e);
         }
 
