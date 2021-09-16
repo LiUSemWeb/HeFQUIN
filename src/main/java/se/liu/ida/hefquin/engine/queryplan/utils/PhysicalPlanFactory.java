@@ -144,6 +144,33 @@ public class PhysicalPlanFactory
 	}
 
 	/**
+	 * Creates a plan with a bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpBGPAdd lop,
+															final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpBGPAdd lop,
+													   final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpBGPAdd lop,
+													   final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
 	 * as per {@link LogicalToPhysicalOpConverter}. The given
