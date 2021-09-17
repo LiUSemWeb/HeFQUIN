@@ -22,6 +22,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     protected final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
     protected final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
     protected final Random rand = new Random();
+    protected final TerminationCriterion terminateCriterion = new TerminatedByNumberOfGenerations();
 
     public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
                                                 final int nmCandidates, final int nmSurvivors, int nmSteps ) {
@@ -46,9 +47,10 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         // initialize the first generation
         List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
 
+        List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
         // TODO: extend this implementation with different sorts of termination criteria
-        // termination criteria: number of generations
-        for ( int gen = 1; gen < nmSteps; gen++ ){
+        while( !(terminateCriterion.readyToTerminate( nmSteps, currentGen, previousGenerations)) ){
+            previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
         return findPlanWithSmallestCost(currentGen).getPlan();
