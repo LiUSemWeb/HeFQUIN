@@ -49,7 +49,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
         List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
         // TODO: extend this implementation with different sorts of termination criteria
-        while( !(terminateCriterion.readyToTerminate( nmSteps, currentGen, previousGenerations)) ){
+        while( ! terminateCriterion.readyToTerminate(nmSteps, currentGen, previousGenerations) ) {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
