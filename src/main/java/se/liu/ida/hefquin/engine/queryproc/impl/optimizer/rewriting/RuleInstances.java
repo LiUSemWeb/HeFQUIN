@@ -87,7 +87,6 @@ public class RuleInstances {
         ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN2(0.25) );
         ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN3(0.25) );
 
-        /*
         // 2. Convert binary join to TPAdd (category: A)
         ruleInstances.add( new RuleMergeJoinAndTPReqIntoTPAdd(0.3) );
         ruleInstances.add( new RuleMergeJoinAndBGPReqIntoBGPAdd(0.3) );
@@ -97,6 +96,7 @@ public class RuleInstances {
         ruleInstances.add( new RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq(0.3) );
         ruleInstances.add( new RuleMergeJoinOfTwoPatternReqIntoOneReq(0.3) );
 
+        /*
         // Rewriting rules of union:
         // 1.category (B)
         ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfUNION(0.25) );
