@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import java.util.List;
 /**
-    termination criterion: number of generations
+ *    termination criterion: number of generations
  **/
 public class TerminatedByNumberOfGenerations implements TerminationCriterion{
 
