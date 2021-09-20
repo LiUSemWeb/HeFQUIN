@@ -48,7 +48,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
 
         int generationNumber = 1;
-        List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
+        final List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
         // TODO: extend this implementation with different sorts of termination criteria
         while( ! terminateCriterion.readyToTerminate( generationNumber, currentGen, previousGenerations ) ) {
             previousGenerations.add(currentGen);
