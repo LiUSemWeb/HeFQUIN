@@ -6,7 +6,7 @@ import java.util.List;
  */
 public class TerminatedByNumberOfGenerations implements TerminationCriterion{
 
-    protected int generationThreshold;
+    protected final int generationThreshold;
 
     public TerminatedByNumberOfGenerations( final int generationThreshold ) {
         this.generationThreshold = generationThreshold;
