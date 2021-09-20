@@ -75,6 +75,45 @@ public class RuleInstances {
 
         // Group 2.5: divide one bgpAdd to multiple operators (category: E)
         ruleInstances.add( new RuleDivideBGPAddToMultiTPAdd(0.1) );
+
+        // Rewriting rules for join:
+        // 1. order tweaking  (category: B)
+        ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfJOIN(0.25) );
+        ruleInstances.add( new RuleDistributeJOINOverUNION(0.25) );
+        // apply associative property of join
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN1(0.25) );
+        // two specific versions of RuleChangeOrderOfThreeSubPlansOfJOIN1
+        // if one of the sub plans of join is a request, it can be rewritten as tpAdd and bgpAdd with a subPlan of the other subPlan
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN2(0.25) );
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN3(0.25) );
+
+        /*
+        // 2. Convert binary join to TPAdd (category: A)
+        ruleInstances.add( new RuleMergeJoinAndTPReqIntoTPAdd(0.3) );
+        ruleInstances.add( new RuleMergeJoinAndBGPReqIntoBGPAdd(0.3) );
+        ruleInstances.add( new RuleMergeJoinOfTwoBGPReqIntoOneReq(0.3) );
+        // fm should support tp request, also support BGP request
+        ruleInstances.add( new RuleMergeJoinOfTwoTPReqIntoOneBGPReq(0.3) );
+        ruleInstances.add( new RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq(0.3) );
+        ruleInstances.add( new RuleMergeJoinOfTwoPatternReqIntoOneReq(0.3) );
+
+        // Rewriting rules of union:
+        // 1.category (B)
+        ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfUNION(0.25) );
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfUNION(0.25) );
+
+        //2.
+        ruleInstances.add( new RuleMergeUnionOfTwoIdenticalSubplansIntoOne(0.3) );
+        ruleInstances.add( new RuleMergeUNIONOfTwoPatternReqIntoOneReq(0.3) );
+
+        // Rewriting rules of BGP Request (category: E) (fm support BGP request, also support tp request)
+        ruleInstances.add( new RuleDivideBGPReqIntoMultiJoins(0.1) );
+        ruleInstances.add( new RuleDivideBGPReqIntoMultiTPAdds(0.1) );
+        ruleInstances.add( new RuleDivideBGPReqIntoMultiBGPAdds(0.1) );
+
+        // Rewriting rules of mu
+
+         */
         // TODO: more rules to be added
         return ruleInstances;
     }

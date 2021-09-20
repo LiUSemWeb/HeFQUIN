@@ -54,7 +54,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
                     }
                     return subPlan;
                 }
-                return null;
+                return plan;
             }
         };
     }
