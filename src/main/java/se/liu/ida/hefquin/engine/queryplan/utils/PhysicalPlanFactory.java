@@ -191,6 +191,52 @@ public class PhysicalPlanFactory
 		return new PhysicalPlanWithUnaryRootImpl(rootOp, subplan) {};
 	}
 
+	/**
+	 * Creates a physical plan with a bgpAdd as root operator.
+	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
+	 * The given subplan becomes the children of the root operator.
+	 */
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final PhysicalOperator op, final LogicalOpBGPAdd lop, final PhysicalPlan subplan ) {
+		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
+			return createPlanWithIndexNLJ( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithFILTER) {
+			return createPlanWithBindJoinFILTER( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithUNION) {
+			return createPlanWithBindJoinUNION( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithVALUES) {
+			return createPlanWithBindJoinVALUES( lop, subplan );
+		}
+		else {
+			return createPlan( lop, subplan );
+		}
+	}
+
+	/**
+	 * Creates a physical plan with a tpAdd as root operator.
+	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
+	 * The given subplan becomes the children of the root operator.
+	 */
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final PhysicalOperator op, final LogicalOpTPAdd lop, final PhysicalPlan subplan ) {
+		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
+			return createPlanWithIndexNLJ( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithFILTER) {
+			return createPlanWithBindJoinFILTER( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithUNION) {
+			return createPlanWithBindJoinUNION( lop, subplan );
+		}
+		else if ( op instanceof PhysicalOpBindJoinWithVALUES) {
+			return createPlanWithBindJoinVALUES( lop, subplan );
+		}
+		else {
+			return createPlan( lop, subplan );
+		}
+	}
+
 
 	// --------- plans with binary root operators -----------
 

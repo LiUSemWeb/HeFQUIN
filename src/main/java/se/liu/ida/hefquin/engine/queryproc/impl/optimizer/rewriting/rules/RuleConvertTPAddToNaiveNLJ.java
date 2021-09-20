@@ -16,7 +16,7 @@ public class RuleConvertTPAddToNaiveNLJ extends AbstractRewritingRuleImpl{
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp);
+        return IdentifyLogicalOp.matchTPAdd(rootOp);
     }
 
     @Override

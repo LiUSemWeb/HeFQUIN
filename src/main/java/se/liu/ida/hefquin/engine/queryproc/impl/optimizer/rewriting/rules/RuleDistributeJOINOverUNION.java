@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -19,8 +20,9 @@ public class RuleDistributeJOINOverUNION extends AbstractRewritingRuleImpl{
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         // root operator is join, and one of the sub plans has union as root
         final PhysicalOperator rootOp = plan.getRootOperator();
-        final PhysicalOperatorForLogicalOperator popLop = (PhysicalOperatorForLogicalOperator) rootOp;
-        if (popLop.getLogicalOperator() instanceof LogicalOpJoin) {
+        final LogicalOperator rootLop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
+
+        if ( rootLop instanceof LogicalOpJoin ) {
             return ( plan.getSubPlan(0).getRootOperator() instanceof PhysicalOpBinaryUnion )
                     || ( plan.getSubPlan(1).getRootOperator() instanceof PhysicalOpBinaryUnion );
         }
@@ -35,14 +37,14 @@ public class RuleDistributeJOINOverUNION extends AbstractRewritingRuleImpl{
                 final BinaryPhysicalOp rootOp = (BinaryPhysicalOp) plan.getRootOperator();
 
                 if ( plan.getSubPlan(0).getRootOperator() instanceof PhysicalOpBinaryUnion ) {
-                    PhysicalPlan newSubPlan1 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0).getSubPlan(0), plan.getSubPlan(1) );
-                    PhysicalPlan newSubPlan2 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0).getSubPlan(1), plan.getSubPlan(1) );
+                    final PhysicalPlan newSubPlan1 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0).getSubPlan(0), plan.getSubPlan(1) );
+                    final PhysicalPlan newSubPlan2 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0).getSubPlan(1), plan.getSubPlan(1) );
 
                     return PhysicalPlanFactory.createPlan( plan.getSubPlan(0).getRootOperator(), newSubPlan1, newSubPlan2 );
                 }
                 else if ( plan.getSubPlan(1).getRootOperator() instanceof PhysicalOpBinaryUnion ) {
-                    PhysicalPlan newSubPlan1 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0), plan.getSubPlan(1).getSubPlan(0) );
-                    PhysicalPlan newSubPlan2 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0), plan.getSubPlan(1).getSubPlan(1) );
+                    final PhysicalPlan newSubPlan1 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0), plan.getSubPlan(1).getSubPlan(0) );
+                    final PhysicalPlan newSubPlan2 = PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0), plan.getSubPlan(1).getSubPlan(1) );
 
                     return PhysicalPlanFactory.createPlan( plan.getSubPlan(1).getRootOperator(), newSubPlan1, newSubPlan2 );
                 }

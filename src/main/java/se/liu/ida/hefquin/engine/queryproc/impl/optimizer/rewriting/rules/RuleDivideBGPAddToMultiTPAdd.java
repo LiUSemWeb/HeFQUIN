@@ -10,10 +10,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -29,7 +25,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(rootOp);
+        return IdentifyLogicalOp.matchBGPAdd(rootOp);
     }
 
     @Override
@@ -49,32 +45,13 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
 
                     while( it.hasNext() ) {
                         final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
-                        final PhysicalOperator tpAddOp = determinePhysicalOpOfRoot( rootOp, logicalTPAdd );
-                        subPlan = PhysicalPlanFactory.createPlan( tpAddOp, subPlan );
+                        subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( rootOp, logicalTPAdd, subPlan );
                     }
                     return subPlan;
                 }
                 return plan;
             }
         };
-    }
-
-    protected PhysicalOperator determinePhysicalOpOfRoot( final PhysicalOperator subRootOp, final LogicalOpTPAdd logicalOpTPAdd) {
-
-        if ( subRootOp instanceof PhysicalOpIndexNestedLoopsJoin) {
-            return new PhysicalOpIndexNestedLoopsJoin( logicalOpTPAdd );
-        }
-        else if ( subRootOp instanceof PhysicalOpBindJoinWithFILTER) {
-            return new PhysicalOpBindJoinWithFILTER( logicalOpTPAdd );
-        }
-        else if ( subRootOp instanceof PhysicalOpBindJoinWithUNION) {
-            return new PhysicalOpBindJoinWithUNION( logicalOpTPAdd );
-        }
-        else if ( subRootOp instanceof PhysicalOpBindJoinWithVALUES) {
-            return new PhysicalOpBindJoinWithVALUES( logicalOpTPAdd );
-        }
-        else
-            throw new IllegalArgumentException("Unexpected type of physical operator (type: " + subRootOp.getClass().getName() + ").");
     }
 
 }

@@ -1,14 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -29,11 +24,8 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN2 extends AbstractRewritingRule
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            final LogicalOperator subPlanLop1 = ((PhysicalOperatorForLogicalOperator) subPlanOp1).getLogicalOperator();
-            final LogicalOperator subPlanLop2 = ((PhysicalOperatorForLogicalOperator) subPlanOp2).getLogicalOperator();
-
-            return (( subPlanLop1 instanceof LogicalOpJoin ) && isTriplePatternRequest(subPlanLop2))
-                    ||(( subPlanLop2 instanceof LogicalOpJoin ) && isTriplePatternRequest(subPlanLop1));
+            return ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyPhysicalOpUsedForReq.isTriplePatternRequest(subPlanOp2) )
+                    ||( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyPhysicalOpUsedForReq.isTriplePatternRequest(subPlanOp1) );
         }
         return false;
     }
@@ -45,50 +37,28 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN2 extends AbstractRewritingRule
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final BinaryPhysicalOp rootOp = (BinaryPhysicalOp) plan.getRootOperator();
 
-                PhysicalPlan subPlan1 = plan.getSubPlan(0);
-                PhysicalPlan subPlan2 = plan.getSubPlan(1);
+                final PhysicalPlan subPlan1 = plan.getSubPlan(0);
+                final PhysicalPlan subPlan2 = plan.getSubPlan(1);
+                final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
+                final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                final LogicalOperator subPlanLop1 = ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
-                final LogicalOperator subPlanLop2 = ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
+                if ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyPhysicalOpUsedForReq.isTriplePatternRequest(subPlanOp2) ) {
+                    final UnaryLogicalOp tpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp2);
+                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( tpAdd, subPlan1.getSubPlan(1) );
 
-                if (( subPlanLop1 instanceof LogicalOpJoin ) && isTriplePatternRequest(subPlanLop2)) {
-                    final TriplePatternRequest tpReq = (TriplePatternRequest) ((LogicalOpRequest<?, ?>) subPlanLop2).getRequest();
-                    final TriplePattern tp = tpReq.getQueryPattern();
-
-                    final FederationMember fm = ((LogicalOpRequest<?, ?>) subPlanLop2).getFederationMember();
-                    final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, tp );
-
-                    final PhysicalPlan subPlanOfJoin1 = subPlan1.getSubPlan(0);
-                    final PhysicalPlan subPlanOfJoin2 = subPlan1.getSubPlan(1);
-                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan(logicalTPAdd, subPlanOfJoin2);
-
-                    return PhysicalPlanFactory.createPlan( rootOp, subPlanOfJoin1, newSubPlan);
+                    return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
                 }
-                else if (( subPlanLop2 instanceof LogicalOpJoin ) && isTriplePatternRequest(subPlanLop1)) {
-                    final TriplePatternRequest tpReq = (TriplePatternRequest) ((LogicalOpRequest<?, ?>) subPlanLop1).getRequest();
-                    final TriplePattern tp = tpReq.getQueryPattern();
+                else if ( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyPhysicalOpUsedForReq.isTriplePatternRequest(subPlanOp1) ) {
+                    final UnaryLogicalOp tpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp1);
+                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan(tpAdd, subPlan2.getSubPlan(0));
 
-                    final FederationMember fm = ((LogicalOpRequest<?, ?>) subPlanLop2).getFederationMember();
-                    final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, tp );
-
-                    final PhysicalPlan subPlanOfJoin1 = subPlan2.getSubPlan(0);
-                    final PhysicalPlan subPlanOfJoin2 = subPlan2.getSubPlan(1);
-                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan(logicalTPAdd, subPlanOfJoin1);
-
-                    return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlanOfJoin2);
+                    return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1));
                 }
                 else  {
                     return plan;
                 }
             }
         };
-    }
-
-    protected boolean isTriplePatternRequest( final LogicalOperator lop ) {
-        if( lop instanceof LogicalOpRequest){
-            return ((LogicalOpRequest<?, ?>) lop).getRequest() instanceof TriplePatternRequest;
-        }
-        return false;
     }
 
 }

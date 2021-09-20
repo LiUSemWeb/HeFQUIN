@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -16,15 +14,14 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN1 extends AbstractRewritingRule
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
-        // root operator is JOIN, and one of the sub plans has JOIN as root
+        // root operator is JOIN, and one of the sub plans has join as root
         final PhysicalOperator rootOp = plan.getRootOperator();
-        final PhysicalOperatorForLogicalOperator popLop = (PhysicalOperatorForLogicalOperator) rootOp;
-        if (popLop.getLogicalOperator() instanceof LogicalOpJoin) {
-            PhysicalOperatorForLogicalOperator subPlanOp1 = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
-            PhysicalOperatorForLogicalOperator subPlanOp2 = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(1).getRootOperator();
 
-            return ( subPlanOp1.getLogicalOperator() instanceof LogicalOpJoin )
-                    || ( subPlanOp2.getLogicalOperator() instanceof LogicalOpJoin );
+        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+            final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
+            final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
+
+            return IdentifyLogicalOp.matchJoin( subPlanOp1 ) || IdentifyLogicalOp.matchJoin( subPlanOp2 );
         }
         return false;
     }
@@ -36,15 +33,18 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN1 extends AbstractRewritingRule
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final BinaryPhysicalOp rootOp = (BinaryPhysicalOp) plan.getRootOperator();
 
-                PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
-                PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
-                if ( ((PhysicalOperatorForLogicalOperator) subPlanOp1).getLogicalOperator() instanceof LogicalOpJoin ) {
-                    PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp1, plan.getSubPlan(0).getSubPlan(1), plan.getSubPlan(1));
-                    return PhysicalPlanFactory.createPlan( rootOp, plan.getSubPlan(0).getSubPlan(0), newSubPlan );
+                final PhysicalPlan subPlan1 = plan.getSubPlan(0);
+                final PhysicalPlan subPlan2 = plan.getSubPlan(1);
+                final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
+                final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
+
+                if ( IdentifyLogicalOp.matchJoin( subPlanOp1 ) ) {
+                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp1, subPlan1.getSubPlan(1), subPlan2 );
+                    return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan );
                 }
-                else if ( ((PhysicalOperatorForLogicalOperator) subPlanOp2).getLogicalOperator() instanceof LogicalOpJoin ) {
-                    PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp2, plan.getSubPlan(0), plan.getSubPlan(1).getSubPlan(0));
-                    return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, plan.getSubPlan(1).getSubPlan(1) );
+                else if ( IdentifyLogicalOp.matchJoin( subPlanOp2 ) ) {
+                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp2, subPlan1, subPlan2.getSubPlan(0));
+                    return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1) );
                 }
                 else  {
                     return plan;

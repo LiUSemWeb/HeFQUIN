@@ -4,26 +4,25 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleChangeOrderOfThreeSubPlansOfJOIN3 extends AbstractRewritingRuleImpl{
+public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImpl{
 
-    public RuleChangeOrderOfThreeSubPlansOfJOIN3( final double priority ) {
+    public RuleMergeJoinOfOneBGPReqIntoBGPAdd( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-        if ( rootOp.getLogicalOperator() instanceof LogicalOpJoin ) {
+        if (rootOp.getLogicalOperator() instanceof LogicalOpJoin) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyPhysicalOpUsedForReq.isBGPRequest(subPlanOp2) )
-                    ||( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyPhysicalOpUsedForReq.isBGPRequest(subPlanOp1));
+            return IdentifyPhysicalOpUsedForReq.isBGPRequest( subPlanOp1 )
+                    || IdentifyPhysicalOpUsedForReq.isBGPRequest( subPlanOp2 );
         }
         return false;
     }
@@ -33,24 +32,18 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN3 extends AbstractRewritingRule
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                final BinaryPhysicalOp rootOp = (BinaryPhysicalOp) plan.getRootOperator();
-
                 final PhysicalPlan subPlan1 = plan.getSubPlan(0);
                 final PhysicalPlan subPlan2 = plan.getSubPlan(1);
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyPhysicalOpUsedForReq.isBGPRequest(subPlanOp2) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp2);
-                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan1.getSubPlan(1));
-
-                    return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
+                if ( IdentifyPhysicalOpUsedForReq.isBGPRequest( subPlanOp1 ) ) {
+                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq( subPlanOp1 );
+                    return PhysicalPlanFactory.createPlan(bgpAdd, subPlan2);
                 }
-                else if ( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyPhysicalOpUsedForReq.isBGPRequest(subPlanOp1) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp1);
-                    final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan2.getSubPlan(0) );
-
-                    return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1));
+                else if ( IdentifyPhysicalOpUsedForReq.isBGPRequest( subPlanOp2 ) ) {
+                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq( subPlanOp2 );
+                    return PhysicalPlanFactory.createPlan(bgpAdd, subPlan1);
                 }
                 else  {
                     return plan;
