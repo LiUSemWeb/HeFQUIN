@@ -17,22 +17,22 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     protected final QueryOptimizationContext ctxt;
     protected final int nmCandidates;
     protected final int nmSurvivors;
-    protected final int nmSteps;
+    protected final TerminationCriterion terminateCriterion;
 
     protected final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
     protected final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
     protected final Random rand = new Random();
-    protected final TerminationCriterion terminateCriterion = new TerminatedByNumberOfGenerations();
 
     public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
-                                                final int nmCandidates, final int nmSurvivors, int nmSteps ) {
+                                                final int nmCandidates, final int nmSurvivors,
+                                                final TerminationCriterion terminateCriterion) {
         assert ctxt != null;
         assert (nmCandidates - nmSurvivors) > 0;
 
         this.ctxt = ctxt;
         this.nmCandidates = nmCandidates;
         this.nmSurvivors = nmSurvivors;
-        this.nmSteps = nmSteps;
+        this.terminateCriterion = terminateCriterion;
     }
 
     @Override
@@ -47,11 +47,13 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         // initialize the first generation
         List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
 
+        int generationNumber = 1;
         List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
         // TODO: extend this implementation with different sorts of termination criteria
-        while( ! terminateCriterion.readyToTerminate(nmSteps, currentGen, previousGenerations) ) {
+        while( ! terminateCriterion.readyToTerminate( generationNumber, currentGen, previousGenerations ) ) {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
+            generationNumber ++;
         }
         return findPlanWithSmallestCost(currentGen).getPlan();
     }

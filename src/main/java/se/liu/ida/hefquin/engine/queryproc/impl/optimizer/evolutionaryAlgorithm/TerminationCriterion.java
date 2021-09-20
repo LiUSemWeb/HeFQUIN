@@ -6,8 +6,8 @@ public interface TerminationCriterion {
     /**
      * Returns true if ...
      */
-     boolean readyToTerminate(int generationNumber,
-                                    List<PhysicalPlanWithCost> currentGeneration,
-                                    List<List<PhysicalPlanWithCost>> previousGenerations);
+     boolean readyToTerminate( final int generationNumber,
+                               final List<PhysicalPlanWithCost> currentGeneration,
+                               final List<List<PhysicalPlanWithCost>> previousGenerations);
 
 }

@@ -6,11 +6,18 @@ import java.util.List;
  **/
 public class TerminatedByNumberOfGenerations implements TerminationCriterion{
 
+    protected int generationThreshold;
+
+    public TerminatedByNumberOfGenerations( final int generationThreshold ) {
+        this.generationThreshold = generationThreshold;
+    }
+
+    /**
+     * Returns true if the generation number exceeds the threshold
+     */
     @Override
     public boolean readyToTerminate( final int generationNumber, final List<PhysicalPlanWithCost> currentGeneration, final List<List<PhysicalPlanWithCost>> previousGenerations ) {
-
-        return ( previousGenerations.size() >= generationNumber-1 );
-
+        return ( generationNumber >= generationThreshold );
     }
 
 }
