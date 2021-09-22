@@ -97,22 +97,21 @@ public class RuleInstances {
         ruleInstances.add( new RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq(0.3) );
 
         // Rewriting rules of union:
-        // 1.category (B)
+        // Group 4.1. order tweaking of subPlans of union (category: B)
         ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfUNION(0.25) );
         ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfUNION(0.25) );
 
-        //2.
+        //Group 4.2. Merge union of two subPlans into one (category: A)
         ruleInstances.add( new RuleMergeUnionOfTwoIdenticalSubPlansIntoOne(0.3) );
         ruleInstances.add( new RuleMergeUNIONOfTwoPatternReqIntoOneReq(0.3) );
 
-        /*
-        // Rewriting rules of BGP Request (category: E) (fm support BGP request, also support tp request)
+        // Group 5.1 Rewriting rules of BGP Request (category: E) (fm support BGP request, also support tp request)
         ruleInstances.add( new RuleDivideBGPReqIntoMultiJoins(0.1) );
         ruleInstances.add( new RuleDivideBGPReqIntoMultiTPAdds(0.1) );
-        ruleInstances.add( new RuleDivideBGPReqIntoMultiBGPAdds(0.1) );
+        //ruleInstances.add( new RuleDivideBGPReqIntoBGPAddOfReq(0.1) );
 
-        // Rewriting rules of mu
-
+        /*
+        // Rewriting rules of mu, mj
          */
         // TODO: more rules to be added
         return ruleInstances;
