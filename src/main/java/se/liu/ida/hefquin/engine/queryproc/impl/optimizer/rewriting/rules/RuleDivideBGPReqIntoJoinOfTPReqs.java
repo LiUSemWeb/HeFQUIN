@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -17,9 +16,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 import java.util.Iterator;
 import java.util.Set;
 
-public class RuleDivideBGPReqIntoMultiJoins extends AbstractRewritingRuleImpl{
+public class RuleDivideBGPReqIntoJoinOfTPReqs extends AbstractRewritingRuleImpl{
 
-    public RuleDivideBGPReqIntoMultiJoins( final double priority ) {
+    public RuleDivideBGPReqIntoJoinOfTPReqs( final double priority ) {
         super(priority);
     }
 
@@ -52,12 +51,12 @@ public class RuleDivideBGPReqIntoMultiJoins extends AbstractRewritingRuleImpl{
                     final DataRetrievalRequest req2 = new TriplePatternRequestImpl( it.next() );
                     PhysicalPlan subPlan2 =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, req2) );
 
-                    PhysicalPlan subPlan = PhysicalPlanFactory.createPlan( LogicalOpJoin.getInstance(), subPlan1, subPlan2);
+                    PhysicalPlan subPlan = PhysicalPlanFactory.createPlanWithJoin( subPlan1, subPlan2);
 
                     while( it.hasNext() ) {
                         final DataRetrievalRequest newReq = new TriplePatternRequestImpl( it.next() );
                         PhysicalPlan newSubPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
-                        subPlan = PhysicalPlanFactory.createPlan( LogicalOpJoin.getInstance(), subPlan, newSubPlan );
+                        subPlan = PhysicalPlanFactory.createPlanWithJoin( subPlan, newSubPlan );
                     }
                     return subPlan;
                 }

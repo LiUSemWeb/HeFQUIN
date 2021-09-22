@@ -313,6 +313,15 @@ public class PhysicalPlanFactory
 	}
 
 	/**
+	 * Creates a plan with a binary join as root operator.
+	 * The root operator is the default physical operator
+	 */
+	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
+													final PhysicalPlan subplan2 ) {
+		return createPlan( LogicalOpJoin.getInstance(), subplan1, subplan2 );
+	}
+
+	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
 	 * as per {@link LogicalToPhysicalOpConverter}. The given

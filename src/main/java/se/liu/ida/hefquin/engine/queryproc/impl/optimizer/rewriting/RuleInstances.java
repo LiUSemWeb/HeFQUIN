@@ -105,15 +105,25 @@ public class RuleInstances {
         ruleInstances.add( new RuleMergeUnionOfTwoIdenticalSubPlansIntoOne(0.3) );
         ruleInstances.add( new RuleMergeUNIONOfTwoPatternReqIntoOneReq(0.3) );
 
-        // Group 5.1 Rewriting rules of BGP Request (category: E) (fm support BGP request, also support tp request)
-        ruleInstances.add( new RuleDivideBGPReqIntoMultiJoins(0.1) );
+        // Rewriting rules of BGP Request
+        // Group 5.1 fm support BGP request, also support tp request (category: E)
+        ruleInstances.add( new RuleDivideBGPReqIntoJoinOfTPReqs(0.1) );
         ruleInstances.add( new RuleDivideBGPReqIntoMultiTPAdds(0.1) );
         //ruleInstances.add( new RuleDivideBGPReqIntoBGPAddOfReq(0.1) );
 
-        /*
-        // Rewriting rules of mu, mj
-         */
-        // TODO: more rules to be added
+        // Rewriting rules of Nary operator
+        // Group 6.1. Merge multiway join(union) of multiple subPlans into one (category: A)
+        ruleInstances.add( new RuleMergeMultiwayJoinOfMultiIdenticalSubPlansIntoOne(0.3) );
+        ruleInstances.add( new RuleMergeMultiwayUnionOfMultiIdenticalSubPlansIntoOne(0.3) );
+
+        // Group 6.2. Divide multiway join(union) (category: E)
+        ruleInstances.add( new RuleDivideMultiwayJoinToJoinOfSubPlans(0.1) );
+        ruleInstances.add( new RuleDivideMultiwayUnionToUnionOfSubPlans(0.1) );
+
+        // Group 6.3. order tweaking of subPlans of multiway join(union) by rewriting the subPlan with binary join (category: B)
+        ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayJoin(0.25) );
+        ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayUnion(0.25) );
+
         return ruleInstances;
     }
 

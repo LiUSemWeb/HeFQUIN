@@ -33,6 +33,16 @@ public class IdentifyLogicalOp {
         return lop instanceof LogicalOpUnion;
     }
 
+    public static boolean matchMultiwayJoin( final PhysicalOperator op ) {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
+        return lop instanceof LogicalOpMultiwayJoin;
+    }
+
+    public static boolean matchMultiwayUnion( final PhysicalOperator op ) {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
+        return lop instanceof LogicalOpMultiwayUnion;
+    }
+
     public static boolean isBGPAddWithFm( final PhysicalOperator op, final FederationMember fm) {
         if ( IdentifyLogicalOp.matchBGPAdd(op) ) {
             final LogicalOpBGPAdd lop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
