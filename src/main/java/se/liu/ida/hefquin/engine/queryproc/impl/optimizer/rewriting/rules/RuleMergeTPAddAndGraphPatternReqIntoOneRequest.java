@@ -47,7 +47,7 @@ public class RuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewr
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
 
-                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPattern( rootLop, subRootLop );
+                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithAND( rootLop, subRootLop );
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
                 final FederationMember fm = rootLop.getFederationMember();
 

@@ -6,16 +6,16 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleChangeOrderOfTwoSubPlansOfJOIN extends AbstractRewritingRuleImpl{
+public class RuleChangeOrderOfTwoSubPlansOfUNION extends AbstractRewritingRuleImpl{
 
-    public RuleChangeOrderOfTwoSubPlansOfJOIN( final double priority ) {
+    public RuleChangeOrderOfTwoSubPlansOfUNION( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchJoin(rootOp);
+        return IdentifyLogicalOp.matchUnion(rootOp);
     }
 
     @Override

@@ -85,8 +85,8 @@ public class RuleInstances {
         // two specific versions of RuleChangeOrderOfThreeSubPlansOfJOIN1
         // if one of the sub plans of join is a request, then it can be rewritten as tpAdd and bgpAdd with one subPlan of the other subPlan
         ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN2(0.25) );
-        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN3(0.25) );
 
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN3(0.3) );
         // Group 3.2. Merge join of two subPlans into one (category: A)
         ruleInstances.add( new RuleMergeJoinOfOneTPReqIntoTPAdd(0.3) );
         ruleInstances.add( new RuleMergeJoinOfOneBGPReqIntoBGPAdd(0.3) );
@@ -96,16 +96,16 @@ public class RuleInstances {
         ruleInstances.add( new RuleMergeJoinOfTwoTPReqIntoOneBGPReq(0.3) );
         ruleInstances.add( new RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq(0.3) );
 
-        /*
         // Rewriting rules of union:
         // 1.category (B)
         ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfUNION(0.25) );
         ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfUNION(0.25) );
 
         //2.
-        ruleInstances.add( new RuleMergeUnionOfTwoIdenticalSubplansIntoOne(0.3) );
+        ruleInstances.add( new RuleMergeUnionOfTwoIdenticalSubPlansIntoOne(0.3) );
         ruleInstances.add( new RuleMergeUNIONOfTwoPatternReqIntoOneReq(0.3) );
 
+        /*
         // Rewriting rules of BGP Request (category: E) (fm support BGP request, also support tp request)
         ruleInstances.add( new RuleDivideBGPReqIntoMultiJoins(0.1) );
         ruleInstances.add( new RuleDivideBGPReqIntoMultiTPAdds(0.1) );

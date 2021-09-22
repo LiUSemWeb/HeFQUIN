@@ -16,8 +16,8 @@ public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImp
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
-        final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-        if (rootOp.getLogicalOperator() instanceof LogicalOpJoin) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 

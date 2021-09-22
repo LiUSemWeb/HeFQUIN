@@ -1,36 +1,34 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleMergeJoinOfTwoTPReqIntoOneBGPReq extends AbstractRewritingRuleImpl{
+public class RuleMergeUNIONOfTwoPatternReqIntoOneReq extends AbstractRewritingRuleImpl{
 
-    public RuleMergeJoinOfTwoTPReqIntoOneBGPReq( final double priority ) {
+    public RuleMergeUNIONOfTwoPatternReqIntoOneReq( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            if ( IdentifyPhysicalOpUsedForReq.isTriplePatternRequest( subPlanOp1 ) ) {
+            if ( IdentifyPhysicalOpUsedForReq.isGraphPatternRequest( subPlanOp1 ) ) {
                 final FederationMember fm = ((LogicalOpRequest) ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator()).getFederationMember();
 
-                return ( fm instanceof SPARQLEndpoint )
-                        && IdentifyPhysicalOpUsedForReq.isTriplePatternRequestWithFm( subPlanOp2, fm );
+                return IdentifyPhysicalOpUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
             }
             return false;
         }
@@ -42,14 +40,14 @@ public class RuleMergeJoinOfTwoTPReqIntoOneBGPReq extends AbstractRewritingRuleI
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                PhysicalPlan subPlan1 = plan.getSubPlan(0);
-                PhysicalPlan subPlan2 = plan.getSubPlan(1);
+                final PhysicalPlan subPlan1 = plan.getSubPlan(0);
+                final PhysicalPlan subPlan2 = plan.getSubPlan(1);
 
                 final LogicalOperator subPlanLop1 = ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
                 final LogicalOperator subPlanLop2 = ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
 
-                final BGP newBGP = GraphPatternConstructor.createNewBGP( (LogicalOpRequest) subPlanLop1, (LogicalOpRequest) subPlanLop2);
-                final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );
+                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithUnion( subPlanLop1, subPlanLop2 );
+                final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
 
                 final FederationMember fm = ((LogicalOpRequest<?, ?>) subPlanLop1).getFederationMember();
 

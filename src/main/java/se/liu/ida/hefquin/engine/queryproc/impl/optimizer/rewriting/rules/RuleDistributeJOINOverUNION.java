@@ -20,9 +20,7 @@ public class RuleDistributeJOINOverUNION extends AbstractRewritingRuleImpl{
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         // root operator is join, and one of the sub plans has union as root
         final PhysicalOperator rootOp = plan.getRootOperator();
-        final LogicalOperator rootLop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
-
-        if ( rootLop instanceof LogicalOpJoin ) {
+        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
             return ( plan.getSubPlan(0).getRootOperator() instanceof PhysicalOpBinaryUnion )
                     || ( plan.getSubPlan(1).getRootOperator() instanceof PhysicalOpBinaryUnion );
         }

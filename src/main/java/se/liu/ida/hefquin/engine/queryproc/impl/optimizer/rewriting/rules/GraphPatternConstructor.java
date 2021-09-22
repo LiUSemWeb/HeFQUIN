@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementUnion;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
@@ -66,7 +67,7 @@ public class GraphPatternConstructor {
         return new BGPImpl(tps);
     }
 
-    public static SPARQLGraphPattern createNewGraphPattern(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest lopReq) {
+    public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest lopReq) {
         final Triple tp = lopTPAdd.getTP().asJenaTriple();
 
         final SPARQLQuery graphPattern = ((SPARQLRequest) lopReq.getRequest()).getQuery();
@@ -77,7 +78,7 @@ public class GraphPatternConstructor {
         return new SPARQLGraphPatternImpl(element);
     }
 
-    public static SPARQLGraphPattern createNewGraphPattern(final LogicalOperator lopReq1, final LogicalOperator lopReq2 ) {
+    public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOperator lopReq1, final LogicalOperator lopReq2 ) {
         final SPARQLQuery graphPattern1 = ((SPARQLRequest) ((LogicalOpRequest)lopReq1).getRequest()).getQuery();
         final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
 
@@ -87,6 +88,19 @@ public class GraphPatternConstructor {
         ((ElementGroup) element1).addElement(element2);
 
         return new SPARQLGraphPatternImpl(element1);
+    }
+
+    public static SPARQLGraphPattern createNewGraphPatternWithUnion(final LogicalOperator lopReq1, final LogicalOperator lopReq2 ) {
+        final SPARQLQuery graphPattern1 = ((SPARQLRequest) ((LogicalOpRequest)lopReq1).getRequest()).getQuery();
+        final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
+
+        final SPARQLQuery graphPattern2 = ((SPARQLRequest) ((LogicalOpRequest)lopReq2).getRequest()).getQuery();
+        final Element element2 = graphPattern2.asJenaQuery().getQueryPattern();
+
+        final ElementUnion elementUnion = new ElementUnion(element1);
+        elementUnion.addElement(element2);
+
+        return new SPARQLGraphPatternImpl(elementUnion);
     }
 
     protected static Set<TriplePattern> getTriplePatternsOfReq( final LogicalOpRequest lop ) {

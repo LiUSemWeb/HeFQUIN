@@ -6,21 +6,20 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleChangeOrderOfThreeSubPlansOfJOIN1 extends AbstractRewritingRuleImpl{
+public class RuleChangeOrderOfThreeSubPlansOfUNION extends AbstractRewritingRuleImpl{
 
-    public RuleChangeOrderOfThreeSubPlansOfJOIN1( final double priority ) {
+    public RuleChangeOrderOfThreeSubPlansOfUNION( final double priority ) {
         super(priority);
     }
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
-        // root operator is JOIN, and one of the sub plans has join as root
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return IdentifyLogicalOp.matchJoin( subPlanOp1 ) || IdentifyLogicalOp.matchJoin( subPlanOp2 );
+            return IdentifyLogicalOp.matchUnion( subPlanOp1 ) || IdentifyLogicalOp.matchUnion( subPlanOp2 );
         }
         return false;
     }
@@ -37,11 +36,11 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN1 extends AbstractRewritingRule
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.matchJoin( subPlanOp1 ) ) {
+                if ( IdentifyLogicalOp.matchUnion( subPlanOp1 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp1, subPlan1.getSubPlan(1), subPlan2 );
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan );
                 }
-                else if ( IdentifyLogicalOp.matchJoin( subPlanOp2 ) ) {
+                else if ( IdentifyLogicalOp.matchUnion( subPlanOp2 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp2, subPlan1, subPlan2.getSubPlan(0));
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1) );
                 }

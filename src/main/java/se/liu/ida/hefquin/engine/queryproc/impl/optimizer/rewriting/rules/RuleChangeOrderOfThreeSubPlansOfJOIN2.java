@@ -19,8 +19,8 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN2 extends AbstractRewritingRule
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         // root operator is JOIN
         // one of the sub plans has join as root, the other sub plan is req
-        final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-        if (rootOp.getLogicalOperator() instanceof LogicalOpJoin) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 

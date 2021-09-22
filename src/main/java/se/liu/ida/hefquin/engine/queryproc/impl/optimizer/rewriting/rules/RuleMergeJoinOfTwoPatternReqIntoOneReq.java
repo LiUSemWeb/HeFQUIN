@@ -20,8 +20,8 @@ public class RuleMergeJoinOfTwoPatternReqIntoOneReq extends AbstractRewritingRul
 
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
-        final PhysicalOperatorForLogicalOperator rootOp = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
-        if (rootOp.getLogicalOperator() instanceof LogicalOpJoin) {
+        final PhysicalOperator rootOp = plan.getRootOperator();
+        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
 
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
@@ -41,13 +41,13 @@ public class RuleMergeJoinOfTwoPatternReqIntoOneReq extends AbstractRewritingRul
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
-                PhysicalPlan subPlan1 = plan.getSubPlan(0);
-                PhysicalPlan subPlan2 = plan.getSubPlan(1);
+                final PhysicalPlan subPlan1 = plan.getSubPlan(0);
+                final PhysicalPlan subPlan2 = plan.getSubPlan(1);
 
                 final LogicalOperator subPlanLop1 = ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
                 final LogicalOperator subPlanLop2 = ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
 
-                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPattern( subPlanLop1, subPlanLop2 );
+                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithAND( subPlanLop1, subPlanLop2 );
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
 
                 final FederationMember fm = ((LogicalOpRequest<?, ?>) subPlanLop1).getFederationMember();
