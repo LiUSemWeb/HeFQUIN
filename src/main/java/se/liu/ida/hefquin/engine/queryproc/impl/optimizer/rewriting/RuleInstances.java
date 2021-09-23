@@ -38,13 +38,14 @@ public class RuleInstances {
         // Group 1.4. Merge two operators into one
         // Merge a TPAdd and a BGP request (with the same fm) into one request (category: A), B' = B U {tp}
         // Equation (13)
-        ruleInstances.add( new RuleMergeTPAddAndBGPReqIntoOneRequest(0.3) );
+        ruleInstances.add( new RuleMergeTPAddOfBGPReqIntoOneRequest(0.3) );
+        //ruleInstances.add( new RuleMergeTPAddOfTPReqIntoOneRequest(0.3) );
         // 4.2 Merge a tpAdd and a graph pattern request (with the same fm: SPARQL endpoint) into one request (category: A),  (P AND tp)
         // Equation (20)
-        ruleInstances.add( new RuleMergeTPAddAndGraphPatternReqIntoOneRequest(0.3) );
+        ruleInstances.add( new RuleMergeTPAddOfGraphPatternReqIntoOneRequest(0.3) );
         // 4.3 Merge a tpAdd and a bgpAdd (with the same fm) into one bgpAdd (category: A), B' = B U {tp}
         // Equation (14)
-        ruleInstances.add( new RuleMergeTPAddAndBGPAddIntoBGPAdd(0.3) );
+        ruleInstances.add( new RuleMergeTPAddOfBGPAddIntoBGPAdd(0.3) );
 
         // rewriting rules for bgpAdd
         // Group 2.1. Convert BGPAdd to binary join (category: D)
@@ -61,13 +62,13 @@ public class RuleInstances {
         // Group 2.3. Merge two operators into one
         // Merge a bgpAdd and a BGP request (with the same fm) into one request (category: A), B' = B1 U B2
         // Equation (6)
-        ruleInstances.add( new RuleMergeBGPAddAndBGPReqIntoOneRequest(0.3) );
+        ruleInstances.add( new RuleMergeBGPAddOfBGPReqIntoOneBGPReq(0.3) );
         // Merge a bgpAdd and a triple pattern request (with the same fm) into one BGP request (category: A), B' = B U {tp}
         // Equation (12)
-        ruleInstances.add( new RuleMergeBGPAddAndTPReqIntoOneRequest(0.3) );
+        ruleInstances.add( new RuleMergeBGPAddOfTPReqIntoOneBGPReq(0.3) );
         // Merge a bgpAdd and a graph pattern request (with the same fm: SPARQL endpoint) into one request (category: A),  (P AND B)
         // Equation (21)
-        ruleInstances.add( new RuleMergeBGPAddAndGraphPatternReqIntoOneRequest(0.3) );
+        ruleInstances.add( new RuleMergeBGPAddOfGraphPatternReqIntoOneRequest(0.3) );
         // Merge two bgpAdd (with the same fm) into one bgpAdd (category: A), B' = B1 U B2
         // The physical operator depends on which bgpAdd?
         // Equation (7)

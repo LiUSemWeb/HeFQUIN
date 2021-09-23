@@ -61,8 +61,7 @@ public class GraphPatternConstructor {
     public static BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpBGPAdd lopBGPAdd ) {
         final TriplePattern tp = lopTPAdd.getTP();
 
-        final BGP bgp = lopBGPAdd.getBGP();
-        final Set<TriplePattern> tps = new HashSet<>(bgp.getTriplePatterns());
+        final Set<TriplePattern> tps = new HashSet<>(lopBGPAdd.getBGP().getTriplePatterns());
         tps.add(tp);
 
         return new BGPImpl(tps);

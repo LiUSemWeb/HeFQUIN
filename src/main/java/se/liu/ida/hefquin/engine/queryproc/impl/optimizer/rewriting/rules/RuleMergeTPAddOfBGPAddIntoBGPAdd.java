@@ -11,9 +11,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
+public class RuleMergeTPAddOfBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
 
-    public RuleMergeTPAddAndBGPAddIntoBGPAdd( final double priority ) {
+    public RuleMergeTPAddOfBGPAddIntoBGPAdd( final double priority ) {
         super(priority);
     }
 

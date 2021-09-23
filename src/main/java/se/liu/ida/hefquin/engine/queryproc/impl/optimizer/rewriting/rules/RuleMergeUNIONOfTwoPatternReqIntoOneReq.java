@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -22,15 +21,9 @@ public class RuleMergeUNIONOfTwoPatternReqIntoOneReq extends AbstractRewritingRu
         final PhysicalOperator rootOp = plan.getRootOperator();
         if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
-            final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator();
+            final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            if ( IdentifyTypeOfRequestUsedForReq.isGraphPatternRequest( lop ) ) {
-                final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
-
-                final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
-                return IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
-            }
-            return false;
+            return IdentifyTypeOfRequestUsedForReq.twoGraphPatternReqWithSameFm( subPlanOp1, subPlanOp2);
         }
         return false;
     }

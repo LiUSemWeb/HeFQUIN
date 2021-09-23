@@ -37,7 +37,6 @@ public class RuleDivideBGPReqIntoMultiTPAdds extends AbstractRewritingRuleImpl{
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {
                 final PhysicalOperator rootOp = plan.getRootOperator();
                 final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
-                final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
                 final BGPRequest req = (BGPRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
                 final Set<TriplePattern> tps = new HashSet<>( req.getQueryPattern().getTriplePatterns() );
@@ -46,9 +45,10 @@ public class RuleDivideBGPReqIntoMultiTPAdds extends AbstractRewritingRuleImpl{
                 if ( tps.size() == 0 ) {
                     throw new IllegalArgumentException( "the BGP is empty" );
                 }
+
+                final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
                 final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
                 PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
-
                 while( it.hasNext() ) {
                     final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
                     subPlan = PhysicalPlanFactory.createPlan( logicalTPAdd, subPlan );
