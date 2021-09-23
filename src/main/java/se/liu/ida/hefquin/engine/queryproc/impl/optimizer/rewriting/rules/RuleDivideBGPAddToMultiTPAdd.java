@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -37,19 +38,21 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
                 final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
                 final FederationMember fm = rootLop.getFederationMember();
 
-                final Set<TriplePattern> tps = (Set<TriplePattern>) rootLop.getBGP().getTriplePatterns();
-                final Iterator<TriplePattern> it = tps.iterator();
-                if ( tps.size() > 0 ) {
-                    final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
-                    PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
+                final Set<TriplePattern> tps = new HashSet<>(rootLop.getBGP().getTriplePatterns());
 
-                    while( it.hasNext() ) {
-                        final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
-                        subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( rootOp, logicalTPAdd, subPlan );
-                    }
-                    return subPlan;
+                if ( tps.size() == 0 ) {
+                    throw new IllegalArgumentException( "the BGP is empty" );
                 }
-                return plan;
+
+                final Iterator<TriplePattern> it = tps.iterator();
+                final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
+                PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
+
+                while( it.hasNext() ) {
+                    final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
+                    subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( rootOp, logicalTPAdd, subPlan );
+                }
+                return subPlan;
             }
         };
     }

@@ -80,21 +80,24 @@ public class RuleInstances {
         // Group 3.1. order tweaking of subPlans of join  (category: B)
         ruleInstances.add( new RuleChangeOrderOfTwoSubPlansOfJOIN(0.25) );
         ruleInstances.add( new RuleDistributeJOINOverUNION(0.25) );
-        // apply associative property of join
-        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN1(0.25) );
-        // two specific versions of RuleChangeOrderOfThreeSubPlansOfJOIN1
-        // if one of the sub plans of join is a request, then it can be rewritten as tpAdd and bgpAdd with one subPlan of the other subPlan
-        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN2(0.25) );
+        // apply associative property of join (3.1.3)
+        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN(0.25) );
 
-        ruleInstances.add( new RuleChangeOrderOfThreeSubPlansOfJOIN3(0.3) );
         // Group 3.2. Merge join of two subPlans into one (category: A)
+        // (3.2.1)
         ruleInstances.add( new RuleMergeJoinOfOneTPReqIntoTPAdd(0.3) );
+        // (3.2.2)
         ruleInstances.add( new RuleMergeJoinOfOneBGPReqIntoBGPAdd(0.3) );
         ruleInstances.add( new RuleMergeJoinOfTwoBGPReqIntoOneReq(0.3) );
         ruleInstances.add( new RuleMergeJoinOfTwoPatternReqIntoOneReq(0.3) );
         // fm should support tp request, also support BGP request
         ruleInstances.add( new RuleMergeJoinOfTwoTPReqIntoOneBGPReq(0.3) );
         ruleInstances.add( new RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq(0.3) );
+        // if one of the sub plans of join is a request, then it can be rewritten as tpAdd and bgpAdd with one subPlan of the other subPlan
+        // A shortcut of the combination of rule (3.1.3) and (3.2.1)
+        ruleInstances.add( new RuleChangeOrderAndMergeJoinOfTPReqIntoTPAdd(0.3) );
+        // A shortcut of the combination of rule (3.1.3) and (3.2.2)
+        ruleInstances.add( new RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd(0.3) );
 
         // Rewriting rules of union:
         // Group 4.1. order tweaking of subPlans of union (category: B)
@@ -124,6 +127,7 @@ public class RuleInstances {
         ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayJoin(0.25) );
         ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayUnion(0.25) );
 
+        // TODO: add corresponding unit tests
         return ruleInstances;
     }
 

@@ -1,11 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
@@ -21,8 +18,8 @@ public class RuleDistributeJOINOverUNION extends AbstractRewritingRuleImpl{
         // root operator is join, and one of the sub plans has union as root
         final PhysicalOperator rootOp = plan.getRootOperator();
         if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
-            return ( plan.getSubPlan(0).getRootOperator() instanceof PhysicalOpBinaryUnion )
-                    || ( plan.getSubPlan(1).getRootOperator() instanceof PhysicalOpBinaryUnion );
+            return ( IdentifyLogicalOp.matchUnion( plan.getSubPlan(0).getRootOperator() )
+                    || IdentifyLogicalOp.matchUnion( plan.getSubPlan(1).getRootOperator() ) );
         }
         return false;
     }

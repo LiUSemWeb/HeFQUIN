@@ -23,11 +23,6 @@ public class IdentifyLogicalOp {
         return lop.getLogicalOperator() instanceof LogicalOpBGPAdd;
     }
 
-    public static boolean matchReq( final PhysicalOperator op ) {
-        final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) op;
-        return lop.getLogicalOperator() instanceof LogicalOpRequest;
-    }
-
     public static boolean matchUnion( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
         return lop instanceof LogicalOpUnion;
@@ -44,7 +39,7 @@ public class IdentifyLogicalOp {
     }
 
     public static boolean isBGPAddWithFm( final PhysicalOperator op, final FederationMember fm) {
-        if ( IdentifyLogicalOp.matchBGPAdd(op) ) {
+        if ( matchBGPAdd(op) ) {
             final LogicalOpBGPAdd lop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
 
             return ( lop.getFederationMember() == fm );

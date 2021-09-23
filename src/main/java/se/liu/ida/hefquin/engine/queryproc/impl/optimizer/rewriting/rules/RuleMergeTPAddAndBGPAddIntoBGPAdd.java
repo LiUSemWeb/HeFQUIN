@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -19,10 +20,10 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
+        final LogicalOperator rootLop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
 
-        if( IdentifyLogicalOp.matchTPAdd(rootOp) ) {
-            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
-            final FederationMember fm = rootLop.getFederationMember();
+        if( rootLop instanceof LogicalOpTPAdd ) {
+            final FederationMember fm = ((LogicalOpTPAdd)rootLop).getFederationMember();
 
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
             return IdentifyLogicalOp.isBGPAddWithFm( subRootOp, fm );
@@ -31,7 +32,7 @@ public class RuleMergeTPAddAndBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl
     }
 
     @Override
-    protected RuleApplication createRuleApplication(PhysicalPlan[] pathToTargetPlan) {
+    protected RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan ) {
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {

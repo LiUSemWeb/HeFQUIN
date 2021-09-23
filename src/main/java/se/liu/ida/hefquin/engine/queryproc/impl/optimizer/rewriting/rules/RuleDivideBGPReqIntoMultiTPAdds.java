@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class RuleDivideBGPReqIntoMultiTPAdds extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForReq.isBGPRequest(rootOp);
+        return IdentifyTypeOfRequestUsedForReq.isBGPRequest(rootOp);
     }
 
     @Override
@@ -39,20 +40,20 @@ public class RuleDivideBGPReqIntoMultiTPAdds extends AbstractRewritingRuleImpl{
                 final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
                 final BGPRequest req = (BGPRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
-                final Set<TriplePattern> tps = (Set<TriplePattern>) req.getQueryPattern().getTriplePatterns();
+                final Set<TriplePattern> tps = new HashSet<>( req.getQueryPattern().getTriplePatterns() );
                 final Iterator<TriplePattern> it = tps.iterator();
 
-                if ( tps.size() > 0 ) {
-                    final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
-                    PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
-
-                    while( it.hasNext() ) {
-                        final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
-                        subPlan = PhysicalPlanFactory.createPlan( logicalTPAdd, subPlan );
-                    }
-                    return subPlan;
+                if ( tps.size() == 0 ) {
+                    throw new IllegalArgumentException( "the BGP is empty" );
                 }
-                return plan;
+                final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
+                PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
+
+                while( it.hasNext() ) {
+                    final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
+                    subPlan = PhysicalPlanFactory.createPlan( logicalTPAdd, subPlan );
+                }
+                return subPlan;
             }
         };
     }

@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -21,13 +22,13 @@ public class RuleMergeBGPAddAndBGPReqIntoOneRequest extends AbstractRewritingRul
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
+        final LogicalOperator rootLop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
 
-        if( IdentifyLogicalOp.matchBGPAdd(rootOp) ) {
-            final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
-            final FederationMember fm = rootLop.getFederationMember();
+        if( rootLop instanceof LogicalOpBGPAdd ) {
+            final FederationMember fm = ((LogicalOpBGPAdd)rootLop).getFederationMember();
 
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return IdentifyPhysicalOpUsedForReq.isBGPRequestWithFm( subRootOp, fm );
+            return IdentifyTypeOfRequestUsedForReq.isBGPRequestWithFm( subRootOp, fm );
         }
         return false;
     }
@@ -41,7 +42,7 @@ public class RuleMergeBGPAddAndBGPReqIntoOneRequest extends AbstractRewritingRul
                 final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
-                final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
+                final LogicalOpRequest<?, ?> subRootLop = (LogicalOpRequest<?, ?>) subRootOp.getLogicalOperator();
 
                 final BGP newBGP = GraphPatternConstructor.createNewBGP( rootLop, subRootLop );
                 final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );

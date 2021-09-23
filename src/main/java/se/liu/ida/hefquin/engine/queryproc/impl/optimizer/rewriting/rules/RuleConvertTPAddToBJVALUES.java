@@ -27,7 +27,7 @@ public class RuleConvertTPAddToBJVALUES extends AbstractRewritingRuleImpl{
     }
 
     @Override
-    protected RuleApplication createRuleApplication(PhysicalPlan[] pathToTargetPlan) {
+    protected RuleApplication createRuleApplication( final PhysicalPlan[] pathToTargetPlan ) {
         return new AbstractRuleApplicationImpl(pathToTargetPlan, this) {
             @Override
             protected PhysicalPlan rewritePlan( final PhysicalPlan plan ) {

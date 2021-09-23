@@ -6,7 +6,6 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -22,14 +21,14 @@ public class RuleMergeJoinOfTwoPatternReqIntoOneReq extends AbstractRewritingRul
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
         if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
-
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
-            final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
+            final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator();
 
-            if ( IdentifyPhysicalOpUsedForReq.isGraphPatternRequest( subPlanOp1 ) ) {
-                final FederationMember fm = ((LogicalOpRequest) ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator()).getFederationMember();
+            if ( IdentifyTypeOfRequestUsedForReq.isGraphPatternRequest( lop ) ) {
+                final FederationMember fm = ((LogicalOpRequest<?, ?>)lop).getFederationMember();
 
-                return IdentifyPhysicalOpUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
+                final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
+                return IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
             }
             return false;
         }
@@ -44,13 +43,13 @@ public class RuleMergeJoinOfTwoPatternReqIntoOneReq extends AbstractRewritingRul
                 final PhysicalPlan subPlan1 = plan.getSubPlan(0);
                 final PhysicalPlan subPlan2 = plan.getSubPlan(1);
 
-                final LogicalOperator subPlanLop1 = ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
-                final LogicalOperator subPlanLop2 = ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
+                final LogicalOpRequest<?, ?> subPlanLop1 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
+                final LogicalOpRequest<?, ?> subPlanLop2 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
 
                 final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithAND( subPlanLop1, subPlanLop2 );
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
 
-                final FederationMember fm = ((LogicalOpRequest<?, ?>) subPlanLop1).getFederationMember();
+                final FederationMember fm = subPlanLop1.getFederationMember();
 
                 return PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, newReq) );
             }

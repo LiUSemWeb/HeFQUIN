@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -21,14 +22,14 @@ public class RuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewr
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
+        final LogicalOperator rootLop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
 
-        if( IdentifyLogicalOp.matchTPAdd(rootOp) ) {
-            final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
-            final FederationMember fm = rootLop.getFederationMember();
+        if( rootLop instanceof LogicalOpTPAdd ) {
+            final FederationMember fm = ( (LogicalOpTPAdd)rootLop ).getFederationMember();
 
             if ( fm instanceof SPARQLEndpoint) {
                 final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-                return IdentifyPhysicalOpUsedForReq.isGraphPatternReqWithFm( subRootOp, fm );
+                return IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithFm( subRootOp, fm );
             }
             return false;
         }
@@ -45,7 +46,7 @@ public class RuleMergeTPAddAndGraphPatternReqIntoOneRequest extends AbstractRewr
                 final LogicalOpTPAdd rootLop = (LogicalOpTPAdd) rootOp.getLogicalOperator();
 
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
-                final LogicalOpRequest subRootLop = (LogicalOpRequest) subRootOp.getLogicalOperator();
+                final LogicalOpRequest<?, ?> subRootLop = (LogicalOpRequest<?, ?>) subRootOp.getLogicalOperator();
 
                 final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithAND( rootLop, subRootLop );
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );

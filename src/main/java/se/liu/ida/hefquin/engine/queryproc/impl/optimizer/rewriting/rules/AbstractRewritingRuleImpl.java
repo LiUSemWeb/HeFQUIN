@@ -40,7 +40,7 @@ public abstract class AbstractRewritingRuleImpl implements RewritingRule
             collectedRuleApps.add(app);
         }
 
-        // recursion to check also within all subplans
+        // recursion to check also within all subPlans
         final int numChildren = plan.numberOfSubPlans();
         for ( int i = 0; i < numChildren; ++i ) {
             collectAllPossibleApplications( plan.getSubPlan(i),
