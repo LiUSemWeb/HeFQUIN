@@ -116,7 +116,7 @@ public class GraphPatternConstructor {
         return new SPARQLGraphPatternImpl(elementUnion);
     }
 
-    protected static Set<TriplePattern> getTriplePatternsOfReq( final LogicalOpRequest<?, ?> lop ) {
+    public static Set<TriplePattern> getTriplePatternsOfReq( final LogicalOpRequest<?, ?> lop ) {
         final DataRetrievalRequest req = lop.getRequest();
 
         if ( req instanceof TriplePatternRequest) {
