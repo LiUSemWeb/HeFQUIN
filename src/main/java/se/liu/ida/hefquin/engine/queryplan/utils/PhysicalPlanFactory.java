@@ -194,7 +194,7 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a physical plan with a bgpAdd as root operator.
 	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
-	 * The given subplan becomes the children of the root operator.
+	 * The given subplan becomes the single child of the root operator.
 	 */
 	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final PhysicalOperator op, final LogicalOpBGPAdd lop, final PhysicalPlan subplan ) {
 		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
