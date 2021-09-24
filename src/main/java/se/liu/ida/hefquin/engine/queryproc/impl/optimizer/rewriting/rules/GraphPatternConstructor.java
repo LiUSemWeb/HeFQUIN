@@ -78,7 +78,7 @@ public class GraphPatternConstructor {
         return new SPARQLGraphPatternImpl(element);
     }
 
-    public static SPARQLGraphPattern createNewGraphPatternWithAND(LogicalOpBGPAdd lopBGPAdd, LogicalOpRequest<?,?> lopReq) {
+    public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
         final BGP bgpOfBGPAdd = lopBGPAdd.getBGP();
         final BasicPattern bgp = ( (OpBGP)bgpOfBGPAdd.asJenaOp() ).getPattern();
         final ElementTriplesBlock elementBGP = new ElementTriplesBlock( bgp );
