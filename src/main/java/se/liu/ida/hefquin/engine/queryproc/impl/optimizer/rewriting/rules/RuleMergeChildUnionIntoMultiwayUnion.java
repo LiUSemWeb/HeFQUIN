@@ -9,9 +9,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 import java.util.ArrayList;
 import java.util.List;
 
-public class RuleChangeOrderOfSubPlansOfMultiwayUnion extends AbstractRewritingRuleImpl{
+public class RuleMergeChildUnionIntoMultiwayUnion extends AbstractRewritingRuleImpl{
 
-    public RuleChangeOrderOfSubPlansOfMultiwayUnion( final double priority ) {
+    public RuleMergeChildUnionIntoMultiwayUnion( final double priority ) {
         super(priority);
     }
 

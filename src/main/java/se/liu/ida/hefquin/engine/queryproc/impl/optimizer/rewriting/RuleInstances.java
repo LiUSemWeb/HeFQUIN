@@ -119,14 +119,13 @@ public class RuleInstances {
         // Group 6.1. Merge multiway join(union) of multiple subPlans into one (category: A)
         ruleInstances.add( new RuleMergeMultiwayJoinOfMultiIdenticalSubPlansIntoOne(0.3) );
         ruleInstances.add( new RuleMergeMultiwayUnionOfMultiIdenticalSubPlansIntoOne(0.3) );
+        // Removes a child join of a multiway join by merging it directly into the multiway join
+        ruleInstances.add( new RuleMergeChildJoinIntoMultiwayJoin(0.3) );
+        ruleInstances.add( new RuleMergeChildUnionIntoMultiwayUnion(0.3) );
 
         // Group 6.2. Divide multiway join(union) (category: E)
         ruleInstances.add( new RuleDivideMultiwayJoinToJoinOfSubPlans(0.1) );
         ruleInstances.add( new RuleDivideMultiwayUnionToUnionOfSubPlans(0.1) );
-
-        // Group 6.3. order tweaking of subPlans of multiway join(union) by rewriting the subPlan with binary join (category: B)
-        ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayJoin(0.25) );
-        ruleInstances.add( new RuleChangeOrderOfSubPlansOfMultiwayUnion(0.25) );
 
         // TODO: add corresponding unit tests
         return ruleInstances;
