@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -43,7 +44,7 @@ public class RuleMergeBGPAddOfGraphPatternReqIntoOneRequest extends AbstractRewr
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest<?, ?> subRootLop = (LogicalOpRequest<?, ?>) subRootOp.getLogicalOperator();
 
-                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithAND(rootLop, subRootLop);
+                final SPARQLGraphPattern newGraphPattern = LogicalOpUtils.createNewGraphPatternWithAND(rootLop, subRootLop);
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
                 final FederationMember fm = rootLop.getFederationMember();
 

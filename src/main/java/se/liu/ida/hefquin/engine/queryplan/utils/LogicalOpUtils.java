@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
+package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.op.OpBGP;
@@ -7,6 +7,7 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
@@ -17,14 +18,18 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class GraphPatternConstructor {
+public class LogicalOpUtils {
 
     public static BGP createNewBGP( final LogicalOpRequest<?, ?> lop1, final LogicalOpRequest<?, ?> lop2 ) {
         final Set<TriplePattern> tps = getTriplePatternsOfReq(lop1);
@@ -67,7 +72,7 @@ public class GraphPatternConstructor {
         return new BGPImpl(tps);
     }
 
-    public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
+    public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
         final Triple tp = lopTPAdd.getTP().asJenaTriple();
 
         final SPARQLQuery graphPattern = ((SPARQLRequest) lopReq.getRequest()).getQuery();
@@ -140,6 +145,37 @@ public class GraphPatternConstructor {
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );
         }
+    }
+
+    public static UnaryLogicalOp createUnaryLopFromReq( final PhysicalOperator op ) {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
+        if ( lop instanceof BGPRequest) {
+            return createBGPAddLopFromReq((BGPRequest) lop);
+        }
+        else if( lop instanceof TriplePatternRequest ) {
+            return createTPAddLopFromReq( (TriplePatternRequest) lop);
+        }
+        else {
+            throw new IllegalArgumentException( "unsupported type of request: " + op.getClass().getName() );
+        }
+    }
+
+    public static LogicalOpBGPAdd createBGPAddLopFromReq( final BGPRequest lop ) {
+        final BGPRequest bgpReq = (BGPRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
+        final BGP bgp = bgpReq.getQueryPattern();
+
+        final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
+
+        return new LogicalOpBGPAdd( fm, bgp );
+    }
+
+    public static LogicalOpTPAdd createTPAddLopFromReq( final TriplePatternRequest lop ) {
+        final TriplePatternRequest tpReq = (TriplePatternRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
+        final TriplePattern tp = tpReq.getQueryPattern();
+
+        final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
+
+        return new LogicalOpTPAdd( fm, tp );
     }
 
 }

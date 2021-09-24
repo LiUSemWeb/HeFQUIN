@@ -196,7 +196,7 @@ public class PhysicalPlanFactory
 	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
 	 * The given subplan becomes the single child of the root operator.
 	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final PhysicalOperator op, final LogicalOpBGPAdd lop, final PhysicalPlan subplan ) {
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final PhysicalOperator op, final PhysicalPlan subplan ) {
 		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
 			return createPlanWithIndexNLJ( lop, subplan );
 		}
@@ -210,7 +210,8 @@ public class PhysicalPlanFactory
 			return createPlanWithBindJoinVALUES( lop, subplan );
 		}
 		else {
-			return createPlan( lop, subplan );
+			//return createPlan( lop, subplan );
+			throw new IllegalArgumentException("Unsupported type of physical operator: " + op.getClass().getName() + ".");
 		}
 	}
 
@@ -219,7 +220,7 @@ public class PhysicalPlanFactory
 	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
 	 * The given subplan becomes the children of the root operator.
 	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final PhysicalOperator op, final LogicalOpTPAdd lop, final PhysicalPlan subplan ) {
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpTPAdd lop, final PhysicalOperator op, final PhysicalPlan subplan ) {
 		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
 			return createPlanWithIndexNLJ( lop, subplan );
 		}
@@ -233,7 +234,8 @@ public class PhysicalPlanFactory
 			return createPlanWithBindJoinVALUES( lop, subplan );
 		}
 		else {
-			return createPlan( lop, subplan );
+			//return createPlan( lop, subplan );
+			throw new IllegalArgumentException("Unsupported type of physical operator: " + op.getClass().getName() + ".");
 		}
 	}
 

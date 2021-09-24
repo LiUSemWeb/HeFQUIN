@@ -26,7 +26,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchBGPAdd(rootOp);
+        return IdentifyLogicalOp.isBGPAdd(rootOp);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
 
                 while( it.hasNext() ) {
                     final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
-                    subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( rootOp, logicalTPAdd, subPlan );
+                    subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( logicalTPAdd, rootOp, subPlan );
                 }
                 return subPlan;
             }

@@ -18,10 +18,10 @@ public class RuleChangeOrderOfSubPlansOfMultiwayJoin extends AbstractRewritingRu
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator op = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchMultiwayJoin(op) ) {
+        if ( IdentifyLogicalOp.isMultiwayJoin(op) ) {
             for ( int i = 0; i < plan.numberOfSubPlans(); i ++ ) {
                 final PhysicalOperator subOp = plan.getSubPlan(i).getRootOperator();
-                if ( IdentifyLogicalOp.matchJoin(subOp) ) {
+                if ( IdentifyLogicalOp.isUnion(subOp) ) {
                     return true;
                 }
             }
@@ -38,7 +38,7 @@ public class RuleChangeOrderOfSubPlansOfMultiwayJoin extends AbstractRewritingRu
                 final List<PhysicalPlan> subPlans = new ArrayList<>();
                 for ( int i = 0; i < plan.numberOfSubPlans(); i++) {
                     final PhysicalPlan subPlan = plan.getSubPlan(i);
-                    if ( IdentifyLogicalOp.matchJoin(subPlan.getRootOperator()) ) {
+                    if ( IdentifyLogicalOp.isJoin(subPlan.getRootOperator()) ) {
                         subPlans.add( subPlan.getSubPlan(0) );
                         subPlans.add( subPlan.getSubPlan(1) );
                     }

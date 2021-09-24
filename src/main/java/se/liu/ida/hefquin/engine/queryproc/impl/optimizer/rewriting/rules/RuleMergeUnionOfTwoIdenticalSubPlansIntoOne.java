@@ -13,7 +13,7 @@ public class RuleMergeUnionOfTwoIdenticalSubPlansIntoOne extends AbstractRewriti
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
+        if ( IdentifyLogicalOp.isUnion(rootOp) ) {
             return plan.getSubPlan(0) == plan.getSubPlan(1);
         }
         return false;

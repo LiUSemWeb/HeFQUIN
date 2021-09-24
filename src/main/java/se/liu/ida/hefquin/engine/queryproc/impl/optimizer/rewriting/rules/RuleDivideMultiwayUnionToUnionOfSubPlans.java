@@ -18,7 +18,7 @@ public class RuleDivideMultiwayUnionToUnionOfSubPlans extends AbstractRewritingR
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator op = plan.getRootOperator();
-        return IdentifyLogicalOp.matchMultiwayUnion(op);
+        return IdentifyLogicalOp.isMultiwayUnion(op);
     }
 
     @Override

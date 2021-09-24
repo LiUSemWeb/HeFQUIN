@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -41,11 +42,11 @@ public class RuleMergeTwoBGPAddIntoOneBGPAdd extends AbstractRewritingRuleImpl{
                 final PhysicalOperator subRootOp =  plan.getSubPlan(0).getRootOperator();
                 final LogicalOpBGPAdd subRootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) subRootOp).getLogicalOperator();
 
-                final BGP newBGP = GraphPatternConstructor.createNewBGP(rootLop, subRootLop);
+                final BGP newBGP = LogicalOpUtils.createNewBGP(rootLop, subRootLop);
                 final FederationMember fm = rootLop.getFederationMember();
                 final LogicalOpBGPAdd logicalBGPAdd = new LogicalOpBGPAdd( fm, newBGP );
 
-                return PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( rootOp, logicalBGPAdd, plan.getSubPlan(0).getSubPlan(0) );
+                return PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( logicalBGPAdd, rootOp, plan.getSubPlan(0).getSubPlan(0) );
             }
         };
     }

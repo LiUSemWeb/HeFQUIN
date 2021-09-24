@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -15,7 +16,7 @@ public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImp
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.isJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
@@ -36,12 +37,12 @@ public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImp
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
                 if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp1 ) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq( subPlanOp1 );
-                    return PhysicalPlanFactory.createPlan(bgpAdd, subPlan2);
+                    final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp1 );
+                    return PhysicalPlanFactory.createPlan(newRoot, subPlan2);
                 }
                 else if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp2 ) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq( subPlanOp2 );
-                    return PhysicalPlanFactory.createPlan(bgpAdd, subPlan1);
+                    final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp2 );
+                    return PhysicalPlanFactory.createPlan(newRoot, subPlan1);
                 }
                 else  {
                     return plan;

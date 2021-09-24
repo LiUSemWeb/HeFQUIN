@@ -16,11 +16,11 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN extends AbstractRewritingRuleI
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         // root operator is JOIN, and one of the sub plans has join as root
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.isJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return IdentifyLogicalOp.matchJoin( subPlanOp1 ) || IdentifyLogicalOp.matchJoin( subPlanOp2 );
+            return IdentifyLogicalOp.isJoin( subPlanOp1 ) || IdentifyLogicalOp.isJoin( subPlanOp2 );
         }
         return false;
     }
@@ -37,11 +37,11 @@ public class RuleChangeOrderOfThreeSubPlansOfJOIN extends AbstractRewritingRuleI
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.matchJoin( subPlanOp1 ) ) {
+                if ( IdentifyLogicalOp.isJoin( subPlanOp1 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp1, subPlan1.getSubPlan(1), subPlan2 );
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan );
                 }
-                else if ( IdentifyLogicalOp.matchJoin( subPlanOp2 ) ) {
+                else if ( IdentifyLogicalOp.isJoin( subPlanOp2 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp2, subPlan1, subPlan2.getSubPlan(0));
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1) );
                 }

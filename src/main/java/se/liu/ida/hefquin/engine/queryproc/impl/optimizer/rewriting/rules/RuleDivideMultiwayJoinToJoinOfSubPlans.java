@@ -18,7 +18,7 @@ public class RuleDivideMultiwayJoinToJoinOfSubPlans extends AbstractRewritingRul
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator op = plan.getRootOperator();
-        return IdentifyLogicalOp.matchMultiwayJoin(op);
+        return IdentifyLogicalOp.isMultiwayJoin(op);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class RuleConvertBGPAddToSymmetricHashJoin extends AbstractRewritingRuleI
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchBGPAdd(rootOp);
+        return IdentifyLogicalOp.isBGPAdd(rootOp);
     }
 
     @Override

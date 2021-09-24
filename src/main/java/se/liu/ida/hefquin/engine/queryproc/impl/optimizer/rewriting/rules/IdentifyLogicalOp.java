@@ -8,38 +8,38 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 
 public class IdentifyLogicalOp {
 
-    public static boolean matchJoin( final PhysicalOperator op ) {
+    public static boolean isJoin( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
         return lop instanceof LogicalOpJoin;
     }
 
-    public static boolean matchTPAdd( final PhysicalOperator op ) {
+    public static boolean isTPAdd( final PhysicalOperator op ) {
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) op;
         return lop.getLogicalOperator() instanceof LogicalOpTPAdd;
     }
 
-    public static boolean matchBGPAdd( final PhysicalOperator op ) {
+    public static boolean isBGPAdd( final PhysicalOperator op ) {
         final PhysicalOperatorForLogicalOperator lop = (PhysicalOperatorForLogicalOperator) op;
         return lop.getLogicalOperator() instanceof LogicalOpBGPAdd;
     }
 
-    public static boolean matchUnion( final PhysicalOperator op ) {
+    public static boolean isUnion( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
         return lop instanceof LogicalOpUnion;
     }
 
-    public static boolean matchMultiwayJoin( final PhysicalOperator op ) {
+    public static boolean isMultiwayJoin( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
         return lop instanceof LogicalOpMultiwayJoin;
     }
 
-    public static boolean matchMultiwayUnion( final PhysicalOperator op ) {
+    public static boolean isMultiwayUnion( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
         return lop instanceof LogicalOpMultiwayUnion;
     }
 
     public static boolean isBGPAddWithFm( final PhysicalOperator op, final FederationMember fm) {
-        if ( matchBGPAdd(op) ) {
+        if ( isBGPAdd(op) ) {
             final LogicalOpBGPAdd lop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
 
             return ( lop.getFederationMember() == fm );

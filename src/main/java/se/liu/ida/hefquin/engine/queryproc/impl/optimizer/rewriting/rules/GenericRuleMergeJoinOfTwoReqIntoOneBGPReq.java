@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -27,7 +28,7 @@ public abstract class GenericRuleMergeJoinOfTwoReqIntoOneBGPReq extends Abstract
                 final LogicalOpRequest<?, ?> subPlanLop1 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
                 final LogicalOpRequest<?, ?> subPlanLop2 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
 
-                final BGP newBGP = GraphPatternConstructor.createNewBGP( subPlanLop1, subPlanLop2);
+                final BGP newBGP = LogicalOpUtils.createNewBGP( subPlanLop1, subPlanLop2);
                 final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );
 
                 final FederationMember fm = subPlanLop1.getFederationMember();

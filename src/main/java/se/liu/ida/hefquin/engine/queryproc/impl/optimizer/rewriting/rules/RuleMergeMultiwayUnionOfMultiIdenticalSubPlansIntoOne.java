@@ -13,7 +13,7 @@ public class RuleMergeMultiwayUnionOfMultiIdenticalSubPlansIntoOne extends Abstr
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator op = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchMultiwayUnion(op) ) {
+        if ( IdentifyLogicalOp.isMultiwayUnion(op) ) {
             final PhysicalPlan subPlan = plan.getSubPlan(0);
             for ( int i = 1; i < plan.numberOfSubPlans(); i ++ ) {
                 if ( subPlan != plan.getSubPlan(i) ) {

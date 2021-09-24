@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -16,12 +17,12 @@ public class RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd extends AbstractRewri
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.isJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) )
-                    ||( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1));
+            return ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) )
+                    ||( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1));
         }
         return false;
     }
@@ -38,14 +39,14 @@ public class RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd extends AbstractRewri
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.matchJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp2);
+                if ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) ) {
+                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp2);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan1.getSubPlan(1));
 
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
                 }
-                else if ( IdentifyLogicalOp.matchJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) ) {
-                    final UnaryLogicalOp bgpAdd = ConstructUnaryLogicalOpFromReq.constructUnaryLopFromReq(subPlanOp1);
+                else if ( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) ) {
+                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp1);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan2.getSubPlan(0) );
 
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1));

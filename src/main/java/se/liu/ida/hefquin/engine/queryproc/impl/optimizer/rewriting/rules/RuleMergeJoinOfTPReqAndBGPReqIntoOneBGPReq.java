@@ -17,7 +17,7 @@ public class RuleMergeJoinOfTPReqAndBGPReqIntoOneBGPReq extends GenericRuleMerge
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchJoin(rootOp) ) {
+        if ( IdentifyLogicalOp.isJoin(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final LogicalOperator lop1 =  ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator();
 

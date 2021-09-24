@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -44,7 +45,7 @@ public class RuleMergeTPAddOfBGPReqIntoOneRequest extends AbstractRewritingRuleI
                 final PhysicalOperatorForLogicalOperator subRootOp = (PhysicalOperatorForLogicalOperator) plan.getSubPlan(0).getRootOperator();
                 final LogicalOpRequest<?, ?> subRootLop = (LogicalOpRequest<?, ?>) subRootOp.getLogicalOperator();
 
-                final BGP newBGP = GraphPatternConstructor.createNewBGP(rootLop, subRootLop);
+                final BGP newBGP = LogicalOpUtils.createNewBGP(rootLop, subRootLop);
                 final DataRetrievalRequest newReq = new BGPRequestImpl( newBGP );
                 final FederationMember fm = rootLop.getFederationMember();
 

@@ -16,7 +16,7 @@ public class RuleConvertBGPAddToHashJoin extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchBGPAdd(rootOp);
+        return IdentifyLogicalOp.isBGPAdd(rootOp);
     }
 
     @Override

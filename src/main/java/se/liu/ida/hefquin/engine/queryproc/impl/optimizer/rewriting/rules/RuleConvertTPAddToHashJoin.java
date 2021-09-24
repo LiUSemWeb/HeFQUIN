@@ -16,7 +16,7 @@ public class RuleConvertTPAddToHashJoin extends AbstractRewritingRuleImpl{
     @Override
     public boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchTPAdd(rootOp);
+        return IdentifyLogicalOp.isTPAdd(rootOp);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class RuleChangeOrderOfTwoSubPlansOfJOIN extends AbstractRewritingRuleImp
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyLogicalOp.matchJoin(rootOp);
+        return IdentifyLogicalOp.isJoin(rootOp);
     }
 
     @Override

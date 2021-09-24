@@ -12,9 +12,9 @@ public class RuleChangeOrderOfTPAddAndBGPAdd extends GenericRuleChangeOrderOfTwo
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if( IdentifyLogicalOp.matchTPAdd(rootOp) ) {
+        if( IdentifyLogicalOp.isTPAdd(rootOp) ) {
             final PhysicalOperator subRootOp = plan.getSubPlan(0).getRootOperator();
-            return IdentifyLogicalOp.matchBGPAdd(subRootOp);
+            return IdentifyLogicalOp.isBGPAdd(subRootOp);
         }
         return false;
     }

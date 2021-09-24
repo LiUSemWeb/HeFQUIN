@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
@@ -19,7 +20,7 @@ public class RuleMergeUNIONOfTwoPatternReqIntoOneReq extends AbstractRewritingRu
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
+        if ( IdentifyLogicalOp.isUnion(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
@@ -39,7 +40,7 @@ public class RuleMergeUNIONOfTwoPatternReqIntoOneReq extends AbstractRewritingRu
                 final LogicalOpRequest<?, ?> subPlanLop1 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan1.getRootOperator()).getLogicalOperator();
                 final LogicalOpRequest<?, ?> subPlanLop2 = (LogicalOpRequest<?, ?>) ((PhysicalOperatorForLogicalOperator) subPlan2.getRootOperator()).getLogicalOperator();
 
-                final SPARQLGraphPattern newGraphPattern = GraphPatternConstructor.createNewGraphPatternWithUnion( subPlanLop1, subPlanLop2 );
+                final SPARQLGraphPattern newGraphPattern = LogicalOpUtils.createNewGraphPatternWithUnion( subPlanLop1, subPlanLop2 );
                 final SPARQLRequestImpl newReq = new SPARQLRequestImpl( newGraphPattern );
 
                 final FederationMember fm = subPlanLop1.getFederationMember();

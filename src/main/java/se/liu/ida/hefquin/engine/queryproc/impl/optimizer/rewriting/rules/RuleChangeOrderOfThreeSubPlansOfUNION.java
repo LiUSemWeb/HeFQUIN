@@ -15,11 +15,11 @@ public class RuleChangeOrderOfThreeSubPlansOfUNION extends AbstractRewritingRule
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        if ( IdentifyLogicalOp.matchUnion(rootOp) ) {
+        if ( IdentifyLogicalOp.isUnion(rootOp) ) {
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return IdentifyLogicalOp.matchUnion( subPlanOp1 ) || IdentifyLogicalOp.matchUnion( subPlanOp2 );
+            return IdentifyLogicalOp.isUnion( subPlanOp1 ) || IdentifyLogicalOp.isUnion( subPlanOp2 );
         }
         return false;
     }
@@ -36,11 +36,11 @@ public class RuleChangeOrderOfThreeSubPlansOfUNION extends AbstractRewritingRule
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.matchUnion( subPlanOp1 ) ) {
+                if ( IdentifyLogicalOp.isUnion( subPlanOp1 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp1, subPlan1.getSubPlan(1), subPlan2 );
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan );
                 }
-                else if ( IdentifyLogicalOp.matchUnion( subPlanOp2 ) ) {
+                else if ( IdentifyLogicalOp.isUnion( subPlanOp2 ) ) {
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( subPlanOp2, subPlan1, subPlan2.getSubPlan(0));
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1) );
                 }

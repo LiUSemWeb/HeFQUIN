@@ -10,23 +10,23 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public class IdentifyPhysicalOpUsedForTPAdd {
 
     public static boolean isIndexNLJ( final PhysicalOperator pop ) {
-        return IdentifyLogicalOp.matchTPAdd( pop ) && ( pop instanceof PhysicalOpIndexNestedLoopsJoin );
+        return IdentifyLogicalOp.isTPAdd( pop ) && ( pop instanceof PhysicalOpIndexNestedLoopsJoin );
     }
 
     public static boolean isBindJoinFILTER( final PhysicalOperator pop ) {
-        return IdentifyLogicalOp.matchTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithFILTER);
+        return IdentifyLogicalOp.isTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithFILTER);
     }
 
     public static boolean isBindJoinUNION( final PhysicalOperator pop ) {
-        return IdentifyLogicalOp.matchTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithUNION);
+        return IdentifyLogicalOp.isTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithUNION);
     }
 
     public static boolean isBindJoinVALUES( final PhysicalOperator pop ) {
-        return IdentifyLogicalOp.matchTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithVALUES);
+        return IdentifyLogicalOp.isTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoinWithVALUES);
     }
 
     public static boolean isBindJoin( final PhysicalOperator pop ) {
-        return IdentifyLogicalOp.matchTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoin);
+        return IdentifyLogicalOp.isTPAdd( pop ) && ( pop instanceof PhysicalOpBindJoin);
     }
 
 }
