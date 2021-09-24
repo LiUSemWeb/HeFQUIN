@@ -138,7 +138,7 @@ public class GraphPatternConstructor {
             }
         }
         else  {
-            throw new IllegalArgumentException( "Cannot get triple patterns of the req" );
+            throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );
         }
     }
 
