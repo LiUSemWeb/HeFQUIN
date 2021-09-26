@@ -50,7 +50,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
 
                 while( it.hasNext() ) {
                     final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );
-                    subPlan = PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( logicalTPAdd, rootOp, subPlan );
+                    subPlan = PhysicalPlanFactory.createPlan( logicalTPAdd, subPlan );
                 }
                 return subPlan;
             }

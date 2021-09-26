@@ -31,6 +31,10 @@ import java.util.Set;
 
 public class LogicalOpUtils {
 
+    /**
+     * Creates a BGP by merging two sets of triple patterns,
+     * which are extracted from two given Requests.
+     */
     public static BGP createNewBGP( final LogicalOpRequest<?, ?> lop1, final LogicalOpRequest<?, ?> lop2 ) {
         final Set<TriplePattern> tps = getTriplePatternsOfReq(lop1);
         tps.addAll( getTriplePatternsOfReq(lop2) );
@@ -38,6 +42,11 @@ public class LogicalOpUtils {
         return new BGPImpl(tps);
     }
 
+    /**
+     * Creates a BGP by adding a triple pattern to a set of triple patterns,
+     * where the triple pattern is extracted from a given tpAdd operator,
+     * and the set of triple patterns are extracted from the given Request.
+     */
     public static BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
         final TriplePattern tp = lopTPAdd.getTP();
 
@@ -47,6 +56,11 @@ public class LogicalOpUtils {
         return new BGPImpl(tps);
     }
 
+    /**
+     * Creates a BGP by merging two sets of triple patterns,
+     * where one of them is extracted from a given bgpAdd operator,
+     * and another one is extracted from a given Request.
+     */
     public static BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?, ?> lopReq ) {
         final Set<TriplePattern> tps = new HashSet<>( lopBGPAdd.getBGP().getTriplePatterns() );
 
@@ -55,6 +69,10 @@ public class LogicalOpUtils {
         return new BGPImpl(tps);
     }
 
+    /**
+     * Creates a BGP by merging two sets of triple patterns,
+     * which are extracted from two given bgpAdd operators.
+     */
     public static BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd1, final LogicalOpBGPAdd lopBGPAdd2 ) {
         final Set<TriplePattern> tps = new HashSet<>( lopBGPAdd1.getBGP().getTriplePatterns() );
 
@@ -63,6 +81,11 @@ public class LogicalOpUtils {
         return new BGPImpl(tps);
     }
 
+    /**
+     * Creates a BGP by adding a triple pattern to a set of triple patterns,
+     * where the triple pattern is extracted from a given tpAdd operator,
+     * and the set of triple patterns are extracted from a given bgpAdd operator.
+     */
     public static BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpBGPAdd lopBGPAdd ) {
         final TriplePattern tp = lopTPAdd.getTP();
 
@@ -72,6 +95,10 @@ public class LogicalOpUtils {
         return new BGPImpl(tps);
     }
 
+    /**
+     * Creates a new graph pattern by adding a triple pattern to the graph pattern of a given SPARQLRequest,
+     * where the triple pattern is extracted from a given tpAdd operator.
+     */
     public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
         final Triple tp = lopTPAdd.getTP().asJenaTriple();
 
@@ -83,6 +110,10 @@ public class LogicalOpUtils {
         return new SPARQLGraphPatternImpl(element);
     }
 
+    /**
+     * Creates a new graph pattern by adding a BGP to the graph pattern of a given SPARQLRequest,
+     * where the BGP is extracted from a given bgpAdd operator.
+     */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
         final BGP bgpOfBGPAdd = lopBGPAdd.getBGP();
         final BasicPattern bgp = ( (OpBGP)bgpOfBGPAdd.asJenaOp() ).getPattern();
@@ -96,6 +127,10 @@ public class LogicalOpUtils {
         return new SPARQLGraphPatternImpl(elementPattern);
     }
 
+    /**
+     * Creates a new graph pattern using a conjunction of two graph patterns,
+     * which are extracted from two given SPARQLRequests.
+     */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
         final SPARQLQuery graphPattern1 = ((SPARQLRequest) lopReq1.getRequest()).getQuery();
         final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
@@ -108,6 +143,10 @@ public class LogicalOpUtils {
         return new SPARQLGraphPatternImpl(element1);
     }
 
+    /**
+     * Creates a new graph pattern using a union of two graph patterns,
+     * which are extracted from two given SPARQLRequests.
+     */
     public static SPARQLGraphPattern createNewGraphPatternWithUnion( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
         final SPARQLQuery graphPattern1 = ((SPARQLRequest) lopReq1.getRequest()).getQuery();
         final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
@@ -121,6 +160,9 @@ public class LogicalOpUtils {
         return new SPARQLGraphPatternImpl(elementUnion);
     }
 
+    /**
+     * Return a set of triple patterns, which are extracted from a given Request (support TriplePatternRequest and BGPRequest)
+     */
     public static Set<TriplePattern> getTriplePatternsOfReq( final LogicalOpRequest<?, ?> lop ) {
         final DataRetrievalRequest req = lop.getRequest();
 
@@ -160,6 +202,9 @@ public class LogicalOpUtils {
         }
     }
 
+    /**
+     * Create a bgpAdd logical operator by extracting the BGP and fm from a given BGPRequest.
+     */
     public static LogicalOpBGPAdd createBGPAddLopFromReq( final BGPRequest lop ) {
         final BGPRequest bgpReq = (BGPRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
         final BGP bgp = bgpReq.getQueryPattern();
@@ -169,6 +214,9 @@ public class LogicalOpUtils {
         return new LogicalOpBGPAdd( fm, bgp );
     }
 
+    /**
+     * Create a tpAdd logical operator by extracting the triple pattern and fm from a given TriplePatternRequest.
+     */
     public static LogicalOpTPAdd createTPAddLopFromReq( final TriplePatternRequest lop ) {
         final TriplePatternRequest tpReq = (TriplePatternRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
         final TriplePattern tp = tpReq.getQueryPattern();

@@ -193,52 +193,23 @@ public class PhysicalPlanFactory
 
 	/**
 	 * Creates a physical plan with a bgpAdd as root operator.
-	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
+	 * The root operator uses the same physical algorithm as the given physical operator, which is usually a specific physical operator for bgpAdd.
 	 * The given subplan becomes the single child of the root operator.
 	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final PhysicalOperator op, final PhysicalPlan subplan ) {
-		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
-			return createPlanWithIndexNLJ( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithFILTER) {
-			return createPlanWithBindJoinFILTER( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithUNION) {
-			return createPlanWithBindJoinUNION( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithVALUES) {
-			return createPlanWithBindJoinVALUES( lop, subplan );
-		}
-		else {
-			//return createPlan( lop, subplan );
-			throw new IllegalArgumentException("Unsupported type of physical operator: " + op.getClass().getName() + ".");
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final Class<? extends PhysicalOperator> opClass, final PhysicalPlan subplan ) {
+		switch ( opClass.getName() ) {
+			case "PhysicalOpIndexNestedLoopsJoin":
+				return createPlanWithIndexNLJ( lop, subplan );
+			case "PhysicalOpBindJoinWithFILTER":
+				return createPlanWithBindJoinFILTER( lop, subplan );
+			case "PhysicalOpBindJoinWithUNION":
+				return createPlanWithBindJoinUNION( lop, subplan );
+			case "PhysicalOpBindJoinWithVALUES":
+				return createPlanWithBindJoinVALUES( lop, subplan );
+			default:
+				throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
 		}
 	}
-
-	/**
-	 * Creates a physical plan with a tpAdd as root operator.
-	 * The physical algorithm of bgpAdd is determined by the type of given physical operator.
-	 * The given subplan becomes the children of the root operator.
-	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpTPAdd lop, final PhysicalOperator op, final PhysicalPlan subplan ) {
-		if ( op instanceof PhysicalOpIndexNestedLoopsJoin) {
-			return createPlanWithIndexNLJ( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithFILTER) {
-			return createPlanWithBindJoinFILTER( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithUNION) {
-			return createPlanWithBindJoinUNION( lop, subplan );
-		}
-		else if ( op instanceof PhysicalOpBindJoinWithVALUES) {
-			return createPlanWithBindJoinVALUES( lop, subplan );
-		}
-		else {
-			//return createPlan( lop, subplan );
-			throw new IllegalArgumentException("Unsupported type of physical operator: " + op.getClass().getName() + ".");
-		}
-	}
-
 
 	// --------- plans with binary root operators -----------
 

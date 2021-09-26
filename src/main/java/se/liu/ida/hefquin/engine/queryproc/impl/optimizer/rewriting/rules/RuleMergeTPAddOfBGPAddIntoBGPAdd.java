@@ -47,7 +47,9 @@ public class RuleMergeTPAddOfBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
 
                 final LogicalOpBGPAdd logicalBGPAdd = new LogicalOpBGPAdd( fm, newBGP );
 
-                return PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( logicalBGPAdd, subRootOp, plan.getSubPlan(0).getSubPlan(0) );
+                // Creates a physical plan with a bgpAdd as root operator.
+                // The new bgpAdd use the same physical algorithm as the bgpAdd (sub)root operator of the given plan (i.e., subRootOp in this plan).
+                return PhysicalPlanFactory.createPlanBasedOnTypeOfGivenPhysicalOp( logicalBGPAdd, subRootOp.getClass(), plan.getSubPlan(0).getSubPlan(0) );
             }
         };
     }
