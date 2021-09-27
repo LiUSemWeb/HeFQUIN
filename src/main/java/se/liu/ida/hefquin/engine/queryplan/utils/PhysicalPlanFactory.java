@@ -197,17 +197,20 @@ public class PhysicalPlanFactory
 	 * The given subplan becomes the single child of the root operator.
 	 */
 	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final Class<? extends PhysicalOperator> opClass, final PhysicalPlan subplan ) {
-		switch ( opClass.getName() ) {
-			case "PhysicalOpIndexNestedLoopsJoin":
-				return createPlanWithIndexNLJ( lop, subplan );
-			case "PhysicalOpBindJoinWithFILTER":
-				return createPlanWithBindJoinFILTER( lop, subplan );
-			case "PhysicalOpBindJoinWithUNION":
-				return createPlanWithBindJoinUNION( lop, subplan );
-			case "PhysicalOpBindJoinWithVALUES":
-				return createPlanWithBindJoinVALUES( lop, subplan );
-			default:
-				throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
+		if ( PhysicalOpIndexNestedLoopsJoin.class.isAssignableFrom(opClass) ) {
+			return createPlanWithIndexNLJ( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithFILTER.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinFILTER( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithUNION.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinUNION( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithVALUES.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinVALUES( lop, subplan );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
 		}
 	}
 
