@@ -191,6 +191,28 @@ public class PhysicalPlanFactory
 		return new PhysicalPlanWithUnaryRootImpl(rootOp, subplan) {};
 	}
 
+	/**
+	 * Creates a physical plan with a bgpAdd as root operator.
+	 * The root operator uses the same physical algorithm as the given physical operator, which is usually a specific physical operator for bgpAdd.
+	 * The given subplan becomes the single child of the root operator.
+	 */
+	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final Class<? extends PhysicalOperator> opClass, final PhysicalPlan subplan ) {
+		if ( PhysicalOpIndexNestedLoopsJoin.class.isAssignableFrom(opClass) ) {
+			return createPlanWithIndexNLJ( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithFILTER.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinFILTER( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithUNION.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinUNION( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithVALUES.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinVALUES( lop, subplan );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
+		}
+	}
 
 	// --------- plans with binary root operators -----------
 
@@ -264,6 +286,15 @@ public class PhysicalPlanFactory
 	                                                   final PhysicalPlan subplan2 ) {
 		final BinaryPhysicalOp pop = new PhysicalOpNaiveNestedLoopsJoin(lop);
 		return createPlan(pop, subplan1, subplan2);
+	}
+
+	/**
+	 * Creates a plan with a binary join as root operator.
+	 * The root operator is the default physical operator
+	 */
+	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
+													final PhysicalPlan subplan2 ) {
+		return createPlan( LogicalOpJoin.getInstance(), subplan1, subplan2 );
 	}
 
 	/**

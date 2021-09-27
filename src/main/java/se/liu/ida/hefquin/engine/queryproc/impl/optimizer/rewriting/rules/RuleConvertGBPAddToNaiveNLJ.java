@@ -16,7 +16,7 @@ public class RuleConvertGBPAddToNaiveNLJ extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForBGPAdd.matchBGPAdd(rootOp);
+        return IdentifyLogicalOp.isBGPAdd(rootOp);
     }
 
     @Override

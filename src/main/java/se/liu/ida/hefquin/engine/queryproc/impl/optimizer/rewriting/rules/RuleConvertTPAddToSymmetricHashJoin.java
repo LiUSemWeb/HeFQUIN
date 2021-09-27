@@ -16,7 +16,7 @@ public class RuleConvertTPAddToSymmetricHashJoin extends AbstractRewritingRuleIm
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyPhysicalOpUsedForTPAdd.matchTPAdd(rootOp);
+        return IdentifyLogicalOp.isTPAdd(rootOp);
     }
 
     @Override

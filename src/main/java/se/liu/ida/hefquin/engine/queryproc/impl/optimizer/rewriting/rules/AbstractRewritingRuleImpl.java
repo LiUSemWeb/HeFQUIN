@@ -35,7 +35,7 @@ public abstract class AbstractRewritingRuleImpl implements RewritingRule
         currentPathFromRoot.push(plan);
 
         if ( canBeAppliedTo(plan) ) {
-            final PhysicalPlan[] pathToTargetPlan = (PhysicalPlan[]) currentPathFromRoot.toArray();
+            final PhysicalPlan[] pathToTargetPlan = currentPathFromRoot.toArray(new PhysicalPlan[currentPathFromRoot.size()]);
             final RuleApplication app = createRuleApplication(pathToTargetPlan);
             collectedRuleApps.add(app);
         }

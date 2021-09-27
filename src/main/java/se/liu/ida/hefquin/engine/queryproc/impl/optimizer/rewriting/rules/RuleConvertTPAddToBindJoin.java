@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 
 public class RuleConvertTPAddToBindJoin extends AbstractRewritingRuleImpl{
 
-    public RuleConvertTPAddToBindJoin(double priority) {
+    public RuleConvertTPAddToBindJoin( final double priority ) {
         super(priority);
     }
 
