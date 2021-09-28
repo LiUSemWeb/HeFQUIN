@@ -24,15 +24,17 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 
 /**
- * Abstract base class for implementations of the {@link FederationAccessManager}
- * interface that use request processors (see {@link RequestProcessor} etc).
+ * As a basis for classes that implement the {@link FederationAccessManager}
+ * interface, this abstract base class provides default implementations of
+ * the methods for issuing cardinality requests. These implementations issue
+ * specific data fetching requests via which the desired cardinality estimates
+ * can be obtained.
  */
 public abstract class FederationAccessManagerBase1 implements FederationAccessManager
 {

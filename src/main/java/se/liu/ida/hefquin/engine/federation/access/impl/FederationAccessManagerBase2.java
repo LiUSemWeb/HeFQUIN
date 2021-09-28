@@ -1,10 +1,16 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.RequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 
+/**
+ * Abstract base class for implementations of the {@link FederationAccessManager}
+ * interface that use request processors (see {@link RequestProcessor} etc).
+ */
 public abstract class FederationAccessManagerBase2 extends FederationAccessManagerBase1
 {
 	protected final SPARQLRequestProcessor    reqProcSPARQL;
