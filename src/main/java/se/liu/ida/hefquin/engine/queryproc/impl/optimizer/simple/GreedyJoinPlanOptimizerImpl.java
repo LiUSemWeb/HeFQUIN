@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
@@ -37,12 +36,17 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 			PhysicalPlan currentPlan = chooseFirstSubplan();
 
 			while ( subplans.size() > 0 ){
-				currentPlan = cardinalityTwoSubQueries(currentPlan);
+				currentPlan = addNextBestJoin(currentPlan);
 			}
 
 			return currentPlan;
 		}
 
+		/**
+		 * Compares all available subplans (see {@link #subplans}) in terms of
+		 * their respective costs (as estimated by using the {@link #costModel})
+		 * and returns the one with the lowest estimated cost.
+		 */
 		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
 			final Double[] costs = CostEstimationUtils.getEstimates(costModel, subplans);
 
@@ -59,7 +63,14 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 			return bestPlan;
 		}
 
-		protected PhysicalPlan cardinalityTwoSubQueries( final PhysicalPlan currentPlan )
+		/**
+		 * Creates a binary join plan with the given plan as left child and one
+		 * of the remaining subplans (see {@link #subplans}) as the right child.
+		 * The subplan that is picked to be the right child is the one for which
+		 * the returned plan has the minimum cost among all plans that can be
+		 * constructed in this way.
+		 */
+		protected PhysicalPlan addNextBestJoin( final PhysicalPlan currentPlan )
 				throws QueryOptimizationException
 		{
 			final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
@@ -77,11 +88,15 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 			return nextPossiblePlans[indexOfBestPlan];
 		}
 
+		/**
+		 * Creates all possible binary join plans with the given plan as left
+		 * child and one of the remaining subplans (see {@link #subplans}) as
+		 * the right child.
+		 */
 		protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
 			final PhysicalPlan[] plans = new PhysicalPlan[ subplans.size() ];
 			for ( int i = 0; i < subplans.size(); ++i ) {
-				final BinaryPhysicalOp joinOp = EnumerationAlgorithm.createNewJoinOperator();
-				plans[i] = PhysicalPlanFactory.createPlan( joinOp, currentPlan, subplans.get(i) );
+				plans[i] = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(i) );
 			}
 			return plans;
 		}

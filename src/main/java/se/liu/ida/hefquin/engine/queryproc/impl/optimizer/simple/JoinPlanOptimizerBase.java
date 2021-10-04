@@ -3,9 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
 /**
@@ -31,10 +28,6 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 	protected interface EnumerationAlgorithm
 	{
 		PhysicalPlan getResultingPlan() throws QueryOptimizationException;
-
-		static BinaryPhysicalOp createNewJoinOperator() {
-			return LogicalToPhysicalOpConverter.convert( LogicalOpJoin.getInstance() );
-		}
 	}
 
 }
