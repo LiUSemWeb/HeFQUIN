@@ -25,6 +25,24 @@ public class BGPImpl implements BGP
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof BGP) )
+			return false;
+
+		final Set<? extends TriplePattern> otps;
+		if ( o instanceof BGPImpl )
+			otps = ((BGPImpl) o).tps;
+		else
+			otps = ((BGP) o).getTriplePatterns();
+		if ( tps == otps )
+			return true;
+		else if ( tps.size() != otps.size() )
+			return false;
+		else
+			return tps.containsAll(otps);
+	}
+
+	@Override
 	public Element asJenaElement() {
 		throw new UnsupportedOperationException();
 	}

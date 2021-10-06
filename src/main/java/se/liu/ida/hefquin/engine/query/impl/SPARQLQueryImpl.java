@@ -30,6 +30,11 @@ public class SPARQLQueryImpl implements SPARQLQuery
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof SPARQLQuery && ((SPARQLQuery) o).asJenaQuery().equals(jenaQuery);
+	}
+
+	@Override
 	public Query asJenaQuery() {
 		return jenaQuery;
 	}

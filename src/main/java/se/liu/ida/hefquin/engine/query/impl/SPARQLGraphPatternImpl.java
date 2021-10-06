@@ -27,6 +27,11 @@ public class SPARQLGraphPatternImpl implements SPARQLGraphPattern
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof SPARQLGraphPattern && ((SPARQLGraphPattern) o).asJenaOp().equals(jenaPatternOp);
+	}
+
+	@Override
 	public Element asJenaElement() {
 		return jenaPatternElement;
 	}
