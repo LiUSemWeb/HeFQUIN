@@ -20,6 +20,12 @@ public abstract class BasePhysicalOpMultiwayJoin implements NaryPhysicalOpForLog
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof NaryPhysicalOpForLogicalOp
+				&& ((NaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
+	}
+
+	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(inputVars);
 		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(inputVars);

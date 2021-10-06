@@ -6,10 +6,16 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpNaiveNested
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpNaiveNestedLoopsJoin extends BasePhysicalOpBinaryJoin {
-    public PhysicalOpNaiveNestedLoopsJoin(final LogicalOpJoin lop) {
+public class PhysicalOpNaiveNestedLoopsJoin extends BasePhysicalOpBinaryJoin
+{
+    public PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
         super(lop);
     }
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpNaiveNestedLoopsJoin && ((PhysicalOpNaiveNestedLoopsJoin) o).lop.equals(lop);
+	}
 
     @Override
     public BinaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
@@ -17,7 +23,7 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BasePhysicalOpBinaryJoin {
     }
 
     @Override
-    public void visit(final PhysicalPlanVisitor visitor) {
+    public void visit( final PhysicalPlanVisitor visitor ) {
         visitor.visit(this);
     }
 }

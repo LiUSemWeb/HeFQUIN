@@ -22,6 +22,18 @@ public class PhysicalPlanWithNullaryRootImpl implements PhysicalPlanWithNullaryR
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof PhysicalPlanWithNullaryRoot) )
+			return false; 
+
+		final PhysicalPlanWithNullaryRoot oo = (PhysicalPlanWithNullaryRoot) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.getRootOperator().equals(rootOp); 
+	}
+
+	@Override
 	public NullaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}

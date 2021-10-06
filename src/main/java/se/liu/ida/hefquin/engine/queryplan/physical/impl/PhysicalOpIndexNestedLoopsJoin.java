@@ -24,6 +24,12 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpIndexNestedLoopsJoin
+				&& ((PhysicalOpIndexNestedLoopsJoin) o).lop.equals(lop);
+	}
+
+	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
 	{
 		if ( lop instanceof LogicalOpTPAdd ) {

@@ -24,6 +24,12 @@ public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin 
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpBindJoinWithVALUES
+				&& ((PhysicalOpBindJoinWithVALUES) o).lop.equals(lop);
+	}
+
+	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
 		assert  inputVars.length == 1;
 		if (! inputVars[0].getPossibleVariables().isEmpty()){

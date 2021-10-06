@@ -18,6 +18,11 @@ public class TripleImpl implements Triple
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof Triple && ((Triple) o).asJenaTriple().equals(jenaObj);
+	}
+
+	@Override
 	public org.apache.jena.graph.Triple asJenaTriple() {
 		return jenaObj;
 	}

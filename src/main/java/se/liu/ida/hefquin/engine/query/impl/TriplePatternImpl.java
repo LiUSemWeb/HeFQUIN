@@ -22,6 +22,11 @@ public class TriplePatternImpl implements TriplePattern
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);
+	}
+
+	@Override
 	public Element asJenaElement() {
 		throw new UnsupportedOperationException();
 	}

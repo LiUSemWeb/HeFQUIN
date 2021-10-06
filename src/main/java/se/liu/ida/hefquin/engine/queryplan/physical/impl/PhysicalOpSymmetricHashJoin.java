@@ -6,10 +6,17 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSymmetricHa
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpSymmetricHashJoin extends BasePhysicalOpBinaryJoin {
-    public PhysicalOpSymmetricHashJoin(final LogicalOpJoin lop) {
+public class PhysicalOpSymmetricHashJoin extends BasePhysicalOpBinaryJoin
+{
+    public PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
         super(lop);
     }
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpSymmetricHashJoin
+				&& ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
+	}
 
     @Override
     public BinaryExecutableOp createExecOp( final ExpectedVariables ... inputVars ) {

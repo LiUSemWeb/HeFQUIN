@@ -32,10 +32,26 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		expectedVars = QueryPatternUtils.getExpectedVariablesInQuery(query);
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof SPARQLRequest) )
+			return false;
+
+		final SPARQLRequest oo = (SPARQLRequest) o;
+		if ( pattern == null ) {
+			return oo.getQueryPattern() == null && query.equals( oo.getQuery() );
+		}
+		else {
+			return pattern.equals( oo.getQueryPattern() );
+		}
+	}
+
+	@Override
 	public SPARQLGraphPattern getQueryPattern() {
 		return pattern;
 	}
 
+	@Override
 	public SPARQLQuery getQuery() {
 		if ( query != null )
 			return query;

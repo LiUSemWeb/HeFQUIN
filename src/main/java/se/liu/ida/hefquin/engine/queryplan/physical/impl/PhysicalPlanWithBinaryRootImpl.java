@@ -31,6 +31,20 @@ public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoo
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof PhysicalPlanWithBinaryRoot) )
+			return false; 
+
+		final PhysicalPlanWithBinaryRoot oo = (PhysicalPlanWithBinaryRoot) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.getRootOperator().equals(rootOp)
+					&& oo.getSubPlan1().equals(subPlan1)
+					&& oo.getSubPlan2().equals(subPlan2); 
+	}
+
+	@Override
 	public BinaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}

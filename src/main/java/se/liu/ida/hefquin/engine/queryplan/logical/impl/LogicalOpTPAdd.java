@@ -20,6 +20,18 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 		this.tp = tp;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalOpTPAdd) )
+			return false;
+
+		final LogicalOpTPAdd oo = (LogicalOpTPAdd) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.fm.equals(fm) && oo.tp.equals(tp); 
+	}
+
 	public FederationMember getFederationMember() {
 		return fm;
 	}
@@ -28,6 +40,7 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 		return tp;
 	}
 
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

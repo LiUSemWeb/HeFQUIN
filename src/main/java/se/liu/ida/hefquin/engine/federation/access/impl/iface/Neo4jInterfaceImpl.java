@@ -4,14 +4,19 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 
-public class Neo4jInterfaceImpl implements Neo4jInterface {
-
+public class Neo4jInterfaceImpl implements Neo4jInterface
+{
     protected final String url;
 
-    public Neo4jInterfaceImpl(final String url) {
+    public Neo4jInterfaceImpl( final String url ) {
         assert url != null;
         this.url = url;
     }
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof Neo4jInterface && ((Neo4jInterface) o).getURL().equals(url);
+	}
 
     @Override
     public boolean supportsTriplePatternRequests() {

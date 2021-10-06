@@ -20,6 +20,18 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		this.bgp = bgp;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalOpBGPAdd) )
+			return false;
+
+		final LogicalOpBGPAdd oo = (LogicalOpBGPAdd) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
+	}
+
 	public FederationMember getFederationMember() {
 		return fm;
 	} 
@@ -28,6 +40,7 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		return bgp;
 	}
 
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

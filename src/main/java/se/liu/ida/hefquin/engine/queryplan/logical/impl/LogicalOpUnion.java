@@ -11,6 +11,12 @@ public class LogicalOpUnion implements BinaryLogicalOp
 
 	protected LogicalOpUnion() {}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpUnion; 
+	}
+
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

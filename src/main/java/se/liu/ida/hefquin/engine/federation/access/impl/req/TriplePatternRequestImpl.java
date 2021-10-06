@@ -14,6 +14,13 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 		this.tp = tp;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof TriplePatternRequest
+				&& ((TriplePatternRequest) o).getQueryPattern().equals(tp);
+	}
+
+	@Override
 	public TriplePattern getQueryPattern() {
 		return tp;
 	}

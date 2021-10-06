@@ -16,6 +16,13 @@ public class BRTPFRequestImpl extends BindingsRestrictedTriplePatternRequestImpl
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof BRTPFRequest
+				&& ((BRTPFRequest) o).getPageNumber() == pageNumber
+				&& super.equals(o); 
+	}
+
+	@Override
 	public int getPageNumber() {
 		return pageNumber;
 	}

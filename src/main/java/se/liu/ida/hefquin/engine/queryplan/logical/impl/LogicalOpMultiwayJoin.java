@@ -11,6 +11,12 @@ public class LogicalOpMultiwayJoin implements NaryLogicalOp
 
 	protected LogicalOpMultiwayJoin() {}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpMultiwayJoin; 
+	}
+
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
