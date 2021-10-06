@@ -29,6 +29,11 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpRequest<?,?> && ((PhysicalOpRequest<?,?>) o).lop.equals(lop);
+	}
+
+	@Override
 	public LogicalOpRequest<ReqType,MemberType> getLogicalOperator() {
 		return lop;
 	}

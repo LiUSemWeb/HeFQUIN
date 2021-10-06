@@ -26,6 +26,12 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
         this.lop = lop;
     }
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof UnaryPhysicalOpForLogicalOp
+				&& ((UnaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
+	}
+
     @Override
     public UnaryLogicalOp getLogicalOperator() { return lop; }
 

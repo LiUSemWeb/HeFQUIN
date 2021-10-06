@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -16,6 +17,12 @@ public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLog
 	protected BasePhysicalOpBinaryJoin(final LogicalOpJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof BinaryPhysicalOpForLogicalOp
+				&& ((BinaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
 	}
 
 	@Override

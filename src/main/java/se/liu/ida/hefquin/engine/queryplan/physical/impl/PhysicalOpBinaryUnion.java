@@ -13,13 +13,18 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
-public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp{
-	
+public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
+{
 	protected final LogicalOpUnion lop;
 
 	public PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
 		assert lop != null;
 		this.lop = lop;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpBinaryUnion && ((PhysicalOpBinaryUnion) o).lop.equals(lop);
 	}
 
 	@Override

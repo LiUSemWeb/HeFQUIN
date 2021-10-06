@@ -39,6 +39,30 @@ public class PhysicalPlanWithNaryRootImpl implements PhysicalPlanWithNaryRoot
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof PhysicalPlanWithNaryRoot) )
+			return false; 
+
+		final PhysicalPlanWithNaryRoot oo = (PhysicalPlanWithNaryRoot) o;
+		if ( oo == this )
+			return true;
+
+		if ( oo.numberOfSubPlans() != subPlans.size() )
+			return false;
+
+		if ( ! oo.getRootOperator().equals(rootOp) )
+			return false;
+
+		for ( int i = 0; i < subPlans.size(); ++i ) {
+			if ( ! oo.getSubPlan(i).equals(subPlans.get(i)) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	@Override
 	public ExpectedVariables getExpectedVariables() {
 		final ExpectedVariables[] e = new ExpectedVariables[ subPlans.size() ];
 		for ( int i = 0; i < subPlans.size(); ++i ) {

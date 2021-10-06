@@ -9,8 +9,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin {
-
+public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
+{
 	public PhysicalOpBindJoinWithFILTER( final LogicalOpTPAdd lop ) {
 		super(lop);
 
@@ -21,6 +21,12 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin 
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpBindJoinWithFILTER
+				&& ((PhysicalOpBindJoinWithFILTER) o).lop.equals(lop);
 	}
 
 	@Override

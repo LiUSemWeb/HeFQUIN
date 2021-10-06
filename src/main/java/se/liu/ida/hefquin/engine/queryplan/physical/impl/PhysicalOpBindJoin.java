@@ -20,6 +20,11 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
     //    super(lop);
     //}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof PhysicalOpBindJoin && ((PhysicalOpBindJoin) o).lop.equals(lop);
+	}
+
     @Override
     public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
     {
