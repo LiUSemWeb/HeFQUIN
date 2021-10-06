@@ -33,4 +33,10 @@ public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
 		return url;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof SPARQLEndpointInterface
+				&& ((SPARQLEndpointInterface) o).getURL().equals(url);
+	}
+
 }
