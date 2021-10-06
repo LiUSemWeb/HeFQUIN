@@ -15,6 +15,11 @@ public class BGPRequestImpl implements BGPRequest
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof BGPRequest && ((BGPRequest) o).getQueryPattern().equals(bgp);
+	}
+
+	@Override
 	public BGP getQueryPattern() {
 		return bgp;
 	}

@@ -12,6 +12,11 @@ public class Neo4jRequestImpl implements Neo4jRequest {
         this.cypherQuery =  cypherQuery;
     }
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof Neo4jRequest && ((Neo4jRequest) o).getCypherQuery().equals(cypherQuery);
+	}
+
     @Override
     public ExpectedVariables getExpectedVariables() {
         return null;

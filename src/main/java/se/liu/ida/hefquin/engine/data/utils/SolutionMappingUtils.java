@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.data.utils;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
@@ -78,6 +79,21 @@ public class SolutionMappingUtils
 	 */
 	public static boolean equals( final SolutionMapping m1, final SolutionMapping m2 ) {
 		return BindingLib.equals( m1.asJenaBinding(), m2.asJenaBinding() );
+	}
+
+	/**
+	 * Returns true if the given set of solution mappings are equivalent; that
+	 * is, if they contain the same number of solution mappings and for each such
+	 * solution mapping there is an equivalent solution mapping in the respective
+	 * other set.
+	 */
+	public static boolean equals( final Set<SolutionMapping> s1, final Set<SolutionMapping> s2 ) {
+		if ( s1 == s2 )
+			return true;
+		else if ( s1.size() != s2.size() )
+			return false;
+		else
+			return s1.containsAll(s2);
 	}
 
 	/**

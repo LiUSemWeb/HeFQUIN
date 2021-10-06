@@ -7,6 +7,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
@@ -39,10 +40,22 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 		}
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof BindingsRestrictedTriplePatternRequest) )
+			return false;
+
+		final BindingsRestrictedTriplePatternRequest oo = (BindingsRestrictedTriplePatternRequest) o;
+		return oo.getTriplePattern().equals(tp)
+				&& SolutionMappingUtils.equals(oo.getSolutionMappings(), solMaps);
+	}
+
+	@Override
 	public TriplePattern getTriplePattern() {
 		return tp;
 	}
 
+	@Override
 	public Set<SolutionMapping> getSolutionMappings() {
 		return solMaps;
 	}

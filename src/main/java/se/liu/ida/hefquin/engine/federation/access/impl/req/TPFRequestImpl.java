@@ -24,6 +24,13 @@ public class TPFRequestImpl extends TriplePatternRequestImpl implements TPFReque
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof TPFRequest
+				&& ((TPFRequest) o).getPageNumber() == pageNumber
+				&& super.equals(o);
+	}
+
+	@Override
 	public int getPageNumber() {
 		return pageNumber;
 	}
