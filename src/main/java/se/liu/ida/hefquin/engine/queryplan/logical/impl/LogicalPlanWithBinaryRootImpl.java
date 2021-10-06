@@ -25,6 +25,20 @@ public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalPlanWithBinaryRoot) )
+			return false; 
+
+		final LogicalPlanWithBinaryRoot oo = (LogicalPlanWithBinaryRoot) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.getRootOperator().equals(rootOp)
+					&& oo.getSubPlan1().equals(subPlan1)
+					&& oo.getSubPlan2().equals(subPlan2); 
+	}
+
+	@Override
 	public BinaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

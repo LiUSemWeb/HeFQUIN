@@ -11,6 +11,12 @@ public class LogicalOpMultiwayUnion implements NaryLogicalOp
 
 	protected LogicalOpMultiwayUnion() {}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpMultiwayUnion; 
+	}
+
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

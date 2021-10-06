@@ -19,6 +19,18 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 		this.req = req;
 	}
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalOpRequest) )
+			return false;
+
+		final LogicalOpRequest<?,?> oo = (LogicalOpRequest<?,?>) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.fm.equals(fm) && oo.req.equals(req); 
+	}
+
 	public MemberType getFederationMember() {
 		return fm;
 	}
@@ -27,6 +39,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 		return req;
 	}
 
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

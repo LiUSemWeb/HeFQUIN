@@ -23,6 +23,31 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalPlanWithNaryRoot) )
+			return false; 
+
+		final LogicalPlanWithNaryRoot oo = (LogicalPlanWithNaryRoot) o;
+		if ( oo == this )
+			return true;
+
+		if ( oo.numberOfSubPlans() != subPlans.size() )
+			return false;
+
+		if ( ! oo.getRootOperator().equals(rootOp) )
+			return false;
+
+		final Iterator<LogicalPlan> it1 = subPlans.iterator();
+		final Iterator<LogicalPlan> it2 = oo.getSubPlans();
+		while ( it1.hasNext() ) {
+			if ( ! it1.next().equals(it2.next()) )
+				return false;
+		}
+
+		return true;
+	}
+
+	@Override
 	public NaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

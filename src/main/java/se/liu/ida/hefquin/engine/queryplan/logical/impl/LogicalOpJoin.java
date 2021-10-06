@@ -11,6 +11,12 @@ public class LogicalOpJoin implements BinaryLogicalOp
 
 	protected LogicalOpJoin() {}
 
+	@Override
+	public boolean equals( final Object o ) {
+		return o instanceof LogicalOpJoin; 
+	}
+
+	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}

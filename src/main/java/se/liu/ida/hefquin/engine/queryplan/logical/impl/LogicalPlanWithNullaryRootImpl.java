@@ -16,6 +16,18 @@ public class LogicalPlanWithNullaryRootImpl implements LogicalPlanWithNullaryRoo
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalPlanWithNullaryRoot) )
+			return false; 
+
+		final LogicalPlanWithNullaryRoot oo = (LogicalPlanWithNullaryRoot) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.getRootOperator().equals(rootOp); 
+	}
+
+	@Override
 	public NullaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

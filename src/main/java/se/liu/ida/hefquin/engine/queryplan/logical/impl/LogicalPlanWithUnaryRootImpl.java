@@ -21,6 +21,19 @@ public class LogicalPlanWithUnaryRootImpl implements LogicalPlanWithUnaryRoot
 	}
 
 	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof LogicalPlanWithUnaryRoot) )
+			return false; 
+
+		final LogicalPlanWithUnaryRoot oo = (LogicalPlanWithUnaryRoot) o;
+		if ( oo == this )
+			return true;
+		else
+			return oo.getRootOperator().equals(rootOp)
+					&& oo.getSubPlan().equals(subPlan); 
+	}
+
+	@Override
 	public UnaryLogicalOp getRootOperator() {
 		return rootOp;
 	}
