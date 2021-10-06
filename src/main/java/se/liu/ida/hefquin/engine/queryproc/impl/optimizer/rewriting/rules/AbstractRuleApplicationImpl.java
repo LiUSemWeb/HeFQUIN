@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
+import java.util.Arrays;
+
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
@@ -21,6 +23,16 @@ public abstract class AbstractRuleApplicationImpl implements RuleApplication
         this.pathToTargetSubPlan = pathToTargetSubPlan;
         this.rule = rule;
     }
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( ! (o instanceof AbstractRuleApplicationImpl) )
+			return false;
+
+		final AbstractRuleApplicationImpl oo = (AbstractRuleApplicationImpl) o;
+		return Arrays.equals(oo.pathToTargetSubPlan, pathToTargetSubPlan)
+				&& oo.rule.equals(rule);
+	}
 
     @Override
     public PhysicalPlan getPlan() {
