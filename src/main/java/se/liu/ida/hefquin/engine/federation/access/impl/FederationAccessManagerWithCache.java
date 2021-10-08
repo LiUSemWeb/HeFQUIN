@@ -36,7 +36,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 	
 	@Override
-	public CompletableFuture<SolMapsResponse> issueRequest(SPARQLRequest req, SPARQLEndpoint fm)
+	public CompletableFuture<SolMapsResponse> issueRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
 			throws FederationAccessException {
 		return fedAccMan.issueRequest(req, fm);
 	}
