@@ -26,6 +26,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	protected final Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap = new HashMap<>();
 	
 	public FederationAccessManagerWithCache(final FederationAccessManager fedAccMan) {
+		assert fedAccMan != null;
 		this.fedAccMan = fedAccMan;
 		this.cacheMap = new HashMap<TriplePattern, CompletableFuture<CardinalityResponse>>();
 	}
