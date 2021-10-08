@@ -31,7 +31,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		this.cacheMap = new HashMap<TriplePattern, CompletableFuture<CardinalityResponse>>();
 	}
 	
-	protected void addResultToCache(TriplePattern tp, CompletableFuture<CardinalityResponse> response) {
+	protected void addResultToCache(final TriplePattern tp, final CompletableFuture<CardinalityResponse> response) {
 		cacheMap.put(tp, response);
 	}
 	
