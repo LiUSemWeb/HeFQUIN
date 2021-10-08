@@ -91,7 +91,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(BRTPFRequest req, BRTPFServer fm)
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final BRTPFRequest req, final BRTPFServer fm)
 			throws FederationAccessException {
 		return fedAccMan.issueCardinalityRequest(req, fm);
 	}
