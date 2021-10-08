@@ -24,27 +24,16 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 {
 	private FederationAccessManager fedAccMan;
 	private Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap;
-	//private Map<TriplePattern, Integer> cacheMap;
-
-	public FederationAccessManagerWithCache() {
-		System.out.println("Inside normal constructor");
-	}
 	
 	public FederationAccessManagerWithCache(FederationAccessManager fedAccMan) {
 		this.fedAccMan = fedAccMan;
-		//this.cacheMap = new HashMap<TriplePattern, Integer>();
 		this.cacheMap = new HashMap<TriplePattern, CompletableFuture<CardinalityResponse>>();
-		System.out.println("Inside constructor creating fedAccMan and cachemap");
 	}
 	
-	public void addResultToCache(TriplePattern tp, CompletableFuture<CardinalityResponse> response) {
+	protected void addResultToCache(TriplePattern tp, CompletableFuture<CardinalityResponse> response) {
 		cacheMap.put(tp, response);
 	}
 	
-	/*public void addResultToCache(TriplePattern tp, Integer response) {
-		cacheMap.put(tp, response);
-	}*/
-
 	@Override
 	public CompletableFuture<SolMapsResponse> issueRequest(SPARQLRequest req, SPARQLEndpoint fm)
 			throws FederationAccessException {
@@ -80,19 +69,17 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return fedAccMan.issueCardinalityRequest(req, fm);
 	}
 
-	// TODO Add caching for this request
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(TPFRequest req, TPFServer fm)
 			throws FederationAccessException {
 		System.out.println(cacheMap.values());
-		//Integer cacheResponse = cacheMap.get(req.getQueryPattern());
 		CompletableFuture<CardinalityResponse> cacheResponse = cacheMap.get(req.getQueryPattern());
 		if (cacheResponse == null) {
-			System.out.println("Did not find in cache - running request");
-			return fedAccMan.issueCardinalityRequest(req, fm).thenApply((response) -> addResultToCache(req.getQueryPattern(), response));
+			final CompletableFuture<CardinalityResponse> newFutureResponse = fedAccMan.issueCardinalityRequest(req, fm);
+			addResultToCache(req.getQueryPattern(), newFutureResponse);
+			return newFutureResponse;
 		}
 		else {
-			System.out.println("Found, returning from cache!");
 			return cacheResponse;
 		}
 	}
