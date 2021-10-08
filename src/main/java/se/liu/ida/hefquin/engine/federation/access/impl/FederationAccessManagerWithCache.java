@@ -22,8 +22,8 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager 
 {
-	private FederationAccessManager fedAccMan;
-	private Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap;
+	protected final FederationAccessManager fedAccMan;
+	protected final Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap = new HashMap<>();
 	
 	public FederationAccessManagerWithCache(FederationAccessManager fedAccMan) {
 		this.fedAccMan = fedAccMan;
