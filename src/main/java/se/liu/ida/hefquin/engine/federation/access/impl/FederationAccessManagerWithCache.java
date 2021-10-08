@@ -73,7 +73,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final TPFServer fm)
 			throws FederationAccessException {
-		CompletableFuture<CardinalityResponse> cacheResponse = cacheMap.get(req.getQueryPattern());
+		final CompletableFuture<CardinalityResponse> cacheResponse = cacheMap.get(req.getQueryPattern());
 		if (cacheResponse == null) {
 			final CompletableFuture<CardinalityResponse> newFutureResponse = fedAccMan.issueCardinalityRequest(req, fm);
 			addResultToCache(req.getQueryPattern(), newFutureResponse);
