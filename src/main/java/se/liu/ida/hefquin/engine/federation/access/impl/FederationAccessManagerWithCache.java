@@ -25,54 +25,58 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	protected final FederationAccessManager fedAccMan;
 	protected final Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap = new HashMap<>();
 	
-	public FederationAccessManagerWithCache(final FederationAccessManager fedAccMan) {
+	public FederationAccessManagerWithCache(final FederationAccessManager fedAccMan) 
+	{
 		assert fedAccMan != null;
 		this.fedAccMan = fedAccMan;
-		this.cacheMap = new HashMap<TriplePattern, CompletableFuture<CardinalityResponse>>();
-	}
-	
-	protected void addResultToCache(final TriplePattern tp, final CompletableFuture<CardinalityResponse> response) {
-		cacheMap.put(tp, response);
 	}
 	
 	@Override
 	public CompletableFuture<SolMapsResponse> issueRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
-			throws FederationAccessException {
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueRequest(req, fm);
 	}
 
 	@Override
-	public CompletableFuture<TPFResponse> issueRequest(TPFRequest req, TPFServer fm) throws FederationAccessException {
+	public CompletableFuture<TPFResponse> issueRequest(final TPFRequest req, final TPFServer fm) 
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueRequest(req, fm);
 	}
 
 	@Override
-	public CompletableFuture<TPFResponse> issueRequest(TPFRequest req, BRTPFServer fm)
-			throws FederationAccessException {
+	public CompletableFuture<TPFResponse> issueRequest(final TPFRequest req, final BRTPFServer fm)
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueRequest(req, fm);
 	}
 
 	@Override
-	public CompletableFuture<TPFResponse> issueRequest(BRTPFRequest req, BRTPFServer fm)
-			throws FederationAccessException {
+	public CompletableFuture<TPFResponse> issueRequest(final BRTPFRequest req, final BRTPFServer fm)
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueRequest(req, fm);
 	}
 
 	@Override
-	public CompletableFuture<StringResponse> issueRequest(Neo4jRequest req, Neo4jServer fm)
-			throws FederationAccessException {
+	public CompletableFuture<StringResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm)
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueRequest(req, fm);
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(SPARQLRequest req, SPARQLEndpoint fm)
-			throws FederationAccessException {
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueCardinalityRequest(req, fm);
 	}
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final TPFServer fm)
-			throws FederationAccessException {
+			throws FederationAccessException 
+	{
 		final CompletableFuture<CardinalityResponse> cacheResponse = cacheMap.get(req.getQueryPattern());
 		if (cacheResponse == null) {
 			final CompletableFuture<CardinalityResponse> newFutureResponse = fedAccMan.issueCardinalityRequest(req, fm);
@@ -86,13 +90,21 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException {
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueCardinalityRequest(req, fm);
 	}
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final BRTPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException {
+			throws FederationAccessException 
+	{
 		return fedAccMan.issueCardinalityRequest(req, fm);
+	}
+	
+	
+	protected void addResultToCache(final TriplePattern tp, final CompletableFuture<CardinalityResponse> response) 
+	{
+		cacheMap.put(tp, response);
 	}
 }
