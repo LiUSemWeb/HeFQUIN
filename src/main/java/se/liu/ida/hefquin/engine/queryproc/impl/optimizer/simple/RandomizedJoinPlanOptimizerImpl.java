@@ -14,6 +14,12 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 	}
 	
 	protected class RandomizedEnumerationAlgorithm implements EnumerationAlgorithm {
+		
+		/**
+		 * The class contains a random seed object.
+		 */
+		Random random;
+		
 		/**
 		 * Have a list of subplans.
 		 */
@@ -22,10 +28,10 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		/**
 		 *  When initializing the algorithm, start with the given list of subplans.
 		 *  @param subplans
-		 *  (These @ things where create automatically when I was making the comments, should I keep them in? // Simon)
 		 */
 		public RandomizedEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
 			this.subplans = subplans;
+			this.random = new Random(); // Generates the random seed.
 		}
 		
 
@@ -42,21 +48,6 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 
 			return currentPlan;
 		}
-
-		
-		/**
-		 * Creating all possible plans, which are then to be picked from at random.
-		 * This method is directly copied from GreedyJoinPlanOptimizer without modification.
-		 * @param currentPlan
-		 * @return
-		 */
-		protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
-			final PhysicalPlan[] plans = new PhysicalPlan[ subplans.size() ];
-			for ( int i = 0; i < subplans.size(); ++i ) {
-				plans[i] = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(i) );
-			}
-			return plans;
-		}
 		
 
 		/**
@@ -66,8 +57,7 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		 * @throws QueryOptimizationException
 		 */
 		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
-			Random random = new Random(); // Create a random seed.
-			int indexOfRandomPlan = random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
+			int indexOfRandomPlan = this.random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
 
 			final PhysicalPlan randomPlan = subplans.get(indexOfRandomPlan);
 			subplans.remove(indexOfRandomPlan);
@@ -84,18 +74,15 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		protected PhysicalPlan addNextRandomJoin( final PhysicalPlan currentPlan )
 				throws QueryOptimizationException
 		{
-			final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
 
-			Random random = new Random(); // Create a random seed.
-			// We're creating another random seed...
-			// ...but would it be better performance-wise to store the random seed in the class?
-			// This would allow us to only have to generate it once, with the downside of it taking up space.
-			// I would probably opt for putting it as part of the class, because processor time is expensive and storage is cheap. // Simon
-
-			int indexOfRandomPlan = random.nextInt(subplans.size());
-
+			int indexOfRandomPlan = this.random.nextInt(subplans.size());
+			final PhysicalPlan nextPlan = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(indexOfRandomPlan));
+			// Instead of creating a whole array of plans, create one.
+			
 			subplans.remove(indexOfRandomPlan);
-			return nextPossiblePlans[indexOfRandomPlan];
+			// Remove the old subplan.
+			
+			return nextPlan; // Return the created plan.
 		}
 		
 	}
