@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.query.impl.UnionCypherQuery;
 
 import java.util.Set;
 
-public interface CypherQuery {
+public interface CypherQuery extends Query {
     String toString();
 
     Set<MatchClause> getMatches();
