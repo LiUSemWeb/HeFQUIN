@@ -1,23 +1,30 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class EmptyReturnStatement implements ReturnStatement{
-    private final String alias;
+/**
+ * Represents a statements that returns an empty string, with an optional alias
+ * For example, RETURN "" AS x
+ */
+public class EmptyReturnStatement implements ReturnStatement {
+    private final CypherVar alias;
 
-    public EmptyReturnStatement(final String alias) {
+    public EmptyReturnStatement(final CypherVar alias) {
         this.alias = alias;
     }
 
-    public String getAlias() {
+    public CypherVar getAlias() {
         return alias;
     }
 
     @Override
     public String toString() {
-        return "\"\"" + (alias != null? " AS " + alias : "");
+        return "\"\"" + (alias != null? " AS " + alias.getName() : "");
     }
 
     @Override

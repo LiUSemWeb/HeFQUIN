@@ -1,15 +1,22 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class LiteralReturnStatement implements ReturnStatement{
+/**
+ * Represents a statement that returns the value of a property, with an optional alias
+ * For example, RETURN n.p
+ */
+public class PropertyValueReturnStatement implements ReturnStatement {
     private final CypherVar var;
     private final String property;
-    private final String alias;
+    private final CypherVar alias;
 
-    public LiteralReturnStatement(final CypherVar var, final String property, final String alias) {
+    public PropertyValueReturnStatement(final CypherVar var, final String property, final CypherVar alias) {
         assert var != null;
         assert property != null;
         this.var = var;
@@ -25,20 +32,21 @@ public class LiteralReturnStatement implements ReturnStatement{
         return property;
     }
 
-    public String getAlias() {
+    @Override
+    public CypherVar getAlias() {
         return alias;
     }
 
     @Override
     public String toString() {
-        return var.getName() + "." + property + (alias != null? " AS " + alias : "");
+        return var.getName() + "." + property + (alias != null? " AS " + alias.getName() : "");
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LiteralReturnStatement)) return false;
-        LiteralReturnStatement that = (LiteralReturnStatement) o;
+        if (!(o instanceof PropertyValueReturnStatement)) return false;
+        PropertyValueReturnStatement that = (PropertyValueReturnStatement) o;
         return var.equals(that.var) && property.equals(that.property) && Objects.equals(alias, that.alias);
     }
 

@@ -1,14 +1,21 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.condition;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class EXISTSWhereCondition implements WhereCondition{
+/**
+ * Represents an EXISTS condition over a property
+ * For example, EXISTS(n.name)
+ */
+public class PropertyEXISTSCondition implements WhereCondition {
     private final CypherVar var;
     private final String property;
 
-    public EXISTSWhereCondition(final CypherVar var, final String property) {
+    public PropertyEXISTSCondition(final CypherVar var, final String property) {
         assert var != null;
         assert property != null;
         this.var = var;
@@ -31,8 +38,8 @@ public class EXISTSWhereCondition implements WhereCondition{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EXISTSWhereCondition)) return false;
-        EXISTSWhereCondition that = (EXISTSWhereCondition) o;
+        if (!(o instanceof PropertyEXISTSCondition)) return false;
+        PropertyEXISTSCondition that = (PropertyEXISTSCondition) o;
         return var.equals(that.var) && property.equals(that.property);
     }
 

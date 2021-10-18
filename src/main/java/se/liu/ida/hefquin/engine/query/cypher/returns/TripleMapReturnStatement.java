@@ -1,19 +1,26 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
 
-import java.util.Collections;
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class TripleMapReturnStatement implements ReturnStatement{
+/**
+ * Represents a statement that returns a map that represents an RDF triple, with an optional alias
+ * For example, RETURN {source: n1, edge: e, target: n2} AS t
+ */
+public class TripleMapReturnStatement implements ReturnStatement {
 
     private final CypherVar source;
     private final CypherVar edge;
     private final CypherVar target;
-    private final String alias;
+    private final CypherVar alias;
 
     public TripleMapReturnStatement(final CypherVar source, final CypherVar edge, final CypherVar target,
-                                    final String alias) {
+                                    final CypherVar alias) {
+        assert source != null && edge != null && target != null;
         this.source = source;
         this.edge = edge;
         this.target = target;
@@ -30,21 +37,24 @@ public class TripleMapReturnStatement implements ReturnStatement{
     }
 
     @Override
-    public String getAlias() {
+    public CypherVar getAlias() {
         return alias;
     }
 
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append("{source: nm(")
+        res.append("{source: ")
                 .append(source.getName())
-                .append("), edge: elm(")
+                .append(", edge: ")
                 .append(edge.getName())
-                .append("), target: nm(")
+                .append(", target: ")
                 .append(target.getName())
-                .append(")} AS ")
-                .append(alias);
+                .append("}");
+        if( alias != null ) {
+            res.append(" AS ")
+               .append(alias.getName());
+        }
         return res.toString();
     }
 

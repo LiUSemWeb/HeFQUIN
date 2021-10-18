@@ -1,14 +1,21 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.condition;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class ClassWhereCondition implements WhereCondition{
+/**
+ * Represents a Cypher condition on the label of a node.
+ * For example, n:Person
+ */
+public class NodeLabelCondition implements WhereCondition {
     private final CypherVar var;
     private final String clazz;
 
-    public ClassWhereCondition(final CypherVar var, final String clazz) {
+    public NodeLabelCondition(final CypherVar var, final String clazz) {
         assert var != null;
         assert clazz != null;
         this.var = var;
@@ -31,8 +38,8 @@ public class ClassWhereCondition implements WhereCondition{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ClassWhereCondition)) return false;
-        ClassWhereCondition that = (ClassWhereCondition) o;
+        if (!(o instanceof NodeLabelCondition)) return false;
+        NodeLabelCondition that = (NodeLabelCondition) o;
         return var.equals(that.var) && clazz.equals(that.clazz);
     }
 

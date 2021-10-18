@@ -1,16 +1,23 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class FilteredPropertiesReturnStatement implements ReturnStatement{
+/**
+ * Represents a statement that returns the properties of a node or edge that have a given value, with an optional alias
+ * For example, RETURN [k in KEYS(x) WHERE x[k]=value | k] AS y
+ */
+public class FilteredPropertiesReturnStatement implements ReturnStatement {
     private final CypherVar var;
-    private final String alias;
+    private final CypherVar alias;
     private final String innerVar;
     private final String filterValue;
 
-    public FilteredPropertiesReturnStatement(final CypherVar var, final String alias,
+    public FilteredPropertiesReturnStatement(final CypherVar var, final CypherVar alias,
                                              final String filterValue, final String innerVar) {
         assert var != null;
         assert filterValue != null;
@@ -20,7 +27,7 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement{
         this.filterValue = filterValue;
     }
 
-    public FilteredPropertiesReturnStatement(final CypherVar var, final String alias,
+    public FilteredPropertiesReturnStatement(final CypherVar var, final CypherVar alias,
                                              final String filterValue) {
         this(var, alias, filterValue, "k");
     }
@@ -29,7 +36,8 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement{
         return var;
     }
 
-    public String getAlias() {
+    @Override
+    public CypherVar getAlias() {
         return alias;
     }
 
@@ -44,7 +52,7 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement{
     @Override
     public String toString() {
         return "[" + innerVar + " IN KEYS(" + var.getName() + ") WHERE " + var.getName() + "[" + innerVar + "]=\""
-                + filterValue + "\" | pm(" + innerVar + ")]" + (alias != null ? " AS " + alias : "");
+                + filterValue + "\" | " + innerVar + "]" + (alias != null ? " AS " + alias.getName() : "");
     }
 
     @Override

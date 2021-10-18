@@ -1,10 +1,17 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.match;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class EdgeMatchClause implements MatchClause{
+/**
+ * Represents a directed path match statement
+ * For example MATCH (x)-[e:label]->(y)
+ */
+public class EdgeMatchClause implements MatchClause {
     protected final CypherVar sourceNode;
     protected final CypherVar targetNode;
     protected final CypherVar edge;
@@ -73,7 +80,7 @@ public class EdgeMatchClause implements MatchClause{
             final NodeMatchClause that = (NodeMatchClause) match;
             return sourceNode.equals(that.node) || targetNode.equals(that.node);
         }
-        return false;
+        return this.equals(match);
     }
 
     @Override

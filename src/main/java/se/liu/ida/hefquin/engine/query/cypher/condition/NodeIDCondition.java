@@ -1,15 +1,22 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.condition;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class IDWhereCondition implements WhereCondition{
+/**
+ * Represents a condition checking the identifier of a node
+ * For example, ID(n)=22
+ */
+public class NodeIDCondition implements WhereCondition {
 
     private final CypherVar var;
     private final String nodeID;
 
-    public IDWhereCondition(CypherVar var, String nodeID) {
+    public NodeIDCondition(CypherVar var, String nodeID) {
         assert var!= null;
         this.var = var;
         this.nodeID = nodeID;
@@ -31,8 +38,8 @@ public class IDWhereCondition implements WhereCondition{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IDWhereCondition)) return false;
-        IDWhereCondition that = (IDWhereCondition) o;
+        if (!(o instanceof NodeIDCondition)) return false;
+        NodeIDCondition that = (NodeIDCondition) o;
         return nodeID.equals(that.nodeID) && var.equals(that.var);
     }
 

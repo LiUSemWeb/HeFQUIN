@@ -1,14 +1,21 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class LabelsReturnStatement implements ReturnStatement{
+/**
+ * Represents a statement that returns the labels of a node, with an optional alias
+ * For example, RETURN labels(x)
+ */
+public class LabelsReturnStatement implements ReturnStatement {
     private final CypherVar node;
-    private final String alias;
+    private final CypherVar alias;
 
-    public LabelsReturnStatement(final CypherVar node, final String alias) {
+    public LabelsReturnStatement(final CypherVar node, final CypherVar alias) {
         assert node != null;
         this.node = node;
         this.alias = alias;
@@ -18,13 +25,14 @@ public class LabelsReturnStatement implements ReturnStatement{
         return node;
     }
 
-    public String getAlias() {
+    @Override
+    public CypherVar getAlias() {
         return alias;
     }
 
     @Override
     public String toString() {
-        return "labels(" + node.getName() + ")" + (alias != null? " AS " + alias : "");
+        return "labels(" + node.getName() + ")" + (alias != null? " AS " + alias.getName() : "");
     }
 
     @Override

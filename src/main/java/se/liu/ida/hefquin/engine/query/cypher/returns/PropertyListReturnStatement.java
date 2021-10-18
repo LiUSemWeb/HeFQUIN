@@ -1,19 +1,26 @@
-package se.liu.ida.hefquin.engine.query.cypher;
+package se.liu.ida.hefquin.engine.query.cypher.returns;
+
+import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
+import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-public class PropertyListReturnStatement implements ReturnStatement{
+/**
+ * Represents a statement that returns the list of properties of an edge or node, with an optional alias
+ * For example, RETURN [k in KEYS(x) | k]
+ */
+public class PropertyListReturnStatement implements ReturnStatement {
     private final CypherVar var;
-    private final String alias;
+    private final CypherVar alias;
     private final String innerVar;
 
-    public PropertyListReturnStatement(final CypherVar var, final String alias) {
+    public PropertyListReturnStatement(final CypherVar var, final CypherVar alias) {
         this(var, alias, "k");
     }
 
-    public PropertyListReturnStatement(final CypherVar var, final String alias, final String innerVar) {
+    public PropertyListReturnStatement(final CypherVar var, final CypherVar alias, final String innerVar) {
         assert var != null;
         this.var = var;
         this.alias = alias;
@@ -24,14 +31,15 @@ public class PropertyListReturnStatement implements ReturnStatement{
         return var;
     }
 
-    public String getAlias() {
+    @Override
+    public CypherVar getAlias() {
         return alias;
     }
 
     @Override
     public String toString() {
-        return "[" + innerVar + " IN KEYS(" + var.getName() + ") | pm(" + var.getName() + ")]"
-                + (alias != null? " AS "+ alias : "");
+        return "[" + innerVar + " IN KEYS(" + var.getName() + ") | " + innerVar + "]"
+                + (alias != null? " AS "+ alias.getName() : "");
     }
 
     @Override
