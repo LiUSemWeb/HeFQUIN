@@ -2,6 +2,14 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import java.util.List;
 
+/**
+ * Distance-based termination criterion:
+ *
+ * Termination is triggered when the relative distance between the cost of the best plan
+ * in the current generation and in the previous generation has not exceeded
+ * a specified distance threshold for a number of generations.
+ */
+
 public class TerminateByDistancePercBest implements TerminationCriterion{
 
     protected final double percBestThreshold;
@@ -14,26 +22,25 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
 
     @Override
     public boolean readyToTerminate( final int generationNumber, final Generation currentGeneration, final List<Generation> previousGenerations ) {
-        final int preNr = previousGenerations.size();
-        if ( preNr < nrGenerations ) {
+        if ( generationNumber < nrGenerations ) {
             return false;
         }
 
-        double bestCostCur = currentGeneration.bestPlan.getWeight();
-        double bestCostPre = previousGenerations.get( previousGenerations.size()-1 ).bestPlan.getWeight();
-        double distance = ( bestCostPre - bestCostCur ) / bestCostPre;
+        double bestCurrentCost = currentGeneration.bestPlan.getWeight();
+        double bestPreviousCost = previousGenerations.get( generationNumber-1-1 ).bestPlan.getWeight();
+        double relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
 
-        if ( distance > percBestThreshold ) {
+        if ( relDistance > percBestThreshold ) {
             return false;
         }
 
         int nrGensForSteadyState = 1;
         while ( nrGensForSteadyState < nrGenerations ) {
-            bestCostCur = bestCostPre;
-            bestCostPre = previousGenerations.get( preNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
+            bestCurrentCost = bestPreviousCost;
+            bestPreviousCost = previousGenerations.get( generationNumber-1-nrGensForSteadyState-1 ).bestPlan.getWeight();
 
-            distance = ( bestCostPre - bestCostCur ) / bestCostPre;
-            if ( distance > percBestThreshold ) {
+            relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
+            if ( relDistance > percBestThreshold ) {
                 return false;
             }
 
