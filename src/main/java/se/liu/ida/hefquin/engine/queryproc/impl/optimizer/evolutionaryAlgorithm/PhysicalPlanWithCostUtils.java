@@ -42,4 +42,20 @@ public class PhysicalPlanWithCostUtils {
         return sum/plansWithCost.size();
     }
 
+    public static double calculateStDevCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost ) {
+        double avgCost = calculateAvgCostOfPlans(plansWithCost);
+
+        return calculateStDevCostOfPlans( plansWithCost, avgCost );
+    }
+
+    public static double calculateStDevCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost, final double avgCost ) {
+        double standardDeviation = 0.0;
+
+        for( final PhysicalPlanWithCost plan: plansWithCost ) {
+            standardDeviation += Math.pow(plan.getWeight() - avgCost, 2);
+        }
+
+        return Math.sqrt( standardDeviation/plansWithCost.size() );
+    }
+
 }
