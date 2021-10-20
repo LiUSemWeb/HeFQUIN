@@ -27,23 +27,17 @@ public class TerminateByDistancePercAvg implements TerminationCriterion{
         }
 
         double avgCurrentCost = currentGeneration.avgCost;
-        double avgPreviousCost = allPreviousGenerations.get( previousGenerationNr-1 ).avgCost;
-        double relDistance = ( avgPreviousCost - avgCurrentCost ) / avgPreviousCost;
+        double avgPreviousCost, relDistance;
 
-        if ( relDistance > percAvgThreshold ) {
-            return false;
-        }
-
-        int nrGensForSteadyState = 1;
+        int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            avgCurrentCost = avgPreviousCost;
             avgPreviousCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState-1 ).avgCost;
-
             relDistance = ( avgPreviousCost - avgCurrentCost ) / avgPreviousCost;
             if ( relDistance > percAvgThreshold ) {
                 return false;
             }
 
+            avgCurrentCost = avgPreviousCost;
             nrGensForSteadyState++;
         }
 

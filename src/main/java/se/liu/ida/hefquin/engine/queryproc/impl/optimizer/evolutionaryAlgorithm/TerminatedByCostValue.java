@@ -24,16 +24,13 @@ public class TerminatedByCostValue implements TerminationCriterion{
         }
 
         double bestPlanCost = currentGeneration.bestPlan.getWeight();
-        if ( bestPlanCost > costValueThreshold ) {
-            return false;
-        }
-
-        int nrGensForSteadyState = 1;
+        int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            bestPlanCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState ).bestPlan.getWeight();
             if ( bestPlanCost > costValueThreshold ) {
                 return false;
             }
+
+            bestPlanCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState ).bestPlan.getWeight();
             nrGensForSteadyState++;
         }
 

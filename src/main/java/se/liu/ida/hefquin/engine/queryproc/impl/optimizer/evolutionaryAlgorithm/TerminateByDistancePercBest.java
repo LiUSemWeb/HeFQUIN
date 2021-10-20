@@ -28,23 +28,17 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
         }
 
         double bestCurrentCost = currentGeneration.bestPlan.getWeight();
-        double bestPreviousCost = allPreviousGenerations.get( previousGenerationNr-1 ).bestPlan.getWeight();
-        double relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
+        double bestPreviousCost, relDistance;
 
-        if ( relDistance > percBestThreshold ) {
-            return false;
-        }
-
-        int nrGensForSteadyState = 1;
+        int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            bestCurrentCost = bestPreviousCost;
             bestPreviousCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
-
             relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
             if ( relDistance > percBestThreshold ) {
                 return false;
             }
 
+            bestCurrentCost = bestPreviousCost;
             nrGensForSteadyState++;
         }
 

@@ -30,22 +30,17 @@ public class TerminateByDiversityDistBest implements TerminationCriterion{
 
         double bestPlanCost = currentGeneration.bestPlan.getWeight();
         double topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( currentGeneration.plans, topK ).getWeight();
-        double relTopKDifference = ( topKPlanCost - bestPlanCost ) / topKPlanCost;
 
-        if ( relTopKDifference > distBestThreshold ) {
-            return false;
-        }
-
-        int nrGensForSteadyState = 1;
+        int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
-            bestPlanCost = previousGen.bestPlan.getWeight();
-            topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( previousGen.plans, topK ).getWeight();
-
-            relTopKDifference = ( topKPlanCost - bestPlanCost ) / topKPlanCost;
+            final double relTopKDifference = ( topKPlanCost - bestPlanCost ) / topKPlanCost;
             if ( relTopKDifference > distBestThreshold ) {
                 return false;
             }
+
+            final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
+            bestPlanCost = previousGen.bestPlan.getWeight();
+            topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( previousGen.plans, topK ).getWeight();
 
             nrGensForSteadyState++;
         }

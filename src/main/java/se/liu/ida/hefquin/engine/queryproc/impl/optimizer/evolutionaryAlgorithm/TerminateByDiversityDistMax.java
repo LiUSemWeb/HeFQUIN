@@ -26,23 +26,17 @@ public class TerminateByDiversityDistMax implements TerminationCriterion{
 
         double bestPlanCost = currentGeneration.bestPlan.getWeight();
         double worstPlanCost = currentGeneration.worstPlan.getWeight();
-        double relMaxDifference = ( worstPlanCost - bestPlanCost ) / worstPlanCost;
 
-        if ( relMaxDifference > distMaxThreshold ) {
-            return false;
-        }
-
-        int nrGensForSteadyState = 1;
+        int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
-            bestPlanCost = previousGen.bestPlan.getWeight();
-            worstPlanCost = previousGen.worstPlan.getWeight();
-
-            relMaxDifference = ( worstPlanCost - bestPlanCost ) / worstPlanCost;
+            final double relMaxDifference = ( worstPlanCost - bestPlanCost ) / worstPlanCost;
             if ( relMaxDifference > distMaxThreshold ) {
                 return false;
             }
 
+            final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
+            bestPlanCost = previousGen.bestPlan.getWeight();
+            worstPlanCost = previousGen.worstPlan.getWeight();
             nrGensForSteadyState++;
         }
 
