@@ -1,19 +1,23 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
 import java.util.List;
+
 /**
  * Diversity-based termination criterion:
  *
+ * Similar to {@link TerminateByDiversityDistMax}, but only the top-k plans with lowest cost within each generation are considered.
  * Termination is triggered when the relative difference between the cost of the best plan
- * and the worst plan within each generation has not exceeded
+ * and the top-k best plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistMax implements TerminationCriterion{
-    protected final double distMaxThreshold;
+public class TerminateByDiversityDistBest implements TerminationCriterion{
+    protected final double distBestThreshold;
+    protected final int topK;
     protected final int nrGenerations;
 
-    public TerminateByDiversityDistMax( final double distMaxThreshold, final int nrGenerations ) {
-        this.distMaxThreshold = distMaxThreshold;
+    public TerminateByDiversityDistBest(final double distBestThreshold, final int nrGenerations, final int topK) {
+        this.distBestThreshold = distBestThreshold;
+        this.topK = topK;
         this.nrGenerations = nrGenerations;
     }
 
@@ -25,10 +29,10 @@ public class TerminateByDiversityDistMax implements TerminationCriterion{
         }
 
         double bestPlanCost = currentGeneration.bestPlan.getWeight();
-        double worstPlanCost = currentGeneration.worstPlan.getWeight();
-        double relMaxDifference = ( worstPlanCost - bestPlanCost ) / worstPlanCost;
+        double topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( currentGeneration.plans, topK ).getWeight();
+        double relTopKDifference = ( topKPlanCost - bestPlanCost ) / topKPlanCost;
 
-        if ( relMaxDifference > distMaxThreshold ) {
+        if ( relTopKDifference > distBestThreshold ) {
             return false;
         }
 
@@ -36,10 +40,10 @@ public class TerminateByDiversityDistMax implements TerminationCriterion{
         while ( nrGensForSteadyState < nrGenerations ) {
             final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
             bestPlanCost = previousGen.bestPlan.getWeight();
-            worstPlanCost = previousGen.worstPlan.getWeight();
+            topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( previousGen.plans, topK ).getWeight();
 
-            relMaxDifference = ( worstPlanCost - bestPlanCost ) / worstPlanCost;
-            if ( relMaxDifference > distMaxThreshold ) {
+            relTopKDifference = ( topKPlanCost - bestPlanCost ) / topKPlanCost;
+            if ( relTopKDifference > distBestThreshold ) {
                 return false;
             }
 

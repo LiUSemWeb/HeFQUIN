@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
@@ -30,6 +31,18 @@ public class PhysicalPlanWithCostUtils {
             }
         }
         return worstPlan;
+    }
+
+    public static PhysicalPlanWithCost findTopKPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost, final int k ) {
+        final List<PhysicalPlanWithCost> plans = new ArrayList<>(plansWithCost);
+
+        PhysicalPlanWithCost topKPlan = findPlanWithLowestCost(plans);
+        for( int i = 1; i < k; i++ ) {
+            plans.remove(topKPlan);
+            topKPlan = findPlanWithHighestCost(plans);
+        }
+
+        return topKPlan;
     }
 
     public static double calculateAvgCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost ) {
