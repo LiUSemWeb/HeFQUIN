@@ -14,7 +14,7 @@ public class Generation {
         this.avgCost = calculateAvgCostOfPlans(plans);
     }
 
-    public static PhysicalPlanWithCost findPlanWithSmallestCost(List<PhysicalPlanWithCost> plansWithCost) {
+    public static PhysicalPlanWithCost findPlanWithSmallestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
         PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
         double min = bestPlan.getWeight();
 
