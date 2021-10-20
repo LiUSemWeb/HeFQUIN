@@ -45,20 +45,19 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     public PhysicalPlan optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
         final RuleApplicationsOfPlans ruleApplicationCache = new RuleApplicationsOfPlans( new RuleInstances() );
         // initialize the first generation
-        List<PhysicalPlanWithCost> currentGen = generateFirstGen( plan, ruleApplicationCache );
+        Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
 
         int generationNumber = 1;
-        final List<List<PhysicalPlanWithCost>> previousGenerations = new ArrayList<>();
-        // TODO: extend this implementation with different sorts of termination criteria
+        final List<Generation> previousGenerations = new ArrayList<>();
         while( ! terminateCriterion.readyToTerminate( generationNumber, currentGen, previousGenerations ) ) {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
             generationNumber ++;
         }
-        return findPlanWithSmallestCost(currentGen).getPlan();
+        return currentGen.bestPlan.getPlan();
     }
 
-    protected List<PhysicalPlanWithCost> generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
+    protected Generation generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
@@ -75,19 +74,19 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             ruleApps.remove( ruleApplication );
         }
 
-        return annotatePlansWithCost(currentGen);
+        return new Generation( annotatePlansWithCost(currentGen) );
     }
 
-    protected List<PhysicalPlanWithCost> generateNextGen( final List<PhysicalPlanWithCost> currentGen, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
-        final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen );
+    protected Generation generateNextGen( final Generation currentGen, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
+        final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen.plans );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 
         while ( newCandidates.size() < nmCandidates && parentSet.size() > 0 ) {
             // pick a parent from the current generation
-            final PhysicalPlan parent = planRandomizedSelect.pickOne( parentSet ) .getPlan() ;
+            final PhysicalPlanWithCost parent = planRandomizedSelect.pickOne( parentSet );
 
             // determine all possible applications of rewriting rules for the parent plan
-            final Set<RuleApplication> ruleApps = cache.getRuleApplications( parent );
+            final Set<RuleApplication> ruleApps = cache.getRuleApplications( parent.getPlan() );
             if ( ruleApps.size() > 0) {
                 // Pick one rewriting rule based on priority
                 final RuleApplication ruleApplication = ruleRandomizedSelect.pickOne( ruleApps );
@@ -98,10 +97,12 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
                 parentSet.remove(parent);
             }
         }
-        currentGen.addAll( annotatePlansWithCost(newCandidates) );
+
+        final List<PhysicalPlanWithCost> candidatesWithCost = annotatePlansWithCost( newCandidates );
+        candidatesWithCost.addAll( currentGen.plans );
 
         // select the next generation from all candidates
-        return selectNextGenFromCandidates( currentGen );
+        return new Generation( selectNextGenFromCandidates( candidatesWithCost ) );
     }
 
     protected List<PhysicalPlanWithCost> annotatePlansWithCost( final List<PhysicalPlan> plans ) throws QueryOptimizationException {
@@ -124,7 +125,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         final List<PhysicalPlanWithCost> currentGen = new ArrayList<>();
 
         for ( int i = 0; i < (nmCandidates-nmSurvivors); i++ ) {
-            final PhysicalPlanWithCost planWithSmallestCost = findPlanWithSmallestCost( planWithCosts );
+            final PhysicalPlanWithCost planWithSmallestCost = PhysicalPlanWithCostUtils.findPlanWithSmallestCost( planWithCosts );
             currentGen.add( planWithSmallestCost );
             planWithCosts.remove( planWithSmallestCost );
         }
@@ -136,20 +137,6 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         }
 
         return currentGen;
-    }
-
-    protected PhysicalPlanWithCost findPlanWithSmallestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
-        PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
-        double min = bestPlan.getWeight();
-
-        for ( int i = 1; i < plansWithCost.size(); i++) {
-            final PhysicalPlanWithCost p = plansWithCost.get(i);
-            if ( p.getWeight() <= min ) {
-                min = p.getWeight();
-                bestPlan = p;
-            }
-        }
-        return bestPlan;
     }
 
 }

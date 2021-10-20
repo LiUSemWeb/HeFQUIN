@@ -16,7 +16,7 @@ public class TerminatedByNumberOfGenerations implements TerminationCriterion{
      * Returns true if the generation number exceeds the threshold
      */
     @Override
-    public boolean readyToTerminate( final int generationNumber, final List<PhysicalPlanWithCost> currentGeneration, final List<List<PhysicalPlanWithCost>> previousGenerations ) {
+    public boolean readyToTerminate( final int generationNumber, final Generation currentGeneration, final List<Generation> previousGenerations) {
         return ( generationNumber >= generationThreshold );
     }
 
