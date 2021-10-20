@@ -31,7 +31,7 @@ public class Generation {
     public static double calculateAvgCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost ) {
         double sum = 0;
 
-        for ( PhysicalPlanWithCost p : plansWithCost ) {
+        for ( final PhysicalPlanWithCost p : plansWithCost ) {
             sum += p.getWeight();
         }
 
