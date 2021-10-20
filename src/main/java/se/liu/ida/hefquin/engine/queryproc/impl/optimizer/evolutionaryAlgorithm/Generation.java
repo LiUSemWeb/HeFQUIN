@@ -10,8 +10,8 @@ public class Generation {
 
     public Generation( final List<PhysicalPlanWithCost> plans ) {
         this.plans = plans;
-        this.bestPlan = PhysicalPlanWithCost.findPlanWithSmallestCost(plans);
-        this.avgCost = PhysicalPlanWithCost.calculateAvgCostOfPlans(plans);
+        this.bestPlan = PhysicalPlanWithCostUtils.findPlanWithSmallestCost(plans);
+        this.avgCost = PhysicalPlanWithCostUtils.calculateAvgCostOfPlans(plans);
     }
 
 }
