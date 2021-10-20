@@ -20,7 +20,7 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
         }
 
         double bestCostCur = currentGeneration.bestPlan.getWeight();
-        double bestCostPre = previousGenerations.get( preNr-1 ).bestPlan.getWeight();
+        double bestCostPre = previousGenerations.get( previousGenerations.size()-1 ).bestPlan.getWeight();
         double distance = ( bestCostPre - bestCostCur ) / bestCostPre;
 
         if ( distance > percBestThreshold ) {
