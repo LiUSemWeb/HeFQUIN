@@ -39,7 +39,7 @@ public class PhysicalPlanWithCostUtils {
         PhysicalPlanWithCost topKPlan = findPlanWithLowestCost(plans);
         for( int i = 1; i < k; i++ ) {
             plans.remove(topKPlan);
-            topKPlan = findPlanWithHighestCost(plans);
+            topKPlan = findPlanWithLowestCost(plans);
         }
 
         return topKPlan;
@@ -65,7 +65,7 @@ public class PhysicalPlanWithCostUtils {
         double standardDeviation = 0.0;
 
         for( final PhysicalPlanWithCost plan: plansWithCost ) {
-            standardDeviation += Math.pow(plan.getWeight() - avgCost, 2);
+            standardDeviation += Math.pow( plan.getWeight() - avgCost, 2 );
         }
 
         return Math.sqrt( standardDeviation/plansWithCost.size() );
