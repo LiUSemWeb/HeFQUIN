@@ -33,15 +33,14 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
             bestCostPre = previousGenerations.get( preNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
 
             distance = ( bestCostPre - bestCostCur ) / bestCostPre;
-            if ( distance <= percBestThreshold ) {
-                nrGensForSteadyState++;
+            if ( distance > percBestThreshold ) {
+                return false;
             }
-            else {
-                break;
-            }
+
+            nrGensForSteadyState++;
         }
 
-        return nrGensForSteadyState == nrGenerations;
+        return true;
     }
 
 }
