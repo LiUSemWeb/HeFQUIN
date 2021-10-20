@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
 
-    public static PhysicalPlanWithCost findPlanWithSmallestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
+    public static PhysicalPlanWithCost findPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
         PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
         double min = bestPlan.getWeight();
 
@@ -16,6 +16,20 @@ public class PhysicalPlanWithCostUtils {
             }
         }
         return bestPlan;
+    }
+
+    public static PhysicalPlanWithCost findPlanWithHighestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
+        PhysicalPlanWithCost worstPlan = plansWithCost.get(0);
+        double max = worstPlan.getWeight();
+
+        for ( int i = 1; i < plansWithCost.size(); i++) {
+            final PhysicalPlanWithCost p = plansWithCost.get(i);
+            if ( p.getWeight() >= max ) {
+                max = p.getWeight();
+                worstPlan = p;
+            }
+        }
+        return worstPlan;
     }
 
     public static double calculateAvgCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost ) {

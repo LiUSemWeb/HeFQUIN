@@ -123,7 +123,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         final List<PhysicalPlanWithCost> currentGen = new ArrayList<>();
 
         for ( int i = 0; i < (nmCandidates-nmSurvivors); i++ ) {
-            final PhysicalPlanWithCost planWithSmallestCost = PhysicalPlanWithCostUtils.findPlanWithSmallestCost( planWithCosts );
+            final PhysicalPlanWithCost planWithSmallestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost( planWithCosts );
             currentGen.add( planWithSmallestCost );
             planWithCosts.remove( planWithSmallestCost );
         }
