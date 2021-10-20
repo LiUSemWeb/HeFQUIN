@@ -15,7 +15,7 @@ public class TerminateByDiversityDistBest implements TerminationCriterion{
     protected final int topK;
     protected final int nrGenerations;
 
-    public TerminateByDiversityDistBest(final double distBestThreshold, final int nrGenerations, final int topK) {
+    public TerminateByDiversityDistBest( final double distBestThreshold, final int nrGenerations, final int topK ) {
         this.distBestThreshold = distBestThreshold;
         this.topK = topK;
         this.nrGenerations = nrGenerations;

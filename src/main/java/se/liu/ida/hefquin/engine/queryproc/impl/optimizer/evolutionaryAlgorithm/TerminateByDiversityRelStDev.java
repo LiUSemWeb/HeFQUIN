@@ -13,7 +13,7 @@ public class TerminateByDiversityRelStDev implements TerminationCriterion{
     protected final double relStDevThreshold;
     protected final int nrGenerations;
 
-    public TerminateByDiversityRelStDev(final double relStDevThreshold, final int nrGenerations ) {
+    public TerminateByDiversityRelStDev( final double relStDevThreshold, final int nrGenerations ) {
         this.relStDevThreshold = relStDevThreshold;
         this.nrGenerations = nrGenerations;
     }
