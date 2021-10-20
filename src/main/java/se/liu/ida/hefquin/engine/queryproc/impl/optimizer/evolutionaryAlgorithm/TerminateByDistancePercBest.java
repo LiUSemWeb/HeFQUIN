@@ -29,7 +29,7 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
 
         int nrGensForSteadyState = 1;
         while ( nrGensForSteadyState < nrGenerations ) {
-            bestCostCur = previousGenerations.get( preNr-nrGensForSteadyState ).bestPlan.getWeight();
+            bestCostCur = bestCostPre;
             bestCostPre = previousGenerations.get( preNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
 
             distance = ( bestCostPre - bestCostCur ) / bestCostPre;
