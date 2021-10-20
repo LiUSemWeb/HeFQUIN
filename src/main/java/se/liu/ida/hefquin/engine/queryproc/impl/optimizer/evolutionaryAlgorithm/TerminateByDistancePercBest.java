@@ -21,13 +21,14 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
     }
 
     @Override
-    public boolean readyToTerminate( final int generationNumber, final Generation currentGeneration, final List<Generation> previousGenerations ) {
-        if ( generationNumber < nrGenerations ) {
+    public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> previousGenerations ) {
+        final int previousGenerationNr = previousGenerations.size();
+        if ( previousGenerationNr < nrGenerations ) {
             return false;
         }
 
         double bestCurrentCost = currentGeneration.bestPlan.getWeight();
-        double bestPreviousCost = previousGenerations.get( generationNumber-1-1 ).bestPlan.getWeight();
+        double bestPreviousCost = previousGenerations.get( previousGenerationNr-1 ).bestPlan.getWeight();
         double relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
 
         if ( relDistance > percBestThreshold ) {
@@ -37,7 +38,7 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
         int nrGensForSteadyState = 1;
         while ( nrGensForSteadyState < nrGenerations ) {
             bestCurrentCost = bestPreviousCost;
-            bestPreviousCost = previousGenerations.get( generationNumber-1-nrGensForSteadyState-1 ).bestPlan.getWeight();
+            bestPreviousCost = previousGenerations.get( previousGenerationNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
 
             relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
             if ( relDistance > percBestThreshold ) {

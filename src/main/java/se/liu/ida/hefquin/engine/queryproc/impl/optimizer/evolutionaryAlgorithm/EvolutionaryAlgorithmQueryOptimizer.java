@@ -47,12 +47,10 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
 
-        int generationNumber = 1;
         final List<Generation> previousGenerations = new ArrayList<>();
-        while( ! terminateCriterion.readyToTerminate( generationNumber, currentGen, previousGenerations ) ) {
+        while( ! terminateCriterion.readyToTerminate( currentGen, previousGenerations ) ) {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
-            generationNumber ++;
         }
         return currentGen.bestPlan.getPlan();
     }
