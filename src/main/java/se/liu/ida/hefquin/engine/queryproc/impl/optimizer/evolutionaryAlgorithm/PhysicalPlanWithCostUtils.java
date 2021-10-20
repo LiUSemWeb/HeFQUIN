@@ -56,7 +56,7 @@ public class PhysicalPlanWithCostUtils {
     }
 
     public static double calculateStDevCostOfPlans( final List<PhysicalPlanWithCost> plansWithCost ) {
-        double avgCost = calculateAvgCostOfPlans(plansWithCost);
+        final double avgCost = calculateAvgCostOfPlans(plansWithCost);
 
         return calculateStDevCostOfPlans( plansWithCost, avgCost );
     }
