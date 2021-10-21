@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.query;
 
-import java.util.Set;
+import java.util.List;
 
 public interface CypherUnionQuery extends CypherQuery {
-    Set<CypherMatchQuery> getUnion();
+    List<CypherMatchQuery> getUnion();
 }

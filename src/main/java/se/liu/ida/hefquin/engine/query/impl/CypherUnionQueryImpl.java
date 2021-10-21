@@ -4,17 +4,16 @@ import se.liu.ida.hefquin.engine.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.query.CypherQuery;
 import se.liu.ida.hefquin.engine.query.CypherUnionQuery;
 import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
-import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CypherUnionQueryImpl implements CypherUnionQuery {
 
-    final Set<CypherMatchQuery> union;
+    final List<CypherMatchQuery> union;
 
     public CypherUnionQueryImpl() {
-        union = new HashSet<>();
+        union = new ArrayList<>();
     }
 
     public CypherUnionQueryImpl(CypherMatchQuery... queries) {
@@ -22,29 +21,13 @@ public class CypherUnionQueryImpl implements CypherUnionQuery {
         union.addAll(Arrays.asList(queries));
     }
 
-    public CypherUnionQueryImpl(Set<CypherMatchQuery> result) {
+    public CypherUnionQueryImpl(List<CypherMatchQuery> result) {
         this.union = result;
     }
 
     @Override
-    public Set<CypherMatchQuery> getUnion() {
+    public List<CypherMatchQuery> getUnion() {
         return union;
-    }
-
-    private void removeMalformed(final Set<CypherMatchQuery> queries) {
-        final List<CypherMatchQuery> toRemove = new LinkedList<>();
-        for (final CypherMatchQuery q : queries) {
-            final List<CypherVar> seenAliases = new ArrayList<>();
-            for (final ReturnStatement r : q.getReturnExprs()) {
-                if (seenAliases.contains(r.getAlias())){
-                    toRemove.add(q);
-                    break;
-                } else {
-                    seenAliases.add(r.getAlias());
-                }
-            }
-        }
-        toRemove.forEach(queries::remove);
     }
 
     @Override

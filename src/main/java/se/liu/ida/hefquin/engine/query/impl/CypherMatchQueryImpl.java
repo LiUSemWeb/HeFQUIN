@@ -6,42 +6,40 @@ import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
 import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
 import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CypherMatchQueryImpl implements CypherMatchQuery {
 
-    final protected Set<MatchClause> matches;
-    final protected Set<WhereCondition> conditions;
-    final protected Set<ReturnStatement> returnExprs;
+    final protected List<MatchClause> matches;
+    final protected List<WhereCondition> conditions;
+    final protected List<ReturnStatement> returnExprs;
 
     public CypherMatchQueryImpl() {
-        matches = new HashSet<>();
-        conditions = new HashSet<>();
-        returnExprs = new HashSet<>();
+        matches = new ArrayList<>();
+        conditions = new ArrayList<>();
+        returnExprs = new ArrayList<>();
     }
 
-    public CypherMatchQueryImpl(final Set<MatchClause> matches, final Set<WhereCondition> conditions,
-                                final Set<ReturnStatement> returnExprs) {
+    public CypherMatchQueryImpl(final List<MatchClause> matches, final List<WhereCondition> conditions,
+                                final List<ReturnStatement> returnExprs) {
         this.matches = matches;
         this.conditions = conditions;
         this.returnExprs = returnExprs;
     }
 
     @Override
-    public Set<MatchClause> getMatches() {
+    public List<MatchClause> getMatches() {
         return matches;
     }
 
     @Override
-    public Set<WhereCondition> getConditions() {
+    public List<WhereCondition> getConditions() {
         return conditions;
     }
 
     @Override
-    public Set<ReturnStatement> getReturnExprs() {
+    public List<ReturnStatement> getReturnExprs() {
         return returnExprs;
     }
 
