@@ -8,7 +8,8 @@ import java.util.List;
  * and the worst plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistMax implements TerminationCriterion{
+public class TerminateByDiversityDistMax implements TerminationCriterion
+{
     protected final double distMaxThreshold;
     protected final int nrGenerations;
 

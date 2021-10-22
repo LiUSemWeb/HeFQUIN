@@ -9,9 +9,8 @@ import java.util.List;
  * in the current generation and in the previous generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-
-public class TerminateByDistancePercBest implements TerminationCriterion{
-
+public class TerminateByDistancePercBest implements TerminationCriterion
+{
     protected final double percBestThreshold;
     protected final int nrGenerations;
 
@@ -28,7 +27,8 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
         }
 
         double bestCurrentCost = currentGeneration.bestPlan.getWeight();
-        double bestPreviousCost, relDistance;
+        double bestPreviousCost;
+        double relDistance;
 
         int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {

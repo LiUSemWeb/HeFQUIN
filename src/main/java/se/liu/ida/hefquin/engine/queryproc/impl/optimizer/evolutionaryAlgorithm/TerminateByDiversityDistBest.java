@@ -10,7 +10,8 @@ import java.util.List;
  * and the top-k best plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistBest implements TerminationCriterion{
+public class TerminateByDiversityDistBest implements TerminationCriterion
+{
     protected final double distBestThreshold;
     protected final int topK;
     protected final int nrGenerations;

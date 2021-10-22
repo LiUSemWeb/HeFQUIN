@@ -9,7 +9,8 @@ import java.util.List;
  * in the current generation and in the previous generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDistancePercAvg implements TerminationCriterion{
+public class TerminateByDistancePercAvg implements TerminationCriterion
+{
     protected final double percAvgThreshold;
     protected final int nrGenerations;
 
@@ -26,7 +27,8 @@ public class TerminateByDistancePercAvg implements TerminationCriterion{
         }
 
         double avgCurrentCost = currentGeneration.avgCost;
-        double avgPreviousCost, relDistance;
+        double avgPreviousCost;
+        double relDistance;
 
         int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
