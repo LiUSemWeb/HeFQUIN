@@ -52,7 +52,7 @@ public class CypherQueryUtils {
                 conditions.add(c);
             }
         }
-        List<ReturnStatement> returns = new ArrayList<>();
+        final List<ReturnStatement> returns = new ArrayList<>();
         for ( final ReturnStatement r : q1.getReturnExprs() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
