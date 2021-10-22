@@ -6,8 +6,8 @@ import java.util.List;
  * Termination is triggered when the lowest-cost plan per generation
  * has not exceeded a specified threshold for a number of generations.
  */
-
-public class TerminatedByCostValue implements TerminationCriterion{
+public class TerminatedByCostValue implements TerminationCriterion
+{
     protected final double costValueThreshold;
     protected final int nrGenerations;
 
