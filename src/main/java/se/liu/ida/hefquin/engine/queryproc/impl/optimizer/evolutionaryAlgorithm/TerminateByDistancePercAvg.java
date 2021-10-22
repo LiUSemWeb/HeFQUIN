@@ -5,18 +5,16 @@ import java.util.List;
 /**
  * Distance-based termination criterion:
  *
- * Termination is triggered when the relative distance between the cost of the best plan
+ * Termination is triggered when the relative distance between the average cost of plans
  * in the current generation and in the previous generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-
-public class TerminateByDistancePercBest implements TerminationCriterion{
-
-    protected final double percBestThreshold;
+public class TerminateByDistancePercAvg implements TerminationCriterion{
+    protected final double percAvgThreshold;
     protected final int nrGenerations;
 
-    public TerminateByDistancePercBest( final double percBestThreshold, final int nrGenerations ) {
-        this.percBestThreshold = percBestThreshold;
+    public TerminateByDistancePercAvg( final double percAvgThreshold, final int nrGenerations ) {
+        this.percAvgThreshold = percAvgThreshold;
         this.nrGenerations = nrGenerations;
     }
 
@@ -27,18 +25,18 @@ public class TerminateByDistancePercBest implements TerminationCriterion{
             return false;
         }
 
-        double bestCurrentCost = currentGeneration.bestPlan.getWeight();
-        double bestPreviousCost, relDistance;
+        double avgCurrentCost = currentGeneration.avgCost;
+        double avgPreviousCost, relDistance;
 
         int nrGensForSteadyState = 0;
         while ( nrGensForSteadyState < nrGenerations ) {
-            bestPreviousCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState-1 ).bestPlan.getWeight();
-            relDistance = ( bestPreviousCost - bestCurrentCost ) / bestPreviousCost;
-            if ( relDistance > percBestThreshold ) {
+            avgPreviousCost = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState-1 ).avgCost;
+            relDistance = ( avgPreviousCost - avgCurrentCost ) / avgPreviousCost;
+            if ( relDistance > percAvgThreshold ) {
                 return false;
             }
 
-            bestCurrentCost = bestPreviousCost;
+            avgCurrentCost = avgPreviousCost;
             nrGensForSteadyState++;
         }
 
