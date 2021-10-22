@@ -8,8 +8,8 @@ import java.util.List;
  * Termination is triggered when the relative standard deviation of the cost values
  * within the current generation is below a given threshold or the N-th generation is reached.
  */
-
-public class TerminateByDiversityRelStDev implements TerminationCriterion{
+public class TerminateByDiversityRelStDev implements TerminationCriterion
+{
     protected final double relStDevThreshold;
     protected final int nrGenerations;
 
