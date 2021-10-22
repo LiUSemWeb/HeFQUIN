@@ -26,7 +26,7 @@ public class CypherQueryUtils {
      * @return the combination of q1 and q2.
      */
     public static CypherMatchQuery combine(final CypherMatchQuery q1, final CypherMatchQuery q2) {
-        List<MatchClause> matches = q1.getMatches();
+        final List<MatchClause> matches = q1.getMatches();
         final Set<MatchClause> redundant = new HashSet<>();
         for ( final MatchClause m1 : q1.getMatches() ) {
             for ( final MatchClause m2 : q2.getMatches() ) {
