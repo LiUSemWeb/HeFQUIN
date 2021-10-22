@@ -69,7 +69,7 @@ public class CypherQueryUtils {
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherMatchQuery q2) {
         final List<CypherMatchQuery> union = new ArrayList<>();
         for (final CypherMatchQuery q : q1.getUnion()) {
-            CypherMatchQuery combination = combine(q, q2);
+            final CypherMatchQuery combination = combine(q, q2);
             if (!union.contains(combination)) {
                 union.add(combination);
             }
