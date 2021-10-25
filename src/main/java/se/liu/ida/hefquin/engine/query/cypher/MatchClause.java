@@ -8,7 +8,9 @@ import java.util.Set;
  */
 public interface MatchClause {
     /**
-     * Checks if two match statements are redundant
+     * Checks if two match statements are redundant. This can happen if they are exactly the same pattern,
+     * or if one is a node pattern and the other a path pattern that contains it. For instance, MATCH (x)
+     * is redundant with MATCH (x)-[y]->(z), MATCH (x), and MATCH (v)-[w]->(x). Note that this is not symmetric.
      * @param match the other match clause to test
      * @return true if the clauses are redundant, i.e.,
      * if both patterns share nodes

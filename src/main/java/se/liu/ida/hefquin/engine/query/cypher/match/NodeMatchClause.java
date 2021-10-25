@@ -16,6 +16,7 @@ public class NodeMatchClause implements MatchClause {
     protected final CypherVar node;
 
     public NodeMatchClause(final CypherVar node) {
+        assert node != null;
         this.node = node;
     }
 

@@ -14,17 +14,12 @@ import java.util.Set;
 public class AllPropertyValuesReturnStatement implements ReturnStatement {
     private final CypherVar var;
     private final CypherVar alias;
-    private final String innerVar;
+    private final String innerVar = "k";
 
     public AllPropertyValuesReturnStatement(final CypherVar var, final CypherVar alias) {
-        this(var, alias, "k");
-    }
-
-    public AllPropertyValuesReturnStatement(final CypherVar var, final CypherVar alias, final String innerVar) {
         assert var != null;
         this.var = var;
         this.alias = alias;
-        this.innerVar = innerVar;
     }
 
     public CypherVar getVar() {
@@ -34,10 +29,6 @@ public class AllPropertyValuesReturnStatement implements ReturnStatement {
     @Override
     public CypherVar getAlias() {
         return alias;
-    }
-
-    public String getInnerVar() {
-        return innerVar;
     }
 
     @Override
@@ -51,7 +42,7 @@ public class AllPropertyValuesReturnStatement implements ReturnStatement {
         if (this == o) return true;
         if (!(o instanceof AllPropertyValuesReturnStatement)) return false;
         AllPropertyValuesReturnStatement that = (AllPropertyValuesReturnStatement) o;
-        return var.equals(that.var) && Objects.equals(alias, that.alias) && innerVar.equals(that.innerVar);
+        return var.equals(that.var) && Objects.equals(alias, that.alias);
     }
 
     @Override

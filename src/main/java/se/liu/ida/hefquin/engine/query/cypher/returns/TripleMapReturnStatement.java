@@ -63,7 +63,8 @@ public class TripleMapReturnStatement implements ReturnStatement {
         if (this == o) return true;
         if (!(o instanceof TripleMapReturnStatement)) return false;
         TripleMapReturnStatement that = (TripleMapReturnStatement) o;
-        return source.equals(that.source) && edge.equals(that.edge) && target.equals(that.target) && alias.equals(that.alias);
+        return source.equals(that.source) && edge.equals(that.edge) && target.equals(that.target)
+                && Objects.equals(alias, that.alias);
     }
 
     @Override

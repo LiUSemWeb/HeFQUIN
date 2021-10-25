@@ -14,17 +14,12 @@ import java.util.Set;
 public class PropertyListReturnStatement implements ReturnStatement {
     private final CypherVar var;
     private final CypherVar alias;
-    private final String innerVar;
+    private final String innerVar = "k";
 
     public PropertyListReturnStatement(final CypherVar var, final CypherVar alias) {
-        this(var, alias, "k");
-    }
-
-    public PropertyListReturnStatement(final CypherVar var, final CypherVar alias, final String innerVar) {
         assert var != null;
         this.var = var;
         this.alias = alias;
-        this.innerVar = innerVar;
     }
 
     public CypherVar getVar() {
@@ -47,7 +42,7 @@ public class PropertyListReturnStatement implements ReturnStatement {
         if (this == o) return true;
         if (!(o instanceof PropertyListReturnStatement)) return false;
         PropertyListReturnStatement that = (PropertyListReturnStatement) o;
-        return var.equals(that.var) && Objects.equals(alias, that.alias) && Objects.equals(innerVar, that.innerVar);
+        return var.equals(that.var) && Objects.equals(alias, that.alias);
     }
 
     @Override

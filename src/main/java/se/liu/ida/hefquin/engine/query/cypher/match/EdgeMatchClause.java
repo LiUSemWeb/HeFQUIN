@@ -15,16 +15,14 @@ public class EdgeMatchClause implements MatchClause {
     protected final CypherVar sourceNode;
     protected final CypherVar targetNode;
     protected final CypherVar edge;
-    protected final String edgeLabel;
 
-    public EdgeMatchClause(final CypherVar sourceNode, final CypherVar targetNode, final CypherVar edge,
-                           final String edgeLabel) {
+    public EdgeMatchClause(final CypherVar sourceNode, final CypherVar edge, final CypherVar targetNode) {
         assert sourceNode != null;
+        assert edge != null;
         assert targetNode != null;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
         this.edge = edge;
-        this.edgeLabel = edgeLabel;
     }
 
     public CypherVar getSourceNode() {
@@ -39,10 +37,6 @@ public class EdgeMatchClause implements MatchClause {
         return edge;
     }
 
-    public String getEdgeLabel() {
-        return edgeLabel;
-    }
-
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
@@ -51,9 +45,6 @@ public class EdgeMatchClause implements MatchClause {
                 .append(")-[");
         if (edge != null)
             builder.append(edge.getName());
-        if (edgeLabel != null){
-            builder.append(":").append(edgeLabel);
-        }
         builder.append("]->(")
                 .append(targetNode.getName())
                 .append(")");
@@ -66,20 +57,16 @@ public class EdgeMatchClause implements MatchClause {
         if (!(o instanceof EdgeMatchClause)) return false;
         EdgeMatchClause that = (EdgeMatchClause) o;
         return sourceNode.equals(that.sourceNode) && targetNode.equals(that.targetNode)
-                && Objects.equals(edge, that.edge) && Objects.equals(edgeLabel, that.edgeLabel);
+                && Objects.equals(edge, that.edge);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceNode, targetNode, edge, edgeLabel);
+        return Objects.hash(sourceNode, targetNode, edge);
     }
 
     @Override
     public boolean isRedundantWith(final MatchClause match) {
-        if (match instanceof NodeMatchClause) {
-            final NodeMatchClause that = (NodeMatchClause) match;
-            return sourceNode.equals(that.node) || targetNode.equals(that.node);
-        }
         return this.equals(match);
     }
 

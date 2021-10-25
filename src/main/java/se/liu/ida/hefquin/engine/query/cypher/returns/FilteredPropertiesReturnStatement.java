@@ -14,22 +14,15 @@ import java.util.Set;
 public class FilteredPropertiesReturnStatement implements ReturnStatement {
     private final CypherVar var;
     private final CypherVar alias;
-    private final String innerVar;
+    private final String innerVar = "k";
     private final String filterValue;
 
-    public FilteredPropertiesReturnStatement(final CypherVar var, final CypherVar alias,
-                                             final String filterValue, final String innerVar) {
+    public FilteredPropertiesReturnStatement(final CypherVar var, final String filterValue, final CypherVar alias) {
         assert var != null;
         assert filterValue != null;
         this.var = var;
         this.alias = alias;
-        this.innerVar = innerVar;
         this.filterValue = filterValue;
-    }
-
-    public FilteredPropertiesReturnStatement(final CypherVar var, final CypherVar alias,
-                                             final String filterValue) {
-        this(var, alias, filterValue, "k");
     }
 
     public CypherVar getVar() {
@@ -39,10 +32,6 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement {
     @Override
     public CypherVar getAlias() {
         return alias;
-    }
-
-    public String getInnerVar() {
-        return innerVar;
     }
 
     public String getFilterValue() {
@@ -60,7 +49,7 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement {
         if (this == o) return true;
         if (!(o instanceof FilteredPropertiesReturnStatement)) return false;
         FilteredPropertiesReturnStatement that = (FilteredPropertiesReturnStatement) o;
-        return var.equals(that.var) && Objects.equals(alias, that.alias) && innerVar.equals(that.innerVar) && filterValue.equals(that.filterValue);
+        return var.equals(that.var) && Objects.equals(alias, that.alias) && filterValue.equals(that.filterValue);
     }
 
     @Override

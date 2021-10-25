@@ -20,28 +20,43 @@ public class CypherQueryUtils {
 
     /**
      * The combine methods merge the sets of match patterns, where conditions and return statements
-     * of two cypher queries. This method does not (as of yet) checks for the validity of the resulting queries.
+     * of two cypher queries. This method does not (as of yet) checks for the validity of the resulting
+     * queries (for instance, by checking that all the aliases used in the RETURN clause are different).
+     * However, the method avoids the introduction of conditions or return statements that use variables
+     * not already defined in the MATCH clauses of the query.
      * @param q1 a CypherQuery Object
      * @param q2 a CypherQuery Object
      * @return the combination of q1 and q2.
      */
     public static CypherMatchQuery combine(final CypherMatchQuery q1, final CypherMatchQuery q2) {
         List<MatchClause> matches = q1.getMatches();
-        final Set<MatchClause> redundant = new HashSet<>();
         for ( final MatchClause m1 : q1.getMatches() ) {
+            boolean redundant = false;
             for ( final MatchClause m2 : q2.getMatches() ) {
-                if (!matches.contains(m2)){
-                    matches.add(m2);
-                }
-                if (m2 instanceof NodeMatchClause && m1.isRedundantWith(m2)) {
-                    redundant.add(m2);
+                if (m1 instanceof NodeMatchClause && m1.isRedundantWith(m2)) {
+                    redundant = true;
+                    break;
                 }
             }
+            if (!redundant) {
+                matches.add(m1);
+            }
         }
-        matches.removeAll(redundant);
-        Set<CypherVar> matchVars = matches.stream().map(MatchClause::getVars)
+        for (final MatchClause m2 : q2.getMatches()) {
+            boolean redundant = false;
+            for (final MatchClause m : matches) {
+                if (m2 instanceof NodeMatchClause && m2.isRedundantWith(m)) {
+                    redundant = true;
+                    break;
+                }
+            }
+            if (!redundant && !matches.contains(m2)) {
+                matches.add(m2);
+            }
+        }
+        final Set<CypherVar> matchVars = matches.stream().map(MatchClause::getVars)
                 .flatMap(Set::stream).collect(Collectors.toSet());
-        List<WhereCondition> conditions = new ArrayList<>();
+        final List<WhereCondition> conditions = new ArrayList<>();
         for ( final WhereCondition c : q1.getConditions() ){
             if (!conditions.contains(c) && compatibleVars(c.getVars(), matchVars)) {
                 conditions.add(c);

@@ -17,7 +17,8 @@ public class NodeIDCondition implements WhereCondition {
     private final String nodeID;
 
     public NodeIDCondition(CypherVar var, String nodeID) {
-        assert var!= null;
+        assert var != null;
+        assert nodeID != null;
         this.var = var;
         this.nodeID = nodeID;
     }
