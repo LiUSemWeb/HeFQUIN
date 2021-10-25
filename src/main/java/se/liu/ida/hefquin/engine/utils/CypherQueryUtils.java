@@ -29,7 +29,7 @@ public class CypherQueryUtils {
      * @return the combination of q1 and q2.
      */
     public static CypherMatchQuery combine(final CypherMatchQuery q1, final CypherMatchQuery q2) {
-        List<MatchClause> matches = q1.getMatches();
+        final List<MatchClause> matches = new ArrayList<>();
         for ( final MatchClause m1 : q1.getMatches() ) {
             boolean redundant = false;
             for ( final MatchClause m2 : q2.getMatches() ) {
@@ -67,7 +67,7 @@ public class CypherQueryUtils {
                 conditions.add(c);
             }
         }
-        List<ReturnStatement> returns = new ArrayList<>();
+        final List<ReturnStatement> returns = new ArrayList<>();
         for ( final ReturnStatement r : q1.getReturnExprs() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
@@ -82,9 +82,9 @@ public class CypherQueryUtils {
     }
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherMatchQuery q2) {
-        List<CypherMatchQuery> union = new ArrayList<>();
+        final List<CypherMatchQuery> union = new ArrayList<>();
         for (final CypherMatchQuery q : q1.getUnion()) {
-            CypherMatchQuery combination = combine(q, q2);
+            final CypherMatchQuery combination = combine(q, q2);
             if (!union.contains(combination)) {
                 union.add(combination);
             }
@@ -97,10 +97,10 @@ public class CypherQueryUtils {
     }
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherUnionQuery q2) {
-        List<CypherMatchQuery> union = new ArrayList<>();
+        final List<CypherMatchQuery> union = new ArrayList<>();
         for (final CypherMatchQuery q3 : q1.getUnion()) {
             for (final CypherMatchQuery q4 : q2.getUnion()){
-                CypherMatchQuery combination = combine(q3, q4);
+                final CypherMatchQuery combination = combine(q3, q4);
                 if (!union.contains(combination)) {
                     union.add(combination);
                 }
