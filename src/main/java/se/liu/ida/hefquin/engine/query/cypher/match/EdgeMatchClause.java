@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Represents a directed path match statement
- * For example MATCH (x)-[e:label]->(y)
+ * Represents a directed path match statement. Conditions on the labels of the nodes or edges, as well as
+ * over property values of nodes or edges are managed through the WHERE clause.
+ * For example MATCH (x)-[e]->(y)
  */
 public class EdgeMatchClause implements MatchClause {
     protected final CypherVar sourceNode;

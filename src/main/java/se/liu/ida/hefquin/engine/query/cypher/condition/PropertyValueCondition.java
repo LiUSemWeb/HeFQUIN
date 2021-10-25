@@ -15,16 +15,14 @@ public class PropertyValueCondition implements WhereCondition {
     protected final CypherVar var;
     protected final String property;
     protected final String value;
-    protected final CypherVar alias;
 
-    public PropertyValueCondition(CypherVar var, String property, String value, CypherVar alias) {
+    public PropertyValueCondition(CypherVar var, String property, String value) {
         assert var != null;
         assert property != null;
         assert value != null;
         this.var = var;
         this.property = property;
         this.value = value;
-        this.alias = alias;
     }
 
     public CypherVar getVar() {
@@ -41,8 +39,7 @@ public class PropertyValueCondition implements WhereCondition {
 
     @Override
     public String toString() {
-        return var.getName() + "." + property + "=\"" + value +"\""
-                + (alias!=null? " AS "+ alias.getName() : "");
+        return var.getName() + "." + property + "=\"" + value +"\"";
     }
 
     @Override
@@ -50,13 +47,12 @@ public class PropertyValueCondition implements WhereCondition {
         if (this == o) return true;
         if (!(o instanceof PropertyValueCondition)) return false;
         PropertyValueCondition that = (PropertyValueCondition) o;
-        return var.equals(that.var) && property.equals(that.property) && value.equals(that.value)
-                && Objects.equals(alias, that.alias);
+        return var.equals(that.var) && property.equals(that.property) && value.equals(that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(var, property, value, alias);
+        return Objects.hash(var, property, value);
     }
 
     @Override
