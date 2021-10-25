@@ -43,10 +43,6 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
         return returnExprs;
     }
 
-    private boolean compatibleVars(Set<CypherVar> inVars, Set<CypherVar> currentVars) {
-        return currentVars.containsAll(inVars);
-    }
-
     @Override
     public Set<CypherVar> getMatchVars() {
         final Set<CypherVar> result = new HashSet<>();
