@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 
 public class IterativeImprovement implements QueryOptimizer {
 	
-	QueryOptimizationContext context;
+	protected final QueryOptimizationContext context;
 	LogicalToPhysicalPlanConverter converter;
 	CostModel costModel;
 	
