@@ -35,11 +35,10 @@ public class IterativeImprovement implements QueryOptimizer {
 		Double optimalCost;
 		try {
 			optimalCost = futureCost.get();
-		} catch(ExecutionException e1) {
-			throw new QueryOptimizationException("CompletableFuture throws ExecutionException!");
-		} catch(InterruptedException e2) {
-			throw new QueryOptimizationException("CompletableFuture throws InterruptedException!");
-			
+		} catch(final ExecutionException e) {
+			throw new QueryOptimizationException("CompletableFuture throws ExecutionException!", e);
+		} catch(final InterruptedException e) {
+			throw new QueryOptimizationException("CompletableFuture throws InterruptedException!", e);		
 		}
 		
 		// Optimization takes place here.
