@@ -15,6 +15,7 @@ public class IterativeImprovement implements QueryOptimizer {
 	CostModel costModel;
 	
 	public IterativeImprovement (final QueryOptimizationContext ctxt) {
+		assert ctxt != null;
 		context = ctxt;
 		converter = context.getLogicalToPhysicalPlanConverter();
 		costModel = context.getCostModel();
