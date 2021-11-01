@@ -88,10 +88,9 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		
 		Set<RuleApplication> ruleApplications = rewritingRule.determineAllPossibleApplications(initialPlan);
 		
-		// Assuming that forEach is the best way to iterate through a set, and that doing it is appropriate. Converting it to an array seems patently wasteful.
-		ruleApplications.forEach((e) -> {
-			resultList.add(e.getResultingPlan());
-		});
+		for ( final RuleApplication ra : ruleApplications ) {
+			resultList.add( ra.getResultingPlan() );
+		}
 		
 		return resultList;
 	}
