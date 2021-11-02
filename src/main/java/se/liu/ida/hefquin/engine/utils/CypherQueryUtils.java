@@ -1,17 +1,16 @@
 package se.liu.ida.hefquin.engine.utils;
 
-import se.liu.ida.hefquin.engine.query.CypherMatchQuery;
-import se.liu.ida.hefquin.engine.query.CypherUnionQuery;
-import se.liu.ida.hefquin.engine.query.cypher.CypherVar;
-import se.liu.ida.hefquin.engine.query.cypher.MatchClause;
-import se.liu.ida.hefquin.engine.query.cypher.ReturnStatement;
-import se.liu.ida.hefquin.engine.query.cypher.WhereCondition;
-import se.liu.ida.hefquin.engine.query.cypher.match.NodeMatchClause;
-import se.liu.ida.hefquin.engine.query.impl.CypherMatchQueryImpl;
-import se.liu.ida.hefquin.engine.query.impl.CypherUnionQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.ReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
