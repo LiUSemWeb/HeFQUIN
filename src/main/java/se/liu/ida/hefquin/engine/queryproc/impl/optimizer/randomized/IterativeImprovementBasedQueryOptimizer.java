@@ -59,7 +59,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		RewritingRule rwRule = null; // Eclipse suggested initiating this by adding the "= null". This doesn't seem quite right...
 		List<PhysicalPlan> neighbours = getNeighbours(optimalPlan,rwRule);
 		
-		List<CompletableFuture<Double>> futureNeighbourCosts = null; // Again, null suggested by Eclipse. Is this right?
+		List<CompletableFuture<Double>> futureNeighbourCosts = new ArrayList<>();
 		List<Double> neighbourCosts;
 		
 		while(true) {
