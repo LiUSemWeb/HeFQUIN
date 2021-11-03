@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 
-public class LPGEdgeValue {
+public class LPGEdgeValue implements Value {
 
     protected final LPGEdge edge;
 
