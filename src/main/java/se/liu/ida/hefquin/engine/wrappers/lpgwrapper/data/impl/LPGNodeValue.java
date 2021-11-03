@@ -1,0 +1,16 @@
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
+
+public class LPGNodeValue implements Value {
+
+    protected final LPGNode node;
+
+    public LPGNodeValue(final LPGNode node) {
+        this.node = node;
+    }
+
+    public LPGNode getNode() {
+        return node;
+    }
+}
