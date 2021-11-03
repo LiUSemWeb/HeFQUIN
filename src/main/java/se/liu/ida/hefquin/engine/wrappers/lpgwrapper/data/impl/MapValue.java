@@ -12,8 +12,7 @@ public class MapValue implements Value {
         this.values = values;
     }
 
-    @Override
-    public Object get() {
+    public Map<String, Object> getMap() {
         return values;
     }
 }

@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
-import java.util.Collection;
 import java.util.List;
 
 public class TableRecordImpl implements TableRecord {
@@ -15,7 +14,7 @@ public class TableRecordImpl implements TableRecord {
     }
 
     @Override
-    public Collection<RecordEntry> getRecordEntries() {
+    public Iterable<RecordEntry> getRecordEntries() {
         return entries;
     }
 }

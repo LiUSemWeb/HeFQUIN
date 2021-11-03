@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data;
 
-import java.util.Collection;
-
 /**
  * A record is a "row" of the results of the evaluation of a Cypher query.
  * Formally is a named tuple r=(a1: v1, ..., an: vn) where ai are names (variables)
@@ -14,5 +12,5 @@ public interface TableRecord {
     /**
      * Gets the collection of entries of the row/record.
      */
-    Collection<RecordEntry> getRecordEntries();
+    Iterable<RecordEntry> getRecordEntries();
 }
