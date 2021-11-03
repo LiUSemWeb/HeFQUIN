@@ -10,8 +10,7 @@ public class LPGNodeValue implements Value {
         this.node = node;
     }
 
-    @Override
-    public Object get() {
+    public LPGNode getNode() {
         return node;
     }
 }
