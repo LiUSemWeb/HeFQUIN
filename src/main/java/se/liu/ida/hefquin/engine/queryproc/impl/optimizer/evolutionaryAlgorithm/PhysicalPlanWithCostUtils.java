@@ -1,9 +1,31 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
+
+    public static List<PhysicalPlanWithCost> annotatePlansWithCost( final CostModel cost, final List<PhysicalPlan> plans ) throws QueryOptimizationException {
+        final Double[] costs;
+        try {
+            costs = CostEstimationUtils.getEstimates( cost, plans );
+        } catch ( final CostEstimationException e ) {
+            throw new QueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
+        }
+
+        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>();
+        for ( int i = 0; i < plans.size(); i++ ) {
+            plansWithCost.add( new PhysicalPlanWithCost( plans.get(i), costs[i] ) );
+        }
+
+        return plansWithCost;
+    }
 
     public static PhysicalPlanWithCost findPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
         PhysicalPlanWithCost bestPlan = plansWithCost.get(0);

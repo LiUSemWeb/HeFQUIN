@@ -4,11 +4,9 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
@@ -72,7 +70,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             ruleApps.remove( ruleApplication );
         }
 
-        return new Generation( annotatePlansWithCost(currentGen) );
+        return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), currentGen) );
     }
 
     protected Generation generateNextGen( final Generation currentGen, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
@@ -96,27 +94,11 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             }
         }
 
-        final List<PhysicalPlanWithCost> candidatesWithCost = annotatePlansWithCost( newCandidates );
+        final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), newCandidates );
         candidatesWithCost.addAll( currentGen.plans );
 
         // select the next generation from all candidates
         return new Generation( selectNextGenFromCandidates( candidatesWithCost ) );
-    }
-
-    protected List<PhysicalPlanWithCost> annotatePlansWithCost( final List<PhysicalPlan> plans ) throws QueryOptimizationException {
-        final Double[] costs;
-        try {
-            costs = CostEstimationUtils.getEstimates( ctxt.getCostModel(), plans );
-        } catch ( final CostEstimationException e ) {
-            throw new QueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
-        }
-
-        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>();
-        for ( int i = 0; i < plans.size(); i++ ) {
-            plansWithCost.add( new PhysicalPlanWithCost( plans.get(i), costs[i] ) );
-        }
-
-        return plansWithCost;
     }
 
     protected List<PhysicalPlanWithCost> selectNextGenFromCandidates( final List<PhysicalPlanWithCost> planWithCosts ) {
