@@ -15,7 +15,7 @@ public class TableRecordImpl implements TableRecord {
     }
 
     @Override
-    public Collection<RecordEntry> getRecords() {
+    public Collection<RecordEntry> getRecordEntries() {
         return entries;
     }
 }

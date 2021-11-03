@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
 
-import java.util.Collection;
 import java.util.Map;
 
 public class PropertyMapImpl implements PropertyMap {
@@ -21,12 +20,12 @@ public class PropertyMapImpl implements PropertyMap {
     }
 
     @Override
-    public Collection<String> getPropertyNames() {
+    public Iterable<String> getPropertyNames() {
         return properties.keySet();
     }
 
     @Override
-    public Collection<Value> getAllValues() {
+    public Iterable<Value> getAllValues() {
         return properties.values();
     }
 }

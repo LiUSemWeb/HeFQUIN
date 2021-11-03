@@ -12,4 +12,8 @@ public class ListValue implements Value {
         this.values = values;
     }
 
+    @Override
+    public Object get() {
+        return values;
+    }
 }

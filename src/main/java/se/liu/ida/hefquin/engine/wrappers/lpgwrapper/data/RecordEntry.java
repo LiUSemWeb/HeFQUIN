@@ -10,13 +10,11 @@ public interface RecordEntry {
 
     /**
      * Gets the name of the column
-     * @return a CypherVar
      */
     CypherVar getName();
 
     /**
      * Gets the value of the column in this entry
-     * @return a Value
      */
     Value getValue();
 }

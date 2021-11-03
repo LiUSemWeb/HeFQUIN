@@ -13,4 +13,16 @@ public class LPGEdge {
         this.label = label;
         this.properties = properties;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public PropertyMap getProperties() {
+        return properties;
+    }
 }

@@ -13,7 +13,6 @@ public interface TableRecord {
 
     /**
      * Gets the collection of entries of the row/record.
-     * @return a Collection of RecordEntry
      */
-    Collection<RecordEntry> getRecords();
+    Collection<RecordEntry> getRecordEntries();
 }

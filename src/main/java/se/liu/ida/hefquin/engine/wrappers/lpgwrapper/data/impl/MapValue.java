@@ -11,4 +11,9 @@ public class MapValue implements Value {
     public MapValue(final Map<String, Object> values) {
         this.values = values;
     }
+
+    @Override
+    public Object get() {
+        return values;
+    }
 }
