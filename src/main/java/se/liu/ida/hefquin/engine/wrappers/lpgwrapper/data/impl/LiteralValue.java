@@ -10,8 +10,7 @@ public class LiteralValue implements Value {
         this.internalValue = internalValue;
     }
 
-    @Override
-    public Object get() {
+    public Object getValue() {
         return internalValue;
     }
 }
