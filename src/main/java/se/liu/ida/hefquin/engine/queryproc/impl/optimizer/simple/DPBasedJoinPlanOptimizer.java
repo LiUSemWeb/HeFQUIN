@@ -46,7 +46,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase{
                     final List<PhysicalPlan> candidatePlans = new ArrayList<>();
                     for ( int index = 0 ; index < plans.length; index ++ ) {
                         final PhysicalPlan[] remainingPlans = ArrayUtils.remove( plans, index );
-                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( plans[index], (PhysicalPlan) optPlan.get(remainingPlans));
+                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( plans[index], optPlan.get(remainingPlans));
                         candidatePlans.add(newPlan);
                     }
 
@@ -62,7 +62,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase{
                     optPlan.put( plans, candidatePlans.get(indexOfBestPlan) );
                 }
             }
-            return (PhysicalPlan) optPlan.get(subplans);
+            return optPlan.get(subplans.toArray( new PhysicalPlan[subplans.size()] ));
         }
 
         protected List<PhysicalPlan[]> processSubsets( final int nums ) {
