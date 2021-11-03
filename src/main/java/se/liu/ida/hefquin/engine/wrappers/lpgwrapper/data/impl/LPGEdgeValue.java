@@ -10,8 +10,7 @@ public class LPGEdgeValue implements Value {
         this.edge = edge;
     }
 
-    @Override
-    public Object get() {
+    public LPGEdge getEdge() {
         return edge;
     }
 }
