@@ -46,4 +46,5 @@ public interface LPG2RDFConfiguration {
      * @return a String with the IRI
      */
     String getLabel();
+
 }
