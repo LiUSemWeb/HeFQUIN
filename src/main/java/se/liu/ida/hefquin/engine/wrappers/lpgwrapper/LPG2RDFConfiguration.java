@@ -69,7 +69,6 @@ public interface LPG2RDFConfiguration {
 
     /**
      * Returns the IRI Node of the property defined as u_label
-     * @return a String with the IRI
      */
     Node getLabel();
 
