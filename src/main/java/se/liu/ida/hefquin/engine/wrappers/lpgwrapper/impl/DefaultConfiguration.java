@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
@@ -13,8 +15,8 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     protected final String LABEL = "http://www.w3.org/2000/01/rdf-schema#Label";
 
     @Override
-    public String mapNode(final LPGNode node) {
-        return NS + NODE + node.getId();
+    public Node mapNode(final LPGNode node) {
+        return NodeFactory.createURI(NS + NODE + node.getId());
     }
 
     @Override
@@ -24,8 +26,8 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String mapNodeLabel(final String label) {
-        return NS + NODELABEL + label;
+    public Node mapNodeLabel(final String label) {
+        return NodeFactory.createURI(NS + NODELABEL + label);
     }
 
     @Override
@@ -34,8 +36,8 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String mapEdgeLabel(final String label) {
-        return NS + RELATIONSHIP + label;
+    public Node mapEdgeLabel(final String label) {
+        return NodeFactory.createURI(NS + RELATIONSHIP + label);
     }
 
     @Override
@@ -44,8 +46,8 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String mapProperty(final String property) {
-        return NS + PROPERTY + property;
+    public Node mapProperty(final String property) {
+        return NodeFactory.createURI(NS + PROPERTY + property);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String getLabel() {
-        return LABEL;
+    public Node getLabel() {
+        return NodeFactory.createURI(LABEL);
     }
 }
