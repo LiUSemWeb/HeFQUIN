@@ -49,10 +49,11 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                     final List<PhysicalPlan> candidatePlans = new ArrayList<>();
 
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
-                    splitIntoSubSets(plans).forEach(l->{
-                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get(l.object1), optPlan.get(l.object2) );
+                    final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
+                    for ( Pair p: candidatePairs ){
+                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get(p.object1), optPlan.get(p.object2) );
                         candidatePlans.add(newPlan);
-                    });
+                    }
 
                     // Prune: only the best candidate plan is retained in optPlan.
                     final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);

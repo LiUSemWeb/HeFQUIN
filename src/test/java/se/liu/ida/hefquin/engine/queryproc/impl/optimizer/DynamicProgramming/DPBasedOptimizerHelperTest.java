@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.DynamicProgramming;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.DPBasedJoinPlanOptimizer;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -46,11 +48,11 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
 
         assertEquals( 30, subsets.size() );
 
-        subsets.forEach(l->{
+        for ( Pair l: subsets ){
             System.out.println( l.object1 );
             System.out.println( l.object2 );
             System.out.println("--------");
-        });
+        }
     }
 
 }
