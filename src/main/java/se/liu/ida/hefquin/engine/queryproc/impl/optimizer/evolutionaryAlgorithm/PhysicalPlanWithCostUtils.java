@@ -19,7 +19,7 @@ public class PhysicalPlanWithCostUtils {
             throw new QueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
         }
 
-        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>();
+        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>( costs.length );
         for ( int i = 0; i < plans.size(); i++ ) {
             plansWithCost.add( new PhysicalPlanWithCost( plans.get(i), costs[i] ) );
         }
