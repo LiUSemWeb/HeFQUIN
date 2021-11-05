@@ -29,9 +29,8 @@ public interface LPG2RDFConfiguration {
     LPGNode unmapNode(final String iri);
 
     /**
-     * Returns an IRI for the given node label
+     * Returns an IRI or Literal for the given node label
      * @param label the label to be mapped
-     * @return a String with the IRI
      */
     String mapNodeLabel(final String label);
 
@@ -42,9 +41,8 @@ public interface LPG2RDFConfiguration {
     String unmapNodeLabel(final String label);
 
     /**
-     * Returns an IRI for a given edge label
+     * Returns an IRI or Literal for a given edge label
      * @param label the edge label to map
-     * @return a String with the IRI
      */
     String mapEdgeLabel(final String label);
 
