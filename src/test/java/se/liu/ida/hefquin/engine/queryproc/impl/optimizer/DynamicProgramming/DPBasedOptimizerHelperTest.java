@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.DynamicProgramming;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.DPBasedJoinPlanOptimizer;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     @Test
     public void getSubsets_1()
     {
-        final List<List<Integer>> subsets = DPBasedOptimizerHelper.getSubSet( list, 3 );
+        final List<List<Integer>> subsets = DPBasedJoinPlanOptimizer.getSubSet( list, 3 );
 
         assertEquals( 10, subsets.size() );
         subsets.forEach( System.out::println );
@@ -22,7 +23,7 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     @Test
     public void getSubsets_2()
     {
-        final List<List<Integer>> subsets = DPBasedOptimizerHelper.getSubSet( list, 0 );
+        final List<List<Integer>> subsets = DPBasedJoinPlanOptimizer.getSubSet( list, 0 );
 
         assertEquals( 1, subsets.size() );
         subsets.forEach( System.out::println );
@@ -31,7 +32,7 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     @Test
     public void getSubsets_3()
     {
-        final List<List<Integer>> subsets = DPBasedOptimizerHelper.getSubSet( list, 7 );
+        final List<List<Integer>> subsets = DPBasedJoinPlanOptimizer.getSubSet( list, 7 );
 
         assertEquals( 0, subsets.size() );
         subsets.forEach( System.out::println );
@@ -40,7 +41,7 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     @Test
     public void splitIntoTwoSubSets()
     {
-        final List<List<List<Integer>>> subsets = DPBasedOptimizerHelper.splitIntoSubSets(list);
+        final List<List<List<Integer>>> subsets = DPBasedJoinPlanOptimizer.splitIntoSubSets(list);
 
         assertEquals( 30, subsets.size() );
 
