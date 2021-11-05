@@ -42,7 +42,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
             for ( int num = 2; num < subplans.size(); num ++ ){
                 // Get all subsets with size num.
-                List<List<PhysicalPlan>> subsets = DPBasedOptimizerHelper.getSubSet( subplans, num);
+                final List<List<PhysicalPlan>> subsets = DPBasedOptimizerHelper.getSubSet(subplans, num);
 
                 for( final List<PhysicalPlan> plans : subsets ){
                     final List<PhysicalPlan> candidatePlans = new ArrayList<>();
