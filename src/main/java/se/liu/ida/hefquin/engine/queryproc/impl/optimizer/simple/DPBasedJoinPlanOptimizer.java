@@ -4,8 +4,8 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.PhysicalPlanWithCost;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.PhysicalPlanWithCostUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.*;

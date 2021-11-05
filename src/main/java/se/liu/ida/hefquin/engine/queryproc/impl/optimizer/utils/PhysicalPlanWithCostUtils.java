@@ -1,17 +1,16 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
 
-    public static List<PhysicalPlanWithCost> annotatePlansWithCost( final CostModel cost, final List<PhysicalPlan> plans ) throws QueryOptimizationException {
+    public static List<PhysicalPlanWithCost> annotatePlansWithCost(final CostModel cost, final List<PhysicalPlan> plans ) throws QueryOptimizationException {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates( cost, plans );

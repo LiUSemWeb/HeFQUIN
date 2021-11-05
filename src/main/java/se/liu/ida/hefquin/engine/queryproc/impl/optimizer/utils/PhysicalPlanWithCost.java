@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
