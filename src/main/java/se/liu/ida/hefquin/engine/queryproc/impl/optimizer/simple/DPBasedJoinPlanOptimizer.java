@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.PhysicalPlanWithCostUtils;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
         @Override
         public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
 
+            // Create a map that will be used to store the optimal plan for each subset of (sub)plans.
             final Map<List<PhysicalPlan>, PhysicalPlan> optPlan = new HashMap<>();
             for ( final PhysicalPlan plan: subplans ){
                 optPlan.put( new ArrayList<>(), plan );
@@ -48,7 +50,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     splitIntoSubSets(plans).forEach(l->{
-                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get(l.get(0)), optPlan.get(l.get(1)));
+                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get(l.object1), optPlan.get(l.object2) );
                         candidatePlans.add(newPlan);
                     });
 
@@ -98,10 +100,10 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
     }
 
     // Split a superset into two subsets. This method returns all possible combinations of subsets.
-    public static <T> List<List<List<T>>> splitIntoSubSets( final List<T> superset ){
+    public static <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset ){
         final List<List<T>> left = new ArrayList<>();
         final List<List<T>> right = new ArrayList<>();
-        final List<List<List<T>>> result = new ArrayList<>();
+        final List< Pair<List<T>, List<T>> > result = new ArrayList<>();
 
         left.add( new ArrayList<>() );
         right.add( new ArrayList<>(superset) );
@@ -118,7 +120,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                 right.add( rightClone );
 
                 if ( leftClone.size() != 0 && rightClone.size() != 0 )
-                    result.add( Arrays.asList( leftClone, rightClone ) );
+                    result.add( new Pair( leftClone, rightClone ) );
 
             }
         }
