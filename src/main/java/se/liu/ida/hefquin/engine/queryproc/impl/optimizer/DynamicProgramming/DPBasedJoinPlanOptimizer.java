@@ -37,8 +37,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
             final Map<List<PhysicalPlan>, PhysicalPlan> optPlan = new HashMap<>();
             for ( final PhysicalPlan plan: subplans ){
-                final List<PhysicalPlan> subplan= new ArrayList<>();
-                optPlan.put( subplan, plan);
+                optPlan.put( new ArrayList<>(), plan );
             }
 
             for ( int num = 2; num < subplans.size(); num ++ ){
