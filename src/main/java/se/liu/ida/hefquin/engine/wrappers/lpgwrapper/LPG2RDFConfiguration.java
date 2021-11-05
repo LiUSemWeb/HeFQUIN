@@ -57,7 +57,6 @@ public interface LPG2RDFConfiguration {
     /**
      * Returns an IRI Node for a given property
      * @param property the name of the property to map
-     * @return a String with the IRI
      */
     Node mapProperty(final String property);
 
