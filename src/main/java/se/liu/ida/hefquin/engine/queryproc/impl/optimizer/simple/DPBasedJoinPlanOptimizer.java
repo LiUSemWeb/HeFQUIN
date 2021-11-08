@@ -35,10 +35,11 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
         @Override
         public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
 
-            // Create a map that will be used to store the optimal plan for each subset of (sub)plans.
-            final Map<List<PhysicalPlan>, PhysicalPlan> optPlan = new HashMap<>();
+            // Create a data structure that will be used to store the optimal plan for each subset of (sub)plans.
+            final DataStructureForStoringPlansOfSubsets optPlan = new DataStructureForStoringPlansOfSubsets();
+
             for ( final PhysicalPlan plan: subplans ){
-                optPlan.put( new ArrayList<>(), plan );
+                optPlan.add( new ArrayList<>(), plan );
             }
 
             for ( int num = 2; num < subplans.size(); num ++ ){
@@ -51,14 +52,16 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
                     for ( Pair p: candidatePairs ){
-                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get(p.object1), optPlan.get(p.object2) );
+                        // TODO: add more options of joining two subplans
+                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get((List<PhysicalPlan>) p.object1), optPlan.get((List<PhysicalPlan>) p.object2) );
                         candidatePlans.add(newPlan);
                     }
 
                     // Prune: only the best candidate plan is retained in optPlan.
+                    // TODO: move cost annotation out of the for loop. Each time for all plans with the same size.
                     final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
                     final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
-                    optPlan.put( plans, planWithLowestCost );
+                    optPlan.add( plans, planWithLowestCost );
                 }
             }
             return optPlan.get( subplans );
