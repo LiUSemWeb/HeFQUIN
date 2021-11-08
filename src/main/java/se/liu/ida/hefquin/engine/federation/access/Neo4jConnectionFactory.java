@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
+import se.liu.ida.hefquin.engine.federation.access.utils.CypherUtils;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,11 +28,11 @@ public class Neo4jConnectionFactory {
             return URL;
         }
 
-        public String execute( final Neo4jRequest req ) throws Neo4JConnectionException {
-            return executeQuery( req.toString() );
+        public TableRecord execute(final Neo4jRequest req ) throws Neo4JConnectionException {
+            return executeQuery( req.getCypherQuery() );
         }
 
-        protected String executeQuery( final String cypher ) throws Neo4JConnectionException {
+        protected TableRecord executeQuery( final String cypher ) throws Neo4JConnectionException {
             final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +
@@ -47,7 +50,7 @@ public class Neo4jConnectionFactory {
             final HttpClient client = HttpClient.newHttpClient();
             try {
                 final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                return response.body();
+                return CypherUtils.parse(response.body());
             } catch ( final IOException e ) {
                 throw new Neo4JConnectionException("Data could not be sent to the server", e, this);
             } catch ( final InterruptedException e ) {

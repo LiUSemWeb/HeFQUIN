@@ -19,7 +19,7 @@ public interface FederationAccessManager
 
 	CompletableFuture<TPFResponse> issueRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
-	CompletableFuture<StringResponse> issueRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
+	CompletableFuture<RecordsResponse> issueRequest( Neo4jRequest req, Neo4jServer fm ) throws FederationAccessException;
 
 	/**
 	 * Requests the cardinality of the result of the given request.

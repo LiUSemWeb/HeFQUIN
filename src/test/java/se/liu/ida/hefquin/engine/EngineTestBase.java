@@ -41,7 +41,7 @@ public abstract class EngineTestBase
 	 * Change this flag to true if you also want to run the
 	 * unit tests that access servers on the actual Web.
 	 */
-	public static boolean skipLiveWebTests = true;
+	public static boolean skipLiveWebTests = false;
 
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
@@ -339,12 +339,12 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req,
+		public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req,
 		                                                       final Neo4jServer fm )
 				throws FederationAccessException
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
-			final StringResponse response = reqProc.performRequest(req, fm);
+			final RecordsResponse response = reqProc.performRequest(req, fm);
 			return CompletableFuture.completedFuture(response);
 		}
 
