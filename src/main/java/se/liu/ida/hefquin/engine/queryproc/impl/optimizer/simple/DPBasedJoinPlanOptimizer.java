@@ -1,9 +1,18 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
+import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
+import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -52,13 +61,34 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
                     for ( Pair p: candidatePairs ){
-                        // TODO: add more options of joining two subplans
-                        final PhysicalPlan newPlan = PhysicalPlanFactory.createPlanWithJoin( optPlan.get((List<PhysicalPlan>) p.object1), optPlan.get((List<PhysicalPlan>) p.object2) );
-                        candidatePlans.add(newPlan);
+                        final PhysicalPlan plan_left = optPlan.get((List<PhysicalPlan>) p.object1);
+                        final PhysicalPlan plan_right = optPlan.get((List<PhysicalPlan>) p.object2);
+
+                        candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
+
+                        if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( plan_left.getRootOperator() ) ){
+                            final LogicalOpBGPAdd newRoot = LogicalOpUtils.createBGPAddLopFromReq((BGPRequest) plan_left.getRootOperator());
+
+                            candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
+                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinFILTER( newRoot, plan_right ) );
+                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinUNION( newRoot, plan_right ) );
+                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinVALUES( newRoot, plan_right ) );
+                        }
+                        else if ( IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest( plan_left.getRootOperator() ) ){
+                            final LogicalOpTPAdd newRoot = LogicalOpUtils.createTPAddLopFromReq((TriplePatternRequest) plan_left.getRootOperator());
+                            candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
+
+                            final FederationMember fm = ( (LogicalOpRequest<?, ?>)plan_left.getRootOperator() ).getFederationMember();
+                            if ( fm instanceof SPARQLEndpoint ){
+                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinFILTER( newRoot, plan_right ) );
+                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinUNION( newRoot, plan_right ) );
+                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinVALUES( newRoot, plan_right ) );
+                            }
+                        }
                     }
 
                     // Prune: only the best candidate plan is retained in optPlan.
-                    // TODO: move cost annotation out of the for loop. Each time for all plans with the same size.
+                    // TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
                     final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
                     final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
                     optPlan.add( plans, planWithLowestCost );
