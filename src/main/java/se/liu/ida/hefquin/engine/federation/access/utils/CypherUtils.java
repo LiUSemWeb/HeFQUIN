@@ -18,7 +18,6 @@ import java.util.List;
 public class CypherUtils {
 
     public static List<TableRecord> parse(final String body) throws JsonProcessingException {
-        System.out.println(body);
         final ObjectMapper mapper = new ObjectMapper();
         final List<TableRecord> records = new LinkedList<>();
         final JsonNode root = mapper.readTree(body);
@@ -49,7 +48,6 @@ public class CypherUtils {
                 records.add(new TableRecordImpl(entries));
             }
         }
-        System.out.println(records);
         return records;
     }
 

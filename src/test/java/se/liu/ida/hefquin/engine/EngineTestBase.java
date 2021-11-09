@@ -41,7 +41,7 @@ public abstract class EngineTestBase
 	 * Change this flag to true if you also want to run the
 	 * unit tests that access servers on the actual Web.
 	 */
-	public static boolean skipLiveWebTests = false;
+	public static boolean skipLiveWebTests = true;
 
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
