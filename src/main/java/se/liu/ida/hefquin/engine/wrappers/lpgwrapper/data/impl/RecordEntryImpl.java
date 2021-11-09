@@ -23,4 +23,12 @@ public class RecordEntryImpl implements RecordEntry {
     public Value getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "name=" + name +
+                ", value=" + value +
+                '}';
+    }
 }

@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.StringResponseI
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
 import java.util.Date;
+import java.util.List;
 
 public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
 {
@@ -17,7 +18,7 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
     {
         final Date requestStartTime = new Date();
         final Neo4jConnectionFactory.Neo4jConnection conn = Neo4jConnectionFactory.connect(fm.getInterface().getURL());
-        final TableRecord result;
+        final List<TableRecord> result;
         try {
             result = conn.execute( req );
         }

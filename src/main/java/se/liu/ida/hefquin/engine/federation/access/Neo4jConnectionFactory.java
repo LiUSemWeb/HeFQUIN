@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 public class Neo4jConnectionFactory {
 
@@ -28,11 +29,11 @@ public class Neo4jConnectionFactory {
             return URL;
         }
 
-        public TableRecord execute(final Neo4jRequest req ) throws Neo4JConnectionException {
+        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JConnectionException {
             return executeQuery( req.getCypherQuery() );
         }
 
-        protected TableRecord executeQuery( final String cypher ) throws Neo4JConnectionException {
+        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JConnectionException {
             final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +

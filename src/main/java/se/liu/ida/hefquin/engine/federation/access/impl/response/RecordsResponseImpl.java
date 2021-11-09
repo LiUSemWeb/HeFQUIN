@@ -6,22 +6,23 @@ import se.liu.ida.hefquin.engine.federation.access.RecordsResponse;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
 import java.util.Date;
+import java.util.List;
 
 public class RecordsResponseImpl extends DataRetrievalResponseBase implements RecordsResponse {
 
-    protected final TableRecord response;
+    protected final List<TableRecord> response;
 
-    public RecordsResponseImpl(final TableRecord response, final FederationMember fm,
-                                  final DataRetrievalRequest request, final Date requestStartTime) {
+    public RecordsResponseImpl(final List<TableRecord> response, final FederationMember fm,
+                               final DataRetrievalRequest request, final Date requestStartTime) {
         super(fm, request, requestStartTime);
 
         assert response != null;
         this.response = response;
     }
 
-    public RecordsResponseImpl(final TableRecord response, final FederationMember fm,
-                                  final DataRetrievalRequest request, final Date requestStartTime,
-                                  final Date retrievalEndTime) {
+    public RecordsResponseImpl(final List<TableRecord> response, final FederationMember fm,
+                               final DataRetrievalRequest request, final Date requestStartTime,
+                               final Date retrievalEndTime) {
         super(fm, request, requestStartTime, retrievalEndTime);
 
         assert response != null;
@@ -29,7 +30,7 @@ public class RecordsResponseImpl extends DataRetrievalResponseBase implements Re
     }
 
     @Override
-    public TableRecord getResponse() {
+    public List<TableRecord> getResponse() {
         return response;
     }
 }

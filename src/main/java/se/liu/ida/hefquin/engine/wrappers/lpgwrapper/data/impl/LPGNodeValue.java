@@ -13,4 +13,9 @@ public class LPGNodeValue implements Value {
     public LPGNode getNode() {
         return node;
     }
+
+    @Override
+    public String toString() {
+        return node.toString();
+    }
 }

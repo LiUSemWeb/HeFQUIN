@@ -17,4 +17,9 @@ public class TableRecordImpl implements TableRecord {
     public Iterable<RecordEntry> getRecordEntries() {
         return entries;
     }
+
+    @Override
+    public String toString() {
+        return entries.toString();
+    }
 }
