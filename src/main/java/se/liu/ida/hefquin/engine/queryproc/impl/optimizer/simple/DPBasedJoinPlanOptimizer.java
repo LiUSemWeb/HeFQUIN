@@ -60,7 +60,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
-                    for ( Pair p: candidatePairs ){
+                    for ( final Pair p: candidatePairs ) {
                         final PhysicalPlan plan_left = optPlan.get((List<PhysicalPlan>) p.object1);
                         final PhysicalPlan plan_right = optPlan.get((List<PhysicalPlan>) p.object2);
 
