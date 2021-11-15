@@ -43,6 +43,12 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
+	/**
+	 * If this flag is true, tests that make requests to local neo4j
+	 * instances will be skipped.
+	 */
+	public static boolean skipLocalNeo4jTests = true;
+
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
 	                              final String expectedURIforV1, final Var v1,

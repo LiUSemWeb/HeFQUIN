@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access.utils;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;

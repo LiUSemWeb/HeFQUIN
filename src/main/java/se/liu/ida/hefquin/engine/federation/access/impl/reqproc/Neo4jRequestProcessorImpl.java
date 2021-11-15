@@ -25,6 +25,9 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
         catch ( final Neo4JConnectionException ex ) {
             throw new FederationAccessException("Executing the given request at the Neo4j endpoint at '"
                     + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
+        } catch (Neo4JException ex) {
+            throw new FederationAccessException("Executing the given request at the Neo4j endpoint at '"
+                    + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
         }
         return new RecordsResponseImpl(result, fm, req, requestStartTime);
     }

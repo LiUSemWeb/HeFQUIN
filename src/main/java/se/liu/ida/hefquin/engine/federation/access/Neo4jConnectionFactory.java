@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.federation.access.utils.CypherUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
 import java.io.IOException;
@@ -29,11 +30,11 @@ public class Neo4jConnectionFactory {
             return URL;
         }
 
-        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JConnectionException {
+        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JConnectionException, Neo4JException {
             return executeQuery( req.getCypherQuery() );
         }
 
-        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JConnectionException {
+        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JConnectionException, Neo4JException {
             final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +
@@ -49,13 +50,19 @@ public class Neo4jConnectionFactory {
                     .build();
 
             final HttpClient client = HttpClient.newHttpClient();
+            HttpResponse<String> response;
             try {
-                final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                return CypherUtils.parse(response.body());
+                response = client.send(request, HttpResponse.BodyHandlers.ofString());
             } catch ( final IOException e ) {
                 throw new Neo4JConnectionException("Data could not be sent to the server", e, this);
             } catch ( final InterruptedException e ) {
                 throw new Neo4JConnectionException("Neo4j server could not be reached.", e, this);
+            }
+            try {
+                return CypherUtils.parse(response.body());
+            } catch (JsonProcessingException e) {
+                throw new Neo4JConnectionException("Neo4j server responded a malformed or unexpected JSON object",
+                        e, this);
             }
         }
     }
