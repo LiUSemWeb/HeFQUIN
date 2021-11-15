@@ -10,7 +10,7 @@ import java.util.*;
 
 public class RecordEntryFactory {
     public static RecordEntry create(final JsonNode col, final JsonNode metaCol, final CypherVar name) {
-        Value val;
+        final Value val;
         final JsonNode type = metaCol.get("type");
         if (type != null) {
             if (type.asText().equals("node")) {
