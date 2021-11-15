@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
@@ -19,12 +18,12 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	
 	protected final QueryOptimizationContext context;
-	protected final int iterations;
+	StoppingConditionForIterativeImprovement condition;
 	
-	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, final int x) {
+	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, StoppingConditionForIterativeImprovement x) {
 		assert ctxt != null;
 		context = ctxt;
-		iterations = x;
+		condition = x;
 	}
 	
 	
@@ -66,9 +65,10 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		
 		boolean improvementFound;
 		
-		for(int y = 0; y < iterations; y++) {
+		while(!condition.readyToStop()) {
 			
 			// assigning a """random""" starting position to currentPlan is to take place here.
+			// The randomized plan generator is to be used here.
 			
 			while(true) {
 				neighbours = getNeighbours(currentPlan,rwRule);
