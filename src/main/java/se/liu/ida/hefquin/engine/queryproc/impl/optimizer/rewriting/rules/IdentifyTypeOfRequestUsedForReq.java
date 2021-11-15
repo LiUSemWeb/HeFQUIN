@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
@@ -40,6 +41,20 @@ public class IdentifyTypeOfRequestUsedForReq {
     public static boolean isGraphPatternRequest( final LogicalOperator lop ) {
         if( lop instanceof LogicalOpRequest){
             return ( (LogicalOpRequest<?, ?>) lop ).getRequest() instanceof SPARQLRequest;
+        }
+        return false;
+    }
+
+    public static boolean isBGPRequestOverSPARQLEndpoint( final PhysicalOperator op ) {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
+
+        return isBGPRequestOverSPARQLEndpoint(lop);
+    }
+
+    public static boolean isBGPRequestOverSPARQLEndpoint( final LogicalOperator lop ) {
+        if ( isBGPRequest(lop) ){
+            final FederationMember fm = ( (LogicalOpRequest<?, ?>)lop ).getFederationMember();
+            return fm instanceof SPARQLEndpoint;
         }
         return false;
     }
