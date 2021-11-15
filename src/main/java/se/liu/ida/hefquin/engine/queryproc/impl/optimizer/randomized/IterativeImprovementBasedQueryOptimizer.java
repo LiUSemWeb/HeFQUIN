@@ -30,11 +30,12 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	
 	@Override
 	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
+	}
 
-		final LogicalToPhysicalPlanConverter converter = context.getLogicalToPhysicalPlanConverter();
-
+	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
 		// The best plan we have found so far. As we have only found one plan, it is the best one so far.
-		PhysicalPlan bestPlan = converter.convert(initialPlan, false);
+		PhysicalPlan bestPlan = initialPlan;
 		PhysicalPlan currentPlan = bestPlan; // This variable will hold the plan which is currently being worked on.
 		
 		// Creating the completable future.
