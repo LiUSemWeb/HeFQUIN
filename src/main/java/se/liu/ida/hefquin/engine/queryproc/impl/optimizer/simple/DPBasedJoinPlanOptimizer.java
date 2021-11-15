@@ -60,13 +60,17 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
-                    for ( final Pair p: candidatePairs ) {
-                        final PhysicalPlan plan_left = optPlan.get((List<PhysicalPlan>) p.object1);
-                        final PhysicalPlan plan_right = optPlan.get((List<PhysicalPlan>) p.object2);
+                    for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> p: candidatePairs ) {
+                        final PhysicalPlan plan_left = optPlan.get( p.object1 );
+                        final PhysicalPlan plan_right = optPlan.get( p.object2 );
+
+                        if( plan_left == null || plan_right == null ) {
+                            throw new IllegalStateException( "No query plan is recorded for the subsets." );
+                        }
 
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
 
-                        if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( plan_left.getRootOperator() ) ){
+                        if ( IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint( plan_left.getRootOperator() ) ){
                             final LogicalOpBGPAdd newRoot = LogicalOpUtils.createBGPAddLopFromReq((BGPRequest) plan_left.getRootOperator());
 
                             candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
@@ -102,8 +106,11 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
     // This method returns all subsets (with the given size) of the given superset.
     public static <T> List<List<T>> getSubSet( final List<T> superset, final int n ){
         final List<List<T>> result = new ArrayList<>();
-        if( n==0 ){
-            result.add( new ArrayList<>() );
+        if ( n < 1 || n > superset.size() ) {
+            throw new IllegalArgumentException("Does not support to get subsets with less than one element or containing more than the total number of elements in the superset (length of subset: " + n + ").");
+        }
+        else if ( n == superset.size() ) {
+            result.add( superset );
             return result;
         }
 
@@ -135,6 +142,10 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
     // Split a superset into two subsets. This method returns all possible combinations of subsets.
     public static <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset ){
+        if ( superset.size() < 2 ){
+            throw new IllegalArgumentException("Cannot divide a set of length less than two into two non-empty subsets. (length: " + superset.size() + ").");
+        }
+
         final List<List<T>> left = new ArrayList<>();
         final List<List<T>> right = new ArrayList<>();
         final List< Pair<List<T>, List<T>> > result = new ArrayList<>();

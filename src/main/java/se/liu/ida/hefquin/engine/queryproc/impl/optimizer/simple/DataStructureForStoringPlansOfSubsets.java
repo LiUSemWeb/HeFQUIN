@@ -10,13 +10,23 @@ public class DataStructureForStoringPlansOfSubsets {
     protected Map< Integer, Map<List<PhysicalPlan>, PhysicalPlan> > map=new HashMap<>();
 
     public void add( final List<PhysicalPlan> subsets, final PhysicalPlan plan ) {
-        final int size=subsets.size();
-        map.putIfAbsent( size, new HashMap<>() );
-        map.get(size).put(subsets, plan);
+        final int size = subsets.size();
+        final Map<List<PhysicalPlan>, PhysicalPlan> mapValue = map.get(size);
+
+        if ( mapValue == null)
+            map.put( size, new HashMap<>() );
+        else
+            mapValue.put( subsets, plan );
     }
 
     public PhysicalPlan get( final List<PhysicalPlan> subsets ) {
-        return map.get(subsets.size()).getOrDefault( subsets,null );
+        final Map<List<PhysicalPlan>, PhysicalPlan> mapValue = map.get(subsets.size());
+
+        if ( mapValue == null)
+            return null;
+        else
+            return mapValue.get( subsets );
+
     }
 
 }
