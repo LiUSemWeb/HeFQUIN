@@ -50,7 +50,7 @@ public class Neo4jConnectionFactory {
                     .build();
 
             final HttpClient client = HttpClient.newHttpClient();
-            HttpResponse<String> response;
+            final HttpResponse<String> response;
             try {
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
             } catch ( final IOException e ) {
