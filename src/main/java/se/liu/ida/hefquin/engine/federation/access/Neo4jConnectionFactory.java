@@ -30,11 +30,11 @@ public class Neo4jConnectionFactory {
             return URL;
         }
 
-        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JConnectionException, Neo4JException {
+        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JException {
             return executeQuery( req.getCypherQuery() );
         }
 
-        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JConnectionException, Neo4JException {
+        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JException {
             final String data = "{\n" +
                     "  \"statements\" : [ {\n" +
                     "    \"statement\" : \""+cypher+"\",\n" +
@@ -61,8 +61,7 @@ public class Neo4jConnectionFactory {
             try {
                 return CypherUtils.parse(response.body());
             } catch ( final JsonProcessingException e ) {
-                throw new Neo4JConnectionException("Neo4j server responded a malformed or unexpected JSON object",
-                        e, this);
+                throw new Neo4JException("Neo4j server responded a malformed or unexpected JSON object", e);
             }
         }
     }
