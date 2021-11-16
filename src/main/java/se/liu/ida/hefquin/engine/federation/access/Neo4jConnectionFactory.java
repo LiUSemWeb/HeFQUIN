@@ -60,7 +60,7 @@ public class Neo4jConnectionFactory {
             }
             try {
                 return CypherUtils.parse(response.body());
-            } catch (JsonProcessingException e) {
+            } catch ( final JsonProcessingException e ) {
                 throw new Neo4JConnectionException("Neo4j server responded a malformed or unexpected JSON object",
                         e, this);
             }
