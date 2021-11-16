@@ -21,19 +21,10 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.StringResponse;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.RecordsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -202,9 +193,8 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req,
-		                                                       final Neo4jServer fm ) {
-			// TODO Auto-generated method stub
+		public CompletableFuture<RecordsResponse> issueRequest(final Neo4jRequest req,
+															   final Neo4jServer fm ) {
 			return null;
 		}
 

@@ -8,16 +8,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
-import se.liu.ida.hefquin.engine.federation.access.StringResponse;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager 
@@ -60,7 +51,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 
 	@Override
-	public CompletableFuture<StringResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm)
+	public CompletableFuture<RecordsResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm)
 			throws FederationAccessException 
 	{
 		return fedAccMan.issueRequest(req, fm);

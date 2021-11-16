@@ -13,4 +13,9 @@ public class LPGEdgeValue implements Value {
     public LPGEdge getEdge() {
         return edge;
     }
+
+    @Override
+    public String toString() {
+        return edge.toString();
+    }
 }

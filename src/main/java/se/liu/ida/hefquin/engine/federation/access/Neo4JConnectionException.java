@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access;
 
 import se.liu.ida.hefquin.engine.federation.access.Neo4jConnectionFactory.Neo4jConnection;
 
-public class Neo4JConnectionException extends Exception
+public class Neo4JConnectionException extends Neo4JException
 {
 	private static final long serialVersionUID = 6639819875154327577L;
 
@@ -28,13 +28,6 @@ public class Neo4JConnectionException extends Exception
     public Neo4JConnectionException( final Throwable cause,
                                      final Neo4jConnection conn ) {
         super(cause);
-
-        assert conn != null;
-        this.conn = conn;
-    }
-
-    public Neo4JConnectionException( final Neo4jConnection conn ) {
-        super();
 
         assert conn != null;
         this.conn = conn;

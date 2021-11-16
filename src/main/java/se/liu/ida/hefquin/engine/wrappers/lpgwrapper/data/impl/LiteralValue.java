@@ -13,4 +13,9 @@ public class LiteralValue implements Value {
     public Object getValue() {
         return internalValue;
     }
+
+    @Override
+    public String toString() {
+        return internalValue.toString();
+    }
 }

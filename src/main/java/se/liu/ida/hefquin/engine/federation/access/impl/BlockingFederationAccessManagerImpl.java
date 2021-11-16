@@ -53,10 +53,10 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req, final Neo4jServer fm )
+	public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req, final Neo4jServer fm )
 			throws FederationAccessException
 	{
-		final StringResponse response = reqProcNeo4j.performRequest(req, fm);
+		final RecordsResponse response = reqProcNeo4j.performRequest(req, fm);
 		return CompletableFuture.completedFuture(response);
 	}
 

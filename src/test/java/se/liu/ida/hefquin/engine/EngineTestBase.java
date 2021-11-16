@@ -43,6 +43,12 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
+	/**
+	 * If this flag is true, tests that make requests to local neo4j
+	 * instances will be skipped.
+	 */
+	public static boolean skipLocalNeo4jTests = true;
+
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
 	                              final String expectedURIforV1, final Var v1,
@@ -339,12 +345,12 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<StringResponse> issueRequest( final Neo4jRequest req,
+		public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req,
 		                                                       final Neo4jServer fm )
 				throws FederationAccessException
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();
-			final StringResponse response = reqProc.performRequest(req, fm);
+			final RecordsResponse response = reqProc.performRequest(req, fm);
 			return CompletableFuture.completedFuture(response);
 		}
 

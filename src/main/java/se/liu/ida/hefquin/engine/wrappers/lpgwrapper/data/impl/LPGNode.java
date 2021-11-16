@@ -25,4 +25,11 @@ public class LPGNode {
     public PropertyMap getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "LPGNode{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }
