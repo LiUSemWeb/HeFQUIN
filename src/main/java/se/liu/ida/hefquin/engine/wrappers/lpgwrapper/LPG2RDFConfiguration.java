@@ -71,4 +71,13 @@ public interface LPG2RDFConfiguration {
      */
     Node getLabel();
 
+    boolean mapsToProperty(final Node n);
+
+    boolean isLabelIRI(final Node n);
+
+    boolean mapsToLabel(final Node n);
+
+    boolean mapsToRelationship(final Node n);
+
+    boolean mapsToNode(final Node n);
 }

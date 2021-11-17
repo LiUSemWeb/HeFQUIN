@@ -59,4 +59,29 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     public Node getLabel() {
         return NodeFactory.createURI(LABEL);
     }
+
+    @Override
+    public boolean mapsToProperty(final Node n) {
+        return n.isURI() && n.getURI().startsWith(NS + PROPERTY);
+    }
+
+    @Override
+    public boolean isLabelIRI(final Node n) {
+        return n.isURI() && n.getURI().equals(LABEL);
+    }
+
+    @Override
+    public boolean mapsToLabel(final Node n) {
+        return n.isURI() && n.getURI().startsWith(NS + NODELABEL);
+    }
+
+    @Override
+    public boolean mapsToRelationship(final Node n) {
+        return n.isURI() && n.getURI().startsWith(NS + RELATIONSHIP);
+    }
+
+    @Override
+    public boolean mapsToNode(final Node n) {
+        return n.isURI() && n.getURI().startsWith(NS + NODE);
+    }
 }
