@@ -32,7 +32,7 @@ public class LabelsReturnStatement implements ReturnStatement {
 
     @Override
     public String toString() {
-        return "labels(" + node.getName() + ")" + (alias != null? " AS " + alias.getName() : "");
+        return "head(labels(" + node.getName() + "))" + (alias != null? " AS " + alias.getName() : "");
     }
 
     @Override
