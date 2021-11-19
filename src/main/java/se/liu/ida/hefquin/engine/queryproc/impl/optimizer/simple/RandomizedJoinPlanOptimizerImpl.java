@@ -74,12 +74,8 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 
 			int indexOfRandomPlan = this.random.nextInt(subplans.size());
 			final PhysicalPlan nextPlan = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(indexOfRandomPlan));
-			// Instead of creating a whole array of plans, create one.
-			
-			subplans.remove(indexOfRandomPlan);
-			// Remove the old subplan.
-			
-			return nextPlan; // Return the created plan.
+			subplans.remove(indexOfRandomPlan);			
+			return nextPlan;
 		}
 		
 	}
