@@ -21,8 +21,9 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	protected final StoppingConditionForIterativeImprovement condition;
 
 	
-	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, StoppingConditionForIterativeImprovement x) {
+	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, final StoppingConditionForIterativeImprovement x) {
 		assert ctxt != null;
+		assert x != null;
 		context = ctxt;
 		condition = x;
 	}
