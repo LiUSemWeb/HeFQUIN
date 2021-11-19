@@ -71,8 +71,7 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		protected PhysicalPlan addNextRandomJoin( final PhysicalPlan currentPlan )
 				throws QueryOptimizationException
 		{
-
-			int indexOfRandomPlan = this.random.nextInt(subplans.size());
+			final int indexOfRandomPlan = random.nextInt(subplans.size());
 			final PhysicalPlan nextPlan = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(indexOfRandomPlan));
 			subplans.remove(indexOfRandomPlan);			
 			return nextPlan;
