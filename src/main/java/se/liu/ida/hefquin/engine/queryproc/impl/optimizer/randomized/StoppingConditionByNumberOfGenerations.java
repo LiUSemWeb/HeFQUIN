@@ -17,10 +17,6 @@ public class StoppingConditionByNumberOfGenerations implements StoppingCondition
 		// As the stopping condition is for the iterative improvement algorithm, we know that it it is checked once per loop.
 		// We can thus increment the current number of generations every time this is called.
 		generations += 1;
-		if(generations > generationThreshold) {
-			return true;
-		} else {
-			return false;
-		}
+		return (generations > generationThreshold);
 	}
 }
