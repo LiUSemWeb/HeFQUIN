@@ -51,10 +51,7 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		
 
 		/**
-		 * Chooses the first subplan.
-		 * Instead of the best plan chosen by Greedy, this method picks a completely random plan.
-		 * @return
-		 * @throws QueryOptimizationException
+		 * Returns one of the subplans which is picked at random.
 		 */
 		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
 			int indexOfRandomPlan = this.random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
