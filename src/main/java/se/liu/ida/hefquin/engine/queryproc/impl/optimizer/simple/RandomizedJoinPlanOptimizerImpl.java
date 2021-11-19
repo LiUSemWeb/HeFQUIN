@@ -54,7 +54,7 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		 * Returns one of the subplans which is picked at random.
 		 */
 		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
-			int indexOfRandomPlan = this.random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
+			final int indexOfRandomPlan = random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
 
 			final PhysicalPlan randomPlan = subplans.get(indexOfRandomPlan);
 			subplans.remove(indexOfRandomPlan);
