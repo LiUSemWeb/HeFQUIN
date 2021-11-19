@@ -18,7 +18,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplicat
 public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	
 	protected final QueryOptimizationContext context;
-	StoppingConditionForIterativeImprovement condition;
+	protected final StoppingConditionForIterativeImprovement condition;
+
 	
 	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, StoppingConditionForIterativeImprovement x) {
 		assert ctxt != null;
