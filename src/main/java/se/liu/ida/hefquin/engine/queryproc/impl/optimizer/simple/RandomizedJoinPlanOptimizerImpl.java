@@ -18,7 +18,7 @@ public class RandomizedJoinPlanOptimizerImpl extends JoinPlanOptimizerBase {
 		/**
 		 * The class contains a random seed object.
 		 */
-		Random random;
+		protected final Random random = new Random();
 		
 		/**
 		 * Have a list of subplans.
