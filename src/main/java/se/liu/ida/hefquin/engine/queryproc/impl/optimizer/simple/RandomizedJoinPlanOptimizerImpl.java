@@ -29,7 +29,8 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 	
 
 	@Override
-	public PhysicalPlan determineJoinPlan(List<PhysicalPlan> subplans) throws QueryOptimizationException {
+	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans ) throws QueryOptimizationException {
+
 
 		int indexOfRandomPlan = random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
 
