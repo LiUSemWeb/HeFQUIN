@@ -69,8 +69,8 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		
 		while(!condition.readyToStop()) {
 			
-			// assigning a """random""" starting position to currentPlan is to take place here.
-			// The randomized plan generator is to be used here.
+			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
+			
 			
 			while(true) {
 				neighbours = getNeighbours(currentPlan,rwRule);
