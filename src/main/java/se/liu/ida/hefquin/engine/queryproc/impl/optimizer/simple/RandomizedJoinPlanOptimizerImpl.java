@@ -14,11 +14,8 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 	 */
 	protected final Random random = new Random();
 	
-	
 	@Override
 	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans ) throws QueryOptimizationException {
-
-
 		int indexOfRandomPlan = random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
 
 		PhysicalPlan currentPlan = subplans.get(indexOfRandomPlan); // Picks out one plan to be the first, at random.
