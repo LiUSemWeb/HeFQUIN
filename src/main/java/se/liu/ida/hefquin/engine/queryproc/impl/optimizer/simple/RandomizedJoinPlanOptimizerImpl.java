@@ -25,7 +25,6 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 	 */
 	public RandomizedJoinPlanOptimizerImpl( final List<PhysicalPlan> subplans ) {
 		this.subplans = subplans;
-		this.random = new Random(); // Generates the random seed.
 	}
 	
 
