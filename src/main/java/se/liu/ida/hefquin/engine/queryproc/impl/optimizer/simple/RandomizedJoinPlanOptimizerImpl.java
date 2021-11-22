@@ -14,20 +14,7 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 	 */
 	protected final Random random = new Random();
 	
-	/**
-	 * Have a list of subplans.
-	 */
-	protected final List<PhysicalPlan> subplans;
 	
-	/**
-	 *  When initializing the algorithm, start with the given list of subplans.
-	 *  @param subplans
-	 */
-	public RandomizedJoinPlanOptimizerImpl( final List<PhysicalPlan> subplans ) {
-		this.subplans = subplans;
-	}
-	
-
 	@Override
 	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans ) throws QueryOptimizationException {
 
