@@ -11,9 +11,8 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 	
 	/**
 	 * The class contains a random seed object.
-	 * This cannot be marked final (compilation error if so).
 	 */
-	protected Random random = new Random();
+	protected final Random random = new Random();
 	
 	/**
 	 * Have a list of subplans.
