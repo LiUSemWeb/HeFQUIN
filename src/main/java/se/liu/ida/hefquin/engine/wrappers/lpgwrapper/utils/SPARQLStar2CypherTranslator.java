@@ -415,7 +415,7 @@ public class SPARQLStar2CypherTranslator {
         );
     }
 
-    private static class CypherVarGenerator {
+    protected static class CypherVarGenerator {
 
         private final Map<String, CypherVar> innerVars = new HashMap<>();
         private final Map<String, CypherVar> retVars = new HashMap<>();
