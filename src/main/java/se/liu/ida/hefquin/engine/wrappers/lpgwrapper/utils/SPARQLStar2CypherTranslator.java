@@ -446,7 +446,7 @@ public class SPARQLStar2CypherTranslator {
             final CypherVar source = new CypherVar("src" + edgeCount);
             final CypherVar edge = new CypherVar("edge" + edgeCount);
             final CypherVar target = new CypherVar("tgt" + edgeCount);
-            final List<CypherVar> vars = new ArrayList<>();
+            final List<CypherVar> vars = new ArrayList<>(3);
             vars.add(source);
             vars.add(edge);
             vars.add(target);
