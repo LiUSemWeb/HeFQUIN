@@ -12,14 +12,15 @@ import java.util.Set;
  * For example, n:Person
  */
 public class NodeLabelCondition implements WhereCondition {
-    private final CypherVar var;
-    private final String clazz;
 
-    public NodeLabelCondition(final CypherVar var, final String clazz) {
+    private final CypherVar var;
+    private final String label;
+
+    public NodeLabelCondition(final CypherVar var, final String label) {
         assert var != null;
-        assert clazz != null;
+        assert label != null;
         this.var = var;
-        this.clazz = clazz;
+        this.label = label;
     }
 
     public CypherVar getVar() {
@@ -27,12 +28,12 @@ public class NodeLabelCondition implements WhereCondition {
     }
 
     public String getCypherClass() {
-        return clazz;
+        return label;
     }
 
     @Override
     public String toString() {
-        return var.getName() + ":" + clazz;
+        return var.getName() + ":" + label;
     }
 
     @Override
@@ -40,12 +41,12 @@ public class NodeLabelCondition implements WhereCondition {
         if (this == o) return true;
         if (!(o instanceof NodeLabelCondition)) return false;
         NodeLabelCondition that = (NodeLabelCondition) o;
-        return var.equals(that.var) && clazz.equals(that.clazz);
+        return var.equals(that.var) && label.equals(that.label);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(var, clazz);
+        return Objects.hash(var, label);
     }
 
     @Override

@@ -15,28 +15,35 @@ public class CypherQueryBuilder {
     private final List<WhereCondition> conditions;
     private final List<ReturnStatement> returns;
 
-    private CypherQueryBuilder() {
+    public CypherQueryBuilder() {
         this.matches = new ArrayList<>();
         this.conditions = new ArrayList<>();
         this.returns = new ArrayList<>();
     }
 
-    public static CypherQueryBuilder newBuilder() {
-        return new CypherQueryBuilder();
-    }
-
-    public CypherQueryBuilder match(final MatchClause match) {
+    public CypherQueryBuilder addMatch(final MatchClause match) {
         this.matches.add(match);
         return this;
     }
 
-    public CypherQueryBuilder condition(final WhereCondition condition) {
+    public CypherQueryBuilder addCondition(final WhereCondition condition) {
         this.conditions.add(condition);
         return this;
     }
 
-    public CypherQueryBuilder returns(final ReturnStatement ret) {
+    public CypherQueryBuilder addReturn(final ReturnStatement ret) {
         this.returns.add(ret);
+        return this;
+    }
+
+    public CypherQueryBuilder add(final Object clause) {
+        if (clause instanceof MatchClause) {
+            this.addMatch((MatchClause) clause);
+        } else if (clause instanceof WhereCondition) {
+            this.addCondition((WhereCondition) clause);
+        } else if (clause instanceof ReturnStatement) {
+            this.addReturn((ReturnStatement) clause);
+        }
         return this;
     }
 

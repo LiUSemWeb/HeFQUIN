@@ -25,6 +25,13 @@ public interface LPG2RDFConfiguration {
     Node mapNode(final LPGNode node);
 
     /**
+     * Checks if the given node is the mapping of an
+     * LPG Node using this configuration
+     * @param n the Node to be tested
+     */
+    boolean mapsToNode(final Node n);
+
+    /**
      * Returns the corresponding LPGNode of a given IRI
      * @param iri the IRI to be unmapped
      */
@@ -37,16 +44,30 @@ public interface LPG2RDFConfiguration {
     Node mapNodeLabel(final String label);
 
     /**
+     * Checks if the given node is the mapping of a
+     * Node Label using this configuration
+     * @param n the Node to be tested
+     */
+    boolean mapsToLabel(final Node n);
+
+    /**
      * Returns the original node label for the given mapped label
      * @param label the mapped IRI or literal of a node label
      */
-    String unmapNodeLabel(final String label);
+    String unmapNodeLabel(final Node label);
 
     /**
      * Returns an IRI or Literal Node for a given edge label
      * @param label the edge label to map
      */
     Node mapEdgeLabel(final String label);
+
+    /**
+     * Checks if the given node is the mapping of an
+     * Edge Label using this configuration
+     * @param n the Node to be tested
+     */
+    boolean mapsToEdgeLabel(final Node n);
 
     /**
      * Returns the original edge label for the given mapped label
@@ -61,6 +82,13 @@ public interface LPG2RDFConfiguration {
     Node mapProperty(final String property);
 
     /**
+     * Checks if the given node is the mapping of a property using
+     * this configuration or not.
+     * @param n the Node to be tested
+     */
+    boolean mapsToProperty(final Node n);
+
+    /**
      * Returns the original property name of the given mapped IRI
      * @param iri the mapped IRI of a property
      */
@@ -71,13 +99,11 @@ public interface LPG2RDFConfiguration {
      */
     Node getLabel();
 
-    boolean mapsToProperty(final Node n);
-
+    /**
+     * Checks if the given node is equal to the
+     * Label IRI of this configuration or not.
+     * @param n the Node to be tested
+     */
     boolean isLabelIRI(final Node n);
 
-    boolean mapsToLabel(final Node n);
-
-    boolean mapsToRelationship(final Node n);
-
-    boolean mapsToNode(final Node n);
 }

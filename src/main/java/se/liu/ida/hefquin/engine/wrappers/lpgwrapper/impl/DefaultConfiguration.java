@@ -31,8 +31,9 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String unmapNodeLabel(String label) {
-        return label.replaceAll(NS + NODELABEL, "");
+    public String unmapNodeLabel(final Node label) {
+        final String text = label.isURI()? label.getURI() : label.getLiteralValue().toString();
+        return text.replaceAll(NS + NODELABEL, "");
     }
 
     @Override
@@ -76,7 +77,7 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public boolean mapsToRelationship(final Node n) {
+    public boolean mapsToEdgeLabel(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + RELATIONSHIP);
     }
 

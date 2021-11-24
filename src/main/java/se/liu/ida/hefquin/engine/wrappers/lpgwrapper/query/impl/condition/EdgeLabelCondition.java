@@ -9,21 +9,21 @@ import java.util.Set;
 public class EdgeLabelCondition implements WhereCondition {
 
     private final CypherVar var;
-    private final String clazz;
+    private final String label;
 
-    public EdgeLabelCondition( final CypherVar var, final String clazz ) {
+    public EdgeLabelCondition( final CypherVar var, final String label ) {
         assert var!= null;
-        assert clazz != null;
+        assert label != null;
         this.var = var;
-        this.clazz = clazz;
+        this.label = label;
     }
 
     public CypherVar getVar() {
         return var;
     }
 
-    public String getClazz() {
-        return clazz;
+    public String getLabel() {
+        return label;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class EdgeLabelCondition implements WhereCondition {
 
     @Override
     public String toString() {
-        return var.getName()+":"+clazz;
+        return var.getName()+":"+ label;
     }
 
     @Override
@@ -41,11 +41,11 @@ public class EdgeLabelCondition implements WhereCondition {
         if (this == o) return true;
         if (!(o instanceof EdgeLabelCondition)) return false;
         EdgeLabelCondition that = (EdgeLabelCondition) o;
-        return var.equals(that.var) && clazz.equals(that.clazz);
+        return var.equals(that.var) && label.equals(that.label);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(var, clazz);
+        return Objects.hash(var, label);
     }
 }
