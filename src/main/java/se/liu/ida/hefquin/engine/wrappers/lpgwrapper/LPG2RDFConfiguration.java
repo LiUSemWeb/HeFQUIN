@@ -19,20 +19,18 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public interface LPG2RDFConfiguration {
 
     /**
-     * Returns a Jena Node for the given LPGNode object.
-     * @param node the LPGNode node to be mapped
+     * Returns a URI or a blank node (in the form of a Jena {@link Node} object) for the given LPG node.
      */
     Node mapNode(final LPGNode node);
 
     /**
-     * Checks if the given node is the mapping of an
-     * LPG Node using this configuration
-     * @param n the Node to be tested
+     * Returns true if the given RDF term is in the image of the mapNode function and, thus, in the domain of the unmapNode function.
      */
     boolean mapsToNode(final Node n);
 
     /**
-     * Returns the corresponding LPGNode of a given Jena Node
+     * Returns the LPG node that corresponds to the given RDF term.
+     * This function is the inverse of mapNode. As such, it is defined only for the RDF terms that may be returned by the mapNode function and, thus, throws an {@link IllegalArgumentException} if any other RDF term is given to it.
      */
     LPGNode unmapNode(final Node node);
 
