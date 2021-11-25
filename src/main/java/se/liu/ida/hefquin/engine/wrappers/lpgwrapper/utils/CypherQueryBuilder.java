@@ -43,6 +43,8 @@ public class CypherQueryBuilder {
             this.addCondition((WhereCondition) clause);
         } else if (clause instanceof ReturnStatement) {
             this.addReturn((ReturnStatement) clause);
+        } else {
+            throw new IllegalArgumentException("Provided object is not a CypherQuery Clause");
         }
         return this;
     }

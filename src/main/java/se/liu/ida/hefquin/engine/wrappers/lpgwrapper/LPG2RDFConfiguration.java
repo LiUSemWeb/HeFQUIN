@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public interface LPG2RDFConfiguration {
 
     /**
-     * Returns an IRI Node for the given node identifier.
+     * Returns a Jena Node for the given LPGNode object.
      * @param node the id of the node to be mapped
      */
     Node mapNode(final LPGNode node);
@@ -32,14 +32,13 @@ public interface LPG2RDFConfiguration {
     boolean mapsToNode(final Node n);
 
     /**
-     * Returns the corresponding LPGNode of a given IRI
-     * @param iri the IRI to be unmapped
+     * Returns the corresponding LPGNode of a given Jena Node
      */
-    LPGNode unmapNode(final String iri);
+    LPGNode unmapNode(final Node node);
 
     /**
-     * Returns an IRI or Literal Node for the given node label
-     * @param label the label to be mapped
+     * Returns a Jena Node for the given node label
+     * @param label the node label to be mapped
      */
     Node mapNodeLabel(final String label);
 
@@ -52,12 +51,12 @@ public interface LPG2RDFConfiguration {
 
     /**
      * Returns the original node label for the given mapped label
-     * @param label the mapped IRI or literal of a node label
+     * @param node the mapped Jena Node of a node label
      */
-    String unmapNodeLabel(final Node label);
+    String unmapNodeLabel(final Node node);
 
     /**
-     * Returns an IRI or Literal Node for a given edge label
+     * Returns a Jena Node for a given edge label
      * @param label the edge label to map
      */
     Node mapEdgeLabel(final String label);
@@ -71,12 +70,12 @@ public interface LPG2RDFConfiguration {
 
     /**
      * Returns the original edge label for the given mapped label
-     * @param label the mapped IRI or literal of an edge label
+     * @param node the mapped Jena Node of an edge label
      */
-    String unmapEdgeLabel(final String label);
+    String unmapEdgeLabel(final Node node);
 
     /**
-     * Returns an IRI Node for a given property
+     * Returns a Jena Node for a given property
      * @param property the name of the property to map
      */
     Node mapProperty(final String property);
@@ -90,18 +89,18 @@ public interface LPG2RDFConfiguration {
 
     /**
      * Returns the original property name of the given mapped IRI
-     * @param iri the mapped IRI of a property
+     * @param node the mapped Jena Node of a property
      */
-    String unmapProperty(final String iri);
+    String unmapProperty(final Node node);
 
     /**
-     * Returns the IRI Node of the property defined as u_label
+     * Returns the Jena Node of the property defined as u_label
      */
     Node getLabel();
 
     /**
      * Checks if the given node is equal to the
-     * Label IRI of this configuration or not.
+     * Label Node of this configuration or not.
      * @param n the Node to be tested
      */
     boolean isLabelIRI(final Node n);

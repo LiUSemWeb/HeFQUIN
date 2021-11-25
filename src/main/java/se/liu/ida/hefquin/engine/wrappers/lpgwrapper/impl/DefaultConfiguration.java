@@ -20,8 +20,12 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public LPGNode unmapNode(String iri) {
-        final String id = iri.replaceAll(NS + NODE, "");
+    public LPGNode unmapNode(final Node node) {
+        if (!node.isURI())
+            throw new IllegalArgumentException("Default configuration only accepts URI Node mappings");
+        if (!node.getURI().startsWith(NS + NODELABEL))
+            throw new IllegalArgumentException("The provided URI is not mapping a Node");
+        final String id = node.getURI().replaceAll(NS + NODE, "");
         return new LPGNode(id, "", null);
     }
 
@@ -31,12 +35,12 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String unmapNodeLabel(final Node label) {
-        if (!label.isURI())
+    public String unmapNodeLabel(final Node node) {
+        if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Node Labels");
-        if (!label.getURI().startsWith(NS + NODELABEL))
+        if (!node.getURI().startsWith(NS + NODELABEL))
             throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
-        return label.getURI().replaceAll(NS + NODELABEL, "");
+        return node.getURI().replaceAll(NS + NODELABEL, "");
     }
 
     @Override
@@ -45,8 +49,12 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String unmapEdgeLabel(String label) {
-        return label.replaceAll(NS + RELATIONSHIP, "");
+    public String unmapEdgeLabel(final Node node) {
+        if (!node.isURI())
+            throw new IllegalArgumentException("Default configuration only accepts URI Edge Labels");
+        if (!node.getURI().startsWith(NS + RELATIONSHIP))
+            throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
+        return node.getURI().replaceAll(NS + RELATIONSHIP, "");
     }
 
     @Override
@@ -55,8 +63,12 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     }
 
     @Override
-    public String unmapProperty(String iri) {
-        return iri.replaceAll(NS + PROPERTY, "");
+    public String unmapProperty(final Node node) {
+        if (!node.isURI())
+            throw new IllegalArgumentException("Default configuration only accepts URI Property mappings");
+        if (!node.getURI().startsWith(NS + PROPERTY))
+            throw new IllegalArgumentException("The provided URI is not mapping a Property");
+        return node.getURI().replaceAll(NS + PROPERTY, "");
     }
 
     @Override

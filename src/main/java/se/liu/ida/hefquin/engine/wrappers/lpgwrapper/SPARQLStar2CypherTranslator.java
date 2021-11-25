@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
-import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 
 public interface SPARQLStar2CypherTranslator {
