@@ -23,7 +23,7 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     public LPGNode unmapNode(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Node mappings");
-        if (!node.getURI().startsWith(NS + NODELABEL))
+        if (!node.getURI().startsWith(NS + NODE))
             throw new IllegalArgumentException("The provided URI is not mapping a Node");
         final String id = node.getURI().replaceAll(NS + NODE, "");
         return new LPGNode(id, "", null);
