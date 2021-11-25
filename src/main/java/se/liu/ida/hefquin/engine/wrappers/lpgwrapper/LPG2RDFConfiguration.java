@@ -20,7 +20,7 @@ public interface LPG2RDFConfiguration {
 
     /**
      * Returns a Jena Node for the given LPGNode object.
-     * @param node the id of the node to be mapped
+     * @param node the LPGNode node to be mapped
      */
     Node mapNode(final LPGNode node);
 
