@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -14,6 +15,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	
@@ -44,17 +47,18 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		CompletableFuture<Double> futureCost = costModel.initiateCostEstimation(bestPlan);
 
 		// Get the cost.
-		// localMinimum = best cost among all neighbours. For it to be a local minimum, none of its neighbours can have a lower cost.
-		Double localMinimum;
+		// currentCost = best cost among all neighbours. For it to be a local minimum, none of its neighbours can have a lower cost.
+		Double currentCost;
 		try {
-			localMinimum = futureCost.get();
+			currentCost = futureCost.get();
 		} catch(final ExecutionException e) {
 			throw new QueryOptimizationException("CompletableFuture throws ExecutionException!", e);
 		} catch(final InterruptedException e) {
 			throw new QueryOptimizationException("CompletableFuture throws InterruptedException!", e);		
 		}
 		// bestCost = best possible cost out of everything that the algorithm has found.
-		Double bestCost = localMinimum;
+		Double initialCost = currentCost;
+		Double bestCost = currentCost;
 		
 		// Optimization takes place here.
 		// Given the one starting state, find a local minimum.
@@ -62,53 +66,47 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		RewritingRule rwRule = null;
 		List<PhysicalPlan> neighbours;
 		
-		List<CompletableFuture<Double>> futureNeighbourCosts;
-		List<Double> neighbourCosts;
+		Double[] neighbourCosts;
+		List<Pair<PhysicalPlan,Double>> betterPlans = new ArrayList<>();
+		Pair<PhysicalPlan,Double> betterPlan = null;
+		Random rng = new Random();
 		
 		boolean improvementFound;
+		int generation = 0;
 		
-		while(!condition.readyToStop()) {
+		while(!condition.readyToStop(generation)) { // Currently only handles generation number as a stopping condition!
 			
 			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
-			
+			currentPlan = initialPlan;
+			currentCost = initialCost;
 			
 			while(true) {
+				generation += 1;
+				
 				neighbours = getNeighbours(currentPlan,rwRule);
-				futureNeighbourCosts = new ArrayList<>();
-				neighbourCosts = new ArrayList<>();
+				neighbourCosts = CostEstimationUtils.getEstimates(costModel, neighbours);
 				improvementFound = false;
 				
-				for (final PhysicalPlan pp : neighbours) {
-					futureNeighbourCosts.add(costModel.initiateCostEstimation(pp));
-				} // doing a similar loop to the one you showed be for RuleApplications. Does this guarantee that it will be in order?
-				
-				// instead of adding it in the same loop, another loop will be used to get the cost. This should improve performance due to multithreading.
-				for (final CompletableFuture<Double> cf : futureNeighbourCosts) {
-					try {
-						neighbourCosts.add(cf.get());
-					} catch(final ExecutionException e) {
-						throw new QueryOptimizationException("CompletableFuture throws ExecutionException!", e);
-					} catch(final InterruptedException e) {
-						throw new QueryOptimizationException("CompletableFuture throws InterruptedException!", e);		
-					}
-				}
-				
 				// Using a for-loop in order to have the index for which neighbouring plan to pick.
-				for (int x = 0; x < neighbourCosts.size(); x++) {
-					if(neighbourCosts.get(x) < localMinimum) { // Since it's a list, iterating through the list once in the loop is probably better than using get, but I'm having this as a stop-gap measure until I've properly figured out Java lists.
+				for (int x = 0; x < neighbourCosts.length; x++) {
+					if(neighbourCosts[x] < currentCost) { // Since it's a list, iterating through the list once in the loop is probably better than using get, but I'm having this as a stop-gap measure until I've properly figured out Java lists.
 						improvementFound = true;
-						currentPlan = neighbours.get(x);
-						localMinimum = neighbourCosts.get(x);
+						betterPlan = new Pair<PhysicalPlan, Double>(neighbours.get(x), neighbourCosts[x]);
+						betterPlans.add(betterPlan); // I haven't figured out how to do this properly for Java yet, but it will be solved by the PhysicalPlanWithCost anyway.
 					}
 				}
 				
 				if(!improvementFound) {
 					break; // break the loop if no improvement is found. This means that we have found a local minimum.
+				} else {
+					betterPlan = betterPlans.get(rng.nextInt(betterPlans.size())); // Get a random object.
+					currentPlan = betterPlan.object1;
+					currentCost = betterPlan.object2;
 				}
 			}
 			
-			if(localMinimum < bestCost) {
-				bestCost = localMinimum;
+			if(currentCost < bestCost) {
+				bestCost = currentCost;
 				bestPlan = currentPlan;
 			}
 		}
