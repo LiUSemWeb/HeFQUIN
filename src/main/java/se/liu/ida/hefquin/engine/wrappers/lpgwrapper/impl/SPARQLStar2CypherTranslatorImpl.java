@@ -21,7 +21,7 @@ import java.util.*;
 
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
-    public CypherQuery translateTriplePattern(final TriplePatternImpl tp, final LPG2RDFConfiguration conf) {
+    public CypherQuery translateTriplePattern(final TriplePattern tp, final LPG2RDFConfiguration conf) {
         return translateTriplePattern(tp, conf, new CypherVarGenerator(), new HashSet<>());
     }
 

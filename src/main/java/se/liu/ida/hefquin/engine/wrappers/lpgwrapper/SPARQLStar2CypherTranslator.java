@@ -9,5 +9,5 @@ public interface SPARQLStar2CypherTranslator {
      * Translates the given Triple Pattern into a Cypher query, using a given LPG2RDFConfiguration.
      * If the Triple Pattern is incompatible with the configuration, this method returns null.
      */
-    CypherQuery translateTriplePattern(final TriplePatternImpl tp, final LPG2RDFConfiguration conf);
+    CypherQuery translateTriplePattern(final TriplePattern tp, final LPG2RDFConfiguration conf);
 }
