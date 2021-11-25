@@ -19,56 +19,88 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public interface LPG2RDFConfiguration {
 
     /**
-     * Returns an IRI Node for the given node identifier.
-     * @param node the id of the node to be mapped
+     * Returns a URI or a blank node (in the form of a Jena {@link Node} object) for the given LPG node.
      */
     Node mapNode(final LPGNode node);
 
     /**
-     * Returns the corresponding LPGNode of a given IRI
-     * @param iri the IRI to be unmapped
+     * Returns true if the given RDF term is in the image of the mapNode function and, thus, in the domain of the unmapNode function.
      */
-    LPGNode unmapNode(final String iri);
+    boolean mapsToNode(final Node n);
 
     /**
-     * Returns an IRI or Literal Node for the given node label
-     * @param label the label to be mapped
+     * Returns the LPG node that corresponds to the given RDF term.
+     * This function is the inverse of mapNode. As such, it is defined only for the RDF terms that may be returned by the mapNode function and, thus, throws an {@link IllegalArgumentException} if any other RDF term is given to it.
+     */
+    LPGNode unmapNode(final Node node);
+
+    /**
+     * Returns a Jena Node for the given node label
+     * @param label the node label to be mapped
      */
     Node mapNodeLabel(final String label);
 
     /**
-     * Returns the original node label for the given mapped label
-     * @param label the mapped IRI or literal of a node label
+     * Checks if the given node is the mapping of a
+     * Node Label using this configuration
+     * @param n the Node to be tested
      */
-    String unmapNodeLabel(final String label);
+    boolean mapsToLabel(final Node n);
 
     /**
-     * Returns an IRI or Literal Node for a given edge label
+     * Returns the original node label for the given mapped label
+     * @param node the mapped Jena Node of a node label
+     */
+    String unmapNodeLabel(final Node node);
+
+    /**
+     * Returns a Jena Node for a given edge label
      * @param label the edge label to map
      */
     Node mapEdgeLabel(final String label);
 
     /**
-     * Returns the original edge label for the given mapped label
-     * @param label the mapped IRI or literal of an edge label
+     * Checks if the given node is the mapping of an
+     * Edge Label using this configuration
+     * @param n the Node to be tested
      */
-    String unmapEdgeLabel(final String label);
+    boolean mapsToEdgeLabel(final Node n);
 
     /**
-     * Returns an IRI Node for a given property
+     * Returns the original edge label for the given mapped label
+     * @param node the mapped Jena Node of an edge label
+     */
+    String unmapEdgeLabel(final Node node);
+
+    /**
+     * Returns a Jena Node for a given property
      * @param property the name of the property to map
      */
     Node mapProperty(final String property);
 
     /**
-     * Returns the original property name of the given mapped IRI
-     * @param iri the mapped IRI of a property
+     * Checks if the given node is the mapping of a property using
+     * this configuration or not.
+     * @param n the Node to be tested
      */
-    String unmapProperty(final String iri);
+    boolean mapsToProperty(final Node n);
 
     /**
-     * Returns the IRI Node of the property defined as u_label
+     * Returns the original property name of the given mapped IRI
+     * @param node the mapped Jena Node of a property
+     */
+    String unmapProperty(final Node node);
+
+    /**
+     * Returns the Jena Node of the property defined as u_label
      */
     Node getLabel();
+
+    /**
+     * Checks if the given node is equal to the
+     * Label Node of this configuration or not.
+     * @param n the Node to be tested
+     */
+    boolean isLabelIRI(final Node n);
 
 }
