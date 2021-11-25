@@ -343,7 +343,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar ovar = gen.getVarFor(o);
         if (certainNodes.contains(o)){
             return new CypherQueryBuilder()
-                    //this rule in the paper uses pvar and ovar, not annonimous vars so this query can't be reused
+                    //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .addMatch(new EdgeMatchClause(a1, pvar, ovar))
                     .addCondition(new NodeIDCondition(a1, node.getId()))
                     .addReturn(new VariableReturnStatement(pvar, gen.getRetVar(p)))

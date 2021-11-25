@@ -32,8 +32,11 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
 
     @Override
     public String unmapNodeLabel(final Node label) {
-        final String text = label.isURI()? label.getURI() : label.getLiteralValue().toString();
-        return text.replaceAll(NS + NODELABEL, "");
+        if (!label.isURI())
+            throw new IllegalArgumentException("Default configuration only accepts URI Node Labels");
+        if (!label.getURI().startsWith(NS + NODELABEL))
+            throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
+        return label.getURI().replaceAll(NS + NODELABEL, "");
     }
 
     @Override
