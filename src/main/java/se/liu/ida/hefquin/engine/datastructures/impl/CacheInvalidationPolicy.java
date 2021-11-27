@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.datastructures.impl;
 
 /**
- * Interfaces for classes that determine whether cache entries are
+ * Interface for classes that determine whether cache entries are
  * still valid. Entries that are not valid anymore can be evicted
  * from the corresponding cache for which this policy is used.
  */

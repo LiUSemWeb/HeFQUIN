@@ -46,10 +46,10 @@ public interface Cache<IdType,ObjectType>
 	boolean evict(IdType id);
 
 	/**
-	 * If the given object is associated with the given ID in this cache,
-	 * then this object is evicted from the cache and the method returns
-	 * <code>true</true>. If there is another object associated with the
-	 * ID, or none at all, the method returns <code>false</true>.
+	 * If an object equivalent to the given one is associated with the given
+	 * ID in this cache, then this object is evicted from the cache and the
+	 * method returns <code>true</true>. If there is another object associated
+	 * with the ID, or none at all, the method returns <code>false</true>.
 	 * 
 	 * Calling this method may also have the side effect that other objects
 	 * are evicted from the cache, depending on the invalidation policy of

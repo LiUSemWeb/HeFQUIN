@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.engine.datastructures.impl;
 
-public interface CachePolicies<EntryType extends CacheEntry<ObjectType>,ObjectType>
+public interface CachePolicies<IdType,
+                               ObjectType,
+                               EntryType extends CacheEntry<ObjectType>>
 {
+	CacheEntryFactory<EntryType, ObjectType> getEntryFactory();
+	CacheReplacementPolicyFactory<IdType,ObjectType,EntryType> getReplacementPolicyFactory();
 	CacheInvalidationPolicy<EntryType,ObjectType> getInvalidationPolicy();
-	CacheReplacementPolicy<EntryType,ObjectType> getReplacementPolicy();
 }
