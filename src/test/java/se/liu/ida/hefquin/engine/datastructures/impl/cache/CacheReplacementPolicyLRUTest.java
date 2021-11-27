@@ -10,7 +10,7 @@ public class CacheReplacementPolicyLRUTest
 {
 	@Test
 	public void getEvictionCandidatesTest() {
-		final CacheReplacementPolicy<Integer,String,MyEntryType> p = new CacheReplacementPolicyLRU<>();
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
 		p.entryWasAdded(1, null);
 		p.entryWasAdded(2, null);
 		p.entryWasAdded(3, null);
@@ -39,7 +39,7 @@ public class CacheReplacementPolicyLRUTest
 
 	@Test
 	public void entryWasEvictedTest() {
-		final CacheReplacementPolicy<Integer,String,MyEntryType> p = new CacheReplacementPolicyLRU<>();
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
 		p.entryWasAdded(1, null);
 		p.entryWasAdded(2, null);
 		p.entryWasAdded(3, null);
@@ -86,7 +86,7 @@ public class CacheReplacementPolicyLRUTest
 
 	@Test
 	public void entryWasRequestedTest() {
-		final CacheReplacementPolicy<Integer,String,MyEntryType> p = new CacheReplacementPolicyLRU<>();
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
 		p.entryWasAdded(1, null);
 		p.entryWasAdded(2, null);
 		p.entryWasAdded(3, null);
@@ -136,7 +136,7 @@ public class CacheReplacementPolicyLRUTest
 
 	@Test
 	public void clearTest() {
-		final CacheReplacementPolicy<Integer,String,MyEntryType> p = new CacheReplacementPolicyLRU<>();
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
 		p.entryWasAdded(1, null);
 		p.entryWasAdded(2, null);
 		p.entryWasAdded(3, null);
@@ -145,12 +145,6 @@ public class CacheReplacementPolicyLRUTest
 
 		final Iterator<Integer> it = p.getEvictionCandidates(1).iterator();
 		assertFalse( it.hasNext() );
-	}
-
-	public static class MyEntryType extends CacheEntryBase<String> {
-		public MyEntryType(final String obj) {
-			super(obj);
-		}
 	}
 
 }
