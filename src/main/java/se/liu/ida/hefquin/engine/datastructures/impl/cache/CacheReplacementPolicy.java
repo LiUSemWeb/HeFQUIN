@@ -8,11 +8,16 @@ public interface CacheReplacementPolicy<IdType,
                                         EntryType extends CacheEntry<ObjectType>>
 {
 	/**
-	 * Tries to determine the given number of cache entries that can be evicted
-	 * from the cache. These cache entries are identified by the corresponding
-	 * ID with which they are associated in the cache. The method may return
-	 * fewer than the given number of candidates (e.g., if there are not enough
-	 * entries).
+	 * Tries to determine the given number of cache entries as next
+	 * candidates to be evicted from the cache. The candidates are
+	 * identified by the corresponding ID with which these entries
+	 * are associated in the cache. While the identified entries are
+	 * considered as candidates, they are not yet considered to be
+	 * evicted (once they are, the cache will inform the replacement
+	 * policy by calling {@link #entryWasEvicted(Object)}.
+	 * 
+	 * This method may not return as many candidates as requests,
+	 * (e.g., if there are not enough entries).
 	 */
 	Iterable<IdType> getEvictionCandidates(int numberOfCandidates);
 

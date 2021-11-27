@@ -17,16 +17,10 @@ public class CacheReplacementPolicyLRU<IdType,
 	@Override
 	public Iterable<IdType> getEvictionCandidates( final int numberOfCandidates ) {
 		final List<IdType> result = new ArrayList<>();
-		int i = 0;
-		while ( i < numberOfCandidates && head != null ) {
-			final IdNode oldHead = head;
-			result.add(oldHead.id);
-
-			head = oldHead.next;
-			oldHead.next = null;
-
-			if ( head != null )
-				head.prev = null;
+		IdNode n = head;
+		while ( result.size() < numberOfCandidates && n != null ) {
+			result.add(n.id);
+			n = n.next;
 		}
 		return result;
 	}
