@@ -22,10 +22,18 @@ public interface CacheReplacementPolicy<IdType,
 	Iterable<IdType> getEvictionCandidates(int numberOfCandidates);
 
 	/**
-	 * Used by the cache to inform the replacement policy that
-	 * the given entry has been added to the cache.
+	 * Used by the cache to inform the replacement policy that the
+	 * given entry has been added to the cache (which includes that
+	 * the given ID is new).
 	 */
 	void entryWasAdded(IdType id, EntryType e);
+
+	/**
+	 * Used by the cache to inform the replacement policy that the
+	 * given entry has been added to the cache as a new entry for
+	 * the given ID.
+	 */
+	void entryWasRewritten(IdType id, EntryType e);
 
 	/**
 	 * Used by the cache to inform the replacement policy that

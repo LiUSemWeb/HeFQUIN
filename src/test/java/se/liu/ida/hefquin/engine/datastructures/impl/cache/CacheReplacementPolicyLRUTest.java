@@ -9,6 +9,43 @@ import java.util.Iterator;
 public class CacheReplacementPolicyLRUTest
 {
 	@Test
+	public void entryWasAddedTest() {
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
+		p.entryWasAdded(1, null);
+
+		try {
+			p.entryWasAdded(1, null);
+			fail();
+		}
+		catch ( final IllegalArgumentException e ) {
+			// expected
+		}
+
+		final Iterator<Integer> it1 = p.getEvictionCandidates(99).iterator();
+		assertEquals( 1, it1.next().intValue() );
+		assertFalse( it1.hasNext() );
+	}
+
+	@Test
+	public void entryWasRewrittenTest() {
+		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
+		p.entryWasAdded(1, null);
+		p.entryWasRewritten(1, null);
+
+		final Iterator<Integer> it1 = p.getEvictionCandidates(99).iterator();
+		assertEquals( 1, it1.next().intValue() );
+		assertFalse( it1.hasNext() );
+
+		try {
+			p.entryWasRewritten(2, null);
+			fail();
+		}
+		catch ( final IllegalArgumentException e ) {
+			// expected
+		}
+	}
+
+	@Test
 	public void getEvictionCandidatesTest() {
 		final CacheReplacementPolicy<Integer,String,CacheEntryBase<String>> p = new CacheReplacementPolicyLRU<>();
 		p.entryWasAdded(1, null);

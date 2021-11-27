@@ -60,6 +60,8 @@ public class GenericCacheImpl<IdType,
 		if ( obj == null )
 			throw new IllegalArgumentException();
 
+		final EntryType newEntry = policies.getEntryFactory().createCacheEntry(obj);
+
 		synchronized (index) {
 			final int slotNr;
 			final Integer existingSlotNr = index.get(id);
@@ -67,29 +69,45 @@ public class GenericCacheImpl<IdType,
 				// If we already have an object for the given ID in the cache,
 				// then we can simply replace that object with the given object.
 				slotNr = existingSlotNr.intValue();
+				slots.set(slotNr, newEntry);
 			}
 			else if ( ! initialPhaseCompleted ) {
 				// If the given ID is a new ID and we are still in the initial
 				// cache population phase, we can use the next available slot.
 				slotNr = slots.size();
+				slots.add(newEntry);
+
 				if ( slotNr + 1 == capacity ) {
 					initialPhaseCompleted = true;
 				}
 			}
 			else {
 				// If the given ID is a new ID and we are already past the initial
-				// cache population phase, we have to replace some object (with some
-				// other ID) from the cache.
-				final Iterable<IdType> eids = replacementPolicy.getEvictionCandidates(1);
-				final IdType eid = eids.iterator().next();
-				slotNr = index.get(eid).intValue();
-				replacementPolicy.entryWasEvicted(eid);
+				// cache population phase, we may have to replace some object (with
+				// some other ID) from the cache. However, let's first check whether
+				// there are still some slots available (which may be the case if
+				// objects have been evicted from the cache).
+				final Integer availableSlotNr = availableSlotIndexes.poll();
+				if ( availableSlotNr != null ) {
+					slotNr = availableSlotNr.intValue();
+					slots.set(slotNr, newEntry);
+				}
+				else {
+					final Iterable<IdType> eids = replacementPolicy.getEvictionCandidates(1);
+					final IdType eid = eids.iterator().next();
+					slotNr = index.remove(eid).intValue();
+					slots.set(slotNr, newEntry);
+					replacementPolicy.entryWasEvicted(eid);
+				}
 			}
 
-			final EntryType e = policies.getEntryFactory().createCacheEntry(obj);
 			index.put(id, slotNr);
-			slots.set(slotNr, e);
-			replacementPolicy.entryWasAdded(id, e);
+
+			if ( existingSlotNr != null ) {
+				replacementPolicy.entryWasRewritten(id, newEntry);
+			} else {
+				replacementPolicy.entryWasAdded(id, newEntry);
+			}
 		}
 	}
 
@@ -129,7 +147,6 @@ public class GenericCacheImpl<IdType,
 		}
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public boolean evict( final IdType id, final ObjectType obj ) {
 		synchronized (index) {
@@ -137,7 +154,7 @@ public class GenericCacheImpl<IdType,
 			if ( slotNr == null )
 				return false;
 
-			if ( ! slots.get(slotNr).equals(obj) )
+			if ( ! slots.get(slotNr).getObject().equals(obj) )
 				return false;
 
 			index.remove(id);
@@ -158,9 +175,8 @@ public class GenericCacheImpl<IdType,
 	@Override
 	public void clear() {
 		synchronized (index) {
-			for ( int i = 0; i < capacity; ++i )
-				slots.set(i, null);
-
+			initialPhaseCompleted = false;
+			slots.clear();
 			index.clear();
 			availableSlotIndexes.clear();
 			replacementPolicy.clear();

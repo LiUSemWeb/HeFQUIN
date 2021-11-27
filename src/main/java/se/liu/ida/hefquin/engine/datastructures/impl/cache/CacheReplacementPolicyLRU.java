@@ -27,6 +27,9 @@ public class CacheReplacementPolicyLRU<IdType,
 
 	@Override
 	public void entryWasAdded( final IdType id, final EntryType e ) {
+		if ( nodes.containsKey(id) )
+			throw new IllegalArgumentException();
+
 		final IdNode oldTail = tail;
 		tail = new IdNode(id, oldTail, null);
 		nodes.put(id, tail);
@@ -36,6 +39,11 @@ public class CacheReplacementPolicyLRU<IdType,
 
 		if ( head == null )
 			head = tail;
+	}
+
+	@Override
+	public void entryWasRewritten( final IdType id, final EntryType e ) {
+		entryWasRequested(id, e);
 	}
 
 	@Override
