@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.datastructures.impl;
+package se.liu.ida.hefquin.engine.datastructures.impl.cache;
 
 /**
  * A generic implementation of {@link CacheInvalidationPolicy} that always

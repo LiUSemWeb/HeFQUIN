@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.datastructures.impl;
+package se.liu.ida.hefquin.engine.datastructures.impl.cache;
 
 /**
  * @param <ObjectType> the type of the objects to be cached via a cache entry

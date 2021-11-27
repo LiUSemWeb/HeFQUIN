@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.datastructures.impl;
+package se.liu.ida.hefquin.engine.datastructures.impl.cache;
 
 /**
  * Interface for classes that implement a replacement policy for a cache.
