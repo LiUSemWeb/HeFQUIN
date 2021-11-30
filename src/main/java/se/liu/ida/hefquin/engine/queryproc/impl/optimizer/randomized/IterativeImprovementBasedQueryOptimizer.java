@@ -42,7 +42,6 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		// The best plan we have found so far. As we have only found one plan, it is the best one so far.
 		PhysicalPlan bestPlan = initialPlan;
 		
-		// Creating the completable future.
 		CostModel costModel = context.getCostModel(); //Created as a value and stored rather than just using the getCostModel, because the same model is used later too.
 
 		Double[] initialCost = CostEstimationUtils.getEstimates(costModel, initialPlan);
