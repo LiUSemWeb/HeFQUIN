@@ -107,7 +107,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 				bestPlan = currentPlan;
 			}
 			
-			generation += 1;
+			generation++;
 		}
 		
 		return bestPlan;
