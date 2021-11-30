@@ -86,7 +86,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 				
 				// Using a for-loop in order to have the index for which neighbouring plan to pick.
 				for (int x = 0; x < neighbourCosts.length; x++) {
-					if(neighbourCosts[x] < currentCost) { // Since it's a list, iterating through the list once in the loop is probably better than using get, but I'm having this as a stop-gap measure until I've properly figured out Java lists.
+					if(neighbourCosts[x] < currentCost) {
 						improvementFound = true;
 						betterPlan = new Pair<PhysicalPlan, Double>(neighbours.get(x), neighbourCosts[x]);
 						betterPlans.add(betterPlan); // I haven't figured out how to do this properly for Java yet, but it will be solved by the PhysicalPlanWithCost anyway.
