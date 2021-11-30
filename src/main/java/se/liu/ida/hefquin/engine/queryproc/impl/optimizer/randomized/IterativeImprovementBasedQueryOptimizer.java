@@ -21,15 +21,13 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	
 	protected final QueryOptimizationContext context;
 	protected final StoppingConditionForIterativeImprovement condition;
-	protected final Random rng;
-
+	protected final Random rng  = new Random();
 	
 	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, final StoppingConditionForIterativeImprovement x) {
 		assert ctxt != null;
 		assert x != null;
 		context = ctxt;
 		condition = x;
-		rng = new Random();
 	}
 	
 	
