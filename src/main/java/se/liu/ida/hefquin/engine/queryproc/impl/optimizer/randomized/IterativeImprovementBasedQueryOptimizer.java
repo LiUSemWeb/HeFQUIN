@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -11,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.RuleApplicationsOfPlans;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
@@ -22,6 +21,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	protected final QueryOptimizationContext context;
 	protected final StoppingConditionForIterativeImprovement condition;
 	protected final Random rng  = new Random();
+	protected final RuleApplicationsOfPlans rules = new RuleApplicationsOfPlans( new RuleInstances() );
 	
 	public IterativeImprovementBasedQueryOptimizer (final QueryOptimizationContext ctxt, final StoppingConditionForIterativeImprovement x) {
 		assert ctxt != null;
@@ -94,14 +94,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	protected List<PhysicalPlan> getNeighbours(final PhysicalPlan initialPlan) {
 		List<PhysicalPlan> resultList = new ArrayList<PhysicalPlan>(); // Create an empty list. Just List<PhysicalPlan> didn't work so I had to look this up.
 		
-		RuleInstances rInst = new RuleInstances();
-		RewritingRule[] rules =  (RewritingRule[]) rInst.ruleInstances.toArray(); // The IDE wants me to have a cast here.
-
-		Set<RuleApplication> ruleApplications = Collections.emptySet();
-		
-		for ( final RewritingRule rr : rules) {
-			ruleApplications.addAll(rr.determineAllPossibleApplications(initialPlan));
-		}
+		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
 		
 		for ( final RuleApplication ra : ruleApplications ) {
 			resultList.add( ra.getResultingPlan() );
