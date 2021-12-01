@@ -54,7 +54,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 			
 			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
 			PhysicalPlan currentPlan = initialPlan; // This variable will hold the plan which is currently being worked on.
-			Double currentCost = initialCost[0]; // The cost of the current plan. For it to be a local minimum, none of its neighbours can have a lower cost
+			Double currentCost = initialCost; // The cost of the current plan. For it to be a local minimum, none of its neighbours can have a lower cost
 			boolean improvementFound = false;
 			
 			do {
