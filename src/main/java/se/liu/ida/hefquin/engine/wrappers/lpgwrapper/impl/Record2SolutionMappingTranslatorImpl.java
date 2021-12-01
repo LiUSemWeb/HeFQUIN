@@ -1,12 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
-import com.github.jsonldjava.core.RDFDataset;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
@@ -34,16 +32,14 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 if (builders.isEmpty())
                     baseBuilder.add(Var.alloc(var.getName()), nodeMapping);
                 else {
-                    for (final BindingBuilder builder : builders)
-                        builder.add(Var.alloc(var.getName()), nodeMapping);
+                    addToAllBuilders(builders, Var.alloc(var.getName()), nodeMapping);
                 }
             } else if (value instanceof LPGEdgeValue) {
                 final Node edgeMapping = conf.mapEdgeLabel(((LPGEdgeValue) value).getEdge().getLabel());
                 if (builders.isEmpty())
                     baseBuilder.add(Var.alloc(var.getName()), edgeMapping);
                 else {
-                    for (final BindingBuilder builder : builders)
-                        builder.add(Var.alloc(var.getName()), edgeMapping);
+                    addToAllBuilders(builders, Var.alloc(var.getName()), edgeMapping);
                 }
             } else if (value instanceof MapValue) {
                 final Map<String, Object> mapValue = ((MapValue) value).getMap();
@@ -55,13 +51,13 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 if (builders.isEmpty())
                     baseBuilder.add(Var.alloc(var.getName()), triple);
                 else {
-                    for (final BindingBuilder builder : builders)
-                        builder.add(Var.alloc(var.getName()), triple);
+                    addToAllBuilders(builders, Var.alloc(var.getName()), triple);
                 }
             } else if (value instanceof ListValue) {
                 final List<Object> values = ((ListValue) value).getList();
                 if (builders.isEmpty()) {
                     for (final Object val : values) {
+                        Node node = getPropertyOrLiteral(val, conf);
                         final BindingBuilder builder = Binding.builder();
                         builder.addAll(baseBuilder.build());
                         //we still need to distinguish properties from values here
@@ -69,21 +65,21 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                         builders.add(builder);
                     }
                 } else {
-                    for (int i=0 ; i<values.size(); i++) {
-                        builders.get(i).add(Var.alloc(var.getName()),
-                                NodeFactory.createLiteral(values.get(i).toString()));
+                    for (final Object val : values) {
+                        addToAllBuilders(builders, Var.alloc(var.getName()), NodeFactory.createLiteral(val.toString()));
                     }
                 }
             } else if (value instanceof LiteralValue) {
+                final String literal = ((LiteralValue) value).getValue().toString();
+                Node node = null;
+                if (literal.equals("label"))
+                    node = conf.getLabel();
+                else
+                    node = NodeFactory.createLiteral(literal);
                 if (builders.isEmpty()) {
-                    //we still need to distinguish general literals from the "label" special value
-                    baseBuilder.add(Var.alloc(var.getName()),
-                            NodeFactory.createLiteral(((LiteralValue) value).getValue().toString()));
+                    baseBuilder.add(Var.alloc(var.getName()), node);
                 } else {
-                    for (final BindingBuilder builder : builders) {
-                        builder.add(Var.alloc(var.getName()),
-                                NodeFactory.createLiteral(((LiteralValue) value).getValue().toString()));
-                    }
+                    addToAllBuilders(builders, Var.alloc(var.getName()), node);
                 }
             }
         }
@@ -95,5 +91,14 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             mappings.add(new SolutionMappingImpl(builder.build()));
         }
         return mappings;
+    }
+
+    private Node getPropertyOrLiteral(final Object value, final LPG2RDFConfiguration conf) {
+        return null;
+    }
+
+    private void addToAllBuilders(final List<BindingBuilder> builders, final Var var, final Node node) {
+        for (final BindingBuilder builder : builders)
+            builder.add(var, node);
     }
 }
