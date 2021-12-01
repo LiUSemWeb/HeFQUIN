@@ -5,6 +5,7 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -12,9 +13,10 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 {
 	protected final StoppingConditionForIterativeImprovement condition;
 
-	public IterativeImprovementBasedQueryOptimizer( final QueryOptimizationContext context,
-	                                                final StoppingConditionForIterativeImprovement x ) {
-		super(context);
+	public IterativeImprovementBasedQueryOptimizer( final StoppingConditionForIterativeImprovement x,
+	                                                final QueryOptimizationContext context,
+	                                                final RuleInstances rewritingRules ) {
+		super(context, rewritingRules);
 
 		assert x != null;
 		condition = x;

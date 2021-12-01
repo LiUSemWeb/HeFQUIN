@@ -16,14 +16,17 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstance
 
 public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 {
-	protected final Random rng                    = new Random();
-	protected final RuleApplicationsOfPlans rules = new RuleApplicationsOfPlans( new RuleInstances() );
+	protected final Random rng = new Random();
 
+	protected final RuleApplicationsOfPlans rules;
 	protected final QueryOptimizationContext context;
 
-	protected RandomizedQueryOptimizerBase( final QueryOptimizationContext context ) {
+	protected RandomizedQueryOptimizerBase( final QueryOptimizationContext context,
+	                                        final RuleInstances rewritingRules ) {
 		assert context != null;
 		this.context = context;
+
+		rules = new RuleApplicationsOfPlans(rewritingRules);
 	}
 
 	@Override
