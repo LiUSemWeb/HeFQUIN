@@ -42,13 +42,13 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 		
 		CostModel costModel = context.getCostModel(); //Created as a value and stored rather than just using the getCostModel, because the same model is used later too.
 
-		Double[] initialCost = CostEstimationUtils.getEstimates(costModel, initialPlan);
+		final Double initialCost = CostEstimationUtils.getEstimates(costModel, initialPlan)[0];
 		
 		// generation = number of times the outer loop has run. Has to be declared here since it will increment each outer loop.
 		int generation = 0;
 		
 		// bestCost = best possible cost out of everything that the algorithm has found. Has to be declared here so that we have something to compare to in all the iterations of the outer loop without losing track of it between loops.
-		Double bestCost = initialCost[0];
+		Double bestCost = initialCost;
 		
 		while(!condition.readyToStop(generation)) { // Currently only handles generation number as a stopping condition!
 			
