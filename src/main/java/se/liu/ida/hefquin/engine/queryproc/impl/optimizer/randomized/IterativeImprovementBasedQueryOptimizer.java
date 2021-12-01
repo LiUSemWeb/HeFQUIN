@@ -92,7 +92,7 @@ public class IterativeImprovementBasedQueryOptimizer implements QueryOptimizer {
 	}
 	
 	protected List<PhysicalPlan> getNeighbours(final PhysicalPlan initialPlan) {
-		List<PhysicalPlan> resultList = new ArrayList<PhysicalPlan>(); // Create an empty list. Just List<PhysicalPlan> didn't work so I had to look this up.
+		final List<PhysicalPlan> resultList = new ArrayList<PhysicalPlan>();
 		
 		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
 		
