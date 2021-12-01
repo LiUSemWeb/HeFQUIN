@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
@@ -24,7 +23,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstance
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -80,9 +78,9 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 
 		final CostModel costModel = new CostModel() {
 			@Override
-			public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan p ) throws CostEstimationException {
-				final Double pseudoCost = Double.valueOf( p.hashCode() );
-				return CompletableFuture.completedFuture(pseudoCost);
+			public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan p ) {
+				final DummyPlanForTest pp = (DummyPlanForTest) p;
+				return CompletableFuture.completedFuture( pp.cost );
 			}
 		};
 
@@ -101,7 +99,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		@Override public PhysicalOperator getRootOperator() { return null; }
 		@Override public ExpectedVariables getExpectedVariables() { return null; }
 		@Override public int numberOfSubPlans() { return 0; }
-		@Override public PhysicalPlan getSubPlan(int i) throws NoSuchElementException { return null; }
+		@Override public PhysicalPlan getSubPlan(int i) { return null; }
 	}
 
 	protected static class DummyRuleApplicationForTest implements RuleApplication {
