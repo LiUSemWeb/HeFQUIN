@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.RuleApplicationsOfPlans;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 
@@ -18,7 +18,7 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 {
 	protected final Random rng = new Random();
 
-	protected final RuleApplicationsOfPlans rules;
+	protected final PlanRewritingUtils rules;
 	protected final QueryOptimizationContext context;
 
 	protected RandomizedQueryOptimizerBase( final QueryOptimizationContext context,
@@ -26,7 +26,7 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		assert context != null;
 		this.context = context;
 
-		rules = new RuleApplicationsOfPlans(rewritingRules);
+		rules = new PlanRewritingUtils(rewritingRules);
 	}
 
 	@Override

@@ -1,20 +1,17 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
+package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class RuleApplicationsOfPlans {
+public class PlanRewritingUtils {
     protected final RuleInstances ruleIns;
     protected final Map<PhysicalPlan, Set<RuleApplication>> cache = new HashMap<>();
 
-    public RuleApplicationsOfPlans( final RuleInstances ruleIns ) {
+    public PlanRewritingUtils( final RuleInstances ruleIns ) {
         this.ruleIns = ruleIns;
     }
 

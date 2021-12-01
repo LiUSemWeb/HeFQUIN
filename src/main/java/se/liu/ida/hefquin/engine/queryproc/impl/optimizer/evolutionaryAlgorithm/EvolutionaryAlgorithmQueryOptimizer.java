@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
@@ -43,7 +44,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     public PhysicalPlan optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
-        final RuleApplicationsOfPlans ruleApplicationCache = new RuleApplicationsOfPlans( new RuleInstances() );
+        final PlanRewritingUtils ruleApplicationCache = new PlanRewritingUtils( new RuleInstances() );
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
 
@@ -55,7 +56,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return currentGen.bestPlan.getPlan();
     }
 
-    protected Generation generateFirstGen( final PhysicalPlan plan, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
+    protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws QueryOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
@@ -75,7 +76,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), currentGen) );
     }
 
-    protected Generation generateNextGen( final Generation currentGen, final RuleApplicationsOfPlans cache ) throws QueryOptimizationException {
+    protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws QueryOptimizationException {
         final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen.plans );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 
