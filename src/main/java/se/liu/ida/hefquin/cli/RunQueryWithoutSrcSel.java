@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
@@ -106,7 +107,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessorImpl();
 
-		return new AsyncFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+		final FederationAccessManager fedAccessMgrWithCache = new FederationAccessManagerWithCache(fedAccessMgrWithoutCache, 100);
+		return fedAccessMgrWithCache;
     }
 
 }
