@@ -147,12 +147,7 @@ public class GenericCacheImplTest
 			}
 		};
 
-		protected final CacheEntryFactory<CacheEntryBase<String>, String> ef = new CacheEntryFactory<CacheEntryBase<String>, String>() {
-			@Override
-			public CacheEntryBase<String> createCacheEntry( final String obj ) {
-				return new CacheEntryBase<String>(obj);
-			}
-		};
+		protected final CacheEntryFactory<CacheEntryBase<String>, String> ef = new CacheEntryBaseFactory<String>();
 
 		@Override
 		public CacheReplacementPolicyFactory<Integer, String, CacheEntryBase<String>> getReplacementPolicyFactory() {

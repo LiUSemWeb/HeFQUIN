@@ -40,7 +40,7 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgr(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -69,7 +69,7 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgr(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -101,7 +101,7 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 			fms[i] = new TPFServerForTest();
 		}
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgr(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<TPFResponse>[] futures = new CompletableFuture[n];
@@ -123,7 +123,7 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 
 	// ------------ helper code ------------
 
-	protected FederationAccessManager createFedAccessMgr( final long sleepMillis ) {
+	public static FederationAccessManager createFedAccessMgrForTests( final long sleepMillis ) {
 		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor(sleepMillis);
 		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor(sleepMillis);
 		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {

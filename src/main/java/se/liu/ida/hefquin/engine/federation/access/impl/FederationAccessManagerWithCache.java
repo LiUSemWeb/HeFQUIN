@@ -6,7 +6,15 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.datastructures.Cache;
 import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntry;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryBase;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryBaseFactory;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryFactory;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheInvalidationPolicy;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
 import se.liu.ida.hefquin.engine.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicy;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicyFactory;
+import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.engine.datastructures.impl.cache.GenericCacheImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -32,6 +40,13 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 		cache = new GenericCacheImpl<>(cacheCapacity, cachePolicies);
 	}
+
+	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
+	                                         final int cacheCapacity ) 
+	{
+		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
+	}
+
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -174,5 +189,46 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			super(req, fm);
 		}
 	}
+
+
+	protected static class MyDefaultCachePolicies
+				implements CachePolicies<Key,
+				                         CompletableFuture<? extends DataRetrievalResponse>,
+				                         CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>>
+	{
+		final CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>,
+		                        CompletableFuture<? extends DataRetrievalResponse>
+		                       > cef = new CacheEntryBaseFactory<>();
+
+		final CacheReplacementPolicyFactory<Key,
+		                                    CompletableFuture<? extends DataRetrievalResponse>,
+		                                    CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>
+		                                   > crpf = new CacheReplacementPolicyFactory<>() {
+			@Override
+			public CacheReplacementPolicy<Key, CompletableFuture<? extends DataRetrievalResponse>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>> create() {
+				return new CacheReplacementPolicyLRU<>();
+			}
+		};
+
+		final CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>,
+		                              CompletableFuture<? extends DataRetrievalResponse>
+		                             > cip = new CacheInvalidationPolicyAlwaysValid<>();
+
+		@Override
+		public CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>, CompletableFuture<? extends DataRetrievalResponse>> getEntryFactory() {
+			return cef;
+		}
+
+		@Override
+		public CacheReplacementPolicyFactory<Key, CompletableFuture<? extends DataRetrievalResponse>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>> getReplacementPolicyFactory() {
+			return crpf;
+		}
+
+		@Override
+		public CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>, CompletableFuture<? extends DataRetrievalResponse>> getInvalidationPolicy() {
+			return cip;
+		}
+
+	} // end of MyDefaultCachePolicies
 
 }

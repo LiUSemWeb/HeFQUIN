@@ -37,7 +37,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneRequestOp() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager();
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests();
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final CompletableFuture<Integer> f = initEstimateForRequestPlan(42, cardEstimator);
@@ -48,7 +48,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoRequestOpsInParallel() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
@@ -71,7 +71,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoRequestOpsInSequence() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan1 = createRequestPlan(42);
@@ -94,7 +94,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void sameRequestOpTwiceInParallel() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan = createRequestPlan(42);
@@ -116,7 +116,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void sameRequestOpTwiceInSequence() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan = createRequestPlan(42);
@@ -138,7 +138,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfTwoRequestOps() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan = createJoinPlan(42, 13);
@@ -156,7 +156,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void joinOfSameRequestOp() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan = createJoinPlan(42, 42);
@@ -174,7 +174,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void oneTPAdd() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan plan = createTPAddPlan(42, 13);
@@ -192,7 +192,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 	@Test
 	public void twoTPAdd() throws InterruptedException, ExecutionException {
-		final FederationAccessManager fedAccessMgr = new MyFederationAccessManager(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
 		final PhysicalPlan subplan = createTPAddPlan(42, 13);
@@ -273,15 +273,15 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	}
 
 
-	protected static class MyFederationAccessManager extends FederationAccessManagerForTest
+	protected static class MyFederationAccessManagerForTests extends FederationAccessManagerForTest
 	{
 		protected final long sleepMillis;
 
-		public MyFederationAccessManager( final long sleepMillis ) {
+		public MyFederationAccessManagerForTests( final long sleepMillis ) {
 			this.sleepMillis = sleepMillis;
 		}
 
-		public MyFederationAccessManager() {
+		public MyFederationAccessManagerForTests() {
 			this(0L);
 		}
 

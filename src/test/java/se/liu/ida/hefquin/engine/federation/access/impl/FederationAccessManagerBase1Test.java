@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.RecordsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -141,15 +140,15 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 	// ------------ helper code ------------
 
 	protected FederationAccessManager createMyFedAccessMgr( final int card ) {
-		return new MyFederationAccessManager(Integer.valueOf(card), SLEEP_MILLIES);
+		return new MyFederationAccessManagerForTests(Integer.valueOf(card), SLEEP_MILLIES);
 	}
 
-	protected class MyFederationAccessManager extends FederationAccessManagerBase1
+	protected class MyFederationAccessManagerForTests extends FederationAccessManagerBase1
 	{
 		protected final Integer card;
 		protected final long sleepMillis;
 
-		public MyFederationAccessManager( final Integer card, final long sleepMillis ) {
+		public MyFederationAccessManagerForTests( final Integer card, final long sleepMillis ) {
 			this.card = card;
 			this.sleepMillis = sleepMillis;
 		}
