@@ -10,16 +10,9 @@ import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.Neo4jServer;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
@@ -27,7 +20,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 {
 	//protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;
-	
+
 	@Test
 	public void twoRequestsInSequence()
 			throws FederationAccessException, InterruptedException, ExecutionException
@@ -39,9 +32,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager AsyncfedAccManObj = createFedAccessMgr(SLEEP_MILLIES);
-		FederationAccessManagerWithCache fedAccessMgr = new FederationAccessManagerWithCache(AsyncfedAccManObj);
-
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -70,9 +61,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager AsyncfedAccManObj = createFedAccessMgr(SLEEP_MILLIES);
-		FederationAccessManagerWithCache fedAccessMgr = new FederationAccessManagerWithCache(AsyncfedAccManObj);
-
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -105,9 +94,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 			fms[i] = new TPFServerForTest();
 		}
 
-		final FederationAccessManager AsyncfedAccManObj = createFedAccessMgr(SLEEP_MILLIES);
-		FederationAccessManagerWithCache fedAccessMgr = new FederationAccessManagerWithCache(AsyncfedAccManObj);
-
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<TPFResponse>[] futures = new CompletableFuture[n];
@@ -126,66 +113,13 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		if ( PRINT_TIME ) System.out.println( "manyRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
 	}
 
+
 	// ------------ helper code ------------
 
-	protected FederationAccessManager createFedAccessMgr( final long sleepMillis ) {
-		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor(sleepMillis);
-		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor(sleepMillis);
-		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { return null; }
-		};
-		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
-			@Override public RecordsResponse performRequest(Neo4jRequest req, Neo4jServer fm) { return null; }
-		};
-
-		return new AsyncFederationAccessManagerImpl(reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+	protected static FederationAccessManagerWithCache createFedAccessMgrForTests( final long sleepMillis ) {
+		return new FederationAccessManagerWithCache(
+				AsyncFederationAccessManagerImplTest.createFedAccessMgrForTests(sleepMillis),
+				10 );
 	}
 
-	protected static class FakeRequestProcessorBase
-	{
-		protected final long sleepMillis;
-
-		public FakeRequestProcessorBase( final long sleepMillis ) {
-			this.sleepMillis = sleepMillis;
-		}
-
-		protected void sleep() {
-			if ( sleepMillis > 0L ) {
-				try {
-					Thread.sleep(sleepMillis);
-				} catch ( final InterruptedException e ) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-	}
-
-	protected static class MySPARQLRequestProcessor extends FakeRequestProcessorBase
-	                                                implements SPARQLRequestProcessor
-	{
-		public MySPARQLRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
-
-		@Override
-		public SolMapsResponse performRequest(SPARQLRequest req, SPARQLEndpoint fm) {
-			sleep();
-			return null;
-		}
-	}
-
-	protected static class MyTPFRequestProcessor extends FakeRequestProcessorBase
-	                                             implements TPFRequestProcessor
-	{
-		public MyTPFRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
-
-		@Override
-		public TPFResponse performRequest(TPFRequest req, TPFServer fm) {
-			sleep(); return null;
-		}
-
-		@Override
-		public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) {
-			sleep(); return null;
-		}
-	}
-	
 }
