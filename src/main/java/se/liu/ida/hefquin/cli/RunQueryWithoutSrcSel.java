@@ -13,10 +13,10 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
 import arq.cmdline.CmdARQ;
-import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
+import se.liu.ida.hefquin.cli.modules.ModResults;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
@@ -29,12 +29,14 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
+import java.io.PrintStream;
+
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
 	protected final ModTime        modTime =        new ModTime();
 	protected final ModQuery       modQuery =       new ModQuery();
 	protected final ModFederation  modFederation =  new ModFederation();
-    protected final ModResultsOut  modResults =     new ModResultsOut();
+	protected final ModResults     modResults =     new ModResults();
 
     public static void main( final String... argv )
     {
@@ -66,11 +68,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
 
+		final PrintStream printStream = modResults.getPrintStream();
 		modTime.startTimer();
 
 		try {
 			final QueryExecution qe = QueryExecutionFactory.create( query, DatasetGraphFactory.createGeneral() );
-			QueryExecUtils.executeQuery(query, qe, resFmt);
+			QueryExecUtils.executeQuery(query, qe, resFmt, printStream);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
