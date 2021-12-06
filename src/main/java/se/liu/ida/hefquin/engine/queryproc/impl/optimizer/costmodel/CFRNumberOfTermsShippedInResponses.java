@@ -74,7 +74,7 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 				throw createIllegalArgumentException(fm);
 			}
 		}
-		else if ( lop instanceof LogicalOpJoin ) {
+		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion ) {
 			return CompletableFuture.completedFuture(0);
 		}
 		else {
