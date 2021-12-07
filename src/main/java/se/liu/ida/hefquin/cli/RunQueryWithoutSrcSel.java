@@ -15,6 +15,7 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
@@ -31,10 +32,11 @@ import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
-	protected final ModTime        modTime =        new ModTime();
-	protected final ModQuery       modQuery =       new ModQuery();
-	protected final ModFederation  modFederation =  new ModFederation();
-    protected final ModResultsOut  modResults =     new ModResultsOut();
+	protected final ModTime          modTime =          new ModTime();
+	protected final ModQuery         modQuery =         new ModQuery();
+	protected final ModFederation    modFederation =    new ModFederation();
+    protected final ModResultsOut    modResults =       new ModResultsOut();
+	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
     public static void main( final String... argv )
     {
@@ -49,6 +51,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
         addModule(modQuery);
         addModule(modFederation);
         addModule(modResults);
+        addModule(modEngineConfig);
     }
 
 	@Override
@@ -62,6 +65,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
 		ctxt.set( HeFQUINConstants.sysFederationCatalog, modFederation.getFederationCatalog() );
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, createFedAccessMgr() );
+
+		modEngineConfig.initializeContext(ctxt);
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
