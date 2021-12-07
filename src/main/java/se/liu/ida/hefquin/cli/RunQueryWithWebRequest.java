@@ -6,18 +6,18 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class RunQueryWithWebRequest extends RunQueryWithoutSrcSel {
-    protected ByteArrayOutputStream output;
-    protected PrintStream ps;
-    final String utf8 = StandardCharsets.UTF_8.name();
+    protected final ByteArrayOutputStream output;
+    protected PrintStream printStream;
+    protected final String utf8 = StandardCharsets.UTF_8.name();
 
     public RunQueryWithWebRequest( final String[] argv ) {
         super(argv);
-        // produce query results as String
         output = new ByteArrayOutputStream();
+
         try {
-            ps = new PrintStream( output, true, utf8 );
-            modResults.setPrintStream(ps);
-        } catch ( UnsupportedEncodingException e ) {
+            printStream = new PrintStream( output, true, utf8 );
+            modResults.setPrintStream(printStream);
+        } catch ( final UnsupportedEncodingException e ) {
             e.printStackTrace();
         }
     }
@@ -28,14 +28,14 @@ public class RunQueryWithWebRequest extends RunQueryWithoutSrcSel {
     }
 
     protected String getResult(){
-        String data = null;
+        String results = null;
         try {
-            ps.flush();
-            data = output.toString(utf8);
-        } catch ( UnsupportedEncodingException e ) {
+            printStream.flush();
+            results = output.toString(utf8);
+        } catch ( final UnsupportedEncodingException e ) {
             e.printStackTrace();
         }
-        return data;
+        return results;
     }
 
 }
