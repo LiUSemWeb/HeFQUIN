@@ -5,12 +5,12 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-public class RunQueryWithWebRequest extends RunQueryWithoutSrcSel {
+public class RunQueryWithResultInStream extends RunQueryWithoutSrcSel {
     protected final ByteArrayOutputStream output;
     protected PrintStream printStream;
     protected final String utf8 = StandardCharsets.UTF_8.name();
 
-    public RunQueryWithWebRequest( final String[] argv ) {
+    public RunQueryWithResultInStream( final String[] argv ) {
         super(argv);
         output = new ByteArrayOutputStream();
 
