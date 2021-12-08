@@ -56,6 +56,9 @@ public abstract class AbstractRuleApplicationImpl implements RuleApplication
         // first, rewrite the target (sub)plan according to this rewriting rule
         PhysicalPlan rewrittenPlan = rewritePlan( pathToTargetSubPlan[numSteps] );
 
+        if ( numSteps == 0 ) {
+            return rewrittenPlan;
+        }
         // next, reconstruct the ancestors all the way up to the root of the original plan
         for ( int i = numSteps-1; i >= 0; i-- ) {
             final PhysicalPlan parent = pathToTargetSubPlan[i];
