@@ -9,6 +9,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
+import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
@@ -85,11 +86,11 @@ public class QueryPatternUtils
 	 * of {@link #getVariablesInPattern(BGP)}.
 	 */
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern ) {
-			return getVariablesInPattern( (TriplePattern) queryPattern );
+		if ( queryPattern.asJenaOp() instanceof Triple) {
+			return getVariablesInPattern( new TriplePatternImpl( (Triple) queryPattern.asJenaOp()) );
 		}
-		else if ( queryPattern instanceof BGP ) {
-			return getVariablesInPattern( (BGP) queryPattern );
+		if ( queryPattern.asJenaOp() instanceof OpBGP) {
+			return getVariablesInPattern( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -170,18 +171,18 @@ public class QueryPatternUtils
 	 * Returns the number of occurrences of variables in the given graph
 	 * pattern. If the same variable occurs multiple times, each occurrence
 	 * is counted.
-	 * 
+	 *
 	 * If the given pattern is a {@link TriplePattern}, this function returns
 	 * the result of {@link #getNumberOfVarOccurrences(TriplePattern)}.
 	 * Similarly, if the given pattern is a {@link BGP}, this function
 	 * returns the result of {@link #getNumberOfVarOccurrences(BGP)}.
 	 */
 	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern ) {
-			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
+		if ( queryPattern.asJenaOp() instanceof Triple) {
+			return getNumberOfVarOccurrences( new TriplePatternImpl( (Triple) queryPattern.asJenaOp()) );
 		}
-		else if ( queryPattern instanceof BGP ) {
-			return getNumberOfVarOccurrences( (BGP) queryPattern );
+		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
+			return getNumberOfVarOccurrences( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -192,18 +193,18 @@ public class QueryPatternUtils
 	 * Returns the number of occurrences of RDF terms in the given graph
 	 * pattern. If the same term occurs multiple times, each occurrence
 	 * is counted.
-	 * 
+	 *
 	 * If the given pattern is a {@link TriplePattern}, this function returns
 	 * the result of {@link #getNumberOfTermOccurrences(TriplePattern)}.
 	 * Similarly, if the given pattern is a {@link BGP}, this function
 	 * returns the result of {@link #getNumberOfTermOccurrences(BGP)}.
 	 */
 	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern ) {
-			return getNumberOfTermOccurrences( (TriplePattern) queryPattern );
+		if ( queryPattern.asJenaOp() instanceof Triple) {
+			return getNumberOfTermOccurrences( new TriplePatternImpl( (Triple) queryPattern.asJenaOp())  );
 		}
-		else if ( queryPattern instanceof BGP ) {
-			return getNumberOfTermOccurrences( (BGP) queryPattern );
+		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
+			return getNumberOfTermOccurrences( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
