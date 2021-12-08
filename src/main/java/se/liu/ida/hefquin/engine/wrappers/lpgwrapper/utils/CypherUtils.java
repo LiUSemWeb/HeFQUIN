@@ -7,7 +7,8 @@ import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,6 +49,30 @@ public class CypherUtils {
             }
         }
         return records;
+    }
+
+    public static boolean isPropertyColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isPropertyColumnPriv((CypherMatchQuery) query, colName);
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isPropertyColumnPriv(q, colName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected static boolean isPropertyColumnPriv(CypherMatchQuery query, CypherVar colName) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && r instanceof PropertyListReturnStatement) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -13,73 +13,90 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMappingTranslator {
+
     @Override
-    public List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf) {
+    public List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
+                                                 final CypherQuery query, final CypherVarGenerator generator) {
         final List<BindingBuilder> builders = new ArrayList<>();
         final BindingBuilder baseBuilder = Binding.builder();
         for (final RecordEntry entry : record.getRecordEntries()){
             final CypherVar var = entry.getName();
             final Value value = entry.getValue();
+            final Var mappingVar = Var.alloc(generator.getReverseRetVarName(var));
             if (value instanceof LPGNodeValue) {
                 final Node nodeMapping  = conf.mapNode(((LPGNodeValue) value).getNode());
                 if (builders.isEmpty())
-                    baseBuilder.add(Var.alloc(var.getName()), nodeMapping);
+                    baseBuilder.add(mappingVar, nodeMapping);
                 else {
-                    addToAllBuilders(builders, Var.alloc(var.getName()), nodeMapping);
+                    addToAllBuilders(builders, mappingVar, nodeMapping);
                 }
             } else if (value instanceof LPGEdgeValue) {
                 final Node edgeMapping = conf.mapEdgeLabel(((LPGEdgeValue) value).getEdge().getLabel());
                 if (builders.isEmpty())
-                    baseBuilder.add(Var.alloc(var.getName()), edgeMapping);
+                    baseBuilder.add(mappingVar, edgeMapping);
                 else {
-                    addToAllBuilders(builders, Var.alloc(var.getName()), edgeMapping);
+                    addToAllBuilders(builders, mappingVar, edgeMapping);
                 }
             } else if (value instanceof MapValue) {
                 final Map<String, Object> mapValue = ((MapValue) value).getMap();
                 final Node triple = NodeFactory.createTripleNode(
                         conf.mapNode((LPGNode) mapValue.get("source")),
-                        conf.mapEdgeLabel(((LPGEdge)mapValue.get("edge")).getLabel()),
+                        conf.mapEdgeLabel(((LPGEdge) mapValue.get("edge")).getLabel()),
                         conf.mapNode((LPGNode) mapValue.get("target"))
                 );
                 if (builders.isEmpty())
-                    baseBuilder.add(Var.alloc(var.getName()), triple);
+                    baseBuilder.add(mappingVar, triple);
                 else {
-                    addToAllBuilders(builders, Var.alloc(var.getName()), triple);
+                    addToAllBuilders(builders, mappingVar, triple);
                 }
             } else if (value instanceof ListValue) {
                 final List<Object> values = ((ListValue) value).getList();
+                final boolean isPropertyList = CypherUtils.isPropertyColumn(query, var);
                 if (builders.isEmpty()) {
                     for (final Object val : values) {
-                        Node node = getPropertyOrLiteral(val, conf);
+                        Node node;
+                        if (isPropertyList) {
+                            node = conf.mapProperty(val.toString());
+                        } else {
+                            node = NodeFactory.createLiteral(val.toString());
+                        }
                         final BindingBuilder builder = Binding.builder();
                         builder.addAll(baseBuilder.build());
-                        //we still need to distinguish properties from values here
-                        builder.add(Var.alloc(var.getName()), NodeFactory.createLiteral(val.toString()));
+                        builder.add(mappingVar, node);
                         builders.add(builder);
                     }
                 } else {
                     for (final Object val : values) {
-                        addToAllBuilders(builders, Var.alloc(var.getName()), NodeFactory.createLiteral(val.toString()));
+                        Node node;
+                        if (isPropertyList) {
+                            node = conf.mapProperty(val.toString());
+                        } else {
+                            node = NodeFactory.createLiteral(val.toString());
+                        }
+                        addToAllBuilders(builders, mappingVar, node);
                     }
                 }
             } else if (value instanceof LiteralValue) {
                 final String literal = ((LiteralValue) value).getValue().toString();
-                Node node = null;
+                Node node;
                 if (literal.equals("label"))
                     node = conf.getLabel();
                 else
                     node = NodeFactory.createLiteral(literal);
                 if (builders.isEmpty()) {
-                    baseBuilder.add(Var.alloc(var.getName()), node);
+                    baseBuilder.add(mappingVar, node);
                 } else {
-                    addToAllBuilders(builders, Var.alloc(var.getName()), node);
+                    addToAllBuilders(builders, mappingVar, node);
                 }
             }
         }
@@ -91,10 +108,6 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             mappings.add(new SolutionMappingImpl(builder.build()));
         }
         return mappings;
-    }
-
-    private Node getPropertyOrLiteral(final Object value, final LPG2RDFConfiguration conf) {
-        return null;
     }
 
     private void addToAllBuilders(final List<BindingBuilder> builders, final Var var, final Node node) {
