@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -35,7 +36,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
@@ -75,7 +75,10 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
-		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
+
+		final QueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
+		final QueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
+
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
 		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();

@@ -79,7 +79,7 @@ public class LogicalToPhysicalOpConverter
 
 	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
 		if (      lop instanceof LogicalOpJoin )  return convert( (LogicalOpJoin) lop );
-		else if ( lop instanceof LogicalOpUnion ) return convert( (LogicalOpUnion) lop );
+		else if ( lop instanceof LogicalOpUnion ) return convertUnion( (LogicalOpUnion) lop );
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
