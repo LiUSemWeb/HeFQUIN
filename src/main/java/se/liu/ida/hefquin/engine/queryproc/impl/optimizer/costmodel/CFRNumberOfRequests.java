@@ -33,7 +33,7 @@ public class CFRNumberOfRequests extends CFRBase
 			// TODO: Returning 1 is not entirely correct here. The actual number of requests depends on the page size used for the requests.
 			result = 1;
 		}
-		else if ( rootOp instanceof BasePhysicalOpBinaryJoin ) {
+		else if ( rootOp instanceof BasePhysicalOpBinaryJoin || rootOp instanceof PhysicalOpBinaryUnion ) {
 			result = 0;
 		}
 		else {

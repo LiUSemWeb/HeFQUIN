@@ -71,7 +71,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 			numberOfJoinVars = 0;    // irrelevant for request operators
 			futureIntResSize = null; // irrelevant for request operators
 		}
-		else if ( lop instanceof LogicalOpJoin ) {
+		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion ) {
 			numberOfVars = 0;        // irrelevant for join operators
 			numberOfJoinVars = 0;    // irrelevant for join operators
 			futureIntResSize = null; // irrelevant for join operators
@@ -83,11 +83,11 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		// cases in which the cost value depends on some intermediate
 		// result size, which needs to be fetched first
 		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
-		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
+				|| pop instanceof PhysicalOpBindJoinWithUNION ) {
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
 		}
 		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-		          || pop instanceof PhysicalOpBindJoin ) {
+				|| pop instanceof PhysicalOpBindJoin ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
 		}
 
@@ -99,7 +99,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		else if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfVars;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
+		else if ( pop instanceof BasePhysicalOpBinaryJoin || pop instanceof PhysicalOpBinaryUnion ) {
 			costValue = 0;
 		}
 		else {
