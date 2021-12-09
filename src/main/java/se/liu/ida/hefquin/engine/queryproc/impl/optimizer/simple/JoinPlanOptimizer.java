@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +18,6 @@ public interface JoinPlanOptimizer
 	 * Returns a plan that combines the given subplans using binary joins.
 	 */
 	default PhysicalPlan determineJoinPlan( PhysicalPlan[] subplans ) throws QueryOptimizationException {
-		return determineJoinPlan( Arrays.asList(subplans) );
+		return determineJoinPlan( new ArrayList<>(Arrays.asList(subplans)) );
 	}
 }

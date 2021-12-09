@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -26,10 +25,10 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 
 	protected class GreedyEnumerationAlgorithm implements EnumerationAlgorithm
 	{
-		protected List<PhysicalPlan> subplans;
+		protected final List<PhysicalPlan> subplans;
 
 		public GreedyEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
-			this.subplans = new ArrayList<>(subplans);
+			this.subplans = subplans;
 		}
 
 		@Override
