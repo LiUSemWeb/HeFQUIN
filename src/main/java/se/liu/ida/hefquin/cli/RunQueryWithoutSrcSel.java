@@ -19,24 +19,22 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModTime          modTime =          new ModTime();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModFederation    modFederation =    new ModFederation();
-    protected final ModResultsOut    modResults =       new ModResultsOut();
+	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
-    public static void main( final String... argv )
-    {
-        new RunQueryWithoutSrcSel(argv).mainRun();
-    }
+	public static void main( final String... argv ) {
+		new RunQueryWithoutSrcSel(argv).mainRun();
+	}
 
-    public RunQueryWithoutSrcSel( final String[] argv )
-    {
-    	super(argv);
+	public RunQueryWithoutSrcSel( final String[] argv ) {
+		super(argv);
 
-        addModule(modTime);
-        addModule(modQuery);
-        addModule(modFederation);
-        addModule(modResults);
-        addModule(modEngineConfig);
-    }
+		addModule(modTime);
+		addModule(modQuery);
+		addModule(modFederation);
+		addModule(modResults);
+		addModule(modEngineConfig);
+	}
 
 	@Override
 	protected String getSummary() {
@@ -60,8 +58,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
-			System.err.println(ex.getMessage());
-            ex.printStackTrace(System.err);
+			System.err.println( ex.getMessage() );
+			ex.printStackTrace( System.err );
 		}
 
 		if ( modTime.timingEnabled() ) {
@@ -70,13 +68,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 	}
 
-    protected Query getQuery() {
-        try {
-            return modQuery.getQuery();
-        } catch ( final NotFoundException ex ) {
-            System.err.println( "Failed to load query: "+ex.getMessage() );
-            throw new TerminationException(1);
-        }
-    }
+	protected Query getQuery() {
+		try {
+			return modQuery.getQuery();
+		} catch ( final NotFoundException ex ) {
+			System.err.println( "Failed to load query: "+ex.getMessage() );
+			throw new TerminationException(1);
+		}
+	}
 
 }
