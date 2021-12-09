@@ -86,11 +86,11 @@ public class QueryPatternUtils
 	 * of {@link #getVariablesInPattern(BGP)}.
 	 */
 	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern.asJenaOp() instanceof Triple) {
-			return getVariablesInPattern( new TriplePatternImpl( (Triple) queryPattern.asJenaOp()) );
+		if ( queryPattern instanceof TriplePattern ) {
+			return getVariablesInPattern( (TriplePattern) queryPattern );
 		}
-		if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getVariablesInPattern( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
+		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
+			return getVariablesInPattern( (OpBGP) queryPattern.asJenaOp() );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -98,8 +98,12 @@ public class QueryPatternUtils
 	}
 
 	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
+		return getVariablesInPattern( tp.asJenaTriple() );
+	}
+
+	public static Set<Var> getVariablesInPattern( final Triple tp ) {
 		final Set<Var> result = new HashSet<>();
-		Vars.addVarsFromTriple( result, tp.asJenaTriple() );
+		Vars.addVarsFromTriple( result, tp );
 		return result;
 	}
 
@@ -111,11 +115,23 @@ public class QueryPatternUtils
 		return result;
 	}
 
+	public static Set<Var> getVariablesInPattern( final OpBGP bgp ) {
+		final Set<Var> result = new HashSet<>();
+		for ( final Triple tp : bgp.getPattern().getList() ) {
+			result.addAll( getVariablesInPattern(tp) );
+		}
+		return result;
+	}
+
 	/**
 	 * Returns the number of elements of the given triple pattern that are variables.
 	 */
 	public static int getNumberOfVarOccurrences( final TriplePattern tp ) {
 		final Triple jenaTP = tp.asJenaTriple();
+		return getNumberOfVarOccurrences(jenaTP);
+	}
+
+	public static int getNumberOfVarOccurrences( final Triple jenaTP ) {
 		int n = 0;
 		if ( jenaTP.getSubject().isVariable() )   { n += 1; }
 		if ( jenaTP.getPredicate().isVariable() ) { n += 1; }
@@ -155,8 +171,20 @@ public class QueryPatternUtils
 		return n;
 	}
 
+	public static int getNumberOfVarOccurrences( final OpBGP bgp ) {
+		int n = 0;
+		for ( final Triple tp : bgp.getPattern().getList() ) {
+			n += getNumberOfVarOccurrences(tp);
+		}
+		return n;
+	}
+
 	public static int getNumberOfTermOccurrences( final BGP bgp ) {
 		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
+	}
+
+	public static int getNumberOfTermOccurrences( final OpBGP bgp ) {
+		return 3 * bgp.getPattern().getList().size() - getNumberOfVarOccurrences(bgp);
 	}
 
 	public static int getNumberOfBNodeOccurrences( final BGP bgp ) {
@@ -178,11 +206,11 @@ public class QueryPatternUtils
 	 * returns the result of {@link #getNumberOfVarOccurrences(BGP)}.
 	 */
 	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern.asJenaOp() instanceof Triple) {
-			return getNumberOfVarOccurrences( new TriplePatternImpl( (Triple) queryPattern.asJenaOp()) );
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
 		}
 		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getNumberOfVarOccurrences( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
+			return getNumberOfVarOccurrences( (OpBGP) queryPattern.asJenaOp()  );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -200,11 +228,11 @@ public class QueryPatternUtils
 	 * returns the result of {@link #getNumberOfTermOccurrences(BGP)}.
 	 */
 	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern.asJenaOp() instanceof Triple) {
-			return getNumberOfTermOccurrences( new TriplePatternImpl( (Triple) queryPattern.asJenaOp())  );
+		if ( queryPattern instanceof TriplePattern ) {
+			return getNumberOfTermOccurrences( (TriplePattern) queryPattern  );
 		}
 		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getNumberOfTermOccurrences( createBGP(((OpBGP) queryPattern.asJenaOp()).getPattern()) );
+			return getNumberOfTermOccurrences( (OpBGP) queryPattern.asJenaOp() );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
