@@ -34,45 +34,44 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 			
 			// TODO: Define what equilibrium entails on a practical level
 			// The paper's implementation counts equilibrium as 16*(number of joins in query).
-			// While not equilibrium do
+			while(!isEquilibrium()) {
 			
-			// Here we want a random neighbour, and its cost
-			// My first instinct to do something like
-			// final PhysicalPlanWithCost alternativePlan = (PhysicalPlan alternativePlanPlan = getRandom(getNeighbours(currentPlan.getPlan())), CostEstimationUtils.getEstimates( context.getCostModel(), alternativePlanPlan )[0])
-			// to make the code really compact.
-			// because it seems wasteful to create a local variable that's stored in optimize() just because we need to get the cost separately.
-			final PhysicalPlan temporaryPlan = getRandom(getNeighbours(currentPlan.getPlan()));
-			final PhysicalPlanWithCost alternativePlan = new PhysicalPlanWithCost(temporaryPlan, CostEstimationUtils.getEstimates( context.getCostModel(), temporaryPlan )[0]);
-			// Alternatively, a better option is possibly to create a new constructor for PhysicalPlanWithCost...
-			// ...that only takes a PhysicalPlan argument, and gets the cost itself.
-			
-			// costDelta = Cost(S')-Cost(S)
-			double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
-			// If costDelta <= 0 then S = S'
-			if (costDelta <= 0) {
-				currentPlan = alternativePlan;
-			} else {
-				// else then S = S' with probability e^(-costDelta / temperature), according to the paper
-				if (rng.nextDouble() > Math.exp(-costDelta / temperature)) {
+				// Here we want a random neighbour, and its cost
+				// My first instinct to do something like
+				// final PhysicalPlanWithCost alternativePlan = (PhysicalPlan alternativePlanPlan = getRandom(getNeighbours(currentPlan.getPlan())), CostEstimationUtils.getEstimates( context.getCostModel(), alternativePlanPlan )[0])
+				// to make the code really compact.
+				// because it seems wasteful to create a local variable that's stored in optimize() just because we need to get the cost separately.
+				final PhysicalPlan temporaryPlan = getRandom(getNeighbours(currentPlan.getPlan()));
+				final PhysicalPlanWithCost alternativePlan = new PhysicalPlanWithCost(temporaryPlan, CostEstimationUtils.getEstimates( context.getCostModel(), temporaryPlan )[0]);
+				// Alternatively, a better option is possibly to create a new constructor for PhysicalPlanWithCost...
+				// ...that only takes a PhysicalPlan argument, and gets the cost itself.
+				
+				double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
+				if (costDelta <= 0) {
 					currentPlan = alternativePlan;
+				} else {
+					if (rng.nextDouble() > Math.exp(-costDelta / temperature)) {
+						currentPlan = alternativePlan;
+					}
+					
 				}
 				
-			}
+				if(currentPlan.getWeight() < bestPlan.getWeight()) {
+					bestPlan = currentPlan;
+					unchanged = 0;
+				}
 			
-			if(currentPlan.getWeight() < bestPlan.getWeight()) {
-				bestPlan = currentPlan;
-				unchanged = 0;
 			}
-			
-			// end of while not equilibrium
 			
 			// reduce temperature. Using the example setting from the paper.
 			temperature *= 0.95;
-			
-			// end of while not frozen
 		}
 		
 		return bestPlan.getPlan();
+	}
+	
+	protected boolean isEquilibrium() {
+		return false;
 	}
 	
 	protected boolean isFrozen(double temperature, int unchanged) {
