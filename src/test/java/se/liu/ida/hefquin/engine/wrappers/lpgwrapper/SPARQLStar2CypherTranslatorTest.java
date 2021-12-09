@@ -256,6 +256,7 @@ public class SPARQLStar2CypherTranslatorTest {
                     .addMatch(new NodeMatchClause(v1))
                     .addCondition(new NodeLabelCondition(v1, "Person"))
                     .addReturn(new VariableReturnStatement(v1, ret1))
+                    .add(new LiteralValueReturnStatement("label", ret2))
                     .build(),
                 translation);
     }

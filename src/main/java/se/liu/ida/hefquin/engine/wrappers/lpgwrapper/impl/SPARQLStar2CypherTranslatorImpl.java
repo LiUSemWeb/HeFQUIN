@@ -293,6 +293,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new NodeMatchClause(svar))
                 .add(new NodeLabelCondition(svar, configuration.unmapNodeLabel(o)))
                 .add(new VariableReturnStatement(svar, gen.getRetVar(s)))
+                .add(new LiteralValueReturnStatement("label", gen.getRetVar(p)))
                 .build();
     }
 

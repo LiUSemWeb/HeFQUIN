@@ -18,7 +18,6 @@ public class Record2SolutionMappingTranslationTest {
     final LPGNode node5 = new LPGNode("5", null, null);
     final LPGNode node9 = new LPGNode("9", null, null);
     final LPGNode node22 = new LPGNode("22", null, null);
-    final LPGNode node23 = new LPGNode("23", null, null);
 
     @Test
     public void translateVarPropertyLiteralTest() {

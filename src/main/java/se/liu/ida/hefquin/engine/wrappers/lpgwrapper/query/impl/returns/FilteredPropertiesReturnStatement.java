@@ -40,8 +40,8 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement {
 
     @Override
     public String toString() {
-        return "[" + innerVar + " IN KEYS(" + var.getName() + ") WHERE " + var.getName() + "[" + innerVar + "]=\""
-                + filterValue + "\" | " + innerVar + "]" + (alias != null ? " AS " + alias.getName() : "");
+        return "[" + innerVar + " IN KEYS(" + var.getName() + ") WHERE " + var.getName() + "[" + innerVar + "]='"
+                + filterValue + "' | " + innerVar + "]" + (alias != null ? " AS " + alias.getName() : "");
     }
 
     @Override
