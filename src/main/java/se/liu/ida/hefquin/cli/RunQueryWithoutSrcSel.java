@@ -1,16 +1,9 @@
 package se.liu.ida.hefquin.cli;
 
 import org.apache.jena.cmd.TerminationException;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.shared.NotFoundException;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.resultset.ResultsFormat;
-import org.apache.jena.sparql.util.Context;
-import org.apache.jena.sparql.util.QueryExecUtils;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
@@ -18,17 +11,8 @@ import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
-import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
+import se.liu.ida.hefquin.engine.HeFQUINEngine;
+import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
@@ -61,12 +45,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	@Override
 	protected void exec() {
-		final Context ctxt = ARQ.getContext();
-		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
-		ctxt.set( HeFQUINConstants.sysFederationCatalog, modFederation.getFederationCatalog() );
-		ctxt.set( HeFQUINConstants.sysFederationAccessManager, createFedAccessMgr() );
-
-		modEngineConfig.initializeContext(ctxt);
+		final HeFQUINEngine e = new HeFQUINEngineBuilder()
+				.setConfiguration( modEngineConfig.getConfig() )
+				.setFederationCatalog( modFederation.getFederationCatalog() )
+				.build();
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
@@ -74,8 +56,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		modTime.startTimer();
 
 		try {
-			final QueryExecution qe = QueryExecutionFactory.create( query, DatasetGraphFactory.createGeneral() );
-			QueryExecUtils.executeQuery(query, qe, resFmt);
+			e.executeQuery(query, resFmt);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
@@ -96,25 +77,6 @@ public class RunQueryWithoutSrcSel extends CmdARQ
             System.err.println( "Failed to load query: "+ex.getMessage() );
             throw new TerminationException(1);
         }
-    }
-
-    protected FederationAccessManager createFedAccessMgr() {
-		final SPARQLRequestProcessor reqProcSPARQL = new SPARQLRequestProcessorImpl();
-		// TODO: replace the following once we have an implementation of TPFRequestProcessor
-		final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
-			@Override public TPFResponse performRequest(TPFRequest req, TPFServer fm) { throw new UnsupportedOperationException(); }
-			@Override public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
-		};
-		// TODO: replace the following once we have an implementation of BRTPFRequestProcessor
-		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
-		};
-
-		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessorImpl();
-
-		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
-		final FederationAccessManager fedAccessMgrWithCache = new FederationAccessManagerWithCache(fedAccessMgrWithoutCache, 100);
-		return fedAccessMgrWithCache;
     }
 
 }
