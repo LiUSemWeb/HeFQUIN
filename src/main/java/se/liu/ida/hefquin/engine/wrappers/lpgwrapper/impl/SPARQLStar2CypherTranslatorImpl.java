@@ -22,9 +22,20 @@ import java.util.*;
 
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
+    protected final CypherVarGenerator generator;
+
+    public SPARQLStar2CypherTranslatorImpl() {
+        this.generator = new CypherVarGenerator();
+    }
+
     @Override
     public CypherQuery translateTriplePattern(final TriplePattern tp, final LPG2RDFConfiguration conf) {
-        return translateTriplePattern(tp, conf, new CypherVarGenerator(), new HashSet<>());
+        return translateTriplePattern(tp, conf, this.generator, new HashSet<>());
+    }
+
+    @Override
+    public CypherVarGenerator getVarGenerator() {
+        return generator;
     }
 
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
