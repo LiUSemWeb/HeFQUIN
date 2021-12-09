@@ -6,8 +6,9 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.RandomizedJoinPlanOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
-import se.liu.ida.hefquin.engine.utils.Pair;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 
 public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOptimizerBase
 {
@@ -37,29 +38,34 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 
 		while ( !condition.readyToStop(generation) ) { // Currently only handles generation number as a stopping condition!
 			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
+			/*
 			PhysicalPlan currentPlan = initialPlan; // This variable will hold the plan which is currently being worked on.
-			Double currentCost = initialCost; // The cost of the current plan. For it to be a local minimum, none of its neighbours can have a lower cost
+			*/
+			final RandomizedJoinPlanOptimizerImpl planRandomizer = new RandomizedJoinPlanOptimizerImpl();
+			PhysicalPlan currentPlan = planRandomizer.determineJoinPlan(getNeighbours(initialPlan));
+			
+			Double currentCost = CostEstimationUtils.getEstimates( context.getCostModel(), currentPlan )[0]; // The cost of the current plan. For it to be a local minimum, none of its neighbours can have a lower cost
 			boolean improvementFound = false;
 
 			do {
 				final List<PhysicalPlan> neighbours = getNeighbours(currentPlan);
 				final Double[] neighbourCosts = CostEstimationUtils.getEstimates( context.getCostModel(), neighbours );
-				final List<Pair<PhysicalPlan,Double>> betterPlans = new ArrayList<>();
+				final List<PhysicalPlanWithCost> betterPlans = new ArrayList<>();
 				improvementFound = false;
 
 				// Using a for-loop in order to have the index for which neighbouring plan to pick.
 				for (int x = 0; x < neighbourCosts.length; x++) {
 					if(neighbourCosts[x] < currentCost) {
 						improvementFound = true;
-						final Pair<PhysicalPlan,Double> betterPlan = new Pair<PhysicalPlan, Double>(neighbours.get(x), neighbourCosts[x]);
+						final PhysicalPlanWithCost betterPlan = new PhysicalPlanWithCost(neighbours.get(x), neighbourCosts[x]);
 						betterPlans.add(betterPlan); // I haven't figured out how to do this properly for Java yet, but it will be solved by the PhysicalPlanWithCost anyway.
 					}
 				}
 
 				if(improvementFound) { // if we have found at least one possible improvement, we want to make one of them into our new current plan.
-					final Pair<PhysicalPlan,Double> newPlan = betterPlans.get(rng.nextInt(betterPlans.size())); // Get a random object.
-					currentPlan = newPlan.object1;
-					currentCost = newPlan.object2;
+					final PhysicalPlanWithCost newPlan = getRandom(betterPlans); // Get a random object.
+					currentPlan = newPlan.getPlan();
+					currentCost = newPlan.getWeight();
 				}
 			}
 			while(improvementFound);
