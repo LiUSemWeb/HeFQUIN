@@ -110,6 +110,17 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return mappings;
     }
 
+    @Override
+    public List<SolutionMapping> translateRecords(final List<TableRecord> records,
+                                                  final LPG2RDFConfiguration conf, final CypherQuery query,
+                                                  final CypherVarGenerator generator) {
+        List<SolutionMapping> results = new ArrayList<>();
+        for (final TableRecord record : records) {
+            results.addAll(translateRecord(record, conf, query, generator));
+        }
+        return results;
+    }
+
     private void addToAllBuilders(final List<BindingBuilder> builders, final Var var, final Node node) {
         for (final BindingBuilder builder : builders)
             builder.add(var, node);

@@ -15,4 +15,6 @@ public interface Record2SolutionMappingTranslator {
     List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
                                           final CypherQuery query, final CypherVarGenerator generator);
 
+    List<SolutionMapping> translateRecords(final List<TableRecord> records, final LPG2RDFConfiguration conf,
+                                           final CypherQuery query, final CypherVarGenerator generator);
 }
