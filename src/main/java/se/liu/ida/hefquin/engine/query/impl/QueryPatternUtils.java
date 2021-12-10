@@ -7,9 +7,11 @@ import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
@@ -17,6 +19,7 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 
@@ -90,18 +93,8 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getVariablesInPattern( (TriplePattern) queryPattern );
 		}
-		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getVariablesInPattern( (OpBGP) queryPattern.asJenaOp() );
-		}
-		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
-			// return 0;
-			final Set<Var> varLeft = getVariablesInPattern( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
-			final Set<Var> varRight = getVariablesInPattern( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
-			varLeft.addAll(varRight);
-			return varLeft;
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		else  {
+			return getVariablesInPattern( queryPattern.asJenaOp() );
 		}
 	}
 
@@ -129,6 +122,34 @@ public class QueryPatternUtils
 			result.addAll( getVariablesInPattern(tp) );
 		}
 		return result;
+	}
+
+
+	public static Set<Var> getVariablesInPattern( final OpJoin join ) {
+		final Set<Var> varLeft = getVariablesInPattern( join.getLeft() );
+		final Set<Var> varRight = getVariablesInPattern( join.getRight() );
+		varLeft.addAll(varRight);
+		return varLeft;
+	}
+
+	public static Set<Var> getVariablesInPattern( final OpFilter filter ) {
+		final ExprList expLi = filter.getExprs();
+		return expLi.getVarsMentioned();
+	}
+
+	public static Set<Var> getVariablesInPattern( final Op op ) {
+		if ( op instanceof OpBGP ) {
+			return getVariablesInPattern( (OpBGP) op);
+		}
+		else if ( op instanceof OpJoin ) {
+			return getVariablesInPattern( (OpJoin) op );
+		}
+		else if ( op instanceof OpFilter )  {
+			return getVariablesInPattern( (OpFilter) op );
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
+		}
 	}
 
 	/**
@@ -187,8 +208,54 @@ public class QueryPatternUtils
 		return n;
 	}
 
+	public static int getNumberOfVarOccurrences( final OpJoin join ) {
+		final int numLeft = getNumberOfVarOccurrences( join.getLeft() );
+		final int numRight = getNumberOfVarOccurrences( join.getRight() );
+
+		return numLeft+numRight;
+	}
+
+	public static int getNumberOfVarOccurrences( final Op op ) {
+		if ( op instanceof OpBGP ) {
+			return getNumberOfVarOccurrences( (OpBGP) op);
+		}
+		else if ( op instanceof OpJoin ) {
+			return getNumberOfVarOccurrences( (OpJoin) op );
+		}
+		else if ( op instanceof OpFilter )  {
+			// TODO
+			return 0;
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
+		}
+	}
+
 	public static int getNumberOfTermOccurrences( final BGP bgp ) {
 		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
+	}
+
+	public static int getNumberOfTermOccurrences( final OpJoin join ) {
+		final int numLeft = getNumberOfTermOccurrences( join.getLeft() );
+		final int numRight = getNumberOfTermOccurrences( join.getRight() );
+
+		return numLeft+numRight;
+	}
+
+	public static int getNumberOfTermOccurrences( final Op op ) {
+		if ( op instanceof OpBGP ) {
+			return getNumberOfTermOccurrences( (OpBGP) op);
+		}
+		else if ( op instanceof OpJoin ) {
+			return getNumberOfTermOccurrences( (OpJoin) op );
+		}
+		else if ( op instanceof OpFilter )  {
+			// TODO
+			return 0;
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
+		}
 	}
 
 	public static int getNumberOfTermOccurrences( final OpBGP bgp ) {
@@ -217,17 +284,8 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
 		}
-		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getNumberOfVarOccurrences( (OpBGP) queryPattern.asJenaOp()  );
-		}
-		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
-			// return 0;
-			final int numLeft = getNumberOfVarOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
-			final int numRight = getNumberOfVarOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
-			return numLeft + numRight;
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		else  {
+			return getNumberOfVarOccurrences( queryPattern.asJenaOp() );
 		}
 	}
 
@@ -245,17 +303,8 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfTermOccurrences( (TriplePattern) queryPattern  );
 		}
-		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
-			return getNumberOfTermOccurrences( (OpBGP) queryPattern.asJenaOp() );
-		}
-		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
-			// return 0;
-			final int numLeft = getNumberOfTermOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
-			final int numRight = getNumberOfTermOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
-			return numLeft + numRight;
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
+		else  {
+			return getNumberOfTermOccurrences( queryPattern.asJenaOp() );
 		}
 	}
 
