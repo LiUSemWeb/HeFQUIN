@@ -10,6 +10,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
@@ -91,6 +92,13 @@ public class QueryPatternUtils
 		}
 		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
 			return getVariablesInPattern( (OpBGP) queryPattern.asJenaOp() );
+		}
+		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
+			// return 0;
+			final Set<Var> varLeft = getVariablesInPattern( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
+			final Set<Var> varRight = getVariablesInPattern( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
+			varLeft.addAll(varRight);
+			return varLeft;
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -212,6 +220,12 @@ public class QueryPatternUtils
 		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
 			return getNumberOfVarOccurrences( (OpBGP) queryPattern.asJenaOp()  );
 		}
+		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
+			// return 0;
+			final int numLeft = getNumberOfVarOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
+			final int numRight = getNumberOfVarOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
+			return numLeft + numRight;
+		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
 		}
@@ -233,6 +247,12 @@ public class QueryPatternUtils
 		}
 		else if ( queryPattern.asJenaOp() instanceof OpBGP) {
 			return getNumberOfTermOccurrences( (OpBGP) queryPattern.asJenaOp() );
+		}
+		else if ( queryPattern.asJenaOp() instanceof OpJoin) {
+			// return 0;
+			final int numLeft = getNumberOfTermOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getLeft() );
+			final int numRight = getNumberOfTermOccurrences( (OpBGP) ((OpJoin) queryPattern.asJenaOp()).getRight() );
+			return numLeft + numRight;
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + queryPattern.asJenaOp().getClass().getName() + ").");
@@ -374,7 +394,7 @@ public class QueryPatternUtils
 
 	public static class VariableByBlankNodeSubstitutionException extends Exception
 	{
-		private static final long serialVersionUID = 3285677866147999456L;	
+		private static final long serialVersionUID = 3285677866147999456L;
 	}
 
 }
