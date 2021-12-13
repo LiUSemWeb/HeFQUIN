@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.jena.base.Sys;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
@@ -21,9 +22,20 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMapping
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.EdgeLabelCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.NodeIDCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.NodeLabelCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.PropertyValueCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.TripleMapReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.VariableReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,21 +53,37 @@ public class Record2SolutionMappingTranslationTest {
     final LPGNode node14 = new LPGNode("14", null, null);
     final LPGNode node22 = new LPGNode("22", null, null);
 
+    final CypherVar cpvar1 = new CypherVar("cpvar1");
+    final CypherVar ret1 = new CypherVar("ret1");
+    final CypherVar src1 = new CypherVar("src1");
+    final CypherVar edge1 = new CypherVar("edge1");
+    final CypherVar tgt1 = new CypherVar("tgt1");
+    final CypherVar a1 = new CypherVar("a1");
+    final CypherVar a2 = new CypherVar("a2");
+
     @Test
     public void translateVarPropertyLiteralTest() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
-        final Triple t = new Triple(Var.alloc("s"), conf.mapProperty("name"),
-                NodeFactory.createLiteral("Lana Wachowski"));
-        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
-        final Pair<CypherQuery, Map<CypherVar, Node>> translation =
-                translator.translateTriplePattern(new TriplePatternImpl(t), conf);
+        final Map<CypherVar, Node> varMap = new HashMap<>();
+        varMap.put(ret1, Var.alloc("s"));
+        final CypherQuery query = new CypherUnionQueryImpl(
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(cpvar1))
+                        .add(new PropertyValueCondition(cpvar1, "name", "Lana Wachowski"))
+                        .add(new VariableReturnStatement(cpvar1, ret1))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(src1, edge1, tgt1))
+                        .add(new PropertyValueCondition(edge1,  "name", "Lana Wachowski"))
+                        .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
+                        .build());
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}]," +
                     "\"meta\":[{\"id\":6,\"type\":\"node\",\"deleted\":false}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
-                .translateRecords(records, conf, translation.object1, translation.object2);
+                .translateRecords(records, conf, query, varMap);
         final BindingBuilder builder = Binding.builder();
         builder.add(Var.alloc("s"), conf.mapNode(node6));
         final SolutionMapping m1 = new SolutionMappingImpl(builder.build());
@@ -66,10 +94,13 @@ public class Record2SolutionMappingTranslationTest {
     @Test
     public void translateVarLabelClassTest() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
-        final Triple t = new Triple(Var.alloc("s"), conf.getLabel(), conf.mapNodeLabel("Person"));
-        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
-        final Pair<CypherQuery, Map<CypherVar, Node>> translation =
-                translator.translateTriplePattern(new TriplePatternImpl(t), conf);
+        final Map<CypherVar, Node> varMap = new HashMap<>();
+        varMap.put(ret1, Var.alloc("s"));
+        final CypherQuery query = new CypherQueryBuilder()
+                .add(new NodeMatchClause(cpvar1))
+                .add(new NodeLabelCondition(cpvar1, "Person"))
+                .add(new VariableReturnStatement(cpvar1, ret1))
+                .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"]," +
                 "\"data\":[{\"row\":[{\"born\":1964,\"name\":\"Keanu Reeves\"}],\"meta\":[{\"id\":1,\"type\":\"node\",\"deleted\":false}]}," +
                 "{\"row\":[{\"born\":1967,\"name\":\"Carrie-Anne Moss\"}],\"meta\":[{\"id\":2,\"type\":\"node\",\"deleted\":false}]}," +
@@ -79,7 +110,7 @@ public class Record2SolutionMappingTranslationTest {
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
-                .translateRecords(records, conf, translation.object1, translation.object2);
+                .translateRecords(records, conf, query, varMap);
         List<SolutionMapping> expected = new ArrayList<>();
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2))));
@@ -92,17 +123,21 @@ public class Record2SolutionMappingTranslationTest {
     @Test
     public void translateVarRelationshipNodeTest() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
-        final Triple t = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), conf.mapNode(node9));
-        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
-        final Pair<CypherQuery, Map<CypherVar, Node>> translation =
-                translator.translateTriplePattern(new TriplePatternImpl(t), conf);
+        final Map<CypherVar, Node> varMap = new HashMap<>();
+        varMap.put(ret1, Var.alloc("s"));
+        final CypherQuery query = new CypherQueryBuilder()
+                .add(new EdgeMatchClause(cpvar1, a1, a2))
+                .add(new NodeIDCondition(a2, "9"))
+                .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                .add(new VariableReturnStatement(cpvar1, ret1))
+                .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}],\"meta\":[{\"id\":6,\"type\":\"node\",\"deleted\":false}]}" +
                 ",{\"row\":[{\"born\":1967,\"name\":\"Andy Wachowski\"}],\"meta\":[{\"id\":5,\"type\":\"node\",\"deleted\":false}]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
-                .translateRecords(records, conf, translation.object1, translation.object2);
+                .translateRecords(records, conf, query, varMap);
         List<SolutionMapping> expected = new ArrayList<>();
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5))));
