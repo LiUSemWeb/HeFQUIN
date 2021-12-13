@@ -17,6 +17,11 @@ import java.util.List;
 
 public class CypherUtils {
 
+    /**
+     * This method parses a JSON response obtained from a Neo4j HTTP server into a list of POJOs
+     * @throws JsonProcessingException if the received body is not valid JSON
+     * @throws Neo4JException if the server responds with an error object
+     */
     public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4JException {
         final ObjectMapper mapper = new ObjectMapper();
         final List<TableRecord> records = new LinkedList<>();
@@ -51,6 +56,11 @@ public class CypherUtils {
         return records;
     }
 
+    /**
+     * This method checks if a given cypher query has a given column name, and if said column is from type
+     * {@link PropertyListReturnStatement}. If the query is a {@link CypherUnionQuery}, the method just checks if
+     * any of the {@link CypherMatchQuery} of the union satisfies the condition.
+     */
     public static boolean isPropertyColumn(final CypherQuery query, final CypherVar colName) {
         if (query instanceof CypherMatchQuery) {
             return isPropertyColumnPriv((CypherMatchQuery) query, colName);
