@@ -32,7 +32,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         for (final RecordEntry entry : record.getRecordEntries()){
             final CypherVar var = entry.getName();
             final Value value = entry.getValue();
-            final Var mappingVar = Var.alloc(generator.getReverseRetVarName(var));
+            final Var mappingVar = Var.alloc(generator.getReverseRetVar(var));
             if (value instanceof LPGNodeValue) {
                 final Node nodeMapping  = conf.mapNode(((LPGNodeValue) value).getNode());
                 if (builders.isEmpty())

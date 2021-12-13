@@ -71,6 +71,8 @@ public class CypherUtils {
                     return true;
                 }
             }
+        } else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query");
         }
         return false;
     }

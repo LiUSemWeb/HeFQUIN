@@ -10,7 +10,8 @@ import java.util.Map;
 
 public class CypherVarGenerator {
     private final Map<String, CypherVar> innerVars = new HashMap<>();
-    private final Map<String, CypherVar> retVars = new HashMap<>();
+    private final Map<Node, CypherVar> retVars = new HashMap<>();
+    private final Map<CypherVar, Node> reverseRetVars = new HashMap<>();
     private final Map<String, List<CypherVar>> edgeVars = new HashMap<>();
 
     private int varCount = 0;
@@ -54,21 +55,17 @@ public class CypherVarGenerator {
     }
 
     public CypherVar getRetVar(final Node n) {
-        CypherVar var = retVars.get(n.getName());
+        CypherVar var = retVars.get(n);
         if (var != null)
             return var;
         retVarCount++;
         var = new CypherVar(retPrefix + retVarCount);
-        retVars.put(n.getName(), var);
+        retVars.put(n, var);
+        reverseRetVars.put(var, n);
         return var;
     }
 
-    public String getReverseRetVarName(final CypherVar var) {
-        for (final Map.Entry<String, CypherVar> entry : retVars.entrySet()) {
-            if (entry.getValue().equals(var)) {
-                return entry.getKey();
-            }
-        }
-        return null;
+    public Node getReverseRetVar(final CypherVar var) {
+        return reverseRetVars.get(var);
     }
 }
