@@ -4,6 +4,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
@@ -22,20 +23,11 @@ import java.util.*;
 
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
-    protected final CypherVarGenerator generator;
-
-    public SPARQLStar2CypherTranslatorImpl() {
-        this.generator = new CypherVarGenerator();
-    }
-
     @Override
-    public CypherQuery translateTriplePattern(final TriplePattern tp, final LPG2RDFConfiguration conf) {
-        return translateTriplePattern(tp, conf, this.generator, new HashSet<>());
-    }
-
-    @Override
-    public CypherVarGenerator getVarGenerator() {
-        return generator;
+    public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
+                                                                          final LPG2RDFConfiguration conf) {
+        final CypherVarGenerator generator = new CypherVarGenerator();
+        return new Pair<>(translateTriplePattern(tp, conf, generator, new HashSet<>()), generator.getReverseMap());
     }
 
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,

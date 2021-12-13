@@ -26,13 +26,13 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
 
     @Override
     public List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
-                                                 final CypherQuery query, final CypherVarGenerator generator) {
+                                                 final CypherQuery query, final Map<CypherVar, Node> varMap) {
         final List<BindingBuilder> builders = new ArrayList<>();
         final BindingBuilder baseBuilder = Binding.builder();
         for (final RecordEntry entry : record.getRecordEntries()){
             final CypherVar var = entry.getName();
             final Value value = entry.getValue();
-            final Var mappingVar = Var.alloc(generator.getReverseRetVar(var));
+            final Var mappingVar = Var.alloc(varMap.get(var));
             if (value instanceof LPGNodeValue) {
                 final Node nodeMapping  = conf.mapNode(((LPGNodeValue) value).getNode());
                 if (builders.isEmpty())
@@ -113,10 +113,10 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     @Override
     public List<SolutionMapping> translateRecords(final List<TableRecord> records,
                                                   final LPG2RDFConfiguration conf, final CypherQuery query,
-                                                  final CypherVarGenerator generator) {
+                                                  final Map<CypherVar, Node> varMap) {
         List<SolutionMapping> results = new ArrayList<>();
         for (final TableRecord record : records) {
-            results.addAll(translateRecord(record, conf, query, generator));
+            results.addAll(translateRecord(record, conf, query, varMap));
         }
         return results;
     }

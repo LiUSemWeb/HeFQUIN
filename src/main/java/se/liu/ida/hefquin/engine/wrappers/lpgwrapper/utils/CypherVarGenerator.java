@@ -68,4 +68,8 @@ public class CypherVarGenerator {
     public Node getReverseRetVar(final CypherVar var) {
         return reverseRetVars.get(var);
     }
+
+    public Map<CypherVar, Node> getReverseMap() {
+        return reverseRetVars;
+    }
 }
