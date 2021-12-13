@@ -22,7 +22,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTrans
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

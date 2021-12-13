@@ -16,7 +16,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +97,8 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 } else {
                     addToAllBuilders(builders, mappingVar, node);
                 }
+            } else {
+                throw new IllegalArgumentException("Unsupported implementation of Value");
             }
         }
         if (builders.isEmpty()) {
