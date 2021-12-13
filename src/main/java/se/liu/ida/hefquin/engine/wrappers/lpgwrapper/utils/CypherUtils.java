@@ -65,7 +65,7 @@ public class CypherUtils {
         return false;
     }
 
-    protected static boolean isPropertyColumnPriv(CypherMatchQuery query, CypherVar colName) {
+    protected static boolean isPropertyColumnPriv( final CypherMatchQuery query, final CypherVar colName ) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof PropertyListReturnStatement) {
