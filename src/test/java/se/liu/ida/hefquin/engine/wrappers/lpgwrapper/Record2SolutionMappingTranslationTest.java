@@ -56,8 +56,8 @@ public class Record2SolutionMappingTranslationTest {
         final BindingBuilder builder = Binding.builder();
         builder.add(Var.alloc("s"), conf.mapNode(node6));
         final SolutionMapping m1 = new SolutionMappingImpl(builder.build());
-        assertEquals(solMaps.size(), 1);
-        assertEquals(solMaps.get(0), m1);
+        assertEquals(1, solMaps.size());
+        assertEquals(m1, solMaps.get(0));
     }
 
     @Test
