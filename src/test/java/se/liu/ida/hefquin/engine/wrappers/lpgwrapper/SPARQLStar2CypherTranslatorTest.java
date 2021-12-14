@@ -155,7 +155,7 @@ public class SPARQLStar2CypherTranslatorTest {
                     .addMatch(new EdgeMatchClause(a1, v1, a2))
                     .addCondition(new NodeIDCondition(a1, "22"))
                     .addCondition(new NodeIDCondition(a2, "23"))
-                    .addReturn(new VariableReturnStatement(v1, ret1))
+                    .addReturn(new RelationshipTypeReturnStatement(v1, ret1))
                     .build(),
                 translation);
     }
@@ -272,7 +272,7 @@ public class SPARQLStar2CypherTranslatorTest {
                     .addMatch(new EdgeMatchClause(v1, v2, a1))
                     .addCondition(new NodeIDCondition(a1, "22"))
                     .addReturn(new VariableReturnStatement(v1, ret1))
-                    .addReturn(new VariableReturnStatement(v2, ret2))
+                    .addReturn(new RelationshipTypeReturnStatement(v2, ret2))
                     .build(),
                 translation);
     }
@@ -321,7 +321,7 @@ public class SPARQLStar2CypherTranslatorTest {
                         new CypherQueryBuilder()
                                 .addMatch(new EdgeMatchClause(a3, a4, a5))
                                 .addCondition(new NodeIDCondition(a3, "22"))
-                                .addReturn(new VariableReturnStatement(a4, ret1))
+                                .addReturn(new RelationshipTypeReturnStatement(a4, ret1))
                                 .addReturn(new VariableReturnStatement(a5, ret2))
                                 .build()),
                 translation);
@@ -338,7 +338,7 @@ public class SPARQLStar2CypherTranslatorTest {
                         new CypherQueryBuilder()
                                 .addMatch(new EdgeMatchClause(a1, a2, a3))
                                 .addReturn(new VariableReturnStatement(a1, ret1))
-                                .addReturn(new VariableReturnStatement(a2, ret2))
+                                .addReturn(new RelationshipTypeReturnStatement(a2, ret2))
                                 .addReturn(new VariableReturnStatement(a3, ret3))
                                 .build(),
                         new CypherQueryBuilder()

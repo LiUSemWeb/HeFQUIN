@@ -46,9 +46,9 @@ public class TripleMapReturnStatement implements ReturnStatement {
         StringBuilder res = new StringBuilder();
         res.append("{source: ")
                 .append(source.getName())
-                .append(", edge: ")
+                .append(", edge: TYPE(")
                 .append(edge.getName())
-                .append(", target: ")
+                .append("), target: ")
                 .append(target.getName())
                 .append("}");
         if( alias != null ) {

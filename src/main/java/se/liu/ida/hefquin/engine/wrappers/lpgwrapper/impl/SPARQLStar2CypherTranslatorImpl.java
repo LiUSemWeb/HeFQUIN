@@ -201,7 +201,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new EdgeMatchClause(xvar, evar, yvar))
                 .add(new NodeIDCondition(xvar, configuration.unmapNode(s).getId()))
                 .add(new NodeIDCondition(yvar, configuration.unmapNode(o).getId()))
-                .add(new VariableReturnStatement(evar, gen.getRetVar(p)))
+                .add(new RelationshipTypeReturnStatement(evar, gen.getRetVar(p)))
                 .build();
     }
 
@@ -298,7 +298,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new EdgeMatchClause(svar, pvar, yvar))
                 .add(new NodeIDCondition(yvar, configuration.unmapNode(o).getId()))
                 .add(new VariableReturnStatement(svar, gen.getRetVar(s)))
-                .add(new VariableReturnStatement(pvar, gen.getRetVar(p)))
+                .add(new RelationshipTypeReturnStatement(pvar, gen.getRetVar(p)))
                 .build();
     }
 
@@ -341,7 +341,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .add(new EdgeMatchClause(a1, pvar, ovar))
                     .add(new NodeIDCondition(a1, node.getId()))
-                    .add(new VariableReturnStatement(pvar, gen.getRetVar(p)))
+                    .add(new RelationshipTypeReturnStatement(pvar, gen.getRetVar(p)))
                     .add(new VariableReturnStatement(ovar, gen.getRetVar(o)))
                     .build();
         }
@@ -361,7 +361,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a3, a4, a5))
                         .addCondition(new NodeIDCondition(a3, node.getId()))
-                        .addReturn(new VariableReturnStatement(a4, gen.getRetVar(p)))
+                        .addReturn(new RelationshipTypeReturnStatement(a4, gen.getRetVar(p)))
                         .addReturn(new VariableReturnStatement(a5, gen.getRetVar(o)))
                         .build()
         );
@@ -376,7 +376,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherMatchQuery q = new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new VariableReturnStatement(a1, gen.getRetVar(s)))
-                .add(new VariableReturnStatement(a2, gen.getRetVar(p)))
+                .add(new RelationshipTypeReturnStatement(a2, gen.getRetVar(p)))
                 .add(new VariableReturnStatement(a3, gen.getRetVar(o)))
                 .build();
         if (certainNodes.contains(s) && certainNodes.contains(o)) {
