@@ -72,7 +72,7 @@ public class CypherUtils {
                 }
             }
         } else {
-            throw new IllegalArgumentException("Unsupported implementation of Cypher Query");
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
         }
         return false;
     }

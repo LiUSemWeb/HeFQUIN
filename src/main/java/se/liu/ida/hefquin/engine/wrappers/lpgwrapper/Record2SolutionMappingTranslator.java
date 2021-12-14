@@ -12,7 +12,7 @@ import java.util.Map;
 public interface Record2SolutionMappingTranslator {
 
     /**
-     *
+     * Translates a single {@link TableRecord} object into a collection of {@link SolutionMapping}
      */
     List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
                                           final CypherQuery query, final Map<CypherVar, Node> varMap);
