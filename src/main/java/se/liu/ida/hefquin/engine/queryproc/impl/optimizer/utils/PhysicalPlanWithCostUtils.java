@@ -9,6 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
+    
+    public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm, final PhysicalPlan plan ) throws QueryOptimizationException {
+        final Double[] costs;
+        try {
+            costs = CostEstimationUtils.getEstimates(cm, plan);
+        } catch ( final CostEstimationException e ) {
+            throw new QueryOptimizationException( "Determining the cost for the plan caused an exception.", e.getCause() );
+        }
+
+        return new PhysicalPlanWithCost( plan, costs[0] );
+    }
 
     public static List<PhysicalPlanWithCost> annotatePlansWithCost(final CostModel cost, final List<PhysicalPlan> plans ) throws QueryOptimizationException {
         final Double[] costs;

@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationConte
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 
@@ -25,19 +26,16 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 		double temperature = currentPlan.getWeight()*2;
 		int unchanged = 0;
 		
-		// Possible TODO: Define what frozen means. Whether to hardcode a temp threshhold below which is frozen, or to pass on a frozen threshhold to the constructor, or something else entirely.
-		// I'm using the paper's implementation of frozen for now.
 		// While not frozen, do
 		while(!isFrozen(temperature,unchanged)) {
 			
 			unchanged++;
 			
-			// TODO: Define what equilibrium entails on a practical level
-			// The paper's implementation counts equilibrium as 16*(number of joins in query).
+			// TODO: Implement Equilibrium. Keep a counter and run the inner loop 16 times the number of logical operations in the initial logical plan.
 			while(!isEquilibrium()) {
 			
 				// Here we want a random neighbour, and its cost
-				final PhysicalPlan temporaryPlan = getRandom(getNeighbours(currentPlan.getPlan()));
+				final PhysicalPlan temporaryPlan = getRandomElement(getNeighbours(currentPlan.getPlan()));
 				final PhysicalPlanWithCost alternativePlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), temporaryPlan );
 				
 				final double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();

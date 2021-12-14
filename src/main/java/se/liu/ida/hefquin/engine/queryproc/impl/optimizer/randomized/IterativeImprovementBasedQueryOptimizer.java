@@ -51,7 +51,7 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 				}
 
 				if(improvementFound) { // if we have found at least one possible improvement, we want to make one of them into our new current plan.
-					currentPlan = getRandom(betterPlans); // Get a random object.
+					currentPlan = getRandomElement(betterPlans); // Get a random object.
 				}
 			}
 			while(improvementFound);

@@ -48,8 +48,12 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		return resultList;
 	}
 	
-	protected <T> T getRandom(List<T> L) {
-		return L.get( rng.nextInt(L.size()) ); // Get a random object.
+	protected <T> T getRandomElement(List<T> L) {
+		if(L.size() == 1) {
+			return L.get(0);
+		} else {
+			return L.get( rng.nextInt(L.size()) ); // Get a random object.
+		}
 	}
 	
 }
