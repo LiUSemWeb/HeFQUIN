@@ -98,7 +98,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                     addToAllBuilders(builders, mappingVar, node);
                 }
             } else {
-                throw new IllegalArgumentException("Unsupported implementation of Value");
+                throw new IllegalArgumentException("Unsupported implementation of value (" + value.getClass().getName() + ")");
             }
         }
         if (builders.isEmpty()) {
