@@ -68,7 +68,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 		return false;
 	}
 	
-	protected boolean isFrozen(double temperature, int unchanged) {
+	protected boolean isFrozen( final double temperature, final int unchanged ) {
 		 // This is the paper's example frozen condition. Low temp and best is left unchanged for 4 outer loops.
 		return (temperature < 1 && unchanged >= 4);
 	}
