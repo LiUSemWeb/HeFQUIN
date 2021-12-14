@@ -42,7 +42,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 				// Alternatively, a better option is possibly to create a new constructor for PhysicalPlanWithCost...
 				// ...that only takes a PhysicalPlan argument, and gets the cost itself.
 				
-				double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
+				final double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
 				if (costDelta <= 0) {
 					currentPlan = alternativePlan;
 				} else {
