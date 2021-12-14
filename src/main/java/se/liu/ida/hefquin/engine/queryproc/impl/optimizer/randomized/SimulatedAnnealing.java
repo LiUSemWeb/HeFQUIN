@@ -30,7 +30,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 		// While not frozen, do
 		while(!isFrozen(temperature,unchanged)) {
 			
-			unchanged += 1;
+			unchanged++;
 			
 			// TODO: Define what equilibrium entails on a practical level
 			// The paper's implementation counts equilibrium as 16*(number of joins in query).
