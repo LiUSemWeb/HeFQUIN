@@ -15,7 +15,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 	}
 
 	@Override
-	public PhysicalPlan optimize(PhysicalPlan initialPlan) throws QueryOptimizationException {
+	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
 		
 		// The first plan, which is currently the best plan we know of.
 		PhysicalPlanWithCost bestPlan = new PhysicalPlanWithCost(initialPlan, CostEstimationUtils.getEstimates( context.getCostModel(), initialPlan )[0]);
