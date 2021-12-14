@@ -37,10 +37,6 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 			while(!isEquilibrium()) {
 			
 				// Here we want a random neighbour, and its cost
-				// My first instinct to do something like
-				// final PhysicalPlanWithCost alternativePlan = (PhysicalPlan alternativePlanPlan = getRandom(getNeighbours(currentPlan.getPlan())), CostEstimationUtils.getEstimates( context.getCostModel(), alternativePlanPlan )[0])
-				// to make the code really compact.
-				// because it seems wasteful to create a local variable that's stored in optimize() just because we need to get the cost separately.
 				final PhysicalPlan temporaryPlan = getRandom(getNeighbours(currentPlan.getPlan()));
 				final PhysicalPlanWithCost alternativePlan = new PhysicalPlanWithCost(temporaryPlan, CostEstimationUtils.getEstimates( context.getCostModel(), temporaryPlan )[0]);
 				// Alternatively, a better option is possibly to create a new constructor for PhysicalPlanWithCost...
