@@ -8,6 +8,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.FilteredPropertiesReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.LabelsReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;
 
 import java.util.ArrayList;
@@ -80,11 +82,37 @@ public class CypherUtils {
     protected static boolean isPropertyColumnPriv( final CypherMatchQuery query, final CypherVar colName ) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
-            if (colName.equals(r.getAlias()) && r instanceof PropertyListReturnStatement) {
+            if (colName.equals(r.getAlias()) && (r instanceof PropertyListReturnStatement
+                                             || r instanceof FilteredPropertiesReturnStatement)) {
                 return true;
             }
         }
         return false;
     }
 
+    public static boolean isLabelColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isLabelColumnPriv((CypherMatchQuery) query, colName);
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isLabelColumnPriv(q, colName)) {
+                    return true;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
+        }
+        return false;
+    }
+
+    private static boolean isLabelColumnPriv(CypherMatchQuery query, CypherVar colName) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

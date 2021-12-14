@@ -90,6 +90,9 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 Node node;
                 if (literal.equals("label"))
                     node = conf.getLabel();
+                else if (CypherUtils.isLabelColumn(query, var)) {
+                    node = conf.mapNodeLabel(literal);
+                }
                 else
                     node = NodeFactory.createLiteral(literal);
                 if (builders.isEmpty()) {
