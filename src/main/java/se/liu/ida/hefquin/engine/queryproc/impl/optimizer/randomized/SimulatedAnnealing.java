@@ -38,9 +38,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 			
 				// Here we want a random neighbour, and its cost
 				final PhysicalPlan temporaryPlan = getRandom(getNeighbours(currentPlan.getPlan()));
-				final PhysicalPlanWithCost alternativePlan = new PhysicalPlanWithCost(temporaryPlan, CostEstimationUtils.getEstimates( context.getCostModel(), temporaryPlan )[0]);
-				// Alternatively, a better option is possibly to create a new constructor for PhysicalPlanWithCost...
-				// ...that only takes a PhysicalPlan argument, and gets the cost itself.
+				final PhysicalPlanWithCost alternativePlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), temporaryPlan );
 				
 				final double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
 				if (costDelta <= 0) {
