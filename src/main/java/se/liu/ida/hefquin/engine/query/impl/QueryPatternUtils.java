@@ -11,7 +11,6 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
@@ -19,7 +18,6 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 
@@ -132,20 +130,12 @@ public class QueryPatternUtils
 		return varLeft;
 	}
 
-	public static Set<Var> getVariablesInPattern( final OpFilter filter ) {
-		final ExprList expLi = filter.getExprs();
-		return expLi.getVarsMentioned();
-	}
-
 	public static Set<Var> getVariablesInPattern( final Op op ) {
 		if ( op instanceof OpBGP ) {
 			return getVariablesInPattern( (OpBGP) op);
 		}
 		else if ( op instanceof OpJoin ) {
 			return getVariablesInPattern( (OpJoin) op );
-		}
-		else if ( op instanceof OpFilter )  {
-			return getVariablesInPattern( (OpFilter) op );
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
@@ -222,10 +212,6 @@ public class QueryPatternUtils
 		else if ( op instanceof OpJoin ) {
 			return getNumberOfVarOccurrences( (OpJoin) op );
 		}
-		else if ( op instanceof OpFilter )  {
-			// TODO
-			return 0;
-		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
 		}
@@ -248,10 +234,6 @@ public class QueryPatternUtils
 		}
 		else if ( op instanceof OpJoin ) {
 			return getNumberOfTermOccurrences( (OpJoin) op );
-		}
-		else if ( op instanceof OpFilter )  {
-			// TODO
-			return 0;
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
