@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.FilteredPropertiesReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.LabelsReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.RelationshipTypeReturnStatement;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,8 +48,7 @@ public class CypherUtils {
                 final List<RecordEntry> entries = new LinkedList<>();
                 int counter = 0;
                 for (final JsonNode col : row) {
-                    final JsonNode metaCol = metaIterator.next();
-                    final RecordEntry entry = RecordEntryFactory.create(col, metaCol, names.get(counter));
+                    final RecordEntry entry = RecordEntryFactory.create(col, metaIterator, names.get(counter));
                     entries.add(entry);
                     counter++;
                 }
@@ -106,10 +106,36 @@ public class CypherUtils {
         return false;
     }
 
-    private static boolean isLabelColumnPriv(CypherMatchQuery query, CypherVar colName) {
+    private static boolean isLabelColumnPriv(final CypherMatchQuery query, final CypherVar colName) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isRelationshipTypeColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isRelationshipTypeColumnPriv((CypherMatchQuery) query, colName);
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isRelationshipTypeColumnPriv(q, colName)) {
+                    return true;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
+        }
+        return false;
+    }
+
+    private static boolean isRelationshipTypeColumnPriv(final CypherMatchQuery query, final CypherVar colName) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && r instanceof RelationshipTypeReturnStatement) {
                 return true;
             }
         }

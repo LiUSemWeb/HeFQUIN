@@ -41,10 +41,11 @@ public class Record2SolutionMappingTranslationTest {
     final LPGNode node4 = new LPGNode("4", null, null);
     final LPGNode node5 = new LPGNode("5", null, null);
     final LPGNode node6 = new LPGNode("6", null, null);
+    final LPGNode node7 = new LPGNode("7", null, null);
     final LPGNode node9 = new LPGNode("9", null, null);
     final LPGNode node10 = new LPGNode("10", null, null);
     final LPGNode node14 = new LPGNode("14", null, null);
-    final LPGNode node22 = new LPGNode("22", null, null);
+    final LPGNode node87 = new LPGNode("87", null, null);
 
     final CypherVar cpvar1 = new CypherVar("cpvar1");
     final CypherVar cpvar2 = new CypherVar("cpvar2");
@@ -226,14 +227,17 @@ public class Record2SolutionMappingTranslationTest {
                 .add(new EdgeMatchClause(a1, cpvar1, a2))
                 .add(new NodeIDCondition(a1, "5"))
                 .add(new NodeIDCondition(a2, "9"))
-                .add(new VariableReturnStatement(cpvar1, ret1))
+                .add(new RelationshipTypeReturnStatement(cpvar1, ret1))
                 .build();
-        // consider returning Type(relationship) instead
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
-                "{\"row\":[{}],\"meta\":[{\"id\":12,\"type\":\"relationship\",\"deleted\":false}]}]}],\"errors\":[]}";
+                "{\"row\":[\"DIRECTED\"],\"meta\":[null]}]}],\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
+        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"),
+                conf.mapEdgeLabel("DIRECTED")));
+        assertEquals(1, solMaps.size());
+        assertEquals(expected, solMaps.get(0));
     }
 
     @Test
@@ -449,24 +453,35 @@ public class Record2SolutionMappingTranslationTest {
                 .add(new EdgeMatchClause(cpvar1, cpvar2, a1))
                 .add(new NodeIDCondition(a1, "9"))
                 .add(new VariableReturnStatement(cpvar1, ret1))
-                // here we also need to consider returning type(cpvar2) instead
-                .add(new VariableReturnStatement(cpvar2, ret2))
+                .add(new RelationshipTypeReturnStatement(cpvar2, ret2))
                 .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
-                "{\"row\":[{\"born\":1952,\"name\":\"Joel Silver\"},{}]," +
-                    "\"meta\":[{\"id\":7,\"type\":\"node\"},{\"id\":14,\"type\":\"relationship\"}]}," +
-                "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"},{}]," +
-                    "\"meta\":[{\"id\":6,\"type\":\"node\"},{\"id\":13,\"type\":\"relationship\"}]}," +
-                "{\"row\":[{\"born\":1967,\"name\":\"Andy Wachowski\"},{}]," +
-                    "\"meta\":[{\"id\":5,\"type\":\"node\"},{\"id\":12,\"type\":\"relationship\"}]}," +
-                "{\"row\":[{\"born\":1960,\"name\":\"Hugo Weaving\"},{\"roles\":[\"Agent Smith\"]}]," +
-                    "\"meta\":[{\"id\":4,\"type\":\"node\"},{\"id\":11,\"type\":\"relationship\"}]}," +
-                "{\"row\":[{\"born\":1961,\"name\":\"Laurence Fishburne\"},{\"roles\":[\"Morpheus\"]}]," +
-                    "\"meta\":[{\"id\":3,\"type\":\"node\"},{\"id\":10,\"type\":\"relationship\"}]}]}]" +
+                "{\"row\":[{\"born\":1952,\"name\":\"Joel Silver\"}, \"DIRECTED\"]," +
+                    "\"meta\":[{\"id\":7,\"type\":\"node\"},null]}," +
+                "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}, \"DIRECTED\"]," +
+                    "\"meta\":[{\"id\":6,\"type\":\"node\"}, null]}," +
+                "{\"row\":[{\"born\":1967,\"name\":\"Andy Wachowski\"}, \"DIRECTED\"]," +
+                    "\"meta\":[{\"id\":5,\"type\":\"node\"}, null]}," +
+                "{\"row\":[{\"born\":1960,\"name\":\"Hugo Weaving\"}, \"ACTED_IN\"]," +
+                    "\"meta\":[{\"id\":4,\"type\":\"node\"}, null]}," +
+                "{\"row\":[{\"born\":1961,\"name\":\"Laurence Fishburne\"}, \"ACTED_IN\"]," +
+                    "\"meta\":[{\"id\":3,\"type\":\"node\"}, null]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
+        final List<SolutionMapping> expected = new ArrayList<>();
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node7),
+                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6),
+                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
+                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
+                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
+                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"))));
+        assertEquals(expected, solMaps);
     }
 
     @Test
@@ -478,7 +493,6 @@ public class Record2SolutionMappingTranslationTest {
         final CypherQuery query = new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(src1, edge1, tgt1))
-                        // here we also need type(edge1) instead
                         .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
                         .add(new FilteredPropertiesReturnStatement(edge1, "The Matrix", ret2))
                         .build(),
@@ -488,6 +502,7 @@ public class Record2SolutionMappingTranslationTest {
                         .add(new FilteredPropertiesReturnStatement(cpvar1, "The Matrix", ret2))
                         .build()
         );
+        //this returns empty lists, we should fix that
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[{\"edge\":{\"roles\":[\"Shane Falco\"]},\"source\":{\"born\":1964,\"name\":\"Keanu\"}," +
                     "\"target\":{\"title\":\"The Replacements\",\"released\":2000}},[]]," +
@@ -503,7 +518,7 @@ public class Record2SolutionMappingTranslationTest {
     }
 
     @Test
-    public void translateNodeVarVarTest() {
+    public void translateNodeVarVarTest() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Map<CypherVar, Node> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
@@ -524,21 +539,33 @@ public class Record2SolutionMappingTranslationTest {
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a3, a4, a5))
                         .add(new NodeIDCondition(a3, "22"))
-                        // here we need to return type(a4)
-                        .add(new VariableReturnStatement(a4, ret1))
+                        .add(new RelationshipTypeReturnStatement(a4, ret1))
                         .add(new VariableReturnStatement(a5, ret2))
                         .build()
         );
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[\"label\",\"Person\"],\"meta\":[null,null]}," +
                 "{\"row\":[[\"born\",\"name\"],[1968,\"Cuba Gooding Jr.\"]],\"meta\":[null,null,null,null]}," +
-                "{\"row\":[{\"roles\":[\"Albert Lewis\"]},{\"title\":\"What Dreams May Come\",\"released\":1998}]," +
-                    "\"meta\":[{\"id\":74,\"type\":\"relationship\"},{\"id\":56,\"type\":\"node\"}]}]}]," +
+                "{\"row\":[\"ACTED_IN\",{\"title\":\"What Dreams May Come\",\"released\":1998}]," +
+                    "\"meta\":[null,{\"id\":0,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
+        final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
+        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+                .translateRecords(records, conf, query, varMap);
+        final List<SolutionMapping> expected = new ArrayList<>();
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabel(),
+                Var.alloc("o"), conf.mapNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("born"),
+                Var.alloc("o"), NodeFactory.createLiteral("1968"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("name"),
+                Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr."))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"),
+                Var.alloc("o"), conf.mapNode(node0))));
+        assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarVarVarTest() {
+    public void translateVarVarVarTest() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Map<CypherVar, Node> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -548,8 +575,7 @@ public class Record2SolutionMappingTranslationTest {
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, a3))
                         .add(new VariableReturnStatement(a1, ret1))
-                        // here we need to return type(a2)
-                        .add(new VariableReturnStatement(a2, ret2))
+                        .add(new RelationshipTypeReturnStatement(a2, ret2))
                         .add(new VariableReturnStatement(a3, ret3))
                         .build(),
                 new CypherQueryBuilder()
@@ -566,21 +592,40 @@ public class Record2SolutionMappingTranslationTest {
                         .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a6, a7, a8))
-                        // here we need to return type(a7)
                         .add(new TripleMapReturnStatement(a6, a7, a8, ret1))
                         .add(new PropertyListReturnStatement(a7, ret2))
                         .add(new AllPropertyValuesReturnStatement(a7, ret3))
                         .build()
         );
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\",\"ret3\"],\"data\":[" +
-                "{\"row\":[{\"born\":1964,\"name\":\"Keanu Reeves\"},{\"roles\":[\"Shane Falco\"]},{\"tagline\":\"Pain heals, Chicks dig scars... Glory lasts forever\",\"title\":\"The Replacements\",\"released\":2000}]," +
-                    "\"meta\":[{\"id\":1,\"type\":\"node\",\"deleted\":false},{\"id\":114,\"type\":\"relationship\",\"deleted\":false},{\"id\":87,\"type\":\"node\",\"deleted\":false}]}," +
-                "{\"row\":[{\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\",\"released\":1999},\"label\",\"Movie\"]," +
-                    "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null,null]}," +
-                "{\"row\":[{\"tagline\":\"Welcome to the Real World\",\"title\":\"The Matrix\",\"released\":1999},[\"title\",\"tagline\",\"released\"],[\"The Matrix\",\"Welcome to the Real World\",1999]]," +
-                    "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null,null,null,null,null,null]}," +
-                "{\"row\":[{\"edge\":{\"roles\":[\"Shane Falco\"]},\"source\":{\"born\":1964,\"name\":\"Keanu Reeves\"},\"target\":{\"tagline\":\"Pain heals, Chicks dig scars... Glory lasts forever\",\"title\":\"The Replacements\",\"released\":2000}},[\"roles\"],[[\"Shane Falco\"]]]," +
-                    "\"meta\":[{\"id\":114,\"type\":\"relationship\",\"deleted\":false},{\"id\":1,\"type\":\"node\",\"deleted\":false},{\"id\":87,\"type\":\"node\",\"deleted\":false},null,null]}]}]," +
+                "{\"row\":[{\"born\":1964,\"name\":\"Keanu Reeves\"},\"ACTED_IN\",{\"title\":\"The Replacements\",\"released\":2000}]," +
+                "\"meta\":[{\"id\":1,\"type\":\"node\"},null,{\"id\":87,\"type\":\"node\"}]}," +
+                "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},\"label\",\"Movie\"]," +
+                "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null,null]}," +
+                "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},[\"title\",\"tagline\",\"released\"],[\"The Matrix\",\"Welcome to the Real World\",1999]]," +
+                "\"meta\":[{\"id\":0,\"type\":\"node\"},null,null,null,null,null,null]}," +
+                "{\"row\":[{\"edge\":\"ACTED_IN\",\"source\":{\"born\":1964,\"name\":\"Keanu Reeves\"},\"target\":{\"title\":\"The Replacements\",\"released\":2000}},[\"roles\"],[\"Shane Falco\"]]," +
+                "\"meta\":[null,{\"id\":1,\"type\":\"node\"},{\"id\":87,\"type\":\"node\"},null,null]}]}]," +
                 "\"errors\":[]}";
+        final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
+        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+                .translateRecords(records, conf, query, varMap);
+        final List<SolutionMapping> expected = new ArrayList<>();
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
+                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.mapNode(node87))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
+                Var.alloc("p"), conf.getLabel(), Var.alloc("o"), conf.mapNodeLabel("Movie"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
+                Var.alloc("p"), conf.mapProperty("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
+                Var.alloc("p"), conf.mapProperty("tagline"), Var.alloc("o"), NodeFactory.createLiteral("Welcome to the Real World"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
+                Var.alloc("p"), conf.mapProperty("released"), Var.alloc("o"), NodeFactory.createLiteral("1999"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"),
+                NodeFactory.createTripleNode(conf.mapNode(node1), conf.mapEdgeLabel("ACTED_IN"), conf.mapNode(node87)),
+                Var.alloc("p"), conf.mapProperty("roles"), Var.alloc("o"), NodeFactory.createLiteral("Shane Falco"))));
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals(expected.get(i), solMaps.get(i));
+        }
     }
 }
