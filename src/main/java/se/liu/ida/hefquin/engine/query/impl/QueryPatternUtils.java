@@ -93,7 +93,10 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getVariablesInPattern( (TriplePattern) queryPattern );
 		}
-		else  {
+		else if ( queryPattern instanceof BGP ) {
+			return getVariablesInPattern( (BGP) queryPattern );
+		}
+		else {
 			return getVariablesInPattern( queryPattern.asJenaOp() );
 		}
 	}
@@ -124,7 +127,6 @@ public class QueryPatternUtils
 		return result;
 	}
 
-
 	public static Set<Var> getVariablesInPattern( final Op2 op ) {
 		final Set<Var> varLeft = getVariablesInPattern( op.getLeft() );
 		final Set<Var> varRight = getVariablesInPattern( op.getRight() );
@@ -143,6 +145,7 @@ public class QueryPatternUtils
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
 		}
 	}
+
 
 	/**
 	 * Returns the number of elements of the given triple pattern that are variables.
@@ -268,7 +271,10 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfVarOccurrences( (TriplePattern) queryPattern );
 		}
-		else  {
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfVarOccurrences( (BGP) queryPattern );
+		}
+		else {
 			return getNumberOfVarOccurrences( queryPattern.asJenaOp() );
 		}
 	}
@@ -287,7 +293,10 @@ public class QueryPatternUtils
 		if ( queryPattern instanceof TriplePattern ) {
 			return getNumberOfTermOccurrences( (TriplePattern) queryPattern  );
 		}
-		else  {
+		else if ( queryPattern instanceof BGP ) {
+			return getNumberOfTermOccurrences( (BGP) queryPattern  );
+		}
+		else {
 			return getNumberOfTermOccurrences( queryPattern.asJenaOp() );
 		}
 	}
