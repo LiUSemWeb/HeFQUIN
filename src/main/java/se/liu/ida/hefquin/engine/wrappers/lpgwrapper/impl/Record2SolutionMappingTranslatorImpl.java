@@ -60,7 +60,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 builders.get(i).add(Var.alloc(varMap.get(pair.object1)), node);
             }
         }
-        List<SolutionMapping> results = new ArrayList<>(builders.size());
+        final List<SolutionMapping> results = new ArrayList<>(builders.size());
         for (final BindingBuilder builder : builders) {
             results.add(new SolutionMappingImpl(builder.build()));
         }
