@@ -1,7 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.access.DataRetrievalInterface;
+import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
@@ -43,6 +46,20 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 	@Override
 	public void visit( final LogicalPlanVisitor visitor ) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public String toString(){
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append("> bgpAdd ");
+		builder.append("( ");
+		builder.append( bgp.getTriplePatterns() );
+		builder.append(", ");
+		LogicalPlanUtils.printStringOfFm( builder, fm );
+		builder.append(" )");
+
+		return builder.toString();
 	}
 
 }

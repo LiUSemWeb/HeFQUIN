@@ -56,4 +56,9 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
 		return lop;
 	}
 
+	@Override
+	public String toString(){
+		return "> binaryUnion ";
+	}
+
 }

@@ -48,4 +48,23 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	public void visit(final PhysicalPlanVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		if ( lop instanceof LogicalOpTPAdd)  {
+			builder.append("> FILTERBindJoin");
+
+			return ((LogicalOpTPAdd) lop).toString();
+		}
+		else if ( lop instanceof LogicalOpBGPAdd ) {
+			builder.append("> FILTERBindJoin");
+			return ((LogicalOpBGPAdd) lop).toString();
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+		}
+	}
+
 }

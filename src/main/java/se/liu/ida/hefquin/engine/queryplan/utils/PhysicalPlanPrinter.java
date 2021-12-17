@@ -18,83 +18,84 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
     private class PhysicalPlanPrinterBeforeVisitor implements PhysicalPlanVisitor {
         @Override
-        public void visit(final PhysicalOpRequest<?, ?> op) {
+        public void visit( final PhysicalOpRequest<?, ?> op ) {
             addTabs();
-            builder.append("> request ");
-            builder.append(System.lineSeparator());
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
         }
 
         @Override
-        public void visit(final PhysicalOpBindJoin op) {
+        public void visit( final PhysicalOpBindJoin op ) {
             addTabs();
-            builder.append("> bindJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpBindJoinWithVALUES op) {
+        public void visit( final PhysicalOpBindJoinWithVALUES op ) {
             addTabs();
-            builder.append("> VALUESBindJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpBindJoinWithFILTER op) {
+        public void visit( final PhysicalOpBindJoinWithFILTER op ) {
             addTabs();
-            builder.append("> FILTERBindJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION) {
+        public void visit( final PhysicalOpBindJoinWithUNION op ) {
             addTabs();
-            builder.append("> UNIONBindJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpNaiveNestedLoopsJoin op) {
+        public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
             addTabs();
-            builder.append("> naiveNestedLoop ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
+        public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
             addTabs();
-            builder.append("> indexNestedLoop ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(PhysicalOpHashJoin physicalOpHashJoin) {
+        public void visit( final PhysicalOpHashJoin op) {
             addTabs();
-            builder.append("> hashJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpSymmetricHashJoin op) {
+        public void visit( final PhysicalOpSymmetricHashJoin op ) {
             addTabs();
-            builder.append("> symmetricHashJoin ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
 
         @Override
-        public void visit(final PhysicalOpBinaryUnion op) {
+        public void visit( final PhysicalOpBinaryUnion op ) {
             addTabs();
-            builder.append("> binaryUnion ");
+            builder.append( op.toString() );
             builder.append(System.lineSeparator());
             indentLevel++;
         }
+
     }
 
     private class PhysicalPlanPrinterAfterVisitor implements PhysicalPlanVisitor {

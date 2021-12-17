@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -56,6 +57,19 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
     @Override
     public void visit(final PhysicalPlanVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+
+        if ( lop instanceof LogicalOpTPAdd)  {
+            builder.append( "> bindJoin");
+            return ( (LogicalOpTPAdd) lop ).toString();
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+        }
     }
 
 }
