@@ -33,7 +33,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return manageLists(base, lists, conf, query, varMap);
     }
 
-    private List<SolutionMapping> manageLists(final SolutionMapping base, final List<Pair<CypherVar, ListValue>> lists,
+    protected List<SolutionMapping> manageLists(final SolutionMapping base, final List<Pair<CypherVar, ListValue>> lists,
                                               final LPG2RDFConfiguration conf, final CypherQuery query,
                                               final Map<CypherVar, Node> varMap) {
         if (lists.isEmpty())
