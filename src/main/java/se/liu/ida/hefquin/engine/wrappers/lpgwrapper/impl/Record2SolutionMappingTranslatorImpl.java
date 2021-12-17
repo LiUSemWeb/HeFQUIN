@@ -122,7 +122,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return results;
     }
 
-    private void addToAllBuilders(final List<BindingBuilder> builders, final Var var, final Node node) {
+    protected void addToAllBuilders(final List<BindingBuilder> builders, final Var var, final Node node) {
         for (final BindingBuilder builder : builders)
             builder.add(var, node);
     }
