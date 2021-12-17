@@ -65,21 +65,22 @@ public class CypherUtils {
      */
     public static boolean isPropertyColumn(final CypherQuery query, final CypherVar colName) {
         if (query instanceof CypherMatchQuery) {
-            return isPropertyColumnPriv((CypherMatchQuery) query, colName);
+            return isPropertyColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
             for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
-                if (isPropertyColumnPriv(q, colName)) {
+                if (isPropertyColumn(q, colName)) {
                     return true;
                 }
             }
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
         }
         return false;
     }
 
-    protected static boolean isPropertyColumnPriv( final CypherMatchQuery query, final CypherVar colName ) {
+    public static boolean isPropertyColumn( final CypherMatchQuery query, final CypherVar colName ) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && (r instanceof PropertyListReturnStatement
