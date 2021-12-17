@@ -67,7 +67,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return results;
     }
 
-    private SolutionMapping translateRecordsPriv(final TableRecord record, final LPG2RDFConfiguration conf,
+    protected SolutionMapping translateRecordsPriv(final TableRecord record, final LPG2RDFConfiguration conf,
                                                  final CypherQuery query, final Map<CypherVar, Node> varMap,
                                                  final List<Pair<CypherVar, ListValue>> lists) {
         final BindingBuilder baseBuilder = Binding.builder();
