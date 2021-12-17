@@ -29,7 +29,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     public List<SolutionMapping> translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
                                                  final CypherQuery query, final Map<CypherVar, Node> varMap) {
         final List<Pair<CypherVar, ListValue>> lists = new ArrayList<>();
-        SolutionMapping base = translateRecordsPriv(record, conf, query, varMap, lists);
+        final SolutionMapping base = translateRecordsPriv(record, conf, query, varMap, lists);
         return manageLists(base, lists, conf, query, varMap);
     }
 
