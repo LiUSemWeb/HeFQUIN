@@ -93,21 +93,22 @@ public class CypherUtils {
 
     public static boolean isLabelColumn(final CypherQuery query, final CypherVar colName) {
         if (query instanceof CypherMatchQuery) {
-            return isLabelColumnPriv((CypherMatchQuery) query, colName);
+            return isLabelColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
             for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
-                if (isLabelColumnPriv(q, colName)) {
+                if (isLabelColumn(q, colName)) {
                     return true;
                 }
             }
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
         }
         return false;
     }
 
-    private static boolean isLabelColumnPriv(final CypherMatchQuery query, final CypherVar colName) {
+    public static boolean isLabelColumn(final CypherMatchQuery query, final CypherVar colName) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
