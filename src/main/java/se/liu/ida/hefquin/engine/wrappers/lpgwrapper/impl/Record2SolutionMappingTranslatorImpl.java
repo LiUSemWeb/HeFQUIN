@@ -115,7 +115,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     public List<SolutionMapping> translateRecords(final List<TableRecord> records,
                                                   final LPG2RDFConfiguration conf, final CypherQuery query,
                                                   final Map<CypherVar, Node> varMap) {
-        List<SolutionMapping> results = new ArrayList<>();
+        final List<SolutionMapping> results = new ArrayList<>();
         for (final TableRecord record : records) {
             results.addAll(translateRecord(record, conf, query, varMap));
         }
