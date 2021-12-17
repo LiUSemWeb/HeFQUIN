@@ -51,7 +51,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 builders.add(builder);
             }
             for (Pair<CypherVar, ListValue> pair : lists) {
-                Node node;
+                final Node node;
                 if (CypherUtils.isPropertyColumn(query, pair.object1)) {
                     node = conf.mapProperty(pair.object2.getList().get(i).toString());
                 } else {
