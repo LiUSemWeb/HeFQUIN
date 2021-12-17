@@ -120,21 +120,22 @@ public class CypherUtils {
 
     public static boolean isRelationshipTypeColumn(final CypherQuery query, final CypherVar colName) {
         if (query instanceof CypherMatchQuery) {
-            return isRelationshipTypeColumnPriv((CypherMatchQuery) query, colName);
+            return isRelationshipTypeColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
             for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
-                if (isRelationshipTypeColumnPriv(q, colName)) {
+                if (isRelationshipTypeColumn(q, colName)) {
                     return true;
                 }
             }
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
         }
         return false;
     }
 
-    private static boolean isRelationshipTypeColumnPriv(final CypherMatchQuery query, final CypherVar colName) {
+    public static boolean isRelationshipTypeColumn(final CypherMatchQuery query, final CypherVar colName) {
         final List<ReturnStatement> returns = query.getReturnExprs();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof RelationshipTypeReturnStatement) {
