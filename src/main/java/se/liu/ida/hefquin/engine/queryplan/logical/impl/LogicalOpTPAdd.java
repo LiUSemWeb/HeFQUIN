@@ -54,7 +54,7 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 
 		builder.append("> tpAdd ");
 		builder.append("( ");
-		builder.append( tp.asJenaTriple() );
+		builder.append( tp.asJenaTriple().toString() );
 		builder.append(", ");
 		LogicalPlanUtils.printStringOfFm( builder, fm );
 		builder.append(" )");
