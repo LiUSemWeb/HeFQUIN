@@ -7,7 +7,11 @@ import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.FilteredPropertiesReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.LabelsReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.RelationshipTypeReturnStatement;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +20,11 @@ import java.util.List;
 
 public class CypherUtils {
 
+    /**
+     * This method parses a JSON response obtained from a Neo4j HTTP server into a list of POJOs
+     * @throws JsonProcessingException if the received body is not valid JSON
+     * @throws Neo4JException if the server responds with an error object
+     */
     public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4JException {
         final ObjectMapper mapper = new ObjectMapper();
         final List<TableRecord> records = new LinkedList<>();
@@ -39,8 +48,7 @@ public class CypherUtils {
                 final List<RecordEntry> entries = new LinkedList<>();
                 int counter = 0;
                 for (final JsonNode col : row) {
-                    final JsonNode metaCol = metaIterator.next();
-                    final RecordEntry entry = RecordEntryFactory.create(col, metaCol, names.get(counter));
+                    final RecordEntry entry = RecordEntryFactory.create(col, metaIterator, names.get(counter));
                     entries.add(entry);
                     counter++;
                 }
@@ -50,4 +58,90 @@ public class CypherUtils {
         return records;
     }
 
+    /**
+     * This method checks if a given cypher query has a given column name, and if said column is from type
+     * {@link PropertyListReturnStatement}. If the query is a {@link CypherUnionQuery}, the method just checks if
+     * any of the {@link CypherMatchQuery} of the union satisfies the condition.
+     */
+    public static boolean isPropertyColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isPropertyColumn( (CypherMatchQuery) query, colName );
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isPropertyColumn(q, colName)) {
+                    return true;
+                }
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
+        }
+        return false;
+    }
+
+    public static boolean isPropertyColumn( final CypherMatchQuery query, final CypherVar colName ) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && (r instanceof PropertyListReturnStatement
+                                             || r instanceof FilteredPropertiesReturnStatement)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isLabelColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isLabelColumn( (CypherMatchQuery) query, colName );
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isLabelColumn(q, colName)) {
+                    return true;
+                }
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
+        }
+        return false;
+    }
+
+    public static boolean isLabelColumn(final CypherMatchQuery query, final CypherVar colName) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isRelationshipTypeColumn(final CypherQuery query, final CypherVar colName) {
+        if (query instanceof CypherMatchQuery) {
+            return isRelationshipTypeColumn( (CypherMatchQuery) query, colName );
+        }
+        else if (query instanceof CypherUnionQuery) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+                if (isRelationshipTypeColumn(q, colName)) {
+                    return true;
+                }
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported implementation of Cypher Query (" + query.getClass().getName() +")");
+        }
+        return false;
+    }
+
+    public static boolean isRelationshipTypeColumn(final CypherMatchQuery query, final CypherVar colName) {
+        final List<ReturnStatement> returns = query.getReturnExprs();
+        for (final ReturnStatement r : returns) {
+            if (colName.equals(r.getAlias()) && r instanceof RelationshipTypeReturnStatement) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

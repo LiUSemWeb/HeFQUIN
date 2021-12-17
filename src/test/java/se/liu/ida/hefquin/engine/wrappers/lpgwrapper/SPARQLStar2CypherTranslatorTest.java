@@ -50,7 +50,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final Triple tp = new Triple(Var.alloc("s"), conf.mapProperty("name"),
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(tp), conf);
+                .translateTriplePattern(new TriplePatternImpl(tp), conf).object1;
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
@@ -71,7 +71,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), conf.getLabel(), conf.mapNodeLabel("Person"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(v1))
@@ -86,7 +86,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), conf.mapNode(node22));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new EdgeMatchClause(v1, a1, a2))
@@ -102,7 +102,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), conf.getLabel(), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(v1))
@@ -117,7 +117,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), conf.mapProperty("name"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(a1))
@@ -133,7 +133,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new EdgeMatchClause(a1, a2, v1))
@@ -149,13 +149,13 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"), conf.mapNode(node23));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new EdgeMatchClause(a1, v1, a2))
                     .addCondition(new NodeIDCondition(a1, "22"))
                     .addCondition(new NodeIDCondition(a2, "23"))
-                    .addReturn(new VariableReturnStatement(v1, ret1))
+                    .addReturn(new RelationshipTypeReturnStatement(v1, ret1))
                     .build(),
                 translation);
     }
@@ -166,7 +166,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final Triple t = new Triple( conf.mapNode(node22), Var.alloc("p"),
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(a1))
@@ -181,7 +181,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"), conf.mapNodeLabel("Person"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                         .addMatch(new NodeMatchClause(a1))
@@ -197,7 +197,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), conf.getLabel(), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(v1))
@@ -212,7 +212,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new EdgeMatchClause(v1, a1, v2))
@@ -228,7 +228,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), conf.mapProperty("name"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
@@ -250,12 +250,13 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), conf.mapNodeLabel("Person"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new NodeMatchClause(v1))
                     .addCondition(new NodeLabelCondition(v1, "Person"))
                     .addReturn(new VariableReturnStatement(v1, ret1))
+                    .add(new LiteralValueReturnStatement("label", ret2))
                     .build(),
                 translation);
     }
@@ -265,13 +266,13 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), conf.mapNode(node22));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
                     .addMatch(new EdgeMatchClause(v1, v2, a1))
                     .addCondition(new NodeIDCondition(a1, "22"))
                     .addReturn(new VariableReturnStatement(v1, ret1))
-                    .addReturn(new VariableReturnStatement(v2, ret2))
+                    .addReturn(new RelationshipTypeReturnStatement(v2, ret2))
                     .build(),
                 translation);
     }
@@ -281,7 +282,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), NodeFactory.createLiteral("The Matrix"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
@@ -302,7 +303,7 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
@@ -320,7 +321,7 @@ public class SPARQLStar2CypherTranslatorTest {
                         new CypherQueryBuilder()
                                 .addMatch(new EdgeMatchClause(a3, a4, a5))
                                 .addCondition(new NodeIDCondition(a3, "22"))
-                                .addReturn(new VariableReturnStatement(a4, ret1))
+                                .addReturn(new RelationshipTypeReturnStatement(a4, ret1))
                                 .addReturn(new VariableReturnStatement(a5, ret2))
                                 .build()),
                 translation);
@@ -331,13 +332,13 @@ public class SPARQLStar2CypherTranslatorTest {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateTriplePattern(new TriplePatternImpl(t), conf);
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .addMatch(new EdgeMatchClause(a1, a2, a3))
                                 .addReturn(new VariableReturnStatement(a1, ret1))
-                                .addReturn(new VariableReturnStatement(a2, ret2))
+                                .addReturn(new RelationshipTypeReturnStatement(a2, ret2))
                                 .addReturn(new VariableReturnStatement(a3, ret3))
                                 .build(),
                         new CypherQueryBuilder()
