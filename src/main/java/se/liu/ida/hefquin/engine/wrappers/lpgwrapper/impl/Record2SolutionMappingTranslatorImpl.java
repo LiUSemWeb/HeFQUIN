@@ -33,6 +33,11 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return manageLists(base, lists, conf, query, varMap);
     }
 
+    /**
+     * This method is in charge to produce multiple solution mappings for records that contain lists of values.
+     * All provided lists should have the same size, since each i-th element of each list will be part of the it-h
+     * solution mapping of the result.
+     */
     protected List<SolutionMapping> manageLists(final SolutionMapping base, final List<Pair<CypherVar, ListValue>> lists,
                                               final LPG2RDFConfiguration conf, final CypherQuery query,
                                               final Map<CypherVar, Node> varMap) {
