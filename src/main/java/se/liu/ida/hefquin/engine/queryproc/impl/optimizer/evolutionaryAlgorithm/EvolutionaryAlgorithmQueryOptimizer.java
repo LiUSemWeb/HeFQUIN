@@ -53,7 +53,11 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
-        return currentGen.bestPlan.getPlan();
+
+        final PhysicalPlanWithCost finalPlan = currentGen.bestPlan;
+        ctxt.getMetrics().putCost( finalPlan.getWeight() );
+
+        return finalPlan.getPlan();
     }
 
     protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws QueryOptimizationException {

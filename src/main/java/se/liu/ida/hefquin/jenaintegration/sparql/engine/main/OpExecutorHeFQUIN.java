@@ -15,6 +15,8 @@ import org.apache.jena.sparql.engine.iterator.QueryIterRepeatApply;
 import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 
+import se.liu.ida.hefquin.engine.HeFQUINMetrics;
+import se.liu.ida.hefquin.engine.HeFQUINMetricsImp;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
@@ -66,12 +68,14 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
 		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
+		final HeFQUINMetrics metrics = new HeFQUINMetricsImp();
 
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
+			@Override public HeFQUINMetrics getMetrics() { return metrics; }
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
@@ -82,7 +86,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
 		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		qProc = new QueryProcessorImpl( planner, compiler, execEngine );
+		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
 	}
 
 	@Override

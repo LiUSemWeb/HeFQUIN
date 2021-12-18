@@ -18,6 +18,8 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.HeFQUINMetrics;
+import se.liu.ida.hefquin.engine.HeFQUINMetricsImp;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -225,12 +227,14 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
 		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
+		final HeFQUINMetrics metrics = new HeFQUINMetricsImp();
 
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
+			@Override public HeFQUINMetrics getMetrics() { return metrics; }
 		};
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
@@ -238,7 +242,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
 		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine);
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 

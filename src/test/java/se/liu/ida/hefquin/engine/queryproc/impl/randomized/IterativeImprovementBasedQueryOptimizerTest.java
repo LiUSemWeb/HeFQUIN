@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.randomized;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.HeFQUINMetrics;
+import se.liu.ida.hefquin.engine.HeFQUINMetricsImp;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
@@ -75,6 +77,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		final FederationCatalog fedCat = new FederationCatalogForTest();
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final HeFQUINMetrics metrics = new HeFQUINMetricsImp();
 
 		final CostModel costModel = new CostModel() {
 			@Override
@@ -89,6 +92,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
+			@Override public HeFQUINMetrics getMetrics() { return metrics; }
 		};
 	}
 
