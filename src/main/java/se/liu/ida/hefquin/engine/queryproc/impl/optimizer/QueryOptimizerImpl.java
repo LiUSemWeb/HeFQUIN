@@ -22,7 +22,7 @@ public class QueryOptimizerImpl implements QueryOptimizer
 		final boolean keepMultiwayJoins = false;
 		final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 
-		ctxt.getMetrics().putCost(  CostEstimationUtils.getEstimates( ctxt.getCostModel(), initialPhysicalPlan )[0] );
+//		ctxt.getMetrics().putCost(  CostEstimationUtils.getEstimates( ctxt.getCostModel(), initialPhysicalPlan )[0] );
 
 		return initialPhysicalPlan;
 
