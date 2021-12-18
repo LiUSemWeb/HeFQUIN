@@ -23,6 +23,12 @@ public class LogicalPlanUtils
 		return v.wasSourceAssignment();
 	}
 	
+	static public int countSubplans ( final LogicalPlan plan ) {
+		final LogicalPlanCounter c = new LogicalPlanCounter();
+		LogicalPlanWalker.walk(plan, null, c);
+		return c.getSubplanCount();
+	}
+	
 	static public class LogicalPlanCounter extends LogicalPlanVisitorBase {
 		protected int subplanCount = 0;
 		
