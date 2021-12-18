@@ -17,7 +17,7 @@ public class LogicalPlanCounter
 	}
 
 	protected static class LogicalCounterVisitor extends LogicalWalkerVisitor {
-		protected int planAmount;
+		protected int planAmount = 0;
 		
 		public LogicalCounterVisitor( final LogicalPlanVisitor beforeVisitor,
 							  final LogicalPlanVisitor afterVisitor ) {
