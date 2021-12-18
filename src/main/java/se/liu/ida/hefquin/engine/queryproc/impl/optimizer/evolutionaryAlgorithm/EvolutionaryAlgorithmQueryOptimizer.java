@@ -3,13 +3,16 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
@@ -37,13 +40,12 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     @Override
-    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
-
         return optimize( initialPhysicalPlan );
     }
 
-    public PhysicalPlan optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
         final PlanRewritingUtils ruleApplicationCache = new PlanRewritingUtils( new RuleInstances() );
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
@@ -53,7 +55,12 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
-        return currentGen.bestPlan.getPlan();
+        final PhysicalPlan bestPlan = currentGen.bestPlan.getPlan();
+
+        final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
+        myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
+
+		return new Pair<>(bestPlan, myStats);
     }
 
     protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws QueryOptimizationException {
