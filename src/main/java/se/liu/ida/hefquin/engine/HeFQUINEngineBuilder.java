@@ -6,6 +6,7 @@ import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -27,6 +28,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestPro
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
@@ -109,9 +111,12 @@ public class HeFQUINEngineBuilder
 
 	protected static class MyEngine implements HeFQUINEngine {
 		@Override
-		public void executeQuery( final Query query, final ResultsFormat outputFormat, final PrintStream output ) {
-			final QueryExecution qe = QueryExecutionFactory.create( query, DatasetGraphFactory.createGeneral() );
+		public QueryProcStats executeQuery( final Query query, final ResultsFormat outputFormat, final PrintStream output ) {
+			final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
+			final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
 			QueryExecUtils.executeQuery(query, qe, outputFormat, output);
+
+			return (QueryProcStats) qe.getContext().get( HeFQUINConstants.sysQueryProcStats );
 		}
 		
 	}

@@ -9,4 +9,6 @@ public class HeFQUINConstants {
     public static final Symbol sysFederationAccessManager = Symbol.create(systemVarNS+"fedAccessMgr");
 
     public static final Symbol sysQueryOptimizerFactory   = Symbol.create(systemVarNS+"optimizerFactory");
+
+    public static final Symbol sysQueryProcStats          = Symbol.create(systemVarNS+"queryProcStats");
 }
