@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
 /**
  * This class implements a simple query optimizer that focuses only
@@ -38,7 +39,10 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
 
-        return optimizePlan( initialPhysicalPlan );
+        final PhysicalPlan finalPlan = optimizePlan( initialPhysicalPlan );
+        ctxt.getMetrics().putCost(  CostEstimationUtils.getEstimates( ctxt.getCostModel(), finalPlan )[0] );
+
+        return finalPlan;
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
