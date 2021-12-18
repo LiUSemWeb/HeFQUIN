@@ -22,6 +22,11 @@ public class StatsImpl implements Stats
 		return entry;
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return entries.isEmpty();
+	}
+
 	public Object put( final String entryName, final Object entry ) {
 		return entries.put(entryName, entry);
 	}
