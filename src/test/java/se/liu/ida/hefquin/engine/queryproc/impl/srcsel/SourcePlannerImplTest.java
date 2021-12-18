@@ -155,7 +155,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
-		return sourcePlanner.createSourceAssignment(query);
+		return sourcePlanner.createSourceAssignment(query).object1;
 	}
 
 	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,

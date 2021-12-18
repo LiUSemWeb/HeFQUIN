@@ -7,8 +7,11 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
  * This class implements a simple query optimizer that focuses only
@@ -34,11 +37,14 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
     }
 
     @Override
-    public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
+        final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
 
-        return optimizePlan( initialPhysicalPlan );
+        final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
+
+		return new Pair<>(bestPlan, myStats);
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {

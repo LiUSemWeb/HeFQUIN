@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.cli;
 
+import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
@@ -13,6 +14,8 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
@@ -21,6 +24,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModFederation    modFederation =    new ModFederation();
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
+
+	protected final ArgDecl statsDecl = new ArgDecl(ArgDecl.NoValue, "queryProcStats");
 
 	public static void main( final String... argv ) {
 		new RunQueryWithoutSrcSel(argv).mainRun();
@@ -34,6 +39,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modFederation);
 		addModule(modResults);
 		addModule(modEngineConfig);
+
+		add(statsDecl, "--queryProcStats", "Print out statistics about the query execution process");
 	}
 
 	@Override
@@ -53,8 +60,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		modTime.startTimer();
 
+		QueryProcStats stats = null;
+
 		try {
-			e.executeQuery(query, resFmt);
+			stats = e.executeQuery(query, resFmt);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
@@ -65,6 +74,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.err.println("Time: " + modTime.timeStr(time) + " sec");
+		}
+
+		if ( stats != null && contains(statsDecl) ) {
+			StatsPrinter.print(stats, System.err, true);
 		}
 	}
 

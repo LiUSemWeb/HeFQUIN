@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc;
 
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public interface SourcePlanner
 {
@@ -12,5 +13,5 @@ public interface SourcePlanner
 	 * multiway joins ({@link LogicalOpMultiwayJoin}), and multiway unions
 	 * ({@link LogicalOpMultiwayUnion}). 
 	 */
-	LogicalPlan createSourceAssignment( final Query query ) throws SourcePlanningException;
+	Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query ) throws SourcePlanningException;
 }
