@@ -16,7 +16,7 @@ public class StatsImpl implements Stats
 	public Object getEntry( final String entryName ) {
 		final Object entry = entries.get(entryName);
 
-		if ( entry == null )
+		if ( entry == null && ! entries.containsKey(entryName) )
 			throw new IllegalArgumentException();
 
 		return entry;

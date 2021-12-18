@@ -31,6 +31,7 @@ public class QueryProcStatsImplTest
 		assertEquals( 1L, s.getCompilationTime() );
 		assertEquals( 2L, s.getExecutionTime() );
 
+		assertEquals( ps, s.getQueryPlanningStats() );
 		assertEquals( es, s.getExecutionStats() );
 
 		assertEquals( 42, s.getEntry("additionalEntry") );
