@@ -1,18 +1,15 @@
 package se.liu.ida.hefquin.engine.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StatsImpl implements Stats
 {
-	private final List<String> entryNames = new ArrayList<>();
-	private final Map<String,Object> entries = new HashMap<>();
+	private final Map<String,Object> entries = new LinkedHashMap<>();
 
 	@Override
 	public Iterable<String> getEntryNames() {
-		return entryNames;
+		return entries.keySet();
 	}
 
 	@Override
@@ -26,10 +23,6 @@ public class StatsImpl implements Stats
 	}
 
 	public Object put( final String entryName, final Object entry ) {
-		final Object old = entries.put(entryName, entry);
-		if ( old == null ) {
-			entryNames.add(entryName);
-		}
-		return old;
+		return entries.put(entryName, entry);
 	}
 }
