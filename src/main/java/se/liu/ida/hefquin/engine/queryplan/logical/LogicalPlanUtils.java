@@ -29,7 +29,7 @@ public class LogicalPlanUtils
 		return c.getSubplanCount();
 	}
 	
-	static public class LogicalPlanCounter extends LogicalPlanVisitorBase {
+	static public class LogicalPlanCounter implements LogicalPlanVisitor {
 		protected int subplanCount = 0;
 		
 		public int getSubplanCount() {
