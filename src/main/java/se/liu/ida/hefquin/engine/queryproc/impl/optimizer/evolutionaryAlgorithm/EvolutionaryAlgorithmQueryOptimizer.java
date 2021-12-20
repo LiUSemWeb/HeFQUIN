@@ -55,12 +55,13 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
             previousGenerations.add(currentGen);
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
-        final PhysicalPlan bestPlan = currentGen.bestPlan.getPlan();
+        final PhysicalPlanWithCost bestPlan = currentGen.bestPlan;
 
         final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
         myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
+        myStats.put( "costOfSelectedPlan", bestPlan.getWeight() );
 
-		return new Pair<>(bestPlan, myStats);
+		return new Pair<>(bestPlan.getPlan(), myStats);
     }
 
     protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws QueryOptimizationException {
