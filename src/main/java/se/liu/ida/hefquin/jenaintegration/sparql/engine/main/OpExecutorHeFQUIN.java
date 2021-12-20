@@ -59,10 +59,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+		final Boolean isExperimentRun = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
 
 		final QueryProcContext procCxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
 		};
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
@@ -71,6 +73,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
 		};

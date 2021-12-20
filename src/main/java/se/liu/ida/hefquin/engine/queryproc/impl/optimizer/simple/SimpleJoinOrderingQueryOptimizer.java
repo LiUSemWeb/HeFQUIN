@@ -44,7 +44,11 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
 
         final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
-        myStats.put("costOfSelectedPlan", CostEstimationUtils.getEstimates( ctxt.getCostModel(), bestPlan )[0]);
+        if ( ctxt.isExperimentRun() ) {
+        	// stats that may be expensive to collected should be collected only when running experiments
+        	myStats.put( "costOfSelectedPlan", CostEstimationUtils.getEstimates(ctxt.getCostModel(), bestPlan)[0] );
+        }
+        
 
 		return new Pair<>(bestPlan, myStats);
     }

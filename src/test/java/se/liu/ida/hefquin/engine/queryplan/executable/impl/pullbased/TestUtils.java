@@ -20,6 +20,7 @@ public class TestUtils extends EngineTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return true; }
 		};
 	}
 
