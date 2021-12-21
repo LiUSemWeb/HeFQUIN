@@ -60,12 +60,7 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 	@Override
 	public String toString() {
 
-		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd )  {
-			return "> UNIONBindJoin" + lop.toString();
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
-		}
+		return "> UNIONBindJoin" + lop.toString();
 	}
 
 }

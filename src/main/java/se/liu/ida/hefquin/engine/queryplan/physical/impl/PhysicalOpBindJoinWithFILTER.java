@@ -52,12 +52,7 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	@Override
 	public String toString() {
 
-		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd )  {
-			return "> FILTERBindJoin" +  lop.toString();
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
-		}
+		return "> FILTERBindJoin" +  lop.toString();
 	}
 
 }

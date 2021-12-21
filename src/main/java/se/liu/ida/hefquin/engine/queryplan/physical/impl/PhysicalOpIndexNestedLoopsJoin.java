@@ -66,12 +66,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	@Override
 	public String toString(){
 
-		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd )  {
-			return "> indexNestedLoop " + lop.toString();
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
-		}
+		return "> indexNestedLoop " + lop.toString();
 	}
 
 }
