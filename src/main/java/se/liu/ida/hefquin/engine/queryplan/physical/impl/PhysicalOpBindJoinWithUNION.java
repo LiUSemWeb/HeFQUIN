@@ -59,15 +59,9 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
 
-		if ( lop instanceof LogicalOpTPAdd)  {
-			builder.append("> UNIONBindJoin");
-			return ((LogicalOpTPAdd) lop).toString();
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			builder.append("> UNIONBindJoin");
-			return ((LogicalOpBGPAdd) lop).toString();
+		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd )  {
+			return "> UNIONBindJoin" + lop.toString();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );

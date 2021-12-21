@@ -7,5 +7,12 @@ public interface BGP extends SPARQLGraphPattern
 	/**
 	 * Returns an unmodifiable set of triple patterns.
 	 */
-	Set<? extends TriplePattern> getTriplePatterns(); 
+	Set<? extends TriplePattern> getTriplePatterns();
+
+
+	/**
+	 * Returns a string representation of the BGP
+	 */
+	String toString();
+
 }

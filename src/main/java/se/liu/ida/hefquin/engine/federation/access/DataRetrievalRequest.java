@@ -22,4 +22,7 @@ public interface DataRetrievalRequest
 	 * in any reasonable way).
 	 */
 	ExpectedVariables getExpectedVariables();
+
+	String toString();
+
 }

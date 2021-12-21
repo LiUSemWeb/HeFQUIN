@@ -64,4 +64,16 @@ public class SPARQLRequestImpl implements SPARQLRequest
 		return expectedVars;
 	}
 
+	@Override
+	public String toString(){
+		if ( query != null ) {
+			return query.toString();
+		}
+		else if ( pattern != null ){
+			return pattern.toString();
+		}
+		else
+			return "The query pattern of SPARQLRequest is null";
+	}
+
 }

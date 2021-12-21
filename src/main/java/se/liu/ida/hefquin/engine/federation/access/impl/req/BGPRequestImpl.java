@@ -29,4 +29,9 @@ public class BGPRequestImpl implements BGPRequest
 		return QueryPatternUtils.getExpectedVariablesInPattern(bgp);
 	}
 
+	@Override
+	public String toString(){
+		return bgp.toString();
+	}
+
 }

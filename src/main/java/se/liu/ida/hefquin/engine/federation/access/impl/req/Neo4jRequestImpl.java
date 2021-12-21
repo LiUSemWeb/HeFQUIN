@@ -26,4 +26,10 @@ public class Neo4jRequestImpl implements Neo4jRequest {
     public String getCypherQuery() {
         return cypherQuery;
     }
+
+    @Override
+    public String toString(){
+        return "Neo4j Request TODO";
+    }
+
 }

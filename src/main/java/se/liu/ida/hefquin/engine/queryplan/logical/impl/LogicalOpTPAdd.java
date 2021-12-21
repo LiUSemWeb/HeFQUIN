@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalInterface;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -50,16 +48,12 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 
 	@Override
 	public String toString(){
-		final StringBuilder builder = new StringBuilder();
 
-		builder.append("> tpAdd ");
-		builder.append("( ");
-		builder.append( tp.asJenaTriple().toString() );
-		builder.append(", ");
-		LogicalPlanUtils.printStringOfFm( builder, fm );
-		builder.append(" )");
-
-		return builder.toString();
+		return "> tpAdd ( "
+				+ tp.toString()
+				+ ", "
+				+ LogicalPlanUtils.printStringOfFm( fm )
+				+ " )";
 	}
 
 }
