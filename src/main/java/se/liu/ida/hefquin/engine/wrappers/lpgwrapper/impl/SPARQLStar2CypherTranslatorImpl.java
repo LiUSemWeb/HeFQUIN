@@ -209,10 +209,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                 final LPG2RDFConfiguration configuration,
                                                 final CypherVarGenerator gen) {
         final CypherVar xvar = gen.getAnonVar();
+        final String literal = o.getLiteralValue().toString();
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(xvar))
                 .add(new NodeIDCondition(xvar, configuration.unmapNode(s).getId()))
-                .add(new FilteredPropertiesReturnStatement(xvar, o.getLiteralValue().toString(), gen.getRetVar(p)))
+                .add(new FilterEmptyPropertyListsCondition(xvar, literal))
+                .add(new FilteredPropertiesReturnStatement(xvar, literal, gen.getRetVar(p)))
                 .build();
     }
 
@@ -306,10 +308,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                final LPG2RDFConfiguration configuration, final CypherVarGenerator gen,
                                                final Set<Node> certainNodes) {
         final CypherVar svar = gen.getVarFor(s);
+        final String literal = o.getLiteralValue().toString();
         final CypherMatchQuery q = new CypherQueryBuilder()
                                         .add(new NodeMatchClause(svar))
                                         .add(new VariableReturnStatement(svar, gen.getRetVar(s)))
-                                        .add(new FilteredPropertiesReturnStatement(svar, o.getLiteralValue().toString(), gen.getRetVar(p)))
+                                        .add(new FilterEmptyPropertyListsCondition(svar, literal))
+                                        .add(new FilteredPropertiesReturnStatement(svar, literal, gen.getRetVar(p)))
                                         .build();
         if (certainNodes.contains(s)) {
             return q;
@@ -318,8 +322,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
+                        .add(new FilterEmptyPropertyListsCondition(sedge.get(1), literal))
                         .add(new TripleMapReturnStatement(sedge.get(0), sedge.get(1), sedge.get(2), gen.getRetVar(s)))
-                        .add(new FilteredPropertiesReturnStatement(sedge.get(1), o.getLiteralValue().toString(), gen.getRetVar(p)))
+                        .add(new FilteredPropertiesReturnStatement(sedge.get(1), literal, gen.getRetVar(p)))
                         .build(),
                 q
         );

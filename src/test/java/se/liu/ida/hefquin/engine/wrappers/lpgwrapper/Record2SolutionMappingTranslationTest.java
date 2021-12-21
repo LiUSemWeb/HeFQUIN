@@ -248,6 +248,7 @@ public class Record2SolutionMappingTranslationTest {
         final CypherQuery query = new CypherQueryBuilder()
                 .add(new NodeMatchClause(a1))
                 .add(new NodeIDCondition(a1, "9"))
+                .add(new FilterEmptyPropertyListsCondition(a1, "Lana Wachowski"))
                 .add(new FilteredPropertiesReturnStatement(a1, "Lana Wachowski", ret1))
                 .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
@@ -485,7 +486,7 @@ public class Record2SolutionMappingTranslationTest {
     }
 
     @Test
-    public void translateVarVarLiteral() {
+    public void translateVarVarLiteral() throws JsonProcessingException, Neo4JException {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Map<CypherVar, Node> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -493,28 +494,28 @@ public class Record2SolutionMappingTranslationTest {
         final CypherQuery query = new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(src1, edge1, tgt1))
+                        .add(new FilterEmptyPropertyListsCondition(edge1, "The Matrix"))
                         .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
                         .add(new FilteredPropertiesReturnStatement(edge1, "The Matrix", ret2))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(cpvar1))
+                        .add(new FilterEmptyPropertyListsCondition(cpvar1, "The Matrix"))
                         .add(new VariableReturnStatement(cpvar1, ret1))
                         .add(new FilteredPropertiesReturnStatement(cpvar1, "The Matrix", ret2))
                         .build()
         );
-        //this returns empty lists, we should fix that
-        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
-                "{\"row\":[{\"edge\":{\"roles\":[\"Shane Falco\"]},\"source\":{\"born\":1964,\"name\":\"Keanu\"}," +
-                    "\"target\":{\"title\":\"The Replacements\",\"released\":2000}},[]]," +
-                    "\"meta\":[{\"id\":114,\"type\":\"relationship\"},{\"id\":1,\"type\":\"node\"},{\"id\":87,\"type\":\"node\",}]}," +
-                "{\"row\":[{\"edge\":{\"roles\":[\"Johnny Mnemonic\"]},\"source\":{\"born\":1964,\"name\":\"Keanu\"}," +
-                    "\"title\":\"Johnny Mnemonic\",\"released\":1995}},[]]," +
-                    "\"meta\":[{\"id\":132,\"type\":\"relationship\"},{\"id\":1,\"type\":\"node\"},{\"id\":100,\"type\":\"node\"}]}," +
-                "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},[\"title\"]]," +
-                    "\"meta\":[{\"id\":0,\"type\":\"node\"},null]}," +
-                "{\"row\":[{\"born\":1964,\"name\":\"Keanu\"},[]]," +
-                    "\"meta\":[{\"id\":1,\"type\":\"node\"}]}]}]," +
-                "\"errors\":[]}";
+        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"], \"data\":[{" +
+                "\"row\":[{\"title\":\"The Matrix\",\"released\":1999},[\"title\"]]," +
+                "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null]}]}]" +
+                ",\"errors\":[]}}";
+        final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
+        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+                .translateRecords(records, conf, query, varMap);
+        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
+                Var.alloc("p"), conf.mapProperty("title")));
+        assertEquals(1, solMaps.size());
+        assertEquals(expected, solMaps.get(0));
     }
 
     @Test
