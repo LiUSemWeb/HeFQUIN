@@ -67,7 +67,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			numberOfJoinVars = 0;    // irrelevant for request operators
 			futureIntResSize = null; // irrelevant for request operators
 		}
-		else if ( lop instanceof LogicalOpJoin ) {
+		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion ) {
 			numberOfTerms = 0;       // irrelevant for join operators
 			numberOfJoinVars = 0;    // irrelevant for join operators
 			futureIntResSize = null; // irrelevant for join operators
@@ -93,7 +93,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfTerms;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin ) {
+		else if ( pop instanceof BasePhysicalOpBinaryJoin || pop instanceof PhysicalOpBinaryUnion ) {
 			costValue = 0;
 		}
 		else {

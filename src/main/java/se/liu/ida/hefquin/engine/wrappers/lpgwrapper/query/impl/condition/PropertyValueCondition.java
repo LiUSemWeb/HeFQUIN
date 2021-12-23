@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Represents a condition checking that the value of a property is a given literal, with an optional alias
- * For example, n.name = "Quentin Tarantino"
+ * For example, n.name = 'Quentin Tarantino'
  */
 public class PropertyValueCondition implements WhereCondition {
     protected final CypherVar var;
@@ -39,7 +39,7 @@ public class PropertyValueCondition implements WhereCondition {
 
     @Override
     public String toString() {
-        return var.getName() + "." + property + "=\"" + value +"\"";
+        return var.getName() + "." + property + "='" + value +"'";
     }
 
     @Override

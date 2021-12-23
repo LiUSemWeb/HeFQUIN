@@ -29,7 +29,7 @@ public class PhysicalPlanWithCostUtils {
             throw new QueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
         }
 
-        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>( costs.length );
+        final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>( );
         for ( int i = 0; i < plans.size(); i++ ) {
             plansWithCost.add( new PhysicalPlanWithCost( plans.get(i), costs[i] ) );
         }
@@ -38,6 +38,10 @@ public class PhysicalPlanWithCostUtils {
     }
 
     public static PhysicalPlanWithCost findPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
+        if ( plansWithCost.size() == 0 ) {
+            throw new IllegalArgumentException( "Cannot find the plan with lowest cost from an empty set" );
+        }
+
         PhysicalPlanWithCost bestPlan = plansWithCost.get(0);
         double min = bestPlan.getWeight();
 
@@ -52,12 +56,16 @@ public class PhysicalPlanWithCostUtils {
     }
 
     public static PhysicalPlanWithCost findPlanWithHighestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
+        if ( plansWithCost.size() == 0 ) {
+            throw new IllegalArgumentException( "Cannot find the plan with highest cost from an empty set" );
+        }
+
         PhysicalPlanWithCost worstPlan = plansWithCost.get(0);
         double max = worstPlan.getWeight();
 
         for ( int i = 1; i < plansWithCost.size(); i++) {
             final PhysicalPlanWithCost p = plansWithCost.get(i);
-            if ( p.getWeight() >= max ) {
+            if ( p.getWeight() > max ) {
                 max = p.getWeight();
                 worstPlan = p;
             }

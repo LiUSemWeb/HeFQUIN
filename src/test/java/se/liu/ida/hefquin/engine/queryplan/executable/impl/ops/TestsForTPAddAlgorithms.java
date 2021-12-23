@@ -437,6 +437,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return true; }
 		};
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 

@@ -27,4 +27,9 @@ public class SolutionMappingImpl implements SolutionMapping
 			return false;
 	}
 
+	@Override
+	public String toString() {
+		return  jenaObj.toString();
+	}
+
 }

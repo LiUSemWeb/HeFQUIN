@@ -35,6 +35,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class SourcePlannerImpl implements SourcePlanner
 {
@@ -46,7 +48,7 @@ public class SourcePlannerImpl implements SourcePlanner
 	}
 
 	@Override
-	public LogicalPlan createSourceAssignment( final Query query )
+	public Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query )
 			throws SourcePlanningException
 	{
 		// The current implementation here does not actually perform
@@ -57,7 +59,11 @@ public class SourcePlannerImpl implements SourcePlanner
 		// implementation here does is to convert the given query
 		// pattern into a logical plan.
 		final Op jenaOp = ( (SPARQLGraphPattern) query ).asJenaOp();
-		return createPlan(jenaOp);
+		final LogicalPlan sa = createPlan(jenaOp);
+
+		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
+
+		return new Pair<>(sa, myStats);
 	}
 
 	protected LogicalPlan createPlan( final Op jenaOp ) {

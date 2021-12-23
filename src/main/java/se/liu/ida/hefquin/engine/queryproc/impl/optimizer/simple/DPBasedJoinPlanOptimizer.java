@@ -48,10 +48,10 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
             final DataStructureForStoringPlansOfSubsets optPlan = new DataStructureForStoringPlansOfSubsets();
 
             for ( final PhysicalPlan plan: subplans ){
-                optPlan.add( new ArrayList<>(), plan );
+                optPlan.add( new ArrayList<>( Arrays.asList(plan) ), plan );
             }
 
-            for ( int num = 2; num < subplans.size(); num ++ ){
+            for ( int num = 2; num < subplans.size()+1; num ++ ){
                 // Get all subsets with size num.
                 final List<List<PhysicalPlan>> subsets = getSubSet(subplans, num);
 

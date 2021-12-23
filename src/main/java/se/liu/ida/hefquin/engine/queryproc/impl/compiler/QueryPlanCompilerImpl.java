@@ -84,6 +84,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
+			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
 		};
 	}
 

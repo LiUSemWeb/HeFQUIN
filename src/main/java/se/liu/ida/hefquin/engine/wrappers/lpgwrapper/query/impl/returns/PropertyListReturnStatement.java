@@ -9,12 +9,11 @@ import java.util.Set;
 
 /**
  * Represents a statement that returns the list of properties of an edge or node, with an optional alias
- * For example, RETURN [k in KEYS(x) | k]
+ * For example, RETURN KEYS(x) AS p
  */
 public class PropertyListReturnStatement implements ReturnStatement {
     private final CypherVar var;
     private final CypherVar alias;
-    private final String innerVar = "k";
 
     public PropertyListReturnStatement(final CypherVar var, final CypherVar alias) {
         assert var != null;
@@ -33,8 +32,7 @@ public class PropertyListReturnStatement implements ReturnStatement {
 
     @Override
     public String toString() {
-        return "[" + innerVar + " IN KEYS(" + var.getName() + ") | " + innerVar + "]"
-                + (alias != null? " AS "+ alias.getName() : "");
+        return "KEYS(" + var.getName() + ")" + (alias != null? " AS "+ alias.getName() : "");
     }
 
     @Override
@@ -47,7 +45,7 @@ public class PropertyListReturnStatement implements ReturnStatement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(var, alias, innerVar);
+        return Objects.hash(var, alias);
     }
 
     @Override

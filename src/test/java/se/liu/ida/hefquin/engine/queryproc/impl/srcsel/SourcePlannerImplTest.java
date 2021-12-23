@@ -151,11 +151,12 @@ public class SourcePlannerImplTest extends EngineTestBase
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
+			@Override public boolean isExperimentRun() { return true; }
 		};
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
-		return sourcePlanner.createSourceAssignment(query);
+		return sourcePlanner.createSourceAssignment(query).object1;
 	}
 
 	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,
