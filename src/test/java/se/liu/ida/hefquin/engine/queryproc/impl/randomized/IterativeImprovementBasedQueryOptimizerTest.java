@@ -62,7 +62,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		final IterativeImprovementBasedQueryOptimizer o = new IterativeImprovementBasedQueryOptimizer( cond, createContextForTest(), rewritingRules );
 
 		// run the test
-		final PhysicalPlan resultingPlan = o.optimize( initialPlan );
+		final PhysicalPlan resultingPlan = o.optimize( initialPlan ).object1;
 
 		// verify that the outcome is correct
 		assertEquals( plan3, resultingPlan );

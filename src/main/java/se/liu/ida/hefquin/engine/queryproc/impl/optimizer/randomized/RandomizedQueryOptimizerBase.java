@@ -32,15 +32,6 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		rules = new PlanRewritingUtils(rewritingRules);
 	}
 
-	@Override
-	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		final PhysicalPlan bestPlan = null; // TODO: fix after merging into main!!
-
-        final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
-
-		return new Pair<>(bestPlan, myStats);		
-	}
-
 	protected List<PhysicalPlan> getNeighbours( final PhysicalPlan initialPlan ) {
 		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
 

@@ -6,11 +6,13 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOptimizerBase
 {
@@ -25,15 +27,14 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 		condition = x;
 	}
 
-	// @Override  TODO: fix after merging to main!!
-	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+	@Override
+	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
 		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
 	}
-	
-	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
+
+	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
 		// The best plan and cost we have found so far. As we have only found one plan, it is the best one so far.
 		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
-
 
 		// generation = number of times the outer loop has run. Has to be declared here since it will increment each outer loop.
 		int generation = 0;
@@ -71,7 +72,9 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 			generation++;
 		}
 
-		return bestPlan.getPlan();
+		final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
+
+		return new Pair<>( bestPlan.getPlan(), myStats );
 	}
 
 }
