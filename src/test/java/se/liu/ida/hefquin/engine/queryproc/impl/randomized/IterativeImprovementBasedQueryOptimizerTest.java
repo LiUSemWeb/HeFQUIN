@@ -42,7 +42,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 
 		final RewritingRule dummyRuleForTest = new RewritingRule() {
 			@Override public double getPriority() { return 0; }
-			
+
 			@Override
 			public Set<RuleApplication> determineAllPossibleApplications( final PhysicalPlan plan ) {
 				final Set<RuleApplication> s = new HashSet<>();

@@ -5,17 +5,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 {
@@ -42,11 +37,12 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 
 		return resultList;
 	}
-	
+
 	protected <T> T getRandomElement( final List<T> L ) {
-		if(L.size() == 1) {
+		if ( L.size() == 1 ) {
 			return L.get(0);
-		} else {
+		}
+		else {
 			return L.get( rng.nextInt(L.size()) ); // Get a random object.
 		}
 	}

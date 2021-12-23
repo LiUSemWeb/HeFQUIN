@@ -39,11 +39,10 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 		// generation = number of times the outer loop has run. Has to be declared here since it will increment each outer loop.
 		int generation = 0;
 
-		while ( !condition.readyToStop(generation) ) { // Currently only handles generation number as a stopping condition!
+		while ( ! condition.readyToStop(generation) ) {
 			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
 			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan ); // This variable will hold the plan which is currently being worked on.
 
-			
 			boolean improvementFound = false;
 
 			do {
@@ -52,20 +51,20 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 				improvementFound = false;
 
 				// Using a for-loop in order to have the index for which neighbouring plan to pick.
-				for (int x = 0; x < neighbours.size(); x++) {
-					if(neighbours.get(x).getWeight() < currentPlan.getWeight()) {
+				for ( int x = 0; x < neighbours.size(); x++ ) {
+					if( neighbours.get(x).getWeight() < currentPlan.getWeight() ) {
 						improvementFound = true;
-						betterPlans.add(neighbours.get(x));
+						betterPlans.add( neighbours.get(x) );
 					}
 				}
 
-				if(improvementFound) { // if we have found at least one possible improvement, we want to make one of them into our new current plan.
+				if ( improvementFound ) { // if we have found at least one possible improvement, we want to make one of them into our new current plan.
 					currentPlan = getRandomElement(betterPlans); // Get a random object.
 				}
 			}
-			while(improvementFound);
+			while ( improvementFound );
 
-			if(currentPlan.getWeight() < bestPlan.getWeight()) {
+			if ( currentPlan.getWeight() < bestPlan.getWeight() ) {
 				bestPlan = currentPlan;
 			}
 

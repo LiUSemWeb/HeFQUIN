@@ -37,7 +37,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 		PhysicalPlanWithCost currentPlan = bestPlan;
 
 		// A temperature value is assigned based on the cost. Because of how this value is used, the only important thing is its size relative to the cost of the current plan.
-		double temperature = currentPlan.getWeight()*2;
+		double temperature = currentPlan.getWeight() * 2;
 		int unchanged = 0;
 
 		// While not frozen, do
@@ -55,13 +55,11 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 				if ( costDelta <= 0 ) {
 					currentPlan = alternativePlan;
 				}
-				else {
-					if (rng.nextDouble() > Math.exp(-costDelta / temperature)) {
-						currentPlan = alternativePlan;
-					}
+				else if ( rng.nextDouble() > Math.exp(-costDelta/temperature) ) {
+					currentPlan = alternativePlan;
 				}
 
-				if(currentPlan.getWeight() < bestPlan.getWeight()) {
+				if ( currentPlan.getWeight() < bestPlan.getWeight() ) {
 					bestPlan = currentPlan;
 					unchanged = 0;
 				}
@@ -80,7 +78,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 
 	protected boolean isFrozen( final double temperature, final int unchanged ) {
 		 // This is the paper's example frozen condition. Low temp and best is left unchanged for 4 outer loops.
-		return (temperature < 1 && unchanged >= 4);
+		return (temperature < 1) && (unchanged >= 4);
 	}
 
 }
