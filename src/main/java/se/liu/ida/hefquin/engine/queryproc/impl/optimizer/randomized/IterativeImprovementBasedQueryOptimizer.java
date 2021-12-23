@@ -32,14 +32,16 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 	
 	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
 		// The best plan and cost we have found so far. As we have only found one plan, it is the best one so far.
-		PhysicalPlanWithCost bestPlan = new PhysicalPlanWithCost( initialPlan, CostEstimationUtils.getEstimates( context.getCostModel(), initialPlan )[0]);
+		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
+
 
 		// generation = number of times the outer loop has run. Has to be declared here since it will increment each outer loop.
 		int generation = 0;
 
 		while ( !condition.readyToStop(generation) ) { // Currently only handles generation number as a stopping condition!
 			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
-			PhysicalPlanWithCost currentPlan = new PhysicalPlanWithCost(initialPlan, CostEstimationUtils.getEstimates( context.getCostModel(), initialPlan )[0]); // This variable will hold the plan which is currently being worked on.
+			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan ); // This variable will hold the plan which is currently being worked on.
+
 			
 			boolean improvementFound = false;
 

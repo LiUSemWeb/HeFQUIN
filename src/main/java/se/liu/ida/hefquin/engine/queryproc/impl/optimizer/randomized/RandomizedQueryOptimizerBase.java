@@ -29,10 +29,6 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		rules = new PlanRewritingUtils(rewritingRules);
 	}
 
-	abstract public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException;
-
-	// abstract public PhysicalPlan optimize( PhysicalPlan initialPlan ) throws QueryOptimizationException;
-
 
 	protected List<PhysicalPlan> getNeighbours( final PhysicalPlan initialPlan ) {
 		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
@@ -45,7 +41,7 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		return resultList;
 	}
 	
-	protected <T> T getRandomElement(List<T> L) {
+	protected <T> T getRandomElement( final List<T> L ) {
 		if(L.size() == 1) {
 			return L.get(0);
 		} else {
