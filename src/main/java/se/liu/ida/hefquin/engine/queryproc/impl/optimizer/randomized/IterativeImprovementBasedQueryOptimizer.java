@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -24,6 +26,10 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 	}
 
 	@Override
+	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
+	}
+	
 	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
 		// The best plan and cost we have found so far. As we have only found one plan, it is the best one so far.
 		PhysicalPlanWithCost bestPlan = new PhysicalPlanWithCost( initialPlan, CostEstimationUtils.getEstimates( context.getCostModel(), initialPlan )[0]);

@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
@@ -9,14 +11,23 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWith
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
+	
+	protected final EquilibriumConditionForSimulatedAnnealing condition;
 
-	public SimulatedAnnealing(	final QueryOptimizationContext context,
+	public SimulatedAnnealing(	final EquilibriumConditionForSimulatedAnnealing x,
+								final QueryOptimizationContext context,
 								final RuleInstances rewritingRules) {
 		super(context, rewritingRules);
+		condition = x;
 	}
 
+
 	@Override
-	public PhysicalPlan optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
+	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false), LogicalPlanUtils.countSubplans(initialPlan) );
+	}
+	
+	public PhysicalPlan optimize( final PhysicalPlan initialPlan, final int numberOfSubplans ) throws QueryOptimizationException {
 		
 		// The first plan, which is currently the best plan we know of.
 		PhysicalPlanWithCost bestPlan = new PhysicalPlanWithCost(initialPlan, CostEstimationUtils.getEstimates( context.getCostModel(), initialPlan )[0]);
@@ -30,9 +41,10 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 		while(!isFrozen(temperature,unchanged)) {
 			
 			unchanged++;
+			int generation = 0; // Generation counter for inner loop.
 			
-			// TODO: Implement Equilibrium. Keep a counter and run the inner loop 16 times the number of logical operations in the initial logical plan.
-			while(!isEquilibrium()) {
+			// While not in equilibrium, do
+			while(!condition.isEquilibrium(generation, numberOfSubplans)) {
 			
 				// Here we want a random neighbour, and its cost
 				final PhysicalPlan temporaryPlan = getRandomElement(getNeighbours(currentPlan.getPlan()));
@@ -53,6 +65,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 					unchanged = 0;
 				}
 			
+				generation++;
 			}
 			
 			// reduce temperature. Using the example setting from the paper.
@@ -60,10 +73,6 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase {
 		}
 		
 		return bestPlan.getPlan();
-	}
-	
-	protected boolean isEquilibrium() {
-		return false;
 	}
 	
 	protected boolean isFrozen( final double temperature, final int unchanged ) {

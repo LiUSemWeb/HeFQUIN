@@ -29,12 +29,9 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		rules = new PlanRewritingUtils(rewritingRules);
 	}
 
-	@Override
-	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
-	}
+	abstract public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException;
 
-	abstract public PhysicalPlan optimize( PhysicalPlan initialPlan ) throws QueryOptimizationException;
+	// abstract public PhysicalPlan optimize( PhysicalPlan initialPlan ) throws QueryOptimizationException;
 
 
 	protected List<PhysicalPlan> getNeighbours( final PhysicalPlan initialPlan ) {
