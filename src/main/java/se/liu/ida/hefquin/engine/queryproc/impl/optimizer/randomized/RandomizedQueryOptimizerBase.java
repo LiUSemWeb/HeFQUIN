@@ -34,15 +34,12 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 
 	@Override
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		final PhysicalPlan bestPlan = optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
+		final PhysicalPlan bestPlan = null; // TODO: fix after merging into main!!
 
         final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
 
 		return new Pair<>(bestPlan, myStats);		
 	}
-
-	abstract public PhysicalPlan optimize( PhysicalPlan initialPlan ) throws QueryOptimizationException;
-
 
 	protected List<PhysicalPlan> getNeighbours( final PhysicalPlan initialPlan ) {
 		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
@@ -54,5 +51,13 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 
 		return resultList;
 	}
-
+	
+	protected <T> T getRandomElement( final List<T> L ) {
+		if(L.size() == 1) {
+			return L.get(0);
+		} else {
+			return L.get( rng.nextInt(L.size()) ); // Get a random object.
+		}
+	}
+	
 }
