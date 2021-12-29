@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -27,9 +28,7 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 	@Override
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize(LogicalPlan initialPlan)
 			throws QueryOptimizationException {
-		// First run II
-		// Then run SA
-		return null;
+		return optimizer2.optimize(optimizer1.optimize(initialPlan).object1,LogicalPlanUtils.countSubplans(initialPlan)); // Should work, but currently only gets the stats from the SA stage.
 	}
 
 }
