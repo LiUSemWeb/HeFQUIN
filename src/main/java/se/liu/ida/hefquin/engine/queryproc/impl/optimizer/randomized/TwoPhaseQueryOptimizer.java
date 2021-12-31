@@ -26,7 +26,7 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 	}
 
 	@Override
-	public Pair<PhysicalPlan, QueryOptimizationStats> optimize(LogicalPlan initialPlan)
+	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan )
 			throws QueryOptimizationException {
 		return optimizer2.optimize(optimizer1.optimize(initialPlan).object1,LogicalPlanUtils.countSubplans(initialPlan)); // Should work, but currently only gets the stats from the SA stage.
 	}
