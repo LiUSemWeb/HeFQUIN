@@ -27,7 +27,7 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan )
 			throws QueryOptimizationException {
 		final PhysicalPlan halfwayPlan = optimizer1.optimize(initialPlan).object1;
-		final PhysicalPlan finalPlan = optimizer2.optimize(halfwayPlan,LogicalPlanUtils.countSubplans(initialPlan),0.1).object1; // Should work, but currently only gets the stats from the SA stage.
+		final PhysicalPlan finalPlan = optimizer2.optimize(halfwayPlan,LogicalPlanUtils.countSubplans(initialPlan),0.1).object1;
 
 		final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
 
