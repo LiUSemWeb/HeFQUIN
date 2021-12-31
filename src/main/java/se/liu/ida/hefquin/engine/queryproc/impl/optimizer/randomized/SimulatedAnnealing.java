@@ -30,14 +30,21 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 		return optimize(initialPP, numberOfSubplans);
 	}
 
+
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
 	                                                            final int numberOfSubplans ) throws QueryOptimizationException {
+		return optimize(initialPlan, numberOfSubplans, 2.0);
+	}
+
+	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
+	                                                            final int numberOfSubplans,
+	                                                            final double temperatureModifier) throws QueryOptimizationException {
 		// The first plan, which is currently the best plan we know of.
 		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
 		PhysicalPlanWithCost currentPlan = bestPlan;
 
 		// A temperature value is assigned based on the cost. Because of how this value is used, the only important thing is its size relative to the cost of the current plan.
-		double temperature = currentPlan.getWeight() * 2;
+		double temperature = currentPlan.getWeight() * temperatureModifier;
 		int unchanged = 0;
 
 		// While not frozen, do
