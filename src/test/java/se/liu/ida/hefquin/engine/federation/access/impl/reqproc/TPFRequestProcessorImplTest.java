@@ -53,9 +53,11 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 			if ( p.isConcrete() ) { assertTrue( tt.getPredicate().matches(p) ); }
 			if ( o.isConcrete() ) { assertTrue( tt.getObject().matches(o) ); }
 		}
-		System.out.println( resp.getSize() );
-		System.out.println( resp.getPayloadSize() );
-		System.out.println( resp.getMetadataSize() );
+
+		// - the following test assumes that i) a card.estimate was returned
+		//   in the TPF response and ii) the number of matching triples is
+		//   smaller than the page size
+		assertTrue( resp.getPayloadSize() == resp.getCardinalityEstimate() ); 
 	}
 
 }

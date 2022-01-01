@@ -25,31 +25,32 @@ public class TPFResponseBuilder
 	protected FederationMember fm             = null;
 	protected DataRetrievalRequest request    = null;
 	protected Date requestStartTime           = null;
-	protected long tripleCount                = -1L;
+	protected int tripleCount                 = -1;  // TODO: should better be long, but changing affects a lot of other things
 
 	public TPFResponseBuilder addMatchingTriple( final Triple t) {
 		matchingTriples.add(t);
 		return this;
 	}
 
-	public TPFResponseBuilder addMatchingTriple( final org.apache.jena.graph.Triple t ) {
+	public final TPFResponseBuilder addMatchingTriple( final org.apache.jena.graph.Triple t ) {
 		return addMatchingTriple( new TripleImpl(t) );
 	}
 
-	public TPFResponseBuilder addMatchingTriple( final Node s, final Node p, final Node o ) {
+	public final TPFResponseBuilder addMatchingTriple( final Node s, final Node p, final Node o ) {
 		return addMatchingTriple( new TripleImpl(s,p,o) );
 	}
 
 	public TPFResponseBuilder addMetadataTriple( final Triple t ) {
 		metadataTriples.add(t);
+		tryExtractCountMetadata(t);
 		return this;
 	}
 
-	public TPFResponseBuilder addMetadataTriple( final org.apache.jena.graph.Triple t ) {
+	public final TPFResponseBuilder addMetadataTriple( final org.apache.jena.graph.Triple t ) {
 		return addMetadataTriple( new TripleImpl(t) );
 	}
 
-	public TPFResponseBuilder addMetadataTriple( final Node s, final Node p, final Node o ) {
+	public final TPFResponseBuilder addMetadataTriple( final Node s, final Node p, final Node o ) {
 		return addMetadataTriple( new TripleImpl(s,p,o) );
 	}
 
@@ -88,18 +89,21 @@ public class TPFResponseBuilder
 		if ( requestStartTime == null )
 			throw new IllegalStateException("requestStartTime not specified");
 
-		return new TPFResponseImpl(matchingTriples, metadataTriples, fm, request, requestStartTime);
+		if ( tripleCount < 0 )
+			return new TPFResponseImpl(matchingTriples, metadataTriples, fm, request, requestStartTime);
+		else
+			return new TPFResponseImpl(matchingTriples, metadataTriples, tripleCount, fm, request, requestStartTime);
 	}
 
 	protected boolean tryExtractCountMetadata( final Triple t ) {
 		final Node p = t.asJenaTriple().getPredicate();
-		if ( countPredicate1.equals(p) || countPredicate2.equals(p) ) {
+		if ( p.equals(countPredicate1) || p.equals(countPredicate2) ) {
 			final Node o = t.asJenaTriple().getObject();
 			if ( o.isLiteral() ) {
 				final String oo = o.getLiteral().getLexicalForm();
-				final long count;
+				final int count;
 				try {
-					count = Long.parseLong(oo);
+					count = Integer.parseInt(oo);
 				}
 				catch ( final NumberFormatException e ) {
 					return false;
