@@ -242,7 +242,7 @@ public abstract class EngineTestBase
 		public TPFResponseForTest( final List<Triple> matchingTriples,
 		                           final FederationMember fm,
 		                           final DataRetrievalRequest req ) {
-			super( matchingTriples, new ArrayList<Triple>(), fm, req, new Date() );
+			super( matchingTriples, new ArrayList<Triple>(), null, fm, req, new Date() );
 		}
 
 		@Override

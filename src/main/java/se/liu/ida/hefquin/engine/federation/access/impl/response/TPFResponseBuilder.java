@@ -16,8 +16,9 @@ import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 
 public class TPFResponseBuilder
 {
-	public static final Node countPredicate1 = VOID.triples.asNode();
-	public static final Node countPredicate2 = NodeFactory.createURI("http://www.w3.org/ns/hydra/core#totalItems");
+	public static final Node countPredicate1    = VOID.triples.asNode();
+	public static final Node countPredicate2    = NodeFactory.createURI("http://www.w3.org/ns/hydra/core#totalItems");
+	public static final Node nextPagePredicate  = NodeFactory.createURI("http://www.w3.org/ns/hydra/core#next");
 
 	protected final List<Triple> matchingTriples = new ArrayList<>();
 	protected final List<Triple> metadataTriples = new ArrayList<>();
@@ -26,6 +27,7 @@ public class TPFResponseBuilder
 	protected DataRetrievalRequest request    = null;
 	protected Date requestStartTime           = null;
 	protected int tripleCount                 = -1;  // TODO: should better be long, but changing affects a lot of other things
+	protected String nextPageURL              = null;
 
 	public TPFResponseBuilder addMatchingTriple( final Triple t) {
 		matchingTriples.add(t);
@@ -42,7 +44,7 @@ public class TPFResponseBuilder
 
 	public TPFResponseBuilder addMetadataTriple( final Triple t ) {
 		metadataTriples.add(t);
-		tryExtractCountMetadata(t);
+		tryExtractCountMetadataOrNextPageURL(t);
 		return this;
 	}
 
@@ -90,12 +92,12 @@ public class TPFResponseBuilder
 			throw new IllegalStateException("requestStartTime not specified");
 
 		if ( tripleCount < 0 )
-			return new TPFResponseImpl(matchingTriples, metadataTriples, fm, request, requestStartTime);
+			return new TPFResponseImpl(matchingTriples, metadataTriples, nextPageURL, fm, request, requestStartTime);
 		else
-			return new TPFResponseImpl(matchingTriples, metadataTriples, tripleCount, fm, request, requestStartTime);
+			return new TPFResponseImpl(matchingTriples, metadataTriples, nextPageURL, tripleCount, fm, request, requestStartTime);
 	}
 
-	protected boolean tryExtractCountMetadata( final Triple t ) {
+	protected boolean tryExtractCountMetadataOrNextPageURL( final Triple t ) {
 		final Node p = t.asJenaTriple().getPredicate();
 		if ( p.equals(countPredicate1) || p.equals(countPredicate2) ) {
 			final Node o = t.asJenaTriple().getObject();
@@ -113,6 +115,13 @@ public class TPFResponseBuilder
 					this.tripleCount = count;
 				}
 
+				return true;
+			}
+		}
+		else if ( p.equals(nextPagePredicate) ) {
+			final Node o = t.asJenaTriple().getObject();
+			if ( o.isURI() ) { // TODO: perhaps we should check the subject first
+				this.nextPageURL = o.getURI(); // TODO: should we simply trust the server here?
 				return true;
 			}
 		}

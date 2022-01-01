@@ -202,6 +202,7 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		{
 			final TPFResponse r = new TPFResponseImpl( Collections.emptyList(),
 			                                           Collections.emptyList(),
+			                                           null,
 			                                           fm, req,
 			                                           new Date() ) {
 				@Override

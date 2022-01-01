@@ -23,7 +23,7 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 {
 	@Test
 	public void performRequestWithPatternOnDBpedia() throws FederationAccessException {
-//		if ( skipLiveWebTests ) { return; }
+		if ( skipLiveWebTests ) { return; }
 
 		// setting up
 		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
@@ -54,10 +54,11 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 			if ( o.isConcrete() ) { assertTrue( tt.getObject().matches(o) ); }
 		}
 
-		// - the following test assumes that i) a card.estimate was returned
+		// - the following tests assume that i) a card.estimate was returned
 		//   in the TPF response and ii) the number of matching triples is
 		//   smaller than the page size
-		assertTrue( resp.getPayloadSize() == resp.getCardinalityEstimate() ); 
+		assertTrue( resp.getPayloadSize() == resp.getCardinalityEstimate() );
+		assertEquals( true, resp.isLastPage() );
 	}
 
 }
