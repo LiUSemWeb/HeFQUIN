@@ -172,7 +172,7 @@ public abstract class EngineTestBase
 
 	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
-		protected final TPFInterface iface = new TPFInterfaceImpl();
+		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
 
 		public TPFServerForTest() { this(null); }
 		public TPFServerForTest( final Graph data ) { super(data); }
@@ -189,7 +189,7 @@ public abstract class EngineTestBase
 
 	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl();
+		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
 
 		public BRTPFServerForTest() { this(null); }
 		public BRTPFServerForTest( final Graph data ) { super(data); }
@@ -242,7 +242,7 @@ public abstract class EngineTestBase
 		public TPFResponseForTest( final List<Triple> matchingTriples,
 		                           final FederationMember fm,
 		                           final DataRetrievalRequest req ) {
-			super( matchingTriples, new ArrayList<Triple>(), fm, req, new Date() );
+			super( matchingTriples, new ArrayList<Triple>(), null, fm, req, new Date() );
 		}
 
 		@Override
