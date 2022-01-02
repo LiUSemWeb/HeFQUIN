@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.jena.graph.Node;
@@ -21,7 +20,6 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseBuilder;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class TPFRequestProcessorImpl implements TPFRequestProcessor
 {
@@ -65,45 +63,22 @@ public class TPFRequestProcessorImpl implements TPFRequestProcessor
 		return b.build();
 	}
 
-	protected TPFResponseBuilder performRequest( final TPFRequest req, final TPFInterface iface ) throws HttpRequestException {
-		final HttpQuery httpReq = iface.createHttpRequest(req);
-
-		httpReq.setConnectTimeout(connectionTimeout);
-		httpReq.setReadTimeout(readTimeout);
-
-		final Date requestStartTime = new Date();
-
-		final TPFResponseBuilder b = performRequestForTriples(httpReq, req.getQueryPattern() );
-		b.setRequestStartTime(requestStartTime);
-		return b;
+	protected TPFResponseBuilder performRequest( final TPFRequest req,
+	                                             final TPFInterface iface ) throws HttpRequestException {
+		return performRequest( iface.createHttpRequest(req), req.getQueryPattern() );
 	}
 
-	protected TPFResponseBuilder performRequestForTriples( final HttpQuery req, final TriplePattern tp ) throws HttpRequestException {
-		final Pair<InputStream, String> httpResponse = performRequest(req);
+	protected TPFResponseBuilder performRequest( final HttpQuery req,
+	                                             final TriplePattern tp ) throws HttpRequestException {
+		req.setConnectTimeout(connectionTimeout);
+		req.setReadTimeout(readTimeout);
 
-		final InputStream inStream = httpResponse.object1;
-		final String contentType = httpResponse.object2;
-
-		final String baseIRI = null;
-		final Triple matchableTP = createMatchableTriplePattern( tp.asJenaTriple() );
-
-		final Lang lang = RDFLanguages.contentTypeToLang(contentType);
-		if ( RDFLanguages.isQuads(lang) ) {
-			final Iterator<Quad> it = RDFDataMgr.createIteratorQuads(inStream, lang, baseIRI);
-			return parseRetrievedQuads(it, matchableTP);
-		}
-		else if ( RDFLanguages.isTriples(lang) ) {
-			final Iterator<Triple> it = RDFDataMgr.createIteratorTriples(inStream, lang, baseIRI);
-			return parseRetrievedTriples(it, matchableTP);
-		}
-		else {
-			throw new HttpRequestException("The content type returned by a TPF or brTPF server is not a valid RDF syntax (" + contentType + ").");
-		}
-	}
-
-	protected Pair<InputStream, String> performRequest( final HttpQuery req ) throws HttpRequestException {
 		final String requestedContentType = req.getContentType();
 
+		final TPFResponseBuilder b = new TPFResponseBuilder();
+		b.setRequestStartTimeNow();
+
+		// execute the request
 		final InputStream inStream;
 		try {
 			inStream = req.exec();
@@ -112,51 +87,91 @@ public class TPFRequestProcessorImpl implements TPFRequestProcessor
 			throw new HttpRequestException("Executing an HTTP request for a TPF or brTPF server caused an exception.", ex);
 		}
 
-		final String returnedContentType = req.getContentType();
-		final String actualContentType;
-		if ( returnedContentType != null && ! returnedContentType.isEmpty() ) {
-			actualContentType = returnedContentType;
-		}
-		else {                              // If the server did not return a content type,
-			actualContentType = requestedContentType; // then we assume that the server
-		}                                   // used the content type that was requested.
+		final String contentType = determineRetrievedContentType(req, requestedContentType);
 
-		return new Pair<>(inStream, actualContentType);
+		parseRetrievedData(inStream, contentType, tp, b);
+
+		return b;
 	}
 
-	protected TPFResponseBuilder parseRetrievedQuads( final Iterator<Quad> it, final Triple tp ) {
-		final TPFResponseBuilder b = new TPFResponseBuilder();
+	protected String determineRetrievedContentType( final HttpQuery req,
+	                                                final String requestedContentType ) {
+		final String returnedContentType = req.getContentType();
+
+		// If the server did not return a content type, then we assume
+		// that the server used the content type that was requested.
+		if ( returnedContentType == null || returnedContentType.isEmpty() ) {
+			return requestedContentType;
+		}
+
+		return returnedContentType;
+	}
+
+	protected void parseRetrievedData( final InputStream inStream,
+	                                   final String contentType,
+	                                   final TriplePattern tp,
+	                                   final TPFResponseBuilder b ) throws HttpRequestException {
+		final String baseIRI = null;
+
+		final Lang lang = RDFLanguages.contentTypeToLang(contentType);
+		if ( RDFLanguages.isQuads(lang) ) {
+			final Iterator<Quad> it = RDFDataMgr.createIteratorQuads(inStream, lang, baseIRI);
+			parseRetrievedQuads(it, tp, b);
+		}
+		else if ( RDFLanguages.isTriples(lang) ) {
+			final Iterator<Triple> it = RDFDataMgr.createIteratorTriples(inStream, lang, baseIRI);
+			parseRetrievedTriples(it, tp, b);
+		}
+		else {
+			throw new HttpRequestException("The given content type is not a valid RDF syntax (" + contentType + ").");
+		}
+	}
+
+	/**
+	 * Iterates over the given quads and adds them to the given
+	 * {@link TPFResponseBuilder} either as matching triples or
+	 * as metadata triples, depending on whether they match the
+	 * given triple pattern.
+	 */
+	protected void parseRetrievedQuads( final Iterator<Quad> it,
+	                                    final TriplePattern tp,
+	                                    final TPFResponseBuilder b ) {
+		final Triple matchableTP = createMatchableTriplePattern( tp.asJenaTriple() );
 		while ( it.hasNext() ) {
 			final Quad q = it.next();
 			final Node s = q.getSubject();
 			final Node p = q.getPredicate();
 			final Node o = q.getObject();
 
-			if ( q.isDefaultGraph() && tp.matches(s,p,o) ) {
+			if ( q.isDefaultGraph() && matchableTP.matches(s,p,o) ) {
 				b.addMatchingTriple(s,p,o);
 			}
 			else {
 				b.addMetadataTriple(s,p,o);
 			}
 		}
-
-		return b;
 	}
 
-	protected TPFResponseBuilder parseRetrievedTriples( final Iterator<Triple> it, final Triple tp ) {
-		final TPFResponseBuilder b = new TPFResponseBuilder();
+	/**
+	 * Iterates over the given triples and adds them to the given
+	 * {@link TPFResponseBuilder} either as matching triples or
+	 * as metadata triples, depending on whether they match the
+	 * given triple pattern.
+	 */
+	protected void parseRetrievedTriples( final Iterator<Triple> it,
+	                                      final TriplePattern tp,
+	                                      final TPFResponseBuilder b ) {
+		final Triple matchableTP = createMatchableTriplePattern( tp.asJenaTriple() );
 		while ( it.hasNext() ) {
 			final Triple t = it.next();
 
-			if ( tp.matches(t) ) {
+			if ( matchableTP.matches(t) ) {
 				b.addMatchingTriple(t);
 			}
 			else {
 				b.addMetadataTriple(t);
 			}
 		}
-
-		return b;
 	}
 
 	public static Triple createMatchableTriplePattern( final Triple tp ) {
@@ -170,6 +185,7 @@ public class TPFRequestProcessorImpl implements TPFRequestProcessor
 
 		return Triple.createMatch(s, p, o);
 	}
+
 
 	public static class HttpRequestException extends Exception {
 		private static final long serialVersionUID = 4355659915417656390L;
