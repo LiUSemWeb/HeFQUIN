@@ -28,17 +28,23 @@ public interface TPFResponse extends TriplesResponse
 	int getMetadataSize();
 
 	/**
-	 * Returns true if the metadata of the given TPF response indicates
-	 * that this response is the last page of matching triples.
+	 * Returns <code>true</code> if the metadata of the given TPF response
+	 * indicates that this response is the last page of matching triples.
 	 *
-	 * Returns null of there is no metadata related to paging. 
+	 * Returns <code>null</code> of there is no metadata related to paging.
 	 */
 	Boolean isLastPage();
 
 	/**
-	 * Returns the cardinality estimate provided by as metadata in the
-	 * given TPF response. Returns null if there is no metadata with a
-	 * cardinality estimate.
+	 * Returns the URL via which the next page of the TPF can be requested.
+	 * Returns <code>null</code> of no such URL is mentioned in the metadata.
+	 */
+	String getNextPageURL();
+
+	/**
+	 * Returns the cardinality estimate provided as metadata in the given
+	 * TPF response. Returns <code>null</code> if there is no metadata
+	 * with a cardinality estimate.
 	 */
 	Integer getCardinalityEstimate();
 }

@@ -134,6 +134,11 @@ public class TPFResponseImpl
 	}
 
 	@Override
+	public String getNextPageURL() {
+		return nextPageURL;
+	}
+
+	@Override
 	public Integer getCardinalityEstimate() {
 		return cardEstimate;
 	}
