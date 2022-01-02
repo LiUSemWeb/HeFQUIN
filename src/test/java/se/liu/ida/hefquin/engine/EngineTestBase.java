@@ -189,7 +189,7 @@ public abstract class EngineTestBase
 
 	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
+		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
 
 		public BRTPFServerForTest() { this(null); }
 		public BRTPFServerForTest( final Graph data ) { super(data); }

@@ -59,9 +59,13 @@ public class TPFInterfaceImpl implements TPFInterface
 
 	@Override
 	public HttpQuery createHttpRequest( final TPFRequest req ) {
-		final HttpQuery httpReq = new HttpQuery(baseURL);
+		// TODO: paging is not captured yet!
 
-		final Triple tp = req.getQueryPattern().asJenaTriple();
+		return createHttpRequest( req.getQueryPattern().asJenaTriple() );
+	}
+
+	protected HttpQuery createHttpRequest( final Triple tp ) {
+		final HttpQuery httpReq = new HttpQuery(baseURL);
 
 		final Node s = tp.getSubject();
 		if ( s != null && s.isConcrete() ) {
@@ -97,9 +101,6 @@ public class TPFInterfaceImpl implements TPFInterface
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal object (" + s.getClass().getName() + ").");
 			}
 		}
-
-		// TODO
-		req.getPageNumber();
 
 		httpReq.setAllowCompression(true);
 		httpReq.setAccept(WebContent.defaultRDFAcceptHeader);
