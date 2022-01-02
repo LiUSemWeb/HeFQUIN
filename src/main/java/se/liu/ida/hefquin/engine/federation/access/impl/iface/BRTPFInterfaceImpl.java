@@ -45,14 +45,23 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 
 	@Override
 	public HttpQuery createHttpRequest( final BRTPFRequest req ) {
-		final HttpQuery httpReq = createHttpRequest( req.getTriplePattern().asJenaTriple() );
+		final HttpQuery httpReq;
 
-		final Set<SolutionMapping> solmaps = req.getSolutionMappings();
-		if ( solmaps != null && ! solmaps.isEmpty() ) {
-			final String values = SolutionMappingUtils.createValuesClause(solmaps, scxt);
-			httpReq.addParam( httpQueryArgumentForBindings, values );
+		final String pageURL = req.getPageURL();
+		if ( pageURL != null ) {
+			httpReq = createHttpRequest( pageURL );
+		}
+		else {
+			httpReq = createHttpRequest( req.getTriplePattern().asJenaTriple() );
+
+			final Set<SolutionMapping> solmaps = req.getSolutionMappings();
+			if ( solmaps != null && ! solmaps.isEmpty() ) {
+				final String values = SolutionMappingUtils.createValuesClause(solmaps, scxt);
+				httpReq.addParam( httpQueryArgumentForBindings, values );
+			}
 		}
 
+		setHeaders(httpReq);
 		return httpReq;
 	}
 

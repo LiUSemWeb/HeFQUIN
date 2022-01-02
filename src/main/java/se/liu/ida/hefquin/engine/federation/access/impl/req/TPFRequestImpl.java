@@ -7,12 +7,12 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class TPFRequestImpl extends TriplePatternRequestImpl implements TPFRequest
 {
-	protected final int pageNumber;
+	protected final String pageURL;
 
 	@SuppressWarnings("unused")
-	public TPFRequestImpl( final TriplePattern tp, final int pageNumber ) {
+	public TPFRequestImpl( final TriplePattern tp, final String pageURL ) {
 		super(tp);
-		this.pageNumber = pageNumber;
+		this.pageURL = pageURL;
 
 		if ( false ) {
 			// check that the given triple pattern does not contain any blank nodes
@@ -23,16 +23,20 @@ public class TPFRequestImpl extends TriplePatternRequestImpl implements TPFReque
 		}
 	}
 
+	public TPFRequestImpl( final TriplePattern tp ) {
+		this(tp, null);
+	}
+
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof TPFRequest
-				&& ((TPFRequest) o).getPageNumber() == pageNumber
+				&& ((TPFRequest) o).getPageURL() == pageURL
 				&& super.equals(o);
 	}
 
 	@Override
-	public int getPageNumber() {
-		return pageNumber;
+	public String getPageURL() {
+		return pageURL;
 	}
 
 }
