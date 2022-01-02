@@ -59,9 +59,21 @@ public class TPFInterfaceImpl implements TPFInterface
 
 	@Override
 	public HttpQuery createHttpRequest( final TPFRequest req ) {
-		// TODO: paging is not captured yet!
+		final HttpQuery httpReq;
 
-		return createHttpRequest( req.getQueryPattern().asJenaTriple() );
+		final String pageURL = req.getPageURL();
+		if ( pageURL != null ) {
+			httpReq = createHttpRequest( pageURL );
+		} else {
+			httpReq = createHttpRequest( req.getQueryPattern().asJenaTriple() );
+		}
+
+		setHeaders(httpReq);
+		return httpReq;
+	}
+
+	protected HttpQuery createHttpRequest( final String pageURL ) {
+		return new HttpQuery(pageURL);
 	}
 
 	protected HttpQuery createHttpRequest( final Triple tp ) {
@@ -102,9 +114,12 @@ public class TPFInterfaceImpl implements TPFInterface
 			}
 		}
 
+		return httpReq;
+	}
+
+	protected void setHeaders( final HttpQuery httpReq ) {
 		httpReq.setAllowCompression(true);
 		httpReq.setAccept(WebContent.defaultRDFAcceptHeader);
-		return httpReq;
 	}
 
 }

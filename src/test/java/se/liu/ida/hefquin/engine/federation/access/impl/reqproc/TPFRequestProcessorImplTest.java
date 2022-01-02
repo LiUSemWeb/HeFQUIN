@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -35,6 +36,8 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		final TPFResponse resp = performTestRequest(s, p, o);
 
 		// checking
+		checkPayload(resp, s, p, o);
+
 		// - the following tests assume that i) a card.estimate was returned
 		//   in the TPF response and ii) the number of matching triples is
 		//   smaller than the page size
@@ -50,16 +53,29 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
 		final Node p = NodeFactory.createVariable("p");
 		final Node o = NodeFactory.createVariable("o");
+		final TriplePattern tp = new TriplePatternImpl(s,p,o);
 
 		// performing the tested operation
-		final TPFResponse resp = performTestRequest(s, p, o);
+		final TPFResponse resp = performTestRequest(tp);
 
 		// checking
+		checkPayload(resp, s, p, o);
+
 		// - the following tests assume that i) a card.estimate was returned
 		//   in the TPF response and ii) the number of matching triples is
 		//   greater than the page size
 		assertTrue( resp.getPayloadSize() < resp.getCardinalityEstimate() );
 		assertEquals( false, resp.isLastPage() );
+
+		final String nextPageURL = resp.getNextPageURL();
+		assertNotEquals( null, nextPageURL );
+
+		// performing the tested operation for a request with a page URL
+		final TPFRequest req2 = new TPFRequestImpl(tp, nextPageURL);
+		final TPFResponse resp2 = performTestRequest(req2);
+
+		checkPayload(resp2, s, p, o);
+		assertNotEquals( nextPageURL, resp2.getNextPageURL() );
 	}
 
 	@Test
@@ -74,6 +90,8 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		// performing the tested operation
 		final TPFResponse resp = performTestRequest(s, p, o);
 
+		// checking
+		checkPayload(resp, s, p, o);
 		assertTrue( resp.getPayloadSize() > 1 );
 	}
 
@@ -89,6 +107,8 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		// performing the tested operation
 		final TPFResponse resp = performTestRequest(s, p, o);
 
+		// checking
+		checkPayload(resp, s, p, o);
 		assertTrue( resp.getPayloadSize() > 1 );
 	}
 
@@ -97,9 +117,15 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 
 	protected TPFResponse performTestRequest( final Node s, final Node p, final Node o ) throws FederationAccessException {
 		final TriplePattern tp = new TriplePatternImpl(s,p,o);
-		final String pageURL = null;
-		final TPFRequest req = new TPFRequestImpl(tp, pageURL);
+		return performTestRequest(tp);
+	}
 
+	protected TPFResponse performTestRequest( final TriplePattern tp ) throws FederationAccessException {
+		final TPFRequest req = new TPFRequestImpl(tp);
+		return performTestRequest(req);
+	}
+
+	protected TPFResponse performTestRequest( final TPFRequest req ) throws FederationAccessException {
 		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
 		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
 		final TPFServer    tpfServer        = new TPFServer() {
@@ -115,14 +141,16 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		assertEquals( req, resp.getRequest() );
 		assertEquals( tpfServer, resp.getFederationMember() );
 
+		return resp;
+	}
+
+	protected void checkPayload( final TPFResponse resp, final Node s, final Node p, final Node o ) {
 		for ( final Triple t : resp.getPayload() ) {
 			final org.apache.jena.graph.Triple tt = t.asJenaTriple();
 			if ( s.isConcrete() ) { assertTrue( tt.getSubject().matches(s) ); }
 			if ( p.isConcrete() ) { assertTrue( tt.getPredicate().matches(p) ); }
 			if ( o.isConcrete() ) { assertTrue( tt.getObject().matches(o) ); }
 		}
-
-		return resp;
 	}
 
 }
