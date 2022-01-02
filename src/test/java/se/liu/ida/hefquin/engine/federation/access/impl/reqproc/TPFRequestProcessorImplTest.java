@@ -97,8 +97,8 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 
 	protected TPFResponse performTestRequest( final Node s, final Node p, final Node o ) throws FederationAccessException {
 		final TriplePattern tp = new TriplePatternImpl(s,p,o);
-		final int pageNumber = 0;
-		final TPFRequest req = new TPFRequestImpl(tp, pageNumber);
+		final String pageURL = null;
+		final TPFRequest req = new TPFRequestImpl(tp, pageURL);
 
 		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
 		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");

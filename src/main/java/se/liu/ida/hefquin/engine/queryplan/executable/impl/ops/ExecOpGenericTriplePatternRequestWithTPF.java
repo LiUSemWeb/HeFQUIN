@@ -22,8 +22,8 @@ public abstract class ExecOpGenericTriplePatternRequestWithTPF<MemberType extend
 	}
 
 	@Override
-	protected TPFRequest createPageRequest( final int pageNumber ) {
-		return new TPFRequestImpl( req.getQueryPattern(), pageNumber );
+	protected TPFRequest createPageRequest( final String nextPageURL ) {
+		return new TPFRequestImpl( req.getQueryPattern(), nextPageURL );
 	}
 
 	@Override

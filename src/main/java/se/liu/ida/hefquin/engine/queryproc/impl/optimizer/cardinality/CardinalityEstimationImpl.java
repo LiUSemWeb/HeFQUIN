@@ -163,7 +163,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				return (TPFRequest) req;
 			}
 			else {
-				return new TPFRequestImpl(req.getQueryPattern(), 0);
+				return new TPFRequestImpl( req.getQueryPattern() );
 			}
 		}
 
@@ -172,7 +172,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				return (BRTPFRequest) req;
 			}
 			else {
-				return new BRTPFRequestImpl(req.getTriplePattern(), req.getSolutionMappings(), 0);
+				return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings() );
 			}
 		}
 

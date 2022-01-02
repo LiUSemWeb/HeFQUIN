@@ -374,8 +374,8 @@ public class PhysicalPlanFactory
 
 		final DataRetrievalRequest req;
 		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl(tp);
-		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp, 0);
-		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp, 0);
+		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp);
+		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp);
 		else {
 			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 		}
