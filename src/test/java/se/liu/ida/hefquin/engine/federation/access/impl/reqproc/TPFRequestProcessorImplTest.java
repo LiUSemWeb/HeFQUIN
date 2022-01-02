@@ -13,10 +13,8 @@ import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -126,12 +124,7 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 	}
 
 	protected TPFResponse performTestRequest( final TPFRequest req ) throws FederationAccessException {
-		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
-		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
-		final TPFServer    tpfServer        = new TPFServer() {
-			@Override public TPFInterface getInterface() { return tpfServerIface; }
-		};
-
+		final TPFServer tpfServer = getDBpediaTPFServer();
 		final TPFRequestProcessor proc = new TPFRequestProcessorImpl();
 
 		// performing the tested operation

@@ -78,6 +78,13 @@ public abstract class EngineTestBase
         assertEquals( expectedURIforV3, b.get(v3).getURI() );
 	}
 
+	protected TPFServer getDBpediaTPFServer() {
+		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
+		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
+		return new TPFServer() {
+			@Override public TPFInterface getInterface() { return tpfServerIface; }
+		};
+	}
 
 	protected static abstract class FederationMemberBaseForTest implements FederationMember
 	{

@@ -18,9 +18,9 @@ public class TriplesToSolMapsConverter
 
 	public static Iterator<SolutionMapping> convert( final Iterator<Triple> itTriples, final TriplePattern tp ) {
 		final org.apache.jena.graph.Triple jTP = tp.asJenaTriple();
-		final String s = ( Var.isVar(jTP.getSubject()) ) ? jTP.getSubject().getName() : null;
-		final String p = ( Var.isVar(jTP.getPredicate()) ) ? jTP.getPredicate().getName() : null;
-		final String o = ( Var.isVar(jTP.getObject()) ) ? jTP.getObject().getName() : null;
+		final String s = ( jTP.getSubject().isVariable() ) ? jTP.getSubject().getName() : null;
+		final String p = ( jTP.getPredicate().isVariable() ) ? jTP.getPredicate().getName() : null;
+		final String o = ( jTP.getObject().isVariable() ) ? jTP.getObject().getName() : null;
 
 		if ( s != null ) {
 			if ( p != null && ! p.equals(s) ) {

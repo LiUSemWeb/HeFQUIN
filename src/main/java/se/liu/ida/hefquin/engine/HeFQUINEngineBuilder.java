@@ -13,20 +13,8 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
@@ -91,22 +79,7 @@ public class HeFQUINEngineBuilder
 
 
 	protected void setDefaultFederationAccessManager() {
-		final SPARQLRequestProcessor reqProcSPARQL = new SPARQLRequestProcessorImpl();
-		// TODO: replace the following once we have an implementation of TPFRequestProcessor
-		final TPFRequestProcessor reqProcTPF = new TPFRequestProcessor() {
-			@Override public TPFResponse performRequest(TPFRequest req, TPFServer fm) { throw new UnsupportedOperationException(); }
-			@Override public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
-		};
-		// TODO: replace the following once we have an implementation of BRTPFRequestProcessor
-		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
-		};
-
-		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessorImpl();
-
-		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
-		final FederationAccessManager fedAccessMgrWithCache = new FederationAccessManagerWithCache(fedAccessMgrWithoutCache, 100);
-		this.fedAccessMgr = fedAccessMgrWithCache;
+		this.fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager();
 	}
 
 	protected static class MyEngine implements HeFQUINEngine {
