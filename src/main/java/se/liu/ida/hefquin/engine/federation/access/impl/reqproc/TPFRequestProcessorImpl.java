@@ -11,19 +11,12 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseBuil
 
 public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements TPFRequestProcessor
 {
-	protected final int connectionTimeout;
-	protected final int readTimeout;
-
-	/**
-	 * The given timeouts are specified in milliseconds. Any value {@literal <=} 0 means no timeout.
-	 */
 	public TPFRequestProcessorImpl( final int connectionTimeout, final int readTimeout ) {
-		this.connectionTimeout = connectionTimeout;
-		this.readTimeout = readTimeout;
+		super(connectionTimeout, readTimeout);
 	}
 
 	public TPFRequestProcessorImpl() {
-		this(-1, -1);
+		super();
 	}
 
 	@Override
@@ -45,10 +38,8 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 			throw new FederationAccessException("Performing a TPF request caused an exception.", ex, req, fm);
 		}
 
-		b.setRequest(req);
-		b.setFederationMember(fm);
-
-		return b.build();
+		return b.setRequest(req)
+		        .setFederationMember(fm)
+		        .build();
 	}
-
 }
