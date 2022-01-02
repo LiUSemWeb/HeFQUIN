@@ -39,7 +39,7 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 	protected TPFResponse performRequest( final TPFRequest req, final TPFInterface iface, final FederationMember fm ) throws FederationAccessException {
 		final TPFResponseBuilder b;
 		try {
-			b = performRequest(req, iface);
+			b = performRequest( iface.createHttpRequest(req), req.getQueryPattern() );
 		}
 		catch ( final Exception ex ) {
 			throw new FederationAccessException("Performing a TPF request caused an exception.", ex, req, fm);
@@ -49,11 +49,6 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 		b.setFederationMember(fm);
 
 		return b.build();
-	}
-
-	protected TPFResponseBuilder performRequest( final TPFRequest req,
-	                                             final TPFInterface iface ) throws HttpRequestException {
-		return performRequest( iface.createHttpRequest(req), req.getQueryPattern() );
 	}
 
 }
