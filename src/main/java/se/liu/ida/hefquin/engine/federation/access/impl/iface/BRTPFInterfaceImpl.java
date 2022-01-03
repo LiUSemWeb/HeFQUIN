@@ -15,4 +15,10 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
 		return req instanceof BindingsRestrictedTriplePatternRequest || super.supportsRequest(req);
 	}
+
+	@Override
+	public String toString() {
+		return "BRTPFInterface server at TODO";
+	}
+
 }

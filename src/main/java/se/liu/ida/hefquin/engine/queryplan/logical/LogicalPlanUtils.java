@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -53,16 +52,5 @@ public class LogicalPlanUtils
 			isSourceAssignment = false;
 		}
 	} // end of class SourceAssignmentChecker
-
-	public static String printStringOfFm( final FederationMember fm ) {
-
-		final DataRetrievalInterface intFace = fm.getInterface();
-		if ( intFace instanceof SPARQLEndpointInterface){
-			return "SPARQL endpoint at " + ((SPARQLEndpointInterface) intFace).getURL();
-		}
-		else {
-			return intFace.getClass().getName() + " server at TODO";
-		}
-	}
 
 }

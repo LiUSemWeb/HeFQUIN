@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
@@ -52,7 +51,7 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		return "> bgpAdd ( "
 				+ bgp.toString()
 				+ ", "
-				+ LogicalPlanUtils.printStringOfFm( fm )
+				+ fm.getInterface().toString()
 				+ " )";
 	}
 

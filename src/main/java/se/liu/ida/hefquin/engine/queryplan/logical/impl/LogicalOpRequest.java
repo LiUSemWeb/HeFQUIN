@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
@@ -51,7 +50,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 		return " > req ( " +
 				"{ " + req.toString() + " }"
 				+ ", "
-				+ LogicalPlanUtils.printStringOfFm( fm )
+				+ fm.getInterface().toString()
 				+ " )";
 	}
 

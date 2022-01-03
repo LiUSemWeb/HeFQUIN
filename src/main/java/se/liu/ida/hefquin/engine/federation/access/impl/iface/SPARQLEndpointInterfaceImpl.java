@@ -39,4 +39,9 @@ public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
 				&& ((SPARQLEndpointInterface) o).getURL().equals(url);
 	}
 
+	@Override
+	public String toString() {
+		return "SPARQL endpoint at " + this.url;
+	}
+
 }

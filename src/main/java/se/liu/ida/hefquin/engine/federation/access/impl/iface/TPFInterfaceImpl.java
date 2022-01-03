@@ -26,4 +26,9 @@ public class TPFInterfaceImpl implements TPFInterface
 		return req instanceof TriplePatternRequest;
 	}
 
+	@Override
+	public String toString() {
+		return "TPFInterface server at TODO";
+	}
+
 }

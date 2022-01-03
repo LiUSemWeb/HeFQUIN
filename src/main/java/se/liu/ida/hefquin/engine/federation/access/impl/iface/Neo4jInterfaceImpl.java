@@ -37,4 +37,10 @@ public class Neo4jInterfaceImpl implements Neo4jInterface
     public String getURL() {
         return url;
     }
+
+    @Override
+    public String toString() {
+        return "Neo4j interface at " + this.url;
+    }
+
 }
