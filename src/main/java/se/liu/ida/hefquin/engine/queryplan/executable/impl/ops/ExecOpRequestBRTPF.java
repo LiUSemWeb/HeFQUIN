@@ -22,8 +22,8 @@ public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<Bindin
 	}
 
 	@Override
-	protected BRTPFRequest createPageRequest( final int pageNumber ) {
-		return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings(), pageNumber );
+	protected BRTPFRequest createPageRequest( final String nextPageURL ) {
+		return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings(), nextPageURL );
 	}
 
 	@Override

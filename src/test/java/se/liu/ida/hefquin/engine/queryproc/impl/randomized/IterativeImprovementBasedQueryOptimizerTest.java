@@ -42,7 +42,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 
 		final RewritingRule dummyRuleForTest = new RewritingRule() {
 			@Override public double getPriority() { return 0; }
-			
+
 			@Override
 			public Set<RuleApplication> determineAllPossibleApplications( final PhysicalPlan plan ) {
 				final Set<RuleApplication> s = new HashSet<>();
@@ -62,7 +62,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		final IterativeImprovementBasedQueryOptimizer o = new IterativeImprovementBasedQueryOptimizer( cond, createContextForTest(), rewritingRules );
 
 		// run the test
-		final PhysicalPlan resultingPlan = o.optimize( initialPlan );
+		final PhysicalPlan resultingPlan = o.optimize( initialPlan ).object1;
 
 		// verify that the outcome is correct
 		assertEquals( plan3, resultingPlan );
@@ -87,6 +87,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		return new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return true; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
 		};

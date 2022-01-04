@@ -1,13 +1,18 @@
 package se.liu.ida.hefquin.engine.data.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.*;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.util.FmtUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
@@ -175,6 +180,85 @@ public class SolutionMappingUtils
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns a set containing all the variables that have a
+	 * binding in at least one of the given solution mappings.
+	 */
+	public static Set<Var> getAllMentionedVariables( final Iterable<SolutionMapping> solmaps ) {
+		final Set<Var> vars = new HashSet<>();
+		for ( final SolutionMapping sm : solmaps ) {
+			final Iterator<Var> it = sm.asJenaBinding().vars();
+			while ( it.hasNext() ) {
+				vars.add( it.next() );
+			}
+		}
+		return vars;
+	}
+
+	/**
+	 * Serializes the given collection of solution mappings as
+	 * a string that can be used in a SPARQL VALUES clause.
+	 */
+	public static String createValuesClause( final Iterable<SolutionMapping> solmaps,
+	                                         final SerializationContext scxt ) {
+		final Set<Var> vars = SolutionMappingUtils.getAllMentionedVariables(solmaps);
+		if ( vars.size() == 1 )
+			return createValuesClauseShortForm( new ArrayList<>(vars), solmaps, scxt );
+		else
+			return createValuesClauseLongForm( new ArrayList<>(vars), solmaps, scxt );
+	}
+
+	protected static String createValuesClauseShortForm( final List<Var> vars,
+	                                                     final Iterable<SolutionMapping> solmaps,
+	                                                     final SerializationContext scxt ) {
+		final StringBuilder b = new StringBuilder();
+		b.append("?");
+		b.append( vars.iterator().next().getVarName() );
+		b.append(" {");
+		for ( final SolutionMapping sm : solmaps ) {
+			appendValuesClauseEntry( b, vars, sm.asJenaBinding(), scxt );
+		}
+		b.append(" }");
+		return b.toString();
+	}
+
+	protected static String createValuesClauseLongForm( final List<Var> vars,
+	                                                    final Iterable<SolutionMapping> solmaps,
+	                                                    final SerializationContext scxt ) {
+		final StringBuilder b = new StringBuilder();
+		b.append("(");
+		for ( final Var v : vars ) {
+			b.append(" ?");
+			b.append( v.getVarName() );
+		}
+		b.append(" )");
+
+		b.append(" {");
+		for ( final SolutionMapping sm : solmaps ) {
+			b.append(" (");
+			appendValuesClauseEntry( b, vars, sm.asJenaBinding(), scxt );
+			b.append(" )");
+		}
+		b.append(" }");
+		return b.toString();
+	}
+
+	protected static void appendValuesClauseEntry( final StringBuilder b,
+	                                               final List<Var> vars,
+	                                               final Binding sm,
+	                                               final SerializationContext scxt ) {
+		for ( final Var v : vars ) {
+			b.append(" ");
+			final Node n = sm.get(v);
+			if ( n == null ) {
+				b.append("UNDEF");
+			}
+			else {
+				FmtUtils.stringForNode(b, n, scxt);
+			}
+		}
 	}
 
 }

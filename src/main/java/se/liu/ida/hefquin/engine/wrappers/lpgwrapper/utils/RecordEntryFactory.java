@@ -9,22 +9,26 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
 import java.util.*;
 
 public class RecordEntryFactory {
-    public static RecordEntry create(final JsonNode col, final JsonNode metaCol, final CypherVar name) {
+    public static RecordEntry create(final JsonNode col, final Iterator<JsonNode> metaRow, final CypherVar name) {
         final Value val;
-        final JsonNode type = metaCol.get("type");
-        if (type != null) {
-            if (type.asText().equals("node")) {
-                val = new LPGNodeValue(parseAsNode(col, metaCol.get("id")));
-            } else if (type.asText().equals("relationship")) {
-                val = new LPGEdgeValue(parseAsEdge(col, metaCol.get("id")));
-            } else {
-                val = null;
+        if (col.isArray()) {
+            val = new ListValue(parseAsList(col));
+            for (int i = 0; i < col.size(); i++) {
+                metaRow.next();
             }
+        } else if (col.get("source") != null) {
+            val = new MapValue(parseAsMap(col, metaRow));
         } else {
-            if (col.isArray()) {
-                val = new ListValue(parseAsList(col));
-            } else if (col.isObject()) {
-                val = new MapValue(parseAsMap(col));
+            final JsonNode metaCol = metaRow.next();
+            final JsonNode type = metaCol.get("type");
+            if (type != null) {
+                if (type.asText().equals("node")) {
+                    val = new LPGNodeValue(parseAsNode(col, metaCol.get("id")));
+                } else if (type.asText().equals("relationship")) {
+                    val = new LPGEdgeValue(parseAsEdge(col, metaCol.get("id")));
+                } else {
+                    val = null;
+                }
             } else {
                 val = new LiteralValue(col.asText());
             }
@@ -32,11 +36,19 @@ public class RecordEntryFactory {
         return new RecordEntryImpl(name, val);
     }
 
-    private static Map<String, Object> parseAsMap(final JsonNode col) {
+    private static Map<String, Object> parseAsMap(final JsonNode col, final Iterator<JsonNode> metaRow) {
         Map<String, Object> values = new HashMap<>();
         for (final Iterator<String> it = col.fieldNames(); it.hasNext(); ) {
             final String name = it.next();
-            values.put(name, col.get(name).asText());
+            final JsonNode val = col.get(name);
+            final JsonNode metaCol = metaRow.next();
+            final Object mapObject;
+            if (val.isObject()) {
+                mapObject = parseAsNode(val, metaCol.get("id"));
+            } else {
+                mapObject = val.asText();
+            }
+            values.put(name, mapObject);
         }
         return values;
     }

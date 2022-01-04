@@ -8,23 +8,27 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class BRTPFRequestImpl extends BindingsRestrictedTriplePatternRequestImpl implements BRTPFRequest
 {
-	protected final int pageNumber;
+	protected final String pageURL;
 
-	public BRTPFRequestImpl( final TriplePattern tp, final Set<SolutionMapping> solMaps, final int pageNumber ) {
+	public BRTPFRequestImpl( final TriplePattern tp, final Set<SolutionMapping> solMaps, final String pageURL ) {
 		super(tp, solMaps);
-		this.pageNumber = pageNumber;
+		this.pageURL = pageURL;
+	}
+
+	public BRTPFRequestImpl( final TriplePattern tp, final Set<SolutionMapping> solMaps ) {
+		this(tp, solMaps, null);
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof BRTPFRequest
-				&& ((BRTPFRequest) o).getPageNumber() == pageNumber
+				&& ((BRTPFRequest) o).getPageURL() == pageURL
 				&& super.equals(o); 
 	}
 
 	@Override
-	public int getPageNumber() {
-		return pageNumber;
+	public String getPageURL() {
+		return pageURL;
 	}
 
 }

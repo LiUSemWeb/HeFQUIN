@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
@@ -29,14 +27,6 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		rules = new PlanRewritingUtils(rewritingRules);
 	}
 
-	@Override
-	public PhysicalPlan optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
-	}
-
-	abstract public PhysicalPlan optimize( PhysicalPlan initialPlan ) throws QueryOptimizationException;
-
-
 	protected List<PhysicalPlan> getNeighbours( final PhysicalPlan initialPlan ) {
 		final Set<RuleApplication> ruleApplications = rules.getRuleApplications(initialPlan);
 
@@ -48,4 +38,13 @@ public abstract class RandomizedQueryOptimizerBase implements QueryOptimizer
 		return resultList;
 	}
 
+	protected <T> T getRandomElement( final List<T> L ) {
+		if ( L.size() == 1 ) {
+			return L.get(0);
+		}
+		else {
+			return L.get( rng.nextInt(L.size()) ); // Get a random object.
+		}
+	}
+	
 }

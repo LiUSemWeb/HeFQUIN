@@ -32,7 +32,7 @@ public class LiteralValueReturnStatement implements ReturnStatement {
 
     @Override
     public String toString() {
-        return value + (alias != null? " AS " + alias.getName() : "");
+        return "'" + value + "'" + (alias != null? " AS " + alias.getName() : "");
     }
 
     @Override

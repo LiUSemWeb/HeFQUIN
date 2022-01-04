@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -29,7 +31,36 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {
 	@Test
-	public void test() throws ExecOpExecutionException {
+	public void testOnline() throws ExecOpExecutionException {
+		if ( skipLiveWebTests ) { return; }
+
+		// setting up
+		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
+		final Node p = NodeFactory.createVariable("p");
+		final Node o = NodeFactory.createVariable("o");
+		final TriplePattern tp = new TriplePatternImpl(s,p,o);
+
+		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
+				new TriplePatternRequestImpl(tp),
+				getDBpediaTPFServer() );
+
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+
+		final FederationAccessManager fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager();
+		final ExecutionContext execCxt = new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { return null; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return true; }
+		};
+
+		op.execute(sink, execCxt);
+
+		final Collection<SolutionMapping> res = (Collection<SolutionMapping>) sink.getMaterializedIntermediateResult();
+		assertTrue( res.size() > 100 );
+	}
+
+	@Test
+	public void testOffline() throws ExecOpExecutionException {
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
@@ -74,6 +105,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return true; }
 		};
 	}
 

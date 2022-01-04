@@ -7,8 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 
-public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
-	
+public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer
+{
 	/**
 	 * The class contains a random seed object.
 	 */
@@ -30,4 +30,5 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer {
 		// At this stage, everything is done, and our working plan is now the final plan.
 		return currentPlan;
 	}
+
 }

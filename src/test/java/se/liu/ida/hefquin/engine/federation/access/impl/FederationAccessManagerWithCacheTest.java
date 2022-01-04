@@ -28,7 +28,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createBlankNode(),
 		                                                NodeFactory.createBlankNode(),
 		                                                NodeFactory.createBlankNode() );
-		final TPFRequest req1 = new TPFRequestImpl(tp, 0);
+		final TPFRequest req1 = new TPFRequestImpl(tp);
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
@@ -57,7 +57,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createBlankNode(),
 		                                                NodeFactory.createBlankNode(),
 		                                                NodeFactory.createBlankNode() );
-		final TPFRequest req1 = new TPFRequestImpl(tp, 0);
+		final TPFRequest req1 = new TPFRequestImpl(tp);
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
@@ -90,7 +90,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TPFRequest[] reqs = new TPFRequest[n];
 		final TPFServer[] fms = new TPFServer[n];
 		for ( int i = 0; i < n; ++i ) {
-			reqs[i] = new TPFRequestImpl(tp, 0);
+			reqs[i] = new TPFRequestImpl(tp);
 			fms[i] = new TPFServerForTest();
 		}
 
