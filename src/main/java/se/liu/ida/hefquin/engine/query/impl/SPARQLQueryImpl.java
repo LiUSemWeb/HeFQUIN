@@ -39,4 +39,9 @@ public class SPARQLQueryImpl implements SPARQLQuery
 		return jenaQuery;
 	}
 
+	@Override
+	public String toString(){
+		return this.asJenaQuery().toString();
+	}
+
 }

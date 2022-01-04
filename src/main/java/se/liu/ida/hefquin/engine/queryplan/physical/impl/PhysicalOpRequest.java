@@ -70,4 +70,9 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+		return lop.toString();
+	}
+
 }

@@ -44,4 +44,14 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+
+		return " > req ( " +
+				"{ " + req.toString() + " }"
+				+ ", "
+				+ fm.getInterface().toString()
+				+ " )";
+	}
+
 }

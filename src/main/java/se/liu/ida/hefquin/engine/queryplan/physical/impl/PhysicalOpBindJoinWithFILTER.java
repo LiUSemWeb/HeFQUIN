@@ -48,4 +48,11 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	public void visit(final PhysicalPlanVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public String toString() {
+
+		return "> FILTERBindJoin" +  lop.toString();
+	}
+
 }

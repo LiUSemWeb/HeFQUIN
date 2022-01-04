@@ -28,4 +28,10 @@ public class PhysicalOpHashJoin extends BasePhysicalOpBinaryJoin
     public void visit(final PhysicalPlanVisitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public String toString(){
+        return "> hashJoin ";
+    }
+
 }

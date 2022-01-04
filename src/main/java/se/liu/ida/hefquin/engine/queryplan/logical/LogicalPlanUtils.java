@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;

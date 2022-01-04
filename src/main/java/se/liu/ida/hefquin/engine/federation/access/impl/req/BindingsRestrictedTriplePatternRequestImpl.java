@@ -65,4 +65,9 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 		return QueryPatternUtils.getExpectedVariablesInPattern(tp);
 	}
 
+	@Override
+	public String toString(){
+		return tp.toString();
+	}
+
 }

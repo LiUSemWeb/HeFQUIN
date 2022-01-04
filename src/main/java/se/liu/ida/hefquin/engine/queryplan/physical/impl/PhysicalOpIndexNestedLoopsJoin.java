@@ -63,4 +63,10 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+
+		return "> indexNestedLoop " + lop.toString();
+	}
+
 }

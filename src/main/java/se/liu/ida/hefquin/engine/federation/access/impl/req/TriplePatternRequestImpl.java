@@ -30,4 +30,9 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 		return QueryPatternUtils.getExpectedVariablesInPattern(tp);
 	}
 
+	@Override
+	public String toString(){
+		return tp.toString();
+	}
+
 }

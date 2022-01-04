@@ -21,4 +21,9 @@ public class LogicalOpMultiwayJoin implements NaryLogicalOp
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+		return "> mj ";
+	}
+
 }

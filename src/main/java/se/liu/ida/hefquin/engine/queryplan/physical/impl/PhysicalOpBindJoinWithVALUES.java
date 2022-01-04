@@ -56,4 +56,11 @@ public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin 
 	public void visit(final PhysicalPlanVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public String toString() {
+
+		return "> VALUESBindJoin" + lop.toString();
+	}
+
 }

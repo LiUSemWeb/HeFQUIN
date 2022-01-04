@@ -4,5 +4,5 @@ import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 
 public interface UnaryLogicalOp extends LogicalOperator
 {
-	
+
 }

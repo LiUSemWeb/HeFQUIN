@@ -57,4 +57,10 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString() {
+
+		return "> UNIONBindJoin" + lop.toString();
+	}
+
 }

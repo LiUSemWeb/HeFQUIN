@@ -57,4 +57,18 @@ public class BGPImpl implements BGP
 		return Collections.unmodifiableSet(tps);
 	}
 
+
+	@Override
+	public String toString(){
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append( "(bgp ");
+		for ( TriplePattern tp: tps){
+			builder.append( tp.toString() );
+		}
+		builder.append( " )");
+
+		return builder.toString();
+	}
+
 }

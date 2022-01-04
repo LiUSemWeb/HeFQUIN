@@ -21,4 +21,9 @@ public class LogicalOpUnion implements BinaryLogicalOp
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+		return "> union ";
+	}
+
 }

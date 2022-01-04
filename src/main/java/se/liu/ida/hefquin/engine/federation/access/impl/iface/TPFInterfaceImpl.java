@@ -122,4 +122,9 @@ public class TPFInterfaceImpl implements TPFInterface
 		httpReq.setAccept(WebContent.defaultRDFAcceptHeader);
 	}
 
+	@Override
+	public String toString() {
+		return "TPFInterface server at " + baseURL;
+	}
+
 }

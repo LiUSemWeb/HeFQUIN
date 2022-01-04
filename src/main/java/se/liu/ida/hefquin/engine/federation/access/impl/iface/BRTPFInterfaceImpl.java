@@ -64,5 +64,11 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 		setHeaders(httpReq);
 		return httpReq;
 	}
+  
+  
+	@Override
+	public String toString() {
+		return "BRTPFInterface server at " + baseURL;
+	}
 
 }

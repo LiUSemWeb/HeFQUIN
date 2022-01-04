@@ -41,4 +41,9 @@ public class SPARQLGraphPatternImpl implements SPARQLGraphPattern
 		return jenaPatternOp;
 	}
 
+	@Override
+	public String toString(){
+		return this.asJenaOp().toString();
+	}
+
 }

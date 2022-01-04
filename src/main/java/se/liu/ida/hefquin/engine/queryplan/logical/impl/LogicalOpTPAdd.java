@@ -45,4 +45,14 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+
+		return "> tpAdd ( "
+				+ tp.toString()
+				+ ", "
+				+ fm.getInterface().toString()
+				+ " )";
+	}
+
 }

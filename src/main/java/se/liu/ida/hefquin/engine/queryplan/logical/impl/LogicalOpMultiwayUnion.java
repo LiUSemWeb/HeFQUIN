@@ -21,4 +21,9 @@ public class LogicalOpMultiwayUnion implements NaryLogicalOp
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+		return "> mu ";
+	}
+
 }

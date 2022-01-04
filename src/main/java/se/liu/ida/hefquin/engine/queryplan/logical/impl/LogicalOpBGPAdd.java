@@ -45,4 +45,14 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		visitor.visit(this);
 	}
 
+	@Override
+	public String toString(){
+
+		return "> bgpAdd ( "
+				+ bgp.toString()
+				+ ", "
+				+ fm.getInterface().toString()
+				+ " )";
+	}
+
 }
