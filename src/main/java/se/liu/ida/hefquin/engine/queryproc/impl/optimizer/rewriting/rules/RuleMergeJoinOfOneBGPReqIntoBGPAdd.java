@@ -21,7 +21,9 @@ public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImp
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
             return IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp1 )
-                    || IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp2 );
+                    || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP( subPlanOp1 )
+                    || IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp2 )
+                    || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP( subPlanOp2 );
         }
         return false;
     }
@@ -36,11 +38,11 @@ public class RuleMergeJoinOfOneBGPReqIntoBGPAdd extends AbstractRewritingRuleImp
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp1 ) ) {
+                if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp1 ) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP( subPlanOp1 ) ) {
                     final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp1 );
                     return PhysicalPlanFactory.createPlan(newRoot, subPlan2);
                 }
-                else if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp2 ) ) {
+                else if ( IdentifyTypeOfRequestUsedForReq.isBGPRequest( subPlanOp2 ) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP( subPlanOp2 ) ) {
                     final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp2 );
                     return PhysicalPlanFactory.createPlan(newRoot, subPlan1);
                 }
