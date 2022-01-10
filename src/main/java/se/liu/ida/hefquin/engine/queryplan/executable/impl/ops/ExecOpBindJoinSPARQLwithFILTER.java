@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.E_Equals;
@@ -21,16 +20,27 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 
-public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithRequestOps<TriplePattern,SPARQLEndpoint>
+public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
 	protected final Set<Var> varsInTP;
 
 	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
+		super(query, fm);
+		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+	}
+
+	public ExecOpBindJoinSPARQLwithFILTER( final BGP query, final SPARQLEndpoint fm ) {
+		super(query, fm);
+		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+	}
+
+	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
 		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
 	}
@@ -48,8 +58,9 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 	}
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
-		if (varsInTP.isEmpty()) 
-			return new OpTriple(query.asJenaTriple());
+		if ( varsInTP.isEmpty() ) {
+			return createOpBasedOnQuery(query);
+		}
 		Expr disjunction = null;
 		boolean mustHaveTheFilter = false;
 		for (final SolutionMapping s : solMaps) {
@@ -81,10 +92,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		}
 
 		if ( disjunction == null ) {
-			return mustHaveTheFilter ? null : new OpTriple(query.asJenaTriple());
+			return mustHaveTheFilter ? null : createOpBasedOnQuery(query);
 		}
 
-		return OpFilter.filter(disjunction, new OpTriple(query.asJenaTriple()));
+		return OpFilter.filter(disjunction, createOpBasedOnQuery(query));
 	}
 
 }

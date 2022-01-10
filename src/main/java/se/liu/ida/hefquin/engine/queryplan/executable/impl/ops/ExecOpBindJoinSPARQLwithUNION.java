@@ -5,7 +5,6 @@ import java.util.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -20,16 +19,27 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 
-public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequestOps<TriplePattern,SPARQLEndpoint>
+public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
 	protected final List<Var> varsInTP;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm ) {
+		super(query, fm);
+		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+	}
+
+	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm ) {
+		super(query, fm);
+		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+	}
+
+	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
 		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
@@ -47,8 +57,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	}
 
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
-		final Op tp = new OpTriple(query.asJenaTriple());
-		if (varsInTP.isEmpty()) return tp;
+		if (varsInTP.isEmpty()) return createOpBasedOnQuery(query);
 
 		final Set<Expr> conjunctions = new HashSet<>();
 		boolean conjunctionsMustBeNonEmpty = false;
@@ -58,7 +67,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 			// the triple pattern of this operator, then every matching triple is a join partner
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
-			if (b.size() == 0) return tp;
+			if (b.size() == 0) return createOpBasedOnQuery(query);
 
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
 				conjunctionsMustBeNonEmpty = true;
@@ -80,12 +89,12 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 		}
 
 		if ( conjunctions.isEmpty() ) {
-			return conjunctionsMustBeNonEmpty ? null : tp;
+			return conjunctionsMustBeNonEmpty ? null : createOpBasedOnQuery(query);
 		}
 
 		Op union = null;
 		for (final Expr conjunction : conjunctions) {
-			final Op filter = OpFilter.filter(conjunction, tp);
+			final Op filter = OpFilter.filter(conjunction, createOpBasedOnQuery(query));
 			if (union == null) {
 				union = filter;
 			} else {
