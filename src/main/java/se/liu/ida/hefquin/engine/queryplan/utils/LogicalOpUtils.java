@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -107,13 +108,13 @@ public class LogicalOpUtils {
      */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
         final Set<TriplePattern> tps = (Set<TriplePattern>) lopBGPAdd.getBGP().getTriplePatterns();
-        final TripleCollectorBGP tpBGP = new TripleCollectorBGP();
+        final BasicPattern bgp = new BasicPattern();
         for ( TriplePattern tp: tps ){
-            tpBGP.addTriple( tp.asJenaTriple() );
+            bgp.add( tp.asJenaTriple() );
         }
 
         final ElementGroup elementGroup = new ElementGroup();
-        elementGroup.addElement( new ElementTriplesBlock( tpBGP.getBGP() ) );
+        elementGroup.addElement( new ElementTriplesBlock( bgp ) );
         elementGroup.addElement( getPatternOfRequest(lopReq) );
         return new SPARQLGraphPatternImpl(elementGroup);
     }
