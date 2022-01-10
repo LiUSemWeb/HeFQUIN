@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import org.apache.jena.graph.Triple;
-import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -98,14 +96,11 @@ public class LogicalOpUtils {
      * where the triple pattern is extracted from a given tpAdd operator.
      */
     public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
-        final Triple tp = lopTPAdd.getTP().asJenaTriple();
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( getPatternOfRequest(lopReq) );
+        elementGroup.addTriplePattern( lopTPAdd.getTP().asJenaTriple() );
 
-        final SPARQLQuery graphPattern = ((SPARQLRequest) lopReq.getRequest()).getQuery();
-        final Element element = graphPattern.asJenaQuery().getQueryPattern();
-
-        ((ElementGroup) element).addTriplePattern(tp);
-
-        return new SPARQLGraphPatternImpl(element);
+        return new SPARQLGraphPatternImpl(elementGroup);
     }
 
     /**
@@ -113,16 +108,16 @@ public class LogicalOpUtils {
      * where the BGP is extracted from a given bgpAdd operator.
      */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
-        final BGP bgpOfBGPAdd = lopBGPAdd.getBGP();
-        final BasicPattern bgp = ( (OpBGP)bgpOfBGPAdd.asJenaOp() ).getPattern();
-        final ElementTriplesBlock elementBGP = new ElementTriplesBlock( bgp );
+        final Set<TriplePattern> tps = (Set<TriplePattern>) lopBGPAdd.getBGP().getTriplePatterns();
+        final BasicPattern bgp = new BasicPattern();
+        for ( TriplePattern tp: tps ){
+            bgp.add( tp.asJenaTriple() );
+        }
 
-        final SPARQLQuery queryOfReq = ((SPARQLRequest) lopReq.getRequest()).getQuery();
-        final Element elementPattern = queryOfReq.asJenaQuery().getQueryPattern();
-
-        ((ElementGroup) elementPattern).addElement(elementBGP);
-
-        return new SPARQLGraphPatternImpl(elementPattern);
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( new ElementTriplesBlock( bgp ) );
+        elementGroup.addElement( getPatternOfRequest(lopReq) );
+        return new SPARQLGraphPatternImpl(elementGroup);
     }
 
     /**
@@ -130,15 +125,11 @@ public class LogicalOpUtils {
      * which are extracted from two given SPARQLRequests.
      */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
-        final SPARQLQuery graphPattern1 = ((SPARQLRequest) lopReq1.getRequest()).getQuery();
-        final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( getPatternOfRequest(lopReq1) );
+        elementGroup.addElement( getPatternOfRequest(lopReq2) );
 
-        final SPARQLQuery graphPattern2 = ((SPARQLRequest) lopReq2.getRequest()).getQuery();
-        final Element element2 = graphPattern2.asJenaQuery().getQueryPattern();
-
-        ((ElementGroup) element1).addElement(element2);
-
-        return new SPARQLGraphPatternImpl(element1);
+        return new SPARQLGraphPatternImpl(elementGroup);
     }
 
     /**
@@ -146,16 +137,23 @@ public class LogicalOpUtils {
      * which are extracted from two given SPARQLRequests.
      */
     public static SPARQLGraphPattern createNewGraphPatternWithUnion( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
-        final SPARQLQuery graphPattern1 = ((SPARQLRequest) lopReq1.getRequest()).getQuery();
-        final Element element1 = graphPattern1.asJenaQuery().getQueryPattern();
-
-        final SPARQLQuery graphPattern2 = ((SPARQLRequest) lopReq2.getRequest()).getQuery();
-        final Element element2 = graphPattern2.asJenaQuery().getQueryPattern();
-
-        final ElementUnion elementUnion = new ElementUnion(element1);
-        elementUnion.addElement(element2);
+        final ElementUnion elementUnion = new ElementUnion();
+        elementUnion.addElement( getPatternOfRequest(lopReq1) );
+        elementUnion.addElement( getPatternOfRequest(lopReq2) );
 
         return new SPARQLGraphPatternImpl(elementUnion);
+    }
+
+    public static Element getPatternOfRequest( final LogicalOpRequest<?, ?> lopReq ){
+        final DataRetrievalRequest req = lopReq.getRequest();
+        if ( req instanceof SPARQLRequest ) {
+            final SPARQLQuery graphPattern = ((SPARQLRequest) req).getQuery();
+            return graphPattern.asJenaQuery().getQueryPattern();
+        }
+        else  {
+            throw new IllegalArgumentException( "Unsupported type of request: " + req.getClass().getName() );
+        }
+
     }
 
     /**
