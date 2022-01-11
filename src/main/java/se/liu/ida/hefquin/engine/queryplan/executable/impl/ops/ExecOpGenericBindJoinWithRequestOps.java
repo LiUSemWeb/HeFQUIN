@@ -98,9 +98,8 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 				return new OpTriple( ((TriplePattern)query).asJenaTriple());
 			}
 			else if (query instanceof BGP) {
-				final Set<TriplePattern> tps = (Set<TriplePattern>) ((BGP) query).getTriplePatterns();
 				final BasicPattern bgp = new BasicPattern();
-				for (TriplePattern tp : tps) {
+				for ( final TriplePattern tp : ((BGP) query).getTriplePatterns() ) {
 					bgp.add( tp.asJenaTriple() );
 				}
 				return new OpBGP(bgp);
