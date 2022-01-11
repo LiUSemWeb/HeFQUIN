@@ -1,13 +1,22 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.core.BasicPattern;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+
+import java.util.Set;
 
 /**
  * Abstract base class to implement bind joins by using request operators.
@@ -77,5 +86,28 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 			}
 		}
     } // end of helper class MyIntermediateResultElementSink
+
+	// ------- helper function ------
+	/**
+	 * Returns a representation of this query pattern as an
+	 * object of the interface {@link Op} of the Jena API.
+	 */
+	protected Op representQueryPatternAsJenaOp( final QueryType query ) {
+		if ( query instanceof SPARQLGraphPattern ) {
+			if ( query instanceof TriplePattern) {
+				return new OpTriple( ((TriplePattern)query).asJenaTriple());
+			}
+			else if (query instanceof BGP) {
+				final BasicPattern bgp = new BasicPattern();
+				for ( final TriplePattern tp : ((BGP) query).getTriplePatterns() ) {
+					bgp.add( tp.asJenaTriple() );
+				}
+				return new OpBGP(bgp);
+			}
+			else return ((SPARQLGraphPattern)query).asJenaOp();
+		}
+		else
+			throw new IllegalArgumentException("Unsupported type of query pattern: " + query.getClass().getName() );
+	}
 
 }

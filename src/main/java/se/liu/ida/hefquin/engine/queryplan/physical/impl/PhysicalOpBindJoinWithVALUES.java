@@ -48,6 +48,15 @@ public class PhysicalOpBindJoinWithVALUES extends BasePhysicalOpSingleInputJoin 
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
+		else if ( lop instanceof LogicalOpBGPAdd ) {
+			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
+			final FederationMember fm = bgpAdd.getFederationMember();
+
+			if ( fm instanceof SPARQLEndpoint )
+				return new ExecOpBindJoinSPARQLwithVALUES( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
+			else
+				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+		}
 		else
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 	}
