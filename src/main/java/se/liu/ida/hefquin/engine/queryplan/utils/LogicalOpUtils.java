@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
