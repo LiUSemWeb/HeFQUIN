@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
@@ -20,6 +21,16 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	public static int DEFAULT_THREAD_POOL_SIZE = 10;
 
 	protected final ExecutorService threadPool;
+
+	// stats
+	protected long issuedSPARQLRequests  = 0L;
+	protected long issuedTPFRequests     = 0L;
+	protected long issuedBRTPFRequests   = 0L;
+	protected long issuedNeo4jRequests   = 0L;
+	protected AtomicLong completedSPARQLRequests  = new AtomicLong(0L);
+	protected AtomicLong completedTPFRequests     = new AtomicLong(0L);
+	protected AtomicLong completedBRTPFRequests   = new AtomicLong(0L);
+	protected AtomicLong completedNeo4jRequests   = new AtomicLong(0L);
 
 	public AsyncFederationAccessManagerImpl(
 			final SPARQLRequestProcessor reqProcSPARQL,
@@ -43,31 +54,61 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	@Override
 	public CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
 	{
+		issuedSPARQLRequests++;
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final TPFServer fm )
 	{
+		issuedTPFRequests++;
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final BRTPFServer fm )
 	{
+		issuedTPFRequests++;
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req, final BRTPFServer fm )
 	{
+		issuedBRTPFRequests++;
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<RecordsResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm )
 	{
+		issuedNeo4jRequests++;
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
+	}
+
+	@Override
+	protected FederationAccessStatsImpl _getStats() {
+		return new FederationAccessStatsImpl( issuedSPARQLRequests,
+		                                      issuedTPFRequests,
+		                                      issuedBRTPFRequests,
+		                                      issuedNeo4jRequests,
+		                                      completedSPARQLRequests.get(),
+		                                      completedTPFRequests.get(),
+		                                      completedBRTPFRequests.get(),
+		                                      completedNeo4jRequests.get() );
+	}
+
+	@Override
+	public void resetStats() {
+		issuedSPARQLRequests  = 0L;
+		issuedTPFRequests     = 0L;
+		issuedBRTPFRequests   = 0L;
+		issuedNeo4jRequests   = 0L;
+
+		completedSPARQLRequests.set(0L);
+		completedTPFRequests.set(0L);
+		completedBRTPFRequests.set(0L);
+		completedNeo4jRequests.set(0L);
 	}
 
 
@@ -76,11 +117,14 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	{
 		return new Supplier<SolMapsResponse>() {
 			@Override public SolMapsResponse get() {
+				final SolMapsResponse resp;
 				try {
-					return reqProcSPARQL.performRequest(req, fm);
+					resp = reqProcSPARQL.performRequest(req, fm);
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+				completedSPARQLRequests.incrementAndGet();
+				return resp;
 			}
 		};
 	}
@@ -90,11 +134,14 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	{
 		return new Supplier<TPFResponse>() {
 			@Override public TPFResponse get() {
+				final TPFResponse resp;
 				try {
-					return reqProcTPF.performRequest(req, fm);
+					resp = reqProcTPF.performRequest(req, fm);
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+				completedTPFRequests.incrementAndGet();
+				return resp;
 			}
 		};
 	}
@@ -104,11 +151,14 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	{
 		return new Supplier<TPFResponse>() {
 			@Override public TPFResponse get() {
+				final TPFResponse resp;
 				try {
-					return reqProcTPF.performRequest(req, fm);
+					resp = reqProcTPF.performRequest(req, fm);
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+				completedTPFRequests.incrementAndGet();
+				return resp;
 			}
 		};
 	}
@@ -118,11 +168,14 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	{
 		return new Supplier<TPFResponse>() {
 			@Override public TPFResponse get() {
+				final TPFResponse resp;
 				try {
-					return reqProcBRTPF.performRequest(req, fm);
+					resp = reqProcBRTPF.performRequest(req, fm);
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+				completedBRTPFRequests.incrementAndGet();
+				return resp;
 			}
 		};
 	}
@@ -130,11 +183,16 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	protected Supplier<RecordsResponse> createSupplier( final Neo4jRequest req,
 	                                                   final Neo4jServer fm )
 	{
-		return () -> {
-			try {
-				return reqProcNeo4j.performRequest(req, fm);
-			} catch ( final FederationAccessException e ) {
-				throw new RuntimeException("Performing a request caused an exception.", e);
+		return new Supplier<RecordsResponse>() {
+			@Override public RecordsResponse get() {
+				final RecordsResponse resp;
+				try {
+					resp = reqProcNeo4j.performRequest(req, fm);
+				} catch ( final FederationAccessException e ) {
+					throw new RuntimeException("Performing a request caused an exception.", e);
+				}
+				completedNeo4jRequests.incrementAndGet();
+				return resp;
 			}
 		};
 	}

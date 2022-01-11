@@ -2,9 +2,11 @@ package se.liu.ida.hefquin.cli;
 
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
+import org.apache.jena.sparql.util.Context;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
@@ -14,8 +16,11 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.utils.Stats;
 import se.liu.ida.hefquin.engine.utils.StatsPrinter;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
@@ -25,7 +30,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
-	protected final ArgDecl statsDecl = new ArgDecl(ArgDecl.NoValue, "queryProcStats");
+	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "queryProcStats");
+	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "fedAccessStats");
 
 	public static void main( final String... argv ) {
 		new RunQueryWithoutSrcSel(argv).mainRun();
@@ -40,7 +46,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modResults);
 		addModule(modEngineConfig);
 
-		add(statsDecl, "--queryProcStats", "Print out statistics about the query execution process");
+		add(argQueryProcStats, "--queryProcStats", "Print out statistics about the query execution process");
+		add(argFedAccessStats, "--fedAccessStats", "Print out statistics of the federation access manager");
 	}
 
 	@Override
@@ -60,10 +67,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		modTime.startTimer();
 
-		QueryProcStats stats = null;
+		QueryProcStats queryProcStats = null;
 
 		try {
-			stats = e.executeQuery(query, resFmt);
+			queryProcStats = e.executeQuery(query, resFmt);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
@@ -76,8 +83,15 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println("Time: " + modTime.timeStr(time) + " sec");
 		}
 
-		if ( stats != null && contains(statsDecl) ) {
-			StatsPrinter.print(stats, System.err, true);
+		if ( queryProcStats != null && contains(argQueryProcStats) ) {
+			StatsPrinter.print(queryProcStats, System.err, true);
+		}
+
+		if ( contains(argFedAccessStats) ) {
+			final Context ctxt = ARQ.getContext();
+			final FederationAccessManager fedAccessMgr = ctxt.get(HeFQUINConstants.sysFederationAccessManager);
+			final Stats fedAccessStats = fedAccessMgr.getStats();
+			StatsPrinter.print(fedAccessStats, System.err, true);
 		}
 	}
 

@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
@@ -38,7 +39,16 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
  */
 public abstract class FederationAccessManagerBase1 implements FederationAccessManager
 {
-	static protected final Var countVar = Var.alloc("__hefquinCountVar");
+	public static final String enOverallNumberOfCardRequestsIssued  = "overallNumberOfCardRequestsIssued";
+	public static final String enNumberOfSPARQLCardRequestsIssued   = "numberOfSPARQLCardRequestsIssued";
+	public static final String enNumberOfTPFCardRequestsIssued      = "numberOfTPFCardRequestsIssued";
+	public static final String enNumberOfBRTPFCardRequestsIssued    = "numberOfBRTPFCardRequestsIssued";
+
+	protected static final Var countVar = Var.alloc("__hefquinCountVar");
+
+	protected long issuedCardRequestsSPARQL  = 0L;
+	protected long issuedCardRequestsTPF     = 0L;
+	protected long issuedCardRequestsBRTPF   = 0L;
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
@@ -99,6 +109,24 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	{
 		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
+
+	@Override
+	public final FederationAccessStats getStats() {
+		final FederationAccessStatsImpl stats = _getStats();
+
+		stats.put(enNumberOfSPARQLCardRequestsIssued, Long.valueOf(issuedCardRequestsSPARQL));
+		stats.put(enNumberOfTPFCardRequestsIssued,    Long.valueOf(issuedCardRequestsTPF));
+		stats.put(enNumberOfBRTPFCardRequestsIssued,  Long.valueOf(issuedCardRequestsBRTPF));
+
+		final long overallCardRequests = issuedCardRequestsSPARQL
+		                               + issuedCardRequestsTPF
+		                               + issuedCardRequestsBRTPF;
+		stats.put(enOverallNumberOfCardRequestsIssued, Long.valueOf(overallCardRequests));
+
+		return stats;
+	}
+
+	protected abstract FederationAccessStatsImpl _getStats();
 
 	protected Function<SolMapsResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromSolMapsResponse() {
 		return new FunctionToObtainCardinalityResponseFromSolMapsResponse();

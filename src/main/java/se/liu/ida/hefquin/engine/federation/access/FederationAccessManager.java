@@ -8,8 +8,9 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
+import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
-public interface FederationAccessManager
+public interface FederationAccessManager extends StatsProvider
 {
 	CompletableFuture<SolMapsResponse> issueRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException;
 
@@ -35,4 +36,7 @@ public interface FederationAccessManager
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest( TPFRequest req, BRTPFServer fm ) throws FederationAccessException;
 
 	CompletableFuture<CardinalityResponse> issueCardinalityRequest( BRTPFRequest req, BRTPFServer fm ) throws FederationAccessException;
+
+	@Override
+	FederationAccessStats getStats();
 }

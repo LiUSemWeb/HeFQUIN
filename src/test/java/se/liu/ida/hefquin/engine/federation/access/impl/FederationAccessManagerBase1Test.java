@@ -221,6 +221,18 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 				return r;
 			});
 		}
+
+		@Override
+		public void resetStats() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		protected FederationAccessStatsImpl _getStats() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 }

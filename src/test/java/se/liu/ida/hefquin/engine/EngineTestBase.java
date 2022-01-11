@@ -396,6 +396,18 @@ public abstract class EngineTestBase
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public void resetStats() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public FederationAccessStats getStats() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 }
