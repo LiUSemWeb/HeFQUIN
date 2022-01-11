@@ -28,21 +28,21 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 
 public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
-	protected final Set<Var> varsInTP;
+	protected final Set<Var> varsInSubQuery;
 
 	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final BGP query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = QueryPatternUtils.getVariablesInPattern(query);
+		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	@Override
@@ -58,13 +58,13 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 	}
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
-		if ( varsInTP.isEmpty() ) {
+		if ( varsInSubQuery.isEmpty() ) {
 			return representQueryPatternAsJenaOp(query);
 		}
 		Expr disjunction = null;
 		boolean solMapsContainBlankNodes = false;
 		for (final SolutionMapping s : solMaps) {
-			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
+			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInSubQuery);
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
 				solMapsContainBlankNodes = true;
 				continue;

@@ -26,28 +26,28 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
-	protected final List<Var> varsInTP;
+	protected final List<Var> varsInSubQuery;
 	
 	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithVALUES( final BGP query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
-		final Set<Binding> bindings = new HashSet<Binding>();
+		final Set<Binding> bindings = new HashSet<>();
 		for ( final SolutionMapping s : solMaps ) {
-			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInTP );
+			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );
 			if ( ! SolutionMappingUtils.containsBlankNodes(b) ) {
 				bindings.add(b);
 			}
@@ -57,7 +57,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithReq
 			return null;
 		}
 
-		final Table table = new TableData( varsInTP, new ArrayList<>(bindings) );
+		final Table table = new TableData( varsInSubQuery, new ArrayList<>(bindings) );
 		final Op op = OpSequence.create( OpTable.create(table), representQueryPatternAsJenaOp(query) );
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);

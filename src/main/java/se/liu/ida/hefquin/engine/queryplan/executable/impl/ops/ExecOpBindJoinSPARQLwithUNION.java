@@ -27,21 +27,21 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 
 public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
-	protected final List<Var> varsInTP;
+	protected final List<Var> varsInSubQuery;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
-		varsInTP = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	@Override
@@ -57,12 +57,12 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	}
 
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
-		if (varsInTP.isEmpty()) return representQueryPatternAsJenaOp(query);
+		if (varsInSubQuery.isEmpty()) return representQueryPatternAsJenaOp(query);
 
 		final Set<Expr> conjunctions = new HashSet<>();
 		boolean solMapsContainBlankNodes = false;
 		for ( final SolutionMapping s : solMaps) {
-			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
+			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInSubQuery);
 			// If the current solution mapping does not have any variables in common with
 			// the triple pattern of this operator, then every matching triple is a join partner
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
@@ -75,7 +75,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 			}
 
 			Expr conjunction = null;
-			for (final Var v : varsInTP){
+			for (final Var v : varsInSubQuery){
 				if (! b.contains(v)) continue;
 				final Node uri = b.get(v);
 				final Expr expr = new E_Equals(new ExprVar(v), new NodeValueNode(uri));
