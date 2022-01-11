@@ -120,11 +120,20 @@ public class SourcePlannerImpl implements SourcePlanner
 
 	protected LogicalPlan createPlan( final Op jenaOp, final FederationMember fm ) {
 		// If the federation member has a SPARQL endpoint interface, then
-		// we can simply wrap the whole query pattern in a single request. 
+		// we can simply wrap the whole query pattern in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(jenaOp) );
-			final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
-			return new LogicalPlanWithNullaryRootImpl(op);
+			if ( jenaOp instanceof OpBGP ) {
+				// If possible, create an explicit BGP request operator
+				// rather than a general SPARQL pattern request operator
+				// because that causes few checks and casts further down
+				// in the query planning pipeline.
+				return createPlanForBGP( (OpBGP) jenaOp, fm );
+			}
+			else {
+				final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(jenaOp) );
+				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
+				return new LogicalPlanWithNullaryRootImpl(op);
+			}
 		}
 
 		// For all federation members with other types of interfaces,
