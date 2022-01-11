@@ -57,20 +57,20 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	}
 
 	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
-		if (varsInTP.isEmpty()) return createOpBasedOnQuery(query);
+		if (varsInTP.isEmpty()) return representQueryPatternAsJenaOp(query);
 
 		final Set<Expr> conjunctions = new HashSet<>();
-		boolean conjunctionsMustBeNonEmpty = false;
+		boolean solMapsContainBlankNodes = false;
 		for ( final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
 			// If the current solution mapping does not have any variables in common with
 			// the triple pattern of this operator, then every matching triple is a join partner
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
-			if (b.size() == 0) return createOpBasedOnQuery(query);
+			if (b.size() == 0) return representQueryPatternAsJenaOp(query);
 
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
-				conjunctionsMustBeNonEmpty = true;
+				solMapsContainBlankNodes = true;
 				continue;
 			}
 
@@ -89,12 +89,12 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 		}
 
 		if ( conjunctions.isEmpty() ) {
-			return conjunctionsMustBeNonEmpty ? null : createOpBasedOnQuery(query);
+			return solMapsContainBlankNodes ? null : representQueryPatternAsJenaOp(query);
 		}
 
 		Op union = null;
 		for (final Expr conjunction : conjunctions) {
-			final Op filter = OpFilter.filter(conjunction, createOpBasedOnQuery(query));
+			final Op filter = OpFilter.filter(conjunction, representQueryPatternAsJenaOp(query));
 			if (union == null) {
 				union = filter;
 			} else {

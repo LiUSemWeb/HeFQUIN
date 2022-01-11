@@ -58,7 +58,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithReq
 		}
 
 		final Table table = new TableData( varsInTP, new ArrayList<>(bindings) );
-		final Op op = OpSequence.create( OpTable.create(table), createOpBasedOnQuery(query) );
+		final Op op = OpSequence.create( OpTable.create(table), representQueryPatternAsJenaOp(query) );
 		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm);

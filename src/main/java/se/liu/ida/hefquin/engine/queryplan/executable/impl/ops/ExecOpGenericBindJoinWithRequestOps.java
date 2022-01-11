@@ -88,21 +88,27 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
     } // end of helper class MyIntermediateResultElementSink
 
 	// ------- helper function ------
-	/* Convert a SPARQL graph pattern to jena Op based on the type of pattern*/
-	protected Op createOpBasedOnQuery( final SPARQLGraphPattern query ) {
-		if ( query instanceof TriplePattern) {
-			return new OpTriple( ((TriplePattern)query).asJenaTriple());
-		}
-		else if (query instanceof BGP) {
-			final Set<TriplePattern> tps = (Set<TriplePattern>) ((BGP) query).getTriplePatterns();
-			final BasicPattern bgp = new BasicPattern();
-			for (TriplePattern tp : tps) {
-				bgp.add( tp.asJenaTriple() );
+	/**
+	 * Returns a representation of this query pattern as an
+	 * object of the interface {@link Op} of the Jena API.
+	 */
+	protected Op representQueryPatternAsJenaOp( final QueryType query ) {
+		if ( query instanceof SPARQLGraphPattern ) {
+			if ( query instanceof TriplePattern) {
+				return new OpTriple( ((TriplePattern)query).asJenaTriple());
 			}
-			return new OpBGP(bgp);
+			else if (query instanceof BGP) {
+				final Set<TriplePattern> tps = (Set<TriplePattern>) ((BGP) query).getTriplePatterns();
+				final BasicPattern bgp = new BasicPattern();
+				for (TriplePattern tp : tps) {
+					bgp.add( tp.asJenaTriple() );
+				}
+				return new OpBGP(bgp);
+			}
+			else return ((SPARQLGraphPattern)query).asJenaOp();
 		}
 		else
-			return query.asJenaOp();
+			throw new IllegalArgumentException("Unsupported type of query pattern: " + query.getClass().getName() );
 	}
 
 }

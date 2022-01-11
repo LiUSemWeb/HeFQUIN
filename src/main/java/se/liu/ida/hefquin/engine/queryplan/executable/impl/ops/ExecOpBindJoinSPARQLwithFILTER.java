@@ -59,14 +59,14 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
 		if ( varsInTP.isEmpty() ) {
-			return createOpBasedOnQuery(query);
+			return representQueryPatternAsJenaOp(query);
 		}
 		Expr disjunction = null;
-		boolean mustHaveTheFilter = false;
+		boolean solMapsContainBlankNodes = false;
 		for (final SolutionMapping s : solMaps) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInTP);
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
-				mustHaveTheFilter = true;
+				solMapsContainBlankNodes = true;
 				continue;
 			}
 
@@ -92,10 +92,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		}
 
 		if ( disjunction == null ) {
-			return mustHaveTheFilter ? null : createOpBasedOnQuery(query);
+			return solMapsContainBlankNodes ? null : representQueryPatternAsJenaOp(query);
 		}
 
-		return OpFilter.filter(disjunction, createOpBasedOnQuery(query));
+		return OpFilter.filter(disjunction, representQueryPatternAsJenaOp(query));
 	}
 
 }
