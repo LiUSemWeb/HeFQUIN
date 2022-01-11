@@ -109,9 +109,8 @@ public class LogicalOpUtils {
      * where the BGP is extracted from a given bgpAdd operator.
      */
     public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
-        final Set<TriplePattern> tps = (Set<TriplePattern>) lopBGPAdd.getBGP().getTriplePatterns();
         final BasicPattern bgp = new BasicPattern();
-        for ( TriplePattern tp: tps ){
+        for ( TriplePattern tp: lopBGPAdd.getBGP().getTriplePatterns() ){
             bgp.add( tp.asJenaTriple() );
         }
 
@@ -196,8 +195,9 @@ public class LogicalOpUtils {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
 
         if ( lop instanceof LogicalOpRequest ) {
-            final DataRetrievalRequest req = ((LogicalOpRequest)lop).getRequest();
-            final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
+            final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) lop;
+            final DataRetrievalRequest req = reqOp.getRequest();
+            final FederationMember fm = reqOp.getFederationMember();
 
             if ( req instanceof BGPRequest) {
                 return createBGPAddLopFromReq( (BGPRequest) req, fm );
