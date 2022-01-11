@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -71,7 +69,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
 
                         if ( IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint( plan_left.getRootOperator() ) ){
-                            final LogicalOpBGPAdd newRoot = LogicalOpUtils.createBGPAddLopFromReq((BGPRequest) plan_left.getRootOperator());
+                            final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq( plan_left.getRootOperator() );
 
                             candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
                             candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinFILTER( newRoot, plan_right ) );
@@ -79,7 +77,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                             candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinVALUES( newRoot, plan_right ) );
                         }
                         else if ( IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest( plan_left.getRootOperator() ) ){
-                            final LogicalOpTPAdd newRoot = LogicalOpUtils.createTPAddLopFromReq((TriplePatternRequest) plan_left.getRootOperator());
+                            final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq( plan_left.getRootOperator() );
                             candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
 
                             final FederationMember fm = ( (LogicalOpRequest<?, ?>)plan_left.getRootOperator() ).getFederationMember();

@@ -3,6 +3,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
@@ -21,6 +25,27 @@ public class IdentifyTypeOfRequestUsedForReq {
     public static boolean isBGPRequest( final LogicalOperator lop ) {
         if( lop instanceof LogicalOpRequest){
             return ( (LogicalOpRequest<?, ?>) lop ).getRequest() instanceof BGPRequest;
+        }
+        return false;
+    }
+
+    // Check whether the type of request is a SPARQL request with BasicPattern
+    public static boolean isGraphPatternReqWithBGP( final PhysicalOperator op ) {
+        final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
+
+        return isGraphPatternReqWithBGP(lop);
+    }
+
+    public static boolean isGraphPatternReqWithBGP( final LogicalOperator lop ) {
+        if ( isGraphPatternRequest(lop) ) {
+            final SPARQLRequest req = (SPARQLRequest) ( (LogicalOpRequest<?, ?>) lop ).getRequest();
+            final SPARQLGraphPattern pattern = req.getQueryPattern();
+            if ( pattern instanceof TriplePattern || pattern instanceof BGP){
+                return false;
+            }
+            else {
+                return pattern.asJenaOp() instanceof OpBGP;
+            }
         }
         return false;
     }

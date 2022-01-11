@@ -38,7 +38,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
                 final LogicalOpBGPAdd rootLop = (LogicalOpBGPAdd) ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
                 final FederationMember fm = rootLop.getFederationMember();
 
-                final Set<TriplePattern> tps = new HashSet<>(rootLop.getBGP().getTriplePatterns());
+                final Set<TriplePattern> tps = new HashSet<>( rootLop.getBGP().getTriplePatterns() );
 
                 if ( tps.size() == 0 ) {
                     throw new IllegalArgumentException( "the BGP is empty" );

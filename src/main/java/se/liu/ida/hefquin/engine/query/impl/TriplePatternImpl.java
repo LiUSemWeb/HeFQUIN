@@ -62,7 +62,7 @@ public class TriplePatternImpl implements TriplePattern
 	
 	@Override
 	public String toString() {
-		return this.asJenaTriple().toString();
+		return "(triple " + this.asJenaTriple().toString() + ") ";
 	}
 
 }

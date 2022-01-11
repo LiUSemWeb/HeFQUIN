@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -10,10 +9,10 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -26,7 +25,7 @@ public class RuleDivideBGPReqIntoJoinOfTPReqs extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyTypeOfRequestUsedForReq.isBGPRequest(rootOp);
+        return IdentifyTypeOfRequestUsedForReq.isBGPRequest(rootOp) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(rootOp);
     }
 
     @Override
@@ -38,8 +37,7 @@ public class RuleDivideBGPReqIntoJoinOfTPReqs extends AbstractRewritingRuleImpl{
                 final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) rootOp).getLogicalOperator();
                 final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
-                final BGPRequest req = (BGPRequest) ((LogicalOpRequest<?, ?>) lop).getRequest();
-                final Set<TriplePattern> tps = new HashSet<>(req.getQueryPattern().getTriplePatterns());
+                final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop);
 
                 final Iterator<TriplePattern> it = tps.iterator();
                 if ( tps.size() == 1 ) {
