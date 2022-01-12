@@ -23,10 +23,10 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	protected final ExecutorService threadPool;
 
 	// stats
-	protected long issuedSPARQLRequests  = 0L;
-	protected long issuedTPFRequests     = 0L;
-	protected long issuedBRTPFRequests   = 0L;
-	protected long issuedNeo4jRequests   = 0L;
+	protected AtomicLong issuedSPARQLRequests  = new AtomicLong(0L);
+	protected AtomicLong issuedTPFRequests     = new AtomicLong(0L);
+	protected AtomicLong issuedBRTPFRequests   = new AtomicLong(0L);
+	protected AtomicLong issuedNeo4jRequests   = new AtomicLong(0L);
 	protected AtomicLong completedSPARQLRequests  = new AtomicLong(0L);
 	protected AtomicLong completedTPFRequests     = new AtomicLong(0L);
 	protected AtomicLong completedBRTPFRequests   = new AtomicLong(0L);
@@ -54,44 +54,44 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	@Override
 	public CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
 	{
-		issuedSPARQLRequests++;
+		issuedSPARQLRequests.incrementAndGet();
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final TPFServer fm )
 	{
-		issuedTPFRequests++;
+		issuedTPFRequests.incrementAndGet();
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final BRTPFServer fm )
 	{
-		issuedTPFRequests++;
+		issuedTPFRequests.incrementAndGet();
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req, final BRTPFServer fm )
 	{
-		issuedBRTPFRequests++;
+		issuedBRTPFRequests.incrementAndGet();
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	public CompletableFuture<RecordsResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm )
 	{
-		issuedNeo4jRequests++;
+		issuedNeo4jRequests.incrementAndGet();
 		return CompletableFuture.supplyAsync( createSupplier(req,fm), threadPool );
 	}
 
 	@Override
 	protected FederationAccessStatsImpl _getStats() {
-		return new FederationAccessStatsImpl( issuedSPARQLRequests,
-		                                      issuedTPFRequests,
-		                                      issuedBRTPFRequests,
-		                                      issuedNeo4jRequests,
+		return new FederationAccessStatsImpl( issuedSPARQLRequests.get(),
+		                                      issuedTPFRequests.get(),
+		                                      issuedBRTPFRequests.get(),
+		                                      issuedNeo4jRequests.get(),
 		                                      completedSPARQLRequests.get(),
 		                                      completedTPFRequests.get(),
 		                                      completedBRTPFRequests.get(),
@@ -99,11 +99,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	}
 
 	@Override
-	public void resetStats() {
-		issuedSPARQLRequests  = 0L;
-		issuedTPFRequests     = 0L;
-		issuedBRTPFRequests   = 0L;
-		issuedNeo4jRequests   = 0L;
+	protected void _resetStats() {
+		issuedSPARQLRequests.set(0L);
+		issuedTPFRequests.set(0L);
+		issuedBRTPFRequests.set(0L);
+		issuedNeo4jRequests.set(0L);
 
 		completedSPARQLRequests.set(0L);
 		completedTPFRequests.set(0L);

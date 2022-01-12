@@ -223,7 +223,7 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		}
 
 		@Override
-		public void resetStats() {
+		protected void _resetStats() {
 			// TODO Auto-generated method stub
 			
 		}

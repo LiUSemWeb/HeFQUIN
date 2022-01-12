@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 import org.apache.jena.graph.Node;
@@ -46,9 +47,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	protected static final Var countVar = Var.alloc("__hefquinCountVar");
 
-	protected long issuedCardRequestsSPARQL  = 0L;
-	protected long issuedCardRequestsTPF     = 0L;
-	protected long issuedCardRequestsBRTPF   = 0L;
+	protected AtomicLong issuedCardRequestsSPARQL  = new AtomicLong(0L);
+	protected AtomicLong issuedCardRequestsTPF     = new AtomicLong(0L);
+	protected AtomicLong issuedCardRequestsBRTPF   = new AtomicLong(0L);
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
@@ -114,6 +115,10 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	public final FederationAccessStats getStats() {
 		final FederationAccessStatsImpl stats = _getStats();
 
+		final long issuedCardRequestsSPARQL = this.issuedCardRequestsSPARQL.get();
+		final long issuedCardRequestsTPF    = this.issuedCardRequestsTPF.get();
+		final long issuedCardRequestsBRTPF  = this.issuedCardRequestsBRTPF.get();
+
 		stats.put(enNumberOfSPARQLCardRequestsIssued, Long.valueOf(issuedCardRequestsSPARQL));
 		stats.put(enNumberOfTPFCardRequestsIssued,    Long.valueOf(issuedCardRequestsTPF));
 		stats.put(enNumberOfBRTPFCardRequestsIssued,  Long.valueOf(issuedCardRequestsBRTPF));
@@ -126,7 +131,20 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		return stats;
 	}
 
+
+	@Override
+	public final void resetStats() {
+		issuedCardRequestsSPARQL.set(0L);
+		issuedCardRequestsTPF.set(0L);
+		issuedCardRequestsBRTPF.set(0L);
+
+		_resetStats();
+	}
+
 	protected abstract FederationAccessStatsImpl _getStats();
+
+	protected abstract void _resetStats();
+
 
 	protected Function<SolMapsResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromSolMapsResponse() {
 		return new FunctionToObtainCardinalityResponseFromSolMapsResponse();
