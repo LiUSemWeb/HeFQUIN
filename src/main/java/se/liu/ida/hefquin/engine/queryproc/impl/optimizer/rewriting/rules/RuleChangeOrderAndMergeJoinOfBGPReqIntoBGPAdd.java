@@ -21,8 +21,8 @@ public class RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd extends AbstractRewri
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return ( IdentifyLogicalOp.isJoin(subPlanOp1) && ( IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(subPlanOp2) ))
-                    || ( IdentifyLogicalOp.isJoin(subPlanOp2) && ( IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(subPlanOp1) ));
+            return ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) )
+                    ||( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1));
         }
         return false;
     }
@@ -39,13 +39,13 @@ public class RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd extends AbstractRewri
                 final PhysicalOperator subPlanOp1 = subPlan1.getRootOperator();
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
-                if ( IdentifyLogicalOp.isJoin(subPlanOp1) && (IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(subPlanOp2))) {
+                if ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) ) {
                     final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp2);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan1.getSubPlan(1));
 
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
                 }
-                else if ( IdentifyLogicalOp.isJoin(subPlanOp2) && (IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(subPlanOp1) )) {
+                else if ( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) ) {
                     final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp1);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan2.getSubPlan(0) );
 

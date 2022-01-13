@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -13,7 +12,6 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
@@ -180,12 +178,6 @@ public class LogicalOpUtils {
                 return new HashSet<>( bgp.getTriplePatterns() );
             }
         }
-        else if ( (req instanceof SPARQLRequest) && ( ((SPARQLRequest) req).getQueryPattern().asJenaOp() instanceof OpBGP ) ) {
-            final SPARQLGraphPattern pattern = ((SPARQLRequest) req).getQueryPattern();
-            final BGP bgp = QueryPatternUtils.createBGP( ((OpBGP)pattern.asJenaOp()).getPattern() );
-
-            return new HashSet<>( bgp.getTriplePatterns() );
-        }
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );
         }
@@ -205,9 +197,6 @@ public class LogicalOpUtils {
             else if( req instanceof TriplePatternRequest ) {
                 return createTPAddLopFromReq( (TriplePatternRequest) req, fm );
             }
-            else if ( (req instanceof SPARQLRequest) && ( ((SPARQLRequest) req).getQueryPattern().asJenaOp() instanceof OpBGP ) ) {
-                    return createBGPAddLopFromReq( (SPARQLRequest) req, fm );
-            }
             else {
                 throw new IllegalArgumentException( "unsupported type of request: " + lop.getClass().getName() );
             }
@@ -216,16 +205,6 @@ public class LogicalOpUtils {
             throw new IllegalArgumentException( "unsupported type of logical operator: " + lop.getClass().getName() );
         }
 
-    }
-
-    /**
-     * Create a bgpAdd logical operator by extracting the BGP and fm from a given SPARQLRequest with BasicPattern.
-     */
-    public static LogicalOpBGPAdd createBGPAddLopFromReq( final SPARQLRequest req, final FederationMember fm ) {
-        final SPARQLGraphPattern pattern = req.getQueryPattern();
-        final BGP bgp = QueryPatternUtils.createBGP(((OpBGP)pattern.asJenaOp()).getPattern());
-
-        return new LogicalOpBGPAdd( fm, bgp );
     }
 
     /**
