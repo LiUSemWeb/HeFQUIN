@@ -25,7 +25,7 @@ public class RuleDivideBGPReqIntoJoinOfTPReqs extends AbstractRewritingRuleImpl{
     @Override
     protected boolean canBeAppliedTo( final PhysicalPlan plan ) {
         final PhysicalOperator rootOp = plan.getRootOperator();
-        return IdentifyTypeOfRequestUsedForReq.isBGPRequest(rootOp) || IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithBGP(rootOp);
+        return IdentifyTypeOfRequestUsedForReq.isBGPRequest(rootOp);
     }
 
     @Override
