@@ -34,7 +34,7 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 
 	@Override
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
+		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,true) );
 	}
 
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
