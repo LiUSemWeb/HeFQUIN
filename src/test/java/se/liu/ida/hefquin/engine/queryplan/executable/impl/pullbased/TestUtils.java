@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 public class TestUtils extends EngineTestBase
 {
@@ -20,6 +21,7 @@ public class TestUtils extends EngineTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 	}

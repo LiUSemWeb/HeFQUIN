@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {
@@ -50,6 +51,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 
@@ -105,6 +107,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 	}

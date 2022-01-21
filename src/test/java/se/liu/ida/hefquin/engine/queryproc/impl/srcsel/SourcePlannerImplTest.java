@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 public class SourcePlannerImplTest extends EngineTestBase
 {
@@ -151,6 +152,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 

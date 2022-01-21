@@ -221,6 +221,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryProcContext procCxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 
@@ -240,7 +241,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
 		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine);
+		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 

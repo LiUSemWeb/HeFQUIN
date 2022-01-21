@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 public class QueryPlanCompilerImpl implements QueryPlanCompiler
 {
@@ -84,6 +85,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
+			@Override public CostModel getCostModel() { return ctxt.getCostModel(); }
 			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
 		};
 	}

@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
@@ -61,21 +60,13 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
 		final Boolean isExperimentRun = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
 
-		final QueryProcContext procCxt = new QueryProcContext() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
-		};
-
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
-		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
 
-		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
+		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
-			@Override public CostModel getCostModel() { return costModel; }
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
@@ -86,7 +77,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
 		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		qProc = new QueryProcessorImpl( planner, compiler, execEngine );
+		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
 	}
 
 	@Override
@@ -278,6 +269,17 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	    @Override public void visit(OpGroup opGroup)              { unsupportedOpFound = true; }
 
 	    @Override public void visit(OpTopN opTop)                 { unsupportedOpFound = true; }
+	}
+
+
+	protected static abstract class QueryOptimizationContextBase implements QueryOptimizationContext {
+		protected final CostModel costModel;
+
+		public QueryOptimizationContextBase() {
+			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
+		}
+
+		@Override public CostModel getCostModel() { return costModel; }
 	}
 
 }

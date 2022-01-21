@@ -12,7 +12,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
 /**
  * This class implements a simple query optimizer that focuses only
@@ -44,11 +43,6 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
 
         final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
-        if ( ctxt.isExperimentRun() ) {
-        	// stats that may be expensive to collected should be collected only when running experiments
-        	myStats.put( "costOfSelectedPlan", CostEstimationUtils.getEstimates(ctxt.getCostModel(), bestPlan)[0] );
-        }
-        
 
 		return new Pair<>(bestPlan, myStats);
     }

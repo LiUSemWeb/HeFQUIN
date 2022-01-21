@@ -31,6 +31,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateRe
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 /**
  * This is an abstract class with tests for any algorithm that is
@@ -437,6 +438,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 		};
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
