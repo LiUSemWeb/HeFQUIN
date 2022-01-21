@@ -103,6 +103,10 @@ public class FederationAccessUtils
 			else {
 				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
 			}
+
+			if ( futures[i] == null ) {
+				throw new FederationAccessException("Unexpected null returned by the federation access manager (i=" + i + ")", req, fm);
+			}
 		}
 
 		try {

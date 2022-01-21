@@ -153,7 +153,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
 			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 		};
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);

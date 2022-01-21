@@ -439,7 +439,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 		};
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 

@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
@@ -53,7 +52,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
 public class QueryProcessorImplTest extends EngineTestBase
 {
 	@Test
-	public void oneTPFoneTriplePattern() {
+	public void oneTPFoneTriplePattern() throws QueryProcException {
 		// setting up
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
@@ -88,7 +87,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void oneBRTPFtwoTriplePatterns() {
+	public void oneBRTPFtwoTriplePatterns() throws QueryProcException {
 		// setting up
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p1> ?y; <http://example.org/p2> ?z }"
@@ -130,7 +129,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void twoTPFtwoTriplePatterns() {
+	public void twoTPFtwoTriplePatterns() throws QueryProcException {
 		// setting up
 		final String queryString = "SELECT * WHERE {"
 				+ "SERVICE <http://example.org/tpf1> { ?x <http://example.org/p1> ?y }"
@@ -176,7 +175,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
-	public void liveTestWithDBpedia() {
+	public void liveTestWithDBpedia() throws QueryProcException {
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String dbpediaURL = "http://dbpedia.org/sparql";
@@ -217,12 +216,12 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
-	                                                  final FederationAccessManager fedAccessMgr ) {
+	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
 		final QueryProcContext procCxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 		};
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
@@ -231,7 +230,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
 		};
@@ -245,12 +244,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
 
-		try {
-			qProc.processQuery(query, resultSink);
-		}
-		catch ( final QueryProcException ex ) {
-			fail( "unexpected exception with the following message: " + ex.getMessage() );
-		}
+		qProc.processQuery(query, resultSink);
 
 		return resultSink.getSolMapsIter();
 	}

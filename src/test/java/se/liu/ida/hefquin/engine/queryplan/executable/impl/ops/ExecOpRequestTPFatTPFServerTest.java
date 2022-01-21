@@ -52,7 +52,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 		};
 
 		op.execute(sink, execCxt);
@@ -108,7 +108,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
+			@Override public boolean isExperimentRun() { return false; }
 		};
 	}
 
