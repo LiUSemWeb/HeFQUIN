@@ -59,7 +59,6 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
         final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
         myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
-        myStats.put( "costOfSelectedPlan", bestPlan.getWeight() );
 
 		return new Pair<>(bestPlan.getPlan(), myStats);
     }

@@ -75,7 +75,7 @@ public class QueryProcessorImpl implements QueryProcessor
 			myStats.put("costOfSelectedPlan", costOfSelectedPlan);
 		}
 
-		return new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats );
+		return (QueryProcStats) myStats;
 	}
 
 }
