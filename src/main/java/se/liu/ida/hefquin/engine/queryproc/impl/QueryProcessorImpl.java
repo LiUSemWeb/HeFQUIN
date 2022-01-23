@@ -13,9 +13,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 /**
  * Simple implementation of {@link QueryProcessor}.
@@ -66,16 +66,16 @@ public class QueryProcessorImpl implements QueryProcessor
 
 		final long t4 = System.currentTimeMillis();
 
-		final StatsImpl myStats = new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats );
+		final QueryPlanningStats myStats = qepAndStats.object2;
 
 		// stats that may be expensive to collect should be collected only when running experiments
 		if ( ctxt.isExperimentRun() ) {
 			final Double costOfSelectedPlan = CostEstimationUtils.getEstimates(ctxt.getCostModel(),
 			                                                                   qepAndStats.object1)[0];
-			myStats.put("costOfSelectedPlan", costOfSelectedPlan);
+			( (QueryOptimizationStatsImpl)myStats.getQueryOptimizationStats() ).put("costOfSelectedPlan", costOfSelectedPlan);
 		}
 
-		return (QueryProcStats) myStats;
+		return new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, myStats, execStats );
 	}
 
 }
