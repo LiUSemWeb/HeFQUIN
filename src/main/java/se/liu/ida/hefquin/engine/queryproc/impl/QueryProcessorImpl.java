@@ -66,7 +66,7 @@ public class QueryProcessorImpl implements QueryProcessor
 
 		final long t4 = System.currentTimeMillis();
 
-		final StatsImpl myStats = new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats );
+		final QueryProcStatsImpl myStats = new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats );
 
 		// stats that may be expensive to collect should be collected only when running experiments
 		if ( ctxt.isExperimentRun() ) {
@@ -75,7 +75,7 @@ public class QueryProcessorImpl implements QueryProcessor
 			myStats.put("costOfSelectedPlan", costOfSelectedPlan);
 		}
 
-		return new QueryProcStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats );
+		return myStats;
 	}
 
 }
