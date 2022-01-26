@@ -5,9 +5,13 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
@@ -25,6 +29,8 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
+
 
 public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 {
@@ -93,11 +99,33 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		};
 	}
 
+	protected static class DummyPhysicalOperatorForTest implements PhysicalOperatorForLogicalOperator {
+		@Override
+		public ExecutableOperator createExecOp(ExpectedVariables... inputVars) {
+			return null;
+		}
+
+		@Override
+		public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
+			return null;
+		}
+
+		@Override
+		public void visit(PhysicalPlanVisitor visitor) {
+			
+		}
+
+		@Override
+		public LogicalOperator getLogicalOperator() {
+			return null;
+		}
+	}
+	
 	protected static class DummyPlanForTest implements PhysicalPlan {
 		public final double cost;
 		public DummyPlanForTest( final double cost ) { this.cost = cost; }
 
-		@Override public PhysicalOperator getRootOperator() { return null; }
+		@Override public PhysicalOperator getRootOperator() { return new DummyPhysicalOperatorForTest(); }
 		@Override public ExpectedVariables getExpectedVariables() { return null; }
 		@Override public int numberOfSubPlans() { return 0; }
 		@Override public PhysicalPlan getSubPlan(int i) { return null; }

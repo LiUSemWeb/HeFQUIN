@@ -10,6 +10,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.RandomizedJoinPlanOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.SimpleJoinOrderingQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -17,6 +19,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOptimizerBase
 {
 	protected final StoppingConditionForIterativeImprovement condition;
+	protected final SimpleJoinOrderingQueryOptimizer simpleOptimizer;
 
 	public IterativeImprovementBasedQueryOptimizer( final StoppingConditionForIterativeImprovement x,
 	                                                final QueryOptimizationContext context,
@@ -25,11 +28,13 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 
 		assert x != null;
 		condition = x;
+		final RandomizedJoinPlanOptimizerImpl randomizer = new RandomizedJoinPlanOptimizerImpl();
+		simpleOptimizer = new SimpleJoinOrderingQueryOptimizer(randomizer,context);
 	}
 
 	@Override
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false) );
+		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,true) );
 	}
 
 	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws QueryOptimizationException {
@@ -40,9 +45,10 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 		int generation = 0;
 
 		while ( ! condition.readyToStop(generation) ) {
-			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
-			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan ); // This variable will hold the plan which is currently being worked on.
-
+			// Selects a random plan and uses it as the starting point for the optimization.
+			PhysicalPlan randomPlan = simpleOptimizer.optimizePlan(initialPlan);
+			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), randomPlan );
+			
 			boolean improvementFound = false;
 
 			do {
