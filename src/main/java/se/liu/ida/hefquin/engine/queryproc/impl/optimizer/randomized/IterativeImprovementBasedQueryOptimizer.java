@@ -45,11 +45,10 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 		int generation = 0;
 
 		while ( ! condition.readyToStop(generation) ) {
-			// The randomized plan generator is to be used here. As a temporary measure, the initial plan is used.
+			// Selects a random plan and uses it as the starting point for the optimization.
 			PhysicalPlan randomPlan = simpleOptimizer.optimizePlan(initialPlan);
 			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), randomPlan );
-			//PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan ); // This variable will hold the plan which is currently being worked on.
-
+			
 			boolean improvementFound = false;
 
 			do {
