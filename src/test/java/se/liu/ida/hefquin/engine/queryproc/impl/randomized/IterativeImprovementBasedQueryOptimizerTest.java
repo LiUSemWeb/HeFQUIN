@@ -99,28 +99,24 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		};
 	}
 
-	protected static class TestOperator implements PhysicalOperatorForLogicalOperator {
+	protected static class DummyPhysicalOperatorForTest implements PhysicalOperatorForLogicalOperator {
 		@Override
 		public ExecutableOperator createExecOp(ExpectedVariables... inputVars) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public void visit(PhysicalPlanVisitor visitor) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public LogicalOperator getLogicalOperator() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}
@@ -129,7 +125,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		public final double cost;
 		public DummyPlanForTest( final double cost ) { this.cost = cost; }
 
-		@Override public PhysicalOperator getRootOperator() { return new TestOperator(); }
+		@Override public PhysicalOperator getRootOperator() { return new DummyPhysicalOperatorForTest(); }
 		@Override public ExpectedVariables getExpectedVariables() { return null; }
 		@Override public int numberOfSubPlans() { return 0; }
 		@Override public PhysicalPlan getSubPlan(int i) { return null; }
