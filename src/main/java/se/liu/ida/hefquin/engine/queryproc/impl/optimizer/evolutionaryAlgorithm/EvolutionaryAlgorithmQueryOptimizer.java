@@ -51,8 +51,34 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
 
         final List<Generation> previousGenerations = new ArrayList<>();
+
+        final List<List<Double>> aggregateCostOfPlansAllGens = new ArrayList<>();
+        final List<List<Double>> costOfPlansAllGens = new ArrayList<>();
+        final List<List<Integer>> hashcodeOfPlansAllGens = new ArrayList<>();
+
         while( ! terminateCriterion.readyToTerminate( currentGen, previousGenerations ) ) {
             previousGenerations.add(currentGen);
+
+            if ( ctxt.isExperimentRun() ) {
+                final List<Double> aggregateCostOfPlansPerGen = new ArrayList<>();
+                aggregateCostOfPlansPerGen.add( currentGen.bestPlan.getWeight() );
+                aggregateCostOfPlansPerGen.add( currentGen.worstPlan.getWeight() );
+                aggregateCostOfPlansPerGen.add( currentGen.avgCost );
+
+                aggregateCostOfPlansAllGens.add( aggregateCostOfPlansPerGen );
+
+                final List<Double> costOfPlansPerGen = new ArrayList<>();
+                final List<Integer> hashcodeOfPlansPerGen = new ArrayList<>();
+                for( PhysicalPlanWithCost planWithCost: currentGen.plans ) {
+                    costOfPlansPerGen.add( planWithCost.getWeight() );
+                    hashcodeOfPlansPerGen.add( planWithCost.hashCode() );
+                }
+
+//              Collections.sort(costOfPlansPerGen);
+                costOfPlansAllGens.add(costOfPlansPerGen);
+                hashcodeOfPlansAllGens.add(hashcodeOfPlansPerGen);
+            }
+
             currentGen = generateNextGen( currentGen, ruleApplicationCache );
         }
         final PhysicalPlanWithCost bestPlan = currentGen.bestPlan;
@@ -60,6 +86,12 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
         myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
         myStats.put( "costOfSelectedPlan", bestPlan.getWeight() );
+
+        if ( ctxt.isExperimentRun() ) {
+            myStats.put( "aggregateCostOfPlansAllGens", aggregateCostOfPlansAllGens );
+            myStats.put( "costOfPlansAllGens", costOfPlansAllGens );
+            myStats.put( "hashcodeOfPlansAllGens", hashcodeOfPlansAllGens );
+        }
 
 		return new Pair<>(bestPlan.getPlan(), myStats);
     }
