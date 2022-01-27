@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -15,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
+import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 /**
  * Simple implementation of {@link QueryProcessor}.
@@ -73,6 +74,9 @@ public class QueryProcessorImpl implements QueryProcessor
 			final Double costOfSelectedPlan = CostEstimationUtils.getEstimates(ctxt.getCostModel(),
 			                                                                   qepAndStats.object1)[0];
 			myStats.put("costOfSelectedPlan", costOfSelectedPlan);
+
+			System.out.println("Selected query plan: \n" + PhysicalPlanPrinter.print(qepAndStats.object1));
+			StatsPrinter.print( myStats, System.out, true );
 		}
 
 		return myStats;
