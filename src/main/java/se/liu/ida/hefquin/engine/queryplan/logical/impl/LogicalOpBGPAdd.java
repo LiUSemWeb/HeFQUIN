@@ -47,8 +47,12 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 
 	@Override
 	public String toString(){
+		final int codeOfBGP = bgp.toString().hashCode();
+		final int codeOfFm = fm.getInterface().toString().hashCode();
 
-		return "> bgpAdd ( "
+		return "> bgpAdd" +
+				"[" + codeOfBGP + ", "+ codeOfFm + "]"+
+				" ( "
 				+ bgp.toString()
 				+ ", "
 				+ fm.getInterface().toString()
