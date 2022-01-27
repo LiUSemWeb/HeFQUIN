@@ -47,8 +47,12 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 
 	@Override
 	public String toString(){
+		final int codeOfTP = tp.toString().hashCode();
+		final int codeOfFm = fm.getInterface().toString().hashCode();
 
-		return "> tpAdd ( "
+		return "> tpAdd" +
+				"[" + codeOfTP + ", "+ codeOfFm + "]"+
+				" ( "
 				+ tp.toString()
 				+ ", "
 				+ fm.getInterface().toString()
