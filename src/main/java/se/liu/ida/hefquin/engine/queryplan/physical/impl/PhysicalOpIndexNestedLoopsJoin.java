@@ -66,7 +66,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	@Override
 	public String toString(){
 
-		return "> indexNestedLoop " + lop.toString();
+		return "> indexNestedLoop" + lop.toString();
 	}
 
 }

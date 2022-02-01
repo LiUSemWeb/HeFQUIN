@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
@@ -94,11 +96,19 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		 * the right child.
 		 */
 		protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
-			final PhysicalPlan[] plans = new PhysicalPlan[ subplans.size() ];
+			final List<PhysicalPlan> plans = new ArrayList<>();
+
 			for ( int i = 0; i < subplans.size(); ++i ) {
-				plans[i] = PhysicalPlanFactory.createPlanWithJoin( currentPlan, subplans.get(i) );
+				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
+				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) currentPlan.getRootOperator(), subplans.get(i), plans );
+				}
+				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) subplans.get(i).getRootOperator(), currentPlan, plans );
+				}
 			}
-			return plans;
+
+			return plans.toArray( new PhysicalPlan[plans.size()]);
 		}
 	}
 
