@@ -19,6 +19,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
@@ -126,14 +128,26 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			return PhysicalPlanFactory.createPlan(pop, children);
 		}
 
-		// As long as we do not have an actual algorithm for multiway joins,
-		// we simply convert this to a left-deep plan of binary joins.
+//		Multiway joins are converted to left-deep plan of joins:
+//		For join operators, use tpAdd and bgpAdd when possible; otherwise, binary joins are used by default.
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-			currentSubPlan = createPhysicalPlanWithBinaryRoot(
+			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
+				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
+						currentSubPlan );
+			}
+			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
+				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
+						children.get(i) );
+			}
+			else {
+				currentSubPlan = createPhysicalPlanWithBinaryRoot(
 					LogicalOpJoin.getInstance(),
 					currentSubPlan,
 					children.get(i) );
+			}
 		}
 
 		return currentSubPlan;
