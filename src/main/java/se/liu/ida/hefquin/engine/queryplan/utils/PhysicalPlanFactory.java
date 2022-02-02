@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
 
 public class PhysicalPlanFactory
 {
@@ -427,6 +428,30 @@ public class PhysicalPlanFactory
 		else {
 			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
 		}
+	}
+
+	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest req, final PhysicalPlan subplan, final List<PhysicalPlan> plans ) {
+		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
+			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+
+			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+
+		}
+		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
+			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+
+			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();
+			if (fm instanceof SPARQLEndpoint) {
+				plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
+				plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
+				plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+			}
+		}
+		return plans;
 	}
 
 }

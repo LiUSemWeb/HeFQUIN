@@ -1,16 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -67,25 +61,11 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         }
 
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
-
-                        if ( IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint( plan_left.getRootOperator() ) ){
-                            final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq( plan_left.getRootOperator() );
-
-                            candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
-                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinFILTER( newRoot, plan_right ) );
-                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinUNION( newRoot, plan_right ) );
-                            candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinVALUES( newRoot, plan_right ) );
+                        if( plan_left.getRootOperator() instanceof PhysicalOpRequest){
+                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) plan_left.getRootOperator(), plan_right, candidatePlans );
                         }
-                        else if ( IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest( plan_left.getRootOperator() ) ){
-                            final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq( plan_left.getRootOperator() );
-                            candidatePlans.add( PhysicalPlanFactory.createPlanWithIndexNLJ( newRoot, plan_right ) );
-
-                            final FederationMember fm = ( (LogicalOpRequest<?, ?>)plan_left.getRootOperator() ).getFederationMember();
-                            if ( fm instanceof SPARQLEndpoint ){
-                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinFILTER( newRoot, plan_right ) );
-                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinUNION( newRoot, plan_right ) );
-                                candidatePlans.add( PhysicalPlanFactory.createPlanWithBindJoinVALUES( newRoot, plan_right ) );
-                            }
+                        if( plan_right.getRootOperator() instanceof PhysicalOpRequest){
+                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) plan_right.getRootOperator(), plan_right, candidatePlans );
                         }
                     }
 
