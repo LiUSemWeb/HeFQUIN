@@ -1,9 +1,12 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.util.ExprUtils;
 
+import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -27,7 +30,22 @@ public class ExecOpFilter implements UnaryExecutableOp
 	public void process( final IntermediateResultBlock input,
 	                     final IntermediateResultElementSink sink,
 	                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		// TODO Auto-generated method stub
+		
+		
+		// For every solution mapping in the input...
+		for(SolutionMapping solution : input.getSolutionMappings()) {
+			//Check whether it satisfies the filter expression
+			ExprUtils.eval(filterExpression, solution.asJenaBinding());
+			// ! eval(Expr expr, Binding binding) in ExprUtils returns expr.eval(binding, env);
+			// I can only find the NodeValue eval(Binding binding, FunctionEnv env) declaration in the Expr.class, I don't know where to see the declaration.
+			// TODO: Find out if there's any other possible value except true or false.
+			// I'll assume that filterExpression can be anything, as long as it is not null.
+			if(true) { // Temporary. Need to look more into the nodevalue and expr.
+				//push it to the output sink.
+				sink.send(solution);
+			}
+			
+		}
 
 		// The idea of what you should implement here is as follows: For every
 		// solution mapping in the given input, input.getSolutionMappings(), check
