@@ -5,8 +5,7 @@ import org.junit.Test;
 public class ExecOpFilterTest
 {
 	@Test
-	public void test1_RenameTheseTestMethodsToSomethingThatDescribesTheirPurpose() {
-		
+	public void filter_Comparison() {
 	}
 
 	@Test

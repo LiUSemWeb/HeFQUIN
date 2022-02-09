@@ -35,14 +35,12 @@ public class ExecOpFilter implements UnaryExecutableOp
 		// For every solution mapping in the input...
 		for(SolutionMapping solution : input.getSolutionMappings()) {
 			//Check whether it satisfies the filter expression
-			ExprUtils.eval(filterExpression, solution.asJenaBinding());
-			// ! eval(Expr expr, Binding binding) in ExprUtils returns expr.eval(binding, env);
-			// I can only find the NodeValue eval(Binding binding, FunctionEnv env) declaration in the Expr.class, I don't know where to see the declaration.
-			// TODO: Find out if there's any other possible value except true or false.
-			// I'll assume that filterExpression can be anything, as long as it is not null.
-			if(true) { // Temporary. Need to look more into the nodevalue and expr.
+			final NodeValue evaluationResult = ExprUtils.eval(filterExpression, solution.asJenaBinding());
+			if(evaluationResult == NodeValue.TRUE) { // Temporary. Need to look more into the nodevalue and expr.
 				//push it to the output sink.
 				sink.send(solution);
+			} else if (evaluationResult != NodeValue.FALSE ) {
+				throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
 			}
 			
 		}
