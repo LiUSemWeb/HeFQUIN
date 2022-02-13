@@ -1,9 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.function.FunctionEnv;
 import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
