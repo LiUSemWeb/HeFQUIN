@@ -2,12 +2,13 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 
 /**
  * Base class for implementations of request operators.
  */
 public abstract class ExecOpGenericRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-                implements NullaryExecutableOp
+                extends NullaryExecutableOpBase
 {
 	protected final ReqType req;
 	protected final MemberType fm;
@@ -23,6 +24,13 @@ public abstract class ExecOpGenericRequest<ReqType extends DataRetrievalRequest,
 	@Override
 	public int preferredInputBlockSize() {
 		return 0; // irrelevant because operators of this type do not have any input
+	}
+
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "requestAsString",    req.toString() );
+		s.put( "fedMemberAsString",  fm.toString() );
+		return s;
 	}
 
 }

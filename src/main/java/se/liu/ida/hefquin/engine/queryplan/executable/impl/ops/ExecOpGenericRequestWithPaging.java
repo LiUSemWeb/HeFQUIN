@@ -25,8 +25,8 @@ public abstract class ExecOpGenericRequestWithPaging<
 	}
 
 	@Override
-	public final void execute( final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) throws ExecOpExecutionException
+	protected final void _execute( final IntermediateResultElementSink sink,
+	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		int pageNumber = 0;
 		boolean wasLastPage = false;

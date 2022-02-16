@@ -51,7 +51,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
 	}
 
 	@Override
-	public void process(
+	protected void _process(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt) throws ExecOpExecutionException

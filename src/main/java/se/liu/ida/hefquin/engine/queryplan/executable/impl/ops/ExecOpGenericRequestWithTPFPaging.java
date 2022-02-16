@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -23,18 +24,22 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
                                   PageReqType extends DataRetrievalRequest>
        extends ExecOpGenericRequest<ReqType,MemberType>
 {
+	private int numberOfPageRequestsIssued = 0;
+
 	public ExecOpGenericRequestWithTPFPaging( final ReqType req, final MemberType fm ) {
 		super( req, fm );
 	}
 
 	@Override
-	public final void execute( final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) throws ExecOpExecutionException
+	protected final void _execute( final IntermediateResultElementSink sink,
+	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		TPFResponse currentPage = null;
 		while ( currentPage == null || ! isLastPage(currentPage) ) {
 			// create the request for the next page (which is the first page if currentPage is null)
 			final PageReqType pageRequest = createPageRequest(currentPage);
+
+			numberOfPageRequestsIssued++;
 
 			// perform the page request
 			try {
@@ -89,4 +94,16 @@ public abstract class ExecOpGenericRequestWithTPFPaging<
 	protected abstract TPFResponse performPageRequest( PageReqType pageReq, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
 	protected abstract Iterator<SolutionMapping> convert( Iterable<Triple> itTriples );
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfPageRequestsIssued = 0;
+	}
+
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfPageRequestsIssued",  Integer.valueOf(numberOfPageRequestsIssued) );
+		return s;
+	}
 }

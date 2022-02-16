@@ -16,8 +16,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-import java.util.Set;
-
 /**
  * Abstract base class to implement bind joins by using request operators.
  *
@@ -40,9 +38,9 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 	@Override
-	public void process( final IntermediateResultBlock input,
-	                     final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt)
+	protected void _process( final IntermediateResultBlock input,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt)
 			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings() );

@@ -14,7 +14,7 @@ public class ExecutionEngineImpl implements ExecutionEngine
 	{
 		plan.run(resultSink);
 
-		return new ExecutionStatsImpl();
+		return new ExecutionStatsImpl( plan.getStats() );
 	}
 
 }

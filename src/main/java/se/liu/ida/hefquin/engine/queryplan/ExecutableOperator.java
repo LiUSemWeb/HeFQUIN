@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan;
 
-public interface ExecutableOperator
+import se.liu.ida.hefquin.engine.utils.StatsProvider;
+
+public interface ExecutableOperator extends StatsProvider
 {
 	/**
 	 * Returns the preferred block size of input blocks
@@ -10,4 +12,7 @@ public interface ExecutableOperator
 	 * hint but it does not have to use it.
 	 */
 	int preferredInputBlockSize();
+
+	@Override
+	ExecutableOperatorStats getStats();
 }

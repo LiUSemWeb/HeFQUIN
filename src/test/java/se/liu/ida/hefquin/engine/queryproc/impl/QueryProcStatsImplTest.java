@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionStatsImpl;
@@ -13,7 +14,8 @@ public class QueryProcStatsImplTest
 	@Test
 	public void test() {
 		final QueryPlanningStats ps = null;
-		final ExecutionStats es = new ExecutionStatsImpl();
+		final ExecutablePlanStats planStats = null;
+		final ExecutionStats es = new ExecutionStatsImpl(planStats);
 
 		final QueryProcStatsImpl s = new QueryProcStatsImpl(4L, 1L, 1L, 2L, ps, es);
 		s.put( "additionalEntry", Integer.valueOf(42) );

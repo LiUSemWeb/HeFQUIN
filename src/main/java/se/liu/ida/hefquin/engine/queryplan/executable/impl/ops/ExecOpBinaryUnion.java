@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpBinaryUnion implements BinaryExecutableOp{
+public class ExecOpBinaryUnion extends BinaryExecutableOpBase {
 
 	@Override
 	public int preferredInputBlockSize() {
@@ -21,26 +21,30 @@ public class ExecOpBinaryUnion implements BinaryExecutableOp{
 	}
 
 	@Override
-	public void processBlockFromChild1(final IntermediateResultBlock input, final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) {
+	protected void _processBlockFromChild1( final IntermediateResultBlock input,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
 		for (final SolutionMapping sm : input.getSolutionMappings())
 			sink.send(sm);
 	}
 
 	@Override
-	public void wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
+	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
 	}
 
 	@Override
-	public void processBlockFromChild2(final IntermediateResultBlock input, final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) {
+	protected void _processBlockFromChild2( final IntermediateResultBlock input,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
 		for (final SolutionMapping sm : input.getSolutionMappings())
 			sink.send(sm);
 	}
 
 	@Override
-	public void wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+	protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
+	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
 	}
 

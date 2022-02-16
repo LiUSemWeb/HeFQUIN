@@ -9,7 +9,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
+public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
+{
     protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
     @Override
@@ -26,19 +27,19 @@ public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         for ( final SolutionMapping sm : input.getSolutionMappings() ){
             inputLHS.add(sm);
         }
     }
 
     @Override
-    public void wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         // nothing to be done here
     }
 
     @Override
-    public void processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         for ( final SolutionMapping smR : input.getSolutionMappings() ) {
             for ( final SolutionMapping smL : inputLHS ) {
                 if ( SolutionMappingUtils.compatible(smL,smR) ) {
@@ -49,7 +50,7 @@ public class ExecOpNaiveNestedLoopsJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         // nothing to be done here
     }
 }

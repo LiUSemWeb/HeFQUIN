@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
+import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -28,6 +29,14 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 		return opRunnerThread.getOp();
 	}
 
+	public ExecutablePlanStats tryGetStatsOfInput1() {
+		return ResultIteratorUtils.tryGetStatsOfProducingSubPlan( opRunnerThread.getInput1() );
+	}
+
+	public ExecutablePlanStats tryGetStatsOfInput2() {
+		return ResultIteratorUtils.tryGetStatsOfProducingSubPlan( opRunnerThread.getInput2() );
+	}
+
 	@Override
 	protected OpRunnerThread getOpRunnerThread() {
 		return opRunnerThread;
@@ -50,9 +59,11 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 		}
 
 		@Override
-		public BinaryExecutableOp getOp() {
-			return op;
-		}
+		public BinaryExecutableOp getOp() { return op; }
+
+		public ResultBlockIterator getInput1() { return inputIter1; }
+
+		public ResultBlockIterator getInput2() { return inputIter2; }
 
 		@Override
 		protected void _run() throws ExecutionException {

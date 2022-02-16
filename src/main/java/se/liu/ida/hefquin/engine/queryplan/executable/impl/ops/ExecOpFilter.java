@@ -1,15 +1,13 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpFilter implements UnaryExecutableOp
+public class ExecOpFilter extends UnaryExecutableOpBase
 {
 	protected final Expr filterExpression;
 
@@ -24,9 +22,9 @@ public class ExecOpFilter implements UnaryExecutableOp
 	}
 
 	@Override
-	public void process( final IntermediateResultBlock input,
-	                     final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	protected void _process( final IntermediateResultBlock input,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		// TODO Auto-generated method stub
 
 		// The idea of what you should implement here is as follows: For every
@@ -45,8 +43,8 @@ public class ExecOpFilter implements UnaryExecutableOp
 	}
 
 	@Override
-	public void concludeExecution( final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt ) {
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
 	}
 
