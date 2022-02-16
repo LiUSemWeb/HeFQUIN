@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.utils;
 
 import java.io.PrintStream;
+import java.util.List;
 
 public class StatsPrinter
 {
@@ -27,7 +28,10 @@ public class StatsPrinter
 			addTabs(out, indentLevel);
 			out.append(entryName + " : ");
 
-			if ( entry instanceof Stats ) {
+			if ( entry == null ) {
+				out.append( "null" );
+			}
+			else if ( entry instanceof Stats ) {
 				final Stats ss = (Stats) entry;
 				if ( ss.isEmpty() ) {
 					out.append( "{ }" );
@@ -42,8 +46,33 @@ public class StatsPrinter
 					out.append( "}" );
 				}
 			}
-			else if ( entry == null) {
-				out.append( "null" );
+			else if ( entry instanceof List<?> ) {
+				final List<?> list = (List<?>) entry;
+				if ( list.isEmpty() ) {
+					out.append( "[ ]" );
+				}
+				else if ( list.get(0) instanceof Stats ) {
+					if ( ! recursive ) {
+						out.append( "[ ... ]" );
+					}
+					else {
+						out.append( "[" + System.lineSeparator() );
+						for ( final Object o : list ) {
+							addTabs(out, indentLevel+1);
+							out.append( "{" + System.lineSeparator() );
+
+							print( (Stats) o, out, recursive, indentLevel+2 );
+
+							addTabs(out, indentLevel+1);
+							out.append( "}" + System.lineSeparator() );
+						}
+						addTabs(out, indentLevel);
+						out.append( "]" );
+					}
+				}
+				else {
+					out.append( list.toString() );
+				}
 			}
 			else {
 				out.append( entry.toString() );
