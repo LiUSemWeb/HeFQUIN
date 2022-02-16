@@ -20,6 +20,7 @@ import org.apache.jena.sparql.engine.binding.BindingBuilder;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
@@ -143,8 +144,11 @@ public abstract class EngineTestBase
 		
 	}
 
-	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	//TODO: These changes should not be in test, could not find implementation in main?
+	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint //which extends FederationMember
 	{
+		private VocabularyMapping vMapping = null;
+	
 		final SPARQLEndpointInterface iface;
 
 		public SPARQLEndpointForTest() { this("http://example.org/sparql", null); }
@@ -157,6 +161,15 @@ public abstract class EngineTestBase
 			super(data);
 			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
 		}
+		
+		/**
+		TODO: How do I create this constructor? 
+		
+		public SPARQLEndpointForTest(VocabularyMapping vm) {
+			vMapping = vm;
+		}
+		
+		**/
 
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
@@ -172,6 +185,11 @@ public abstract class EngineTestBase
 				result = getSolutions(req.getQueryPattern());
 			}
 			return new SolMapsResponseImpl( result, this, req, new Date() );
+		}
+		
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return vMapping;
 		}
 
 	}
