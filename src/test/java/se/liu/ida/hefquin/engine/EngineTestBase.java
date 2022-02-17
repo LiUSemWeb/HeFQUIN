@@ -144,10 +144,9 @@ public abstract class EngineTestBase
 		
 	}
 
-	//TODO: These changes should not be in test, could not find implementation in main?
-	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint //which extends FederationMember
+	
+	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
-		private VocabularyMapping vMapping = null;
 	
 		final SPARQLEndpointInterface iface;
 
@@ -162,14 +161,6 @@ public abstract class EngineTestBase
 			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
 		}
 		
-		/**
-		TODO: How do I create this constructor? 
-		
-		public SPARQLEndpointForTest(VocabularyMapping vm) {
-			vMapping = vm;
-		}
-		
-		**/
 
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
@@ -189,7 +180,7 @@ public abstract class EngineTestBase
 		
 		@Override
 		public VocabularyMapping getVocabularyMapping() {
-			return vMapping;
+			return null;
 		}
 
 	}
