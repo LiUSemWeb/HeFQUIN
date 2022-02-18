@@ -131,15 +131,21 @@ public abstract class BinaryExecutableOpBase implements BinaryExecutableOp
 		s.put( "leftInputConsumed",              Boolean.valueOf(leftInputConsumed) );
 		s.put( "rightInputConsumed",             Boolean.valueOf(rightInputConsumed) );
 
+		final double avgProcTimeLeft = (numberOfLeftInputBlocksProcessed==0)
+				? 0 : sumOfLeftProcessingTimes/numberOfLeftInputBlocksProcessed;
+
 		s.put( "numberOfLeftInputBlocksProcessed",    Integer.valueOf(numberOfLeftInputBlocksProcessed) );
 		s.put( "numberOfLeftInputMappingsProcessed",  Long.valueOf(numberOfLeftInputMappingsProcessed) );
-		s.put( "averageProcTimePerLeftInputBlock",    Double.valueOf(sumOfLeftProcessingTimes/numberOfLeftInputBlocksProcessed) );
+		s.put( "averageProcTimePerLeftInputBlock",    Double.valueOf(avgProcTimeLeft) );
 		s.put( "minimumProcTimePerLeftInputBlock",    Long.valueOf(minLeftProcessingTime) );
 		s.put( "maximumProcTimePerLeftInputBlock",    Long.valueOf(maxLeftProcessingTime) );
 
+		final double avgProcTimeRight = (numberOfRightInputBlocksProcessed==0)
+				? 0 : sumOfRightProcessingTimes/numberOfRightInputBlocksProcessed;
+
 		s.put( "numberOfRightInputBlocksProcessed",    Integer.valueOf(numberOfRightInputBlocksProcessed) );
 		s.put( "numberOfRightInputMappingsProcessed",  Long.valueOf(numberOfRightInputMappingsProcessed) );
-		s.put( "averageProcTimePerRightInputBlock",    Double.valueOf(sumOfRightProcessingTimes/numberOfRightInputBlocksProcessed) );
+		s.put( "averageProcTimePerRightInputBlock",    Double.valueOf(avgProcTimeRight) );
 		s.put( "minimumProcTimePerRightInputBlock",    Long.valueOf(minRightProcessingTime) );
 		s.put( "maximumProcTimePerRightInputBlock",    Long.valueOf(maxRightProcessingTime) );
 		return s;

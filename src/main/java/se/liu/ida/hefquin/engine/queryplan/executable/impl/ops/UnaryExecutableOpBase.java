@@ -73,10 +73,14 @@ public abstract class UnaryExecutableOpBase implements UnaryExecutableOp
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
+
+		final double avgProcTime = (numberOfInputBlocksProcessed==0)
+				? 0 : sumOfProcessingTimes/numberOfInputBlocksProcessed;
+
 		s.put( "executionConcluded",              Boolean.valueOf(executionConcluded) );
 		s.put( "numberOfInputBlocksProcessed",    Integer.valueOf(numberOfInputBlocksProcessed) );
 		s.put( "numberOfInputMappingsProcessed",  Long.valueOf(numberOfInputMappingsProcessed) );
-		s.put( "averageProcTimePerInputBlock",    Double.valueOf(sumOfProcessingTimes/numberOfInputBlocksProcessed) );
+		s.put( "averageProcTimePerInputBlock",    Double.valueOf(avgProcTime) );
 		s.put( "minimumProcTimePerInputBlock",    Long.valueOf(minProcessingTime) );
 		s.put( "maximumProcTimePerInputBlock",    Long.valueOf(maxProcessingTime) );
 		return s;
