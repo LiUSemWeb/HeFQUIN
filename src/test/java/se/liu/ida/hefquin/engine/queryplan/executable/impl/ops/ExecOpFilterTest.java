@@ -42,15 +42,19 @@ public class ExecOpFilterTest
 
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
-		final Node uri1 = NodeFactory.createURI("http://example.org/x1");
-		final Node uri2 = NodeFactory.createURI("http://example.org/x2");
+		final Var var3 = Var.alloc("v3");
+		final Node uri1 = NodeFactory.createURI("http://example.org/uri1");
+		final Node uri2 = NodeFactory.createURI("http://example.org/uri2");
+		final Node uri3 = NodeFactory.createURI("http://example.org/uri3");
 		
 		final SolutionMapping sol1 = SolutionMappingUtils.createSolutionMapping(var1, uri1, var2, uri2);
+		final SolutionMapping sol2 = SolutionMappingUtils.createSolutionMapping(var3, uri3);
 		
 		//resultBlock.add(mapping8);
 		//resultBlock.add(mapping12);
 		
 		resultBlock.add(sol1);
+		resultBlock.add(sol2);
 		
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10);
 		try {
