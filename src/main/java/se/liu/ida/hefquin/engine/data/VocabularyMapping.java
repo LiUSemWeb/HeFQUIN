@@ -1,7 +1,9 @@
 package se.liu.ida.hefquin.engine.data;
 
 import java.util.Set;
-import org.apache.jena.reasoner.TriplePattern;
+
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 
 public interface VocabularyMapping {
@@ -14,12 +16,5 @@ public interface VocabularyMapping {
 	 * function is a singleton set that simply contains the given triple
 	 * pattern.
 	 */
-	
-	/**
-	 * TODO: Is TripplePattern enough? Which data structure to use?
-	 * Unions and intersections also need to be represented
-	 * Would Graph be a fitting? Both Jena union and intersection are graphs
-	 */
-		
-	Set<TriplePattern> translateTriple( TriplePattern tp );
+	Set<SPARQLGraphPattern> translateTriplePattern( TriplePattern tp );
 }
