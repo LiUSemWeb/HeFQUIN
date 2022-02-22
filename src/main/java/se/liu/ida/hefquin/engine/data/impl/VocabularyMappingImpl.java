@@ -36,7 +36,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	}
 
 	@Override
-	public Set<SPARQLGraphPattern> translateTriplePattern(final TriplePattern tp) {
+	public SPARQLGraphPattern translateTriplePattern(final TriplePattern tp) {
 		return null;
 	}
 	
