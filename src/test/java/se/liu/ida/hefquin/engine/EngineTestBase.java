@@ -143,7 +143,6 @@ public abstract class EngineTestBase
 		}
 		
 	}
-	
 	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
 		final SPARQLEndpointInterface iface;
@@ -157,7 +156,7 @@ public abstract class EngineTestBase
 		public SPARQLEndpointForTest( final String ifaceURL, final Graph data ) {
 			super(data);
 			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
-		}		
+		}
 
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
