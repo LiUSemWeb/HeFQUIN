@@ -20,11 +20,13 @@ import org.apache.jena.sparql.engine.binding.BindingBuilder;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
@@ -83,6 +85,11 @@ public abstract class EngineTestBase
 		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
 		return new TPFServer() {
 			@Override public TPFInterface getInterface() { return tpfServerIface; }
+
+			@Override
+			public VocabularyMapping getVocabularyMapping() {
+				return null;
+			}
 		};
 	}
 
@@ -142,7 +149,6 @@ public abstract class EngineTestBase
 		}
 		
 	}
-
 	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
 		final SPARQLEndpointInterface iface;
@@ -173,6 +179,11 @@ public abstract class EngineTestBase
 			}
 			return new SolMapsResponseImpl( result, this, req, new Date() );
 		}
+		
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
 
 	}
 
@@ -190,6 +201,10 @@ public abstract class EngineTestBase
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
 		}
 	}
 
@@ -241,6 +256,25 @@ public abstract class EngineTestBase
 				}
 			}
 			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+	}
+
+	protected static class Neo4jServerImpl4Test implements Neo4jServer {
+
+		public Neo4jServerImpl4Test() {}
+
+		@Override
+		public Neo4jInterface getInterface() {
+			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+		}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
 		}
 	}
 

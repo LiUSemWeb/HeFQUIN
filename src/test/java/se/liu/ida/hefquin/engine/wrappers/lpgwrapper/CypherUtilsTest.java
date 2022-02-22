@@ -3,11 +3,9 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.federation.access.RecordsResponse;
+import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
@@ -40,7 +38,7 @@ public class CypherUtilsTest extends EngineTestBase {
             final String cypherQuery = "MATCH (x)-[e:ACTED_IN]->(y) RETURN x, e, y LIMIT 2";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
-            final Neo4jServer fm = () -> new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+            final Neo4jServer fm = new Neo4jServerImpl4Test();
 
             final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 
@@ -78,7 +76,7 @@ public class CypherUtilsTest extends EngineTestBase {
             final String cypherQuery = "RETURN 2 AS a, [1, 2, 3] AS b, {x:1, y:2} AS c";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
-            final Neo4jServer fm = () -> new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+            final Neo4jServer fm = new Neo4jServerImpl4Test();
 
             final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 
