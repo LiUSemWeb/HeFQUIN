@@ -26,6 +26,7 @@ import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
@@ -256,6 +257,21 @@ public abstract class EngineTestBase
 			}
 			return new TPFResponseForTest(result, this, req);
 		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+	}
+
+	protected static class Neo4jServerImpl4Test implements Neo4jServer {
+
+		public Neo4jServerImpl4Test() {}
+
+		@Override
+		public Neo4jInterface getInterface() {
+			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+		}
+
 		@Override
 		public VocabularyMapping getVocabularyMapping() {
 			return null;
