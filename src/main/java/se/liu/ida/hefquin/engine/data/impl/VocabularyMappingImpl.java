@@ -48,7 +48,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		return null;
 	}
 	
-	protected Set<SPARQLGraphPattern> translatePredicate(final TriplePattern tp){
+	protected SPARQLGraphPattern translatePredicate(final TriplePattern tp){
 		return null;
 	}
 	
