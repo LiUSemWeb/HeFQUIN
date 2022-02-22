@@ -6,5 +6,4 @@ public interface SPARQLEndpoint extends FederationMember
 {
 	@Override
 	SPARQLEndpointInterface getInterface();
-	
 }
