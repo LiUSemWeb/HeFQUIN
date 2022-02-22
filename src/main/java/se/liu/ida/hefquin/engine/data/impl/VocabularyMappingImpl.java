@@ -26,12 +26,12 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		vocabularyMapping = RDFDataMgr.loadModel(rdfFile); //.nt file for N-Triple
 	}
 	
-	public VocabularyMappingImpl(final Set<Triple> tps) {
+	public VocabularyMappingImpl(final Set<Triple> triples) {
 		vocabularyMapping = ModelFactory.createDefaultModel();
-		Iterator<Triple> i = tps.iterator();
+		final Iterator<Triple> i = triples.iterator();
 		while(i.hasNext()) {
-			Triple tp = i.next();
-			vocabularyMapping.asStatement(tp.asJenaTriple());
+			final Triple t = i.next();
+			vocabularyMapping.asStatement(t.asJenaTriple());
 		}
 	}
 
