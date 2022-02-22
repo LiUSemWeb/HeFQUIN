@@ -1,24 +1,25 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.junit.Test;
 
-/*
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-*/
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.TestUtils;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.TestUtils.SolutionMappingForTests;
 
 public class ExecOpFilterTest
 {
@@ -28,33 +29,16 @@ public class ExecOpFilterTest
 		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
-		// Lacks support for binding, produces an error when processing.
-		/*
-		final SolutionMappingForTests mapping8 = new SolutionMappingForTests("?x -> 8");
-		final SolutionMappingForTests mapping12 = new SolutionMappingForTests("?x -> 12");
-		*/
+		final Node value8 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
+		final Node value12 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
+		final Var x8 = Var.alloc("x");
+		final Var x12 = Var.alloc("x");
 		
-		// Going to be looking more into how bindings are made, bindingbuilder, bindingfactory, etc.
-		/*
-		final SolutionMappingImpl mapping8 = new SolutionMappingImpl("?x -> 8");
-		final SolutionMappingImpl mapping12 = new SolutionMappingImpl("?x -> 12");
-		*/
-
-		final Var var1 = Var.alloc("v1");
-		final Var var2 = Var.alloc("v2");
-		final Var var3 = Var.alloc("v3");
-		final Node uri1 = NodeFactory.createURI("http://example.org/uri1");
-		final Node uri2 = NodeFactory.createURI("http://example.org/uri2");
-		final Node uri3 = NodeFactory.createURI("http://example.org/uri3");
+		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x8, value8);
+		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x12, value12);
 		
-		final SolutionMapping sol1 = SolutionMappingUtils.createSolutionMapping(var1, uri1, var2, uri2);
-		final SolutionMapping sol2 = SolutionMappingUtils.createSolutionMapping(var3, uri3);
-		
-		//resultBlock.add(mapping8);
-		//resultBlock.add(mapping12);
-		
-		resultBlock.add(sol1);
-		resultBlock.add(sol2);
+		resultBlock.add(sol8);
+		resultBlock.add(sol12);
 		
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10);
 		try {
@@ -62,16 +46,25 @@ public class ExecOpFilterTest
 		} catch (ExecOpExecutionException e) {
 			e.printStackTrace();
 		}
-		/*
-		assertThat(resultBlock.getSolutionMappings(), contains (
-				hasProperty("string", is("?x -> 8"))
-				));
-			*/	
+
+		final Iterator<SolutionMapping> it = resultBlock.getSolutionMappings().iterator();
+		assertHasNext( it, 8, x8);
 	}
 
 	@Test
 	public void test2_RenameTheseTestMethodsToSomethingThatDescribesTheirPurpose() {
 		
+	}
+	
+	protected void assertHasNext( final Iterator<SolutionMapping> it,
+								  final int expectedIntforV1, final Var v1 )
+	{
+		assertTrue( it.hasNext() );
+		
+		final Binding b = it.next().asJenaBinding();
+		assertEquals(1, b.size() );
+		
+		assertEquals( expectedIntforV1, b.get(v1).getLiteralValue() );
 	}
 
 	protected static class FilterTestSink implements IntermediateResultElementSink

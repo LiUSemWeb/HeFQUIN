@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.expr.VariableNotBoundException;
 import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -33,12 +34,16 @@ public class ExecOpFilter implements UnaryExecutableOp
 		// For every solution mapping in the input...
 		for(SolutionMapping solution : input.getSolutionMappings()) {
 			//Check whether it satisfies the filter expression
-			final NodeValue evaluationResult = ExprUtils.eval(filterExpression, solution.asJenaBinding());
-			if(evaluationResult == NodeValue.TRUE) { // Temporary. Need to look more into the nodevalue and expr.
-				//push it to the output sink.
-				sink.send(solution);
-			} else if (evaluationResult != NodeValue.FALSE ) {
-				throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
+			
+			try {
+				final NodeValue evaluationResult = ExprUtils.eval(filterExpression, solution.asJenaBinding());
+				if(evaluationResult == NodeValue.TRUE) {
+					sink.send(solution);
+				} else if (evaluationResult != NodeValue.FALSE ) {
+					throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
+				}
+			} catch (VariableNotBoundException e) {
+				throw new ExecOpExecutionException("A variable name in the binding does not match the variable names in the filter.", null);
 			}
 			
 		}
