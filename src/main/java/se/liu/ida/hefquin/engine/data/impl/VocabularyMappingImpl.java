@@ -52,7 +52,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		return null;
 	}
 	
-	protected Set<Triple> getMappings(TriplePattern tp){
+	protected Set<Triple> getMappings(final TriplePattern tp){
 		return null;
 	}
 
