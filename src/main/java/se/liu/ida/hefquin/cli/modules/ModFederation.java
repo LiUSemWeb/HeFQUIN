@@ -10,6 +10,8 @@ import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
+
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
@@ -58,6 +60,11 @@ public class ModFederation extends ModBase
 		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl(sparqlEndpointValue);
 		final SPARQLEndpoint fm = new SPARQLEndpoint() {
 			@Override public SPARQLEndpointInterface getInterface() { return iface; }
+
+			@Override
+			public VocabularyMapping getVocabularyMapping() {
+				return null;
+			}
 		};
 		membersByURI.put(sparqlEndpointValue, fm);
 	}

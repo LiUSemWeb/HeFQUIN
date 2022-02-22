@@ -84,6 +84,11 @@ public abstract class EngineTestBase
 		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
 		return new TPFServer() {
 			@Override public TPFInterface getInterface() { return tpfServerIface; }
+
+			@Override
+			public VocabularyMapping getVocabularyMapping() {
+				return null;
+			}
 		};
 	}
 
@@ -196,6 +201,10 @@ public abstract class EngineTestBase
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
 		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
 	}
 
 
@@ -246,6 +255,10 @@ public abstract class EngineTestBase
 				}
 			}
 			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
 		}
 	}
 

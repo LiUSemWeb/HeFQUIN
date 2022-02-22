@@ -3,9 +3,11 @@ package se.liu.ida.hefquin.engine.data.impl;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
@@ -27,12 +29,13 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	}
 	
 	public VocabularyMappingImpl(final Set<Triple> triples) {
-		vocabularyMapping = ModelFactory.createDefaultModel();
+		Graph vocabularyGraph = GraphFactory.createDefaultGraph();
 		final Iterator<Triple> i = triples.iterator();
 		while(i.hasNext()) {
 			final Triple t = i.next();
-			vocabularyMapping.asStatement(t.asJenaTriple());
+			vocabularyGraph.add(t.asJenaTriple());
 		}
+		vocabularyMapping = ModelFactory.createModelForGraph(vocabularyGraph);
 	}
 
 	@Override
