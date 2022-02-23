@@ -85,7 +85,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 				 * The results would be an intersection between the new BGP and union? Not a Union of the two
 				 */
 				List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
-				Iterator<? extends TriplePattern> m = ((BGP) m).getTriplePatterns().iterator();
+				Iterator<? extends TriplePattern> m = ((BGP) j).getTriplePatterns().iterator();
 				while(m.hasNext()) {
 					unionList.add(translatePredicate(m.next()));
 				}
