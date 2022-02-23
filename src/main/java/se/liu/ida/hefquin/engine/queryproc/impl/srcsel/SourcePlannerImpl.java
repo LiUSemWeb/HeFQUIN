@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -130,7 +130,7 @@ public class SourcePlannerImpl implements SourcePlanner
 				return createPlanForBGP( (OpBGP) jenaOp, fm );
 			}
 			else {
-				final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(jenaOp) );
+				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp) );
 				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
 				return new LogicalPlanWithNullaryRootImpl(op);
 			}
