@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -14,6 +15,9 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
@@ -103,7 +107,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		Iterator<Triple> i = mappings.iterator();
 		while (i.hasNext()) {
 			org.apache.jena.graph.Triple m = i.next().asJenaTriple();
-			if (m.getPredicate().toString() == "owl:sameAs") {
+			if (m.getPredicate().getURI().equals(OWL.sameAs.getURI())) {
 				TriplePattern translation = new TriplePatternImpl(m.getObject(), t.getPredicate(), t.getObject());
 				results.add(translation);
 			}
@@ -114,7 +118,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	//Used to return SPARQLGraphPattern
 	protected Element translateObject(final TriplePattern tp){
 		org.apache.jena.graph.Triple t = tp.asJenaTriple();
-		if(t.getObject().isVariable() || !t.getPredicate().getName().equals("rdfs:type")) {
+		if(t.getObject().isVariable() || !t.getPredicate().getName().equals(RDF.type.getURI())) {
 			ElementTriplesBlock e = new ElementTriplesBlock();
 			e.addTriple(t);
 			return e;
@@ -127,17 +131,17 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		ElementUnion results = new ElementUnion();
 		while (i.hasNext()) {
 			org.apache.jena.graph.Triple m = i.next().asJenaTriple();
-			String predicate = m.getPredicate().toString();
-			if (predicate.equals("owl:sameAs") || predicate.equals("rdfs:subclassof") || predicate.equals("owl:equivalentclass")) {
+			String predicate = m.getPredicate().getURI();
+			if (predicate.equals(OWL.sameAs.getURI()) || predicate.equals(RDFS.subClassOf.getURI()) || predicate.equals(OWL.equivalentClass.getURI())) {
 				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.getObject()).asJenaTriple();
 				ElementTriplesBlock block = new ElementTriplesBlock();
 				block.addTriple(translation);
 				results.addElement(block);
-			} else if (predicate.equals("owl:unionOf")){
+			} else if (predicate.equals(OWL.unionOf.getURI())){
 				ElementUnion union = new ElementUnion();
 				//TODO: How are the union represented as triples
 				results.addElement(union);
-			} else if (predicate.equals("owl:intersectionOf")) {
+			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
 				ElementTriplesBlock block = new ElementTriplesBlock();
 				//TODO: How are the intersections represented as triples
 				results.addElement(block);
@@ -166,22 +170,22 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		ElementUnion results = new ElementUnion();
 		while (i.hasNext()) {
 			org.apache.jena.graph.Triple m = i.next().asJenaTriple();
-			String predicate = m.getPredicate().toString();
-			if (predicate.equals("owl:equivalentProperty") || predicate.equals("rdfs:subPropertyOf")) {
+			String predicate = m.getPredicate().getURI();
+			if (predicate.equals(OWL.equivalentProperty.getURI()) || predicate.equals(RDFS.subPropertyOf.getURI())) {
 				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getSubject(), m.getObject(), t.getObject()).asJenaTriple();
 				ElementTriplesBlock block = new ElementTriplesBlock();
 				block.addTriple(translation);
 				results.addElement(block);
-			} else if (predicate.equals("owl:inverseOf")){
+			} else if (predicate.equals(OWL.inverseOf.getURI())){
 				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getObject(), m.getObject(), t.getSubject()).asJenaTriple();
 				ElementTriplesBlock block = new ElementTriplesBlock();
 				block.addTriple(translation);
 				results.addElement(block);	
-			}else if (predicate.equals("owl:unionOf")){
+			}else if (predicate.equals(OWL.unionOf.getURI())){
 				ElementUnion union = new ElementUnion();
 				//TODO: How are the union represented as triples
 				results.addElement(union);
-			} else if (predicate.equals("owl:intersectionOf")) {
+			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
 				ElementTriplesBlock block = new ElementTriplesBlock();
 				//TODO: How are the intersections represented as triples
 				results.addElement(block);
