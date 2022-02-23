@@ -2,28 +2,26 @@ package se.liu.ida.hefquin.engine.data.impl;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.graph.GraphFactory;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
 public class VocabularyMappingImpl implements VocabularyMapping{
@@ -52,39 +50,60 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	}
 
 	@Override
-	//source: https://jena.apache.org/documentation/query/manipulating_sparql_using_arq.html
 	public SPARQLGraphPattern translateTriplePattern(final TriplePattern tp) {
-		//Triples -> ElementTriplesBlock or ElementUnion -> ElementGroup -> SPARQLGraphPattern
 		Set<TriplePattern> subjectTranslation = translateSubject(tp);
 		Iterator<TriplePattern> i = subjectTranslation.iterator();
-		ElementUnion objectTranslation = new ElementUnion();
+		List<SPARQLGraphPattern> objectTranslation = Collections.<SPARQLGraphPattern>emptyList();
 		while(i.hasNext()) {
 			TriplePattern tpNext = i.next();
-			//How do I loop through the resulting triples if this is a SPARQLGraphPattern?
-			objectTranslation.addElement(translateObject(tpNext));
+			objectTranslation.add(translateObject(tpNext));
 		}
-		ElementUnion finalTranslation = new ElementUnion();
-		for(Element j : objectTranslation.getElements()) {
-			if(j instanceof ElementUnion) {  //TODO: Check if I need one more "depth" of union
-				ElementUnion predicateTranslation = new ElementUnion();
-				for(Element k: ((ElementGroup) j).getElements()) {
-					Iterator<org.apache.jena.graph.Triple> l = ((ElementTriplesBlock) k).patternElts();
-					while(l.hasNext()) {
-						TriplePattern ltp = new TriplePatternImpl(l.next());
-						predicateTranslation.addElement(translatePredicate(ltp));
+		List<SPARQLGraphPattern> predicateTranslation = Collections.<SPARQLGraphPattern>emptyList();
+		for(SPARQLGraphPattern j : objectTranslation) {
+			
+			if(j instanceof SPARQLUnionPattern) { 
+				List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
+				for(SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {
+					if(k instanceof TriplePattern) {
+						unionList.add(translatePredicate((TriplePattern) k));
+					} else if (k instanceof BGP) {
+						// Iterator<TriplePattern> l = ((BGP)k).getTriplePatterns().iterator(); Does not work need to be:
+						Iterator<? extends TriplePattern> l = ((BGP) k).getTriplePatterns().iterator(); //why?
+						while(l.hasNext()) {
+							unionList.add(translatePredicate(l.next()));
+						}
 					}
 				}
-				finalTranslation.addElement(predicateTranslation);
-			} else if (j instanceof ElementTriplesBlock) {
-				Iterator<org.apache.jena.graph.Triple> m = ((ElementTriplesBlock) j).patternElts();
+				SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
+				predicateTranslation.add(union);
+				
+			} else if (j instanceof BGP) { 
+				/**
+				 * TODO: This should be able to create an intersection, BGP, between a set of triples and a union.
+				 * How can this be done?
+				 * For example if one of the triples of the BGP translate to a new BGP and one to a union 
+				 * The results would be an intersection between the new BGP and union? Not a Union of the two
+				 */
+				List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
+				Iterator<? extends TriplePattern> m = ((BGP) m).getTriplePatterns().iterator();
 				while(m.hasNext()) {
-					TriplePattern mtp = new TriplePatternImpl(m.next());
-					finalTranslation.addElement(translatePredicate(mtp));
+					unionList.add(translatePredicate(m.next()));
 				}
+				SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
+				predicateTranslation.add(union);
+				
+			} else if (j instanceof TriplePattern) {
+				predicateTranslation.add(translatePredicate((TriplePattern) j));
 			}
+			
 		}
-		SPARQLGraphPattern translation = new SPARQLGraphPatternImpl(finalTranslation);
-		return translation;
+		
+		if(predicateTranslation.size() > 1) {
+			SPARQLUnionPattern translation = new SPARQLUnionPatternImpl(predicateTranslation);
+			return translation;
+		} else {
+			return predicateTranslation.get(0);
+		}
 	}
 	
 	protected Set<TriplePattern> translateSubject(final TriplePattern tp){
@@ -115,86 +134,129 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		return results;
 	}
 	
-	//Used to return SPARQLGraphPattern
-	protected Element translateObject(final TriplePattern tp){
+	protected SPARQLGraphPattern translateObject(final TriplePattern tp){
 		org.apache.jena.graph.Triple t = tp.asJenaTriple();
-		if(t.getObject().isVariable() || !t.getPredicate().getName().equals(RDF.type.getURI())) {
-			ElementTriplesBlock e = new ElementTriplesBlock();
-			e.addTriple(t);
-			return e;
+		if(t.getObject().isVariable() || !t.getPredicate().getURI().equals(RDF.type.getURI())) {
+			return tp;
 		}
 		Node p = NodeFactory.createVariable("p");
 		Node o = NodeFactory.createVariable("o");
 		TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);
 		Set<Triple> mappings = getMappings(tpQuery);
 		Iterator<Triple> i = mappings.iterator();
-		ElementUnion results = new ElementUnion();
+		
+		List<SPARQLGraphPattern> resultsList = Collections.<SPARQLGraphPattern>emptyList();
 		while (i.hasNext()) {
 			org.apache.jena.graph.Triple m = i.next().asJenaTriple();
 			String predicate = m.getPredicate().getURI();
+			
 			if (predicate.equals(OWL.sameAs.getURI()) || predicate.equals(RDFS.subClassOf.getURI()) || predicate.equals(OWL.equivalentClass.getURI())) {
-				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.getObject()).asJenaTriple();
-				ElementTriplesBlock block = new ElementTriplesBlock();
-				block.addTriple(translation);
-				results.addElement(block);
+				TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.getObject());
+				resultsList.add(translation);
+				
 			} else if (predicate.equals(OWL.unionOf.getURI())){
-				ElementUnion union = new ElementUnion();
-				//TODO: How are the union represented as triples
-				results.addElement(union);
+				/**
+				 * TODO: How are the union represented as triples
+				 * = How to add multiple object to a triple, do I represent them with multiple triples?
+				 */
+				/** 
+				 * List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
+				 * for(i : m.getObject()){
+				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), i);
+				 * 		unionList.add(translation)
+				 * }
+				 * SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
+				 * results.add(union);
+				 */
+				
 			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
-				ElementTriplesBlock block = new ElementTriplesBlock();
-				//TODO: How are the intersections represented as triples
-				results.addElement(block);
+				/**
+				 * TODO: How are the union represented as triples
+				 * = How to add multiple object to a triple, do I represent them with multiple triples?
+				 */
+				/** 
+				 * List<TriplePattern> intersectionList = Collections.<TriplePattern>emptyList();
+				 * for(i : m.getObject()){
+				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), i);
+				 * 		intersectionList.add(translation)
+				 * }
+				 * BGP intersection = new BGPImpl(intersectionList);
+				 * results.add(intersection);
+				 */
 			}
 		}
-		if (results.getElements().size() > 1) {
+		
+		if (resultsList.size() > 1) {
+			SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
 			return results;	
 		} else {
-			return results.getElements().get(0);
+			return resultsList.get(0);
 		}
+		
 	}
 	
-	//Used to return SPARQLGraphPattern
-	protected Element translatePredicate(final TriplePattern tp){
+
+	protected SPARQLGraphPattern translatePredicate(final TriplePattern tp){
 		org.apache.jena.graph.Triple t = tp.asJenaTriple();
 		if(t.getPredicate().isVariable()) {
-			ElementTriplesBlock e = new ElementTriplesBlock();
-			e.addTriple(t);
-			return e;
+			return tp;
 		}
 		Node p = NodeFactory.createVariable("p");
 		Node o = NodeFactory.createVariable("o");
 		TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);
 		Set<Triple> mappings = getMappings(tpQuery);
 		Iterator<Triple> i = mappings.iterator();
-		ElementUnion results = new ElementUnion();
+		
+		List<SPARQLGraphPattern> resultsList = Collections.<SPARQLGraphPattern>emptyList();
 		while (i.hasNext()) {
 			org.apache.jena.graph.Triple m = i.next().asJenaTriple();
 			String predicate = m.getPredicate().getURI();
+			
 			if (predicate.equals(OWL.equivalentProperty.getURI()) || predicate.equals(RDFS.subPropertyOf.getURI())) {
-				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getSubject(), m.getObject(), t.getObject()).asJenaTriple();
-				ElementTriplesBlock block = new ElementTriplesBlock();
-				block.addTriple(translation);
-				results.addElement(block);
+				TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.getObject(), t.getObject());
+				resultsList.add(translation);
+				
 			} else if (predicate.equals(OWL.inverseOf.getURI())){
-				org.apache.jena.graph.Triple translation = new TriplePatternImpl(t.getObject(), m.getObject(), t.getSubject()).asJenaTriple();
-				ElementTriplesBlock block = new ElementTriplesBlock();
-				block.addTriple(translation);
-				results.addElement(block);	
+				TriplePattern translation = new TriplePatternImpl(t.getObject(), m.getObject(), t.getSubject());
+				resultsList.add(translation);	
+				
 			}else if (predicate.equals(OWL.unionOf.getURI())){
-				ElementUnion union = new ElementUnion();
-				//TODO: How are the union represented as triples
-				results.addElement(union);
+				/**
+				 * TODO: How are the union represented as triples
+				 * = How to add multiple object to a triple, do I represent them with multiple triples?
+				 */
+				/** 
+				 * List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
+				 * for(i : m.getObject()){
+				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), i, t.getObject());
+				 * 		unionList.add(translation)
+				 * }
+				 * SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
+				 * results.add(union);
+				 */
+				
 			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
-				ElementTriplesBlock block = new ElementTriplesBlock();
-				//TODO: How are the intersections represented as triples
-				results.addElement(block);
+				/**
+				 * TODO: How are the union represented as triples
+				 * = How to add multiple object to a triple, do I represent them with multiple triples?
+				 */
+				/** 
+				 * List<TriplePattern> intersectionList = Collections.<TriplePattern>emptyList();
+				 * for(i : m.getObject()){
+				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), i, t.getObject());
+				 * 		intersectionList.add(translation)
+				 * }
+				 * BGP intersection = new BGPImpl(intersectionList);
+				 * results.add(intersection);
+				 */
 			}
 		}
-		if (results.getElements().size() > 1) {
+		
+		if (resultsList.size() > 1) {
+			SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
 			return results;	
 		} else {
-			return results.getElements().get(0);
+			return resultsList.get(0);
 		}
 	}
 	
