@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -36,6 +37,8 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public abstract class EngineTestBase
 {
@@ -139,8 +142,21 @@ public abstract class EngineTestBase
 		}
 		
 		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern pattern ) {
+			final Op jenaOp;
+			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+				@SuppressWarnings("deprecation")
+				final Op o = ( (GenericSPARQLGraphPatternImpl1) pattern ).asJenaOp();
+				jenaOp = o;
+			}
+			else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+				jenaOp = ( (GenericSPARQLGraphPatternImpl2) pattern ).asJenaOp();
+			}
+			else {
+				throw new UnsupportedOperationException( pattern.getClass().getName() );
+			}
+
+			final QueryIterator qIter = Algebra.exec(jenaOp, data);
 			final List<SolutionMapping> results = new ArrayList<>();
-			final QueryIterator qIter = Algebra.exec(pattern.asJenaOp(), data);
 			while ( qIter.hasNext() ){
 				final Binding b = qIter.nextBinding() ;
 				results.add(new SolutionMappingImpl(b));
@@ -149,6 +165,7 @@ public abstract class EngineTestBase
 		}
 		
 	}
+
 	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
 		final SPARQLEndpointInterface iface;

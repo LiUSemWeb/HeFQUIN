@@ -3,8 +3,6 @@ package se.liu.ida.hefquin.engine.query.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.jena.sparql.algebra.Op;
-
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 
@@ -20,11 +18,6 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	public SPARQLUnionPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
 		assert subPatterns.length > 1;
 		this.subPatterns = Arrays.asList(subPatterns);
-	}
-
-	@Override
-	public Op asJenaOp() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

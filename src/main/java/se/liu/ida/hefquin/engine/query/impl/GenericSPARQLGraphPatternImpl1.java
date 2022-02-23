@@ -35,7 +35,11 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 		return jenaPatternElement;
 	}
 
-	@Override
+	/**
+	 * Avoid using this function because, when called, it compiles the
+	 * internal {@link Element} object into an {@link Op} object.
+	 */
+	@Deprecated
 	public Op asJenaOp() {
 		return Algebra.compile(jenaPatternElement);
 	}
