@@ -113,7 +113,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		}
 		
 		if(predicateTranslation.size() > 1) {
-			SPARQLUnionPattern translation = new SPARQLUnionPatternImpl(predicateTranslation);
+			final SPARQLUnionPattern translation = new SPARQLUnionPatternImpl(predicateTranslation);
 			return translation;
 		} else {
 			return predicateTranslation.get(0);
@@ -127,12 +127,12 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 			results.add(tp);
 			return results;
 		}
-		Node p = NodeFactory.createVariable("p");
-		Node o = NodeFactory.createVariable("o");
-		TriplePattern tpQuery = new TriplePatternImpl(t.getSubject(), p, o);
+		final Node p = NodeFactory.createVariable("p");
+		final Node o = NodeFactory.createVariable("o");
+		final TriplePattern tpQuery = new TriplePatternImpl(t.getSubject(), p, o);
 		for (final Triple m : getMappings(tpQuery)) {
 			if (m.asJenaTriple().getPredicate().getURI().equals(OWL.sameAs.getURI())) {
-				TriplePattern translation = new TriplePatternImpl(m.asJenaTriple().getObject(), t.getPredicate(), t.getObject());
+				final TriplePattern translation = new TriplePatternImpl(m.asJenaTriple().getObject(), t.getPredicate(), t.getObject());
 				results.add(translation);
 			} else {
 				throw new IllegalArgumentException(m.asJenaTriple().getPredicate().getURI());
@@ -146,9 +146,9 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		if(t.getObject().isVariable() || !t.getPredicate().getURI().equals(RDF.type.getURI())) {
 			return tp;
 		}
-		Node p = NodeFactory.createVariable("p");
-		Node o = NodeFactory.createVariable("o");
-		TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);		
+		final Node p = NodeFactory.createVariable("p");
+		final Node o = NodeFactory.createVariable("o");
+		final TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);		
 		List<SPARQLGraphPattern> resultsList = Collections.<SPARQLGraphPattern>emptyList();
 		for (final Triple m : getMappings(tpQuery)) {
 			String predicate = m.asJenaTriple().getPredicate().getURI();
@@ -160,7 +160,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 			**/
 			
 			if(predicate.equals(OWL.sameAs.getURI())) {
-				TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
+				final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
 				resultsList.add(translation);
 			} else if (predicate.equals(OWL.equivalentClass.getURI())) {
 				
@@ -172,9 +172,9 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 				 */
 				if (m.asJenaTriple().getObject().isBlank()) {
 					//Union or intersection
-					Node blankP = NodeFactory.createVariable("p");
-					Node blankO = NodeFactory.createVariable("o");
-					TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), blankP, blankO);
+					final Node newP = NodeFactory.createVariable("p");
+					final Node newO = NodeFactory.createVariable("o");
+					final TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), newP, newO);
 					String newPredicate = "";
 					List<Node> objects = Collections.emptyList();
 					for(final Triple i : getMappings(blankQuery)) {
@@ -192,7 +192,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					if (newPredicate.equals(OWL.unionOf.getURI())) {
 						SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
 						for(Node j : objects){
-							TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
+							final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
 							union.addSubPattern(translation);
 						}
 						resultsList.add(union);
@@ -200,10 +200,10 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
 						 Set<TriplePattern> intersectionList = Collections.emptySet();
 						 for(Node j : objects){
-						  	TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
+						  	final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
 						  	intersectionList.add(translation);
 						 }
-						 BGP intersection = new BGPImpl(intersectionList);
+						 final BGP intersection = new BGPImpl(intersectionList);
 						 resultsList.add(intersection); 
 						 
 					} else {
@@ -211,7 +211,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					}		
 					
 				} else {
-					TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
+					final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
 					resultsList.add(translation);	
 				}
 				
@@ -221,7 +221,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		}
 		
 		if (resultsList.size() > 1) {
-			SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
+			final SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
 			return results;	
 		} else {
 			return resultsList.get(0);
@@ -235,27 +235,27 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		if(t.getPredicate().isVariable()) {
 			return tp;
 		}
-		Node p = NodeFactory.createVariable("p");
-		Node o = NodeFactory.createVariable("o");
-		TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);
+		final Node p = NodeFactory.createVariable("p");
+		final Node o = NodeFactory.createVariable("o");
+		final TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);
 		List<SPARQLGraphPattern> resultsList = Collections.<SPARQLGraphPattern>emptyList();
 		for (final Triple m : getMappings(tpQuery)) {
 			String predicate = m.asJenaTriple().getPredicate().getURI();
 			
 			if (predicate.equals(RDFS.subPropertyOf.getURI())) {
-				TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
+				final TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
 				resultsList.add(translation);
 				
 			} else if (predicate.equals(OWL.inverseOf.getURI())){
-				TriplePattern translation = new TriplePatternImpl(t.getObject(), m.asJenaTriple().getObject(), t.getSubject());
+				final TriplePattern translation = new TriplePatternImpl(t.getObject(), m.asJenaTriple().getObject(), t.getSubject());
 				resultsList.add(translation);	
 				
 			} else if (predicate.equals(OWL.equivalentProperty.getURI())){
 				if (m.asJenaTriple().getObject().isBlank()) {
 					//Union or intersection
-					Node blankP = NodeFactory.createVariable("p");
-					Node blankO = NodeFactory.createVariable("o");
-					TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), blankP, blankO);
+					final Node newP = NodeFactory.createVariable("p");
+					final Node newO = NodeFactory.createVariable("o");
+					final TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), newP, newO);
 					String newPredicate = "";
 					List<Node> objects = Collections.emptyList();
 					for(final Triple i : getMappings(blankQuery)) {
@@ -273,7 +273,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					if (newPredicate.equals(OWL.unionOf.getURI())) {
 						SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
 						for(Node j : objects){
-							TriplePattern translation = new TriplePatternImpl(t.getSubject(), j, t.getObject());
+							final TriplePattern translation = new TriplePatternImpl(t.getSubject(), j, t.getObject());
 							union.addSubPattern(translation);
 						}
 						resultsList.add(union);
@@ -281,10 +281,10 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
 						 Set<TriplePattern> intersectionList = Collections.emptySet();
 						 for(Node j : objects){
-						  	TriplePattern translation = new TriplePatternImpl(t.getSubject(), j,  t.getObject());
+						  	final TriplePattern translation = new TriplePatternImpl(t.getSubject(), j,  t.getObject());
 						  	intersectionList.add(translation);
 						 }
-						 BGP intersection = new BGPImpl(intersectionList);
+						 final BGP intersection = new BGPImpl(intersectionList);
 						 resultsList.add(intersection); 
 						 
 					} else {
@@ -292,7 +292,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					}		
 					
 				} else {
-					TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
+					final TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
 					resultsList.add(translation);	
 				}
 				
@@ -302,7 +302,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		}
 		
 		if (resultsList.size() > 1) {
-			SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
+			final SPARQLUnionPattern results = new SPARQLUnionPatternImpl(resultsList);
 			return results;	
 		} else {
 			return resultsList.get(0);
@@ -313,7 +313,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		Set<Triple> mappings = Collections.emptySet();
 		final Iterator<org.apache.jena.graph.Triple> i = this.vocabularyMapping.find(tp.asJenaTriple());
 		while(i.hasNext()) {
-			Triple t = new TripleImpl(i.next());
+			final Triple t = new TripleImpl(i.next());
 			mappings.add(t);
 		}
 		return mappings;
