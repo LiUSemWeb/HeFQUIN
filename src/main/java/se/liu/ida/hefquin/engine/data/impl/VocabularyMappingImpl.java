@@ -21,6 +21,8 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
+import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
@@ -76,19 +78,33 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 				predicateTranslation.add(union);
 				
 			} else if (j instanceof BGP) { 
-				/**
-				 * TODO: This should be able to create an intersection, BGP, between a set of triples and a union.
-				 * How can this be done?
-				 * For example if one of the triples of the BGP translate to a new BGP and one to a union 
-				 * The results would be an intersection between the new BGP and union? Not a Union of the two
-				 */
-				List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();				
-				for( final TriplePattern m : ((BGP) j).getTriplePatterns()){
-					unionList.add(translatePredicate(m));
+				// try to create a BGP if possible (which is the case if all
+				// the graph patterns resulting from the predicate translation
+				// are triple patterns); if not possible, then create a group
+				// graph pattern
+				final List<SPARQLGraphPattern> allSubPatterns = Collections.emptyList();
+				final Set<TriplePattern> tpSubPatterns = Collections.emptySet();
+				boolean allSubPatternsAreTriplePatterns = true; // assume yes
+
+				for( final TriplePattern m : ((BGP) j).getTriplePatterns() ) {
+					final SPARQLGraphPattern p = translatePredicate(m);
+					allSubPatterns.add(p);
+
+					if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern ) {
+						tpSubPatterns.add( (TriplePattern) p );
+					}
+					else {
+						allSubPatternsAreTriplePatterns = false;
+					}
 				}
-				SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
-				predicateTranslation.add(union);
-				
+
+				if ( allSubPatternsAreTriplePatterns ) {
+					predicateTranslation.add( new BGPImpl(tpSubPatterns) );
+				}
+				else {
+					predicateTranslation.add( new SPARQLGroupPatternImpl(allSubPatterns) );
+				}
+
 			} else if (j instanceof TriplePattern) {
 				predicateTranslation.add(translatePredicate((TriplePattern) j));
 				
