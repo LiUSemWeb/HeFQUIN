@@ -24,7 +24,7 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
@@ -52,7 +52,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 			return null;
 		}
 
-		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm);
 	}

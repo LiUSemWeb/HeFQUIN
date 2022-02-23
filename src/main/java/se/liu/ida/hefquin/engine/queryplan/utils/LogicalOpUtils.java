@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -99,7 +99,7 @@ public class LogicalOpUtils {
         elementGroup.addElement( getPatternOfRequest(lopReq) );
         elementGroup.addTriplePattern( lopTPAdd.getTP().asJenaTriple() );
 
-        return new SPARQLGraphPatternImpl(elementGroup);
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
     }
 
     /**
@@ -115,7 +115,7 @@ public class LogicalOpUtils {
         final ElementGroup elementGroup = new ElementGroup();
         elementGroup.addElement( new ElementTriplesBlock( bgp ) );
         elementGroup.addElement( getPatternOfRequest(lopReq) );
-        return new SPARQLGraphPatternImpl(elementGroup);
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
     }
 
     /**
@@ -127,7 +127,7 @@ public class LogicalOpUtils {
         elementGroup.addElement( getPatternOfRequest(lopReq1) );
         elementGroup.addElement( getPatternOfRequest(lopReq2) );
 
-        return new SPARQLGraphPatternImpl(elementGroup);
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
     }
 
     /**
@@ -139,7 +139,7 @@ public class LogicalOpUtils {
         elementUnion.addElement( getPatternOfRequest(lopReq1) );
         elementUnion.addElement( getPatternOfRequest(lopReq2) );
 
-        return new SPARQLGraphPatternImpl(elementUnion);
+        return new GenericSPARQLGraphPatternImpl1(elementUnion);
     }
 
     public static Element getPatternOfRequest( final LogicalOpRequest<?, ?> lopReq ){

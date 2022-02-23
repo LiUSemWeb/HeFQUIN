@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.syntax.Element;
-
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -40,16 +37,6 @@ public class BGPImpl implements BGP
 			return false;
 		else
 			return tps.containsAll(otps);
-	}
-
-	@Override
-	public Element asJenaElement() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Op asJenaOp() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -22,10 +22,10 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -58,7 +58,19 @@ public class SourcePlannerImpl implements SourcePlanner
 		// (i.e., not "SERVICE var {...}"). Therefore, all that this
 		// implementation here does is to convert the given query
 		// pattern into a logical plan.
-		final Op jenaOp = ( (SPARQLGraphPattern) query ).asJenaOp();
+		final Op jenaOp;
+		if ( query instanceof GenericSPARQLGraphPatternImpl1 ) {
+			@SuppressWarnings("deprecation")
+			final Op o = ( (GenericSPARQLGraphPatternImpl1) query ).asJenaOp();
+			jenaOp = o;
+		}
+		else if ( query instanceof GenericSPARQLGraphPatternImpl2 ) {
+			jenaOp = ( (GenericSPARQLGraphPatternImpl2) query ).asJenaOp();
+		}
+		else {
+			throw new UnsupportedOperationException( query.getClass().getName() );
+		}
+
 		final LogicalPlan sa = createPlan(jenaOp);
 
 		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
@@ -130,7 +142,7 @@ public class SourcePlannerImpl implements SourcePlanner
 				return createPlanForBGP( (OpBGP) jenaOp, fm );
 			}
 			else {
-				final SPARQLRequest req = new SPARQLRequestImpl( new SPARQLGraphPatternImpl(jenaOp) );
+				final SPARQLRequest req = new SPARQLRequestImpl( new GenericSPARQLGraphPatternImpl2(jenaOp) );
 				final LogicalOpRequest<SPARQLRequest,SPARQLEndpoint> op = new LogicalOpRequest<>( (SPARQLEndpoint) fm, req );
 				return new LogicalPlanWithNullaryRootImpl(op);
 			}
