@@ -6,6 +6,11 @@ import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 
+/**
+ * This class is a generic implementation of {@link SPARQLGraphPattern}
+ * in which this graph pattern is given as an object of the class
+ * {@link Op} of the Jena API.
+ */
 public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 {
 	protected final Op jenaPatternOp;
