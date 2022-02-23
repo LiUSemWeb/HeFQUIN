@@ -14,12 +14,11 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 	protected final List<SPARQLGraphPattern> subPatterns;
 
 	public SPARQLGroupPatternImpl( final List<SPARQLGraphPattern> subPatterns ) {
-		assert subPatterns.size() > 1;
+		assert subPatterns != null;
 		this.subPatterns = subPatterns;
 	}
 
 	public SPARQLGroupPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
-		assert subPatterns.length > 1;
 		this.subPatterns = Arrays.asList(subPatterns);
 	}
 
@@ -46,6 +45,10 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 	@Override
 	public SPARQLGraphPattern getSubPatterns( final int i ) throws IndexOutOfBoundsException {
 		return subPatterns.get(i);
+	}
+
+	public void addSubPattern( final SPARQLGraphPattern p ) {
+		subPatterns.add(p);
 	}
 
 }

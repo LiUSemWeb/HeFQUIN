@@ -14,12 +14,11 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	protected final List<SPARQLGraphPattern> subPatterns;
 
 	public SPARQLUnionPatternImpl( final List<SPARQLGraphPattern> subPatterns ) {
-		assert subPatterns.size() > 1;
+		assert subPatterns != null;
 		this.subPatterns = subPatterns;
 	}
 
 	public SPARQLUnionPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
-		assert subPatterns.length > 1;
 		this.subPatterns = Arrays.asList(subPatterns);
 	}
 
@@ -46,6 +45,10 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	@Override
 	public SPARQLGraphPattern getSubPatterns( final int i ) throws IndexOutOfBoundsException {
 		return subPatterns.get(i);
+	}
+
+	public void addSubPattern( final SPARQLGraphPattern p ) {
+		subPatterns.add(p);
 	}
 
 }
