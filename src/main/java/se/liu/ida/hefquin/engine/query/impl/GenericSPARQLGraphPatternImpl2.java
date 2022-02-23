@@ -31,7 +31,6 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 		return false;
 	}
 
-	@Override
 	public Element asJenaElement() {
 		return OpAsQuery.asQuery(jenaPatternOp).getQueryPattern();
 	}
