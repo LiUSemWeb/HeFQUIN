@@ -61,20 +61,19 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		List<SPARQLGraphPattern> predicateTranslation = Collections.<SPARQLGraphPattern>emptyList();
 		for(final SPARQLGraphPattern j : objectTranslation) {
 			
-			if(j instanceof SPARQLUnionPattern) { 
-				List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
+			if(j instanceof SPARQLUnionPattern) {
+				SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
 				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {		
 					if(k instanceof TriplePattern) {
-						unionList.add(translatePredicate((TriplePattern) k));	
+						union.addSubPattern(translatePredicate((TriplePattern) k));	
 					} else if (k instanceof BGP) {
 						for(final TriplePattern l : ((BGP) k).getTriplePatterns()) {
-							unionList.add(translatePredicate(l));
+							union.addSubPattern(translatePredicate(l));
 						}		
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
 				}
-				SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
 				predicateTranslation.add(union);
 				
 			} else if (j instanceof BGP) { 
@@ -154,39 +153,68 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		for (final Triple m : getMappings(tpQuery)) {
 			String predicate = m.asJenaTriple().getPredicate().getURI();
 			
+			/** OLD Version
 			if (predicate.equals(OWL.sameAs.getURI()) || predicate.equals(RDFS.subClassOf.getURI()) || predicate.equals(OWL.equivalentClass.getURI())) {
 				TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
+				resultsList.add(translation);	
+			**/
+			
+			if(predicate.equals(OWL.sameAs.getURI())) {
+				TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
 				resultsList.add(translation);
+			} else if (predicate.equals(OWL.equivalentClass.getURI())) {
 				
-			} else if (predicate.equals(OWL.unionOf.getURI())){
-				/**
-				 * TODO: How are the union represented as triples
-				 * = How to add multiple object to a triple, do I represent them with multiple triples?
+				/*
+				 * Blank node used to help create intersections and unions
+				 * (a equals b)
+				 * (b unionof c)
+				 * (b unionof d)
 				 */
-				/** 
-				 * List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
-				 * for(i : m.asJenaTriple().getObject()){
-				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), i);
-				 * 		unionList.add(translation)
-				 * }
-				 * SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
-				 * results.add(union);
-				 */
+				if (m.asJenaTriple().getObject().isBlank()) {
+					//Union or intersection
+					Node blankP = NodeFactory.createVariable("p");
+					Node blankO = NodeFactory.createVariable("o");
+					TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), blankP, blankO);
+					String newPredicate = "";
+					List<Node> objects = Collections.emptyList();
+					for(final Triple i : getMappings(blankQuery)) {
+						String iPredicate = i.asJenaTriple().getPredicate().getURI();
+						if(newPredicate.equals("")) {
+							newPredicate = iPredicate;
+						} else {
+							if (!iPredicate.equals(newPredicate)) {
+								throw new IllegalArgumentException(iPredicate);
+							}
+						}
+						objects.add(i.asJenaTriple().getObject());
+					}
+					
+					if (newPredicate.equals(OWL.unionOf.getURI())) {
+						SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+						for(Node j : objects){
+							TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
+							union.addSubPattern(translation);
+						}
+						resultsList.add(union);
+						
+					} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
+						 Set<TriplePattern> intersectionList = Collections.emptySet();
+						 for(Node j : objects){
+						  	TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
+						  	intersectionList.add(translation);
+						 }
+						 BGP intersection = new BGPImpl(intersectionList);
+						 resultsList.add(intersection); 
+						 
+					} else {
+						throw new IllegalArgumentException(newPredicate);
+					}		
+					
+				} else {
+					TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), m.asJenaTriple().getObject());
+					resultsList.add(translation);	
+				}
 				
-			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
-				/**
-				 * TODO: How are the union represented as triples
-				 * = How to add multiple object to a triple, do I represent them with multiple triples?
-				 */
-				/** 
-				 * List<TriplePattern> intersectionList = Collections.<TriplePattern>emptyList();
-				 * for(i : m.asJenaTriple().getObject()){
-				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), i);
-				 * 		intersectionList.add(translation)
-				 * }
-				 * BGP intersection = new BGPImpl(intersectionList);
-				 * results.add(intersection);
-				 */
 			} else {
 				throw new IllegalArgumentException(predicate);
 			}
@@ -214,7 +242,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		for (final Triple m : getMappings(tpQuery)) {
 			String predicate = m.asJenaTriple().getPredicate().getURI();
 			
-			if (predicate.equals(OWL.equivalentProperty.getURI()) || predicate.equals(RDFS.subPropertyOf.getURI())) {
+			if (predicate.equals(RDFS.subPropertyOf.getURI())) {
 				TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
 				resultsList.add(translation);
 				
@@ -222,35 +250,52 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 				TriplePattern translation = new TriplePatternImpl(t.getObject(), m.asJenaTriple().getObject(), t.getSubject());
 				resultsList.add(translation);	
 				
-			}else if (predicate.equals(OWL.unionOf.getURI())){
-				/**
-				 * TODO: How are the union represented as triples
-				 * = How to add multiple object to a triple, do I represent them with multiple triples?
-				 */
-				/** 
-				 * List<SPARQLGraphPattern> unionList = Collections.<SPARQLGraphPattern>emptyList();
-				 * for(i : m.asJenaTriple().getObject()){
-				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), i, t.getObject());
-				 * 		unionList.add(translation)
-				 * }
-				 * SPARQLUnionPattern union = new SPARQLUnionPatternImpl(unionList);
-				 * results.add(union);
-				 */
+			} else if (predicate.equals(OWL.equivalentProperty.getURI())){
+				if (m.asJenaTriple().getObject().isBlank()) {
+					//Union or intersection
+					Node blankP = NodeFactory.createVariable("p");
+					Node blankO = NodeFactory.createVariable("o");
+					TriplePattern blankQuery = new TriplePatternImpl(m.asJenaTriple().getObject(), blankP, blankO);
+					String newPredicate = "";
+					List<Node> objects = Collections.emptyList();
+					for(final Triple i : getMappings(blankQuery)) {
+						String iPredicate = i.asJenaTriple().getPredicate().getURI();
+						if(newPredicate.equals("")) {
+							newPredicate = iPredicate;
+						} else {
+							if (!iPredicate.equals(newPredicate)) {
+								throw new IllegalArgumentException(iPredicate);
+							}
+						}
+						objects.add(i.asJenaTriple().getObject());
+					}
+					
+					if (newPredicate.equals(OWL.unionOf.getURI())) {
+						SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+						for(Node j : objects){
+							TriplePattern translation = new TriplePatternImpl(t.getSubject(), j, t.getObject());
+							union.addSubPattern(translation);
+						}
+						resultsList.add(union);
+						
+					} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
+						 Set<TriplePattern> intersectionList = Collections.emptySet();
+						 for(Node j : objects){
+						  	TriplePattern translation = new TriplePatternImpl(t.getSubject(), j,  t.getObject());
+						  	intersectionList.add(translation);
+						 }
+						 BGP intersection = new BGPImpl(intersectionList);
+						 resultsList.add(intersection); 
+						 
+					} else {
+						throw new IllegalArgumentException(newPredicate);
+					}		
+					
+				} else {
+					TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.asJenaTriple().getObject(), t.getObject());
+					resultsList.add(translation);	
+				}
 				
-			} else if (predicate.equals(OWL.intersectionOf.getURI())) {
-				/**
-				 * TODO: How are the union represented as triples
-				 * = How to add multiple object to a triple, do I represent them with multiple triples?
-				 */
-				/** 
-				 * List<TriplePattern> intersectionList = Collections.<TriplePattern>emptyList();
-				 * for(i : m.asJenaTriple().getObject()){
-				 * 		TriplePattern translation = new TriplePatternImpl(t.getSubject(), i, t.getObject());
-				 * 		intersectionList.add(translation)
-				 * }
-				 * BGP intersection = new BGPImpl(intersectionList);
-				 * results.add(intersection);
-				 */
 			} else {
 				throw new IllegalArgumentException(predicate);
 			}
