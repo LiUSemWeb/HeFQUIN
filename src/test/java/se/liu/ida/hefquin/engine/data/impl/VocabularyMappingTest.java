@@ -71,7 +71,7 @@ public class VocabularyMappingTest {
 		System.out.print(translation.toString() + "\n");
 		System.out.print(correct.toString() + "\n");
 
-		//assertEquals(correct, translation);
+		assertEquals(correct, translation);
 	}
 	
 	public Set<Triple> CreateTestTriples(){

@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.syntax.Element;
@@ -49,6 +50,23 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 
 	public void addSubPattern( final SPARQLGraphPattern p ) {
 		subPatterns.add(p);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(subPatterns);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SPARQLGroupPatternImpl other = (SPARQLGroupPatternImpl) obj;
+		return Objects.equals(subPatterns, other.subPatterns);
 	}
 
 }
