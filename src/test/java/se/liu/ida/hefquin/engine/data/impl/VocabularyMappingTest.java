@@ -27,21 +27,22 @@ public class VocabularyMappingTest {
 	@Test
 	public void VocabularyMappingConstructorTest() {
 		final Set<Triple> testTriples = CreateTestTriples();
-		final List<Triple> triplesList = new ArrayList<Triple>();
-		triplesList.addAll(testTriples);
-		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
+		final Set<org.apache.jena.graph.Triple> jenaTriples = new HashSet<>();
+		for(Triple t : testTriples) {
+			jenaTriples.add(t.asJenaTriple());
+		}
+		final VocabularyMappingImpl vm = new VocabularyMappingImpl(testTriples);
 		
 		final Node s = NodeFactory.createVariable("s");
 		final Node p = NodeFactory.createVariable("p");
 		final Node o = NodeFactory.createVariable("o");
 		final org.apache.jena.graph.Triple testQuery = new TriplePatternImpl(s, p, o).asJenaTriple();
-		List<Triple> QueryResults = new ArrayList<Triple>();
+		final Set<org.apache.jena.graph.Triple> queryResults = new HashSet<>();
 		final Iterator<org.apache.jena.graph.Triple> i = vm.getVocabularyMappingAsGraph().find(testQuery);
 		while(i.hasNext()) {
-			final Triple t = new TripleImpl(i.next());
-			QueryResults.add(t);
+			queryResults.add(i.next());
 		}
-		//assertEquals(QueryResults, triplesList);
+		assertEquals(queryResults, jenaTriples);
 	}
 	
 	@Test
@@ -78,28 +79,28 @@ public class VocabularyMappingTest {
 	}
 	
 	public Set<Triple> CreateTestTriples(){
-		Set<Triple> testSet = new HashSet<Triple>();
+		final Set<Triple> testSet = new HashSet<>();
 		
 		Node s = NodeFactory.createLiteral("s1");
-		Node p = NodeFactory.createURI(OWL.sameAs.getURI());
+		Node p = OWL.sameAs.asNode();
 		Node o = NodeFactory.createLiteral("s2");
 		Triple t = new TripleImpl(s, p, o);
 		testSet.add(t);
 		
-		s = NodeFactory.createURI(RDF.type.getURI());
-		p = NodeFactory.createURI(OWL.inverseOf.getURI());
+		s = RDF.type.asNode();
+		p = OWL.inverseOf.asNode();
 		o = NodeFactory.createLiteral("Not type");
 		t = new TripleImpl(s, p, o);
 		testSet.add(t);
 		
 		s = NodeFactory.createLiteral("o1");
-		p = NodeFactory.createURI(OWL.equivalentClass.getURI());
+		p = OWL.equivalentClass.asNode();
 		o = NodeFactory.createBlankNode();
 		t = new TripleImpl(s, p, o);
 		testSet.add(t);
 		
 		s = o;
-		p = NodeFactory.createURI(OWL.unionOf.getURI());
+		p = OWL.unionOf.asNode();
 		o = NodeFactory.createLiteral("o2");
 		t = new TripleImpl(s, p, o);
 		testSet.add(t);

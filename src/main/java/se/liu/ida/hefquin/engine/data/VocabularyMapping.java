@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.data;
 
-import org.apache.jena.graph.Graph;
-
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -20,5 +18,4 @@ public interface VocabularyMapping {
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
 	
-	Graph getVocabularyMappingAsGraph();
 }
