@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -15,12 +16,11 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 	protected final List<SPARQLGraphPattern> subPatterns;
 
 	public SPARQLGroupPatternImpl( final List<SPARQLGraphPattern> subPatterns ) {
-		assert subPatterns != null;
-		this.subPatterns = subPatterns;
+		this.subPatterns = new ArrayList<>(subPatterns);
 	}
 
 	public SPARQLGroupPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
-		this.subPatterns = Arrays.asList(subPatterns);
+		this.subPatterns = new ArrayList<>( Arrays.asList(subPatterns) );
 	}
 
 	@Override
