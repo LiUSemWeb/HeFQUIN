@@ -148,10 +148,18 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		if(t.getObject().isVariable()) {
 			return tp;
 		}
+		
+		final Node s = NodeFactory.createVariable("s");
+		TriplePattern tpQuery = new TriplePatternImpl(s, RDFS.subClassOf.asNode(), t.getObject());
+		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		for (final org.apache.jena.graph.Triple n : getMappings(tpQuery)) {
+			final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), n.getSubject());
+			resultsList.add(translation);
+		}
+		
 		final Node p = NodeFactory.createVariable("p");
 		final Node o = NodeFactory.createVariable("o");
-		final TriplePattern tpQuery = new TriplePatternImpl(t.getObject(), p, o);		
-		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		tpQuery = new TriplePatternImpl(t.getObject(), p, o);
 		for (final org.apache.jena.graph.Triple m : getMappings(tpQuery)) {
 			final String predicate = m.getPredicate().getURI();
 			
@@ -239,18 +247,22 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 		if(t.getPredicate().isVariable()) {
 			return tp;
 		}
+		
+		final Node s = NodeFactory.createVariable("s");
+		TriplePattern tpQuery = new TriplePatternImpl(s, RDFS.subPropertyOf.asNode(), t.getPredicate());
+		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		for (final org.apache.jena.graph.Triple n : getMappings(tpQuery)) {
+			final TriplePattern translation = new TriplePatternImpl(t.getSubject(), n.getSubject(), t.getObject());
+			resultsList.add(translation);
+		}
+		
 		final Node p = NodeFactory.createVariable("p");
 		final Node o = NodeFactory.createVariable("o");
-		final TriplePattern tpQuery = new TriplePatternImpl(t.getPredicate(), p, o);
-		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		tpQuery = new TriplePatternImpl(t.getPredicate(), p, o);
 		for (final org.apache.jena.graph.Triple m : getMappings(tpQuery)) {
 			final String predicate = m.getPredicate().getURI();
 			
-			if (predicate.equals(RDFS.subPropertyOf.getURI())) {
-				final TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.getObject(), t.getObject());
-				resultsList.add(translation);
-				
-			} else if (predicate.equals(OWL.inverseOf.getURI())){
+			if (predicate.equals(OWL.inverseOf.getURI())){
 				final TriplePattern translation = new TriplePatternImpl(t.getObject(), m.getObject(), t.getSubject());
 				resultsList.add(translation);	
 				
