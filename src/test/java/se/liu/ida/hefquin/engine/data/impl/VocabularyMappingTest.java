@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -54,11 +55,21 @@ public class VocabularyMappingTest {
 		final Node o = NodeFactory.createLiteral("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
+		
+		/* Test Union
 		assert(translation instanceof SPARQLUnionPattern);
 		final Set<org.apache.jena.graph.Triple> translatedTriples = new HashSet<>();
 		for(final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
 			assert(i instanceof TriplePattern);
 			translatedTriples.add(((TriplePattern) i).asJenaTriple());
+		}
+		*/
+		
+		//Test Intersection
+		assert(translation instanceof BGPImpl);
+		final Set<org.apache.jena.graph.Triple> translatedTriples = new HashSet<>();
+		for(final TriplePattern i : ((BGPImpl)translation).getTriplePatterns()) {
+			translatedTriples.add(i.asJenaTriple());
 		}
 		
 		System.out.print(testData.object2);
@@ -86,7 +97,8 @@ public class VocabularyMappingTest {
 		testSet.add(new TripleImpl(s, p, o));
 		
 		s = o;
-		p = OWL.unionOf.asNode();
+		//p = OWL.unionOf.asNode();
+		p = OWL.intersectionOf.asNode();
 		Node o1Res = NodeFactory.createLiteral("o2");
 		testSet.add(new TripleImpl(s, p, o1Res));
 		
@@ -100,4 +112,6 @@ public class VocabularyMappingTest {
 		Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> returnP = new Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>>(testSet, expectedRes);
 		return returnP;
 	}
+	
+	
 }
