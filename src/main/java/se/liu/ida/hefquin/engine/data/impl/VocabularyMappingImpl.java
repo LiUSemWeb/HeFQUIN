@@ -64,25 +64,22 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 			
 			if(j instanceof SPARQLUnionPattern) {
 				
-				//PARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-				List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
+				SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+				//List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
 				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {		
 					if(k instanceof TriplePattern) {
-						/*
-						 * Did not work when running test
-						 * union.addSubPattern(translatePredicate((TriplePattern) k));
-						 */	
-						unionList.add(translatePredicate((TriplePattern) k));
+						union.addSubPattern(translatePredicate((TriplePattern) k));
+						//unionList.add(translatePredicate((TriplePattern) k));
 					} else if (k instanceof BGP) {
 						for(final TriplePattern l : ((BGP) k).getTriplePatterns()) {
-							//union.addSubPattern(translatePredicate(l));
-							unionList.add(translatePredicate(l));
+							union.addSubPattern(translatePredicate(l));
+							//unionList.add(translatePredicate(l));
 						}		
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
 				}
-				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
+				//final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
 				predicateTranslation.add(union);
 				
 			} else if (j instanceof BGP) { 
@@ -199,14 +196,14 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 						}
 						
 						if (newPredicate.equals(OWL.unionOf.getURI())) {
-							//SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-							final List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
+							SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+							//final List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
 							for(final Node j : objects){
 								final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
-								//union.addSubPattern(translation);
-								unionList.add(translation);
+								union.addSubPattern(translation);
+								//unionList.add(translation);
 							}
-							SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
+							//SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
 							resultsList.add(union);
 							
 						} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {

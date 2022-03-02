@@ -25,12 +25,7 @@ public class TriplePatternImpl implements TriplePattern
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);
-		/*
-		return o instanceof TriplePattern && jenaObj.getSubject().equals(((TriplePattern) o).asJenaTriple().getSubject()) 
-				&& jenaObj.getPredicate().equals(((TriplePattern) o).asJenaTriple().getPredicate()) &&
-				jenaObj.getObject().equals(((TriplePattern) o).asJenaTriple().getObject());
-		*/
+		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);	
 	}
 
 	@Override

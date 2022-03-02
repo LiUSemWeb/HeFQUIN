@@ -1,12 +1,8 @@
 package se.liu.ida.hefquin.engine.data.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -20,7 +16,6 @@ import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -28,7 +23,7 @@ public class VocabularyMappingTest {
 
 	@Test
 	public void VocabularyMappingConstructorTest() {
-		final Pair<Set<Triple>,List<SPARQLGraphPattern>> testData= CreateTestTriples();
+		final Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> testData= CreateTestTriples();
 		final Set<Triple> testTriples = testData.object1;
 		final Set<org.apache.jena.graph.Triple> jenaTriples = new HashSet<>();
 		for(Triple t : testTriples) {
@@ -50,7 +45,7 @@ public class VocabularyMappingTest {
 	
 	@Test
 	public void TranslateTriplePatternTest() {
-		final Pair<Set<Triple>,List<SPARQLGraphPattern>> testData= CreateTestTriples();
+		final Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> testData= CreateTestTriples();
 		final Set<Triple> testTriples = testData.object1;
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
@@ -59,13 +54,20 @@ public class VocabularyMappingTest {
 		final Node o = NodeFactory.createLiteral("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
+		assert(translation instanceof SPARQLUnionPattern);
+		final Set<org.apache.jena.graph.Triple> translatedTriples = new HashSet<>();
+		for(final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+			assert(i instanceof TriplePattern);
+			translatedTriples.add(((TriplePattern) i).asJenaTriple());
+		}
 		
-		final SPARQLUnionPattern correct = new SPARQLUnionPatternImpl(testData.object2);	
+		System.out.print(testData.object2);
+		System.out.print(translatedTriples);
 		
-		assertEquals(correct, translation);
+		assertEquals(testData.object2, translatedTriples);
 	}
 	
-	public Pair<Set<Triple>,List<SPARQLGraphPattern>> CreateTestTriples(){
+	public Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> CreateTestTriples(){
 		final Set<Triple> testSet = new HashSet<>();
 		
 		Node s = NodeFactory.createLiteral("s1");
@@ -91,11 +93,11 @@ public class VocabularyMappingTest {
 		Node o2Res = NodeFactory.createLiteral("o3");
 		testSet.add(new TripleImpl(s, p, o2Res));
 		
-		final List<SPARQLGraphPattern> expectedRes = new ArrayList<>();
-		expectedRes.add(new TriplePatternImpl(o2Res, pRes, sRes));
-		expectedRes.add(new TriplePatternImpl(o1Res, pRes, sRes));
+		final Set<org.apache.jena.graph.Triple> expectedRes = new HashSet<>();
+		expectedRes.add(new TriplePatternImpl(o2Res, pRes, sRes).asJenaTriple());
+		expectedRes.add(new TriplePatternImpl(o1Res, pRes, sRes).asJenaTriple());
 		
-		Pair<Set<Triple>,List<SPARQLGraphPattern>> returnP = new Pair<Set<Triple>,List<SPARQLGraphPattern>>(testSet, expectedRes);
+		Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> returnP = new Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>>(testSet, expectedRes);
 		return returnP;
 	}
 }
