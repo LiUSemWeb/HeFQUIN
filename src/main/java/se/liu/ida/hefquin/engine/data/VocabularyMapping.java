@@ -3,9 +3,8 @@ package se.liu.ida.hefquin.engine.data;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
-
-public interface VocabularyMapping {
-
+public interface VocabularyMapping
+{
 	/**
 	 * Applies this vocabulary mapping to the given triple pattern and
 	 * returns the resulting combination of triple patterns, which may be
@@ -17,5 +16,4 @@ public interface VocabularyMapping {
 	 * pattern itself.
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
-	
 }
