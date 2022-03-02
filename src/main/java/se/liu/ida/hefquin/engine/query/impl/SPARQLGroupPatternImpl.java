@@ -66,7 +66,7 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 		if (getClass() != obj.getClass())
 			return false;
 		SPARQLGroupPatternImpl other = (SPARQLGroupPatternImpl) obj;
-		return Objects.equals(subPatterns, other.subPatterns);
+		return subPatterns.equals(other.subPatterns);
 	}
 
 }

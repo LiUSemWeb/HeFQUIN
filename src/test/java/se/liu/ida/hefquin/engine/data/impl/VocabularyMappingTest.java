@@ -22,12 +22,14 @@ import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class VocabularyMappingTest {
 
 	@Test
 	public void VocabularyMappingConstructorTest() {
-		final Set<Triple> testTriples = CreateTestTriples();
+		final Pair<Set<Triple>,List<SPARQLGraphPattern>> testData= CreateTestTriples();
+		final Set<Triple> testTriples = testData.object1;
 		final Set<org.apache.jena.graph.Triple> jenaTriples = new HashSet<>();
 		for(Triple t : testTriples) {
 			jenaTriples.add(t.asJenaTriple());
@@ -48,7 +50,8 @@ public class VocabularyMappingTest {
 	
 	@Test
 	public void TranslateTriplePatternTest() {
-		final Set<Triple> testTriples = CreateTestTriples();
+		final Pair<Set<Triple>,List<SPARQLGraphPattern>> testData= CreateTestTriples();
+		final Set<Triple> testTriples = testData.object1;
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		final Node s = NodeFactory.createLiteral("s1");
@@ -57,49 +60,42 @@ public class VocabularyMappingTest {
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
-		final Node sTranslated = NodeFactory.createLiteral("s2");
-		final Node pTranslated = NodeFactory.createLiteral("Not type");
-		final Node oTranslated1 = NodeFactory.createLiteral("o2");
-		final Node oTranslated2 = NodeFactory.createLiteral("o3");
-		final TriplePattern tp1 = new TriplePatternImpl(oTranslated1, pTranslated, sTranslated);
-		final TriplePattern tp2 = new TriplePatternImpl(oTranslated2, pTranslated, sTranslated);	
-		final List<SPARQLGraphPattern> union = new ArrayList<>();
-		union.add(tp1);
-		union.add(tp2);
-		final SPARQLUnionPattern correct = new SPARQLUnionPatternImpl(union);
+		final SPARQLUnionPattern correct = new SPARQLUnionPatternImpl(testData.object2);	
 		
-		System.out.print(translation.toString() + "\n");
-		System.out.print(correct.toString() + "\n");
-
 		assertEquals(correct, translation);
 	}
 	
-	public Set<Triple> CreateTestTriples(){
+	public Pair<Set<Triple>,List<SPARQLGraphPattern>> CreateTestTriples(){
 		final Set<Triple> testSet = new HashSet<>();
 		
 		Node s = NodeFactory.createLiteral("s1");
 		Node p = OWL.sameAs.asNode();
-		Node o = NodeFactory.createLiteral("s2");
-		testSet.add(new TripleImpl(s, p, o));
+		Node sRes = NodeFactory.createLiteral("s2");
+		testSet.add(new TripleImpl(s, p, sRes));
 		
 		s = RDF.type.asNode();
 		p = OWL.inverseOf.asNode();
-		o = NodeFactory.createLiteral("Not type");
-		testSet.add(new TripleImpl(s, p, o));
+		Node pRes = NodeFactory.createLiteral("Not type");
+		testSet.add(new TripleImpl(s, p, pRes));
 		
 		s = NodeFactory.createLiteral("o1");
 		p = OWL.equivalentClass.asNode();
-		o = NodeFactory.createBlankNode();
+		Node o = NodeFactory.createBlankNode();
 		testSet.add(new TripleImpl(s, p, o));
 		
 		s = o;
 		p = OWL.unionOf.asNode();
-		o = NodeFactory.createLiteral("o2");
-		testSet.add(new TripleImpl(s, p, o));
+		Node o1Res = NodeFactory.createLiteral("o2");
+		testSet.add(new TripleImpl(s, p, o1Res));
 		
-		o = NodeFactory.createLiteral("o3");
-		testSet.add(new TripleImpl(s, p, o));
+		Node o2Res = NodeFactory.createLiteral("o3");
+		testSet.add(new TripleImpl(s, p, o2Res));
 		
-		return testSet;
+		final List<SPARQLGraphPattern> expectedRes = new ArrayList<>();
+		expectedRes.add(new TriplePatternImpl(o2Res, pRes, sRes));
+		expectedRes.add(new TriplePatternImpl(o1Res, pRes, sRes));
+		
+		Pair<Set<Triple>,List<SPARQLGraphPattern>> returnP = new Pair<Set<Triple>,List<SPARQLGraphPattern>>(testSet, expectedRes);
+		return returnP;
 	}
 }
