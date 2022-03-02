@@ -9,6 +9,7 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class BGPImpl implements BGP
@@ -69,6 +70,10 @@ public class BGPImpl implements BGP
 		builder.append( " )");
 
 		return builder.toString();
+	}
+	
+	public void addTriplePattern( final TriplePattern tp ) {
+		tps.add(tp);
 	}
 
 }

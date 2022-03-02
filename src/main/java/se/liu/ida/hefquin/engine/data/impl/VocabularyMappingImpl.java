@@ -65,21 +65,17 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 			if(j instanceof SPARQLUnionPattern) {
 				
 				SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-				//List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
 				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {		
 					if(k instanceof TriplePattern) {
 						union.addSubPattern(translatePredicate((TriplePattern) k));
-						//unionList.add(translatePredicate((TriplePattern) k));
 					} else if (k instanceof BGP) {
 						for(final TriplePattern l : ((BGP) k).getTriplePatterns()) {
 							union.addSubPattern(translatePredicate(l));
-							//unionList.add(translatePredicate(l));
 						}		
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
 				}
-				//final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
 				predicateTranslation.add(union);
 				
 			} else if (j instanceof BGP) { 
@@ -197,22 +193,18 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 						
 						if (newPredicate.equals(OWL.unionOf.getURI())) {
 							SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-							//final List<SPARQLGraphPattern> unionList = new ArrayList<SPARQLGraphPattern>();
 							for(final Node j : objects){
 								final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
 								union.addSubPattern(translation);
-								//unionList.add(translation);
 							}
-							//SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl(unionList);
 							resultsList.add(union);
 							
 						} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
-							 Set<TriplePattern> intersectionList = new HashSet<TriplePattern>();;
+							 BGPImpl intersection = new BGPImpl();
 							 for(Node j : objects){
 							  	final TriplePattern translation = new TriplePatternImpl(t.getSubject(), t.getPredicate(), j);
-							  	intersectionList.add(translation);
+							  	intersection.addTriplePattern(translation);
 							 }
-							 final BGP intersection = new BGPImpl(intersectionList);
 							 resultsList.add(intersection); 
 							 
 						} else {
@@ -289,12 +281,11 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 						resultsList.add(union);
 						
 					} else if (newPredicate.equals(OWL.intersectionOf.getURI())) {
-						 Set<TriplePattern> intersectionList = new HashSet<TriplePattern>();;
+						 BGPImpl intersection = new BGPImpl();
 						 for(Node j : objects){
 						  	final TriplePattern translation = new TriplePatternImpl(t.getSubject(), j,  t.getObject());
-						  	intersectionList.add(translation);
+						  	intersection.addTriplePattern(translation);
 						 }
-						 final BGP intersection = new BGPImpl(intersectionList);
 						 resultsList.add(intersection); 
 						 
 					} else {
