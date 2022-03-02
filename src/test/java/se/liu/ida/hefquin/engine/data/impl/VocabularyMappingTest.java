@@ -29,7 +29,7 @@ public class VocabularyMappingTest {
 		final Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> testData= CreateTestTriples();
 		final Set<Triple> testTriples = testData.object1;
 		final Set<org.apache.jena.graph.Triple> jenaTriples = new HashSet<>();
-		for(Triple t : testTriples) {
+		for(final Triple t : testTriples) {
 			jenaTriples.add(t.asJenaTriple());
 		}
 		final VocabularyMappingImpl vm = new VocabularyMappingImpl(testTriples);
@@ -108,7 +108,7 @@ public class VocabularyMappingTest {
 		expectedRes.add(new org.apache.jena.graph.Triple(o2Res, pRes, sRes));
 		expectedRes.add(new org.apache.jena.graph.Triple(o1Res, pRes, sRes));
 		
-		Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> returnP = new Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>>(testSet, expectedRes);
+		final Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> returnP = new Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>>(testSet, expectedRes);
 		return returnP;
 	}
 	

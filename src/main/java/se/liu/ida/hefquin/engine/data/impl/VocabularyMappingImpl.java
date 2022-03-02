@@ -38,7 +38,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	
 	// Source: https://jena.apache.org/documentation/io/rdf-input.html
 	public VocabularyMappingImpl(final String rdfFile) {
-		Model mappingModel = RDFDataMgr.loadModel(rdfFile); //.nt file for N-Triple
+		final Model mappingModel = RDFDataMgr.loadModel(rdfFile); //.nt file for N-Triple
 		vocabularyMapping = mappingModel.getGraph();
 	}
 	
@@ -54,12 +54,12 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 
 	@Override
 	public SPARQLGraphPattern translateTriplePattern(final TriplePattern tp) {
-		List<SPARQLGraphPattern> objectTranslation = new ArrayList<SPARQLGraphPattern>();
+		final List<SPARQLGraphPattern> objectTranslation = new ArrayList<SPARQLGraphPattern>();
 		for(final TriplePattern i : translateSubject(tp)) {
 			objectTranslation.add(translateObject(i));
 		}
 		
-		List<SPARQLGraphPattern> predicateTranslation = new ArrayList<SPARQLGraphPattern>();
+		final List<SPARQLGraphPattern> predicateTranslation = new ArrayList<SPARQLGraphPattern>();
 		for(final SPARQLGraphPattern j : objectTranslation) {
 			
 			if(j instanceof SPARQLUnionPattern) {
@@ -235,16 +235,16 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	
 
 	protected SPARQLGraphPattern translatePredicate(final TriplePattern tp){
-		org.apache.jena.graph.Triple t = tp.asJenaTriple();
+		final org.apache.jena.graph.Triple t = tp.asJenaTriple();
 		if(t.getPredicate().isVariable()) {
 			return tp;
 		}
 		final Node p = NodeFactory.createVariable("p");
 		final Node o = NodeFactory.createVariable("o");
 		final TriplePattern tpQuery = new TriplePatternImpl(t.getPredicate(), p, o);
-		List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
 		for (final org.apache.jena.graph.Triple m : getMappings(tpQuery)) {
-			String predicate = m.getPredicate().getURI();
+			final String predicate = m.getPredicate().getURI();
 			
 			if (predicate.equals(RDFS.subPropertyOf.getURI())) {
 				final TriplePattern translation = new TriplePatternImpl(t.getSubject(), m.getObject(), t.getObject());
@@ -259,9 +259,9 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 					//Union or intersection
 					final TriplePattern blankQuery = new TriplePatternImpl(m.getObject(), p, o);
 					String newPredicate = "";
-					List<Node> objects = new ArrayList<Node>();
+					final List<Node> objects = new ArrayList<Node>();
 					for(final org.apache.jena.graph.Triple i : getMappings(blankQuery)) {
-						String iPredicate = i.getPredicate().getURI();
+						final String iPredicate = i.getPredicate().getURI();
 						if(newPredicate.equals("")) {
 							newPredicate = iPredicate;
 						} else {
@@ -313,7 +313,7 @@ public class VocabularyMappingImpl implements VocabularyMapping{
 	}
 	
 	protected Set<org.apache.jena.graph.Triple> getMappings(final TriplePattern tp){
-		Set<org.apache.jena.graph.Triple> mappings = new HashSet<org.apache.jena.graph.Triple>();
+		final Set<org.apache.jena.graph.Triple> mappings = new HashSet<org.apache.jena.graph.Triple>();
 		final Iterator<org.apache.jena.graph.Triple> i = this.vocabularyMapping.find(tp.asJenaTriple());
 		while(i.hasNext()) {
 			mappings.add(i.next());
