@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.data.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class VocabularyMappingTest {
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
 		/* Test Union
-		assert(translation instanceof SPARQLUnionPattern);
+		assertTrue(translation instanceof SPARQLUnionPattern);
 		final Set<org.apache.jena.graph.Triple> translatedTriples = new HashSet<>();
 		for(final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
 			assert(i instanceof TriplePattern);
@@ -66,14 +68,11 @@ public class VocabularyMappingTest {
 		*/
 		
 		//Test Intersection
-		assert(translation instanceof BGPImpl);
+		assertTrue(translation instanceof BGPImpl);
 		final Set<org.apache.jena.graph.Triple> translatedTriples = new HashSet<>();
 		for(final TriplePattern i : ((BGPImpl)translation).getTriplePatterns()) {
 			translatedTriples.add(i.asJenaTriple());
 		}
-		
-		System.out.print(testData.object2);
-		System.out.print(translatedTriples);
 		
 		assertEquals(testData.object2, translatedTriples);
 	}
@@ -83,26 +82,26 @@ public class VocabularyMappingTest {
 		
 		Node s = NodeFactory.createLiteral("s1");
 		Node p = OWL.sameAs.asNode();
-		Node sRes = NodeFactory.createLiteral("s2");
+		final Node sRes = NodeFactory.createLiteral("s2");
 		testSet.add(new TripleImpl(s, p, sRes));
 		
 		s = RDF.type.asNode();
 		p = OWL.inverseOf.asNode();
-		Node pRes = NodeFactory.createLiteral("Not type");
+		final Node pRes = NodeFactory.createLiteral("Not type");
 		testSet.add(new TripleImpl(s, p, pRes));
 		
 		s = NodeFactory.createLiteral("o1");
 		p = OWL.equivalentClass.asNode();
-		Node o = NodeFactory.createBlankNode();
+		final Node o = NodeFactory.createBlankNode();
 		testSet.add(new TripleImpl(s, p, o));
 		
 		s = o;
 		//p = OWL.unionOf.asNode();
 		p = OWL.intersectionOf.asNode();
-		Node o1Res = NodeFactory.createLiteral("o2");
+		final Node o1Res = NodeFactory.createLiteral("o2");
 		testSet.add(new TripleImpl(s, p, o1Res));
 		
-		Node o2Res = NodeFactory.createLiteral("o3");
+		final Node o2Res = NodeFactory.createLiteral("o3");
 		testSet.add(new TripleImpl(s, p, o2Res));
 		
 		final Set<org.apache.jena.graph.Triple> expectedRes = new HashSet<>();
