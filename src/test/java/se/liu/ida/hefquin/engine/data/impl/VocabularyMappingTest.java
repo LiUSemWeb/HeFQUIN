@@ -105,8 +105,8 @@ public class VocabularyMappingTest {
 		testSet.add(new TripleImpl(s, p, o2Res));
 		
 		final Set<org.apache.jena.graph.Triple> expectedRes = new HashSet<>();
-		expectedRes.add(new TriplePatternImpl(o2Res, pRes, sRes).asJenaTriple());
-		expectedRes.add(new TriplePatternImpl(o1Res, pRes, sRes).asJenaTriple());
+		expectedRes.add(new org.apache.jena.graph.Triple(o2Res, pRes, sRes));
+		expectedRes.add(new org.apache.jena.graph.Triple(o1Res, pRes, sRes));
 		
 		Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>> returnP = new Pair<Set<Triple>,Set<org.apache.jena.graph.Triple>>(testSet, expectedRes);
 		return returnP;
