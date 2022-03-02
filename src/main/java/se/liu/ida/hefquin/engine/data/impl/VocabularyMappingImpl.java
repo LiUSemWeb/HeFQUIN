@@ -145,10 +145,16 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 		final List<SPARQLGraphPattern> resultsList = new ArrayList<>();
 
-		final Set<Triple> mappings = getMappings( jenaTP.getObject(), Node.ANY, Node.ANY );
-		for (final Triple m : mappings) {
+		final Set<Triple> mappings1 = getMappings( Node.ANY, RDFS.subClassOf.asNode(), jenaTP.getObject() );
+		for (final Triple n : mappings1) {
+			final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), n.getSubject());
+			resultsList.add(translation);
+		}
+
+		final Set<Triple> mappings2 = getMappings( jenaTP.getObject(), Node.ANY, Node.ANY );
+		for (final Triple m : mappings2) {
 			final Node predicate = m.getPredicate();
-			
+
 			if(predicate.equals(OWL.sameAs.asNode())) {
 				final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), m.getObject());
 				resultsList.add(translation);
@@ -230,17 +236,19 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			return tp;
 		}
 
-		final List<SPARQLGraphPattern> resultsList = new ArrayList<SPARQLGraphPattern>();
+		final List<SPARQLGraphPattern> resultsList = new ArrayList<>();
 
-		final Set<Triple> mappings = getMappings( jenaTP.getPredicate(), Node.ANY, Node.ANY );
-		for (final Triple m : mappings) {
+		final Set<Triple> mappings1 = getMappings( Node.ANY, RDFS.subPropertyOf.asNode(), jenaTP.getPredicate() );
+		for (final Triple n : mappings1) {
+			final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), n.getSubject(), jenaTP.getObject());
+			resultsList.add(translation);
+		}
+
+		final Set<Triple> mappings2 = getMappings( jenaTP.getPredicate(), Node.ANY, Node.ANY );
+		for (final Triple m : mappings2) {
 			final Node predicate = m.getPredicate();
 			
-			if (predicate.equals(RDFS.subPropertyOf.asNode())) {
-				final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), m.getObject(), jenaTP.getObject());
-				resultsList.add(translation);
-				
-			} else if (predicate.equals(OWL.inverseOf.asNode())){
+			if (predicate.equals(OWL.inverseOf.asNode())){
 				final TriplePattern translation = new TriplePatternImpl(jenaTP.getObject(), m.getObject(), jenaTP.getSubject());
 				resultsList.add(translation);	
 				
