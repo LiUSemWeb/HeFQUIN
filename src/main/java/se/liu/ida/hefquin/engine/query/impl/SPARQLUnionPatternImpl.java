@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.query.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.syntax.Element;
@@ -53,20 +52,14 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(subPatterns);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals( final Object other ) {
+		if ( this == other )
 			return true;
-		if (obj == null)
+
+		if ( other == null || !(other instanceof SPARQLUnionPattern) )
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SPARQLUnionPatternImpl other = (SPARQLUnionPatternImpl) obj;
-		return Objects.equals(subPatterns, other.subPatterns);
+
+		return ((SPARQLUnionPattern) other).getSubPatterns().equals(subPatterns);
 	}
 
 }
