@@ -64,10 +64,31 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					if(k instanceof TriplePattern) {
 						union.addSubPattern(translatePredicate((TriplePattern) k));
 					} else if (k instanceof BGP) {
+						
+						final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
+						final Set<TriplePattern> tpSubPatterns = new HashSet<>();
+						boolean allSubPatternsAreTriplePatterns = true; // assume yes
+						
 						for(final TriplePattern l : ((BGP) k).getTriplePatterns()) {
-// TODO: I think that this part here is incorrect, please double check
-							union.addSubPattern(translatePredicate(l));
+
+							final SPARQLGraphPattern p = translatePredicate(l);
+							allSubPatterns.add(p);
+
+							if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern ) {
+								tpSubPatterns.add( (TriplePattern) p );
+							}
+							else {
+								allSubPatternsAreTriplePatterns = false;
+							}
 						}
+
+						if ( allSubPatternsAreTriplePatterns ) {
+							union.addSubPattern( new BGPImpl(tpSubPatterns) );
+						}
+						else {
+							union.addSubPattern( new SPARQLGroupPatternImpl(allSubPatterns) );
+						}
+						
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
