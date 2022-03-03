@@ -13,8 +13,7 @@ public class BGPImpl implements BGP
 	private final Set<TriplePattern> tps;
 
 	public BGPImpl( final Set<TriplePattern> tps ) {
-		assert tps != null;
-		this.tps = tps;
+		this.tps = new HashSet<>(tps);
 	}
 
 	public BGPImpl( final TriplePattern ... tps ) {
@@ -44,6 +43,10 @@ public class BGPImpl implements BGP
 		return Collections.unmodifiableSet(tps);
 	}
 
+	public void addTriplePattern( final TriplePattern tp ) {
+		tps.add(tp);
+	}
+
 
 	@Override
 	public String toString(){
@@ -57,5 +60,4 @@ public class BGPImpl implements BGP
 
 		return builder.toString();
 	}
-
 }

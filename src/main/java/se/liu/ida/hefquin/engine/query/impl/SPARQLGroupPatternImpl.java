@@ -4,19 +4,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.syntax.Element;
 
-public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
+
+public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 {
 	protected final List<SPARQLGraphPattern> subPatterns;
 
-	public SPARQLUnionPatternImpl( final List<SPARQLGraphPattern> subPatterns ) {
+	public SPARQLGroupPatternImpl( final List<SPARQLGraphPattern> subPatterns ) {
 		this.subPatterns = new ArrayList<>(subPatterns);
 	}
 
-	public SPARQLUnionPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
+	public SPARQLGroupPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
 		this.subPatterns = new ArrayList<>( Arrays.asList(subPatterns) );
+	}
+
+	@Override
+	public Element asJenaElement() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Op asJenaOp() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -43,10 +56,10 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 		if ( this == other )
 			return true;
 
-		if ( other == null || !(other instanceof SPARQLUnionPattern) )
+		if ( other == null || !(other instanceof SPARQLGroupPattern) )
 			return false;
 
-		return ((SPARQLUnionPattern) other).getSubPatterns().equals(subPatterns);
+		return ((SPARQLGroupPattern) other).getSubPatterns().equals(subPatterns);
 	}
 
 }
