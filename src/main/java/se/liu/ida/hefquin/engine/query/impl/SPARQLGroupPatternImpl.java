@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.syntax.Element;
-
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 
@@ -20,16 +17,6 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 
 	public SPARQLGroupPatternImpl( final SPARQLGraphPattern ... subPatterns ) {
 		this.subPatterns = new ArrayList<>( Arrays.asList(subPatterns) );
-	}
-
-	@Override
-	public Element asJenaElement() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Op asJenaOp() {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
