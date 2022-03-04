@@ -114,6 +114,19 @@ public class VocabularyMappingTest
 		final Node o2Res = NodeFactory.createLiteral("o3");
 		testSet.add(new Triple(s, p, o2Res));
 		
+		/* Wrong predicate should lead to error
+		p = OWL.unionOf.asNode();
+		o = NodeFactory.createLiteral("o4");
+		testSet.add(new Triple(s, p, o));
+		*/
+		
+		 /*Not possible mapping should lead to error
+		 p = OWL.inverseOf.asNode();
+		 o = NodeFactory.createLiteral("o5");
+		 testSet.add(new Triple(s, p, o));
+		 */
+		 
+		
 		/*
 		SPARQLUnionPatternImpl pUnion1 = new SPARQLUnionPatternImpl();
 		pUnion1.addSubPattern(new TriplePatternImpl(s1Res, p2Res, o1Res));
