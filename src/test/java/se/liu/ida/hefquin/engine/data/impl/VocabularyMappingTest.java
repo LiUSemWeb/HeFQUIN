@@ -104,7 +104,7 @@ public class VocabularyMappingTest
 		expectedResults.add(new Triple(o1, p, o));
 		expectedResults.add(new Triple(o2, p, o));
 		
-		assertEquals(translationTriples, expectedResults);
+		assertEquals(expectedResults, translationTriples);
 	}
 	
 	@Test
