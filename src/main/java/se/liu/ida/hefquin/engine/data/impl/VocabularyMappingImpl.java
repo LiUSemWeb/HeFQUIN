@@ -352,7 +352,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final Set<Triple> mappings = new HashSet<>();
 		final Iterator<Triple> i = vocabularyMapping.find(s,p,o);
 		while(i.hasNext()) {
-			Triple next = i.next();
+			final Triple next = i.next();
 			mappings.add(next);
 		}
 		return mappings;
