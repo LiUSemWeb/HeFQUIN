@@ -74,6 +74,226 @@ public class VocabularyMappingTest
 		assertEquals(testData.object2, translationTriples);
 	}
 	
+	@Test
+	public void TranslateSubjectTest() {
+		final Set<Triple> testTriples = new HashSet<>();
+		//Equality
+		Node s = NodeFactory.createLiteral("s1");
+		Node p = OWL.sameAs.asNode();
+		final Node o1 = NodeFactory.createLiteral("s2");
+		testTriples.add(new Triple(s, p, o1));
+				
+		//Multiple mappings for same subject
+		final Node o2 = NodeFactory.createLiteral("s3");
+		testTriples.add(new Triple(s, p, o2));
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
+		
+		p = NodeFactory.createLiteral("p");
+		final Node o = NodeFactory.createLiteral("o");
+		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		final Set<Triple> translationTriples = new HashSet<>();
+		assertTrue(translation instanceof SPARQLUnionPatternImpl);
+		for (final SPARQLGraphPattern i : ((SPARQLUnionPatternImpl) translation).getSubPatterns()) {
+			assertTrue(i instanceof TriplePattern);
+			translationTriples.add(((TriplePattern) i).asJenaTriple());
+		}
+			
+		final Set<Triple> expectedResults = new HashSet<>();
+		expectedResults.add(new Triple(o1, p, o));
+		expectedResults.add(new Triple(o2, p, o));
+		
+		assertEquals(translationTriples, expectedResults);
+	}
+	
+	@Test
+	public void TranslatePredicateTest() {
+		final Set<Triple> testTriples = new HashSet<>();
+		//Equality
+		Node s = NodeFactory.createLiteral("p1");
+		Node p = OWL.equivalentProperty.asNode();
+		final Node t1 = NodeFactory.createLiteral("p2");
+		testTriples.add(new Triple(s, p, t1));
+				
+		//Predicate inverse
+		p = OWL.inverseOf.asNode();
+		final Node t2 = NodeFactory.createLiteral("Not p1");
+		testTriples.add(new Triple(s, p, t2));
+			
+		//Predicate subProperty
+		final Node t3 = NodeFactory.createLiteral("Subtype");
+		p = RDFS.subPropertyOf.asNode();
+		testTriples.add(new Triple(t3, p, s));
+		
+		//Predicate Intersection
+		p = OWL.equivalentProperty.asNode();
+		final Node t4 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t4));	
+		p = OWL.intersectionOf.asNode();
+		final Node t5 = NodeFactory.createLiteral("p3");
+		testTriples.add(new Triple(t4, p, t5));		
+		final Node t6 = NodeFactory.createLiteral("p4");
+		testTriples.add(new Triple(t4, p, t6));
+		
+		//Predicate Union
+		p = OWL.equivalentProperty.asNode();
+		final Node t7 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t7));	
+		p = OWL.unionOf.asNode();
+		final Node t8 = NodeFactory.createLiteral("p5");
+		testTriples.add(new Triple(t7, p, t8));		
+		final Node t9 = NodeFactory.createLiteral("p6");
+		testTriples.add(new Triple(t7, p, t9));
+
+		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
+		
+		p = s;
+		s = NodeFactory.createLiteral("s");
+		final Node o = NodeFactory.createLiteral("o");
+		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		final Set<Triple> translationTriples = new HashSet<>();
+		assertTrue(translation instanceof SPARQLUnionPatternImpl);
+		boolean oneUnion = false;
+		boolean oneIntersection = false;
+		for (final SPARQLGraphPattern i : ((SPARQLUnionPatternImpl) translation).getSubPatterns()) {
+			if(i instanceof SPARQLUnionPatternImpl) {
+				if(oneUnion) {
+					oneUnion = false;
+					break;
+				} else {
+					oneUnion = true;
+					for (final SPARQLGraphPattern j : ((SPARQLUnionPatternImpl) i).getSubPatterns()) {
+						assertTrue(j instanceof TriplePattern);
+						translationTriples.add(((TriplePattern) j).asJenaTriple());
+					}
+				}
+			} else if (i instanceof BGPImpl) {
+				if(oneIntersection) {
+					oneIntersection = false;
+					break;
+				} else {
+					oneIntersection = true;
+					for (final TriplePattern k : ((BGPImpl) i).getTriplePatterns()) {
+						translationTriples.add(k.asJenaTriple());
+					}
+				}
+			} else if (i instanceof TriplePattern) {
+				translationTriples.add(((TriplePattern) i).asJenaTriple());
+			} else {
+				throw new IllegalArgumentException(i.getClass().toString());
+			}
+		}
+		assertTrue(oneUnion);
+		assertTrue(oneIntersection);
+			
+		final Set<Triple> expectedResults = new HashSet<>();
+		expectedResults.add(new Triple(s, t1, o));
+		expectedResults.add(new Triple(o, t2, s));
+		expectedResults.add(new Triple(s, t3, o));
+		expectedResults.add(new Triple(s, t5, o));
+		expectedResults.add(new Triple(s, t6, o));
+		expectedResults.add(new Triple(s, t8, o));
+		expectedResults.add(new Triple(s, t9, o));
+		
+		assertEquals(translationTriples, expectedResults);
+	}
+	
+	@Test
+	public void TranslateObjectTest() {
+		final Set<Triple> testTriples = new HashSet<>();
+		//Equality
+		Node s = NodeFactory.createLiteral("o1");
+		Node p = OWL.equivalentClass.asNode();
+		final Node t1 = NodeFactory.createLiteral("o2");
+		testTriples.add(new Triple(s, p, t1));
+		
+		//Equality
+		p = OWL.sameAs.asNode();
+		final Node t2 = NodeFactory.createLiteral("o3");
+		testTriples.add(new Triple(s, p, t2));	
+		
+		//Object subClass
+		final Node t3 = NodeFactory.createLiteral("Subclass");
+		p = RDFS.subClassOf.asNode();
+		testTriples.add(new Triple(t3, p, s));
+		
+		//Object Intersection
+		p = OWL.equivalentClass.asNode();
+		final Node t4 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t4));	
+		p = OWL.intersectionOf.asNode();
+		final Node t5 = NodeFactory.createLiteral("o4");
+		testTriples.add(new Triple(t4, p, t5));		
+		final Node t6 = NodeFactory.createLiteral("o5");
+		testTriples.add(new Triple(t4, p, t6));
+		
+		//Object Union
+		p = OWL.equivalentClass.asNode();
+		final Node t7 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t7));	
+		p = OWL.unionOf.asNode();
+		final Node t8 = NodeFactory.createLiteral("o6");
+		testTriples.add(new Triple(t7, p, t8));		
+		final Node t9 = NodeFactory.createLiteral("o7");
+		testTriples.add(new Triple(t7, p, t9));
+
+		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
+		
+		final Node o = s;
+		s = NodeFactory.createLiteral("s");
+		p = RDF.type.asNode();
+		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		final Set<Triple> translationTriples = new HashSet<>();
+		assertTrue(translation instanceof SPARQLUnionPatternImpl);
+		boolean oneUnion = false;
+		boolean oneIntersection = false;
+		for (final SPARQLGraphPattern i : ((SPARQLUnionPatternImpl) translation).getSubPatterns()) {
+			if(i instanceof SPARQLUnionPatternImpl) {
+				if(oneUnion) {
+					oneUnion = false;
+					break;
+				} else {
+					oneUnion = true;
+					for (final SPARQLGraphPattern j : ((SPARQLUnionPatternImpl) i).getSubPatterns()) {
+						assertTrue(j instanceof TriplePattern);
+						translationTriples.add(((TriplePattern) j).asJenaTriple());
+					}
+				}
+			} else if (i instanceof BGPImpl) {
+				if(oneIntersection) {
+					oneIntersection = false;
+					break;
+				} else {
+					oneIntersection = true;
+					for (final TriplePattern k : ((BGPImpl) i).getTriplePatterns()) {
+						translationTriples.add(k.asJenaTriple());
+					}
+				}
+			} else if (i instanceof TriplePattern) {
+				translationTriples.add(((TriplePattern) i).asJenaTriple());
+			} else {
+				throw new IllegalArgumentException(i.getClass().toString());
+			}
+		}
+		System.out.print("\n");
+		assertTrue(oneUnion);
+		assertTrue(oneIntersection);
+			
+		final Set<Triple> expectedResults = new HashSet<>();
+		expectedResults.add(new Triple(s, p, t1));
+		expectedResults.add(new Triple(s, p, t2));
+		expectedResults.add(new Triple(s, p, t3));
+		expectedResults.add(new Triple(s, p, t5));
+		expectedResults.add(new Triple(s, p, t6));
+		expectedResults.add(new Triple(s, p, t8));
+		expectedResults.add(new Triple(s, p, t9));
+		
+		assertEquals(translationTriples, expectedResults);
+	}
+	
 	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples(){
 		final Set<Triple> testSet = new HashSet<>();
 		

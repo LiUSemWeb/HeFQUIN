@@ -57,13 +57,14 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final List<SPARQLGraphPattern> predicateTranslation = new ArrayList<>();
 		for(final SPARQLGraphPattern j : objectTranslation) {
 			
-			if(j instanceof SPARQLUnionPattern) {
-				
+			if(j instanceof SPARQLUnionPatternImpl) {				
 				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {		
+				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {
+					
 					if(k instanceof TriplePattern) {
 						union.addSubPattern(translatePredicate((TriplePattern) k));
-					} else if (k instanceof BGP) {
+						
+					} else if (k instanceof BGPImpl) {
 						
 						final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
 						final Set<TriplePattern> tpSubPatterns = new HashSet<>();
@@ -84,18 +85,28 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 						if ( allSubPatternsAreTriplePatterns ) {
 							union.addSubPattern( new BGPImpl(tpSubPatterns) );
-						}
-						else {
+						} else {
 							union.addSubPattern( new SPARQLGroupPatternImpl(allSubPatterns) );
 						}
 						
+					} else if (k instanceof SPARQLUnionPatternImpl) {
+						final SPARQLUnionPatternImpl innerUnion = new SPARQLUnionPatternImpl();
+						for(final SPARQLGraphPattern m: ((SPARQLUnionPattern) k).getSubPatterns()) {
+							if(m instanceof TriplePattern) {
+								innerUnion.addSubPattern(translatePredicate((TriplePattern) m));
+							} else {
+								throw new IllegalArgumentException(m.getClass().getName());
+							}
+						}
+						union.addSubPattern(innerUnion);
+					
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
 				}
 				predicateTranslation.add(union);
 				
-			} else if (j instanceof BGP) { 
+			} else if (j instanceof BGPImpl) { 
 				// try to create a BGP if possible (which is the case if all
 				// the graph patterns resulting from the predicate translation
 				// are triple patterns); if not possible, then create a group
@@ -155,6 +166,10 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				throw new IllegalArgumentException(m.getPredicate().getURI());
 			}
 		}
+		
+		if(results.isEmpty()) {
+			results.add(tp);
+		}
 		return results;
 	}
 	
@@ -181,11 +196,9 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				resultsList.add(translation);
 			} else {
 				if (!jenaTP.getPredicate().isURI()) {
-					resultsList.add(tp);
 					continue;
 				} else {
 					if(!jenaTP.getPredicate().equals(RDF.type.asNode())) {
-						resultsList.add(tp);
 						continue;
 					}
 				}
@@ -206,8 +219,10 @@ public class VocabularyMappingImpl implements VocabularyMapping
 							final Node iPredicate = i.getPredicate();
 							if(newPredicate == null) {
 								newPredicate = iPredicate;
-							} else if (!iPredicate.equals(newPredicate)) {
-								throw new IllegalArgumentException( iPredicate.toString() );		
+							} else {
+								if (!iPredicate.equals(newPredicate)) {
+									throw new IllegalArgumentException( iPredicate.toString() );
+								}
 							}
 							objects.add(i.getObject());
 						}
@@ -219,6 +234,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 								union.addSubPattern(translation);
 							}
 							resultsList.add(union);
+							for(SPARQLGraphPattern gp : union.getSubPatterns()) {
+							}
 							
 						} else if (newPredicate.equals(OWL.intersectionOf.asNode())) {
 							 final BGPImpl intersection = new BGPImpl();
@@ -242,7 +259,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			}
 		}
 		
-		if(resultsList.size() == 0) {
+		if(resultsList.isEmpty()) {
 			return tp;
 		} else if (resultsList.size() > 1) {
 			return new SPARQLUnionPatternImpl(resultsList);
@@ -335,7 +352,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final Set<Triple> mappings = new HashSet<>();
 		final Iterator<Triple> i = vocabularyMapping.find(s,p,o);
 		while(i.hasNext()) {
-			mappings.add(i.next());
+			Triple next = i.next();
+			mappings.add(next);
 		}
 		return mappings;
 	}
