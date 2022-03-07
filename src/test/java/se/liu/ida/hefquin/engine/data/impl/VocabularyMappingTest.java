@@ -3,10 +3,8 @@ package se.liu.ida.hefquin.engine.data.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -18,13 +16,10 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -148,11 +143,12 @@ public class VocabularyMappingTest
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
-		p = s;
 		s = NodeFactory.createLiteral("s");
+		p = NodeFactory.createLiteral("p1");
 		final Node o = NodeFactory.createLiteral("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+
 		final Set<Triple> translationTriples = new HashSet<>();
 		assertTrue(translation instanceof SPARQLUnionPatternImpl);
 		boolean oneUnion = false;
@@ -196,8 +192,25 @@ public class VocabularyMappingTest
 		expectedResults.add(new Triple(s, t6, o));
 		expectedResults.add(new Triple(s, t8, o));
 		expectedResults.add(new Triple(s, t9, o));
+
+		/*
+		final SPARQLUnionPatternImpl expectedResults = new SPARQLUnionPatternImpl();
+		expectedResults.addSubPattern(new TriplePatternImpl(s, t1, o));
+		expectedResults.addSubPattern(new TriplePatternImpl(o, t2, s));
+		expectedResults.addSubPattern(new TriplePatternImpl(s, t3, o));
+		final BGPImpl intersection = new BGPImpl();
+		intersection.addTriplePattern(new TriplePatternImpl(s, t5, o));
+		intersection.addTriplePattern(new TriplePatternImpl(s, t6, o));
+		expectedResults.addSubPattern(intersection);
+		final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+		union.addSubPattern(new TriplePatternImpl(s, t8, o));
+		union.addSubPattern(new TriplePatternImpl(s, t9, o));
+		expectedResults.addSubPattern(union);
 		
-		assertEquals(translationTriples, expectedResults);
+		assertEquals(expectedResults, translation);
+		*/
+		
+		assertEquals(expectedResults, translationTriples);
 	}
 	
 	@Test
@@ -241,9 +254,9 @@ public class VocabularyMappingTest
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
-		final Node o = s;
 		s = NodeFactory.createLiteral("s");
 		p = RDF.type.asNode();
+		final Node o = NodeFactory.createLiteral("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		final Set<Triple> translationTriples = new HashSet<>();
@@ -291,7 +304,7 @@ public class VocabularyMappingTest
 		expectedResults.add(new Triple(s, p, t8));
 		expectedResults.add(new Triple(s, p, t9));
 		
-		assertEquals(translationTriples, expectedResults);
+		assertEquals(expectedResults, translationTriples);
 	}
 	
 	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples(){

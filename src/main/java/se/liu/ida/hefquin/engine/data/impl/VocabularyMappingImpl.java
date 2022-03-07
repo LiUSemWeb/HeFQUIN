@@ -57,14 +57,14 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final List<SPARQLGraphPattern> predicateTranslation = new ArrayList<>();
 		for(final SPARQLGraphPattern j : objectTranslation) {
 			
-			if(j instanceof SPARQLUnionPatternImpl) {				
+			if(j instanceof SPARQLUnionPattern) {				
 				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
 				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {
 					
 					if(k instanceof TriplePattern) {
 						union.addSubPattern(translatePredicate((TriplePattern) k));
 						
-					} else if (k instanceof BGPImpl) {
+					} else if (k instanceof BGP) {
 						
 						final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
 						final Set<TriplePattern> tpSubPatterns = new HashSet<>();
@@ -89,7 +89,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 							union.addSubPattern( new SPARQLGroupPatternImpl(allSubPatterns) );
 						}
 						
-					} else if (k instanceof SPARQLUnionPatternImpl) {
+					} else if (k instanceof SPARQLUnionPattern) {
 						final SPARQLUnionPatternImpl innerUnion = new SPARQLUnionPatternImpl();
 						for(final SPARQLGraphPattern m: ((SPARQLUnionPattern) k).getSubPatterns()) {
 							if(m instanceof TriplePattern) {
@@ -106,7 +106,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				}
 				predicateTranslation.add(union);
 				
-			} else if (j instanceof BGPImpl) { 
+			} else if (j instanceof BGP) { 
 				// try to create a BGP if possible (which is the case if all
 				// the graph patterns resulting from the predicate translation
 				// are triple patterns); if not possible, then create a group
@@ -234,8 +234,6 @@ public class VocabularyMappingImpl implements VocabularyMapping
 								union.addSubPattern(translation);
 							}
 							resultsList.add(union);
-							for(SPARQLGraphPattern gp : union.getSubPatterns()) {
-							}
 							
 						} else if (newPredicate.equals(OWL.intersectionOf.asNode())) {
 							 final BGPImpl intersection = new BGPImpl();
