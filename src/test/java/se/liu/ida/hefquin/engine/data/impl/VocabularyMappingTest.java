@@ -193,6 +193,8 @@ public class VocabularyMappingTest
 		expectedResults.add(new Triple(s, t8, o));
 		expectedResults.add(new Triple(s, t9, o));
 
+		assertEquals(expectedResults, translationTriples);
+
 		/*
 		final SPARQLUnionPatternImpl expectedResults = new SPARQLUnionPatternImpl();
 		expectedResults.addSubPattern(new TriplePatternImpl(s, t1, o));
@@ -210,7 +212,6 @@ public class VocabularyMappingTest
 		assertEquals(expectedResults, translation);
 		*/
 		
-		assertEquals(expectedResults, translationTriples);
 	}
 	
 	@Test
