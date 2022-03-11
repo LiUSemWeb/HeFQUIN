@@ -44,10 +44,7 @@ public class BGPImpl implements BGP
 			otpsTriple.add(j.asJenaTriple());
 		}
 		
-		if ( tpsTriple.equals(otpsTriple) )
-			return true;
-		else if ( tps.size() != otps.size() )
-			return false;
+		return tpsTriple.equals(otpsTriple)
 		else
 			return tps.containsAll(otps);
 	}
