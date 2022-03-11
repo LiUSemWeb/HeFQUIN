@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.jena.graph.Triple;
+
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -30,7 +32,19 @@ public class BGPImpl implements BGP
 			otps = ((BGPImpl) o).tps;
 		else
 			otps = ((BGP) o).getTriplePatterns();
-		if ( tps == otps )
+		
+		final Set<Triple> tpsTriple = new HashSet<>();
+		final Set<Triple> otpsTriple = new HashSet<>();
+		
+		for(TriplePattern i : tps) {
+			tpsTriple.add(i.asJenaTriple());
+		}
+		
+		for(TriplePattern j : otps) {
+			otpsTriple.add(j.asJenaTriple());
+		}
+		
+		if ( tpsTriple.equals(otpsTriple) )
 			return true;
 		else if ( tps.size() != otps.size() )
 			return false;
