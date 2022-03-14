@@ -17,28 +17,30 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.TestUtils;
 
 public class ExecOpFilterTest
 {
 	@Test
 	public void filter_Numbers() {
-		final FilterTestSink sink = new FilterTestSink();
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
 		final Node value8 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
-		final Node value12 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
-		final Var x8 = Var.alloc("x");
-		final Var x12 = Var.alloc("x");
+		final Node value9 = NodeFactory.createLiteral("9", XSDDatatype.XSDinteger);
+		final Node value12 = NodeFactory.createLiteral("12", XSDDatatype.XSDinteger);
+		final Var x = Var.alloc("x");
 		
-		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x8, value8);
-		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x12, value12);
+		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x, value8);
+		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(x, value9);
+		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x, value12);
 		
 		resultBlock.add(sol8);
-		resultBlock.add(sol12);
+		resultBlock.add(sol12); // 12 is added before 9. This should not pass the filter. 9 should be after 8.
+		resultBlock.add(sol9);
 		
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10);
 		try {
@@ -47,8 +49,9 @@ public class ExecOpFilterTest
 			e.printStackTrace();
 		}
 
-		final Iterator<SolutionMapping> it = resultBlock.getSolutionMappings().iterator();
-		assertHasNext( it, 8, x8);
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		assertHasNext( it, 8, x);
+		assertHasNext( it, 9, x); // See that 9 made it and 12 did not, as 9 < 10 is true whereas 12 < 10 is false.
 	}
 
 	@Test
@@ -66,13 +69,4 @@ public class ExecOpFilterTest
 		
 		assertEquals( expectedIntforV1, b.get(v1).getLiteralValue() );
 	}
-
-	protected static class FilterTestSink implements IntermediateResultElementSink
-	{
-		@Override
-		public void send( final SolutionMapping element ) {
-			// Do nothing;
-		}
-    }
-
 }
