@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.impl.XSDDateType;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
@@ -55,8 +56,43 @@ public class ExecOpFilterTest
 	}
 
 	@Test
-	public void test2_RenameTheseTestMethodsToSomethingThatDescribesTheirPurpose() {
+	public void filter_Dates() {
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
+		final Expr after2019 = ExprUtils.parse("?x > 2019-12-31");
+	
+
+		final Node date2020 = NodeFactory.createLiteral("2020-10-20", XSDDatatype.XSDdate);
+		final Node date2019 = NodeFactory.createLiteral("2019-10-20", XSDDatatype.XSDdate);
+		final Node date2021 = NodeFactory.createLiteral("2021-02-01", XSDDatatype.XSDdate);
+		final Node dateNewYearsEve = NodeFactory.createLiteral("2019-12-31", XSDDatatype.XSDdate);
+		final Node dateNewYearsDay = NodeFactory.createLiteral("2020-01-01", XSDDatatype.XSDdate);
+		final Var x = Var.alloc("x");
 		
+
+		final SolutionMapping sol2020 = SolutionMappingUtils.createSolutionMapping(x, date2020);
+		final SolutionMapping sol2019 = SolutionMappingUtils.createSolutionMapping(x, date2019);
+		final SolutionMapping sol2021 = SolutionMappingUtils.createSolutionMapping(x, date2021);
+		final SolutionMapping solNYE = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsEve);
+		final SolutionMapping solNYD = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsDay);
+		
+		resultBlock.add(sol2020);
+		resultBlock.add(sol2019);
+		resultBlock.add(sol2021);
+		resultBlock.add(solNYE);
+		resultBlock.add(solNYD);
+		
+		final ExecOpFilter filterAfter2019= new ExecOpFilter(after2019);
+		try {
+			filterAfter2019.process(resultBlock, sink, TestUtils.createExecContextForTests());
+		} catch (ExecOpExecutionException e) {
+			e.printStackTrace();
+		}
+
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		assertHasNext( it, 2020-10-20, x);
+		assertHasNext( it, 2021-02-01, x);
+		assertHasNext( it, 2020-01-01, x);
 	}
 	
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
@@ -68,5 +104,16 @@ public class ExecOpFilterTest
 		assertEquals(1, b.size() );
 		
 		assertEquals( expectedIntforV1, b.get(v1).getLiteralValue() );
+	}
+	
+	protected void assertHasNext( final Iterator<SolutionMapping> it,
+								  final XSDDateType expectedDateforV1, final Var v1 )
+	{
+		assertTrue( it.hasNext() );
+		
+		final Binding b = it.next().asJenaBinding();
+		assertEquals(1, b.size() );
+		
+		assertEquals( expectedDateforV1, b.get(v1).getLiteralValue() );
 	}
 }
