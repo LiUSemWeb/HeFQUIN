@@ -32,7 +32,7 @@ public class ExecOpFilter implements UnaryExecutableOp
 		
 		
 		// For every solution mapping in the input...
-		for(SolutionMapping solution : input.getSolutionMappings()) {
+		for( final SolutionMapping solution : input.getSolutionMappings() ) {
 			//Check whether it satisfies the filter expression
 			
 			try {
