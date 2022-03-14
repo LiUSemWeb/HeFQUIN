@@ -24,6 +24,8 @@ public class BGPImpl implements BGP
 
 	@Override
 	public boolean equals( final Object o ) {
+		//System.out.print("In BGP equals: " + o + ", " + tps + "\n");
+		
 		if ( ! (o instanceof BGP) )
 			return false;
 

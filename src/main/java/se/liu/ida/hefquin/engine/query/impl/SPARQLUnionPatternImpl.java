@@ -7,8 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Triple;
+
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 {
@@ -43,15 +46,29 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 
 	@Override
 	public boolean equals( final Object other ) {
-		
+		//System.out.print("In Union equals: " + other.toString() + ", " + subPatterns + "\n");
 		if ( this == other )
 			return true;
 
 		if ( other == null || !(other instanceof SPARQLUnionPattern) )
 			return false;
-
+		
+		/*
+		final Set<SPARQLGraphPattern> thisTriple = new HashSet<>();
+		final Set<SPARQLGraphPattern> otherTriple = new HashSet<>();
+		
+		for(SPARQLGraphPattern i : subPatterns) {
+			thisTriple.add(i);
+		}
+		
+		for(SPARQLGraphPattern j : ((SPARQLUnionPattern) other).getSubPatterns()) {
+			otherTriple.add(j);
+		}
+		
+		return thisTriple.equals(otherTriple);
+		*/
+		
 		return subPatterns.containsAll((Collection<?>) ((SPARQLUnionPattern) other).getSubPatterns());
-
 	}
 
 }

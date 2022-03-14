@@ -23,6 +23,7 @@ public class TriplePatternImpl implements TriplePattern
 
 	@Override
 	public boolean equals( final Object o ) {
+		//System.out.print("In TriplePattern equals: " + o + ", " + jenaObj + "\n");
 		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);	
 	}
 
