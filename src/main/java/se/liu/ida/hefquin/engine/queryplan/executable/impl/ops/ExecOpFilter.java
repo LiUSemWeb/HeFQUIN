@@ -43,7 +43,11 @@ public class ExecOpFilter implements UnaryExecutableOp
 					throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
 				}
 			} catch ( final VariableNotBoundException e ) {
-				throw new ExecOpExecutionException("A variable name in the binding does not match the variable names in the filter.", null);
+				// The current solution mapping does not satisfy the filter condition (because
+				// evaluating the filter expression based on this solution mapping resulted in
+				// this error). Therefore this solution mapping is not in the output of this operator
+				// and, thus, must not be sent to the sink. Hence, we do not have to do anything
+				// here in this catch block.
 			}
 			
 		}
