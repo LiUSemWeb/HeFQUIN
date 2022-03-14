@@ -42,7 +42,7 @@ public class ExecOpFilter implements UnaryExecutableOp
 				} else if (evaluationResult != NodeValue.FALSE ) {
 					throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
 				}
-			} catch (VariableNotBoundException e) {
+			} catch ( final VariableNotBoundException e ) {
 				throw new ExecOpExecutionException("A variable name in the binding does not match the variable names in the filter.", null);
 			}
 			
