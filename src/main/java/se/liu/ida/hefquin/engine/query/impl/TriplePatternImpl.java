@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
-import java.util.Objects;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
@@ -23,7 +21,6 @@ public class TriplePatternImpl implements TriplePattern
 
 	@Override
 	public boolean equals( final Object o ) {
-		//System.out.print("In TriplePattern equals: " + o + ", " + jenaObj + "\n");
 		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);	
 	}
 

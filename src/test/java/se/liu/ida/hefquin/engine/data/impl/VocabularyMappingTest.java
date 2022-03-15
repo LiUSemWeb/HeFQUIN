@@ -311,39 +311,6 @@ public class VocabularyMappingTest
 		 o = NodeFactory.createLiteral("o5");
 		 testSet.add(new Triple(s, p, o));
 		 */
-		 
-		
-		/*
-		SPARQLUnionPatternImpl pUnion1 = new SPARQLUnionPatternImpl();
-		pUnion1.addSubPattern(new TriplePatternImpl(s1Res, p2Res, o1Res));
-		pUnion1.addSubPattern(new TriplePatternImpl(o1Res, p1Res, s1Res));
-		
-		SPARQLUnionPatternImpl pUnion2 = new SPARQLUnionPatternImpl();
-		pUnion2.addSubPattern(new TriplePatternImpl(s1Res, p2Res, o2Res));
-		pUnion2.addSubPattern(new TriplePatternImpl(o2Res, p1Res, s1Res));
-		
-		SPARQLUnionPatternImpl pUnion3 = new SPARQLUnionPatternImpl();
-		pUnion3.addSubPattern(new TriplePatternImpl(s2Res, p2Res, o1Res));
-		pUnion3.addSubPattern(new TriplePatternImpl(o1Res, p1Res, s2Res));
-		
-		SPARQLUnionPatternImpl pUnion4 = new SPARQLUnionPatternImpl();
-		pUnion4.addSubPattern(new TriplePatternImpl(s2Res, p2Res, o2Res));
-		pUnion4.addSubPattern(new TriplePatternImpl(o2Res, p1Res, s2Res));
-		
-		List<SPARQLGraphPattern> oList1 = new ArrayList<>();
-		oList1.add(pUnion1);
-		oList1.add(pUnion2);
-		SPARQLGroupPattern oIntersection1 = new SPARQLGroupPatternImpl(oList1);
-		
-		List<SPARQLGraphPattern> oList2 = new ArrayList<>();
-		oList2.add(pUnion3);
-		oList2.add(pUnion4);
-		SPARQLGroupPattern oIntersection2 = new SPARQLGroupPatternImpl(oList2);
-		
-		SPARQLUnionPatternImpl sUnion = new SPARQLUnionPatternImpl();
-		sUnion.addSubPattern(oIntersection1);
-		sUnion.addSubPattern(oIntersection2);
-		*/
 		
 		Set<Triple> expectedResults = new HashSet<>();
 		expectedResults.add(new Triple(s1Res, p2Res, o1Res));
