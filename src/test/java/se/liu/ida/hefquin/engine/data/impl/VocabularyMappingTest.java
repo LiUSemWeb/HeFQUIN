@@ -3,8 +3,10 @@ package se.liu.ida.hefquin.engine.data.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -21,6 +23,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -141,26 +144,37 @@ public class VocabularyMappingTest
 		p = NodeFactory.createLiteral("p1");
 		final Node o = NodeFactory.createLiteral("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 		
+		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
+		assertTrue(translation instanceof SPARQLUnionPattern);
+		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+			if(i instanceof SPARQLUnionPattern) {
+				assertTrue(((SPARQLUnionPattern) i).getNumberOfSubPatterns() == 2);
+				for(SPARQLGraphPattern j : ((SPARQLUnionPattern) i).getSubPatterns()) {
+					translationSubPatterns.add(j);
+				}
+			} else {
+				translationSubPatterns.add(i);
+			}
+		}
 	
-		final SPARQLUnionPatternImpl expectedResults = new SPARQLUnionPatternImpl();
-		expectedResults.addSubPattern(new TriplePatternImpl(s, t3, o));
-		expectedResults.addSubPattern(new TriplePatternImpl(s, t1, o));
+		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
+		expectedResults.add(new TriplePatternImpl(s, t3, o));
+		expectedResults.add(new TriplePatternImpl(s, t1, o));
 		
-		final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-		union.addSubPattern(new TriplePatternImpl(s, t8, o));
-		union.addSubPattern(new TriplePatternImpl(s, t9, o));
-		expectedResults.addSubPattern(union);
+		//Union subpatterns
+		expectedResults.add(new TriplePatternImpl(s, t8, o));
+		expectedResults.add(new TriplePatternImpl(s, t9, o));
 		
 		final BGPImpl intersection = new BGPImpl();
 		intersection.addTriplePattern(new TriplePatternImpl(s, t5, o));
 		intersection.addTriplePattern(new TriplePatternImpl(s, t6, o));
-		expectedResults.addSubPattern(intersection);
+		expectedResults.add(intersection);
 		
-		expectedResults.addSubPattern(new TriplePatternImpl(o, t2, s));
+		expectedResults.add(new TriplePatternImpl(o, t2, s));
 		
-		assertEquals(expectedResults, translation);
-		
+		assertTrue(translationSubPatterns.containsAll(expectedResults));
+		assertTrue(translationSubPatterns.size() == expectedResults.size());
 	}
 	
 	@Test
@@ -209,23 +223,35 @@ public class VocabularyMappingTest
 		final Node o = NodeFactory.createLiteral("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
+		assertTrue(translation instanceof SPARQLUnionPattern);
+		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+			if(i instanceof SPARQLUnionPattern) {
+				assertTrue(((SPARQLUnionPattern) i).getNumberOfSubPatterns() == 2);
+				for(SPARQLGraphPattern j : ((SPARQLUnionPattern) i).getSubPatterns()) {
+					translationSubPatterns.add(j);
+				}
+			} else {
+				translationSubPatterns.add(i);
+			}
+		}
 			
-		final SPARQLUnionPatternImpl expectedResults = new SPARQLUnionPatternImpl();
-		expectedResults.addSubPattern(new TriplePatternImpl(s, p, t1));
-		expectedResults.addSubPattern(new TriplePatternImpl(s, p, t2));
-		expectedResults.addSubPattern(new TriplePatternImpl(s, p, t3));
+		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
+		expectedResults.add(new TriplePatternImpl(s, p, t1));
+		expectedResults.add(new TriplePatternImpl(s, p, t2));
+		expectedResults.add(new TriplePatternImpl(s, p, t3));
 		
-		final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-		union.addSubPattern(new TriplePatternImpl(s, p, t8));
-		union.addSubPattern(new TriplePatternImpl(s, p, t9));
-		expectedResults.addSubPattern(union);
+		//Union subpatterns
+		expectedResults.add(new TriplePatternImpl(s, p, t8));
+		expectedResults.add(new TriplePatternImpl(s, p, t9));
 		
 		final BGPImpl intersection = new BGPImpl();
 		intersection.addTriplePattern(new TriplePatternImpl(s, p, t5));
 		intersection.addTriplePattern(new TriplePatternImpl(s, p, t6));
-		expectedResults.addSubPattern(intersection);
+		expectedResults.add(intersection);
 		
-		assertEquals(expectedResults, translation);
+		assertTrue(translationSubPatterns.containsAll(expectedResults));
+		assertTrue(translationSubPatterns.size() == expectedResults.size());
 	}
 	
 	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples(){

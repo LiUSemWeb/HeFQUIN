@@ -46,14 +46,13 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 
 	@Override
 	public boolean equals( final Object other ) {
-		//System.out.print("In Union equals: " + ((Collection<?>) ((SPARQLUnionPattern) other).getSubPatterns()) + ", " + subPatterns + "\n");
 		if ( this == other )
 			return true;
 
 		if ( other == null || !(other instanceof SPARQLUnionPattern) )
 			return false;
 		
-		return subPatterns.containsAll((Collection<?>) ((SPARQLUnionPattern) other).getSubPatterns()) && subPatterns.size() == ((SPARQLUnionPattern) other).getNumberOfSubPatterns();
+		return subPatterns.equals((Collection<?>) ((SPARQLUnionPattern) other).getSubPatterns());
 	}
 
 }
