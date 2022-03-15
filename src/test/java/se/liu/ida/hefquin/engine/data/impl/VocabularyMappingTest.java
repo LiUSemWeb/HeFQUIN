@@ -90,13 +90,19 @@ public class VocabularyMappingTest
 		p = NodeFactory.createLiteral("p");
 		final Node o = NodeFactory.createLiteral("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
+		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
+		assertTrue(translation instanceof SPARQLUnionPattern);
+		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+			translationSubPatterns.add(i);
+		}
 		
-		final SPARQLUnionPatternImpl expectedResults = new SPARQLUnionPatternImpl();
-		expectedResults.addSubPattern(new TriplePatternImpl(t1, p, o));
-		expectedResults.addSubPattern(new TriplePatternImpl(t2, p, o));
+		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
+		expectedResults.add(new TriplePatternImpl(t1, p, o));
+		expectedResults.add(new TriplePatternImpl(t2, p, o));
 		
-		assertEquals(expectedResults, translation);
+		assertTrue(translationSubPatterns.containsAll(expectedResults));
+		assertTrue(translationSubPatterns.size() == expectedResults.size());
 	}
 	
 	@Test
