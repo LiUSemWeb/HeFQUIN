@@ -156,6 +156,7 @@ public class VocabularyMappingTest
 		intersection.addTriplePattern(new TriplePatternImpl(s, t5, o));
 		intersection.addTriplePattern(new TriplePatternImpl(s, t6, o));
 		expectedResults.addSubPattern(intersection);
+		
 		expectedResults.addSubPattern(new TriplePatternImpl(o, t2, s));
 		
 		assertEquals(expectedResults, translation);
