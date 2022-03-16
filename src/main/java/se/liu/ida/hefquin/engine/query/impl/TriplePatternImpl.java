@@ -53,9 +53,9 @@ public class TriplePatternImpl implements TriplePattern
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof TriplePatternImpl)) return false;
-		TriplePatternImpl that = (TriplePatternImpl) o;
-		return Objects.equals(jenaObj, that.jenaObj);
+		if (!(o instanceof TriplePattern)) return false;
+		final TriplePattern that = (TriplePattern) o;
+		return Objects.equals( jenaObj, that.asJenaTriple() );
 	}
 
 	@Override

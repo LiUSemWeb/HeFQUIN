@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.query.impl;
 
 import java.util.*;
 
-import org.apache.jena.graph.Triple;
-
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -43,11 +41,19 @@ public class BGPImpl implements BGP
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals( final Object o ) {
 		if (this == o) return true;
-		if (!(o instanceof BGPImpl)) return false;
-		BGPImpl bgp = (BGPImpl) o;
-		return Objects.equals(tps, bgp.tps);
+		if ( !(o instanceof BGP) ) return false;
+
+		if ( o instanceof BGPImpl ) {
+			final BGPImpl bgp = (BGPImpl) o;
+			return Objects.equals(tps, bgp.tps);
+		}
+		else {
+			final BGP bgp = (BGP) o;
+			final Set<? extends TriplePattern> tpsOther = bgp.getTriplePatterns();
+			return (tps.size() == tpsOther.size()) && tps.containsAll(tpsOther);
+		}
 	}
 
 	@Override
