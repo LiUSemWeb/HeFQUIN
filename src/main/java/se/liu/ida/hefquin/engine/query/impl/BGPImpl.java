@@ -1,9 +1,6 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.jena.graph.Triple;
 
@@ -20,38 +17,6 @@ public class BGPImpl implements BGP
 
 	public BGPImpl( final TriplePattern ... tps ) {
 		this.tps = new HashSet<>( Arrays.asList(tps) );
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		
-		if ( ! (o instanceof BGP) )
-			return false;
-
-		final Set<? extends TriplePattern> otps;
-		if ( o instanceof BGPImpl )
-			otps = ((BGPImpl) o).tps;
-		else
-			otps = ((BGP) o).getTriplePatterns();
-		
-		final Set<Triple> tpsTriple = new HashSet<>();
-		final Set<Triple> otpsTriple = new HashSet<>();
-		
-		for(TriplePattern i : tps) {
-			tpsTriple.add(i.asJenaTriple());
-		}
-		
-		for(TriplePattern j : otps) {
-			otpsTriple.add(j.asJenaTriple());
-		}
-		
-		return tpsTriple.equals(otpsTriple);
-		
-		/*
-		System.out.print("In BGP equals: " + otps + ", " + tps + " Answer: " + tps.containsAll(otps) + "\n");
-		return tps.size() == otps.size() && tps.containsAll(otps);
-		*/
-
 	}
 
 	@Override
@@ -75,5 +40,18 @@ public class BGPImpl implements BGP
 		builder.append( " )");
 
 		return builder.toString();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof BGPImpl)) return false;
+		BGPImpl bgp = (BGPImpl) o;
+		return Objects.equals(tps, bgp.tps);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(tps);
 	}
 }
