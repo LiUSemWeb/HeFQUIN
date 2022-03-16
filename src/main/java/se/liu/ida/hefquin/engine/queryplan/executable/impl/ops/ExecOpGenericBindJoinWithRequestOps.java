@@ -11,12 +11,12 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-
-import java.util.Set;
 
 /**
  * Abstract base class to implement bind joins by using request operators.
@@ -40,9 +40,9 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 	@Override
-	public void process( final IntermediateResultBlock input,
-	                     final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt)
+	protected void _process( final IntermediateResultBlock input,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt)
 			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings() );
@@ -104,7 +104,17 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 				}
 				return new OpBGP(bgp);
 			}
-			else return ((SPARQLGraphPattern)query).asJenaOp();
+			else if ( query instanceof GenericSPARQLGraphPatternImpl1 ) {
+				@SuppressWarnings("deprecation")
+				final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) query ).asJenaOp();
+				return jenaOp;
+			}
+			else if ( query instanceof GenericSPARQLGraphPatternImpl2 ) {
+				return ( (GenericSPARQLGraphPatternImpl2) query ).asJenaOp();
+			}
+			else {
+				throw new UnsupportedOperationException( query.getClass().getName() );
+			}
 		}
 		else
 			throw new IllegalArgumentException("Unsupported type of query pattern: " + query.getClass().getName() );

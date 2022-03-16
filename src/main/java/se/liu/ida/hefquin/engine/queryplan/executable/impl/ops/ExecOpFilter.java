@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpFilter implements UnaryExecutableOp
+public class ExecOpFilter extends UnaryExecutableOpBase
 {
 	protected final Expr filterExpression;
 
@@ -26,9 +26,9 @@ public class ExecOpFilter implements UnaryExecutableOp
 	}
 
 	@Override
-	public void process( final IntermediateResultBlock input,
-	                     final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	protected void _process( final IntermediateResultBlock input,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
 
 		// For every solution mapping in the input...
 		for( final SolutionMapping solution : input.getSolutionMappings() ) {
@@ -51,8 +51,8 @@ public class ExecOpFilter implements UnaryExecutableOp
 	}
 
 	@Override
-	public void concludeExecution( final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt ) {
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt ) {
 		// nothing to be done here
 	}
 

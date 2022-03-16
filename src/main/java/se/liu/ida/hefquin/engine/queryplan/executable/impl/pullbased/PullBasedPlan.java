@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
 import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
+import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
@@ -23,6 +24,16 @@ public class PullBasedPlan implements ExecutablePlan
 		catch ( final ResultElementIterException ex ) {
 			throw new ExecutionException( "An exception occurred during result iteration.", ex.getWrappedExecutionException() );
 		}
+	}
+
+	@Override
+	public void resetStats() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ExecutablePlanStats getStats() {
+		return ResultIteratorUtils.tryGetStatsOfProducingSubPlan(it);
 	}
 
 }

@@ -16,11 +16,11 @@ public class Neo4jRequestProcessorImplTest extends EngineTestBase {
 
     @Test
     public void testLocalhost() throws FederationAccessException {
-        if ( ! skipLiveWebTests ){
+        if ( ! skipLocalNeo4jTests ){
             final String cypherQuery = "MATCH (x)-[e:ACTED_IN]->(y) RETURN x, e, head(labels(y)) AS l, {a: 2} AS t LIMIT 2";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
-            final Neo4jServer fm = () -> new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+            final Neo4jServer fm = new Neo4jServerImpl4Test();
 
             final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 

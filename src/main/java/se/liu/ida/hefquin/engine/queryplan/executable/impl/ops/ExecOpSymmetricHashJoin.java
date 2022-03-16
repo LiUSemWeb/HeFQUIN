@@ -13,7 +13,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.*;
 
-public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
+public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
+{
 
     protected final SolutionMappingsIndex indexForChild1;
     protected final SolutionMappingsIndex indexForChild2;
@@ -66,7 +67,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt) {
+    protected void _processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt) {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
             indexForChild1.add(smL);
 
@@ -78,12 +79,12 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    protected void _wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
         // nothing to do here
     }
 
     @Override
-    public void processBlockFromChild2(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    protected void _processBlockFromChild2(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt) {
         for ( final SolutionMapping smR : input.getSolutionMappings() ) {
             indexForChild2.add(smR);
 
@@ -95,7 +96,7 @@ public class ExecOpSymmetricHashJoin implements BinaryExecutableOp{
     }
 
     @Override
-    public void wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    protected void _wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
         // nothing to do here
     }
 }

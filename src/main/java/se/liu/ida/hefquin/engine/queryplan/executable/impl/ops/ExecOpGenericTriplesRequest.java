@@ -28,8 +28,8 @@ public abstract class ExecOpGenericTriplesRequest<ReqType extends DataRetrievalR
 	}
 
 	@Override
-	public void execute( final IntermediateResultElementSink sink,
-	                     final ExecutionContext execCxt )
+	protected void _execute( final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt )
 	{
 		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
 

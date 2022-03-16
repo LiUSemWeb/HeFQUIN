@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
@@ -76,8 +75,16 @@ public class QueryPatternUtils
 			}
 			return e;
 		}
+		else if ( p instanceof GenericSPARQLGraphPatternImpl1 ) {
+			return ( (GenericSPARQLGraphPatternImpl1) p ).asJenaElement();
+		}
+		else if ( p instanceof GenericSPARQLGraphPatternImpl2 ) {
+			@SuppressWarnings("deprecation")
+			final Element jenaElement = ( (GenericSPARQLGraphPatternImpl2) p ).asJenaElement();
+			return jenaElement;
+		}
 		else {
-			return OpAsQuery.asQuery( p.asJenaOp() ).getQueryPattern();
+			throw new UnsupportedOperationException( p.getClass().getName() );
 		}
 	}
 
@@ -96,8 +103,17 @@ public class QueryPatternUtils
 		else if ( queryPattern instanceof BGP ) {
 			return getVariablesInPattern( (BGP) queryPattern );
 		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			@SuppressWarnings("deprecation")
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaOp();
+			return getVariablesInPattern(jenaOp);
+		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
+			return getVariablesInPattern(jenaOp);
+		}
 		else {
-			return getVariablesInPattern( queryPattern.asJenaOp() );
+			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
 		}
 	}
 
@@ -274,8 +290,17 @@ public class QueryPatternUtils
 		else if ( queryPattern instanceof BGP ) {
 			return getNumberOfVarOccurrences( (BGP) queryPattern );
 		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			@SuppressWarnings("deprecation")
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaOp();
+			return getNumberOfVarOccurrences(jenaOp);
+		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
+			return getNumberOfVarOccurrences(jenaOp);
+		}
 		else {
-			return getNumberOfVarOccurrences( queryPattern.asJenaOp() );
+			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
 		}
 	}
 
@@ -296,8 +321,17 @@ public class QueryPatternUtils
 		else if ( queryPattern instanceof BGP ) {
 			return getNumberOfTermOccurrences( (BGP) queryPattern  );
 		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			@SuppressWarnings("deprecation")
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaOp();
+			return getNumberOfTermOccurrences(jenaOp);
+		}
+		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
+			return getNumberOfTermOccurrences(jenaOp);
+		}
 		else {
-			return getNumberOfTermOccurrences( queryPattern.asJenaOp() );
+			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
 		}
 	}
 
@@ -325,8 +359,21 @@ public class QueryPatternUtils
 			};
 		}
 		else {
-			final Set<Var> certainVars = OpVars.fixedVars( pattern.asJenaOp() );
-			Set<Var> possibleVars = OpVars.visibleVars( pattern.asJenaOp() );
+			final Op jenaOp;
+			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+				@SuppressWarnings("deprecation")
+				final Op o = ( (GenericSPARQLGraphPatternImpl1) pattern ).asJenaOp();
+				jenaOp = o;
+			}
+			else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+				jenaOp = ( (GenericSPARQLGraphPatternImpl2) pattern ).asJenaOp();
+			}
+			else {
+				throw new UnsupportedOperationException( pattern.getClass().getName() );
+			}
+
+			final Set<Var> certainVars = OpVars.fixedVars(jenaOp);
+			Set<Var> possibleVars = OpVars.visibleVars(jenaOp);
 			possibleVars.removeAll(certainVars);
 
 			return new ExpectedVariables() {

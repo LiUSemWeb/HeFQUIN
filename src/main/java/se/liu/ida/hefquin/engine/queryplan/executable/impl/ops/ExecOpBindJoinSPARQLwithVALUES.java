@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
@@ -59,7 +59,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithReq
 
 		final Table table = new TableData( varsInSubQuery, new ArrayList<>(bindings) );
 		final Op op = OpSequence.create( OpTable.create(table), representQueryPatternAsJenaOp(query) );
-		final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl(op);
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm);
 	}

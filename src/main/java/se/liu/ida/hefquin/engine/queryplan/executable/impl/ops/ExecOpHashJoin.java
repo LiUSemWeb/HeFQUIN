@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ExecOpHashJoin implements BinaryExecutableOp
+public class ExecOpHashJoin extends BinaryExecutableOpBase
 {
     protected final SolutionMappingsIndex index;
 
@@ -61,19 +61,19 @@ public class ExecOpHashJoin implements BinaryExecutableOp
     }
 
     @Override
-    public void processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
             index.add(smL);
         }
     }
 
     @Override
-    public void wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         this.child1InputComplete = true;
     }
 
     @Override
-    public void processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         if (child1InputComplete == false){
             throw new IllegalStateException();
         }
@@ -86,7 +86,7 @@ public class ExecOpHashJoin implements BinaryExecutableOp
     }
 
     @Override
-    public void wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
         // nothing to be done here
     }
 }

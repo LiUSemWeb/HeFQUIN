@@ -9,6 +9,7 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
@@ -128,6 +129,16 @@ public class ResultElementIterWithUnaryExecOpTest
 
 		@Override
 		public int preferredInputBlockSize() { return 1; }
+
+		@Override
+		public void resetStats()
+		{
+		}
+
+		@Override
+		public ExecutableOperatorStats getStats() {
+			return null;
+		}
 	}
 
 }

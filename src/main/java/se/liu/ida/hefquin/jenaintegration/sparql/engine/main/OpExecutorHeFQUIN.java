@@ -18,7 +18,7 @@ import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
@@ -158,7 +158,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			final QueryProcStats stats;
 
 			try {
-				stats = qProc.processQuery( new SPARQLGraphPatternImpl(opForStage), sink );
+				stats = qProc.processQuery( new GenericSPARQLGraphPatternImpl2(opForStage), sink );
 			}
 			catch ( final QueryProcException ex ) {
 				throw new QueryExecException("Processing the query operator using HeFQUIN failed.", ex);

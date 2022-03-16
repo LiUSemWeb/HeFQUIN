@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGraphPatternImpl;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
@@ -36,7 +36,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 		if ( ! skipLiveWebTests ) {
 			// setting up
 			final String queryString = "SELECT * WHERE { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }";
-			final SPARQLGraphPattern pattern = new SPARQLGraphPatternImpl( QueryFactory.create(queryString).getQueryPattern() );
+			final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 			final SPARQLRequest req = new SPARQLRequestImpl(pattern);
 
 			// performing the tested operation

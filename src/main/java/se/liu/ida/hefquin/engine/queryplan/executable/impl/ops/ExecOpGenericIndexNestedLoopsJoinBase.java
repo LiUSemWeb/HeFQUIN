@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class ExecOpGenericIndexNestedLoopsJoinBase<QueryType extends Query,
                                                             MemberType extends FederationMember>
-                   implements UnaryExecutableOp
+                   extends UnaryExecutableOpBase
 {
 	protected final QueryType query;
 	protected final MemberType fm;
@@ -24,7 +24,7 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinBase<QueryType extends Qu
 	}
 
 	@Override
-	public void concludeExecution(
+	protected void _concludeExecution(
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt )
 	{
