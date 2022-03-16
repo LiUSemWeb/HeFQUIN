@@ -29,17 +29,15 @@ public class ExecOpFilter implements UnaryExecutableOp
 	public void process( final IntermediateResultBlock input,
 	                     final IntermediateResultElementSink sink,
 	                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		
-		
+
 		// For every solution mapping in the input...
 		for( final SolutionMapping solution : input.getSolutionMappings() ) {
 			//Check whether it satisfies the filter expression
-			
 			try {
 				final NodeValue evaluationResult = ExprUtils.eval(filterExpression, solution.asJenaBinding());
-				if(evaluationResult == NodeValue.TRUE) {
+				if( evaluationResult.equals(NodeValue.TRUE) ) {
 					sink.send(solution);
-				} else if (evaluationResult != NodeValue.FALSE ) {
+				} else if ( ! evaluationResult.equals(NodeValue.FALSE) ) {
 					throw new ExecOpExecutionException("The result of the eval is neither TRUE nor FALSE!", null);
 				}
 			} catch ( final VariableNotBoundException e ) {
@@ -49,22 +47,7 @@ public class ExecOpFilter implements UnaryExecutableOp
 				// and, thus, must not be sent to the sink. Hence, we do not have to do anything
 				// here in this catch block.
 			}
-			
 		}
-
-		// The idea of what you should implement here is as follows: For every
-		// solution mapping in the given input, input.getSolutionMappings(), check
-		// whether it satisfies the filter expression (filterExpression); if it
-		// does, push it to the output sink, sink.send( ... ), else simply move
-		// on to the next input solution mapping.
-		// To do the check, call ExprUtils.eval(filterExpression, b), where b is the
-		// Binding object that you can get from the SolutionMapping. I assume (please
-		// verify) that eval function may return either NodeValue.TRUE or NodeValue.FALSE,
-		// where NodeValue.TRUE would mean that the solution mapping can be pushed to the
-		// output sink.
-		// Another useful function is ExprUtils.parse(String) which parses a string with
-		// a filter expression as written directly in SPARQL into an Expr object. This
-		// will come handy when writing unit tests for this class here.
 	}
 
 	@Override
