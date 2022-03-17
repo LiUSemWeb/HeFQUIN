@@ -50,9 +50,9 @@ public class VocabularyMappingTest
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testData.object1);
 		
-		final Node s = NodeFactory.createLiteral("s1");
+		final Node s = NodeFactory.createURI("s1");
 		final Node p = RDF.type.asNode();
-		final Node o = NodeFactory.createLiteral("o1");
+		final Node o = NodeFactory.createURI("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
@@ -76,19 +76,19 @@ public class VocabularyMappingTest
 	public void TranslateSubjectTest() {
 		final Set<Triple> testTriples = new HashSet<>();
 		//Equality
-		Node s = NodeFactory.createLiteral("s1");
+		Node s = NodeFactory.createURI("s1");
 		Node p = OWL.sameAs.asNode();
-		final Node t1 = NodeFactory.createLiteral("s2");
+		final Node t1 = NodeFactory.createURI("s2");
 		testTriples.add(new Triple(s, p, t1));
 				
 		//Multiple mappings for same subject
-		final Node t2 = NodeFactory.createLiteral("s3");
+		final Node t2 = NodeFactory.createURI("s3");
 		testTriples.add(new Triple(s, p, t2));
 		
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
-		p = NodeFactory.createLiteral("p");
-		final Node o = NodeFactory.createLiteral("o");
+		p = NodeFactory.createURI("p");
+		final Node o = NodeFactory.createURI("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -109,18 +109,18 @@ public class VocabularyMappingTest
 	public void TranslatePredicateTest() {
 		final Set<Triple> testTriples = new HashSet<>();
 		//Equality
-		Node s = NodeFactory.createLiteral("p1");
+		Node s = NodeFactory.createURI("p1");
 		Node p = OWL.equivalentProperty.asNode();
-		final Node t1 = NodeFactory.createLiteral("p2");
+		final Node t1 = NodeFactory.createURI("p2");
 		testTriples.add(new Triple(s, p, t1));
 				
 		//Predicate inverse
 		p = OWL.inverseOf.asNode();
-		final Node t2 = NodeFactory.createLiteral("Not p1");
+		final Node t2 = NodeFactory.createURI("Not p1");
 		testTriples.add(new Triple(s, p, t2));
 			
 		//Predicate subProperty
-		final Node t3 = NodeFactory.createLiteral("Subtype");
+		final Node t3 = NodeFactory.createURI("Subtype");
 		p = RDFS.subPropertyOf.asNode();
 		testTriples.add(new Triple(t3, p, s));
 		
@@ -130,7 +130,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(s, p, t4));	
 		
 		p = RDF.first.asNode();
-		final Node t5 = NodeFactory.createLiteral("p3");
+		final Node t5 = NodeFactory.createURI("p3");
 		testTriples.add(new Triple(t4, p, t5));	
 		
 		p = RDF.rest.asNode();
@@ -138,7 +138,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(t4, p, t6));
 		
 		p = RDF.first.asNode();
-		final Node t7 = NodeFactory.createLiteral("p4");
+		final Node t7 = NodeFactory.createURI("p4");
 		testTriples.add(new Triple(t6, p, t7));	
 		
 		p = RDF.rest.asNode();
@@ -151,7 +151,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(s, p, t8));	
 		
 		p = RDF.first.asNode();
-		final Node t9 = NodeFactory.createLiteral("p5");
+		final Node t9 = NodeFactory.createURI("p5");
 		testTriples.add(new Triple(t8, p, t9));	
 		
 		p = RDF.rest.asNode();
@@ -159,7 +159,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(t8, p, t10));
 		
 		p = RDF.first.asNode();
-		final Node t11 = NodeFactory.createLiteral("p6");
+		final Node t11 = NodeFactory.createURI("p6");
 		testTriples.add(new Triple(t10, p, t11));	
 		
 		p = RDF.rest.asNode();
@@ -168,9 +168,9 @@ public class VocabularyMappingTest
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
-		s = NodeFactory.createLiteral("s");
-		p = NodeFactory.createLiteral("p1");
-		o = NodeFactory.createLiteral("o");
+		s = NodeFactory.createURI("s");
+		p = NodeFactory.createURI("p1");
+		o = NodeFactory.createURI("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -209,18 +209,18 @@ public class VocabularyMappingTest
 	public void TranslateObjectTest() {
 		final Set<Triple> testTriples = new HashSet<>();
 		//Equality
-		Node s = NodeFactory.createLiteral("o1");
+		Node s = NodeFactory.createURI("o1");
 		Node p = OWL.equivalentClass.asNode();
-		final Node t1 = NodeFactory.createLiteral("o2");
+		final Node t1 = NodeFactory.createURI("o2");
 		testTriples.add(new Triple(s, p, t1));
 		
 		//Equality
 		p = OWL.sameAs.asNode();
-		final Node t2 = NodeFactory.createLiteral("o3");
+		final Node t2 = NodeFactory.createURI("o3");
 		testTriples.add(new Triple(s, p, t2));	
 		
 		//Object subClass
-		final Node t3 = NodeFactory.createLiteral("Subclass");
+		final Node t3 = NodeFactory.createURI("Subclass");
 		p = RDFS.subClassOf.asNode();
 		testTriples.add(new Triple(t3, p, s));
 		
@@ -231,7 +231,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(s, p, t4));	
 		
 		p = RDF.first.asNode();
-		final Node t5 = NodeFactory.createLiteral("o4");
+		final Node t5 = NodeFactory.createURI("o4");
 		testTriples.add(new Triple(t4, p, t5));	
 		
 		p = RDF.rest.asNode();
@@ -239,7 +239,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(t4, p, t6));
 		
 		p = RDF.first.asNode();
-		final Node t7 = NodeFactory.createLiteral("o5");
+		final Node t7 = NodeFactory.createURI("o5");
 		testTriples.add(new Triple(t6, p, t7));	
 		
 		p = RDF.rest.asNode();
@@ -252,7 +252,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(s, p, t8));	
 		
 		p = RDF.first.asNode();
-		final Node t9 = NodeFactory.createLiteral("o6");
+		final Node t9 = NodeFactory.createURI("o6");
 		testTriples.add(new Triple(t8, p, t9));	
 		
 		p = RDF.rest.asNode();
@@ -260,7 +260,7 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(t8, p, t10));
 		
 		p = RDF.first.asNode();
-		final Node t11 = NodeFactory.createLiteral("o7");
+		final Node t11 = NodeFactory.createURI("o7");
 		testTriples.add(new Triple(t10, p, t11));	
 		
 		p = RDF.rest.asNode();
@@ -268,9 +268,9 @@ public class VocabularyMappingTest
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
-		s = NodeFactory.createLiteral("s");
+		s = NodeFactory.createURI("s");
 		p = RDF.type.asNode();
-		o = NodeFactory.createLiteral("o1");
+		o = NodeFactory.createURI("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -308,29 +308,29 @@ public class VocabularyMappingTest
 		final Set<Triple> testSet = new HashSet<>();
 		
 		//Equality
-		Node s = NodeFactory.createLiteral("s1");
+		Node s = NodeFactory.createURI("s1");
 		Node p = OWL.sameAs.asNode();
-		final Node s1Res = NodeFactory.createLiteral("s2");
+		final Node s1Res = NodeFactory.createURI("s2");
 		testSet.add(new Triple(s, p, s1Res));
 		
 		//Multiple mappings for same subject
-		final Node s2Res = NodeFactory.createLiteral("s3");
+		final Node s2Res = NodeFactory.createURI("s3");
 		testSet.add(new Triple(s, p, s2Res));
 		
 		//Predicate inverse
 		s = RDF.type.asNode();
 		p = OWL.inverseOf.asNode();
-		final Node p1Res = NodeFactory.createLiteral("Not type");
+		final Node p1Res = NodeFactory.createURI("Not type");
 		testSet.add(new Triple(s, p, p1Res));
 			
 		//Predicate subProperty
 		Node o = s;
-		final Node p2Res = NodeFactory.createLiteral("Subtype");
+		final Node p2Res = NodeFactory.createURI("Subtype");
 		p = RDFS.subPropertyOf.asNode();
 		testSet.add(new Triple(p2Res, p, o));
 		
 		//Object Intersection or union
-		s = NodeFactory.createLiteral("o1");
+		s = NodeFactory.createURI("o1");
 		//p = OWL.unionOf.asNode();
 		p = OWL.intersectionOf.asNode();
 		o = NodeFactory.createBlankNode();
@@ -338,7 +338,7 @@ public class VocabularyMappingTest
 		
 		s = o;
 		p = RDF.first.asNode();
-		final Node o1Res = NodeFactory.createLiteral("o2");
+		final Node o1Res = NodeFactory.createURI("o2");
 		testSet.add(new Triple(s, p, o1Res));
 		
 		p = RDF.rest.asNode();
@@ -347,7 +347,7 @@ public class VocabularyMappingTest
 		
 		s = o;
 		p = RDF.first.asNode();
-		final Node o2Res = NodeFactory.createLiteral("o3");
+		final Node o2Res = NodeFactory.createURI("o3");
 		testSet.add(new Triple(s, p, o2Res));
 		
 		p = RDF.rest.asNode();
@@ -358,13 +358,13 @@ public class VocabularyMappingTest
 		
 		/* Wrong predicate should lead to error
 		p = OWL.unionOf.asNode();
-		o = NodeFactory.createLiteral("o4");
+		o = NodeFactory.createURI("o4");
 		testSet.add(new Triple(s, p, o));
 		*/
 		
 		 /*Not possible mapping should lead to error
 		 p = OWL.inverseOf.asNode();
-		 o = NodeFactory.createLiteral("o5");
+		 o = NodeFactory.createURI("o5");
 		 testSet.add(new Triple(s, p, o));
 		 */
 		
