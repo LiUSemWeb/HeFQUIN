@@ -6,6 +6,8 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
+import java.util.Objects;
+
 public class TriplePatternImpl implements TriplePattern
 {
 	protected final Triple jenaObj;
@@ -17,11 +19,6 @@ public class TriplePatternImpl implements TriplePattern
 
 	public TriplePatternImpl( final Node s, final Node p, final Node o ) {
 		this( new Triple(s,p,o) );
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		return o instanceof TriplePattern && ((TriplePattern) o).asJenaTriple().equals(jenaObj);	
 	}
 
 	@Override
@@ -53,4 +50,16 @@ public class TriplePatternImpl implements TriplePattern
 		return "(triple " + this.asJenaTriple().toString() + ") ";
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof TriplePattern)) return false;
+		final TriplePattern that = (TriplePattern) o;
+		return Objects.equals( jenaObj, that.asJenaTriple() );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(jenaObj);
+	}
 }

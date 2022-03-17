@@ -186,7 +186,7 @@ public class VocabularyMappingTest
 			}
 		}
 	
-		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
+		final List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
 		expectedResults.add(new TriplePatternImpl(s, t3, o));
 		expectedResults.add(new TriplePatternImpl(s, t1, o));
 		
