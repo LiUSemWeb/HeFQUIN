@@ -125,30 +125,52 @@ public class VocabularyMappingTest
 		testTriples.add(new Triple(t3, p, s));
 		
 		//Predicate Intersection
-		p = OWL.equivalentProperty.asNode();
+		p = OWL.intersectionOf.asNode();
 		final Node t4 = NodeFactory.createBlankNode();
 		testTriples.add(new Triple(s, p, t4));	
-		p = OWL.intersectionOf.asNode();
+		
+		p = RDF.first.asNode();
 		final Node t5 = NodeFactory.createLiteral("p3");
-		testTriples.add(new Triple(t4, p, t5));		
-		final Node t6 = NodeFactory.createLiteral("p4");
+		testTriples.add(new Triple(t4, p, t5));	
+		
+		p = RDF.rest.asNode();
+		final Node t6 = NodeFactory.createBlankNode();
 		testTriples.add(new Triple(t4, p, t6));
 		
+		p = RDF.first.asNode();
+		final Node t7 = NodeFactory.createLiteral("p4");
+		testTriples.add(new Triple(t6, p, t7));	
+		
+		p = RDF.rest.asNode();
+		Node o = RDF.nil.asNode();
+		testTriples.add(new Triple(t6, p, o));
+		
 		//Predicate Union
-		p = OWL.equivalentProperty.asNode();
-		final Node t7 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t7));	
 		p = OWL.unionOf.asNode();
-		final Node t8 = NodeFactory.createLiteral("p5");
-		testTriples.add(new Triple(t7, p, t8));		
-		final Node t9 = NodeFactory.createLiteral("p6");
-		testTriples.add(new Triple(t7, p, t9));
+		final Node t8 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t8));	
+		
+		p = RDF.first.asNode();
+		final Node t9 = NodeFactory.createLiteral("p5");
+		testTriples.add(new Triple(t8, p, t9));	
+		
+		p = RDF.rest.asNode();
+		final Node t10 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(t8, p, t10));
+		
+		p = RDF.first.asNode();
+		final Node t11 = NodeFactory.createLiteral("p6");
+		testTriples.add(new Triple(t10, p, t11));	
+		
+		p = RDF.rest.asNode();
+		testTriples.add(new Triple(t10, p, o));
+		
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		s = NodeFactory.createLiteral("s");
 		p = NodeFactory.createLiteral("p1");
-		final Node o = NodeFactory.createLiteral("o");
+		o = NodeFactory.createLiteral("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -169,12 +191,12 @@ public class VocabularyMappingTest
 		expectedResults.add(new TriplePatternImpl(s, t1, o));
 		
 		//Union subpatterns
-		expectedResults.add(new TriplePatternImpl(s, t8, o));
 		expectedResults.add(new TriplePatternImpl(s, t9, o));
+		expectedResults.add(new TriplePatternImpl(s, t11, o));
 		
 		final BGPImpl intersection = new BGPImpl();
 		intersection.addTriplePattern(new TriplePatternImpl(s, t5, o));
-		intersection.addTriplePattern(new TriplePatternImpl(s, t6, o));
+		intersection.addTriplePattern(new TriplePatternImpl(s, t7, o));
 		expectedResults.add(intersection);
 		
 		expectedResults.add(new TriplePatternImpl(o, t2, s));
@@ -202,31 +224,53 @@ public class VocabularyMappingTest
 		p = RDFS.subClassOf.asNode();
 		testTriples.add(new Triple(t3, p, s));
 		
+		
 		//Object Intersection
-		p = OWL.equivalentClass.asNode();
+		p = OWL.intersectionOf.asNode();
 		final Node t4 = NodeFactory.createBlankNode();
 		testTriples.add(new Triple(s, p, t4));	
-		p = OWL.intersectionOf.asNode();
+		
+		p = RDF.first.asNode();
 		final Node t5 = NodeFactory.createLiteral("o4");
-		testTriples.add(new Triple(t4, p, t5));		
-		final Node t6 = NodeFactory.createLiteral("o5");
+		testTriples.add(new Triple(t4, p, t5));	
+		
+		p = RDF.rest.asNode();
+		final Node t6 = NodeFactory.createBlankNode();
 		testTriples.add(new Triple(t4, p, t6));
 		
+		p = RDF.first.asNode();
+		final Node t7 = NodeFactory.createLiteral("o5");
+		testTriples.add(new Triple(t6, p, t7));	
+		
+		p = RDF.rest.asNode();
+		Node o = RDF.nil.asNode();
+		testTriples.add(new Triple(t6, p, o));
+		
 		//Object Union
-		p = OWL.equivalentClass.asNode();
-		final Node t7 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t7));	
 		p = OWL.unionOf.asNode();
-		final Node t8 = NodeFactory.createLiteral("o6");
-		testTriples.add(new Triple(t7, p, t8));		
-		final Node t9 = NodeFactory.createLiteral("o7");
-		testTriples.add(new Triple(t7, p, t9));
+		final Node t8 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, t8));	
+		
+		p = RDF.first.asNode();
+		final Node t9 = NodeFactory.createLiteral("o6");
+		testTriples.add(new Triple(t8, p, t9));	
+		
+		p = RDF.rest.asNode();
+		final Node t10 = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(t8, p, t10));
+		
+		p = RDF.first.asNode();
+		final Node t11 = NodeFactory.createLiteral("o7");
+		testTriples.add(new Triple(t10, p, t11));	
+		
+		p = RDF.rest.asNode();
+		testTriples.add(new Triple(t10, p, o));
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		s = NodeFactory.createLiteral("s");
 		p = RDF.type.asNode();
-		final Node o = NodeFactory.createLiteral("o1");
+		o = NodeFactory.createLiteral("o1");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -248,12 +292,12 @@ public class VocabularyMappingTest
 		expectedResults.add(new TriplePatternImpl(s, p, t3));
 		
 		//Union subpatterns
-		expectedResults.add(new TriplePatternImpl(s, p, t8));
 		expectedResults.add(new TriplePatternImpl(s, p, t9));
+		expectedResults.add(new TriplePatternImpl(s, p, t11));
 		
 		final BGPImpl intersection = new BGPImpl();
 		intersection.addTriplePattern(new TriplePatternImpl(s, p, t5));
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, t6));
+		intersection.addTriplePattern(new TriplePatternImpl(s, p, t7));
 		expectedResults.add(intersection);
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
@@ -287,18 +331,30 @@ public class VocabularyMappingTest
 		
 		//Object Intersection or union
 		s = NodeFactory.createLiteral("o1");
-		p = OWL.equivalentClass.asNode();
+		//p = OWL.unionOf.asNode();
+		p = OWL.intersectionOf.asNode();
 		o = NodeFactory.createBlankNode();
 		testSet.add(new Triple(s, p, o));
 		
 		s = o;
-		//p = OWL.unionOf.asNode();
-		p = OWL.intersectionOf.asNode();
+		p = RDF.first.asNode();
 		final Node o1Res = NodeFactory.createLiteral("o2");
 		testSet.add(new Triple(s, p, o1Res));
 		
+		p = RDF.rest.asNode();
+		o = NodeFactory.createBlankNode();
+		testSet.add(new Triple(s, p, o));
+		
+		s = o;
+		p = RDF.first.asNode();
 		final Node o2Res = NodeFactory.createLiteral("o3");
 		testSet.add(new Triple(s, p, o2Res));
+		
+		p = RDF.rest.asNode();
+		o = RDF.nil.asNode();
+		testSet.add(new Triple(s, p, o));
+		
+		
 		
 		/* Wrong predicate should lead to error
 		p = OWL.unionOf.asNode();
