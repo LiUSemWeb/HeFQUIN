@@ -78,17 +78,17 @@ public class VocabularyMappingTest
 		//Equality
 		Node s = NodeFactory.createURI("s1");
 		Node p = OWL.sameAs.asNode();
-		final Node t1 = NodeFactory.createURI("s2");
-		testTriples.add(new Triple(s, p, t1));
+		Node o  = NodeFactory.createURI("s2");
+		testTriples.add(new Triple(s, p, o));
 				
 		//Multiple mappings for same subject
-		final Node t2 = NodeFactory.createURI("s3");
-		testTriples.add(new Triple(s, p, t2));
+		o = NodeFactory.createURI("s3");
+		testTriples.add(new Triple(s, p, o));
 		
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		p = NodeFactory.createURI("p");
-		final Node o = NodeFactory.createURI("o");
+		o = NodeFactory.createURI("o");
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
@@ -98,8 +98,10 @@ public class VocabularyMappingTest
 		}
 		
 		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
-		expectedResults.add(new TriplePatternImpl(t1, p, o));
-		expectedResults.add(new TriplePatternImpl(t2, p, o));
+		s = NodeFactory.createURI("s2");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		s = NodeFactory.createURI("s3");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
 		assertTrue(translationSubPatterns.size() == expectedResults.size());
@@ -111,59 +113,62 @@ public class VocabularyMappingTest
 		//Equality
 		Node s = NodeFactory.createURI("p1");
 		Node p = OWL.equivalentProperty.asNode();
-		final Node t1 = NodeFactory.createURI("p2");
-		testTriples.add(new Triple(s, p, t1));
+		Node o = NodeFactory.createURI("p2");
+		testTriples.add(new Triple(s, p, o));
 				
 		//Predicate inverse
 		p = OWL.inverseOf.asNode();
-		final Node t2 = NodeFactory.createURI("Not p1");
-		testTriples.add(new Triple(s, p, t2));
+		o = NodeFactory.createURI("Not p1");
+		testTriples.add(new Triple(s, p, o));
 			
 		//Predicate subProperty
-		final Node t3 = NodeFactory.createURI("Subtype");
+		o = NodeFactory.createURI("Subtype");
 		p = RDFS.subPropertyOf.asNode();
-		testTriples.add(new Triple(t3, p, s));
+		testTriples.add(new Triple(o, p, s));
 		
 		//Predicate Intersection
 		p = OWL.intersectionOf.asNode();
-		final Node t4 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t4));	
+		Node blank = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, blank));	
 		
 		p = RDF.first.asNode();
-		final Node t5 = NodeFactory.createURI("p3");
-		testTriples.add(new Triple(t4, p, t5));	
+		o = NodeFactory.createURI("p3");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		final Node t6 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(t4, p, t6));
+		o = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(blank, p, o));
 		
+		blank = o;
 		p = RDF.first.asNode();
-		final Node t7 = NodeFactory.createURI("p4");
-		testTriples.add(new Triple(t6, p, t7));	
+		o = NodeFactory.createURI("p4");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		Node o = RDF.nil.asNode();
-		testTriples.add(new Triple(t6, p, o));
+		o = RDF.nil.asNode();
+		testTriples.add(new Triple(blank, p, o));
 		
 		//Predicate Union
 		p = OWL.unionOf.asNode();
-		final Node t8 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t8));	
+		blank = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, blank));	
 		
 		p = RDF.first.asNode();
-		final Node t9 = NodeFactory.createURI("p5");
-		testTriples.add(new Triple(t8, p, t9));	
+		o = NodeFactory.createURI("p5");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		final Node t10 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(t8, p, t10));
+		o = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(blank, p, o));
 		
+		blank = o;
 		p = RDF.first.asNode();
-		final Node t11 = NodeFactory.createURI("p6");
-		testTriples.add(new Triple(t10, p, t11));	
+		o = NodeFactory.createURI("p6");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		testTriples.add(new Triple(t10, p, o));
+		o = RDF.nil.asNode();
+		testTriples.add(new Triple(blank, p, o));
 		
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
@@ -187,19 +192,26 @@ public class VocabularyMappingTest
 		}
 	
 		final List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
-		expectedResults.add(new TriplePatternImpl(s, t3, o));
-		expectedResults.add(new TriplePatternImpl(s, t1, o));
+		p = NodeFactory.createURI("p2");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		p = NodeFactory.createURI("Subtype");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
 		
 		//Union subpatterns
-		expectedResults.add(new TriplePatternImpl(s, t9, o));
-		expectedResults.add(new TriplePatternImpl(s, t11, o));
+		p = NodeFactory.createURI("p5");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		p = NodeFactory.createURI("p6");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
 		
 		final BGPImpl intersection = new BGPImpl();
-		intersection.addTriplePattern(new TriplePatternImpl(s, t5, o));
-		intersection.addTriplePattern(new TriplePatternImpl(s, t7, o));
+		p = NodeFactory.createURI("p3");
+		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
+		p = NodeFactory.createURI("p4");
+		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
 		expectedResults.add(intersection);
 		
-		expectedResults.add(new TriplePatternImpl(o, t2, s));
+		p = NodeFactory.createURI("Not p1");
+		expectedResults.add(new TriplePatternImpl(o, p, s));
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
 		assertTrue(translationSubPatterns.size() == expectedResults.size());
@@ -211,60 +223,63 @@ public class VocabularyMappingTest
 		//Equality
 		Node s = NodeFactory.createURI("o1");
 		Node p = OWL.equivalentClass.asNode();
-		final Node t1 = NodeFactory.createURI("o2");
-		testTriples.add(new Triple(s, p, t1));
+		Node o = NodeFactory.createURI("o2");
+		testTriples.add(new Triple(s, p, o));
 		
 		//Equality
 		p = OWL.sameAs.asNode();
-		final Node t2 = NodeFactory.createURI("o3");
-		testTriples.add(new Triple(s, p, t2));	
+		o = NodeFactory.createURI("o3");
+		testTriples.add(new Triple(s, p, o));	
 		
 		//Object subClass
-		final Node t3 = NodeFactory.createURI("Subclass");
+		o = NodeFactory.createURI("Subclass");
 		p = RDFS.subClassOf.asNode();
-		testTriples.add(new Triple(t3, p, s));
+		testTriples.add(new Triple(o, p, s));
 		
 		
 		//Object Intersection
 		p = OWL.intersectionOf.asNode();
-		final Node t4 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t4));	
+		Node blank = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, blank));	
 		
 		p = RDF.first.asNode();
-		final Node t5 = NodeFactory.createURI("o4");
-		testTriples.add(new Triple(t4, p, t5));	
+		o = NodeFactory.createURI("o4");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		final Node t6 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(t4, p, t6));
+		o = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(blank, p, o));
 		
+		blank = o;
 		p = RDF.first.asNode();
-		final Node t7 = NodeFactory.createURI("o5");
-		testTriples.add(new Triple(t6, p, t7));	
+		o = NodeFactory.createURI("o5");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		Node o = RDF.nil.asNode();
-		testTriples.add(new Triple(t6, p, o));
+		o = RDF.nil.asNode();
+		testTriples.add(new Triple(blank, p, o));
 		
 		//Object Union
 		p = OWL.unionOf.asNode();
-		final Node t8 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, t8));	
+		blank = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(s, p, blank));	
 		
 		p = RDF.first.asNode();
-		final Node t9 = NodeFactory.createURI("o6");
-		testTriples.add(new Triple(t8, p, t9));	
+		o = NodeFactory.createURI("o6");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		final Node t10 = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(t8, p, t10));
+		o = NodeFactory.createBlankNode();
+		testTriples.add(new Triple(blank, p, o));
 		
+		blank = o;
 		p = RDF.first.asNode();
-		final Node t11 = NodeFactory.createURI("o7");
-		testTriples.add(new Triple(t10, p, t11));	
+		o = NodeFactory.createURI("o7");
+		testTriples.add(new Triple(blank, p, o));	
 		
 		p = RDF.rest.asNode();
-		testTriples.add(new Triple(t10, p, o));
+		o = RDF.nil.asNode();
+		testTriples.add(new Triple(blank, p, o));
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
@@ -287,17 +302,24 @@ public class VocabularyMappingTest
 		}
 			
 		List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
-		expectedResults.add(new TriplePatternImpl(s, p, t1));
-		expectedResults.add(new TriplePatternImpl(s, p, t2));
-		expectedResults.add(new TriplePatternImpl(s, p, t3));
+		o = NodeFactory.createURI("o2");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		o = NodeFactory.createURI("o3");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		o = NodeFactory.createURI("Subclass");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
 		
 		//Union subpatterns
-		expectedResults.add(new TriplePatternImpl(s, p, t9));
-		expectedResults.add(new TriplePatternImpl(s, p, t11));
+		o = NodeFactory.createURI("o6");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
+		o = NodeFactory.createURI("o7");
+		expectedResults.add(new TriplePatternImpl(s, p, o));
 		
 		final BGPImpl intersection = new BGPImpl();
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, t5));
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, t7));
+		o = NodeFactory.createURI("o4");
+		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
+		o = NodeFactory.createURI("o5");
+		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
 		expectedResults.add(intersection);
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
@@ -310,24 +332,24 @@ public class VocabularyMappingTest
 		//Equality
 		Node s = NodeFactory.createURI("s1");
 		Node p = OWL.sameAs.asNode();
-		final Node s1Res = NodeFactory.createURI("s2");
-		testSet.add(new Triple(s, p, s1Res));
+		Node o = NodeFactory.createURI("s2");
+		testSet.add(new Triple(s, p, o));
 		
 		//Multiple mappings for same subject
-		final Node s2Res = NodeFactory.createURI("s3");
-		testSet.add(new Triple(s, p, s2Res));
+		o = NodeFactory.createURI("s3");
+		testSet.add(new Triple(s, p, o));
 		
 		//Predicate inverse
 		s = RDF.type.asNode();
 		p = OWL.inverseOf.asNode();
-		final Node p1Res = NodeFactory.createURI("Not type");
-		testSet.add(new Triple(s, p, p1Res));
+		o = NodeFactory.createURI("Not type");
+		testSet.add(new Triple(s, p, o));
 			
 		//Predicate subProperty
-		Node o = s;
-		final Node p2Res = NodeFactory.createURI("Subtype");
+		o = s;
+		s = NodeFactory.createURI("Subtype");
 		p = RDFS.subPropertyOf.asNode();
-		testSet.add(new Triple(p2Res, p, o));
+		testSet.add(new Triple(s, p, o));
 		
 		//Object Intersection or union
 		s = NodeFactory.createURI("o1");
@@ -338,8 +360,8 @@ public class VocabularyMappingTest
 		
 		s = o;
 		p = RDF.first.asNode();
-		final Node o1Res = NodeFactory.createURI("o2");
-		testSet.add(new Triple(s, p, o1Res));
+		o = NodeFactory.createURI("o2");
+		testSet.add(new Triple(s, p, o));
 		
 		p = RDF.rest.asNode();
 		o = NodeFactory.createBlankNode();
@@ -347,14 +369,12 @@ public class VocabularyMappingTest
 		
 		s = o;
 		p = RDF.first.asNode();
-		final Node o2Res = NodeFactory.createURI("o3");
-		testSet.add(new Triple(s, p, o2Res));
+		o = NodeFactory.createURI("o3");
+		testSet.add(new Triple(s, p, o));
 		
 		p = RDF.rest.asNode();
 		o = RDF.nil.asNode();
-		testSet.add(new Triple(s, p, o));
-		
-		
+		testSet.add(new Triple(s, p, o));	
 		
 		/* Wrong predicate should lead to error
 		p = OWL.unionOf.asNode();
@@ -369,15 +389,34 @@ public class VocabularyMappingTest
 		 */
 		
 		Set<Triple> expectedResults = new HashSet<>();
-		expectedResults.add(new Triple(s1Res, p2Res, o1Res));
-		expectedResults.add(new Triple(o1Res, p1Res, s1Res));
-		expectedResults.add(new Triple(s1Res, p2Res, o2Res));
-		expectedResults.add(new Triple(o2Res, p1Res, s1Res));
-		expectedResults.add(new Triple(s2Res, p2Res, o1Res));
-		expectedResults.add(new Triple(o1Res, p1Res, s2Res));
-		expectedResults.add(new Triple(s2Res, p2Res, o2Res));
-		expectedResults.add(new Triple(o2Res, p1Res, s2Res));
+		s = NodeFactory.createURI("s2");
+		p = NodeFactory.createURI("Subtype");
+		o = NodeFactory.createURI("o2");
+		expectedResults.add(new Triple(s, p , o));
 		
+		o = NodeFactory.createURI("o3");
+		expectedResults.add(new Triple(s, p , o));
+		
+		s = NodeFactory.createURI("s3");
+		expectedResults.add(new Triple(s, p , o));	
+		
+		o = NodeFactory.createURI("o2");
+		expectedResults.add(new Triple(s, p , o));
+		
+		s = o;
+		p = NodeFactory.createURI("Not type");
+		o = NodeFactory.createURI("s2");
+		expectedResults.add(new Triple(s, p , o));
+		
+		o = NodeFactory.createURI("s3");
+		expectedResults.add(new Triple(s, p , o));
+		
+		s = NodeFactory.createURI("o3");
+		expectedResults.add(new Triple(s, p , o));
+		
+		o = NodeFactory.createURI("s2");
+		expectedResults.add(new Triple(s, p , o));
+	
 		return new Pair<>(testSet, expectedResults);
 	}
 
