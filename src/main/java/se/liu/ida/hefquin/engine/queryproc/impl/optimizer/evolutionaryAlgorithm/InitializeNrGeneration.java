@@ -9,23 +9,16 @@ public class InitializeNrGeneration {
     public static int countNumOfOp( final LogicalPlan plan ) {
         final LogicalOperator lop = plan.getRootOperator();
 
-        if ( lop instanceof LogicalOpMultiwayJoin) {
+        if ( lop instanceof LogicalOpMultiwayJoin || lop instanceof LogicalOpMultiwayUnion ) {
             final int count = plan.numberOfSubPlans();
 
-            int nrGeneration = calcFactorial(count);
+            int nrGeneration = ( lop instanceof LogicalOpMultiwayJoin ) ? calcFactorial(count) : 1;
             for ( int i = 0; i < count; i++ ) {
                 nrGeneration = nrGeneration * countNumOfOp( plan.getSubPlan( i ) );
+                if ( nrGeneration < 0 )
+                    return Integer.MAX_VALUE;
             }
-            return nrGeneration > 0 ? nrGeneration: Integer.MAX_VALUE;
-        }
-        else if ( lop instanceof LogicalOpMultiwayUnion) {
-            final int count = plan.numberOfSubPlans();
-
-            int nrGeneration = 1;
-            for ( int i = 0; i < count; i++ ) {
-                nrGeneration = nrGeneration * countNumOfOp( plan.getSubPlan( i ) );
-            }
-            return nrGeneration > 0 ? nrGeneration: Integer.MAX_VALUE;
+            return nrGeneration;
         }
         else if ( lop instanceof LogicalOpRequest) {
             return 1;
