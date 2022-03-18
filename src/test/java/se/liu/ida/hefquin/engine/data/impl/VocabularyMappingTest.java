@@ -18,6 +18,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -46,17 +47,18 @@ public class VocabularyMappingTest
 	
 	@Test
 	public void TranslateTriplePatternTest() {
+		
 		final Pair<Set<Triple>,Set<Triple>> testData = CreateTestTriples();
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testData.object1);
 		
-		final Node s = NodeFactory.createURI("s1");
-		final Node p = RDF.type.asNode();
-		final Node o = NodeFactory.createURI("o1");
-		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
+		Node s = NodeFactory.createURI("s1");
+		Node p = RDF.type.asNode();
+		Node o = NodeFactory.createURI("o1");
+		TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
-		final Set<Triple> translationTriples = new HashSet<>();
+		Set<Triple> translationTriples = new HashSet<>();
 		assertTrue(translation instanceof SPARQLUnionPatternImpl);
 		for (final SPARQLGraphPattern i : ((SPARQLUnionPatternImpl) translation).getSubPatterns()) {
 			assertTrue(i instanceof SPARQLGroupPattern);
@@ -70,6 +72,40 @@ public class VocabularyMappingTest
 		}
 		
 		assertEquals(testData.object2, translationTriples);
+		
+		//Test with variable
+		o = NodeFactory.createVariable("o");
+		testTp = new TriplePatternImpl(s, p, o);
+		translation = vm.translateTriplePattern(testTp);
+		
+		translationTriples = new HashSet<>();
+		assertTrue(translation instanceof SPARQLUnionPattern);
+		for (final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+			assertTrue(i instanceof SPARQLUnionPattern);
+			for (final SPARQLGraphPattern j : ((SPARQLUnionPattern) i).getSubPatterns()) {
+				assertTrue(j instanceof TriplePattern);
+				translationTriples.add(((TriplePattern) j).asJenaTriple());
+			}
+		}
+		
+		final Set<Triple> expectedResults = new HashSet<>();
+		s = NodeFactory.createURI("s2");
+		p = NodeFactory.createURI("Subtype");
+		expectedResults.add(new Triple(s, p, o));
+		
+		s = NodeFactory.createURI("s3");
+		expectedResults.add(new Triple(s, p, o));
+		
+		s = o;
+		p = NodeFactory.createURI("Not type");
+		o = NodeFactory.createURI("s2");
+		expectedResults.add(new Triple(s, p, o));
+		
+		o = NodeFactory.createURI("s3");
+		expectedResults.add(new Triple(s, p, o));		
+		
+		assertEquals(expectedResults, translationTriples);
+		
 	}
 	
 	@Test
@@ -89,8 +125,8 @@ public class VocabularyMappingTest
 		
 		p = NodeFactory.createURI("p");
 		o = NodeFactory.createURI("o");
-		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
+		TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
@@ -105,6 +141,15 @@ public class VocabularyMappingTest
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
 		assertTrue(translationSubPatterns.size() == expectedResults.size());
+		
+		//Testing with variable
+		s = NodeFactory.createVariable("s");
+		p = NodeFactory.createURI("p");
+		o = NodeFactory.createURI("o");
+		testTp = new TriplePatternImpl(s, p, o);
+		translation = vm.translateTriplePattern(testTp);
+		assertTrue(testTp.equals(translation));
+		
 	}
 	
 	@Test
@@ -176,8 +221,8 @@ public class VocabularyMappingTest
 		s = NodeFactory.createURI("s");
 		p = NodeFactory.createURI("p1");
 		o = NodeFactory.createURI("o");
-		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
@@ -215,6 +260,14 @@ public class VocabularyMappingTest
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
 		assertTrue(translationSubPatterns.size() == expectedResults.size());
+		
+		//Testing with variable
+		s = NodeFactory.createURI("s");
+		p = NodeFactory.createVariable("p");
+		o = NodeFactory.createURI("o");
+		testTp = new TriplePatternImpl(s, p, o);
+		translation = vm.translateTriplePattern(testTp);
+		assertTrue(testTp.equals(translation));
 	}
 	
 	@Test
@@ -286,8 +339,8 @@ public class VocabularyMappingTest
 		s = NodeFactory.createURI("s");
 		p = RDF.type.asNode();
 		o = NodeFactory.createURI("o1");
-		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
-		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
+		TriplePattern testTp = new TriplePatternImpl(s, p, o);
+		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp); 
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
@@ -324,6 +377,14 @@ public class VocabularyMappingTest
 		
 		assertTrue(translationSubPatterns.containsAll(expectedResults));
 		assertTrue(translationSubPatterns.size() == expectedResults.size());
+		
+		//Testing with variable
+		s = NodeFactory.createURI("s");
+		p = NodeFactory.createURI("p");
+		p = NodeFactory.createVariable("o");
+		testTp = new TriplePatternImpl(s, p, o);
+		translation = vm.translateTriplePattern(testTp);
+		assertTrue(testTp.equals(translation));
 	}
 	
 	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples(){
