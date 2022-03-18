@@ -26,6 +26,9 @@ public class InitializeNrGeneration {
         else if ( lop instanceof LogicalOpRequest) {
             nrGeneration = 1;
         }
+        else {
+            throw new IllegalArgumentException( lop.getClass().getName() );
+        }
         return nrGeneration;
     }
 
