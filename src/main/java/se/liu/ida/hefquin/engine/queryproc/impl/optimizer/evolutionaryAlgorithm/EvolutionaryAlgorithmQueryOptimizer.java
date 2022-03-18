@@ -41,6 +41,10 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
     @Override
     public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+        if( terminateCriterion instanceof TerminateByDistancePercAvgDynamicG ){
+            ((TerminateByDistancePercAvgDynamicG) terminateCriterion).initialize( initialPlan );
+        }
+
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
         return optimize( initialPhysicalPlan );
     }
@@ -64,6 +68,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
                 aggregateCostOfPlansPerGen.add( currentGen.bestPlan.getWeight() );
                 aggregateCostOfPlansPerGen.add( currentGen.worstPlan.getWeight() );
                 aggregateCostOfPlansPerGen.add( currentGen.avgCost );
+                aggregateCostOfPlansPerGen.add( (double) currentGen.nrOfPlansWithBestCost );
 
                 aggregateCostOfPlansAllGens.add( aggregateCostOfPlansPerGen );
 

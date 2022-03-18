@@ -111,4 +111,15 @@ public class PhysicalPlanWithCostUtils {
         return Math.sqrt( standardDeviation/plansWithCost.size() );
     }
 
+    public static int countNrOfPlansWithBestCost( final List<PhysicalPlanWithCost> plansWithCost, final double bestCost ) {
+        int count = 0;
+        for( final PhysicalPlanWithCost plan: plansWithCost ) {
+            if ( plan.getWeight() == bestCost ) {
+                count += 1;
+            }
+        }
+
+        return count;
+    }
+
 }
