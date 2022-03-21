@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import org.apache.jena.sparql.expr.Expr;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
