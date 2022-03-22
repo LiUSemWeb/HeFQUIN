@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -66,6 +67,11 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op )     {
+			subplanCount++;
+		}
+
+		@Override
+		public void visit( final LogicalOpFilter op )     {
 			subplanCount++;
 		}
 	}
