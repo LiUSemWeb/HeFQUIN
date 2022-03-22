@@ -17,15 +17,11 @@ public class LogicalOpFilter implements UnaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpFilter) )
-
-			return false;
+		if ( o == this ) return true;
+		if ( ! (o instanceof LogicalOpFilter) ) return false;
 
 		final LogicalOpFilter oo = (LogicalOpFilter) o;
-		if ( oo == this )
-			return true;
-		else
-			return oo.filterExpression.equals(filterExpression); 
+		return oo.filterExpression.equals(filterExpression); 
 	}
 
 	public Expr getFilterExpression() {
