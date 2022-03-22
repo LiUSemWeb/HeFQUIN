@@ -38,13 +38,7 @@ public class LogicalOpFilter implements UnaryLogicalOp
 	}
 
 	@Override
-	public String toString(){ // Unsure about what to do with this one.
-		final int codeOfExpr = filterExpression.toString().hashCode();
-
-		return "> filter" +
-				"[" + codeOfExpr + "]"+
-				" ( "
-				+ filterExpression.getVarName()
-				+ " )";
+	public String toString() {
+		return "> filter ( " + filterExpression.toString() + " )";
 	}
 }
