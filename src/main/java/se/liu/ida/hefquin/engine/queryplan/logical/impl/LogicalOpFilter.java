@@ -17,7 +17,8 @@ public class LogicalOpFilter implements UnaryLogicalOp
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpTPAdd) )
+		if ( ! (o instanceof LogicalOpFilter) )
+
 			return false;
 
 		final LogicalOpFilter oo = (LogicalOpFilter) o;
