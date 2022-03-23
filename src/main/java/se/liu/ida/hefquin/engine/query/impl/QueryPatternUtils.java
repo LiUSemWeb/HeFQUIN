@@ -11,6 +11,8 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.core.BasicPattern;
@@ -157,6 +159,9 @@ public class QueryPatternUtils
 		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
 			return getVariablesInPattern( (Op2) op );
 		}
+		else if ( op instanceof OpService ){
+			return getVariablesInPattern( ((Op1) op).getSubOp());
+		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
 		}
@@ -233,6 +238,9 @@ public class QueryPatternUtils
 		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
 			return getNumberOfVarOccurrences( (Op2) op );
 		}
+		else if ( op instanceof OpService ){
+			return getNumberOfVarOccurrences( ((Op1) op).getSubOp());
+		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
 		}
@@ -255,6 +263,9 @@ public class QueryPatternUtils
 		}
 		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
 			return getNumberOfTermOccurrences( (Op2) op );
+		}
+		else if ( op instanceof OpService ){
+			return getNumberOfTermOccurrences( ((Op1) op).getSubOp());
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
