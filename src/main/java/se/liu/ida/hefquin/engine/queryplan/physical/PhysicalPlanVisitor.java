@@ -16,4 +16,6 @@ public interface PhysicalPlanVisitor {
     void visit(final PhysicalOpSymmetricHashJoin op);
 
     void visit(final PhysicalOpBinaryUnion op);
+
+    void visit(final PhysicalOpFilter op);
 }
