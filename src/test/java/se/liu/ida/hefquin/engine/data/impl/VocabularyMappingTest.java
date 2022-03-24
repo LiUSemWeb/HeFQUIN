@@ -136,11 +136,19 @@ public class VocabularyMappingTest
 		o = RDF.nil.asNode();
 		testSet.add(new Triple(s, p ,o));
 		
+		s = NodeFactory.createURI("c");
+		p = OWL.equivalentClass.asNode();
+		o = NodeFactory.createURI("m");
+		testSet.add(new Triple(s, p ,o));
+		
 		final VocabularyMapping vm = new VocabularyMappingImpl(testSet);
 		
 		final BindingBuilder testBuilder = BindingBuilder.create();
-		final Var testVar = Var.alloc("v");
-		final Node testNode = NodeFactory.createURI("n");
+		Var testVar = Var.alloc("v");
+		Node testNode = NodeFactory.createURI("n");
+		testBuilder.add(testVar, testNode);
+		testVar = Var.alloc("w");
+		testNode = NodeFactory.createURI("m");
 		testBuilder.add(testVar, testNode);
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
@@ -149,12 +157,16 @@ public class VocabularyMappingTest
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
 		Node n = NodeFactory.createURI("a");
-		first.add(testVar, n);
+		first.add(Var.alloc("v"), n);
+		n = NodeFactory.createURI("c");
+		first.add(Var.alloc("w"), n);
 		expectedResults.add(new SolutionMappingImpl(first.build()));
 		
 		final BindingBuilder second = BindingBuilder.create();
 		n = NodeFactory.createURI("b");
-		second.add(testVar, n);
+		second.add(Var.alloc("v"), n);
+		n = NodeFactory.createURI("c");
+		second.add(Var.alloc("w"), n);
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 		
 		System.out.print(expectedResults.toString());
