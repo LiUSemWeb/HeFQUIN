@@ -21,7 +21,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 		if(inputVars.length == 1) {
 			return inputVars[1];
 		} else {
-			throw new IllegalArgumentException("There are more than 1 input variable.");
+			throw new IllegalArgumentException("There is more than 1 input variable.");
 		}
 	}
 
