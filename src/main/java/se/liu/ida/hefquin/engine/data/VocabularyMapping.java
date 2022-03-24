@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.data;
 
+import java.util.Set;
+
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -16,4 +18,6 @@ public interface VocabularyMapping
 	 * pattern itself.
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
+	
+	Set<SolutionMapping> translateSolutionMapping(SolutionMapping sm);
 }

@@ -10,10 +10,13 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -23,6 +26,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class VocabularyMappingTest
 {
+	/*
 	@Test
 	public void VocabularyMappingConstructorTest() {
 		final Pair<Set<Triple>,Set<Triple>> testData = CreateTestTriples();
@@ -49,14 +53,12 @@ public class VocabularyMappingTest
 		final TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		final SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
-		/* Test Union
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		final Set<Triple> translatedTriples = new HashSet<>();
 		for(final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
 			assert(i instanceof TriplePattern);
 			translatedTriples.add(((TriplePattern) i).asJenaTriple());
 		}
-		*/
 		
 		//Test Intersection
 		assertTrue(translation instanceof BGP);
@@ -100,6 +102,65 @@ public class VocabularyMappingTest
 		expectedRes.add(new Triple(o1Res, pRes, sRes));
 		
 		return new Pair<>(testSet, expectedRes);
+	}
+	*/
+	
+	@Test
+	public void TranslateSolutionMappingTest() {
+		final Set<Triple> testSet = new HashSet<>();
+		Node s = NodeFactory.createURI("a");
+		Node p = OWL.equivalentClass.asNode();
+		Node o = NodeFactory.createURI("n");
+		testSet.add(new Triple(s, p ,o));
+		
+		s = NodeFactory.createURI("b");
+		p = OWL.unionOf.asNode();
+		o = NodeFactory.createBlankNode();
+		testSet.add(new Triple(s, p ,o));
+		
+		s = o;
+		p = RDF.first.asNode();
+		o = NodeFactory.createURI("c");
+		testSet.add(new Triple(s, p ,o));
+		
+		p = RDF.rest.asNode();
+		o = NodeFactory.createBlankNode();
+		testSet.add(new Triple(s, p ,o));
+		
+		s = o;
+		p = RDF.first.asNode();
+		o = NodeFactory.createURI("n");
+		testSet.add(new Triple(s, p ,o));
+		
+		p = RDF.rest.asNode();
+		o = RDF.nil.asNode();
+		testSet.add(new Triple(s, p ,o));
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(testSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		final Var testVar = Var.alloc("v");
+		final Node testNode = NodeFactory.createURI("n");
+		testBuilder.add(testVar, testNode);
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		Node n = NodeFactory.createURI("a");
+		first.add(testVar, n);
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+		
+		final BindingBuilder second = BindingBuilder.create();
+		n = NodeFactory.createURI("b");
+		second.add(testVar, n);
+		expectedResults.add(new SolutionMappingImpl(second.build()));
+		
+		System.out.print(expectedResults.toString());
+		System.out.print(translation.toString());
+		
+		//assertEquals(expectedResults, translation);
 	}
 
 }
