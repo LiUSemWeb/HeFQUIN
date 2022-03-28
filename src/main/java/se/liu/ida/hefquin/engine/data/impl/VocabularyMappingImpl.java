@@ -366,7 +366,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					for (final BindingBuilder k : bbs) {
 						BindingBuilder translationCopy = BindingBuilder.create();
 						if(!k.isEmpty()) {
-							translationCopy.addAll(k.build());
+							translationCopy.addAll(k.snapshot());
 						}
 						translationCopy.add(v, j);
 						bbsCopy.add(translationCopy);
@@ -393,7 +393,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		for (final Triple m : getMappings(Node.ANY, Node.ANY, n)){
 			final Node predicate = m.getPredicate();
 			if (predicate == OWL.sameAs.asNode() || predicate == OWL.equivalentClass.asNode() || 
-				predicate == OWL.equivalentProperty.asNode() || predicate == RDFS.subPropertyOf.asNode()) {
+				predicate == RDFS.subClassOf.asNode() || predicate == OWL.equivalentProperty.asNode() || 
+				predicate == RDFS.subPropertyOf.asNode()) {
 				results.add(m.getSubject());
 			} else if (predicate == RDF.first.asNode()) {
 				Set<Triple> unionMappings = getMappings(Node.ANY, Node.ANY, m.getSubject());

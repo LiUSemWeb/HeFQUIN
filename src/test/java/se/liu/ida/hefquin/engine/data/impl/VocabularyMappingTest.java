@@ -14,6 +14,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -136,9 +137,23 @@ public class VocabularyMappingTest
 		o = RDF.nil.asNode();
 		testSet.add(new Triple(s, p ,o));
 		
-		s = NodeFactory.createURI("c");
-		p = OWL.equivalentClass.asNode();
+		s = NodeFactory.createURI("d");
+		p = RDFS.subClassOf.asNode();
+		o = NodeFactory.createURI("n");
+		testSet.add(new Triple(s, p ,o));
+		
+		s = NodeFactory.createURI("e");
+		p = OWL.equivalentProperty.asNode();
 		o = NodeFactory.createURI("m");
+		testSet.add(new Triple(s, p ,o));
+		
+		s = NodeFactory.createURI("f");
+		p = RDFS.subPropertyOf.asNode();
+		testSet.add(new Triple(s, p ,o));
+		
+		s = NodeFactory.createURI("g");
+		p = OWL.sameAs.asNode();
+		o = NodeFactory.createURI("o");
 		testSet.add(new Triple(s, p ,o));
 		
 		final VocabularyMapping vm = new VocabularyMappingImpl(testSet);
@@ -146,6 +161,7 @@ public class VocabularyMappingTest
 		final BindingBuilder testBuilder = BindingBuilder.create();
 		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("n"));
 		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("m"));
+		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("o"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
 		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
@@ -153,18 +169,42 @@ public class VocabularyMappingTest
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
 		first.add(Var.alloc("v"), NodeFactory.createURI("a"));
-		first.add(Var.alloc("w"), NodeFactory.createURI("c"));
+		first.add(Var.alloc("w"), NodeFactory.createURI("e"));
+		first.add(Var.alloc("x"), NodeFactory.createURI("g"));
 		expectedResults.add(new SolutionMappingImpl(first.build()));
 		
 		final BindingBuilder second = BindingBuilder.create();
 		second.add(Var.alloc("v"), NodeFactory.createURI("b"));
-		second.add(Var.alloc("w"), NodeFactory.createURI("c"));
+		second.add(Var.alloc("w"), NodeFactory.createURI("e"));
+		second.add(Var.alloc("x"), NodeFactory.createURI("g"));
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 		
-		System.out.print(expectedResults);
-		System.out.print(translation.toString());
+		final BindingBuilder third = BindingBuilder.create();
+		third.add(Var.alloc("v"), NodeFactory.createURI("d"));
+		third.add(Var.alloc("w"), NodeFactory.createURI("e"));
+		third.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		expectedResults.add(new SolutionMappingImpl(third.build()));
+		
+		final BindingBuilder fourth = BindingBuilder.create();
+		fourth.add(Var.alloc("v"), NodeFactory.createURI("a"));
+		fourth.add(Var.alloc("w"), NodeFactory.createURI("f"));
+		fourth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		expectedResults.add(new SolutionMappingImpl(fourth.build()));
+		
+		final BindingBuilder fifth = BindingBuilder.create();
+		fifth.add(Var.alloc("v"), NodeFactory.createURI("b"));
+		fifth.add(Var.alloc("w"), NodeFactory.createURI("f"));
+		fifth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		expectedResults.add(new SolutionMappingImpl(fifth.build()));
+		
+		final BindingBuilder sixth = BindingBuilder.create();
+		sixth.add(Var.alloc("v"), NodeFactory.createURI("d"));
+		sixth.add(Var.alloc("w"), NodeFactory.createURI("f"));
+		sixth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		expectedResults.add(new SolutionMappingImpl(sixth.build()));
 
 		assertEquals(expectedResults, translation);
+		
 	}
 
 }
