@@ -358,7 +358,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		while(i.hasNext()) {
 			final Var v = i.next();
 			final Node n = sm.asJenaBinding().get(v);
-			Set<Node> bindingTranslation = translateBinding(n);
+			final Set<Node> bindingTranslation = translateBinding(n);
 			if (bindingTranslation.size() > 1) {
 				final Set<BindingBuilder> bbsCopy = new HashSet<>();
 				
