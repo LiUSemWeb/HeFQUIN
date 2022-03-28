@@ -17,7 +17,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 	}
 	
 	@Override
-	public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) {
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		if(inputVars.length == 1) {
 			return inputVars[1];
 		} else {
