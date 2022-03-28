@@ -161,10 +161,10 @@ public class VocabularyMappingTest
 		second.add(Var.alloc("w"), NodeFactory.createURI("c"));
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 		
-		System.out.print(expectedResults.toString());
+		System.out.print(expectedResults);
 		System.out.print(translation.toString());
-		
-		//assertTrue(expectedResults.equals(translation));
+
+		assertEquals(expectedResults, translation);
 	}
 
 }
