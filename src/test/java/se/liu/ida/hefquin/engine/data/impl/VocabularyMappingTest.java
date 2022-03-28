@@ -144,35 +144,27 @@ public class VocabularyMappingTest
 		final VocabularyMapping vm = new VocabularyMappingImpl(testSet);
 		
 		final BindingBuilder testBuilder = BindingBuilder.create();
-		Var testVar = Var.alloc("v");
-		Node testNode = NodeFactory.createURI("n");
-		testBuilder.add(testVar, testNode);
-		testVar = Var.alloc("w");
-		testNode = NodeFactory.createURI("m");
-		testBuilder.add(testVar, testNode);
+		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("n"));
+		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("m"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
 		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
-		Node n = NodeFactory.createURI("a");
-		first.add(Var.alloc("v"), n);
-		n = NodeFactory.createURI("c");
-		first.add(Var.alloc("w"), n);
+		first.add(Var.alloc("v"), NodeFactory.createURI("a"));
+		first.add(Var.alloc("w"), NodeFactory.createURI("c"));
 		expectedResults.add(new SolutionMappingImpl(first.build()));
 		
 		final BindingBuilder second = BindingBuilder.create();
-		n = NodeFactory.createURI("b");
-		second.add(Var.alloc("v"), n);
-		n = NodeFactory.createURI("c");
-		second.add(Var.alloc("w"), n);
+		second.add(Var.alloc("v"), NodeFactory.createURI("b"));
+		second.add(Var.alloc("w"), NodeFactory.createURI("c"));
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 		
 		System.out.print(expectedResults.toString());
 		System.out.print(translation.toString());
 		
-		//assertEquals(expectedResults, translation);
+		//assertTrue(expectedResults.equals(translation));
 	}
 
 }
