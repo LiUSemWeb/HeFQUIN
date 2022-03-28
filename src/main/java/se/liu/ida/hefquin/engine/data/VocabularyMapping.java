@@ -19,5 +19,5 @@ public interface VocabularyMapping
 	 */
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
 	
-	Set<SolutionMapping> translateSolutionMapping(SolutionMapping sm);
+	Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm );
 }
