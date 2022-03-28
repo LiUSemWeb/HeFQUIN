@@ -26,7 +26,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 	}
 
 	@Override
-	public void visit(PhysicalPlanVisitor visitor) {
+	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
