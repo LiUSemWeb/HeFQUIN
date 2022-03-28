@@ -349,7 +349,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> translateSolutionMapping(SolutionMapping sm) {		
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {		
 		Set<BindingBuilder> bbs = new HashSet<>();
 		BindingBuilder translation = BindingBuilder.create();
 		bbs.add(translation);
