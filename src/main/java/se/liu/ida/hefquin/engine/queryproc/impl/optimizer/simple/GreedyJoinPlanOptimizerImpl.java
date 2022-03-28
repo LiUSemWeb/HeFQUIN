@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
@@ -75,19 +78,24 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		protected PhysicalPlan addNextBestJoin( final PhysicalPlan currentPlan )
 				throws QueryOptimizationException
 		{
-			final PhysicalPlan[] nextPossiblePlans = createNextPossiblePlans(currentPlan);
-			final Double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans);
+			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = createNextPossiblePlans(currentPlan);
 
-			int indexOfBestPlan = 0;
+			Pair<Integer, Integer> indexOfBestPlan = new Pair<>(0, 0);
+			double leastCost = Double.MAX_VALUE;
+			for ( int indexOfSubPlan = 0; indexOfSubPlan < subplans.size(); indexOfSubPlan ++ ){
+				final Double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans.get(indexOfSubPlan));
 
-			for ( int i = 1; i < subplans.size(); ++i ) {
-				if ( costs[indexOfBestPlan] > costs[i] ) {
-					indexOfBestPlan = i;
+				for ( int i = 0; i < costs.length; i ++ ){
+					if ( leastCost > costs[i] ) {
+						leastCost = costs[i];
+						indexOfBestPlan = new Pair<>(indexOfSubPlan, i);
+					}
 				}
 			}
 
-			subplans.remove(indexOfBestPlan);
-			return nextPossiblePlans[indexOfBestPlan];
+			int indexOfSubPlan = indexOfBestPlan.object1;
+			subplans.remove( indexOfSubPlan );
+			return nextPossiblePlans.get(indexOfBestPlan.object1).get(indexOfBestPlan.object2);
 		}
 
 		/**
@@ -95,10 +103,11 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		 * child and one of the remaining subplans (see {@link #subplans}) as
 		 * the right child.
 		 */
-		protected PhysicalPlan[] createNextPossiblePlans( final PhysicalPlan currentPlan ) {
-			final List<PhysicalPlan> plans = new ArrayList<>();
+		protected Map<Integer, List<PhysicalPlan>> createNextPossiblePlans( final PhysicalPlan currentPlan ) {
+			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = new HashMap<>();
 
 			for ( int i = 0; i < subplans.size(); ++i ) {
+				final List<PhysicalPlan> plans = new ArrayList<>();
 				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
 				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
 					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) currentPlan.getRootOperator(), subplans.get(i), plans );
@@ -106,9 +115,10 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
 					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) subplans.get(i).getRootOperator(), currentPlan, plans );
 				}
+				nextPossiblePlans.put(i, plans);
 			}
 
-			return plans.toArray( new PhysicalPlan[plans.size()]);
+			return nextPossiblePlans;
 		}
 	}
 
