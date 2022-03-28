@@ -12,7 +12,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 
 	protected final LogicalOpFilter logicalFilter;
 	
-	public PhysicalOpFilter(LogicalOpFilter lf) {
+	public PhysicalOpFilter( final LogicalOpFilter lf ) {
 		this.logicalFilter = lf;
 	}
 	
