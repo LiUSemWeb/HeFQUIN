@@ -19,7 +19,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		if(inputVars.length == 1) {
-			return inputVars[1];
+			return inputVars[0];
 		} else {
 			throw new IllegalArgumentException("There is more than 1 input variable.");
 		}
