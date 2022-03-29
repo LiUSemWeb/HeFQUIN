@@ -37,9 +37,10 @@ public class CostEstimationUtils
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{
-		final List<Double> costsOfPlans= new ArrayList<>();
-
+//		TODO: Temporarily set the batch size as 50
 		final List<List<PhysicalPlan>> blockOfPlans = PhysicalPlanWithCostUtils.slicePlans(plans, 50);
+
+		final List<Double> costsOfPlans= new ArrayList<>();
 		for ( List<PhysicalPlan> oneBlockOfPlans : blockOfPlans ) {
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<Double>[] futures = new CompletableFuture[oneBlockOfPlans.size()];

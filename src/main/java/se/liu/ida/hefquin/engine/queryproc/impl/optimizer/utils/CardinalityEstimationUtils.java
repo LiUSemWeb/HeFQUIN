@@ -46,9 +46,10 @@ public class CardinalityEstimationUtils
 	                                      final List<PhysicalPlan> plans )
 			throws CardinalityEstimationException
 	{
-		final List<Integer> costsOfPlans= new ArrayList<>();
+//		TODO: Temporarily set the batch size as 50
 		final List<List<PhysicalPlan>> blockOfPlans = PhysicalPlanWithCostUtils.slicePlans(plans, 50);
 
+		final List<Integer> costsOfPlans= new ArrayList<>();
 		for ( List<PhysicalPlan> oneBlockOfPlans: blockOfPlans ){
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<Integer>[] futures = new CompletableFuture[oneBlockOfPlans.size()];
