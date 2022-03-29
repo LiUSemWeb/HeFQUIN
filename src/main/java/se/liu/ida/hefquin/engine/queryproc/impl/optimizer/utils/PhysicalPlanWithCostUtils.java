@@ -37,6 +37,23 @@ public class PhysicalPlanWithCostUtils {
         return plansWithCost;
     }
 
+    public static <T> List<List<T>> slicePlans( final List<T> plans, final int batchSize ) {
+        final List<List<T>> planBatches = new ArrayList<>();
+        if (plans ==null || plans.size() == 0) {
+            return planBatches;
+        }
+
+        int from = 0, to = 0, slicedItems = 0;
+        while ( slicedItems < plans.size() ) {
+            to = from + Math.min(batchSize, plans.size() - to);
+            final List<T> slice = plans.subList(from, to);
+            planBatches.add(slice);
+            slicedItems += slice.size();
+            from = to;
+        }
+        return planBatches;
+    }
+
     public static PhysicalPlanWithCost findPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost ) {
         if ( plansWithCost.size() == 0 ) {
             throw new IllegalArgumentException( "Cannot find the plan with lowest cost from an empty set" );
