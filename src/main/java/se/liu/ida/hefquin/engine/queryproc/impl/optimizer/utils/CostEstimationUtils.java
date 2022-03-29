@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -36,24 +37,31 @@ public class CostEstimationUtils
 	                                     final List<PhysicalPlan> plans )
 			throws CostEstimationException
 	{
-		@SuppressWarnings("unchecked")
-		final CompletableFuture<Double>[] futures = new CompletableFuture[plans.size()];
+//		TODO: Temporarily set the batch size as 50
+		final List<List<PhysicalPlan>> blockOfPlans = PhysicalPlanWithCostUtils.slicePlans(plans, 50);
 
-		for ( int i = 0; i < plans.size(); ++i ) {
-			futures[i] = costModel.initiateCostEstimation( plans.get(i) );
-		}
+		final List<Double> costsOfPlans= new ArrayList<>();
+		for ( List<PhysicalPlan> oneBlockOfPlans : blockOfPlans ) {
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<Double>[] futures = new CompletableFuture[oneBlockOfPlans.size()];
+			for (int i = 0; i < oneBlockOfPlans.size(); ++i) {
+				futures[i] = costModel.initiateCostEstimation(oneBlockOfPlans.get(i));
+			}
 
-		try {
-			return CompletableFutureUtils.getAll(futures, Double.class);
-		}
-		catch ( final CompletableFutureUtils.GetAllException ex ) {
-			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new CostEstimationException("Unexpected interruption when getting a cost estimate.", ex.getCause(), plans.get(ex.i) );
+			try {
+				Double[] costs= CompletableFutureUtils.getAll(futures, Double.class);
+				costsOfPlans.addAll(List.of(costs));
 			}
-			else {
-				throw new CostEstimationException("Getting a cost estimate caused an exception.", ex.getCause(), plans.get(ex.i) );
+			catch ( final CompletableFutureUtils.GetAllException ex ) {
+				if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
+					throw new CostEstimationException("Unexpected interruption when getting a cost estimate.", ex.getCause(), plans.get(ex.i) );
+				}
+				else {
+					throw new CostEstimationException("Getting a cost estimate caused an exception.", ex.getCause(), plans.get(ex.i) );
+				}
 			}
 		}
+		return costsOfPlans.toArray(new Double[plans.size()]);
 	}
 
 }

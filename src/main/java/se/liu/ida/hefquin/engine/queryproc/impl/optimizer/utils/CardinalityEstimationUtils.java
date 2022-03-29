@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -45,24 +46,29 @@ public class CardinalityEstimationUtils
 	                                      final List<PhysicalPlan> plans )
 			throws CardinalityEstimationException
 	{
-		@SuppressWarnings("unchecked")
-		final CompletableFuture<Integer>[] futures = new CompletableFuture[plans.size()];
+//		TODO: Temporarily set the batch size as 50
+		final List<List<PhysicalPlan>> blockOfPlans = PhysicalPlanWithCostUtils.slicePlans(plans, 50);
 
-		for ( int i = 0; i < plans.size(); ++i ) {
-			futures[i] = cardEstimate.initiateCardinalityEstimation( plans.get(i) );
-		}
+		final List<Integer> costsOfPlans= new ArrayList<>();
+		for ( List<PhysicalPlan> oneBlockOfPlans: blockOfPlans ){
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<Integer>[] futures = new CompletableFuture[oneBlockOfPlans.size()];
+			for (int i = 0; i < oneBlockOfPlans.size(); ++i) {
+				futures[i] = cardEstimate.initiateCardinalityEstimation(oneBlockOfPlans.get(i));
+			}
 
-		try {
-			return CompletableFutureUtils.getAll(futures, Integer.class);
-		}
-		catch ( final CompletableFutureUtils.GetAllException ex ) {
-			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new CardinalityEstimationException("Unexpected interruption when getting a cardinality estimate.", ex.getCause(), plans.get(ex.i) );
+			try {
+				Integer[] cardinalities= CompletableFutureUtils.getAll(futures, Integer.class);
+				costsOfPlans.addAll(List.of(cardinalities));
+			} catch (final CompletableFutureUtils.GetAllException ex) {
+				if (ex.getCause() != null && ex.getCause() instanceof InterruptedException) {
+					throw new CardinalityEstimationException("Unexpected interruption when getting a cardinality estimate.", ex.getCause(), plans.get(ex.i));
+				} else {
+					throw new CardinalityEstimationException("Getting a cardinality estimate caused an exception.", ex.getCause(), plans.get(ex.i));
+				}
 			}
-			else {
-				throw new CardinalityEstimationException("Getting a cardinality estimate caused an exception.", ex.getCause(), plans.get(ex.i) );
-			}
 		}
+		return costsOfPlans.toArray(new Integer[plans.size()]);
 	}
 
 }
