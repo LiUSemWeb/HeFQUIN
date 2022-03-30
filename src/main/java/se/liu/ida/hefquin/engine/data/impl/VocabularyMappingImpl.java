@@ -387,7 +387,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		return results;
 	}
 	
-	protected Set<Node> translateBinding(Node n){
+	protected Set<Node> translateBinding( final Node n ) {
 		final Set<Node> results = new HashSet<>();
 		for (final Triple m : getMappings(Node.ANY, Node.ANY, n)){
 			final Node predicate = m.getPredicate();
