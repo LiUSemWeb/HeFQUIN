@@ -351,8 +351,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	@Override
 	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {		
 		Set<BindingBuilder> bbs = new HashSet<>();
-		BindingBuilder translation = BindingBuilder.create();
-		bbs.add(translation);
+		bbs.add( BindingBuilder.create() );
 		
 		final Iterator<Var> i = sm.asJenaBinding().vars();
 		while(i.hasNext()) {
