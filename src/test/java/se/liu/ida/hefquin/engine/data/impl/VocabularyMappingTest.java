@@ -3,15 +3,22 @@ package se.liu.ida.hefquin.engine.data.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.system.RiotLib;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
@@ -107,100 +114,67 @@ public class VocabularyMappingTest
 	*/
 	
 	@Test
-	public void TranslateSolutionMappingTest() {
-		final Set<Triple> testSet = new HashSet<>();
-		Node s = NodeFactory.createURI("a");
-		Node p = OWL.equivalentClass.asNode();
-		Node o = NodeFactory.createURI("n");
-		testSet.add(new Triple(s, p ,o));
+	public void TranslateSolutionMappingTest() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:a owl:equivalentClass ex:n . "
+				+ "ex:b owl:unionOf (ex:c ex:n) . "
+				+ "ex:d rdfs:subClassOf ex:n . "
+				+ "ex:e owl:equivalentProperty ex:m . "
+				+ "ex:f rdfs:subPropertyOf ex:m . "
+				+ "ex:g owl:sameAs ex:o . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
 		
-		s = NodeFactory.createURI("b");
-		p = OWL.unionOf.asNode();
-		o = NodeFactory.createBlankNode();
-		testSet.add(new Triple(s, p ,o));
-		
-		s = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("c");
-		testSet.add(new Triple(s, p ,o));
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testSet.add(new Triple(s, p ,o));
-		
-		s = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("n");
-		testSet.add(new Triple(s, p ,o));
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testSet.add(new Triple(s, p ,o));
-		
-		s = NodeFactory.createURI("d");
-		p = RDFS.subClassOf.asNode();
-		o = NodeFactory.createURI("n");
-		testSet.add(new Triple(s, p ,o));
-		
-		s = NodeFactory.createURI("e");
-		p = OWL.equivalentProperty.asNode();
-		o = NodeFactory.createURI("m");
-		testSet.add(new Triple(s, p ,o));
-		
-		s = NodeFactory.createURI("f");
-		p = RDFS.subPropertyOf.asNode();
-		testSet.add(new Triple(s, p ,o));
-		
-		s = NodeFactory.createURI("g");
-		p = OWL.sameAs.asNode();
-		o = NodeFactory.createURI("o");
-		testSet.add(new Triple(s, p ,o));
-		
-		final VocabularyMapping vm = new VocabularyMappingImpl(testSet);
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
 		
 		final BindingBuilder testBuilder = BindingBuilder.create();
-		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("n"));
-		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("m"));
-		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("o"));
+		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/n"));
+		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
+		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/o"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
 		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
-		first.add(Var.alloc("v"), NodeFactory.createURI("a"));
-		first.add(Var.alloc("w"), NodeFactory.createURI("e"));
-		first.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		first.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		first.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(first.build()));
 		
 		final BindingBuilder second = BindingBuilder.create();
-		second.add(Var.alloc("v"), NodeFactory.createURI("b"));
-		second.add(Var.alloc("w"), NodeFactory.createURI("e"));
-		second.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		second.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		second.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 		
 		final BindingBuilder third = BindingBuilder.create();
-		third.add(Var.alloc("v"), NodeFactory.createURI("d"));
-		third.add(Var.alloc("w"), NodeFactory.createURI("e"));
-		third.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		third.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		third.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		third.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(third.build()));
 		
 		final BindingBuilder fourth = BindingBuilder.create();
-		fourth.add(Var.alloc("v"), NodeFactory.createURI("a"));
-		fourth.add(Var.alloc("w"), NodeFactory.createURI("f"));
-		fourth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		fourth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		fourth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		fourth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(fourth.build()));
 		
 		final BindingBuilder fifth = BindingBuilder.create();
-		fifth.add(Var.alloc("v"), NodeFactory.createURI("b"));
-		fifth.add(Var.alloc("w"), NodeFactory.createURI("f"));
-		fifth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		fifth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		fifth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		fifth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(fifth.build()));
 		
 		final BindingBuilder sixth = BindingBuilder.create();
-		sixth.add(Var.alloc("v"), NodeFactory.createURI("d"));
-		sixth.add(Var.alloc("w"), NodeFactory.createURI("f"));
-		sixth.add(Var.alloc("x"), NodeFactory.createURI("g"));
+		sixth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		sixth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		sixth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
 		expectedResults.add(new SolutionMappingImpl(sixth.build()));
 
 		assertEquals(expectedResults, translation);

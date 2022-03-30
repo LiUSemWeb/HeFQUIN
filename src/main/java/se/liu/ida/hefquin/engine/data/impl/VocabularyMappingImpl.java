@@ -12,7 +12,6 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
@@ -357,6 +356,11 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		while(i.hasNext()) {
 			final Var v = i.next();
 			final Node n = sm.asJenaBinding().get(v);
+			
+			if(!n.isURI()) {
+				continue;
+			}
+			
 			final Set<Node> bindingTranslation = translateBinding(n);
 			if (bindingTranslation.size() > 1) {
 				final Set<BindingBuilder> bbsCopy = new HashSet<>();
@@ -373,6 +377,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				}
 				
 				bbs = bbsCopy;
+			} else if (bindingTranslation.size() == 0) {
+				continue;
 			} else {
 				for (final BindingBuilder j : bbs) {
 					j.add(v, bindingTranslation.iterator().next());
@@ -391,14 +397,14 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final Set<Node> results = new HashSet<>();
 		for (final Triple m : getMappings(Node.ANY, Node.ANY, n)){
 			final Node predicate = m.getPredicate();
-			if (predicate == OWL.sameAs.asNode() || predicate == OWL.equivalentClass.asNode() || 
-				predicate == RDFS.subClassOf.asNode() || predicate == OWL.equivalentProperty.asNode() || 
-				predicate == RDFS.subPropertyOf.asNode()) {
+			if (predicate.equals(OWL.sameAs.asNode()) || predicate.equals(OWL.equivalentClass.asNode()) || 
+				predicate.equals(RDFS.subClassOf.asNode()) || predicate.equals(OWL.equivalentProperty.asNode()) || 
+				predicate.equals(RDFS.subPropertyOf.asNode())) {
 				results.add(m.getSubject());
-			} else if (predicate == RDF.first.asNode()) {
+			} else if (predicate.equals(RDF.first.asNode())) {
 				Set<Triple> unionMappings = getMappings(Node.ANY, Node.ANY, m.getSubject());
 				Triple mapping = unionMappings.iterator().next();
-				while(mapping.getPredicate() != OWL.unionOf.asNode()) {
+				while(!mapping.getPredicate().equals(OWL.unionOf.asNode())) {
 					unionMappings = getMappings(Node.ANY, Node.ANY, mapping.getSubject());
 					mapping = unionMappings.iterator().next();
 				}
