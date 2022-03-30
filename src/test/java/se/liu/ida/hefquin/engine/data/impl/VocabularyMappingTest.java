@@ -61,6 +61,7 @@ public class VocabularyMappingTest
 		Node s = NodeFactory.createURI("http://example.org/s1");
 		Node p = RDF.type.asNode();
 		Node o = NodeFactory.createURI("http://example.org/o1");
+
 		TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
@@ -95,19 +96,19 @@ public class VocabularyMappingTest
 		}
 		
 		final Set<Triple> expectedResults = new HashSet<>();
-		s = NodeFactory.createURI("s2");
-		p = NodeFactory.createURI("Subtype");
+		s = NodeFactory.createURI("http://example.org/s2");
+		p = NodeFactory.createURI("http://example.org/subType");
 		expectedResults.add(new Triple(s, p, o));
 		
-		s = NodeFactory.createURI("s3");
+		s = NodeFactory.createURI("http://example.org/s3");
 		expectedResults.add(new Triple(s, p, o));
 		
 		s = o;
-		p = NodeFactory.createURI("Not type");
-		o = NodeFactory.createURI("s2");
+		p = NodeFactory.createURI("http://example.org/notType");
+		o = NodeFactory.createURI("http://example.org/s2");
 		expectedResults.add(new Triple(s, p, o));
 		
-		o = NodeFactory.createURI("s3");
+		o = NodeFactory.createURI("http://example.org/s3");
 		expectedResults.add(new Triple(s, p, o));		
 		
 		assertEquals(expectedResults, translationTriples);
@@ -400,62 +401,13 @@ public class VocabularyMappingTest
 				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
 				+ "@prefix ex:   <http://example.org/> .  \n"
 				+ "ex:s1 owl:sameAs ex:s2 . "
-				+ "ex:s3 owl:sameAs ex:s2 . "
+				+ "ex:s1 owl:sameAs ex:s3 . "
 				+ "rdf:type owl:inverseOf ex:notType . "
 				+ "ex:subType rdfs:subPropertyOf rdf:type . "
 				+ "ex:o1 owl:intersectionOf (ex:o2 ex:o3) . ";
 		final Graph mapping = GraphFactory.createDefaultGraph();
 		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
 		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
-
-		final Set<Triple> testSet = new HashSet<>();
-		
-		//Equality
-		Node s = NodeFactory.createURI("s1");
-		Node p = OWL.sameAs.asNode();
-		Node o = NodeFactory.createURI("s2");
-		testSet.add(new Triple(s, p, o));
-		
-		//Multiple mappings for same subject
-		o = NodeFactory.createURI("s3");
-		testSet.add(new Triple(s, p, o));
-		
-		//Predicate inverse
-		s = RDF.type.asNode();
-		p = OWL.inverseOf.asNode();
-		o = NodeFactory.createURI("Not type");
-		testSet.add(new Triple(s, p, o));
-			
-		//Predicate subProperty
-		o = s;
-		s = NodeFactory.createURI("Subtype");
-		p = RDFS.subPropertyOf.asNode();
-		testSet.add(new Triple(s, p, o));
-		
-		//Object Intersection or union
-		s = NodeFactory.createURI("o1");
-		//p = OWL.unionOf.asNode();
-		p = OWL.intersectionOf.asNode();
-		o = NodeFactory.createBlankNode();
-		testSet.add(new Triple(s, p, o));
-		
-		s = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("o2");
-		testSet.add(new Triple(s, p, o));
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testSet.add(new Triple(s, p, o));
-		
-		s = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("o3");
-		testSet.add(new Triple(s, p, o));
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testSet.add(new Triple(s, p, o));	
 		
 		/* Wrong predicate should lead to error
 		p = OWL.unionOf.asNode();
@@ -486,36 +438,6 @@ public class VocabularyMappingTest
 		RDFDataMgr.read(expected, IOUtils.toInputStream(expectedAsTurtle, "UTF-8"), Lang.TURTLE);
 		final Set<Triple> expectedSet = new HashSet<>( RiotLib.triples(expected, Node.ANY, Node.ANY, Node.ANY) );
 
-		Set<Triple> expectedResults = new HashSet<>();
-		s = NodeFactory.createURI("s2");
-		p = NodeFactory.createURI("Subtype");
-		o = NodeFactory.createURI("o2");
-		expectedResults.add(new Triple(s, p , o));
-		
-		o = NodeFactory.createURI("o3");
-		expectedResults.add(new Triple(s, p , o));
-		
-		s = NodeFactory.createURI("s3");
-		expectedResults.add(new Triple(s, p , o));	
-		
-		o = NodeFactory.createURI("o2");
-		expectedResults.add(new Triple(s, p , o));
-		
-		s = o;
-		p = NodeFactory.createURI("Not type");
-		o = NodeFactory.createURI("s2");
-		expectedResults.add(new Triple(s, p , o));
-		
-		o = NodeFactory.createURI("s3");
-		expectedResults.add(new Triple(s, p , o));
-		
-		s = NodeFactory.createURI("o3");
-		expectedResults.add(new Triple(s, p , o));
-		
-		o = NodeFactory.createURI("s2");
-		expectedResults.add(new Triple(s, p , o));
-	
-		//return new Pair<>(testSet, expectedResults);
 		return new Pair<>(mappingSet, expectedSet);
 	}
 
