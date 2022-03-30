@@ -1,9 +1,6 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -18,24 +15,6 @@ public class BGPImpl implements BGP
 
 	public BGPImpl( final TriplePattern ... tps ) {
 		this.tps = new HashSet<>( Arrays.asList(tps) );
-	}
-
-	@Override
-	public boolean equals( final Object o ) {
-		if ( ! (o instanceof BGP) )
-			return false;
-
-		final Set<? extends TriplePattern> otps;
-		if ( o instanceof BGPImpl )
-			otps = ((BGPImpl) o).tps;
-		else
-			otps = ((BGP) o).getTriplePatterns();
-		if ( tps == otps )
-			return true;
-		else if ( tps.size() != otps.size() )
-			return false;
-		else
-			return tps.containsAll(otps);
 	}
 
 	@Override
@@ -59,5 +38,26 @@ public class BGPImpl implements BGP
 		builder.append( " )");
 
 		return builder.toString();
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if (this == o) return true;
+		if ( !(o instanceof BGP) ) return false;
+
+		if ( o instanceof BGPImpl ) {
+			final BGPImpl bgp = (BGPImpl) o;
+			return Objects.equals(tps, bgp.tps);
+		}
+		else {
+			final BGP bgp = (BGP) o;
+			final Set<? extends TriplePattern> tpsOther = bgp.getTriplePatterns();
+			return (tps.size() == tpsOther.size()) && tps.containsAll(tpsOther);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(tps);
 	}
 }
