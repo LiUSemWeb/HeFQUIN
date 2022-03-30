@@ -3,22 +3,28 @@ package se.liu.ida.hefquin.engine.data.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.system.RiotLib;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -31,7 +37,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 public class VocabularyMappingTest
 {
 	@Test
-	public void VocabularyMappingConstructorTest() {
+	public void VocabularyMappingConstructorTest() throws IOException {
 		final Pair<Set<Triple>,Set<Triple>> testData = CreateTestTriples();
 
 		final VocabularyMappingImpl vm = new VocabularyMappingImpl(testData.object1);
@@ -46,15 +52,15 @@ public class VocabularyMappingTest
 	}
 	
 	@Test
-	public void TranslateTriplePatternTest() {
+	public void TranslateTriplePatternTest() throws IOException {
 		
 		final Pair<Set<Triple>,Set<Triple>> testData = CreateTestTriples();
 
 		final VocabularyMapping vm = new VocabularyMappingImpl(testData.object1);
 		
-		Node s = NodeFactory.createURI("s1");
+		Node s = NodeFactory.createURI("http://example.org/s1");
 		Node p = RDF.type.asNode();
-		Node o = NodeFactory.createURI("o1");
+		Node o = NodeFactory.createURI("http://example.org/o1");
 		TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
 		
@@ -387,7 +393,21 @@ public class VocabularyMappingTest
 		assertTrue(testTp.equals(translation));
 	}
 	
-	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples(){
+	public Pair<Set<Triple>, Set<Triple>> CreateTestTriples() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:s1 owl:sameAs ex:s2 . "
+				+ "ex:s3 owl:sameAs ex:s2 . "
+				+ "rdf:type owl:inverseOf ex:notType . "
+				+ "ex:subType rdfs:subPropertyOf rdf:type . "
+				+ "ex:o1 owl:intersectionOf (ex:o2 ex:o3) . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+
 		final Set<Triple> testSet = new HashSet<>();
 		
 		//Equality
@@ -448,7 +468,24 @@ public class VocabularyMappingTest
 		 o = NodeFactory.createURI("o5");
 		 testSet.add(new Triple(s, p, o));
 		 */
-		
+
+		final String expectedAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> .\n"
+				+ "@prefix ex:   <http://example.org/> .\n"
+				+ "ex:s2 ex:subType ex:o2 ."
+				+ "ex:s2 ex:subType ex:o3 ."
+				+ "ex:s3 ex:subType ex:o2 ."
+				+ "ex:s3 ex:subType ex:o3 ."
+				+ "ex:o2 ex:notType ex:s2 ."
+				+ "ex:o2 ex:notType ex:s3 ."
+				+ "ex:o3 ex:notType ex:s2 ."
+				+ "ex:o3 ex:notType ex:s3 .";
+		final Graph expected = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(expected, IOUtils.toInputStream(expectedAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> expectedSet = new HashSet<>( RiotLib.triples(expected, Node.ANY, Node.ANY, Node.ANY) );
+
 		Set<Triple> expectedResults = new HashSet<>();
 		s = NodeFactory.createURI("s2");
 		p = NodeFactory.createURI("Subtype");
@@ -478,7 +515,8 @@ public class VocabularyMappingTest
 		o = NodeFactory.createURI("s2");
 		expectedResults.add(new Triple(s, p , o));
 	
-		return new Pair<>(testSet, expectedResults);
+		//return new Pair<>(testSet, expectedResults);
+		return new Pair<>(mappingSet, expectedSet);
 	}
 
 }
