@@ -353,8 +353,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		Set<BindingBuilder> bbs = new HashSet<>();
 		BindingBuilder translation = BindingBuilder.create();
 		bbs.add(translation);
-		final Iterator<Var> i = sm.asJenaBinding().vars();
 		
+		final Iterator<Var> i = sm.asJenaBinding().vars();
 		while(i.hasNext()) {
 			final Var v = i.next();
 			final Node n = sm.asJenaBinding().get(v);
