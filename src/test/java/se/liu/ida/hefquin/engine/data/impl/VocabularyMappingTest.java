@@ -39,7 +39,6 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class VocabularyMappingTest
 {
-	/*
 	@Test
 	public void VocabularyMappingConstructorTest() throws IOException {
 		final Pair<Set<Triple>,Set<Triple>> testData = CreateTestTriples();
@@ -444,7 +443,6 @@ public class VocabularyMappingTest
 
 		return new Pair<>(mappingSet, expectedSet);
 	}
-	*/
 	
 	@Test
 	public void TranslateSolutionMappingTest() throws IOException {
