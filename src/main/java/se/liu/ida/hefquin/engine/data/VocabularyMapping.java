@@ -20,14 +20,14 @@ public interface VocabularyMapping
 	SPARQLGraphPattern translateTriplePattern( TriplePattern tp );
 	
 	/**
-	 * Applies this vocabulary mapping to the given Solution Mapping expressed
-	 * in the local vocabulary and returns returns a resulting set of
-	 * Solution Mappings expressed in the global vocabulary. 
-	 * If this mapping is not relevant for the given Solution Mapping (i.e.,
-	 * applying the mapping to the given Solution Mapping does not have any
+	 * Applies this vocabulary mapping to the given solution mapping expressed
+	 * in the local vocabulary and returns a resulting set of solution mappings
+	 * expressed in the global vocabulary. 
+	 * If this mapping is not relevant for the given solution mapping (i.e.,
+	 * applying the mapping to the given solution mapping does not have any
 	 * effect), then the result of this function is a set containing only the
-	 * given Solution Mapping.
+	 * given solution mapping.
 	 */
-	Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm );
+	Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm );
 
 }
