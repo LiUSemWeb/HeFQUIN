@@ -11,11 +11,14 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -360,6 +363,82 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 	public Graph getVocabularyMappingAsGraph() {
 		return vocabularyMapping;
+	}
+
+	@Override
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {		
+		Set<BindingBuilder> bbs = new HashSet<>();
+		bbs.add( BindingBuilder.create() );
+		
+		final Iterator<Var> i = sm.asJenaBinding().vars();
+		while(i.hasNext()) {
+			final Var v = i.next();
+			final Node n = sm.asJenaBinding().get(v);
+			
+			if(!n.isURI()) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			}
+			
+			final Set<Node> bindingTranslation = translateBinding(n);
+			if (bindingTranslation.size() > 1) {
+				final Set<BindingBuilder> bbsCopy = new HashSet<>();
+				
+				for(final Node j : bindingTranslation) {
+					for (final BindingBuilder k : bbs) {
+						BindingBuilder translationCopy = BindingBuilder.create();
+						if(!k.isEmpty()) {
+							translationCopy.addAll(k.snapshot());
+						}
+						translationCopy.add(v, j);
+						bbsCopy.add(translationCopy);
+					}
+				}
+				
+				bbs = bbsCopy;
+			} else if (bindingTranslation.size() == 0) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			} else {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, bindingTranslation.iterator().next());
+				}
+			}
+		}
+		
+		final Set<SolutionMapping> results = new HashSet<>();
+		for (final BindingBuilder b : bbs) {
+			results.add(new SolutionMappingImpl(b.build()));
+		}
+		return results;
+	}
+	
+	protected Set<Node> translateBinding( final Node n ) {
+		final Set<Node> results = new HashSet<>();
+		for (final Triple m : getMappings(Node.ANY, Node.ANY, n)){
+			final Node predicate = m.getPredicate();
+			if (predicate.equals(OWL.sameAs.asNode()) || predicate.equals(OWL.equivalentClass.asNode()) || 
+				predicate.equals(RDFS.subClassOf.asNode()) || predicate.equals(OWL.equivalentProperty.asNode()) || 
+				predicate.equals(RDFS.subPropertyOf.asNode())) {
+				results.add(m.getSubject());
+			} else if (predicate.equals(RDF.first.asNode())) {
+				Set<Triple> unionMappings = getMappings(Node.ANY, Node.ANY, m.getSubject());
+				Triple mapping = unionMappings.iterator().next();
+				while(!mapping.getPredicate().equals(OWL.unionOf.asNode())) {
+					unionMappings = getMappings(Node.ANY, Node.ANY, mapping.getSubject());
+					mapping = unionMappings.iterator().next();
+				}
+				if (unionMappings.size() > 1) {
+					throw new IllegalArgumentException(unionMappings.toString());
+				}
+				results.add(mapping.getSubject());
+			} else {
+				throw new IllegalArgumentException(predicate.toString());
+			}
+		}
+		return results;
 	}
 
 }

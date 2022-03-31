@@ -18,12 +18,15 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.RiotLib;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
@@ -64,7 +67,7 @@ public class VocabularyMappingTest
 
 		TriplePattern testTp = new TriplePatternImpl(s, p, o);
 		SPARQLGraphPattern translation = vm.translateTriplePattern(testTp);
-		
+
 		Set<Triple> translationTriples = new HashSet<>();
 		assertTrue(translation instanceof SPARQLUnionPatternImpl);
 		for (final SPARQLGraphPattern i : ((SPARQLUnionPatternImpl) translation).getSubPatterns()) {
@@ -439,6 +442,103 @@ public class VocabularyMappingTest
 		final Set<Triple> expectedSet = new HashSet<>( RiotLib.triples(expected, Node.ANY, Node.ANY, Node.ANY) );
 
 		return new Pair<>(mappingSet, expectedSet);
+	}
+	
+	@Test
+	public void TranslateSolutionMappingTest() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:a owl:equivalentClass ex:n . "
+				+ "ex:b owl:unionOf (ex:c ex:n) . "
+				+ "ex:d rdfs:subClassOf ex:n . "
+				+ "ex:e owl:equivalentProperty ex:m . "
+				+ "ex:f rdfs:subPropertyOf ex:m . "
+				+ "ex:g owl:sameAs ex:o . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/n"));
+		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
+		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/o"));
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		first.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		first.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+		
+		final BindingBuilder second = BindingBuilder.create();
+		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		second.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		second.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(second.build()));
+		
+		final BindingBuilder third = BindingBuilder.create();
+		third.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		third.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/e"));
+		third.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(third.build()));
+		
+		final BindingBuilder fourth = BindingBuilder.create();
+		fourth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		fourth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		fourth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(fourth.build()));
+		
+		final BindingBuilder fifth = BindingBuilder.create();
+		fifth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		fifth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		fifth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(fifth.build()));
+		
+		final BindingBuilder sixth = BindingBuilder.create();
+		sixth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		sixth.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/f"));
+		sixth.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(sixth.build()));
+
+		assertEquals(expectedResults, translation);
+		
+	}
+	
+	//Test the two cases in which a binding is not translated
+	@Test
+	public void TranslateSolutionMappingTestNoTranslation() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:g owl:sameAs ex:o . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		testBuilder.add(Var.alloc("v"), RDF.type.asNode());
+		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		expectedResults.add(testSm);
+
+		assertEquals(expectedResults, translation);
+		
 	}
 
 }

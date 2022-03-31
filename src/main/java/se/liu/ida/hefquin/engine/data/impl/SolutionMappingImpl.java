@@ -5,6 +5,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 
+import java.util.Objects;
+
 public class SolutionMappingImpl implements SolutionMapping
 {
 	protected final Binding jenaObj;
@@ -20,11 +22,16 @@ public class SolutionMappingImpl implements SolutionMapping
 	}
 
 	@Override
-	public boolean equals( final Object o ) {
+	public boolean equals( final Object o ){
 		if ( o instanceof SolutionMapping )
 			return SolutionMappingUtils.equals( this, (SolutionMapping) o );
 		else
 			return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(jenaObj);
 	}
 
 	@Override
