@@ -28,6 +28,7 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class VocabularyMappingImpl implements VocabularyMapping
 {
@@ -60,12 +61,13 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final List<SPARQLGraphPattern> predicateTranslation = new ArrayList<>();
 		for(final SPARQLGraphPattern j : objectTranslation) {
 			
-			if(j instanceof SPARQLUnionPattern) {
-				
+			if(j instanceof SPARQLUnionPattern) {				
 				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {		
+				for(final SPARQLGraphPattern k: ((SPARQLUnionPattern) j).getSubPatterns()) {
+					
 					if(k instanceof TriplePattern) {
 						union.addSubPattern(translatePredicate((TriplePattern) k));
+						
 					} else if (k instanceof BGP) {
 						
 						final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
@@ -87,11 +89,21 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 						if ( allSubPatternsAreTriplePatterns ) {
 							union.addSubPattern( new BGPImpl(tpSubPatterns) );
-						}
-						else {
+						} else {
 							union.addSubPattern( new SPARQLGroupPatternImpl(allSubPatterns) );
 						}
 						
+					} else if (k instanceof SPARQLUnionPattern) {
+						final SPARQLUnionPatternImpl innerUnion = new SPARQLUnionPatternImpl();
+						for(final SPARQLGraphPattern m: ((SPARQLUnionPattern) k).getSubPatterns()) {
+							if(m instanceof TriplePattern) {
+								innerUnion.addSubPattern(translatePredicate((TriplePattern) m));
+							} else {
+								throw new IllegalArgumentException(m.getClass().getName());
+							}
+						}
+						union.addSubPattern(innerUnion);
+					
 					} else {
 						throw new IllegalArgumentException(k.getClass().getName());
 					}
@@ -158,6 +170,10 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				throw new IllegalArgumentException(m.getPredicate().getURI());
 			}
 		}
+		
+		if(results.isEmpty()) {
+			results.add(tp);
+		}
 		return results;
 	}
 	
@@ -184,68 +200,49 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				resultsList.add(translation);
 			} else {
 				if (!jenaTP.getPredicate().isURI()) {
-					resultsList.add(tp);
 					continue;
 				} else {
 					if(!jenaTP.getPredicate().equals(RDF.type.asNode())) {
-						resultsList.add(tp);
 						continue;
 					}
 				}
 				if (predicate.equals(OWL.equivalentClass.asNode())) {
+					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), m.getObject());
+					resultsList.add(translation);	
 					
-					/*
-					 * Blank node used to help create intersections and unions
-					 * (a equals b)
-					 * (b unionof c)
-					 * (b unionof d)
-					 */
-					if (m.getObject().isBlank()) {
-						//Union or intersection
-						Node newPredicate = null;
-						final List<Node> objects = new ArrayList<>();
-						final Set<Triple> subMappings = getMappings( m.getObject(), Node.ANY, Node.ANY );
-						for(final Triple i : subMappings) {
-							final Node iPredicate = i.getPredicate();
-							if(newPredicate == null) {
-								newPredicate = iPredicate;
-							} else if (!iPredicate.equals(newPredicate)) {
-								throw new IllegalArgumentException( iPredicate.toString() );		
-							}
-							objects.add(i.getObject());
+				} else if (predicate.equals(OWL.unionOf.asNode())) {
+					final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+					Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+					while(true) {
+						final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), mapping.object1);
+						union.addSubPattern(translation);
+						if (mapping.object2.equals(RDF.nil.asNode())) {
+							break;
 						}
-						
-						if (newPredicate.equals(OWL.unionOf.asNode())) {
-							final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-							for(final Node j : objects){
-								final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), j);
-								union.addSubPattern(translation);
-							}
-							resultsList.add(union);
-							
-						} else if (newPredicate.equals(OWL.intersectionOf.asNode())) {
-							 final BGPImpl intersection = new BGPImpl();
-							 for( final Node j : objects ){
-							  	final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), j);
-							  	intersection.addTriplePattern(translation);
-							 }
-							 resultsList.add(intersection); 
-							 
-						} else {
-							throw new IllegalArgumentException( newPredicate.toString() );
-						}		
-						
-					} else {
-						final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), m.getObject());
-						resultsList.add(translation);	
+						mapping = getComplexMapping(mapping.object2);
 					}
+					resultsList.add(union);	
+					
+				} else if (predicate.equals(OWL.intersectionOf.asNode())) {
+					final BGPImpl intersection = new BGPImpl();
+					Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+					while(true) {
+						final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), jenaTP.getPredicate(), mapping.object1);
+						intersection.addTriplePattern(translation);
+						if (mapping.object2.equals(RDF.nil.asNode())) {
+							break;
+						}
+						mapping = getComplexMapping(mapping.object2);
+					}
+					resultsList.add(intersection);
+					
 				} else {
 					throw new IllegalArgumentException( predicate.toString() );
 				}
 			}
 		}
 		
-		if(resultsList.size() == 0) {
+		if(resultsList.isEmpty()) {
 			return tp;
 		} else if (resultsList.size() > 1) {
 			return new SPARQLUnionPatternImpl(resultsList);
@@ -277,48 +274,34 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				resultsList.add(translation);	
 				
 			} else if (predicate.equals(OWL.equivalentProperty.asNode())){
-				if (m.getObject().isBlank()) {
-					//Union or intersection
-					Node newPredicate = null;
-					final List<Node> objects = new ArrayList<>();
-
-					final Set<Triple> subMappings = getMappings( m.getObject(), Node.ANY, Node.ANY );
-					for(final Triple i : subMappings) {
-						final Node iPredicate = i.getPredicate();
-						if(newPredicate == null) {
-							newPredicate = iPredicate;
-						} else {
-							if (!iPredicate.equals(newPredicate)) {
-								throw new IllegalArgumentException( iPredicate.toString() );
-							}
-						}
-						objects.add(i.getObject());
+				final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), m.getObject(), jenaTP.getObject());
+				resultsList.add(translation);	
+				
+			} else if (predicate.equals(OWL.unionOf.asNode())) {
+				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
+				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+				while(true) {
+					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), mapping.object1,  jenaTP.getObject());
+					union.addSubPattern(translation);
+					if (mapping.object2.equals(RDF.nil.asNode())) {
+						break;
 					}
-					
-					if (newPredicate.equals(OWL.unionOf.asNode())) {
-						final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-						for ( final Node j : objects ) {
-							final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), j, jenaTP.getObject());
-							union.addSubPattern(translation);
-						}
-						resultsList.add(union);
-						
-					} else if (newPredicate.equals(OWL.intersectionOf.asNode())) {
-						 final BGPImpl intersection = new BGPImpl();
-						 for ( final Node j : objects ) {
-						  	final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), j,  jenaTP.getObject());
-						  	intersection.addTriplePattern(translation);
-						 }
-						 resultsList.add(intersection); 
-						 
-					} else {
-						throw new IllegalArgumentException( newPredicate.toString() );
-					}
-					
-				} else {
-					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), m.getObject(), jenaTP.getObject());
-					resultsList.add(translation);	
+					mapping = getComplexMapping(mapping.object2);
 				}
+				resultsList.add(union);
+				
+			} else if (predicate.equals(OWL.intersectionOf.asNode())) {
+				final BGPImpl intersection = new BGPImpl();
+				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+				while(true) {
+					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), mapping.object1,  jenaTP.getObject());
+					intersection.addTriplePattern(translation);
+					if (mapping.object2.equals(RDF.nil.asNode())) {
+						break;
+					}
+					mapping = getComplexMapping(mapping.object2);
+				}
+				resultsList.add(intersection);
 				
 			} else {
 				throw new IllegalArgumentException( predicate.toString() );
@@ -338,9 +321,44 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		final Set<Triple> mappings = new HashSet<>();
 		final Iterator<Triple> i = vocabularyMapping.find(s,p,o);
 		while(i.hasNext()) {
-			mappings.add(i.next());
+			final Triple next = i.next();
+			mappings.add(next);
 		}
 		return mappings;
+	}
+	
+	protected Pair<Node, Node> getComplexMapping( final Node s){
+		Node first = RDF.nil.asNode();
+		Node rest = RDF.nil.asNode();
+		boolean hasFirst = false;
+		boolean hasRest = false;
+		final Iterator<Triple> i = vocabularyMapping.find(s, Node.ANY, Node.ANY);
+		while(i.hasNext()) {
+			final Triple next = i.next();
+			if (next.getPredicate().equals(RDF.first.asNode())) {
+				if (!hasFirst) {
+					hasFirst = true;
+					first = next.getObject();
+				} else {
+					throw new IllegalArgumentException(next.getPredicate().toString());
+				}
+			} else if (next.getPredicate().equals(RDF.rest.asNode())) {
+				if (!hasRest) {
+					hasRest = true;
+					rest = next.getObject();
+				} else {
+					throw new IllegalArgumentException(next.getPredicate().toString());
+				}
+			} else {
+				throw new IllegalArgumentException(next.getPredicate().toString());
+			}		
+		}
+		if (hasFirst && hasRest) {
+			final Pair<Node, Node> mapping = new Pair(first, rest);
+			return mapping;
+		} else {
+			throw new IllegalArgumentException(hasFirst + ", " + hasRest);
+		}
 	}
 
 	public Graph getVocabularyMappingAsGraph() {

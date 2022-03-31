@@ -45,8 +45,8 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 
 		if ( other == null || !(other instanceof SPARQLUnionPattern) )
 			return false;
-
-		return ((SPARQLUnionPattern) other).getSubPatterns().equals(subPatterns);
+		
+		return subPatterns.equals(((SPARQLUnionPattern) other).getSubPatterns());
 	}
 
 }

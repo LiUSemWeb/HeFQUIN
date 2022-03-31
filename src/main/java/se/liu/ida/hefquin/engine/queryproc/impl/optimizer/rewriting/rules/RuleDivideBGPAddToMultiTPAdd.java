@@ -1,13 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -45,8 +42,7 @@ public class RuleDivideBGPAddToMultiTPAdd extends AbstractRewritingRuleImpl{
                 }
 
                 final Iterator<TriplePattern> it = tps.iterator();
-                final DataRetrievalRequest initialReq = new TriplePatternRequestImpl( it.next() );
-                PhysicalPlan subPlan =  PhysicalPlanFactory.createPlanWithRequest( new LogicalOpRequest<>(fm, initialReq) );
+                PhysicalPlan subPlan = plan.getSubPlan(0);
 
                 while( it.hasNext() ) {
                     final LogicalOpTPAdd logicalTPAdd = new LogicalOpTPAdd( fm, it.next() );

@@ -64,9 +64,6 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         if( plan_left.getRootOperator() instanceof PhysicalOpRequest){
                             PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) plan_left.getRootOperator(), plan_right, candidatePlans );
                         }
-                        if( plan_right.getRootOperator() instanceof PhysicalOpRequest){
-                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) plan_right.getRootOperator(), plan_right, candidatePlans );
-                        }
                     }
 
                     // Prune: only the best candidate plan is retained in optPlan.
