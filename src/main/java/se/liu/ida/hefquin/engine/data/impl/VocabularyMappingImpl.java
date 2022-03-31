@@ -358,7 +358,9 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			final Node n = sm.asJenaBinding().get(v);
 			
 			if(!n.isURI()) {
-				continue;
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
 			}
 			
 			final Set<Node> bindingTranslation = translateBinding(n);
@@ -378,7 +380,9 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				
 				bbs = bbsCopy;
 			} else if (bindingTranslation.size() == 0) {
-				continue;
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
 			} else {
 				for (final BindingBuilder j : bbs) {
 					j.add(v, bindingTranslation.iterator().next());

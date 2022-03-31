@@ -180,5 +180,34 @@ public class VocabularyMappingTest
 		assertEquals(expectedResults, translation);
 		
 	}
+	
+	//Test the two cases in which a binding is not translated
+	@Test
+	public void TranslateSolutionMappingTestNoTranslation() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:g owl:sameAs ex:o . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		testBuilder.add(Var.alloc("v"), RDF.type.asNode());
+		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		expectedResults.add(testSm);
+
+		assertEquals(expectedResults, translation);
+		
+	}
 
 }
