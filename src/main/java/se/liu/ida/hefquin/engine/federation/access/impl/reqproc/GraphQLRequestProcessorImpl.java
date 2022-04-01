@@ -27,6 +27,11 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor
 	                                    final GraphQLEndpoint fm )
 	                                    		throws FederationAccessException {
 		// TODO this function needs to be implemented
+		//
+		// To get the GraphQL query that is to be executed you can do
+		// req.getGraphQLQuery() and to get the URL of the GraphQL
+		// endpoint to which the request needs to be posted you can
+		// do fm.getInterface().getURL()
 
 		return null;
 	}
