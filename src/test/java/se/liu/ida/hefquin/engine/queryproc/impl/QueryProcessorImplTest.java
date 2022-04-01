@@ -175,6 +175,85 @@ public class QueryProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
+	public void oneTPFoneTriplePatternWithFilterInside() throws QueryProcException {
+		// setting up
+		final String queryString = "SELECT * WHERE { "
+				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y FILTER (?y = <http://example.org/o1>) } "
+				+ "}";
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s1"),
+				NodeFactory.createURI("http://example.org/p"),
+				NodeFactory.createURI("http://example.org/o1")) );
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s2"),
+				NodeFactory.createURI("http://example.org/p"),
+				NodeFactory.createURI("http://example.org/o2")) );
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = it.next().asJenaBinding();
+		assertEquals( 2, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertEquals( "http://example.org/s1", sm1.get(varX).getURI() );
+		assertEquals( "http://example.org/o1", sm1.get(varY).getURI() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void oneTPFoneTriplePatternWithFilterOutside() throws QueryProcException {
+		// setting up
+		final String queryString = "SELECT * WHERE { "
+				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y } "
+				+ "FILTER (?y = <http://example.org/o1>) "
+				+ "}";
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s1"),
+				NodeFactory.createURI("http://example.org/p"),
+				NodeFactory.createURI("http://example.org/o1")) );
+		dataForMember.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s2"),
+				NodeFactory.createURI("http://example.org/p"),
+				NodeFactory.createURI("http://example.org/o2")) );
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = it.next().asJenaBinding();
+		assertEquals( 2, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertEquals( "http://example.org/s1", sm1.get(varX).getURI() );
+		assertEquals( "http://example.org/o1", sm1.get(varY).getURI() );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
 	public void liveTestWithDBpedia() throws QueryProcException {
 		if ( ! skipLiveWebTests ) {
 			// setting up

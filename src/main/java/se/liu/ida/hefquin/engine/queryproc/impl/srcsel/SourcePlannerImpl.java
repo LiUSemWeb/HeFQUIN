@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
@@ -27,11 +28,13 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -88,6 +91,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp );
 		}
+		else if ( jenaOp instanceof OpFilter ) {
+			return createPlanForFilter( (OpFilter) jenaOp );
+		}
 		else if ( jenaOp instanceof OpService ) {
 			return createPlanForServicePattern( (OpService) jenaOp ); 
 		}
@@ -119,6 +125,12 @@ public class SourcePlannerImpl implements SourcePlanner
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
 		return mergeIntoMultiwayUnion(leftSubPlan,rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
+		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
+		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 
 	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp ) {
@@ -156,6 +168,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp, fm );
 		}
+		else if ( jenaOp instanceof OpFilter ) {
+			return createPlanForFilter( (OpFilter) jenaOp, fm );
+		}
 		else if ( jenaOp instanceof OpBGP ) {
 			return createPlanForBGP( (OpBGP) jenaOp, fm );
 		}
@@ -174,6 +189,12 @@ public class SourcePlannerImpl implements SourcePlanner
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
 		return mergeIntoMultiwayUnion(leftSubPlan,rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp, final FederationMember fm ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), fm );
+		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
+		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 
 	protected LogicalPlan createPlanForBGP( final OpBGP pattern, final FederationMember fm ) {
