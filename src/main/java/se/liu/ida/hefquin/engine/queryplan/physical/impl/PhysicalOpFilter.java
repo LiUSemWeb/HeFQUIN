@@ -32,7 +32,7 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 
 	@Override
 	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
-		return new ExecOpFilter(logicalFilter.getFilterExpression());
+		return new ExecOpFilter( logicalFilter.getFilterExpressions() );
 	}
 
 	@Override

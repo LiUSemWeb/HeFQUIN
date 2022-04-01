@@ -1,18 +1,26 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
 public class LogicalOpFilter implements UnaryLogicalOp
 {
-	protected final Expr filterExpression;
+	protected final ExprList filterExpressions;
 
-	public LogicalOpFilter( final Expr filterExpression) {
+	public LogicalOpFilter( final ExprList filterExpressions ) {
+		assert filterExpressions != null;
+		assert ! filterExpressions.isEmpty();
+
+		this.filterExpressions = filterExpressions;
+	}
+
+	public LogicalOpFilter( final Expr filterExpression ) {
 		assert filterExpression != null;
 
-		this.filterExpression = filterExpression;
+		this.filterExpressions = new ExprList(filterExpression);
 	}
 
 	@Override
@@ -21,11 +29,11 @@ public class LogicalOpFilter implements UnaryLogicalOp
 		if ( ! (o instanceof LogicalOpFilter) ) return false;
 
 		final LogicalOpFilter oo = (LogicalOpFilter) o;
-		return oo.filterExpression.equals(filterExpression); 
+		return oo.filterExpressions.equals(filterExpressions); 
 	}
 
-	public Expr getFilterExpression() {
-		return filterExpression;
+	public ExprList getFilterExpressions() {
+		return filterExpressions;
 	}
 
 	@Override
@@ -35,6 +43,6 @@ public class LogicalOpFilter implements UnaryLogicalOp
 
 	@Override
 	public String toString() {
-		return "> filter ( " + filterExpression.toString() + " )";
+		return "> filter ( " + filterExpressions.toString() + " )";
 	}
 }
