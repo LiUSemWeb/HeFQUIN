@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 
-import org.apache.jena.sparql.engine.http.HttpQuery;
-
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
@@ -33,13 +31,6 @@ public class GraphQLInterfaceImpl implements GraphQLInterface
 	@Override
 	public String getURL() {
 		return url;
-	}
-
-	@Override
-	public HttpQuery createHttpRequest( final GraphQLRequest req ) {
-		// TODO this method needs to be implemented
-
-		return null;
 	}
 
 	@Override
