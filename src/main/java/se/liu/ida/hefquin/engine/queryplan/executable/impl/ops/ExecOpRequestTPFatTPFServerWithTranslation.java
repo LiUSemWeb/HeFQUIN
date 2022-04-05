@@ -1,6 +1,20 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
+
+import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
+import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -8,6 +22,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -31,31 +46,62 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	                                          final FederationAccessManager fedAccessMgr )
 			throws FederationAccessException
 	{
-		SPARQLGraphPattern translation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
-		if(translation instanceof TriplePattern) {
-			TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) translation), fm);
-			//How do I get solutionMapping from res?
-			//Return translation of res
-			return res;
+		SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
+		if(reqTranslation instanceof TriplePattern) {
+			final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) reqTranslation), fm);
+			final List<Triple> resTranslation = new ArrayList<>();
+			for(final Triple i : res.getPayload()) {
+				BindingBuilder bb = BindingBuilder.create();
+				final Var s = Var.alloc("s");
+				final Var p = Var.alloc("p");
+				final Var o = Var.alloc("o");
+				bb.add(s, i.asJenaTriple().getSubject());
+				bb.add(p, i.asJenaTriple().getPredicate());
+				bb.add(o, i.asJenaTriple().getObject());
+				SolutionMapping sm = new SolutionMappingImpl(bb.build());
+				for (final SolutionMapping j : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
+					Binding b = j.asJenaBinding();
+					resTranslation.add(new TripleImpl(b.get(s), b.get(p), b.get(o)));
+				}
+			}
+			final List<Triple> allTriples = new ArrayList<>();
+			res.getMetadata().forEach(allTriples::add);
+			return new TPFResponseImpl(resTranslation, allTriples, res.getNextPageURL(), fm, req, res.getRequestStartTime());
 		}
 		
-		//How do I create a union of all results?
-		else if(translation instanceof SPARQLUnionPattern) {
-			for (final SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
+		else if(reqTranslation instanceof SPARQLUnionPattern) {
+			final Set<Triple> resTranslation = new HashSet<>();
+			for (final SPARQLGraphPattern i : ((SPARQLUnionPattern) reqTranslation).getSubPatterns()) {
 				if (i instanceof TriplePattern) {
-					FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
+					final TPFResponse res =FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
+					for(final Triple j : res.getPayload()) {
+						BindingBuilder bb = BindingBuilder.create();
+						final Var s = Var.alloc("s");
+						final Var p = Var.alloc("p");
+						final Var o = Var.alloc("o");
+						bb.add(s, j.asJenaTriple().getSubject());
+						bb.add(p, j.asJenaTriple().getPredicate());
+						bb.add(o, j.asJenaTriple().getObject());
+						SolutionMapping sm = new SolutionMappingImpl(bb.build());
+						for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
+							Binding b = k.asJenaBinding();
+							resTranslation.add(new TripleImpl(b.get(s), b.get(p), b.get(o)));
+						}
+					}
 				}
 				//TODO: Add all other option of instance
 				else {
 					throw new FederationAccessException(i.toString(), req, fm);
 				}
 			}
-			//Return union of all results
+			final List<Triple> resTriples = new ArrayList<>();
+			resTriples.addAll(resTranslation);
+			return new TPFResponseImpl(resTriples ,resTriples, null, fm, req, null);
 		}
 		
 		//Same for GroupPattern
-		else if(translation instanceof SPARQLGroupPattern) {
-			for(final SPARQLGraphPattern i : ((SPARQLGroupPattern) translation).getSubPatterns()) {
+		else if(reqTranslation instanceof SPARQLGroupPattern) {
+			for(final SPARQLGraphPattern i : ((SPARQLGroupPattern) reqTranslation).getSubPatterns()) {
 				if (i instanceof TriplePattern) {
 					FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
 					//Translate solutionMapping
@@ -68,17 +114,37 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 			//Return intersection of all results
 		}
 		
-		//And same for BGP
-		else if(translation instanceof BGP) {
-			for(final TriplePattern i : ((BGP) translation).getTriplePatterns()) {
-				FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
-				//Translate solutionMapping
+		else if(reqTranslation instanceof BGP) {
+			Set<Triple> resTranslation = new HashSet<>();
+			for(final TriplePattern i : ((BGP) reqTranslation).getTriplePatterns()) {
+				final TPFResponse res =FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
+				final Set<Triple> partialRes = new HashSet<>();
+				for(final Triple j : res.getPayload()) {
+					BindingBuilder bb = BindingBuilder.create();
+					final Var s = Var.alloc("s");
+					final Var p = Var.alloc("p");
+					final Var o = Var.alloc("o");
+					bb.add(s, j.asJenaTriple().getSubject());
+					bb.add(p, j.asJenaTriple().getPredicate());
+					bb.add(o, j.asJenaTriple().getObject());
+					SolutionMapping sm = new SolutionMappingImpl(bb.build());
+					for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
+						Binding b = k.asJenaBinding();
+						Triple t = new TripleImpl(b.get(s), b.get(p), b.get(o));
+						if (resTranslation.contains(t)) {
+							partialRes.add(t);
+						}
+					}
+				}
+				resTranslation = partialRes;
 			}
-			//Return intersection
+			final List<Triple> resTriples = new ArrayList<>();
+			resTriples.addAll(resTranslation);
+			return new TPFResponseImpl(resTriples ,resTriples, null, fm, req, null);
 		}
 		
 		else {
-			throw new FederationAccessException(translation.toString(), req, fm);
+			throw new FederationAccessException(reqTranslation.toString(), req, fm);
 		}
 		
 		return null;
