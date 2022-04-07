@@ -1,12 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashSet;
 
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
@@ -46,107 +44,193 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	                                          final FederationAccessManager fedAccessMgr )
 			throws FederationAccessException
 	{
-		SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
+		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
+		final List<Triple> resList = new ArrayList<>();
 		if(reqTranslation instanceof TriplePattern) {
-			final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) reqTranslation), fm);
-			final List<Triple> resTranslation = new ArrayList<>();
-			for(final Triple i : res.getPayload()) {
-				BindingBuilder bb = BindingBuilder.create();
-				final Var s = Var.alloc("s");
-				final Var p = Var.alloc("p");
-				final Var o = Var.alloc("o");
-				bb.add(s, i.asJenaTriple().getSubject());
-				bb.add(p, i.asJenaTriple().getPredicate());
-				bb.add(o, i.asJenaTriple().getObject());
-				SolutionMapping sm = new SolutionMappingImpl(bb.build());
-				for (final SolutionMapping j : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
-					Binding b = j.asJenaBinding();
-					resTranslation.add(new TripleImpl(b.get(s), b.get(p), b.get(o)));
-				}
-			}
-			final List<Triple> allTriples = new ArrayList<>();
-			res.getMetadata().forEach(allTriples::add);
-			return new TPFResponseImpl(resTranslation, allTriples, res.getNextPageURL(), fm, req, res.getRequestStartTime());
+			resList.addAll(handleTriplePattern((TriplePattern) reqTranslation, fedAccessMgr));
 		}
 		
 		else if(reqTranslation instanceof SPARQLUnionPattern) {
-			final Set<Triple> resTranslation = new HashSet<>();
-			for (final SPARQLGraphPattern i : ((SPARQLUnionPattern) reqTranslation).getSubPatterns()) {
-				if (i instanceof TriplePattern) {
-					final TPFResponse res =FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
-					for(final Triple j : res.getPayload()) {
-						BindingBuilder bb = BindingBuilder.create();
-						final Var s = Var.alloc("s");
-						final Var p = Var.alloc("p");
-						final Var o = Var.alloc("o");
-						bb.add(s, j.asJenaTriple().getSubject());
-						bb.add(p, j.asJenaTriple().getPredicate());
-						bb.add(o, j.asJenaTriple().getObject());
-						SolutionMapping sm = new SolutionMappingImpl(bb.build());
-						for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
-							Binding b = k.asJenaBinding();
-							resTranslation.add(new TripleImpl(b.get(s), b.get(p), b.get(o)));
-						}
-					}
-				}
-				//TODO: Add all other option of instance
-				else {
-					throw new FederationAccessException(i.toString(), req, fm);
-				}
-			}
-			final List<Triple> resTriples = new ArrayList<>();
-			resTriples.addAll(resTranslation);
-			return new TPFResponseImpl(resTriples ,resTriples, null, fm, req, null);
+			resList.addAll(handleUnionPattern(((SPARQLUnionPattern) reqTranslation), fedAccessMgr));
 		}
 		
-		//Same for GroupPattern
 		else if(reqTranslation instanceof SPARQLGroupPattern) {
-			for(final SPARQLGraphPattern i : ((SPARQLGroupPattern) reqTranslation).getSubPatterns()) {
-				if (i instanceof TriplePattern) {
-					FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
-					//Translate solutionMapping
-				}
-				//TODO: Add all other option of instance
-				else {
-					throw new FederationAccessException(i.toString(), req, fm);
-				}
-			}
-			//Return intersection of all results
+			resList.addAll(handleGroupPattern(((SPARQLGroupPattern) reqTranslation), fedAccessMgr));
 		}
 		
 		else if(reqTranslation instanceof BGP) {
-			Set<Triple> resTranslation = new HashSet<>();
-			for(final TriplePattern i : ((BGP) reqTranslation).getTriplePatterns()) {
-				final TPFResponse res =FederationAccessUtils.performRequest(fedAccessMgr, new TPFRequestImpl((TriplePattern) i), fm);
-				final Set<Triple> partialRes = new HashSet<>();
-				for(final Triple j : res.getPayload()) {
-					BindingBuilder bb = BindingBuilder.create();
-					final Var s = Var.alloc("s");
-					final Var p = Var.alloc("p");
-					final Var o = Var.alloc("o");
-					bb.add(s, j.asJenaTriple().getSubject());
-					bb.add(p, j.asJenaTriple().getPredicate());
-					bb.add(o, j.asJenaTriple().getObject());
-					SolutionMapping sm = new SolutionMappingImpl(bb.build());
-					for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
-						Binding b = k.asJenaBinding();
-						Triple t = new TripleImpl(b.get(s), b.get(p), b.get(o));
-						if (resTranslation.contains(t)) {
-							partialRes.add(t);
-						}
-					}
-				}
-				resTranslation = partialRes;
-			}
-			final List<Triple> resTriples = new ArrayList<>();
-			resTriples.addAll(resTranslation);
-			return new TPFResponseImpl(resTriples ,resTriples, null, fm, req, null);
+			resList.addAll(handleBGP((BGP) reqTranslation, fedAccessMgr));
 		}
 		
 		else {
 			throw new FederationAccessException(reqTranslation.toString(), req, fm);
 		}
 		
-		return null;
+		return new TPFResponseImpl(resList, resList, null, fm, req, null);
+	}
+	
+	protected Set<Triple> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		final TPFRequest newReq = new TPFRequestImpl(tp);
+		final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, newReq, fm);
+		final Set<Triple> tripleTranslation = new HashSet<>();
+		for(final Triple i : res.getPayload()) {
+			tripleTranslation.addAll(translateResultTriple(i, newReq));
+		}
+		return tripleTranslation;
+	}
+	
+	protected Set<Triple> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		final Set<Triple> unionTranslation = new HashSet<>();
+		for(final SPARQLGraphPattern i : up.getSubPatterns()) {
+			if (i instanceof TriplePattern) {
+				unionTranslation.addAll(handleTriplePattern(((TriplePattern) i), fedAccessMgr));
+			} else if (i instanceof SPARQLUnionPattern) {
+				unionTranslation.addAll(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
+			} else if (i instanceof SPARQLGroupPattern) {
+				unionTranslation.addAll(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
+			} else if (i instanceof BGP) {
+				unionTranslation.addAll(handleBGP(((BGP) i), fedAccessMgr));
+			} else {
+				throw new FederationAccessException(i.toString(), req, fm);
+			}
+		}
+		return unionTranslation;
+	}
+	
+	protected Set<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		Set<Triple> groupTranslation = null;
+		for(final SPARQLGraphPattern i : gp.getSubPatterns()) {
+			if (i instanceof TriplePattern) {
+				if (groupTranslation == null) {
+					groupTranslation = handleTriplePattern((TriplePattern) i, fedAccessMgr);
+				} else {
+					final Set<Triple> partialTranslation = new HashSet<>();
+					for(final Triple j : handleTriplePattern((TriplePattern) i, fedAccessMgr)) {
+						if (groupTranslation.contains(j)) {
+							partialTranslation.add(j);
+						}
+					}
+					groupTranslation = partialTranslation;
+				}
+			} else if (i instanceof SPARQLUnionPattern) {
+				if (groupTranslation == null) {
+					groupTranslation = handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr);
+				} else {
+					final Set<Triple> partialTranslation = new HashSet<>();
+					for(final Triple j : handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr)) {
+						if (groupTranslation.contains(j)) {
+							partialTranslation.add(j);
+						}
+					}
+					groupTranslation = partialTranslation;
+				}
+			} else if (i instanceof SPARQLGroupPattern) {
+				if (groupTranslation == null) {
+					groupTranslation = handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr);
+				} else {
+					final Set<Triple> partialTranslation = new HashSet<>();
+					for(final Triple j : handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr)) {
+						if (groupTranslation.contains(j)) {
+							partialTranslation.add(j);
+						}
+					}
+					groupTranslation = partialTranslation;
+				}
+				
+			} else if (i instanceof BGP) {
+				if (groupTranslation == null) {
+					groupTranslation = handleBGP(((BGP) i), fedAccessMgr);
+				} else {
+					final Set<Triple> partialTranslation = new HashSet<>();
+					for(final Triple j : handleBGP(((BGP) i), fedAccessMgr)) {
+						if (groupTranslation.contains(j)) {
+							partialTranslation.add(j);
+						}
+					}
+					groupTranslation = partialTranslation;
+				}
+			} else {
+				throw new FederationAccessException(i.toString(), req, fm);
+			}
+		}
+		return groupTranslation;
+	}
+	
+	protected Set<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		Set<Triple> bgpTranslation = null;
+		for(final TriplePattern i : bgp.getTriplePatterns()) {
+			if (bgpTranslation == null) {
+				bgpTranslation = handleTriplePattern(i, fedAccessMgr);
+			} else {
+				final Set<Triple> partialRes = new HashSet<>();
+				for (Triple j : handleTriplePattern(i, fedAccessMgr)) {
+					if (bgpTranslation.contains(j)) {
+						partialRes.add(j);
+					}
+				}
+				bgpTranslation = partialRes;
+			}
+		}
+		return bgpTranslation;
+	}
+	
+	protected Set<Triple> translateResultTriple(final Triple t, final TPFRequest q){
+		final BindingBuilder bb = BindingBuilder.create();
+		final org.apache.jena.graph.Triple jt = q.getQueryPattern().asJenaTriple();
+		boolean sVar = false;
+		boolean pVar = false;
+		boolean oVar = false;
+		if (jt.getSubject().isVariable()) {
+			sVar = true;
+			bb.add((Var) jt.getSubject(), t.asJenaTriple().getSubject());
+		}
+		if (jt.getPredicate().isVariable()) {
+			pVar = true;
+			bb.add((Var) jt.getPredicate(), t.asJenaTriple().getPredicate());
+		}
+		if (jt.getObject().isVariable()) {
+			oVar = true;
+			bb.add((Var) jt.getObject(), t.asJenaTriple().getObject());
+		}
+		final SolutionMapping sm = new SolutionMappingImpl(bb.build());
+		
+		Set<Triple> res = new HashSet<>();
+		for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
+			final Binding b = k.asJenaBinding();
+			Triple newT = null;
+			
+			if (sVar) {
+				if (pVar) {
+					if (oVar) {
+						newT = new TripleImpl(b.get((Var) jt.getSubject()), b.get((Var) jt.getPredicate()), b.get((Var) jt.getObject()));
+					} else {
+						newT = new TripleImpl(b.get((Var) jt.getSubject()), b.get((Var) jt.getPredicate()), t.asJenaTriple().getObject());
+					}
+				} else {
+					if (oVar) {
+						newT = new TripleImpl(b.get((Var) jt.getSubject()), t.asJenaTriple().getPredicate(), b.get((Var) jt.getObject()));
+					} else {
+						newT = new TripleImpl(b.get((Var) jt.getSubject()), t.asJenaTriple().getPredicate(), t.asJenaTriple().getObject());
+					}
+				}
+			} else {
+				if (pVar) {
+					if (oVar) {
+						newT = new TripleImpl(t.asJenaTriple().getSubject(), b.get((Var) jt.getPredicate()), b.get((Var) jt.getObject()));
+					} else {
+						newT = new TripleImpl(t.asJenaTriple().getSubject(), b.get((Var) jt.getPredicate()), t.asJenaTriple().getObject());
+					}
+				} else {
+					if (oVar) {
+						newT = new TripleImpl(t.asJenaTriple().getSubject(), t.asJenaTriple().getPredicate(), b.get((Var) jt.getObject()));
+					} else {
+						newT = new TripleImpl(t.asJenaTriple().getSubject(), t.asJenaTriple().getPredicate(), t.asJenaTriple().getObject());
+					}
+				}
+			}
+			
+			res.add(newT);
+		}
+		return res;
 	}
 }
