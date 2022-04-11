@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -98,77 +99,54 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	}
 	
 	protected Set<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> groupTranslation = null;
+		List<Set<Triple>> partialTranslations = new ArrayList<>();
 		for(final SPARQLGraphPattern i : gp.getSubPatterns()) {
 			if (i instanceof TriplePattern) {
-				if (groupTranslation == null) {
-					groupTranslation = handleTriplePattern((TriplePattern) i, fedAccessMgr);
-				} else {
-					final Set<Triple> partialTranslation = new HashSet<>();
-					for(final Triple j : handleTriplePattern((TriplePattern) i, fedAccessMgr)) {
-						if (groupTranslation.contains(j)) {
-							partialTranslation.add(j);
-						}
-					}
-					groupTranslation = partialTranslation;
-				}
+				partialTranslations.add(handleTriplePattern((TriplePattern) i, fedAccessMgr));
 			} else if (i instanceof SPARQLUnionPattern) {
-				if (groupTranslation == null) {
-					groupTranslation = handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr);
-				} else {
-					final Set<Triple> partialTranslation = new HashSet<>();
-					for(final Triple j : handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr)) {
-						if (groupTranslation.contains(j)) {
-							partialTranslation.add(j);
-						}
-					}
-					groupTranslation = partialTranslation;
-				}
+				partialTranslations.add(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
 			} else if (i instanceof SPARQLGroupPattern) {
-				if (groupTranslation == null) {
-					groupTranslation = handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr);
-				} else {
-					final Set<Triple> partialTranslation = new HashSet<>();
-					for(final Triple j : handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr)) {
-						if (groupTranslation.contains(j)) {
-							partialTranslation.add(j);
-						}
-					}
-					groupTranslation = partialTranslation;
-				}
-				
+				partialTranslations.add(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
 			} else if (i instanceof BGP) {
-				if (groupTranslation == null) {
-					groupTranslation = handleBGP(((BGP) i), fedAccessMgr);
-				} else {
-					final Set<Triple> partialTranslation = new HashSet<>();
-					for(final Triple j : handleBGP(((BGP) i), fedAccessMgr)) {
-						if (groupTranslation.contains(j)) {
-							partialTranslation.add(j);
-						}
-					}
-					groupTranslation = partialTranslation;
-				}
+				partialTranslations.add(handleBGP(((BGP) i), fedAccessMgr));
 			} else {
 				throw new FederationAccessException(i.toString(), req, fm);
+			}
+		}
+		Set<Triple> groupTranslation = new HashSet<>();
+		for(final Triple j : partialTranslations.get(0)) {
+			boolean join = true;
+			ListIterator<Set<Triple>> k = partialTranslations.listIterator(1);
+			while(k.hasNext()) {
+				if (!k.next().contains(j)){
+					join = false;
+					break;
+				}
+			}
+			if (join) {
+				groupTranslation.add(j);
 			}
 		}
 		return groupTranslation;
 	}
 	
 	protected Set<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> bgpTranslation = null;
+		List<Set<Triple>> partialTranslations = new ArrayList<>();
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
-			if (bgpTranslation == null) {
-				bgpTranslation = handleTriplePattern(i, fedAccessMgr);
-			} else {
-				final Set<Triple> partialRes = new HashSet<>();
-				for (Triple j : handleTriplePattern(i, fedAccessMgr)) {
-					if (bgpTranslation.contains(j)) {
-						partialRes.add(j);
-					}
+			partialTranslations.add(handleTriplePattern(i, fedAccessMgr));
+		}
+		Set<Triple> bgpTranslation = new HashSet<>();
+		for(final Triple j : partialTranslations.get(0)) {
+			boolean join = true;
+			ListIterator<Set<Triple>> k = partialTranslations.listIterator(1);
+			while(k.hasNext()) {
+				if (!k.next().contains(j)){
+					join = false;
+					break;
 				}
-				bgpTranslation = partialRes;
+			}
+			if (join) {
+				bgpTranslation.add(j);
 			}
 		}
 		return bgpTranslation;
