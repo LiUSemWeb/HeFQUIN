@@ -74,7 +74,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, newReq, fm);
 		final Set<Triple> tripleTranslation = new HashSet<>();
 		for(final Triple i : res.getPayload()) {
-			tripleTranslation.addAll(translateResultTriple(i, newReq));
+			tripleTranslation.addAll(translateResultTriple(i, newReq.getQueryPattern()));
 		}
 		return tripleTranslation;
 	}
@@ -174,23 +174,24 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		return bgpTranslation;
 	}
 	
-	protected Set<Triple> translateResultTriple(final Triple t, final TPFRequest q){
+	protected Set<Triple> translateResultTriple(final Triple t, final TriplePattern q){
 		final BindingBuilder bb = BindingBuilder.create();
-		final org.apache.jena.graph.Triple jt = q.getQueryPattern().asJenaTriple();
+		final org.apache.jena.graph.Triple jq = q.asJenaTriple();
+		final org.apache.jena.graph.Triple jt = t.asJenaTriple();
 		boolean sVar = false;
 		boolean pVar = false;
 		boolean oVar = false;
-		if (jt.getSubject().isVariable()) {
+		if (jq.getSubject().isVariable()) {
 			sVar = true;
-			bb.add((Var) jt.getSubject(), t.asJenaTriple().getSubject());
+			bb.add((Var) jq.getSubject(), jt.getSubject());
 		}
-		if (jt.getPredicate().isVariable()) {
+		if (jq.getPredicate().isVariable()) {
 			pVar = true;
-			bb.add((Var) jt.getPredicate(), t.asJenaTriple().getPredicate());
+			bb.add((Var) jq.getPredicate(), jt.getPredicate());
 		}
-		if (jt.getObject().isVariable()) {
+		if (jq.getObject().isVariable()) {
 			oVar = true;
-			bb.add((Var) jt.getObject(), t.asJenaTriple().getObject());
+			bb.add((Var) jq.getObject(), jt.getObject());
 		}
 		final SolutionMapping sm = new SolutionMappingImpl(bb.build());
 		
@@ -202,29 +203,29 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 			if (sVar) {
 				if (pVar) {
 					if (oVar) {
-						newT = new TripleImpl(b.get((Var) jt.getSubject()), b.get((Var) jt.getPredicate()), b.get((Var) jt.getObject()));
+						newT = new TripleImpl(b.get((Var) jq.getSubject()), b.get((Var) jq.getPredicate()), b.get((Var) jq.getObject()));
 					} else {
-						newT = new TripleImpl(b.get((Var) jt.getSubject()), b.get((Var) jt.getPredicate()), t.asJenaTriple().getObject());
+						newT = new TripleImpl(b.get((Var) jq.getSubject()), b.get((Var) jq.getPredicate()), jt.getObject());
 					}
 				} else {
 					if (oVar) {
-						newT = new TripleImpl(b.get((Var) jt.getSubject()), t.asJenaTriple().getPredicate(), b.get((Var) jt.getObject()));
+						newT = new TripleImpl(b.get((Var) jq.getSubject()), jt.getPredicate(), b.get((Var) jq.getObject()));
 					} else {
-						newT = new TripleImpl(b.get((Var) jt.getSubject()), t.asJenaTriple().getPredicate(), t.asJenaTriple().getObject());
+						newT = new TripleImpl(b.get((Var) jq.getSubject()), jt.getPredicate(), jt.getObject());
 					}
 				}
 			} else {
 				if (pVar) {
 					if (oVar) {
-						newT = new TripleImpl(t.asJenaTriple().getSubject(), b.get((Var) jt.getPredicate()), b.get((Var) jt.getObject()));
+						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), b.get((Var) jq.getObject()));
 					} else {
-						newT = new TripleImpl(t.asJenaTriple().getSubject(), b.get((Var) jt.getPredicate()), t.asJenaTriple().getObject());
+						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), t.asJenaTriple().getObject());
 					}
 				} else {
 					if (oVar) {
-						newT = new TripleImpl(t.asJenaTriple().getSubject(), t.asJenaTriple().getPredicate(), b.get((Var) jt.getObject()));
+						newT = new TripleImpl(jt.getSubject(), jt.getPredicate(), b.get((Var) jq.getObject()));
 					} else {
-						newT = new TripleImpl(t.asJenaTriple().getSubject(), t.asJenaTriple().getPredicate(), t.asJenaTriple().getObject());
+						newT = new TripleImpl(jt.getSubject(), jt.getPredicate(), jt.getObject());
 					}
 				}
 			}
