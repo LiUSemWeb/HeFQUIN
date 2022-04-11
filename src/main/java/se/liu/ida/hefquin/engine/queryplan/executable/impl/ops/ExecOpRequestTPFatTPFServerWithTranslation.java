@@ -219,7 +219,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 					if (oVar) {
 						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), b.get((Var) jq.getObject()));
 					} else {
-						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), t.asJenaTriple().getObject());
+						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), jt.getObject());
 					}
 				} else {
 					if (oVar) {
