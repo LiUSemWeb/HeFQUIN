@@ -99,54 +99,39 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	}
 	
 	protected Set<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		List<Set<Triple>> partialTranslations = new ArrayList<>();
+		Set<Triple> groupTranslation = null;
 		for(final SPARQLGraphPattern i : gp.getSubPatterns()) {
+			final Set<Triple> partialTranslation = new HashSet<>();
 			if (i instanceof TriplePattern) {
-				partialTranslations.add(handleTriplePattern((TriplePattern) i, fedAccessMgr));
+				partialTranslation.addAll(handleTriplePattern((TriplePattern) i, fedAccessMgr));
 			} else if (i instanceof SPARQLUnionPattern) {
-				partialTranslations.add(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
+				partialTranslation.addAll(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
 			} else if (i instanceof SPARQLGroupPattern) {
-				partialTranslations.add(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
+				partialTranslation.addAll(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
 			} else if (i instanceof BGP) {
-				partialTranslations.add(handleBGP(((BGP) i), fedAccessMgr));
+				partialTranslation.addAll(handleBGP(((BGP) i), fedAccessMgr));
 			} else {
 				throw new FederationAccessException(i.toString(), req, fm);
 			}
-		}
-		Set<Triple> groupTranslation = new HashSet<>();
-		for(final Triple j : partialTranslations.get(0)) {
-			boolean join = true;
-			ListIterator<Set<Triple>> k = partialTranslations.listIterator(1);
-			while(k.hasNext()) {
-				if (!k.next().contains(j)){
-					join = false;
-					break;
-				}
-			}
-			if (join) {
-				groupTranslation.add(j);
+			
+			if (groupTranslation == null) {
+				groupTranslation = new HashSet<>();
+				groupTranslation.addAll(partialTranslation);
+			} else {
+				groupTranslation.retainAll(partialTranslation);
 			}
 		}
 		return groupTranslation;
 	}
 	
 	protected Set<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		List<Set<Triple>> partialTranslations = new ArrayList<>();
+		Set<Triple> bgpTranslation = null;
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
-			partialTranslations.add(handleTriplePattern(i, fedAccessMgr));
-		}
-		Set<Triple> bgpTranslation = new HashSet<>();
-		for(final Triple j : partialTranslations.get(0)) {
-			boolean join = true;
-			ListIterator<Set<Triple>> k = partialTranslations.listIterator(1);
-			while(k.hasNext()) {
-				if (!k.next().contains(j)){
-					join = false;
-					break;
-				}
-			}
-			if (join) {
-				bgpTranslation.add(j);
+			if (bgpTranslation == null) {
+				bgpTranslation = new HashSet<>();
+				bgpTranslation.addAll(handleTriplePattern(i, fedAccessMgr));
+			} else {
+				bgpTranslation.retainAll(handleTriplePattern(i, fedAccessMgr));
 			}
 		}
 		return bgpTranslation;
