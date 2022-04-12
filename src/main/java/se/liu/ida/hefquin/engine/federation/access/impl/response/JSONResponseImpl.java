@@ -12,13 +12,16 @@ public class JSONResponseImpl extends DataRetrievalResponseBase implements JSONR
 
     protected final JsonObject jsonObj;
 
-    public JSONResponseImpl(JsonObject obj, FederationMember fm, DataRetrievalRequest request, Date requestStartTime) {
+    public JSONResponseImpl(final JsonObject obj, final FederationMember fm, 
+            final DataRetrievalRequest request, final Date requestStartTime) {
         super(fm, request, requestStartTime);
         this.jsonObj = obj;
     }
 
-    public JSONResponseImpl(JsonObject obj, FederationMember fm, DataRetrievalRequest request, Date requestStartTime, Date requestEndTime) {
-        super(fm, request, requestStartTime,requestEndTime);
+    public JSONResponseImpl(final JsonObject obj, final FederationMember fm, 
+            final DataRetrievalRequest request, final Date requestStartTime, 
+            final Date requestEndTime) {
+        super(fm, request, requestStartTime, requestEndTime);
         this.jsonObj = obj;
     }
 

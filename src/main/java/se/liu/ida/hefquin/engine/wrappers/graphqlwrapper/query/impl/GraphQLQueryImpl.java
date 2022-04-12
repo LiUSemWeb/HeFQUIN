@@ -1,102 +1,82 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
-import org.apache.jena.atlas.json.JsonValue;
 
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 
-public class GraphQLQueryImpl implements GraphQLQuery
-{
-    protected TreeSet<String> fieldPaths;
-    protected JsonObject parameterValues;
-    protected Map<String,String> parameterDefinitions;
+public class GraphQLQueryImpl implements GraphQLQuery {
+    protected final TreeSet<String> fieldPaths;
+    protected final JsonObject parameterValues;
+    protected final Map<String, String> parameterDefinitions;
 
-    public GraphQLQueryImpl(){
-        this.fieldPaths = new TreeSet<>();
-        this.parameterValues = new JsonObject();
-        this.parameterDefinitions = new HashMap<>();
+    public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject parameterValues,
+            final Map<String, String> parameterDefinitions) {
+        this.fieldPaths = fieldPaths;
+        this.parameterValues = parameterValues;
+        this.parameterDefinitions = parameterDefinitions;
     }
 
-    /**
-     * Example: 
-     *      addFieldPath("books/title")
-     *      addFieldPath("books/author/name")
-     */
-    public void addFieldPath(String fieldPath){
-        fieldPaths.add(fieldPath.replaceAll(" ", ""));
-    }
-
-    public void addParameter(String parameterName, JsonValue parameterValue, String graphQLType){
-        parameterValues.put(parameterName, parameterValue);
-        parameterDefinitions.put(parameterName, graphQLType);
-    }
-
-    public String getURL(){
-        String url = "?query=";
-        if(!parameterDefinitions.isEmpty()){
-            url += "query(";
-            for(String parameterName : parameterDefinitions.keySet()){
-                url += "$" + parameterName + ":" + parameterDefinitions.get(parameterName)+",";
+    public String toString() {
+        String query = "";
+        if (!parameterDefinitions.isEmpty()) {
+            query += "query(";
+            for (String parameterName : parameterDefinitions.keySet()) {
+                query += "$" + parameterName + ":" + parameterDefinitions.get(parameterName) + ",";
             }
-            url += ")";
+            query += ")";
         }
-        url += queryToString();
-        url += "&variables="+getParameterString();
-        url += "&raw";
+        query += buildQueryString();
 
-        return url;
+        return query;
     }
-    
-    /**
-     * Helper function to create the url string
-     */
-    protected String queryToString(){
-        String urlQuery = "";
+
+    public JsonObject getParameterValues() {
+        return parameterValues;
+    }
+
+    protected String buildQueryString() {
+        String query = "";
         String path = "";
         int depth = 0;
 
-        for(String currentPath : fieldPaths){
+        for (String currentPath : fieldPaths) {
 
-            int splitIndex = currentPath.lastIndexOf("/")+1;
+            int splitIndex = currentPath.lastIndexOf("/") + 1;
             String domain = currentPath.substring(0, splitIndex);
             String field = currentPath.substring(splitIndex);
 
             // Parse out if domain of currentPath starts differently than actual path
-            while(!domain.startsWith(path)){
-                urlQuery += "},";
-                int i = path.lastIndexOf("/",path.length()-2);
-                path = (i>0) ? path.substring(0, i+1) : "";
+            while (!domain.startsWith(path)) {
+                query += "},";
+                int i = path.lastIndexOf("/", path.length() - 2);
+                path = (i > 0) ? path.substring(0, i + 1) : "";
                 --depth;
             }
 
-            // Parse in if domain and path are different, keep adding parts from domain to path until they are the same
-            int begin=path.length();
-            while(!path.equals(domain)){
-                int i = domain.indexOf("/",begin);
-                String domainPart = (i>0) ? domain.substring(begin,i) : domain.substring(begin);
-                urlQuery += domainPart + "{";
+            // Parse in if domain and path are different, keep adding parts from domain to
+            // path until they are the same
+            int begin = path.length();
+            while (!path.equals(domain)) {
+                int i = domain.indexOf("/", begin);
+                String domainPart = (i > 0) ? domain.substring(begin, i) : domain.substring(begin);
+                query += domainPart + "{";
                 path += domainPart + "/";
-                begin=i+1;
+                begin = i + 1;
                 ++depth;
             }
 
-            urlQuery += field + ",";
+            query += field + ",";
         }
 
         // Parse out completely after final field is added
-        while(depth > 0){
-            urlQuery += "}";
+        while (depth > 0) {
+            query += "}";
             --depth;
         }
-            
-        return "{"+urlQuery+"}";
-    }
 
-    protected String getParameterString(){
-        return parameterValues.toString().replaceAll(" ", "");
+        return "{" + query + "}";
     }
 }
