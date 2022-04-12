@@ -225,6 +225,43 @@ public abstract class EngineTestBase
 		}
 	}
 
+	//TODO: Add our own TPFServerWithVocabularyMappingForTest
+	
+	protected static class TPFServerWithVocabularyMappingForTest extends FederationMemberBaseForTest implements TPFServer
+	{
+		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
+		
+		final VocabularyMapping vm;
+
+		public TPFServerWithVocabularyMappingForTest() { 
+			super(null);
+			vm = null;
+		
+		}
+		
+		public TPFServerWithVocabularyMappingForTest( final Graph data ) { 
+			super(data); 
+			vm = null;
+		}
+		
+		public TPFServerWithVocabularyMappingForTest( final VocabularyMapping vocabularyMapping ) { 
+			super(null); 
+			vm = vocabularyMapping;
+		}
+
+		@Override
+		public TPFInterface getInterface() { return iface; }
+
+		public TPFResponse performRequest( final TPFRequest req ) {
+			final List<Triple> result = getMatchingTriples(req);
+			return new TPFResponseForTest(result, this, req);
+		}
+		
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return vm;
+		}
+	}
 
 	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
