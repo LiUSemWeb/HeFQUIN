@@ -47,11 +47,14 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 		final GraphQLQuery query = req.getGraphQLQuery();
 		final String url = fm.getInterface().getURL();
 
+		HttpURLConnection con = null;
+		OutputStreamWriter outWriter = null;
+		BufferedReader bufferReader = null;
 		String responseBody = "{}";
 		try {
 			// Setup the connection
 			final URL endpointURL = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) endpointURL.openConnection();
+			con = (HttpURLConnection) endpointURL.openConnection();
 			con.setRequestMethod("POST");
 			con.setConnectTimeout(connectionTimeout);
 			con.setReadTimeout(readTimeout);
@@ -65,7 +68,7 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			postBody.put("query", query.toString());
 			postBody.put("variables", query.getParameterValues());
 			postBody.put("raw", true);
-			final OutputStreamWriter outWriter = new OutputStreamWriter(con.getOutputStream());
+			outWriter = new OutputStreamWriter(con.getOutputStream());
 			outWriter.write(postBody.toString());
 			outWriter.close();
 
@@ -75,12 +78,13 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			if (status >= 200 && status < 300) {
 				iStream = con.getInputStream();
 			} else {
+				con.disconnect();
 				throw new FederationAccessException(
 						"Couldn't establish a connection to endpoint. Response code: " + status, req, fm);
 			}
 
 			// Components used to read the message
-			final BufferedReader bufferReader = new BufferedReader(new InputStreamReader(iStream));
+			bufferReader = new BufferedReader(new InputStreamReader(iStream));
 			StringBuilder stringBuilder = new StringBuilder();
 
 			// Read from the buffer
@@ -95,7 +99,21 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			bufferReader.close();
 			con.disconnect();
 		} 
-		catch (IOException e) {
+		catch (final IOException e) {
+			if(con != null){
+				con.disconnect();
+			}
+			try {
+				if(outWriter != null){
+					outWriter.close();
+				}
+				if(bufferReader != null){
+					bufferReader.close();
+				}
+			}
+			catch(final IOException e2){
+				throw new FederationAccessException(req, fm);
+			}
 			throw new FederationAccessException(req, fm);
 		}
 
@@ -104,7 +122,7 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 		try {
 			jsonObj = JSON.parse(responseBody);
 		} 
-		catch (JsonParseException e) {
+		catch (final JsonParseException e) {
 			throw new FederationAccessException("Unable to parse the retrieved JSON", req, fm);
 		}
 
