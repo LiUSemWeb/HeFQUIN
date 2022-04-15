@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
@@ -53,6 +54,11 @@ public abstract class EngineTestBase
 	 * instances will be skipped.
 	 */
 	public static boolean skipLocalNeo4jTests = true;
+
+	/**
+	 * If true, skip tests to local GraphQL endpoint
+	 */
+	public static boolean skipLocalGraphQLTests = true;
 
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
@@ -292,6 +298,21 @@ public abstract class EngineTestBase
 		@Override
 		public VocabularyMapping getVocabularyMapping() {
 			return null;
+		}
+	}
+
+	protected static class GraphQLEndpointTest implements GraphQLEndpoint {
+
+		public GraphQLEndpointTest() {}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+
+		@Override
+		public GraphQLInterface getInterface() {
+			return new GraphQLInterfaceImpl("http://localhost:4000/graphql");
 		}
 	}
 
