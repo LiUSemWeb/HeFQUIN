@@ -225,8 +225,6 @@ public abstract class EngineTestBase
 		}
 	}
 
-	//TODO: Add our own TPFServerWithVocabularyMappingForTest
-	
 	protected static class TPFServerWithVocabularyMappingForTest extends FederationMemberBaseForTest implements TPFServer
 	{
 		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");

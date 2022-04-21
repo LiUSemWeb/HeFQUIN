@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.jena.sparql.core.Var;
@@ -45,6 +46,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	                                          final FederationAccessManager fedAccessMgr )
 			throws FederationAccessException
 	{
+		final Date startTime = new Date();
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
 		final List<Triple> resList = new ArrayList<>();
 		if(reqTranslation instanceof TriplePattern) {
@@ -67,7 +69,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 			throw new FederationAccessException(reqTranslation.toString(), req, fm);
 		}
 		
-		return new TPFResponseImpl(resList, resList, null, fm, req, null);
+		return new TPFResponseImpl(resList, resList, null, fm, req, startTime);
 	}
 	
 	protected Set<Triple> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{

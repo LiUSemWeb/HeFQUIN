@@ -37,13 +37,12 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 
 	@Test
 	public void testOffline() throws ExecOpExecutionException {
-		//TODO: our query
 		final Node s = NodeFactory.createURI("http://example.org/a");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
 		final TriplePattern tp = new TriplePatternImpl(s,p,v);
 		
-		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
+		final ExecOpRequestTPFatTPFServerWithTranslation op = new ExecOpRequestTPFatTPFServerWithTranslation(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerWithVocabularyMappingForTest(createVocabularyMappingForTests()) );
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
