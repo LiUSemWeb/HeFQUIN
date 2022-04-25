@@ -40,6 +40,8 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 			reqTranslation = handleBGP((BGP) query);
 		} else if (query instanceof SPARQLGroupPattern) {
 			reqTranslation = handleGroup((SPARQLGroupPattern) query);
+		} else if (query instanceof SPARQLUnionPattern) {
+			reqTranslation = handleUnion((SPARQLUnionPattern) query);
 		}
 		else {
 			throw new FederationAccessException(query.toString(), req, fm);
