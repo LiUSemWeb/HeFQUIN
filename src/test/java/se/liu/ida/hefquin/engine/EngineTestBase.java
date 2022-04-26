@@ -242,8 +242,8 @@ public abstract class EngineTestBase
 			vm = null;
 		}
 		
-		public TPFServerWithVocabularyMappingForTest( final VocabularyMapping vocabularyMapping ) { 
-			super(null); 
+		public TPFServerWithVocabularyMappingForTest( final Graph data, final VocabularyMapping vocabularyMapping ) { 
+			super(data); 
 			vm = vocabularyMapping;
 		}
 
@@ -402,7 +402,11 @@ public abstract class EngineTestBase
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
 			}
 			else {
-				response = ( (TPFServerForTest) fm ).performRequest(req);
+				if (fm.getVocabularyMapping() != null) {
+					response = ( (TPFServerWithVocabularyMappingForTest) fm).performRequest(req);
+				} else {
+					response = ( (TPFServerForTest) fm ).performRequest(req);
+				}
 			}
 			return CompletableFuture.completedFuture(response);
 		}

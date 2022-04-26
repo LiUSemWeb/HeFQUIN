@@ -10,16 +10,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -37,50 +41,51 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 
 	@Test
 	public void testOffline() throws ExecOpExecutionException {
-		final Node s = NodeFactory.createURI("http://example.org/a");
+		final Node a = NodeFactory.createURI("http://example.org/a");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
-		final TriplePattern tp = new TriplePatternImpl(s,p,v);
+		final TriplePattern tp = new TriplePatternImpl(a,p,v);
+		
+		final Graph g = GraphFactory.createDefaultGraph();
+
+		//TODO: add our data
+		final Node s = NodeFactory.createURI("http://example.org/s");
+		final Node o1 = NodeFactory.createURI("http://example.org/o1");
+		g.add(s,p,o1);
+
+		final Node o2 = NodeFactory.createURI("http://example.org/o2");
+		g.add(s,p,o2);
 		
 		final ExecOpRequestTPFatTPFServerWithTranslation op = new ExecOpRequestTPFatTPFServerWithTranslation(
 				new TriplePatternRequestImpl(tp),
-				new TPFServerWithVocabularyMappingForTest(createVocabularyMappingForTests()) );
+				new TPFServerWithVocabularyMappingForTest(g, createVocabularyMappingForTests()) );
 		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );
+		
+		final Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/o1"));
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+		
+		final BindingBuilder second = BindingBuilder.create();
+		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/o2"));
+		expectedResults.add(new SolutionMappingImpl(second.build()));
 
 		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
-
-		assertTrue( it.hasNext() );
-		final Binding b1 = it.next().asJenaBinding();
 		
-		assertEquals( 1, b1.size() );
-		assertTrue( b1.contains(v) );
-		assertEquals( "http://example.org/o1", b1.get(v).getURI() );
-
-		assertTrue( it.hasNext() );
-		final Binding b2 = it.next().asJenaBinding();
-		assertEquals( 1, b2.size() );
-		assertTrue( b2.contains(v) );
-		assertEquals( "http://example.org/o2", b2.get(v).getURI() );
-
-		assertFalse( it.hasNext() );
+		final Set<SolutionMapping> results = new HashSet<>();
+		while (it.hasNext()) {
+			results.add(it.next());
+		}
+		
+		assertTrue(expectedResults.equals(results));
 	}
 
 
 	public static ExecutionContext createExecContextForTests() {
-		final List<Triple> l = new ArrayList<Triple>();
 
-		//TODO: add our data
-		final Node s = NodeFactory.createURI("http://example.org/s");
-		final Node p = NodeFactory.createURI("http://example.org/p");
-		final Node o1 = NodeFactory.createURI("http://example.org/o1");
-		l.add( new TripleImpl(s,p,o1) );
-
-		final Node o2 = NodeFactory.createURI("http://example.org/o2");
-		l.add( new TripleImpl(s,p,o2) );
-
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest(null, l);
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
