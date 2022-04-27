@@ -79,7 +79,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 			results.add(it.next());
 		}
 		
-		assertTrue(expectedResults.equals(results));
+		assertEquals(expectedResults, results);
 	}
 
 
