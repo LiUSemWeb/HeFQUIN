@@ -41,14 +41,14 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 
 	@Test
 	public void testOffline() throws ExecOpExecutionException {
+		//Query
 		final Node a = NodeFactory.createURI("http://example.org/a");
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
 		final TriplePattern tp = new TriplePatternImpl(a,p,v);
 		
+		//Data
 		final Graph g = GraphFactory.createDefaultGraph();
-
-		//TODO: add our data
 		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node o1 = NodeFactory.createURI("http://example.org/o1");
 		g.add(s,p,o1);
@@ -63,6 +63,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 
 		op.execute( sink, createExecContextForTests() );
 		
+		//Expected results
 		final Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
 		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/o1"));
@@ -72,8 +73,8 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/o2"));
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
-		
+		//Results
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();		
 		final Set<SolutionMapping> results = new HashSet<>();
 		while (it.hasNext()) {
 			results.add(it.next());
