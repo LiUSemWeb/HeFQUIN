@@ -97,9 +97,9 @@ public class ExecOpRequestTPFWithTranslationTest extends ExecOpTestBase {
 	public static VocabularyMapping createVocabularyMappingForTests() {
 		final Set<org.apache.jena.graph.Triple> mappingTriples = new HashSet<>();
 		//Equality
-		Node s = NodeFactory.createURI("http://example.org/a");
-		Node p = OWL.sameAs.asNode();
-		Node o  = NodeFactory.createURI("http://example.org/s");
+		final Node s = NodeFactory.createURI("http://example.org/a");
+		final Node p = OWL.sameAs.asNode();
+		final Node o  = NodeFactory.createURI("http://example.org/s");
 		mappingTriples.add(new org.apache.jena.graph.Triple(s, p, o));
 		
 		return new VocabularyMappingImpl(mappingTriples);
