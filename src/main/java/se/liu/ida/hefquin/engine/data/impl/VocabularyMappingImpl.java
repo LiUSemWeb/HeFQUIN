@@ -366,7 +366,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {		
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm , final boolean fromLocal) {		
 		Set<BindingBuilder> bbs = new HashSet<>();
 		bbs.add( BindingBuilder.create() );
 		
@@ -381,7 +381,12 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				}
 			}
 			
-			final Set<Node> bindingTranslation = translateBinding(n);
+			Set<Node> bindingTranslation = new HashSet<>();
+			if (fromLocal) {
+				bindingTranslation = translateBinding(n);
+			} else {
+				bindingTranslation = translateBindingFromGlobal(n);
+			}
 			if (bindingTranslation.size() > 1) {
 				final Set<BindingBuilder> bbsCopy = new HashSet<>();
 				
@@ -437,6 +442,35 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			} else {
 				throw new IllegalArgumentException(predicate.toString());
 			}
+		}
+		return results;
+	}
+	
+	protected Set<Node> translateBindingFromGlobal( final Node n ) {
+		final Set<Node> results = new HashSet<>();
+		for (final Triple m : getMappings(n, Node.ANY, Node.ANY)){
+			final Node predicate = m.getPredicate();
+			if (predicate.equals(OWL.sameAs.asNode()) || predicate.equals(OWL.equivalentClass.asNode()) || 
+				predicate.equals(OWL.equivalentProperty.asNode())) {
+				results.add(m.getObject());
+			} else if (predicate.equals(OWL.unionOf.asNode())) {
+				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+				while(true) {
+					results.add(mapping.object1);
+					if (mapping.object2.equals(RDF.nil.asNode())) {
+						break;
+					}
+					mapping = getComplexMapping(mapping.object2);
+				}
+			} else {
+				throw new IllegalArgumentException(predicate.toString());
+			}
+		}
+		for (final Triple o : getMappings(Node.ANY, RDFS.subClassOf.asNode(), n)) {
+			results.add(o.getSubject());
+		}
+		for (final Triple p : getMappings(Node.ANY, RDFS.subPropertyOf.asNode(), n)) {
+			results.add(p.getSubject());
 		}
 		return results;
 	}

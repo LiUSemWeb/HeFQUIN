@@ -469,7 +469,7 @@ public class VocabularyMappingTest
 		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/o"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
-		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm, true);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
@@ -532,7 +532,7 @@ public class VocabularyMappingTest
 		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
-		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm, true);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		expectedResults.add(testSm);
