@@ -33,7 +33,7 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public abstract class ExecOpRequestTPFWithTranslation<MemberType extends FederationMember> extends ExecOpGenericTriplePatternRequestWithTPF<MemberType>{
 
-	public ExecOpRequestTPFWithTranslation(TriplePatternRequest req, MemberType fm) {
+	public ExecOpRequestTPFWithTranslation( final TriplePatternRequest req, final MemberType fm) {
 		super(req, fm);
 	}
 	
