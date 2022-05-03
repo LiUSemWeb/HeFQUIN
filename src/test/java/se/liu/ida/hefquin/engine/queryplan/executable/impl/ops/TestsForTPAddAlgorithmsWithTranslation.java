@@ -36,21 +36,24 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		final Var var3 = Var.alloc("v3");
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final Node x1 = NodeFactory.createURI("http://example.org/x1");
-		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
+		
+		final Node ax1 = NodeFactory.createURI("http://example.org/a");
+		final Node by1 = NodeFactory.createURI("http://example.org/b");
+		final Node cx2 = NodeFactory.createURI("http://example.org/c");
+		final Node dy2 = NodeFactory.createURI("http://example.org/d");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
+				var1, ax1,
+				var2, by1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x2,
-				var2, y2) );
+				var1, cx2,
+				var2, dy2) );
 
 		final TriplePattern tp = new TriplePatternImpl(var2,p,var3);
 
@@ -94,8 +97,8 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		for ( final Binding b : result ) {
 			assertEquals( 3, b.size() );
 
-			if ( b.get(var1).getURI().equals("http://example.org/x1") ) {
-				assertEquals( "http://example.org/y1", b.get(var2).getURI() );
+			if ( b.get(var1).getURI().equals("http://example.org/a") ) {
+				assertEquals( "http://example.org/b", b.get(var2).getURI() );
 				if ( b.get(var3).getURI().equals("http://example.org/z1") ) {
 					b1Found = true;
 				}
@@ -106,8 +109,8 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 					fail( "Unexpected URI for ?v3: " + b.get(var3).getURI() );
 				}
 			}
-			else if ( b.get(var1).getURI().equals("http://example.org/x2") ) {
-				assertEquals( "http://example.org/y2", b.get(var2).getURI() );
+			else if ( b.get(var1).getURI().equals("http://example.org/c") ) {
+				assertEquals( "http://example.org/d", b.get(var2).getURI() );
 				assertEquals( "http://example.org/z3", b.get(var3).getURI() );
 				b3Found = true;
 			}
@@ -133,14 +136,19 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+		
+		final Node ax1 = NodeFactory.createURI("http://example.org/a");
+		final Node by1 = NodeFactory.createURI("http://example.org/b");
+		final Node cx2 = NodeFactory.createURI("http://example.org/c");
+		final Node dy2 = NodeFactory.createURI("http://example.org/d");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x1,
-				var2, y1) );
+				var1, ax1,
+				var2, by1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, x2,
-				var2, y2) );
+				var1, cx2,
+				var2, dy2) );
 
 		final TriplePattern tp = new TriplePatternImpl(var1,var2,var3);
 
@@ -179,13 +187,13 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		for ( final Binding b : result ) {
 			assertEquals( 3, b.size() );
 
-			if ( b.get(var1).getURI().equals("http://example.org/x1") ) {
-				assertEquals( "http://example.org/y1", b.get(var2).getURI() );
+			if ( b.get(var1).getURI().equals("http://example.org/a") ) {
+				assertEquals( "http://example.org/b", b.get(var2).getURI() );
 				assertEquals( "http://example.org/z1", b.get(var3).getURI() );
 				b1Found = true;
 			}
-			else if ( b.get(var1).getURI().equals("http://example.org/x2") ) {
-				assertEquals( "http://example.org/y2", b.get(var2).getURI() );
+			else if ( b.get(var1).getURI().equals("http://example.org/c") ) {
+				assertEquals( "http://example.org/d", b.get(var2).getURI() );
 				assertEquals( "http://example.org/z2", b.get(var3).getURI() );
 				b2Found = true;
 			}
@@ -204,16 +212,17 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		final Var var3 = Var.alloc("v3");
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
-		final Node x1 = NodeFactory.createURI("http://example.org/x1");
-		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+		
+		final Node ax1 = NodeFactory.createURI("http://example.org/a");
+		final Node cx2 = NodeFactory.createURI("http://example.org/c");
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
-		input.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, ax1) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, cx2) );
 
 		final TriplePattern tp = new TriplePatternImpl(var2,p,var3);
 
@@ -329,12 +338,12 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		boolean b2Found = false;
 		for ( final Binding b : result ) {
 			assertEquals( 2, b.size() );
-			assertEquals( "http://example.org/o1", b.get(var2).getURI() );
+			assertEquals( "http://example.org/g3", b.get(var2).getURI() );
 
-			if ( b.get(var1).getURI().equals("http://example.org/s1") ) {
+			if ( b.get(var1).getURI().equals("http://example.org/g1") ) {
 				b1Found = true;
 			}
-			else if ( b.get(var1).getURI().equals("http://example.org/s2") ) {
+			else if ( b.get(var1).getURI().equals("http://example.org/g2") ) {
 				b2Found = true;
 			}
 			else {
@@ -352,9 +361,9 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, NodeFactory.createURI("http://example.org/x1")) );
+				var1, NodeFactory.createURI("http://example.org/a")) );
 		input.add( SolutionMappingUtils.createSolutionMapping(
-				var1, NodeFactory.createURI("http://example.org/x2")) );
+				var1, NodeFactory.createURI("http://example.org/b")) );
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
@@ -388,9 +397,12 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		final Node o1 = NodeFactory.createURI("http://example.org/o1");
 		final Node o2 = NodeFactory.createURI("http://example.org/o2");
 		
+		final Node a = NodeFactory.createURI("http://example.org/a");
+		final Node b = NodeFactory.createURI("http://example.org/b");
+		
 		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1) );
-		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, o1) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, a) );
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, a, var2, b) );
 
 		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
 
