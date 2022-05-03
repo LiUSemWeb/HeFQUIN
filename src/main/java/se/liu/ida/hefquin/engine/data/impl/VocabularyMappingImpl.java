@@ -366,7 +366,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm , final boolean fromLocal) {		
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm) {		
 		Set<BindingBuilder> bbs = new HashSet<>();
 		bbs.add( BindingBuilder.create() );
 		
@@ -381,12 +381,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 				}
 			}
 			
-			Set<Node> bindingTranslation = new HashSet<>();
-			if (fromLocal) {
-				bindingTranslation = translateBinding(n);
-			} else {
-				bindingTranslation = translateBindingFromGlobal(n);
-			}
+			final Set<Node> bindingTranslation = translateBinding(n);
 			if (bindingTranslation.size() > 1) {
 				final Set<BindingBuilder> bbsCopy = new HashSet<>();
 				
@@ -442,6 +437,56 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			} else {
 				throw new IllegalArgumentException(predicate.toString());
 			}
+		}
+		return results;
+	}
+	
+	@Override
+	public Set<SolutionMapping> translateSolutionMappingFromGlobal( final SolutionMapping sm) {		
+		Set<BindingBuilder> bbs = new HashSet<>();
+		bbs.add( BindingBuilder.create() );
+		
+		final Iterator<Var> i = sm.asJenaBinding().vars();
+		while(i.hasNext()) {
+			final Var v = i.next();
+			final Node n = sm.asJenaBinding().get(v);
+			
+			if(!n.isURI()) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			}
+			
+			final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
+			if (bindingTranslation.size() > 1) {
+				final Set<BindingBuilder> bbsCopy = new HashSet<>();
+				
+				for(final Node j : bindingTranslation) {
+					for (final BindingBuilder k : bbs) {
+						BindingBuilder translationCopy = BindingBuilder.create();
+						if(!k.isEmpty()) {
+							translationCopy.addAll(k.snapshot());
+						}
+						translationCopy.add(v, j);
+						bbsCopy.add(translationCopy);
+					}
+				}
+				
+				bbs = bbsCopy;
+			} else if (bindingTranslation.size() == 0) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			} else {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, bindingTranslation.iterator().next());
+				}
+			}
+		}
+		
+		final Set<SolutionMapping> results = new HashSet<>();
+		for (final BindingBuilder b : bbs) {
+			results.add(new SolutionMappingImpl(b.build()));
 		}
 		return results;
 	}

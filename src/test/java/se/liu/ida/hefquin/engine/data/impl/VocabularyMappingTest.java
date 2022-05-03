@@ -469,7 +469,7 @@ public class VocabularyMappingTest
 		testBuilder.add(Var.alloc("x"), NodeFactory.createURI("http://example.org/o"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
-		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm, true);
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		final BindingBuilder first = BindingBuilder.create();
@@ -532,7 +532,7 @@ public class VocabularyMappingTest
 		testBuilder.add(Var.alloc("w"), NodeFactory.createURI("http://example.org/m"));
 		
 		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
-		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm, true);
+		Set<SolutionMapping> translation = vm.translateSolutionMapping(testSm);
 		
 		Set<SolutionMapping> expectedResults = new HashSet<>();
 		expectedResults.add(testSm);
@@ -540,5 +540,65 @@ public class VocabularyMappingTest
 		assertEquals(expectedResults, translation);
 		
 	}
+	
+	@Test
+	public void TranslateSolutionMappingFromGlobalTest() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:n owl:equivalentClass ex:a . "
+				+ "ex:n owl:equivalentProperty ex:b . "
+				+ "ex:n owl:sameAs ex:c . "
+				+ "ex:d rdfs:subPropertyOf ex:n . "
+				+ "ex:e rdfs:subClassOf ex:n . "
+				+ "ex:n owl:unionOf (ex:f ex:g) . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/n"));
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMappingFromGlobal(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+		
+		final BindingBuilder second = BindingBuilder.create();
+		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		expectedResults.add(new SolutionMappingImpl(second.build()));
+		
+		final BindingBuilder third = BindingBuilder.create();
+		third.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/c"));
+		expectedResults.add(new SolutionMappingImpl(third.build()));
+		
+		final BindingBuilder fourth = BindingBuilder.create();
+		fourth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		expectedResults.add(new SolutionMappingImpl(fourth.build()));
+		
+		final BindingBuilder fifth = BindingBuilder.create();
+		fifth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/e"));
+		expectedResults.add(new SolutionMappingImpl(fifth.build()));
+		
+		final BindingBuilder sixth = BindingBuilder.create();
+		sixth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/f"));
+		expectedResults.add(new SolutionMappingImpl(sixth.build()));
+		
+		final BindingBuilder seventh = BindingBuilder.create();
+		seventh.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(seventh.build()));
+
+		assertEquals(expectedResults, translation);
+		
+	}
 
 }
+
+

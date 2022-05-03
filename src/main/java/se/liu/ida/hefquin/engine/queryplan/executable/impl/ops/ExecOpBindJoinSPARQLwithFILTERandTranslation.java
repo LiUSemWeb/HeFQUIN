@@ -1,28 +1,18 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGenericBindJoinWithRequestOps.MyIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoinSPARQLwithFILTER{
@@ -36,7 +26,7 @@ public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoin
 		
 		final Set<SolutionMapping> solMapsTranslation = new HashSet<>();
 		for (final SolutionMapping sm : solMaps) {
-			solMapsTranslation.addAll(fm.getVocabularyMapping().translateSolutionMapping(sm, false));
+			solMapsTranslation.addAll(fm.getVocabularyMapping().translateSolutionMappingFromGlobal(sm));
 		}
 		
 		final Op op = createFilter(solMapsTranslation);

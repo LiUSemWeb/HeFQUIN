@@ -22,14 +22,23 @@ public interface VocabularyMapping
 	/**
 	 * Applies this vocabulary mapping to the given solution mapping expressed
 	 * in the local vocabulary and returns a resulting set of solution mappings
-	 * expressed in the global vocabulary, if boolean fromLocal is true. Else the
-	 * vocabulary mapping is used to from the global vocabulary to the local
-	 * vocabulary.
+	 * expressed in the global vocabulary.
 	 * If this mapping is not relevant for the given solution mapping (i.e.,
 	 * applying the mapping to the given solution mapping does not have any
 	 * effect), then the result of this function is a set containing only the
 	 * given solution mapping.
 	 */
-	Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm , boolean fromLocal);
+	Set<SolutionMapping> translateSolutionMapping( SolutionMapping sm );
+	
+	/**
+	 * Applies this vocabulary mapping to the given solution mapping expressed
+	 * in the global vocabulary and returns a resulting set of solution mappings
+	 * expressed in the local vocabulary.
+	 * If this mapping is not relevant for the given solution mapping (i.e.,
+	 * applying the mapping to the given solution mapping does not have any
+	 * effect), then the result of this function is a set containing only the
+	 * given solution mapping.
+	 */
+	Set<SolutionMapping> translateSolutionMappingFromGlobal( SolutionMapping sm );
 
 }

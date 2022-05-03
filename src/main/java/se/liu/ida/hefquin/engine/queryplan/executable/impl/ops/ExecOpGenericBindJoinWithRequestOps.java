@@ -110,7 +110,7 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 			// We need an implementation of IntermediateResultBlock that can
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
-			final Set<SolutionMapping> smFromRequestTranslated = vocabularyMapping.translateSolutionMapping(smFromRequest, true);
+			final Set<SolutionMapping> smFromRequestTranslated = vocabularyMapping.translateSolutionMapping(smFromRequest);
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				for (final SolutionMapping smTranslated : smFromRequestTranslated) {
 					if ( SolutionMappingUtils.compatible(smFromInput, smTranslated) ) {
