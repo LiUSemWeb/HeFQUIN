@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Date;
