@@ -80,18 +80,18 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		return new TPFResponseImpl(resList, resList, null, fm, req, startTime);
 	}
 	
-	protected Set<Triple> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+	protected List<Triple> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
 		final TPFRequest newReq = new TPFRequestImpl(tp);
 		final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, newReq, fm);
-		final Set<Triple> tripleTranslation = new HashSet<>();
+		final List<Triple> tripleTranslation = new ArrayList<>();
 		for(final Triple i : res.getPayload()) {
 			tripleTranslation.addAll(translateResultTriple(i, newReq.getQueryPattern()));
 		}
 		return tripleTranslation;
 	}
 	
-	protected Set<Triple> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		final Set<Triple> unionTranslation = new HashSet<>();
+	protected List<Triple> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		final List<Triple> unionTranslation = new ArrayList<>();
 		for(final SPARQLGraphPattern i : up.getSubPatterns()) {
 			if (i instanceof TriplePattern) {
 				unionTranslation.addAll(handleTriplePattern(((TriplePattern) i), fedAccessMgr));
@@ -108,8 +108,8 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		return unionTranslation;
 	}
 	
-	protected Set<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> groupTranslation = null;
+	protected List<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		List<Triple> groupTranslation = null;
 		for(final SPARQLGraphPattern i : gp.getSubPatterns()) {
 			final Set<Triple> partialTranslation = new HashSet<>();
 			if (i instanceof TriplePattern) {
@@ -125,7 +125,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 			}
 			
 			if (groupTranslation == null) {
-				groupTranslation = new HashSet<>();
+				groupTranslation = new ArrayList<>();
 				groupTranslation.addAll(partialTranslation);
 			} else {
 				groupTranslation.retainAll(partialTranslation);
@@ -134,11 +134,11 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		return groupTranslation;
 	}
 	
-	protected Set<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> bgpTranslation = null;
+	protected List<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
+		List<Triple> bgpTranslation = null;
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
 			if (bgpTranslation == null) {
-				bgpTranslation = new HashSet<>();
+				bgpTranslation = new ArrayList<>();
 				bgpTranslation.addAll(handleTriplePattern(i, fedAccessMgr));
 			} else {
 				bgpTranslation.retainAll(handleTriplePattern(i, fedAccessMgr));
