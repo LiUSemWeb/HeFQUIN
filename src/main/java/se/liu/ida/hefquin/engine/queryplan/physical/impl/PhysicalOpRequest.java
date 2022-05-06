@@ -47,9 +47,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 			return new ExecOpRequestSPARQL( (SPARQLRequest) req, (SPARQLEndpoint) fm );
 		}
 		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
-			if(fm.getVocabularyMapping() != null) {
-				return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm );
-			}
 			return new ExecOpRequestTPFatTPFServer( (TriplePatternRequest) req, (TPFServer) fm );
 		}
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {

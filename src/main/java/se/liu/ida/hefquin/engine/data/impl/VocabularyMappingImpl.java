@@ -440,5 +440,144 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		}
 		return results;
 	}
+	
+	@Override
+	public Set<se.liu.ida.hefquin.engine.data.Triple> translateTriplePatternFromLocal(final Triple t) {
+		final Set<Triple> objectTranslation = new HashSet<>();
+		for(final Triple i : translateSubjectFromLocal(t)) {
+			objectTranslation.addAll(translateObjectFromLocal(i));
+		}
+
+		final Set<se.liu.ida.hefquin.engine.data.Triple> predicateTranslation = new HashSet<>();
+		for(final Triple j : objectTranslation) {
+			predicateTranslation.addAll(translatePredicateFromLocal(j));
+		}
+
+		return predicateTranslation;
+	}
+	
+	protected Set<Triple> translateSubjectFromLocal(final Triple t){
+		final Set<Triple> results = new HashSet<>();
+		if (t.getSubject().isVariable()) {
+			results.add(t);
+			return results;
+		}
+
+		final Set<Triple> mappings = getMappings( t.getSubject(), Node.ANY, Node.ANY );
+		for (final Triple m : mappings) {
+			if ( m.getPredicate().equals(OWL.sameAs.asNode()) ) {
+				final Triple translation = new Triple(m.getObject(), t.getPredicate(), t.getObject());
+				results.add(translation);
+			} else {
+				throw new IllegalArgumentException(m.getPredicate().getURI());
+			}
+		}
+		
+		if(results.isEmpty()) {
+			results.add(t);
+		}
+		return results;
+	}
+	
+	protected Set<Triple> translateObjectFromLocal(final Triple t){
+		
+		final Set<Triple> results = new HashSet<>();
+		if(t.getObject().isVariable()) {
+			results.add(t);
+			return results;
+		}
+
+		final Set<Triple> mappings = getMappings( Node.ANY, Node.ANY, t.getObject() );
+		for (final Triple m : mappings) {
+			final Node predicate = m.getPredicate();
+
+			if(predicate.equals(OWL.sameAs.asNode())) {
+				final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getObject());
+				results.add(translation);
+			} else {
+				if (!t.getPredicate().isURI()) {
+					continue;
+				} else {
+					if(!t.getPredicate().equals(RDF.type.asNode())) {
+						continue;
+					}
+				}
+				if (predicate.equals(OWL.equivalentClass.asNode())) {
+					final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getObject());
+					results.add(translation);	
+					
+				} else if (predicate.equals(RDF.first.asNode())) {
+					Set<Triple> unionMappings = getMappings(Node.ANY, Node.ANY, m.getSubject());
+					Triple mapping = unionMappings.iterator().next();
+					while(!mapping.getPredicate().equals(OWL.unionOf.asNode())) {
+						unionMappings = getMappings(Node.ANY, Node.ANY, mapping.getSubject());
+						mapping = unionMappings.iterator().next();
+					}
+					if (unionMappings.size() > 1) {
+						throw new IllegalArgumentException(unionMappings.toString());
+					}
+					final Triple translation = new Triple(t.getSubject(), t.getPredicate(), mapping.getSubject());
+					results.add(translation);
+					
+				} else {
+					throw new IllegalArgumentException( predicate.toString() );
+				}
+			}
+		}
+		
+		if(results.isEmpty()) {
+			results.add(t);
+			return results;
+		} else {
+			return results;
+		}
+	}
+
+	protected Set<se.liu.ida.hefquin.engine.data.Triple> translatePredicateFromLocal(final Triple t){
+		
+		final Set<se.liu.ida.hefquin.engine.data.Triple> results = new HashSet<>();
+		if(t.getPredicate().isVariable()) {
+			results.add(new TripleImpl(t));
+			return results;
+		}
+
+		final Set<Triple> mappings = getMappings( Node.ANY, Node.ANY, t.getPredicate() );
+
+		for (final Triple m : mappings) {
+			final Node predicate = m.getPredicate();
+			
+			if (predicate.equals(OWL.inverseOf.asNode())){
+				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getObject(), m.getObject(), t.getSubject());
+				results.add(translation);	
+				
+			} else if (predicate.equals(OWL.equivalentProperty.asNode())){
+				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getSubject(), m.getObject(), t.getObject());
+				results.add(translation);	
+				
+			} else if (predicate.equals(RDF.first.asNode())) {
+				Set<Triple> unionMappings = getMappings(Node.ANY, Node.ANY, m.getSubject());
+				Triple mapping = unionMappings.iterator().next();
+				while(!mapping.getPredicate().equals(OWL.unionOf.asNode())) {
+					unionMappings = getMappings(Node.ANY, Node.ANY, mapping.getSubject());
+					mapping = unionMappings.iterator().next();
+				}
+				if (unionMappings.size() > 1) {
+					throw new IllegalArgumentException(unionMappings.toString());
+				}
+				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getSubject(), mapping.getSubject(), t.getObject());
+				results.add(translation);
+				
+			} else {
+				throw new IllegalArgumentException( predicate.toString() );
+			}
+		}
+		
+		if(results.isEmpty()) {
+			results.add(new TripleImpl(t));
+			return results;
+		} else {
+			return results;
+		}
+	}
 
 }

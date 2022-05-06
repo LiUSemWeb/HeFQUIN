@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -14,6 +15,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
+import se.liu.ida.hefquin.engine.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -38,6 +40,15 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 {
 	public ExecOpRequestTPFatTPFServerWithTranslation( final TriplePatternRequest req, final TPFServer fm ) {
 		super( req, fm );
+	}
+	
+	@Override
+	protected Iterator<SolutionMapping> convert( final Iterable<Triple> itTriples ) {
+		Set<Triple> itTriplesTranslated = new HashSet<>();
+		for (final Triple t : itTriples) {
+			itTriplesTranslated.addAll(fm.getVocabularyMapping().translateTriplePatternFromLocal(t.asJenaTriple()));
+		}
+		return TriplesToSolMapsConverter.convert( itTriplesTranslated, req.getQueryPattern() );
 	}
 
 	@Override
