@@ -40,7 +40,15 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 {
 
 	@Test
-	public void testOffline() throws ExecOpExecutionException {
+	public void testTriplePatternTranslationForTPFRequest() throws ExecOpExecutionException {
+		// This test simulates a TPF server with the following two triples that use a local vocabulary:
+		//   (ex:s, ex:p, ex:o1)
+		//   (ex:s, ex:p, ex:o2)
+		// The corresponding vocabulary mapping defines that the URI ex:s in the local
+		// vocabulary is owl:sameAs the URI ex:a in the global vocabulary. Then, the test
+		// checks that a request with the triple pattern (ex:a, ex:p, ?v) results in two solution
+		// mappings, one for each of the triples of the simulated server.
+
 		//Query
 		final Node a = NodeFactory.createURI("http://example.org/a");
 		final Node p = NodeFactory.createURI("http://example.org/p");
