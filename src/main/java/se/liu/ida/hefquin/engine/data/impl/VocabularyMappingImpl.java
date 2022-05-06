@@ -458,15 +458,11 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	
 	protected Set<Triple> translateSubjectFromLocal(final Triple t){
 		final Set<Triple> results = new HashSet<>();
-		if (t.getSubject().isVariable()) {
-			results.add(t);
-			return results;
-		}
 
-		final Set<Triple> mappings = getMappings( t.getSubject(), Node.ANY, Node.ANY );
+		final Set<Triple> mappings = getMappings(Node.ANY, Node.ANY, t.getSubject() );
 		for (final Triple m : mappings) {
 			if ( m.getPredicate().equals(OWL.sameAs.asNode()) ) {
-				final Triple translation = new Triple(m.getObject(), t.getPredicate(), t.getObject());
+				final Triple translation = new Triple(m.getSubject(), t.getPredicate(), t.getObject());
 				results.add(translation);
 			} else {
 				throw new IllegalArgumentException(m.getPredicate().getURI());
@@ -482,17 +478,13 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	protected Set<Triple> translateObjectFromLocal(final Triple t){
 		
 		final Set<Triple> results = new HashSet<>();
-		if(t.getObject().isVariable()) {
-			results.add(t);
-			return results;
-		}
 
 		final Set<Triple> mappings = getMappings( Node.ANY, Node.ANY, t.getObject() );
 		for (final Triple m : mappings) {
 			final Node predicate = m.getPredicate();
 
 			if(predicate.equals(OWL.sameAs.asNode())) {
-				final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getObject());
+				final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getSubject());
 				results.add(translation);
 			} else {
 				if (!t.getPredicate().isURI()) {
@@ -503,7 +495,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					}
 				}
 				if (predicate.equals(OWL.equivalentClass.asNode())) {
-					final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getObject());
+					final Triple translation = new Triple(t.getSubject(), t.getPredicate(), m.getSubject());
 					results.add(translation);	
 					
 				} else if (predicate.equals(RDF.first.asNode())) {
@@ -536,10 +528,6 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	protected Set<se.liu.ida.hefquin.engine.data.Triple> translatePredicateFromLocal(final Triple t){
 		
 		final Set<se.liu.ida.hefquin.engine.data.Triple> results = new HashSet<>();
-		if(t.getPredicate().isVariable()) {
-			results.add(new TripleImpl(t));
-			return results;
-		}
 
 		final Set<Triple> mappings = getMappings( Node.ANY, Node.ANY, t.getPredicate() );
 
@@ -547,11 +535,11 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			final Node predicate = m.getPredicate();
 			
 			if (predicate.equals(OWL.inverseOf.asNode())){
-				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getObject(), m.getObject(), t.getSubject());
+				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getObject(), m.getSubject(), t.getSubject());
 				results.add(translation);	
 				
 			} else if (predicate.equals(OWL.equivalentProperty.asNode())){
-				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getSubject(), m.getObject(), t.getObject());
+				final se.liu.ida.hefquin.engine.data.Triple translation = new TripleImpl(t.getSubject(), m.getSubject(), t.getObject());
 				results.add(translation);	
 				
 			} else if (predicate.equals(RDF.first.asNode())) {

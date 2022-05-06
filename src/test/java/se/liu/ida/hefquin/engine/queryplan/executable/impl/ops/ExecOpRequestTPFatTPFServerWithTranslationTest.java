@@ -90,6 +90,51 @@ public class ExecOpRequestTPFatTPFServerWithTranslationTest extends ExecOpTestBa
 		
 		assertEquals(expectedResults, results);
 	}
+	
+	@Test
+	public void testSolutionTranslationForTPFRequest() throws ExecOpExecutionException {
+		// This test simulates a TPF server with the following triple that use a local vocabulary:
+		//   (ex:s, ex:p, ex:o)
+		// The corresponding vocabulary mapping defines that the URI ex:s in the local
+		// vocabulary is owl:sameAs the URI ex:a in the global vocabulary. Then, the test
+		// checks that a request with the triple pattern (ex:?v, ex:p, o) results in one solution
+		// mapping, corresponding to the triple of the simulated server, expressed
+		// in the global vocabulary
+
+		//Query
+		final Var v = Var.alloc("v");
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node o = NodeFactory.createURI("http://example.org/o");
+		final TriplePattern tp = new TriplePatternImpl(v, p, o);
+		
+		//Data
+		final Graph g = GraphFactory.createDefaultGraph();
+		final Node s = NodeFactory.createURI("http://example.org/s");
+		g.add(s,p,o);
+
+		
+		final ExecOpRequestTPFatTPFServerWithTranslation op = new ExecOpRequestTPFatTPFServerWithTranslation(
+				new TriplePatternRequestImpl(tp),
+				new TPFServerWithVocabularyMappingForTest(g, createVocabularyMappingForTests()) );
+		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+
+		op.execute( sink, createExecContextForTests() );
+		
+		//Expected results
+		final Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+
+		//Results
+		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();		
+		final Set<SolutionMapping> results = new HashSet<>();
+		while (it.hasNext()) {
+			results.add(it.next());
+		}
+		
+		assertEquals(expectedResults, results);
+	}
 
 
 	public static ExecutionContext createExecContextForTests() {

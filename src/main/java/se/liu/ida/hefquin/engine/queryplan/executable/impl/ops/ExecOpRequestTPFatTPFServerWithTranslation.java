@@ -85,7 +85,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 		final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, newReq, fm);
 		final List<Triple> tripleTranslation = new ArrayList<>();
 		for(final Triple i : res.getPayload()) {
-			tripleTranslation.addAll(translateResultTriple(i, newReq.getQueryPattern()));
+			tripleTranslation.add(i);
 		}
 		return tripleTranslation;
 	}
