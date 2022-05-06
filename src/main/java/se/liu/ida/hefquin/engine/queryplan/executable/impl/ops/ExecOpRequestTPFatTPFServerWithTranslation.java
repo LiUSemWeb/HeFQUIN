@@ -58,23 +58,19 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 	{
 		final Date startTime = new Date();
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
-		final List<Triple> resList = new ArrayList<>();
+		final List<Triple> resList;
 		if(reqTranslation instanceof TriplePattern) {
-			resList.addAll(handleTriplePattern((TriplePattern) reqTranslation, fedAccessMgr));
+			resList = handleTriplePattern((TriplePattern) reqTranslation, fedAccessMgr);
 		}
-		
 		else if(reqTranslation instanceof SPARQLUnionPattern) {
-			resList.addAll(handleUnionPattern(((SPARQLUnionPattern) reqTranslation), fedAccessMgr));
+			resList = handleUnionPattern(((SPARQLUnionPattern) reqTranslation), fedAccessMgr);
 		}
-		
 		else if(reqTranslation instanceof SPARQLGroupPattern) {
-			resList.addAll(handleGroupPattern(((SPARQLGroupPattern) reqTranslation), fedAccessMgr));
+			resList = handleGroupPattern(((SPARQLGroupPattern) reqTranslation), fedAccessMgr);
 		}
-		
 		else if(reqTranslation instanceof BGP) {
-			resList.addAll(handleBGP((BGP) reqTranslation, fedAccessMgr));
+			resList = handleBGP((BGP) reqTranslation, fedAccessMgr);
 		}
-		
 		else {
 			throw new FederationAccessException(reqTranslation.toString(), req, fm);
 		}
