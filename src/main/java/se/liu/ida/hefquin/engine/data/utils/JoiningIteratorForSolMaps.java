@@ -9,6 +9,9 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  * This iterator enumerates the result of joining two collections of solution
  * mappings. The current implementation of this iterator performs a nested
  * loops join.
+ *
+ * If you need the join result materialized, use
+ * {@link SolutionMappingUtils#nestedLoopJoin(Iterable, Iterable)} instead.
  */
 public class JoiningIteratorForSolMaps implements Iterator<SolutionMapping>
 {
