@@ -129,6 +129,21 @@ public class SolutionMappingUtils
 	}
 
 	/**
+	 * Performs a nested-loop join between two Solution Mapping iterables
+	 */
+	public static Set<SolutionMapping> nestedLoopJoin( final Iterable<SolutionMapping> i1,
+													   final Iterable<SolutionMapping> i2) {
+		final Set<SolutionMapping> result = new HashSet<>();
+		for ( final SolutionMapping m1 : i1 ) {
+			for ( final SolutionMapping m2 : i2 ) {
+				if ( compatible(m1, m2) )
+					result.add(merge(m1, m2));
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Restricts the given Jena binding to the given set of variables.
 	 * Hence, the returned binding will be compatible to the solution
 	 * mapping given as input, but it will be defined only for the variables
