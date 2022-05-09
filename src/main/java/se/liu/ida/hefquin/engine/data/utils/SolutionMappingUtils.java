@@ -129,7 +129,11 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Performs a nested-loop join between two Solution Mapping iterables
+	 * Performs a nested-loop join between two Solution Mapping iterables.
+	 *
+	 * If you do not need the join result materialized (as done by this function),
+	 * it is better to use {@link JoiningIterableForSolMaps} instead (or the
+	 * iterator version: {@link JoiningIteratorForSolMaps}).
 	 */
 	public static Set<SolutionMapping> nestedLoopJoin( final Iterable<SolutionMapping> i1,
 													   final Iterable<SolutionMapping> i2) {
