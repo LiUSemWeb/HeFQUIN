@@ -2,8 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
@@ -24,7 +23,7 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
     public void testLocalEndpoint() throws FederationAccessException {
         if (!skipLocalGraphQLTests) {
             TreeSet<String> fieldPaths = new TreeSet<>();
-            Map<String, String> parameterDefinitions = new HashMap<>();
+            TreeMap<String, String> parameterDefinitions = new TreeMap<>();
             JsonObject parameterValues = new JsonObject();
 
             fieldPaths.add("author(id:$id)/name");
