@@ -276,33 +276,6 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			} else if (predicate.equals(OWL.equivalentProperty.asNode())){
 				final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), m.getObject(), jenaTP.getObject());
 				resultsList.add(translation);	
-				
-			} else if (predicate.equals(OWL.unionOf.asNode())) {
-				final SPARQLUnionPatternImpl union = new SPARQLUnionPatternImpl();
-				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
-				while(true) {
-					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), mapping.object1,  jenaTP.getObject());
-					union.addSubPattern(translation);
-					if (mapping.object2.equals(RDF.nil.asNode())) {
-						break;
-					}
-					mapping = getComplexMapping(mapping.object2);
-				}
-				resultsList.add(union);
-				
-			} else if (predicate.equals(OWL.intersectionOf.asNode())) {
-				final BGPImpl intersection = new BGPImpl();
-				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
-				while(true) {
-					final TriplePattern translation = new TriplePatternImpl(jenaTP.getSubject(), mapping.object1,  jenaTP.getObject());
-					intersection.addTriplePattern(translation);
-					if (mapping.object2.equals(RDF.nil.asNode())) {
-						break;
-					}
-					mapping = getComplexMapping(mapping.object2);
-				}
-				resultsList.add(intersection);
-				
 			} else {
 				throw new IllegalArgumentException( predicate.toString() );
 			}
