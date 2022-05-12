@@ -44,7 +44,7 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 			reqTranslation = handleUnion((SPARQLUnionPattern) query);
 		}
 		else {
-			throw new FederationAccessException(query.toString(), req, fm);
+			throw new FederationAccessException("Unsupported type of pattern: " + query.getClass().getName(), req, fm);
 		}
 		
 		final SPARQLRequest newReq = new SPARQLRequestImpl(reqTranslation);
