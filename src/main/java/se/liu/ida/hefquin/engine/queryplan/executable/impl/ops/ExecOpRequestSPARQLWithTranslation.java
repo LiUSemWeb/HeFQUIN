@@ -44,8 +44,8 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 	@Override
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
 	{
-		for ( SolutionMapping sm : response.getSolutionMappings() ) {
-			for (SolutionMapping smTranslated : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
+		for ( final SolutionMapping sm : response.getSolutionMappings() ) {
+			for ( final SolutionMapping smTranslated : fm.getVocabularyMapping().translateSolutionMapping(sm) ) {
 				sink.send( smTranslated );
 			}
 		}
@@ -54,21 +54,25 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 	@Override
 	protected SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr ) throws FederationAccessException {
 		final SPARQLGraphPattern query = req.getQueryPattern();
-		SPARQLGraphPattern reqTranslation = null;
+		final SPARQLGraphPattern reqTranslation;
 		if (query instanceof TriplePattern) {
 			reqTranslation = handleTriplePattern((TriplePattern) query);	
 		} 
 		else if (query instanceof BGP) {
 			reqTranslation = handleBGP((BGP) query);
-		} else if (query instanceof SPARQLGroupPattern) {
+		}
+		else if (query instanceof SPARQLGroupPattern) {
 			reqTranslation = handleGroup((SPARQLGroupPattern) query);
-		} else if (query instanceof SPARQLUnionPattern) {
+		}
+		else if (query instanceof SPARQLUnionPattern) {
 			reqTranslation = handleUnion((SPARQLUnionPattern) query);
-		} else if (query instanceof GenericSPARQLGraphPatternImpl1) {
-			Op gp = ((GenericSPARQLGraphPatternImpl1) query).asJenaOp();
+		}
+		else if (query instanceof GenericSPARQLGraphPatternImpl1) {
+			final Op gp = ((GenericSPARQLGraphPatternImpl1) query).asJenaOp();
 			reqTranslation = handleOp(gp);		
-		} else if (query instanceof GenericSPARQLGraphPatternImpl2) {
-			Op gp = ((GenericSPARQLGraphPatternImpl2) query).asJenaOp();
+		}
+		else if (query instanceof GenericSPARQLGraphPatternImpl2) {
+			final Op gp = ((GenericSPARQLGraphPatternImpl2) query).asJenaOp();
 			reqTranslation = handleOp(gp);	
 		}
 		else {
@@ -81,11 +85,11 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 	
 	
 	
-	protected SPARQLGraphPattern handleTriplePattern(TriplePattern tp) {
+	protected SPARQLGraphPattern handleTriplePattern( final TriplePattern tp ) {
 		return fm.getVocabularyMapping().translateTriplePattern((TriplePattern) tp);
 	}
 	
-	protected SPARQLGraphPattern handleBGP(BGP bgp) {
+	protected SPARQLGraphPattern handleBGP( final BGP bgp ) {
 		final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
 		final Set<TriplePattern> tpSubPatterns = new HashSet<>();
 		boolean allSubPatternsAreTriplePatterns = true; // assume yes
@@ -110,7 +114,7 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 		}
 	}
 	
-	protected SPARQLGraphPattern handleUnion(SPARQLUnionPattern up) throws FederationAccessException {
+	protected SPARQLGraphPattern handleUnion( final SPARQLUnionPattern up ) throws FederationAccessException {
 		final SPARQLUnionPatternImpl unionTranslation = new SPARQLUnionPatternImpl();
 		for (final SPARQLGraphPattern i : up.getSubPatterns()) {
 			if (i instanceof TriplePattern) {
@@ -122,14 +126,14 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 			} else if (i instanceof SPARQLGroupPattern) {
 				unionTranslation.addSubPattern(handleGroup((SPARQLGroupPattern) i));
 			} else {
-				throw new FederationAccessException(i.toString(), req, fm);
+				throw new FederationAccessException("Unsupported type of pattern: " + i.getClass().getName(), req, fm);
 			}
 		}
 		return unionTranslation;
 	}
 	
-	protected SPARQLGraphPattern handleGroup(SPARQLGroupPattern gp) throws FederationAccessException {
-		List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
+	protected SPARQLGraphPattern handleGroup( final SPARQLGroupPattern gp ) throws FederationAccessException {
+		final List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
 		for (final SPARQLGraphPattern i : gp.getSubPatterns()) {
 			if (i instanceof TriplePattern) {
 				subPatterns.add(handleTriplePattern((TriplePattern) i));
@@ -140,14 +144,14 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 			} else if (i instanceof SPARQLGroupPattern) {
 				subPatterns.add(handleGroup((SPARQLGroupPattern) i));
 			} else {
-				throw new FederationAccessException(i.toString(), req, fm);
+				throw new FederationAccessException("Unsupported type of pattern: " + i.getClass().getName(), req, fm);
 			}
 		}
 		
 		return new SPARQLGroupPatternImpl(subPatterns);
 	}
 	
-	protected SPARQLGraphPattern handleOp(Op op) throws FederationAccessException {
+	protected SPARQLGraphPattern handleOp( final Op op ) throws FederationAccessException {
 		if (op instanceof OpJoin) {
 			return handleJoin((OpJoin) op);
 		} else if (op instanceof OpUnion) {
@@ -163,20 +167,20 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 		}
 	}
 	
-	protected SPARQLGraphPattern handleJoin(OpJoin oj) throws FederationAccessException {
-		List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
-		Op left = oj.getLeft();
+	protected SPARQLGraphPattern handleJoin( final OpJoin oj ) throws FederationAccessException {
+		final List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
+		final Op left = oj.getLeft();
 		subPatterns.add(handleOp(left));
-		Op right = oj.getRight();
+		final Op right = oj.getRight();
 		subPatterns.add(handleOp(right));
 		return new SPARQLGroupPatternImpl(subPatterns);
 	}
 	
-	protected SPARQLGraphPattern handleOpUnion(OpUnion ou) throws FederationAccessException {
+	protected SPARQLGraphPattern handleOpUnion( final OpUnion ou ) throws FederationAccessException {
 		final SPARQLUnionPatternImpl unionTranslation = new SPARQLUnionPatternImpl();
-		Op left = ou.getLeft();
+		final Op left = ou.getLeft();
 		unionTranslation.addSubPattern(handleOp(left));
-		Op right = ou.getRight();
+		final Op right = ou.getRight();
 		unionTranslation.addSubPattern(handleOp(right));
 		return unionTranslation;
 	}
@@ -186,13 +190,13 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 		return null;
 	}
 	
-	protected SPARQLGraphPattern handleOpBGP(OpBGP obgp) throws FederationAccessException {	
+	protected SPARQLGraphPattern handleOpBGP( final OpBGP obgp ) throws FederationAccessException {	
 		final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
 		final Set<TriplePattern> tpSubPatterns = new HashSet<>();
 		boolean allSubPatternsAreTriplePatterns = true; // assume yes
 
 		for( final Triple i : obgp.getPattern().getList() ) {
-			TriplePattern itp = new TriplePatternImpl(i);
+			final TriplePattern itp = new TriplePatternImpl(i);
 			final SPARQLGraphPattern iTranslation = fm.getVocabularyMapping().translateTriplePattern(itp); 
 			allSubPatterns.add(iTranslation);
 
@@ -212,8 +216,8 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 		}
 	}
 	
-	protected SPARQLGraphPattern handleOpSequence(OpSequence os) throws FederationAccessException {
-		List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
+	protected SPARQLGraphPattern handleOpSequence( final OpSequence os ) throws FederationAccessException {
+		final List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
 		for( final Op i : os.getElements()) {
 			subPatterns.add(handleOp(i));
 		}
