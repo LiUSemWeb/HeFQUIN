@@ -66,7 +66,12 @@ public class PhysicalPlanFactory
 	 */
 	public static <R extends DataRetrievalRequest, M extends FederationMember>
 	PhysicalPlan createPlanWithRequest( final LogicalOpRequest<R,M> lop ) {
-		final NullaryPhysicalOp pop = new PhysicalOpRequest<>(lop);
+		final NullaryPhysicalOp pop;
+		if ( lop.getFederationMember().getVocabularyMapping() != null )
+			pop = new PhysicalOpRequestWithTranslation<>(lop);
+		else
+			pop = new PhysicalOpRequest<>(lop);
+
 		return createPlan(pop);
 	}
 
@@ -430,7 +435,35 @@ public class PhysicalPlanFactory
 		}
 	}
 
-	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest req, final PhysicalPlan subplan, final List<PhysicalPlan> plans ) {
+	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest<?, ?> req,
+	                                                                   final PhysicalPlan subplan,
+	                                                                   final List<PhysicalPlan> plans ) {
+		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
+			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+
+			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
+			plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+
+		}
+		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
+			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+
+			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();
+			if (fm instanceof SPARQLEndpoint) {
+				plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
+				plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
+				plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+			}
+		}
+		return plans;
+	}
+
+	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequestWithTranslation<?, ?> req,
+	                                                                   final PhysicalPlan subplan,
+	                                                                   final List<PhysicalPlan> plans ) {
 		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
 			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
 

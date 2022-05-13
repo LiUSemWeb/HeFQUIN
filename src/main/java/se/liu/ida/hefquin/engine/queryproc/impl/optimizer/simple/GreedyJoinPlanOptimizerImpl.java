@@ -8,6 +8,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
@@ -109,12 +110,21 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 			for ( int i = 0; i < subplans.size(); ++i ) {
 				final List<PhysicalPlan> plans = new ArrayList<>();
 				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
+
 				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) currentPlan.getRootOperator(), subplans.get(i), plans );
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i), plans );
 				}
+				else if ( currentPlan.getRootOperator() instanceof PhysicalOpRequestWithTranslation ){
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) currentPlan.getRootOperator(), subplans.get(i), plans );
+				}
+
 				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) subplans.get(i).getRootOperator(), currentPlan, plans );
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan, plans );
 				}
+				else if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
+					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) subplans.get(i).getRootOperator(), currentPlan, plans );
+				}
+
 				nextPossiblePlans.put(i, plans);
 			}
 

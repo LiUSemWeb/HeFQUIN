@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQLWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
