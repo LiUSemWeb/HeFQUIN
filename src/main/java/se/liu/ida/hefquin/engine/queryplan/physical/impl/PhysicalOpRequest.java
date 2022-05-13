@@ -44,9 +44,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		final ReqType req = lop.getRequest();
 		final MemberType fm = lop.getFederationMember();
 		if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
-			if(fm.getVocabularyMapping() != null) {
-				return new ExecOpRequestSPARQLWithTranslation( (SPARQLRequest) req, (SPARQLEndpoint) fm );
-			}
 			return new ExecOpRequestSPARQL( (SPARQLRequest) req, (SPARQLEndpoint) fm );
 		}
 		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {

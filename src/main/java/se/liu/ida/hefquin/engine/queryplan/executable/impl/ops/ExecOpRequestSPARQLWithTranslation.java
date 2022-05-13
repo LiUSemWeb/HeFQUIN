@@ -156,8 +156,11 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 			return handleJoin((OpJoin) op);
 		} else if (op instanceof OpUnion) {
 			return handleOpUnion((OpUnion) op);
+			//TODO: Implement handleOpFilter
+			/*
 		} else if (op instanceof OpFilter) {
 			return handleOpFilter((OpFilter) op);
+			*/
 		} else if (op instanceof OpBGP) {
 			return handleOpBGP((OpBGP) op);
 		} else if (op instanceof OpSequence) {
@@ -183,11 +186,6 @@ public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequ
 		final Op right = ou.getRight();
 		unionTranslation.addSubPattern(handleOp(right));
 		return unionTranslation;
-	}
-	
-	//TODO: Handle OpFilter
-	protected SPARQLGraphPattern handleOpFilter(OpFilter of) throws FederationAccessException {
-		return null;
 	}
 	
 	protected SPARQLGraphPattern handleOpBGP( final OpBGP obgp ) throws FederationAccessException {	
