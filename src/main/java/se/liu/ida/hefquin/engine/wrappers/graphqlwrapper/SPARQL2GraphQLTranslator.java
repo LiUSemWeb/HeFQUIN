@@ -11,5 +11,5 @@ public interface SPARQL2GraphQLTranslator {
     /**
      * Translates @param bgp into a GraphQL query using information from @param config
      */
-    public GraphQLQuery translateBGP(final BGP bgp, final RdfViewConfiguration config);
+    public GraphQLQuery translateBGP(final BGP bgp, final GraphQL2RDFConfiguration config);
 }

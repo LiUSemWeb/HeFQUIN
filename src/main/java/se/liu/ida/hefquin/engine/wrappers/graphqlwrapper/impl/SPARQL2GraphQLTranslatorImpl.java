@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonBoolean;
@@ -19,21 +18,24 @@ import org.apache.jena.graph.impl.LiteralLabel;
 
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.RdfViewConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.SPARQL2GraphQLTranslator;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.CyclicFinder;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
     @Override
-    public GraphQLQuery translateBGP(final BGP bgp, final RdfViewConfiguration config) {
+    public GraphQLQuery translateBGP(final BGP bgp, final GraphQL2RDFConfiguration config) {
 
         // Initialize necessary data structures
-        Map<Node, Set<TP>> subgraphPatterns = new HashMap<>();
-        Map<Integer, Node> connectors = new HashMap<>();
+        final Map<Node, Set<TP>> subgraphPatterns = new HashMap<>();
+        final Map<Integer, Node> connectors = new HashMap<>();
 
         // Partition BGP into SGPs and give unique integer id to TPs
         final Set<? extends TriplePattern> bgpSet = bgp.getTriplePatterns();
@@ -45,7 +47,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                 subgraphPatterns.get(subject).add(wrappedTriplePattern);
             }
             else{
-                Set<TP> sgp = new HashSet<>();
+                final Set<TP> sgp = new HashSet<>();
                 sgp.add(wrappedTriplePattern);
                 subgraphPatterns.put(subject, sgp);
             }
@@ -53,39 +55,38 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         }
 
         // Check for dependencies between the SGPs and create connectors
-        Map<Node,SgpNode> sgpNodes = new HashMap<>();
+        final Map<Node,SGPNode> sgpNodes = new HashMap<>();
         for(final Node subject : subgraphPatterns.keySet()){
             final Set<TP> sgp = subgraphPatterns.get(subject);
             for(final TP tp : sgp){
-                final Node object = tp.getTp().asJenaTriple().getObject();
-                if(subgraphPatterns.containsKey(object) && object != subject){
+                final Node object = tp.getTriplePattern().asJenaTriple().getObject();
+                if(subgraphPatterns.containsKey(object) && ! object.equals(subject)){
                     if(!sgpNodes.containsKey(subject)){
-                        sgpNodes.put(subject,new SgpNode());
+                        sgpNodes.put(subject,new SGPNode());
                     }
                     if(!sgpNodes.containsKey(object)){
-                        sgpNodes.put(object,new SgpNode());
+                        sgpNodes.put(object,new SGPNode());
                     }
-                    SgpNode subjectSgpNode = sgpNodes.get(subject);
-                    SgpNode objectSgpNode = sgpNodes.get(object);
-                    subjectSgpNode.adjacentNodes.put(tp.getId(),objectSgpNode);
+                    final SGPNode subjectSgpNode = sgpNodes.get(subject);
+                    final SGPNode objectSgpNode = sgpNodes.get(object);
+                    subjectSgpNode.addAdjacentNode(tp.getId(),objectSgpNode);
                     connectors.put(tp.getId(), object);
                 }
             }
         }
         // Remove all potential cyclic connector bindings
-        Set<Integer> connectorsToBeRemoved = new HashSet<>();
-        determineCyclicConnectors(sgpNodes, connectorsToBeRemoved);
-        for(int i : connectorsToBeRemoved){
+        final Set<Integer> connectorsToBeRemoved = CyclicFinder.determineCyclicConnectors(sgpNodes);
+        for(final int i : connectorsToBeRemoved){
             connectors.remove(i);
         }
 
         // Creating necessary variables for the GraphQL query
-        TreeSet<String> fieldPaths = new TreeSet<>();
-        JsonObject parameterValues = new JsonObject();
-        TreeMap<String, String> parameterDefinitions = new TreeMap<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final JsonObject parameterValues = new JsonObject();
+        final Map<String, String> parameterDefinitions = new HashMap<>();
 
         // Get all SGP without a connector
-        Map<Node,String> withoutConnector = new HashMap<>();
+        final Map<Node,String> withoutConnector = new HashMap<>();
         boolean isDeterminable = true;
         for(final Node n : subgraphPatterns.keySet()){
             final String sgpType = determineSgpType(subgraphPatterns.get(n),config);
@@ -115,9 +116,9 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                     final GraphQLEntrypoint e = config.getEntrypoint(sgpType,GraphQLEntrypointType.SINGLE);
                     final String entrypointAlias = "ep_single" + entrypointCounter + ":" + e.getFieldName();
                     currentPath += entrypointAlias + "(";
-                    final TreeMap<String,String> entrypointParamDefs = e.getParameterDefinitions();
+                    final Map<String,String> entrypointParamDefs = e.getParameterDefinitions();
 
-                    for(final String paramName : entrypointParamDefs.keySet()){
+                    for(final String paramName : new TreeSet<String>(entrypointParamDefs.keySet())){
                         final String variableName = "var"+variableCounter;
                         currentPath += paramName + ":$" + variableName + ",";
                         parameterDefinitions.put(variableName,entrypointParamDefs.get(paramName));
@@ -139,9 +140,9 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                     final GraphQLEntrypoint e = config.getEntrypoint(sgpType,GraphQLEntrypointType.FILTERED);
                     final String entrypointAlias = "ep_filtered" + entrypointCounter + ":" + e.getFieldName();
                     currentPath += entrypointAlias + "(";
-                    final TreeMap<String,String> entrypointParamDefs = e.getParameterDefinitions();
+                    final Map<String,String> entrypointParamDefs = e.getParameterDefinitions();
 
-                    for(final String paramName : entrypointParamDefs.keySet()){
+                    for(final String paramName : new TreeSet<String>(entrypointParamDefs.keySet())){
                         final String variableName = "var"+variableCounter;
                         currentPath += paramName + ":$" + variableName + ",";
                         parameterDefinitions.put(variableName,entrypointParamDefs.get(paramName));
@@ -173,44 +174,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         return new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
     }
 
-    /**
-     * Helper function used to call the DFS function for each SgpNode
-     */
-    protected void determineCyclicConnectors(Map<Node,SgpNode> sgpNodes, Set<Integer> removeConnectors){
-        for(SgpNode n : sgpNodes.values()){
-            DFS(n,removeConnectors);
-        }
-    }
-
-    /**
-     * DFS algorithm function to determine which connectors are to be removed later
-     */
-    protected boolean DFS(SgpNode node, Set<Integer> removeConnectors){
-        if(node.finished){
-            return false;
-        }
-        if(node.visited){
-            return true;
-        }
-        node.visited = true;
-        for(int connectorId : node.adjacentNodes.keySet()){
-            final boolean visited = DFS(node.adjacentNodes.get(connectorId), removeConnectors);
-
-            if(visited){
-                removeConnectors.add(connectorId);
-            }
-        }
-
-        node.finished = true;
-
-        return false;
-    }
 
     /**
      * Recursive function used to add fields from the TPs in a given SGP
      */
-    protected void addSgp(TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
-            final RdfViewConfiguration config, final Node subgraphNode, final String currentPath, final String sgpType){
+    protected void addSgp(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
+            final GraphQL2RDFConfiguration config, final Node subgraphNode, final String currentPath, final String sgpType){
 
         // Necessary id field present in all objects used to indentify the GraphQL object
         fieldPaths.add(currentPath + "id_" + sgpType + ":id");
@@ -226,20 +195,20 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
         // Add fields that has nested objects to other SGPs using recursion
         for(final TP currentTP : tpConnectors){
-            final Triple t = currentTP.getTp().asJenaTriple();
+            final Triple t = currentTP.getTriplePattern().asJenaTriple();
             final Node nestedSubgraphNode = connectors.get(currentTP.getId());
             final Node predicate = t.getPredicate();
 
             if(predicate.isVariable()){
                 // If the current TP predicate is a variable we need to add everything
-                final Set<String> allObjectURI = config.getObjectURIs(sgpType);
+                final Set<String> allObjectURI = config.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT);
 
                 for(final String uri : allObjectURI){
                     addNodeField(fieldPaths,subgraphPatterns,connectors,config,nestedSubgraphNode,currentPath,sgpType,uri);
                 }
 
             }
-            else if(predicate.isURI() && config.containsPropertyURI(sgpType,predicate.getURI())){
+            else if(predicate.isURI() && config.containsPropertyURI(predicate.getURI())){
                 // If the current TP predicate is a URI, add field onl
                 addNodeField(fieldPaths,subgraphPatterns,connectors,config,nestedSubgraphNode,
                     currentPath,sgpType,predicate.getURI());
@@ -249,8 +218,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         // Add fields that doesn't link to another SGP, 
         if(addAllFields){
             // If variable predicate exist in the current SGP, then query for everything
-            final Set<String> allObjectURI = config.getObjectURIs(sgpType);
-            final Set<String> allScalarURI = config.getScalarURIs(sgpType);
+            final Set<String> allObjectURI = config.getPropertyURIs(sgpType,GraphQLFieldType.OBJECT);
+            final Set<String> allScalarURI = config.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR);
 
             for(final String uri : allObjectURI){
                 addEmptyNodeField(fieldPaths,subgraphPatterns,connectors,config,currentPath,sgpType,uri);
@@ -264,11 +233,11 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         else{
             // If no variable predicate exist, only the necessary fields from the SGP have to be added.
             for(final TP t : subgraphPatterns.get(subgraphNode)){
-                final Node predicate = t.getTp().asJenaTriple().getPredicate();
-                if(predicate.isURI() && config.containsPropertyURI(sgpType,predicate.getURI())){
-                    final String withoutPrefix = removePrefix(predicate.getURI(),config);
-                    final String propertyName = removeSuffix(withoutPrefix);
-                    if(config.isObjectProperty(sgpType,propertyName)){
+                final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
+                if(predicate.isURI() && config.containsPropertyURI(predicate.getURI())){
+                    final String withoutPrefix = config.removePropertyPrefix(predicate.getURI());
+                    final String propertyName = config.removePropertySuffix(withoutPrefix);
+                    if(config.getPropertyFieldType(sgpType,propertyName) == GraphQLFieldType.OBJECT){
                         addEmptyNodeField(fieldPaths,subgraphPatterns,connectors,config,
                             currentPath,sgpType,predicate.getURI());
                     }
@@ -284,12 +253,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Helper function to add a field to the query that represents a nested object. Fields in that nested 
      * object are added recursively through addSgp
      */
-    protected void addNodeField(TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
-            final RdfViewConfiguration config, final Node nestedSubgraphNode, final String currentPath, final String sgpType, 
+    protected void addNodeField(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
+            final GraphQL2RDFConfiguration config, final Node nestedSubgraphNode, final String currentPath, final String sgpType, 
             final String predicateURI){
 
-        final String alias = removePrefix(predicateURI,config);
-        final String propertyName = removeSuffix(alias);
+        final String alias = config.removePropertyPrefix(predicateURI);
+        final String propertyName = config.removePropertySuffix(alias);
         final String fieldName = "node_" + alias + ":" + propertyName;
         final String newPath = currentPath + fieldName + "/";
         final String nestedType = config.getPropertyValueType(sgpType, propertyName);
@@ -301,11 +270,11 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Helper function to add a field to the query that represents a nested object that only needs an id field
      */
-    protected void addEmptyNodeField(TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
-            final RdfViewConfiguration config, final String currentPath, final String sgpType, 
+    protected void addEmptyNodeField(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors,
+            final GraphQL2RDFConfiguration config, final String currentPath, final String sgpType, 
             final String predicateURI){
-        final String alias = removePrefix(predicateURI,config);
-        final String propertyName = removeSuffix(alias);
+        final String alias = config.removePropertyPrefix(predicateURI);
+        final String propertyName = config.removePropertySuffix(alias);
         final String fieldName = "node_" + alias + ":" + propertyName;
         final String newPath = currentPath + fieldName + "/";
         final String nestedType = config.getPropertyValueType(sgpType, propertyName);
@@ -315,10 +284,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Helper function to add a field to the query that represents a scalar value
      */
-    protected void addScalarField(TreeSet<String> fieldPaths, final RdfViewConfiguration config, 
+    protected void addScalarField(final TreeSet<String> fieldPaths, final GraphQL2RDFConfiguration config, 
             final String currentPath, final String predicateURI){
-        final String alias = removePrefix(predicateURI,config);
-        final String propertyName = removeSuffix(alias);
+        final String alias = config.removePropertyPrefix(predicateURI);
+        final String propertyName = config.removePropertySuffix(alias);
         final String fieldName = "scalar_" + alias + ":" + propertyName;
         fieldPaths.add(currentPath + fieldName);
     }
@@ -326,8 +295,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Materialize the entire view
      */
-    protected void materializeAll(TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
-            final Map<Integer,Node> connectors,final RdfViewConfiguration config){
+    protected void materializeAll(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
+            final Map<Integer,Node> connectors,final GraphQL2RDFConfiguration config){
         
         int entrypointCounter = 0;
         final Set<String> classNames = config.getClasses();
@@ -338,8 +307,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final String currentPath = entrypointAlias + "/";
             fieldPaths.add(currentPath + "id_" + className + ":id");
 
-            final Set<String> allObjectURI = config.getObjectURIs(className);
-            final Set<String> allScalarURI = config.getScalarURIs(className);
+            final Set<String> allObjectURI = config.getPropertyURIs(className,GraphQLFieldType.OBJECT);
+            final Set<String> allScalarURI = config.getPropertyURIs(className,GraphQLFieldType.SCALAR);
 
             for(final String uri : allObjectURI){
                 // Add all fields that nests another object
@@ -356,27 +325,11 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     }
 
     /**
-     * Helper function to remove the prefix and colon from @param uri
-     */
-    protected String removePrefix(final String uri, final RdfViewConfiguration config){
-        final int splitIndex = config.getPropertyPrefix().length();
-        return uri.substring(splitIndex);
-    }
-
-    /**
-     * Helper function to remove the suffix from @param uri
-     */
-    protected String removeSuffix(final String uri){
-        final int splitIndex = uri.lastIndexOf("_of_");
-        return uri.substring(0, splitIndex);
-    }
-
-    /**
      * Helper function which checks if any triple pattern predicate in @param sgp is a variable or blank node, returns true if so
      */
     protected boolean hasVariablePredicate(final Set<TP> sgp){
         for(final TP t : sgp){
-            final Node predicate = t.getTp().asJenaTriple().getPredicate();
+            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
             if(predicate.isVariable()){
                 return true;
             }    
@@ -387,17 +340,15 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Returns the rdfs class @param sgp correponds to. If the type is undeterminable @return null
      */
-    protected String determineSgpType(final Set<TP> sgp, final RdfViewConfiguration config){
+    protected String determineSgpType(final Set<TP> sgp, final GraphQL2RDFConfiguration config){
         for(final TP t : sgp){
-            final Node predicate = t.getTp().asJenaTriple().getPredicate();
-            final Node object = t.getTp().asJenaTriple().getObject();
+            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
+            final Node object = t.getTriplePattern().asJenaTriple().getObject();
 
             if(predicate.isURI() && predicate.getURI().startsWith(config.getPropertyPrefix())){
-                final int splitIndex = predicate.getURI().lastIndexOf('_') + 1;
-                final String sgpType = predicate.getURI().substring(splitIndex);
-                return sgpType;
+                return config.getClassFromPropertyURI(predicate.getURI());
             }
-            else if(predicate.isURI() && predicate.getURI().equals("rdf:type")){
+            else if(predicate.isURI() && predicate.getURI().equals(config.getRDFPrefix() + "type")){
                 if(object.isURI() && object.getURI().startsWith(config.getClassPrefix())){
                     final int splitIndex = config.getClassPrefix().length();
                     final String sgpType = object.getURI().substring(splitIndex);
@@ -413,17 +364,17 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * @return a map consisting of what can be used as parameters from the given @param sgp
      * The predicate from a TP needs to be a property URI and the object needs to be a literal
      */
-    protected final Map<String,LiteralLabel> getSgpParameters(final Set<TP> sgp, final RdfViewConfiguration config){
-        Map<String,LiteralLabel> parameters = new HashMap<>();
+    protected final Map<String,LiteralLabel> getSgpParameters(final Set<TP> sgp, final GraphQL2RDFConfiguration config){
+        final Map<String,LiteralLabel> parameters = new HashMap<>();
         for(final TP t : sgp){
-            final Node predicate = t.getTp().asJenaTriple().getPredicate();
-            final Node object = t.getTp().asJenaTriple().getObject();
+            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
+            final Node object = t.getTriplePattern().asJenaTriple().getObject();
 
             if(predicate.isURI() && predicate.getURI().startsWith(config.getPropertyPrefix())){
                 if(object.isLiteral() && object.getLiteral().isWellFormed()){
                     // Remove prefix and suffix before adding to map
-                    final String s = removePrefix(predicate.toString(),config);
-                    final String parameterName = removeSuffix(s);
+                    final String s = config.removePropertyPrefix(predicate.toString());
+                    final String parameterName = config.removePropertySuffix(s);
                     parameters.put(parameterName,object.getLiteral());
                 }
             }
@@ -431,7 +382,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         return parameters;
     }
 
-
+    /**
+     * If @param checkAll is true then every element in @param entrypointParameter must exist in 
+     * @param sgpParameters . Otherwise a single match is enough. If @param sgpParameters is empty return false.
+     */
     protected boolean hasNecessaryParameters(final Set<String> sgpParameters, final Set<String> entrypointParameters, 
             final boolean checkAll){
         
@@ -456,7 +410,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Utility function used to convert a literal value to a valid jsonvalue
      */
-    protected JsonValue literalToJsonValue(LiteralLabel literal){
+    protected JsonValue literalToJsonValue(final LiteralLabel literal){
         final Class<?> type = literal.getValue().getClass();
 
         if(type.equals(int.class)){
@@ -478,28 +432,19 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      */
     private class TP {
         private final int id;
-        private final TriplePattern tp;
+        private final TriplePattern triplePattern;
 
-        public TP(final int id, final TriplePattern tp) {
+        public TP(final int id, final TriplePattern triplePattern) {
             this.id = id;
-            this.tp = tp;
+            this.triplePattern = triplePattern;
         }
 
         public final int getId() {
             return id;
         }
 
-        public final TriplePattern getTp(){
-            return tp;
+        public final TriplePattern getTriplePattern(){
+            return triplePattern;
         }
-    }
-
-    /**
-     * Helper class representing the nodes used to check for cyclic bindings between SGPs
-     */
-    private class SgpNode {
-        public Map<Integer,SgpNode> adjacentNodes = new HashMap<>();
-        public boolean visited = false;
-        public boolean finished = false;
     }
 }

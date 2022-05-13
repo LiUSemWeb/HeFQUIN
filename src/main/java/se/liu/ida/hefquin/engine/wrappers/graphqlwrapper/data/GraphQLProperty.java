@@ -2,7 +2,10 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data;
 
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 
-public interface GraphQLViewProperty {
+/**
+ * Used to represent information about a field in a GraphQL object
+ */
+public interface GraphQLProperty {
     
     /**
      * @return the name of the property
@@ -15,7 +18,7 @@ public interface GraphQLViewProperty {
     public String getValueType();
 
     /**
-     * @return the field type of the property (SCALAR or OBJECT)
+     * @return the GraphQLFieldType of the property
      */
     public GraphQLFieldType getFieldType();
 }

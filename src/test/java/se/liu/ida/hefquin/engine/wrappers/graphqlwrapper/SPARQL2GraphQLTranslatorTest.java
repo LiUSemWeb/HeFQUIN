@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static java.util.Map.entry;
@@ -23,12 +22,12 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLViewProperty;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLViewPropertyImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.RdfViewConfigurationImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLPropertyImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQL2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SPARQL2GraphQLTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
@@ -36,41 +35,47 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 public class SPARQL2GraphQLTranslatorTest {
     
     // Author properties
-    protected static final GraphQLViewProperty a1 = new GraphQLViewPropertyImpl("id","ID!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty a2 = new GraphQLViewPropertyImpl("name","String!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty a3 = new GraphQLViewPropertyImpl("age","Int!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty a4 = new GraphQLViewPropertyImpl("books","Book",GraphQLFieldType.OBJECT);
+    protected static final GraphQLProperty a1 = new GraphQLPropertyImpl("id","ID!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty a2 = new GraphQLPropertyImpl("name","String!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty a3 = new GraphQLPropertyImpl("age","Int!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty a4 = new GraphQLPropertyImpl("books","Book",GraphQLFieldType.OBJECT);
 
     // Book properties
-    protected static final GraphQLViewProperty b1 = new GraphQLViewPropertyImpl("id","ID!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty b2 = new GraphQLViewPropertyImpl("title","String!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty b3 = new GraphQLViewPropertyImpl("nr_pages","Int!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty b4 = new GraphQLViewPropertyImpl("genre","String",GraphQLFieldType.SCALAR);
-    protected static final GraphQLViewProperty b5 = new GraphQLViewPropertyImpl("authors","Author",GraphQLFieldType.OBJECT);
+    protected static final GraphQLProperty b1 = new GraphQLPropertyImpl("id","ID!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty b2 = new GraphQLPropertyImpl("title","String!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty b3 = new GraphQLPropertyImpl("nr_pages","Int!",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty b4 = new GraphQLPropertyImpl("genre","String",GraphQLFieldType.SCALAR);
+    protected static final GraphQLProperty b5 = new GraphQLPropertyImpl("authors","Author",GraphQLFieldType.OBJECT);
 
     // Parameter definitions for entrypoints
-    protected static final TreeMap<String,String> paramDefs1 = new TreeMap<>(Map.ofEntries(
+    protected static final Map<String,String> paramDefs1 = Map.ofEntries(
         entry("id", "ID!")
-    ));
+    );
 
-    protected static final TreeMap<String,String> paramDefs2 = new TreeMap<>(Map.ofEntries(
+    protected static final Map<String,String> paramDefs2 = Map.ofEntries(
         entry("name","String"),
         entry("age","Int")
-    ));
+    );
 
-    protected static final TreeMap<String,String> paramDefs3 = new TreeMap<>(Map.ofEntries(
+    protected static final Map<String,String> paramDefs3 = Map.ofEntries(
         entry("title","String"),
         entry("nr_pages","Int"),
         entry("genre","Genre")
-    ));
+    );
 
     // query entrypoints
     protected static final GraphQLEntrypoint e1 = new GraphQLEntrypointImpl("author", paramDefs1, "Author");
     protected static final GraphQLEntrypoint e2 = new GraphQLEntrypointImpl("authors", paramDefs2, "Author");
-    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new TreeMap<>(), "Author");
+    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new HashMap<>(), "Author");
     protected static final GraphQLEntrypoint e4 = new GraphQLEntrypointImpl("book", paramDefs1, "Book");
     protected static final GraphQLEntrypoint e5 = new GraphQLEntrypointImpl("books", paramDefs3, "Book");
-    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new TreeMap<>(), "Book");
+    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book");
+
+    // Translator and config
+    protected static final String classPrefix = "http://example.org/c/";
+    protected static final String propertyPrefix = "http://example.org/p/";
+    protected static final SPARQL2GraphQLTranslator translator = new SPARQL2GraphQLTranslatorImpl();
+    protected static final GraphQL2RDFConfiguration config = initializeRDFViewConfig(classPrefix,propertyPrefix);
 
     // Variables nodes
     protected static final Node var1 = NodeFactory.createVariable("author");
@@ -83,18 +88,18 @@ public class SPARQL2GraphQLTranslatorTest {
     protected static final Node var8 = NodeFactory.createVariable("o");
 
     // URI nodes
-    protected static final Node uri1 = NodeFactory.createURI("p:id_of_Author");
-    protected static final Node uri2 = NodeFactory.createURI("p:name_of_Author");
-    protected static final Node uri3 = NodeFactory.createURI("p:age_of_Author");
-    protected static final Node uri4 = NodeFactory.createURI("p:books_of_Author");
-    protected static final Node uri5 = NodeFactory.createURI("p:id_of_Book");
-    protected static final Node uri6 = NodeFactory.createURI("p:title_of_Book");
-    protected static final Node uri7 = NodeFactory.createURI("p:nr_pages_of_Book");
-    protected static final Node uri8 = NodeFactory.createURI("p:genre_of_Book");
-    protected static final Node uri9 = NodeFactory.createURI("p:authors_of_Book");
-    protected static final Node uri10 = NodeFactory.createURI("rdf:type");
-    protected static final Node uri11 = NodeFactory.createURI("c:Author");
-    protected static final Node uri12 = NodeFactory.createURI("c:Book");
+    protected static final Node uri1 = NodeFactory.createURI(propertyPrefix + "id_of_Author");
+    protected static final Node uri2 = NodeFactory.createURI(propertyPrefix +"name_of_Author");
+    protected static final Node uri3 = NodeFactory.createURI(propertyPrefix +"age_of_Author");
+    protected static final Node uri4 = NodeFactory.createURI(propertyPrefix +"books_of_Author");
+    protected static final Node uri5 = NodeFactory.createURI(propertyPrefix +"id_of_Book");
+    protected static final Node uri6 = NodeFactory.createURI(propertyPrefix +"title_of_Book");
+    protected static final Node uri7 = NodeFactory.createURI(propertyPrefix +"nr_pages_of_Book");
+    protected static final Node uri8 = NodeFactory.createURI(propertyPrefix +"genre_of_Book");
+    protected static final Node uri9 = NodeFactory.createURI(propertyPrefix +"authors_of_Book");
+    protected static final Node uri10 = NodeFactory.createURI(config.getRDFPrefix()+"type");
+    protected static final Node uri11 = NodeFactory.createURI(classPrefix + "Author");
+    protected static final Node uri12 = NodeFactory.createURI(classPrefix + "Book");
 
     // Literal nodes
     protected static final Node lit1 = NodeFactory.createLiteral("auth3", XSDBaseStringType.XSDstring);
@@ -103,18 +108,13 @@ public class SPARQL2GraphQLTranslatorTest {
     protected static final Node lit4 = NodeFactory.createLiteral("William Shakespeare", XSDBaseStringType.XSDstring);
     protected static final Node lit5 = NodeFactory.createLiteral("MYSTERY", XSDBaseStringType.XSDstring);
 
-    // Translator and config
-    protected static final SPARQL2GraphQLTranslator translator = new SPARQL2GraphQLTranslatorImpl();
-    protected static final RdfViewConfiguration config = initializeRDFViewConfig();
-
-
     /**
      * Initializes the RDFViewConfiguration
      */
-    protected static final RdfViewConfiguration initializeRDFViewConfig(){
-        Map<String,GraphQLViewProperty> authorProperties = new HashMap<>();
-        Map<String,GraphQLViewProperty> bookProperties = new HashMap<>();
-        Map<String,Map<String,GraphQLViewProperty>> classToProperty = new HashMap<>();
+    protected static final GraphQL2RDFConfiguration initializeRDFViewConfig(final String classPrefix, final String propertyPrefix){
+        Map<String,GraphQLProperty> authorProperties = new HashMap<>();
+        Map<String,GraphQLProperty> bookProperties = new HashMap<>();
+        Map<String,Map<String,GraphQLProperty>> classToProperty = new HashMap<>();
         Map<GraphQLEntrypointType,GraphQLEntrypoint> authorEntrypoints = new HashMap<>();
         Map<GraphQLEntrypointType,GraphQLEntrypoint> bookEntrypoints = new HashMap<>();
         Map<String,Map<GraphQLEntrypointType,GraphQLEntrypoint>> classToEntrypoint = new HashMap<>();
@@ -141,7 +141,7 @@ public class SPARQL2GraphQLTranslatorTest {
 
         classToEntrypoint.put("Author", authorEntrypoints);
         classToEntrypoint.put("Book", bookEntrypoints);
-        return new RdfViewConfigurationImpl(classToProperty, classToEntrypoint);
+        return new GraphQL2RDFConfigurationImpl(classToProperty, classToEntrypoint, classPrefix, propertyPrefix);
     }
 
 
@@ -162,15 +162,15 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_single0:author(id:$var0)/id_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/scalar_title_of_Book:title");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_id_of_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_name_of_Author:name");
-        JsonObject parameterValues = new JsonObject();
+        final JsonObject parameterValues = new JsonObject();
         parameterValues.put("var0", "auth3");
-        TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         parameterDefinitions.put("var0","ID!");
         final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
 
@@ -183,13 +183,13 @@ public class SPARQL2GraphQLTranslatorTest {
         /**
          * ?s ?p ?o .
          */
-        Set<TriplePattern> tps = new HashSet<>();
+        final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var6, var7, var8));
         final BGP bgp = new BGPImpl(tps);
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected Result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_full0:allBooks/id_Book:id");
         fieldPaths.add("ep_full0:allBooks/node_authors_of_Book:authors/id_Author:id");
         fieldPaths.add("ep_full0:allBooks/scalar_genre_of_Book:genre");
@@ -202,7 +202,7 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_full1:allAuthors/scalar_id_of_Author:id");
         fieldPaths.add("ep_full1:allAuthors/scalar_name_of_Author:name");
         final JsonObject parameterValues = new JsonObject();
-        final TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
 
         assertEquals(expectedQuery.toString(), translatedQuery.toString());
@@ -216,7 +216,7 @@ public class SPARQL2GraphQLTranslatorTest {
          * ?author p:books_of_Author ?book .
          * ?book   ?p                ?o .
          */
-        Set<TriplePattern> tps = new HashSet<>();
+        final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var1, uri1, lit1));
         tps.add(new TriplePatternImpl(var1, uri4, var2));
         tps.add(new TriplePatternImpl(var2, var7, var8));
@@ -224,7 +224,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_single0:author(id:$var0)/id_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/node_authors_of_Book:authors/id_Author:id");
@@ -233,9 +233,9 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/scalar_nr_pages_of_Book:nr_pages");
         fieldPaths.add("ep_single0:author(id:$var0)/node_books_of_Author:books/scalar_title_of_Book:title");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_id_of_Author:id");
-        JsonObject parameterValues = new JsonObject();
+        final JsonObject parameterValues = new JsonObject();
         parameterValues.put("var0", "auth3");
-        TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         parameterDefinitions.put("var0","ID!");
         final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
         
@@ -249,21 +249,21 @@ public class SPARQL2GraphQLTranslatorTest {
          * ?s rdf:type c:Author .
          * ?s ?p       ?o .
          */
-        Set<TriplePattern> tps = new HashSet<>();
+        final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var6, uri10, uri11));
         tps.add(new TriplePatternImpl(var6, var7, var8));
         final BGP bgp = new BGPImpl(tps);
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_full0:allAuthors/id_Author:id");
         fieldPaths.add("ep_full0:allAuthors/node_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_full0:allAuthors/scalar_age_of_Author:age");
         fieldPaths.add("ep_full0:allAuthors/scalar_id_of_Author:id");
         fieldPaths.add("ep_full0:allAuthors/scalar_name_of_Author:name");
         final JsonObject parameterValues = new JsonObject();
-        final TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
         
         assertEquals(expectedQuery.toString(), translatedQuery.toString());
@@ -278,7 +278,7 @@ public class SPARQL2GraphQLTranslatorTest {
          * ?book   p:nr_pages_of_Book 39 .
          * ?book   p:authors_of_Book  ?author .
          */
-        Set<TriplePattern> tps = new HashSet<>();
+        final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var1, uri4, var2));
         tps.add(new TriplePatternImpl(var1, uri2, lit4));
         tps.add(new TriplePatternImpl(var2, uri7, lit3));
@@ -287,16 +287,16 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/id_Author:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/node_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/node_books_of_Author:books/node_authors_of_Book:authors/id_Author:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/node_books_of_Author:books/scalar_nr_pages_of_Book:nr_pages");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/scalar_name_of_Author:name");
-        JsonObject parameterValues = new JsonObject();
+        final JsonObject parameterValues = new JsonObject();
         parameterValues.put("var0", JsonNull.instance);
         parameterValues.put("var1", "William Shakespeare");
-        TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         parameterDefinitions.put("var0", "Int");
         parameterDefinitions.put("var1", "String");
         final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
@@ -311,22 +311,22 @@ public class SPARQL2GraphQLTranslatorTest {
          * ?book p:genre_of_Book "MYSTERY" .
          * ?book p:title_of_Book ?title .
          */
-        Set<TriplePattern> tps = new HashSet<>();
+        final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var2, uri8, lit5));
         tps.add(new TriplePatternImpl(var2, uri6, var4));
         final BGP bgp = new BGPImpl(tps);
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config);
 
         // Expected result
-        TreeSet<String> fieldPaths = new TreeSet<>();
+        final TreeSet<String> fieldPaths = new TreeSet<>();
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/id_Book:id");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_genre_of_Book:genre");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_title_of_Book:title");
-        JsonObject parameterValues = new JsonObject();
+        final JsonObject parameterValues = new JsonObject();
         parameterValues.put("var0", "MYSTERY");
         parameterValues.put("var1", JsonNull.instance);
         parameterValues.put("var2", JsonNull.instance);
-        TreeMap<String,String> parameterDefinitions = new TreeMap<>();
+        final Map<String,String> parameterDefinitions = new HashMap<>();
         parameterDefinitions.put("var0", "Genre");
         parameterDefinitions.put("var1", "Int");
         parameterDefinitions.put("var2", "String");

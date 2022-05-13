@@ -1,7 +1,11 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data;
 
-import java.util.TreeMap;
+import java.util.Map;
 
+/**
+ * Used to represent and contain information about a specific field
+ * in the GraphQL query type
+ */
 public interface GraphQLEntrypoint {
     /**
      * @return the GraphQL query fieldname
@@ -10,12 +14,12 @@ public interface GraphQLEntrypoint {
 
     /**
      * @return the parameter definitions for the entrypoint as a map
-     * consisting of parameternames mapped to parameter value types.
+     * consisting of parameter names mapped to parameter value types.
      */
-    public TreeMap<String,String> getParameterDefinitions();
+    public Map<String,String> getParameterDefinitions();
 
     /**
-     * @return the sgp type of the entrypoint
+     * @return the GraphQL type the entrypoint represents
      */
     public String getType();
 }

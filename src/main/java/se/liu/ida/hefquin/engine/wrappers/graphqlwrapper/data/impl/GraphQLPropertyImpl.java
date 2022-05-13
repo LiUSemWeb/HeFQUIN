@@ -1,14 +1,14 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl;
 
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLViewProperty;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
 
-public class GraphQLViewPropertyImpl implements GraphQLViewProperty {
+public class GraphQLPropertyImpl implements GraphQLProperty {
     
     protected final String name;
     protected final String valueType;
     protected final GraphQLFieldType fieldType;
 
-    public GraphQLViewPropertyImpl(final String name,
+    public GraphQLPropertyImpl(final String name,
             final String valueType, final GraphQLFieldType fieldType){
         this.name = name;
         this.valueType = valueType;
@@ -26,7 +26,7 @@ public class GraphQLViewPropertyImpl implements GraphQLViewProperty {
     }
 
     @Override
-    public GraphQLFieldType getFieldType() {
+    public final GraphQLFieldType getFieldType() {
         return fieldType;
     }
 }

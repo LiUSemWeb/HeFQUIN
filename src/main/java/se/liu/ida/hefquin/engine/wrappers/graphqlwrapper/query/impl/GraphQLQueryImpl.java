@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl;
 
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
@@ -10,10 +10,10 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 public class GraphQLQueryImpl implements GraphQLQuery {
     protected final TreeSet<String> fieldPaths;
     protected final JsonObject parameterValues;
-    protected final TreeMap<String, String> parameterDefinitions;
+    protected final Map<String, String> parameterDefinitions;
 
     public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject parameterValues,
-            final TreeMap<String, String> parameterDefinitions) {
+            final Map<String, String> parameterDefinitions) {
         this.fieldPaths = fieldPaths;
         this.parameterValues = parameterValues;
         this.parameterDefinitions = parameterDefinitions;
