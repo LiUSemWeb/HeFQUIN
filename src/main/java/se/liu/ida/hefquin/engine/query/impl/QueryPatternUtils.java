@@ -22,12 +22,16 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
@@ -74,6 +78,24 @@ public class QueryPatternUtils
 			final ElementPathBlock e = new ElementPathBlock();
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 				e.addTriple( tp.asJenaTriple() );
+			}
+			return e;
+		}
+		else if (p instanceof SPARQLUnionPattern) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) p;
+			
+			final ElementUnion e = new ElementUnion(); // ?
+			for ( final SPARQLGraphPattern gp : up.getSubPatterns() ) {
+				e.addElement(convertToJenaElement(gp));
+			}
+			return e;
+		}
+		else if (p instanceof SPARQLGroupPattern) {
+			final SPARQLGroupPattern gp = (SPARQLGroupPattern) p;
+			
+			final ElementGroup e = new ElementGroup(); // ?
+			for ( final SPARQLGraphPattern g : gp.getSubPatterns() ) {
+				e.addElement(convertToJenaElement(g));
 			}
 			return e;
 		}
