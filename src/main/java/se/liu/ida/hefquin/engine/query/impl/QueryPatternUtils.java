@@ -84,7 +84,7 @@ public class QueryPatternUtils
 		else if (p instanceof SPARQLUnionPattern) {
 			final SPARQLUnionPattern up = (SPARQLUnionPattern) p;
 			
-			final ElementUnion e = new ElementUnion(); // ?
+			final ElementUnion e = new ElementUnion();
 			for ( final SPARQLGraphPattern gp : up.getSubPatterns() ) {
 				e.addElement(convertToJenaElement(gp));
 			}
@@ -93,7 +93,7 @@ public class QueryPatternUtils
 		else if (p instanceof SPARQLGroupPattern) {
 			final SPARQLGroupPattern gp = (SPARQLGroupPattern) p;
 			
-			final ElementGroup e = new ElementGroup(); // ?
+			final ElementGroup e = new ElementGroup();
 			for ( final SPARQLGraphPattern g : gp.getSubPatterns() ) {
 				e.addElement(convertToJenaElement(g));
 			}
