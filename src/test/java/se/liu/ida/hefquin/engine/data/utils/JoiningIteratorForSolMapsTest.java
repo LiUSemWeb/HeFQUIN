@@ -6,17 +6,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 
-public class JoiningIteratorForSolMapsTest extends EngineTestBase
+public class JoiningIteratorForSolMapsTest extends TestsForSolutionMappingsIterators
 {
 	@Test
 	public void joinTest() {
@@ -78,30 +73,6 @@ public class JoiningIteratorForSolMapsTest extends EngineTestBase
 
 		final Iterator<SolutionMapping> itSwap = new JoiningIteratorForSolMaps(i2, i1);
 		assertFalse( itSwap.hasNext() );
-	}
-
-
-	// ----- helper methods ------------
-
-	/**
-	 * Use this method instead of {@link SolutionMappingUtils#createSolutionMapping(Var, Node)}
-	 * to make ensure new java objects for the variables and RDF terms.
-	 */
-	protected SolutionMapping createSolMap( final String varName, final String uriString ) {
-		final BindingBuilder b = BindingBuilder.create();
-		b.add( Var.alloc(varName), NodeFactory.createURI(uriString) );
-		return new SolutionMappingImpl( b.build() );
-	}
-
-	/**
-	 * Use this method instead of {@link SolutionMappingUtils#createSolutionMapping(Var, Node, Var, Node)}
-	 * to make ensure new java objects for the variables and RDF terms.
-	 */
-	protected SolutionMapping createSolMap( final String varName1, final String uriString1, final String varName2, final String uriString2 ) {
-		final BindingBuilder b = BindingBuilder.create();
-		b.add( Var.alloc(varName1), NodeFactory.createURI(uriString1) );
-		b.add( Var.alloc(varName2), NodeFactory.createURI(uriString2) );
-		return new SolutionMappingImpl( b.build() );
 	}
 
 }
