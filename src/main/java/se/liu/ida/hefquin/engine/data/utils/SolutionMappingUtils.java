@@ -15,6 +15,7 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.util.FmtUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 
 public class SolutionMappingUtils
@@ -126,6 +127,43 @@ public class SolutionMappingUtils
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
 		return new SolutionMappingImpl( BindingLib.merge(b1,b2) );
+	}
+
+	/**
+	 * Applies the given vocabulary mapping to each of the solution mappings
+	 * of the given iterable (translating them from the global vocabulary to
+	 * the local vocabulary), collects the resulting solution mappings in a
+	 * list, and returns this list in the end.
+	 *
+	 * Attention: While this function materializes the complete list of all the
+	 * resulting solution mappings, for use cases in which such a materialization
+	 * is not necessary, use {@link RewritingIterableForSolMapsG2L} or
+	 * {@link RewritingIteratorForSolMapsG2L} instead.
+	 */
+	public static List<SolutionMapping> applyVocabularyMappingG2L( final Iterable<SolutionMapping> it,
+	                                                               final VocabularyMapping vm ) {
+		return applyVocabularyMappingG2L( it.iterator(), vm );
+	}
+
+	/**
+	 * Applies the given vocabulary mapping to each of the solution mappings
+	 * of the given iterator (translating them from the global vocabulary to
+	 * the local vocabulary), collects the resulting solution mappings in a
+	 * list, and returns this list in the end.
+	 *
+	 * Attention: While this function materializes the complete list of all the
+	 * resulting solution mappings, for use cases in which such a materialization
+	 * is not necessary, use {@link RewritingIterableForSolMapsG2L} or
+	 * {@link RewritingIteratorForSolMapsG2L} instead.
+	 */
+	public static List<SolutionMapping> applyVocabularyMappingG2L( final Iterator<SolutionMapping> it,
+	                                                               final VocabularyMapping vm ) {
+		final List<SolutionMapping> result = new ArrayList<>();
+		while ( it.hasNext() ) {
+			final SolutionMapping sm = it.next();
+			result.addAll( vm.translateSolutionMappingFromGlobal(sm) );
+		}
+		return result;
 	}
 
 	/**
