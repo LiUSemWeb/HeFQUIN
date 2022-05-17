@@ -40,7 +40,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 
 	
 	@Override
-	protected void _execute(IntermediateResultElementSink sink, ExecutionContext execCxt)
+	protected void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt)
 			throws ExecOpExecutionException {
 		
 		final FederationAccessManager fedAccessMgr = execCxt.getFederationAccessMgr();
