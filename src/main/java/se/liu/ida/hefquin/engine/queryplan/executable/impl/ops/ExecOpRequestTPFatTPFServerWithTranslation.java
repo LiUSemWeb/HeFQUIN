@@ -43,7 +43,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 	protected void _execute(IntermediateResultElementSink sink, ExecutionContext execCxt)
 			throws ExecOpExecutionException {
 		
-		FederationAccessManager fedAccessMgr = execCxt.getFederationAccessMgr();
+		final FederationAccessManager fedAccessMgr = execCxt.getFederationAccessMgr();
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
 		Iterator<SolutionMapping> res;
 		if(reqTranslation instanceof TriplePattern) {
