@@ -6,12 +6,12 @@ import java.util.Set;
 
 import org.apache.jena.graph.Node;
 
-public class CyclicFinder {
+public class GraphCycleDetector {
 
     /**
      * Helper function used to call the DFS function for each SgpNode
      */
-    public static final Set<Integer> determineCyclicConnectors(final Map<Node,SGPNode> sgpNodes){
+    public static Set<Integer> determineCyclicConnectors(final Map<Node,SGPNode> sgpNodes){
         final Set<Integer> connectorsToBeRemoved = new HashSet<>();
 
         for(final SGPNode n : sgpNodes.values()){

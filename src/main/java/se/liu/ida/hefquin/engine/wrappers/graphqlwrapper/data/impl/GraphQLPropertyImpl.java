@@ -26,7 +26,7 @@ public class GraphQLPropertyImpl implements GraphQLProperty {
     }
 
     @Override
-    public final GraphQLFieldType getFieldType() {
+    public GraphQLFieldType getFieldType() {
         return fieldType;
     }
 }

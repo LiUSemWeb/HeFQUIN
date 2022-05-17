@@ -18,12 +18,12 @@ public class GraphQLEntrypointImpl implements GraphQLEntrypoint {
     }
 
     @Override
-    public final String getFieldName() {
+    public String getFieldName() {
         return this.fieldName;
     }
 
     @Override
-    public final Map<String, String> getParameterDefinitions() {
+    public Map<String, String> getParameterDefinitions() {
         return parameterDefs;
     }
 

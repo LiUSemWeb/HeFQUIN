@@ -7,7 +7,7 @@ import java.util.Map;
  * Helper class representing the nodes used to check for cyclic bindings between SGPs
  */
 public class SGPNode {
-    private Map<Integer,SGPNode> adjacentNodes = new HashMap<>();
+    private final Map<Integer,SGPNode> adjacentNodes = new HashMap<>();
     private boolean visited = false;
     private boolean finished = false;
 
@@ -31,7 +31,7 @@ public class SGPNode {
         adjacentNodes.put(connectorID, sgpNode);
     }
 
-    public final Map<Integer,SGPNode> getAdjacentNodes(){
+    public Map<Integer,SGPNode> getAdjacentNodes(){
         return adjacentNodes;
     }
 }

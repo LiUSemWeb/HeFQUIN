@@ -22,6 +22,7 @@ public class GraphQL2RDFConfigurationImpl implements GraphQL2RDFConfiguration {
     protected final String classPrefix;
     protected final String propertyPrefix;
     protected final String rdfPrefix = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    protected final String connectingText = "_of_";
     
 
     public GraphQL2RDFConfigurationImpl(final Map<String,Map<String,GraphQLProperty>> classToProperty, 
@@ -84,16 +85,15 @@ public class GraphQL2RDFConfigurationImpl implements GraphQL2RDFConfiguration {
     }
 
     @Override
-    public final GraphQLFieldType getPropertyFieldType(final String className, final String propertyName) {
+    public GraphQLFieldType getPropertyFieldType(final String className, final String propertyName) {
         if(containsClass(className) && containsProperty(className, propertyName)){
-            final GraphQLFieldType type = classToProperty.get(className).get(propertyName).getFieldType();
-            return type;
+            return classToProperty.get(className).get(propertyName).getFieldType();
         }
         return null;
     }
 
     @Override
-    public final String getPropertyValueType(final String className, final String propertyName) {
+    public String getPropertyValueType(final String className, final String propertyName) {
         if(containsClass(className) && containsProperty(className, propertyName)){
             return classToProperty.get(className).get(propertyName).getValueType();
         }
@@ -101,13 +101,18 @@ public class GraphQL2RDFConfigurationImpl implements GraphQL2RDFConfiguration {
     }
 
     @Override
-    public final Set<String> getPropertyURIs(final String className, final GraphQLFieldType fieldType) {
+    public Set<String> getPropertyURIs(final String className, final GraphQLFieldType fieldType) {
         final Set<String> propertyURIs = new HashSet<>();
         if(containsClass(className)){
             final Map<String,GraphQLProperty> properties = classToProperty.get(className);
             for(final String propertyName : properties.keySet()){
                 if(getPropertyFieldType(className, propertyName) == fieldType){
-                    propertyURIs.add(propertyPrefix + propertyName + "_of_" + className);
+                    final StringBuilder propertyURI = new StringBuilder();
+                    propertyURI.append(propertyPrefix);
+                    propertyURI.append(propertyName);
+                    propertyURI.append(connectingText);
+                    propertyURI.append(className);
+                    propertyURIs.add(propertyURI.toString());
                 }
             }
         }
@@ -115,45 +120,45 @@ public class GraphQL2RDFConfigurationImpl implements GraphQL2RDFConfiguration {
     }
 
     @Override
-    public final Set<String> getClasses() {
+    public Set<String> getClasses() {
         return classToProperty.keySet();
     }
 
     @Override
-    public final String getPropertyPrefix() {
+    public String getPropertyPrefix() {
         return propertyPrefix;
     }
 
     @Override
-    public final String getClassPrefix() {
+    public String getClassPrefix() {
         return classPrefix;
     }
 
     @Override
-    public final String getRDFPrefix(){
+    public String getRDFPrefix(){
         return rdfPrefix;
     }
 
     @Override
-    public final String getClassFromPropertyURI(final String uri){
-        final int splitIndex = uri.lastIndexOf("_of_");
+    public String getClassFromPropertyURI(final String uri){
+        final int splitIndex = uri.lastIndexOf(connectingText);
         return splitIndex > 0 ? uri.substring(splitIndex + 4) : null;
     }
 
     @Override
-    public final String removePropertyPrefix(final String uri){
+    public String removePropertyPrefix(final String uri){
         final int splitIndex = propertyPrefix.length();
         return uri.startsWith(propertyPrefix) ? uri.substring(splitIndex) : null;
     }
 
     @Override
-    public final String removePropertySuffix(final String uri){
-        final int splitIndex = uri.lastIndexOf("_of_");
+    public String removePropertySuffix(final String uri){
+        final int splitIndex = uri.lastIndexOf(connectingText);
         return splitIndex > 0 ? uri.substring(0, splitIndex) : null;
     }
 
     @Override
-    public final GraphQLEntrypoint getEntrypoint(final String className, final GraphQLEntrypointType type) {
+    public GraphQLEntrypoint getEntrypoint(final String className, final GraphQLEntrypointType type) {
         if(containsClass(className) && classToEntrypoint.get(className).containsKey(type)){
             return classToEntrypoint.get(className).get(type);
         }

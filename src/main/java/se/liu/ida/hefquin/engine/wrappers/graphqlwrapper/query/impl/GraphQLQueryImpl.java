@@ -20,64 +20,67 @@ public class GraphQLQueryImpl implements GraphQLQuery {
     }
 
     public String toString() {
-        String query = "";
+        final StringBuilder query = new StringBuilder();
         if (!parameterDefinitions.isEmpty()) {
-            query += "query(";
-            for (String parameterName : parameterDefinitions.keySet()) {
-                query += "$" + parameterName + ":" + parameterDefinitions.get(parameterName) + ",";
+            query.append("query(");
+            for (final String parameterName : parameterDefinitions.keySet()) {
+                query.append("$").append(parameterName).append(":");
+                query.append(parameterDefinitions.get(parameterName));
+                query.append(",");
             }
-            query += ")";
+            query.append(")");
         }
-        query += buildQueryString();
+        query.append(buildQueryString());
 
-        return query;
+        return query.toString();
     }
 
     @Override
-    public final JsonObject getParameterValues() {
+    public JsonObject getParameterValues() {
         return parameterValues;
     }
 
     protected String buildQueryString() {
-        String query = "";
-        String path = "";
+        final StringBuilder query = new StringBuilder();
+        query.append("{");
+        StringBuilder path = new StringBuilder();
         int depth = 0;
 
-        for (String currentPath : fieldPaths) {
+        for (final String currentPath : fieldPaths) {
 
-            int splitIndex = currentPath.lastIndexOf("/") + 1;
-            String domain = currentPath.substring(0, splitIndex);
-            String field = currentPath.substring(splitIndex);
+            final int splitIndex = currentPath.lastIndexOf("/") + 1;
+            final String domain = currentPath.substring(0, splitIndex);
+            final String field = currentPath.substring(splitIndex);
 
             // Parse out if domain of currentPath starts differently than actual path
-            while (!domain.startsWith(path)) {
-                query += "},";
-                int i = path.lastIndexOf("/", path.length() - 2);
-                path = (i > 0) ? path.substring(0, i + 1) : "";
+            while (!domain.startsWith(path.toString())) {
+                query.append( "},");
+                final int i = path.lastIndexOf("/", path.length() - 2);
+                path = (i > 0) ? new StringBuilder(path.substring(0, i + 1)) : new StringBuilder();
                 --depth;
             }
 
             // Parse in if domain and path are different, keep adding parts from domain to
             // path until they are the same
             int begin = path.length();
-            while (!path.equals(domain)) {
-                int i = domain.indexOf("/", begin);
-                String domainPart = (i > 0) ? domain.substring(begin, i) : domain.substring(begin);
-                query += domainPart + "{";
-                path += domainPart + "/";
+            while (!path.toString().equals(domain)) {
+                final int i = domain.indexOf("/", begin);
+                final String domainPart = (i > 0) ? domain.substring(begin, i) : domain.substring(begin);
+                query.append(domainPart).append("{");
+                path.append(domainPart).append("/");
                 begin = i + 1;
                 ++depth;
             }
 
-            query += field + ",";
+            query.append(field).append(",");
         }
 
         // Parse out completely after final field is added
         while (depth > 0) {
-            query += "}";
+            query.append("}");
             --depth;
         }
 
-        return "{" + query + "}";
+        return query.append("}").toString();
     }
 }
