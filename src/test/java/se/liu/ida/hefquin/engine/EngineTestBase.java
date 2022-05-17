@@ -210,6 +210,39 @@ public abstract class EngineTestBase
 
 	}
 
+	protected static class SPARQLEndpointWithVocabularyMappingForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	{
+		final SPARQLEndpointInterface iface;
+		final VocabularyMapping vocabularyMapping;
+
+		public SPARQLEndpointWithVocabularyMappingForTest( final String ifaceURL, final Graph data , final VocabularyMapping vm) {
+			super(data);
+			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+			vocabularyMapping = vm;
+		}
+
+		@Override
+		public SPARQLEndpointInterface getInterface() { return iface; }
+
+		public SolMapsResponse performRequest( final SPARQLRequest req ) {
+			final List<SolutionMapping> result;
+			if ( req instanceof TriplePatternRequest ) {
+				result = getSolutions( (TriplePatternRequest) req);
+			}
+			else if (req.getQueryPattern() instanceof TriplePattern) {
+				result = getSolutions( (TriplePattern) req.getQueryPattern() );
+			} else {
+				result = getSolutions(req.getQueryPattern());
+			}
+			return new SolMapsResponseImpl( result, this, req, new Date() );
+		}
+		
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return vocabularyMapping;
+		}
+
+	}
 
 	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
@@ -373,7 +406,11 @@ public abstract class EngineTestBase
 				response = new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
 			}
 			else {
-				response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
+				if (fm.getVocabularyMapping() != null) {
+					response = ( (SPARQLEndpointWithVocabularyMappingForTest) fm ).performRequest(req);
+				} else {
+					response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
+				}
 			}
 			return CompletableFuture.completedFuture(response);
 		}

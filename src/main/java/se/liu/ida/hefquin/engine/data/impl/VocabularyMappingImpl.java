@@ -339,7 +339,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {		
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm) {		
 		Set<BindingBuilder> bbs = new HashSet<>();
 		bbs.add( BindingBuilder.create() );
 		
@@ -410,6 +410,85 @@ public class VocabularyMappingImpl implements VocabularyMapping
 			} else {
 				throw new IllegalArgumentException(predicate.toString());
 			}
+		}
+		return results;
+	}
+	
+	@Override
+	public Set<SolutionMapping> translateSolutionMappingFromGlobal( final SolutionMapping sm) {		
+		Set<BindingBuilder> bbs = new HashSet<>();
+		bbs.add( BindingBuilder.create() );
+		
+		final Iterator<Var> i = sm.asJenaBinding().vars();
+		while(i.hasNext()) {
+			final Var v = i.next();
+			final Node n = sm.asJenaBinding().get(v);
+			
+			if(!n.isURI()) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			}
+			
+			final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
+			if (bindingTranslation.size() > 1) {
+				final Set<BindingBuilder> bbsCopy = new HashSet<>();
+				
+				for(final Node j : bindingTranslation) {
+					for (final BindingBuilder k : bbs) {
+						BindingBuilder translationCopy = BindingBuilder.create();
+						if(!k.isEmpty()) {
+							translationCopy.addAll(k.snapshot());
+						}
+						translationCopy.add(v, j);
+						bbsCopy.add(translationCopy);
+					}
+				}
+				
+				bbs = bbsCopy;
+			} else if (bindingTranslation.size() == 0) {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, n);
+				}
+			} else {
+				for (final BindingBuilder j : bbs) {
+					j.add(v, bindingTranslation.iterator().next());
+				}
+			}
+		}
+		
+		final Set<SolutionMapping> results = new HashSet<>();
+		for (final BindingBuilder b : bbs) {
+			results.add(new SolutionMappingImpl(b.build()));
+		}
+		return results;
+	}
+	
+	protected Set<Node> translateBindingFromGlobal( final Node n ) {
+		final Set<Node> results = new HashSet<>();
+		for (final Triple m : getMappings(n, Node.ANY, Node.ANY)){
+			final Node predicate = m.getPredicate();
+			if (predicate.equals(OWL.sameAs.asNode()) || predicate.equals(OWL.equivalentClass.asNode()) || 
+				predicate.equals(OWL.equivalentProperty.asNode())) {
+				results.add(m.getObject());
+			} else if (predicate.equals(OWL.unionOf.asNode())) {
+				Pair<Node,Node> mapping = getComplexMapping(m.getObject());
+				while(true) {
+					results.add(mapping.object1);
+					if (mapping.object2.equals(RDF.nil.asNode())) {
+						break;
+					}
+					mapping = getComplexMapping(mapping.object2);
+				}
+			} else {
+				throw new IllegalArgumentException(predicate.toString());
+			}
+		}
+		for (final Triple o : getMappings(Node.ANY, RDFS.subClassOf.asNode(), n)) {
+			results.add(o.getSubject());
+		}
+		for (final Triple p : getMappings(Node.ANY, RDFS.subPropertyOf.asNode(), n)) {
+			results.add(p.getSubject());
 		}
 		return results;
 	}
