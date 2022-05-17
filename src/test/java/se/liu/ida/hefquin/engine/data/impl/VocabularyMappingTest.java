@@ -181,51 +181,6 @@ public class VocabularyMappingTest
 		p = RDFS.subPropertyOf.asNode();
 		testTriples.add(new Triple(o, p, s));
 		
-		//Predicate Intersection
-		p = OWL.intersectionOf.asNode();
-		Node blank = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, blank));	
-		
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p3");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		blank = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p4");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		//Predicate Union
-		p = OWL.unionOf.asNode();
-		blank = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, blank));	
-		
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p5");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		blank = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p6");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		s = NodeFactory.createURI("s");
@@ -236,14 +191,7 @@ public class VocabularyMappingTest
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
-			if(i instanceof SPARQLUnionPattern) {
-				assertTrue(((SPARQLUnionPattern) i).getNumberOfSubPatterns() == 2);
-				for(SPARQLGraphPattern j : ((SPARQLUnionPattern) i).getSubPatterns()) {
-					translationSubPatterns.add(j);
-				}
-			} else {
-				translationSubPatterns.add(i);
-			}
+			translationSubPatterns.add(i);
 		}
 	
 		final List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
@@ -251,20 +199,6 @@ public class VocabularyMappingTest
 		expectedResults.add(new TriplePatternImpl(s, p, o));
 		p = NodeFactory.createURI("Subtype");
 		expectedResults.add(new TriplePatternImpl(s, p, o));
-		
-		//Union subpatterns
-		p = NodeFactory.createURI("p5");
-		expectedResults.add(new TriplePatternImpl(s, p, o));
-		p = NodeFactory.createURI("p6");
-		expectedResults.add(new TriplePatternImpl(s, p, o));
-		
-		final BGPImpl intersection = new BGPImpl();
-		p = NodeFactory.createURI("p3");
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
-		p = NodeFactory.createURI("p4");
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
-		expectedResults.add(intersection);
-		
 		p = NodeFactory.createURI("Not p1");
 		expectedResults.add(new TriplePatternImpl(o, p, s));
 		

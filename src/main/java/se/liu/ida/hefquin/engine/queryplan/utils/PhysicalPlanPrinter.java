@@ -25,6 +25,13 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit( final PhysicalOpRequestWithTranslation<?, ?> op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
+        }
+        
+        @Override
         public void visit( final PhysicalOpBindJoin op ) {
             addTabs();
             builder.append( op.toString() );
@@ -109,6 +116,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
     private class PhysicalPlanPrinterAfterVisitor implements PhysicalPlanVisitor {
         @Override
         public void visit(final PhysicalOpRequest<?, ?> op) {
+            // nothing to do here
+        }
+        
+        @Override
+        public void visit(final PhysicalOpRequestWithTranslation<?, ?> op) {
             // nothing to do here
         }
 

@@ -130,6 +130,25 @@ public class SolutionMappingUtils
 	}
 
 	/**
+	 * Performs a nested-loop join between two Solution Mapping iterables.
+	 *
+	 * If you do not need the join result materialized (as done by this function),
+	 * it is better to use {@link JoiningIterableForSolMaps} instead (or the
+	 * iterator version: {@link JoiningIteratorForSolMaps}).
+	 */
+	public static Set<SolutionMapping> nestedLoopJoin( final Iterable<SolutionMapping> i1,
+													   final Iterable<SolutionMapping> i2) {
+		final Set<SolutionMapping> result = new HashSet<>();
+		for ( final SolutionMapping m1 : i1 ) {
+			for ( final SolutionMapping m2 : i2 ) {
+				if ( compatible(m1, m2) )
+					result.add(merge(m1, m2));
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Applies the given vocabulary mapping to each of the solution mappings
 	 * of the given iterable (translating them from the global vocabulary to
 	 * the local vocabulary), collects the resulting solution mappings in a
