@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTERandTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
@@ -37,11 +36,7 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 			final FederationMember fm = tpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint )
-				if (fm.getVocabularyMapping() != null) {
-					return new ExecOpBindJoinSPARQLwithFILTERandTranslation( tpAdd.getTP(), (SPARQLEndpoint) fm );
-				} else {
-					return new ExecOpBindJoinSPARQLwithFILTER( tpAdd.getTP(), (SPARQLEndpoint) fm );
-				}
+				return new ExecOpBindJoinSPARQLwithFILTER( tpAdd.getTP(), (SPARQLEndpoint) fm );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
@@ -50,11 +45,7 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 			final FederationMember fm = bgpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint )
-				if (fm.getVocabularyMapping() != null) {
-					return new ExecOpBindJoinSPARQLwithFILTERandTranslation( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
-				} else {
-					return new ExecOpBindJoinSPARQLwithFILTER( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
-				}
+				return new ExecOpBindJoinSPARQLwithFILTER( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
