@@ -1,15 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jena.sparql.algebra.Op;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.RewritingIterableForSolMapsG2L;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -17,28 +11,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoinSPARQLwithFILTER{
 	
-	public ExecOpBindJoinSPARQLwithFILTERandTranslation(final SPARQLGraphPattern query, SPARQLEndpoint fm) {
+	public ExecOpBindJoinSPARQLwithFILTERandTranslation( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm);
+
+		assert fm.getVocabularyMapping() != null;
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
-		
-		final Set<SolutionMapping> solMapsTranslation = new HashSet<>();
-		for (final SolutionMapping sm : solMaps) {
-			solMapsTranslation.addAll(fm.getVocabularyMapping().translateSolutionMappingFromGlobal(sm));
-		}
-		
-		final Op op = createFilter(solMapsTranslation);
-		if ( op == null ) {
-			return null;
-		}
-		
-		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
-		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm);
+		final Iterable<SolutionMapping> translatedSolMaps = new RewritingIterableForSolMapsG2L( solMaps, fm.getVocabularyMapping() );
+		return super.createExecutableRequestOperator(translatedSolMaps);
 	}	
-	
+
 	@Override
 	protected void _process( final IntermediateResultBlock input,
 	                         final IntermediateResultElementSink sink,
