@@ -4,21 +4,86 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 
 public class GraphQLRequestProcessorImplTest extends EngineTestBase {
+
+    protected static class GraphQLEndpointTest implements GraphQLEndpoint {
+
+		public GraphQLEndpointTest() {}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+
+		@Override
+		public GraphQLInterface getInterface() {
+			return new GraphQLInterfaceImpl("http://localhost:4000/graphql");
+		}
+
+		@Override
+		public boolean containsClass(String className) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean containsProperty(String className, String propertyName) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public GraphQLFieldType getPropertyFieldType(String className, String propertyName) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getPropertyValueType(String className, String propertyName) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Set<String> getClasses() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<String, GraphQLProperty> getClassProperties(String className) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public GraphQLEntrypoint getEntrypoint(String className, GraphQLEntrypointType type) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
 
     @Test
     public void testLocalEndpoint() throws FederationAccessException {
