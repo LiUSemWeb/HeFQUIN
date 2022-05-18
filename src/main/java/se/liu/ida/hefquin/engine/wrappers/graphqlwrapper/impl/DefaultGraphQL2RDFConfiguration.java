@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.vocabulary.RDF;
+
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
@@ -11,10 +13,8 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldT
 
 public class DefaultGraphQL2RDFConfiguration implements GraphQL2RDFConfiguration {
 
-    // The URI prefixes used by the virtual RDF view
     protected final String classPrefix;
     protected final String propertyPrefix;
-    protected final String rdfPrefix = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     protected final String connectingText = "_of_";
     
     public DefaultGraphQL2RDFConfiguration(){
@@ -87,8 +87,8 @@ public class DefaultGraphQL2RDFConfiguration implements GraphQL2RDFConfiguration
     }
 
     @Override
-    public String getRDFPrefix(){
-        return rdfPrefix;
+    public String getClassMembershipURI(){
+        return RDF.type.getURI();
     }
 
     @Override

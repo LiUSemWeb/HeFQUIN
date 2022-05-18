@@ -38,10 +38,9 @@ public interface GraphQL2RDFConfiguration {
     public String getClassPrefix();
 
     /**
-     * @return the predefined namespace prefix for rdf
-     * https://www.w3.org/1999/02/22-rdf-syntax-ns#
+     * @return the rdf:type URI
      */
-    public String getRDFPrefix();
+    public String getClassMembershipURI();
 
     /**
      * @return the class associated with the property URI
