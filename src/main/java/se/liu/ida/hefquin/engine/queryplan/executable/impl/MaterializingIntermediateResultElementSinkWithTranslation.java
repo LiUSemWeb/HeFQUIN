@@ -17,9 +17,9 @@ public class MaterializingIntermediateResultElementSinkWithTranslation extends M
 	}
 	
 	@Override
-	public void send(SolutionMapping element) {
+	public void send(final SolutionMapping element) {
 		if ( ! closed ) {
-			for (SolutionMapping sm : vocabularyMapping.translateSolutionMapping(element)) {
+			for (final SolutionMapping sm : vocabularyMapping.translateSolutionMapping(element)) {
 				l.add(sm);
 			}
 		}
