@@ -37,9 +37,8 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 			throws ExecOpExecutionException {
 		
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
-		final Iterator<SolutionMapping> res = handlePattern(reqTranslation, execCxt).iterator();	
-		while(res.hasNext()) {
-			sink.send(res.next());
+		for ( final SolutionMapping sm : handlePattern(reqTranslation, execCxt) ) {
+			sink.send(sm);
 		}	
 	}
 	
