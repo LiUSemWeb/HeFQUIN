@@ -23,11 +23,6 @@ public class JoiningIteratorForSolMaps implements Iterator<SolutionMapping>
 	protected SolutionMapping currentInputElement;
 	protected SolutionMapping nextOutputElement;
 
-	public JoiningIteratorForSolMaps( final Iterator<SolutionMapping> input1,
-									  final Iterator<SolutionMapping> input2) {
-		this(()->input1, ()->input2);
-	}
-
 	public JoiningIteratorForSolMaps( final Iterable<SolutionMapping> input1,
 	                                  final Iterable<SolutionMapping> input2 ) {
 		this.input2 = input2;
