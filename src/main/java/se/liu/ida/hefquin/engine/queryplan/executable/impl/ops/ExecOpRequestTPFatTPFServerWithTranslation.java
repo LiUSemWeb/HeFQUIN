@@ -104,7 +104,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
 		Iterator<SolutionMapping> groupTranslation = handlePattern(i.next(), fedAccessMgr);
 		while(i.hasNext()){
-			groupTranslation = new JoiningIteratorForSolMaps(getIterableFromIterator(groupTranslation), getIterableFromIterator(handlePattern(i.next(), fedAccessMgr)));
+			groupTranslation = new JoiningIteratorForSolMaps(groupTranslation, handlePattern(i.next(), fedAccessMgr));
 		}
 		return groupTranslation;
 	}
@@ -115,19 +115,10 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 			if (bgpTranslation == null) {
 				bgpTranslation = handleTriplePattern(i, fedAccessMgr);
 			} else {
-				bgpTranslation = new JoiningIteratorForSolMaps(getIterableFromIterator(bgpTranslation), getIterableFromIterator(handleTriplePattern(i, fedAccessMgr)));
+				bgpTranslation = new JoiningIteratorForSolMaps(bgpTranslation, handleTriplePattern(i, fedAccessMgr));
 			}
 		}
 		return bgpTranslation;
 	}
-
-	
-	//Source: https://www.geeksforgeeks.org/convert-iterator-to-iterable-in-java/
-	// Function to get the Spliterator
-    public static <T> Iterable<T>
-    getIterableFromIterator(Iterator<T> iterator)
-    {
-        return () -> iterator;
-    }
 	
 }
