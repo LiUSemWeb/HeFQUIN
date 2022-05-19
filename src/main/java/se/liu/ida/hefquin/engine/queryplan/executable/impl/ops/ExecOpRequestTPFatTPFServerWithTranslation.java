@@ -42,23 +42,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 		
 		final FederationAccessManager fedAccessMgr = execCxt.getFederationAccessMgr();
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
-		Iterator<SolutionMapping> res;
-		if(reqTranslation instanceof TriplePattern) {
-			res = handleTriplePattern((TriplePattern) reqTranslation, fedAccessMgr);
-		}
-		else if(reqTranslation instanceof SPARQLUnionPattern) {
-			res = handleUnionPattern(((SPARQLUnionPattern) reqTranslation), fedAccessMgr);
-		}
-		else if(reqTranslation instanceof SPARQLGroupPattern) {
-			res = handleGroupPattern(((SPARQLGroupPattern) reqTranslation), fedAccessMgr);
-		}
-		else if(reqTranslation instanceof BGP) {
-			res = handleBGP((BGP) reqTranslation, fedAccessMgr);
-		}
-		else {
-			throw new ExecOpExecutionException(reqTranslation.toString(), this);
-		}
-		
+		final Iterator<SolutionMapping> res = handlePattern(reqTranslation, fedAccessMgr);	
 		while(res.hasNext()) {
 			sink.send(res.next());
 		}
