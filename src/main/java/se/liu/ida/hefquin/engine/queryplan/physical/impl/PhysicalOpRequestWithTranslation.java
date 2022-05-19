@@ -2,10 +2,13 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQLWithTranslation;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServerWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
@@ -46,10 +49,10 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 		if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
 			return new ExecOpRequestSPARQLWithTranslation( (SPARQLRequest) req, (SPARQLEndpoint) fm );
 		}
-// TODO: we need executable operators for the following cases
-//		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
-//			return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm );
-//		}
+		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
+			return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm );
+		}
+		// TODO: we need executable operators for the following cases
 //		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
 //			return new ExecOpRequestTPFatBRTPFServer( (TriplePatternRequest) req, (BRTPFServer) fm );
 //		}
