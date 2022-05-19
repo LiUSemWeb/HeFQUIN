@@ -108,7 +108,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 	}
 	
 	protected Iterator<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException {
-		Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
+		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
 		Iterator<SolutionMapping> unionTranslation = handlePattern(i.next(), fedAccessMgr);
 		while(i.hasNext()){
 			unionTranslation = new UnionIteratorForSolMaps(unionTranslation, handlePattern(i.next(), fedAccessMgr));
@@ -117,7 +117,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 	}
 	
 	protected Iterator<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException {
-		Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
+		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
 		Iterator<SolutionMapping> groupTranslation = handlePattern(i.next(), fedAccessMgr);
 		while(i.hasNext()){
 			groupTranslation = new JoiningIteratorForSolMaps(getIterableFromIterator(groupTranslation), getIterableFromIterator(handlePattern(i.next(), fedAccessMgr)));
