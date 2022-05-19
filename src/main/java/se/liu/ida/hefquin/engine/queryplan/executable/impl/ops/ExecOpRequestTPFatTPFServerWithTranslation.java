@@ -40,85 +40,73 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 	protected void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt)
 			throws ExecOpExecutionException {
 		
-		final FederationAccessManager fedAccessMgr = execCxt.getFederationAccessMgr();
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getQueryPattern());
-		final Iterator<SolutionMapping> res = handlePattern(reqTranslation, fedAccessMgr);	
+		final Iterator<SolutionMapping> res = handlePattern(reqTranslation, execCxt).iterator();	
 		while(res.hasNext()) {
 			sink.send(res.next());
-		}
-		
+		}	
 	}
 	
-	protected Iterator<SolutionMapping> handlePattern(final SPARQLGraphPattern p, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException{
+	protected Iterable<SolutionMapping> handlePattern(final SPARQLGraphPattern p, final ExecutionContext execCxt) throws ExecOpExecutionException{
 		if (p instanceof TriplePattern) {
-			return handleTriplePattern((TriplePattern) p, fedAccessMgr);
+			return handleTriplePattern((TriplePattern) p, execCxt);
 		} else if (p instanceof SPARQLUnionPattern) {
-			return handleUnionPattern(((SPARQLUnionPattern) p), fedAccessMgr);
+			return handleUnionPattern(((SPARQLUnionPattern) p), execCxt);
 		} else if (p instanceof SPARQLGroupPattern) {
-			return handleGroupPattern(((SPARQLGroupPattern) p), fedAccessMgr);
+			return handleGroupPattern(((SPARQLGroupPattern) p), execCxt);
 		} else if (p instanceof BGP) {
-			return handleBGP(((BGP) p), fedAccessMgr);
+			return handleBGP(((BGP) p), execCxt);
 		} else {
 			throw new ExecOpExecutionException(p.toString(), this);
 		}
 	}
 	
-	protected Iterator<SolutionMapping> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException{
+	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt) throws ExecOpExecutionException{
 		
 		final TriplePatternRequest newReq = new TriplePatternRequestImpl(tp);
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(newReq, fm);
 		final MaterializingIntermediateResultElementSinkWithTranslation sink = new MaterializingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
 		
-		TPFResponse currentPage = null;
-		while ( currentPage == null || ! op.isLastPage(currentPage) ) {
-			// create the request for the next page (which is the first page if currentPage is null)
-			final TPFRequest pageRequest = op.createPageRequest(currentPage);
-
-			// perform the page request
-			try {
-				currentPage = op.performPageRequest( pageRequest, fedAccessMgr );
-			}
-			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a page request caused an exception: " + e.toString(), this);
-			}
-			
-			// consume the matching triples retrieved via the page request
-			op.consumeMatchingTriples( currentPage.getPayload(), sink );
-
-		}	
+		op.execute(sink, execCxt);
 	
-		return sink.getMaterializedIntermediateResult().iterator();
-
+		return sink.getMaterializedIntermediateResult();
 	}
 	
-	protected Iterator<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException {
+	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt) throws ExecOpExecutionException {
 		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
-		Iterator<SolutionMapping> unionTranslation = handlePattern(i.next(), fedAccessMgr);
+		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			unionTranslation = new UnionIteratorForSolMaps(unionTranslation, handlePattern(i.next(), fedAccessMgr));
+			unionTranslation = getIterableFromIterator(new UnionIteratorForSolMaps(unionTranslation, handlePattern(i.next(), execCxt)));
 		}
 		return unionTranslation;
 	}
 	
-	protected Iterator<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException {
+	protected Iterable<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final ExecutionContext execCxt) throws ExecOpExecutionException {
 		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
-		Iterator<SolutionMapping> groupTranslation = handlePattern(i.next(), fedAccessMgr);
+		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			groupTranslation = new JoiningIteratorForSolMaps(groupTranslation, handlePattern(i.next(), fedAccessMgr));
+			groupTranslation = getIterableFromIterator(new JoiningIteratorForSolMaps(groupTranslation, handlePattern(i.next(), execCxt)));
 		}
 		return groupTranslation;
 	}
 	
-	protected Iterator<SolutionMapping> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws ExecOpExecutionException {
-		Iterator<SolutionMapping> bgpTranslation = null;
+	protected Iterable<SolutionMapping> handleBGP(final BGP bgp, final ExecutionContext execCxt) throws ExecOpExecutionException {
+		Iterable<SolutionMapping> bgpTranslation = null;
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
 			if (bgpTranslation == null) {
-				bgpTranslation = handleTriplePattern(i, fedAccessMgr);
+				bgpTranslation = handleTriplePattern(i, execCxt);
 			} else {
-				bgpTranslation = new JoiningIteratorForSolMaps(bgpTranslation, handleTriplePattern(i, fedAccessMgr));
+				bgpTranslation = getIterableFromIterator(new JoiningIteratorForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt)));
 			}
 		}
 		return bgpTranslation;
 	}
 	
+	//Source: https://www.geeksforgeeks.org/convert-iterator-to-iterable-in-java/
+	// Function to get the Spliterator
+    public static <T> Iterable<T>
+    getIterableFromIterator(Iterator<T> iterator)
+    {
+        return () -> iterator;
+    }
 }
