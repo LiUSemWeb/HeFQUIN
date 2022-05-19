@@ -3,13 +3,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.Iterator;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.JoiningIteratorForSolMaps;
-import se.liu.ida.hefquin.engine.data.utils.UnionIteratorForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.JoiningIterableForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.UnionIterableForSolMaps;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -76,7 +72,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
 		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			unionTranslation = getIterableFromIterator(new UnionIteratorForSolMaps(unionTranslation, handlePattern(i.next(), execCxt)));
+			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt));
 		}
 		return unionTranslation;
 	}
@@ -85,7 +81,7 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
 		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			groupTranslation = getIterableFromIterator(new JoiningIteratorForSolMaps(groupTranslation, handlePattern(i.next(), execCxt)));
+			groupTranslation = new JoiningIterableForSolMaps(groupTranslation, handlePattern(i.next(), execCxt));
 		}
 		return groupTranslation;
 	}
@@ -96,17 +92,10 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericReq
 			if (bgpTranslation == null) {
 				bgpTranslation = handleTriplePattern(i, execCxt);
 			} else {
-				bgpTranslation = getIterableFromIterator(new JoiningIteratorForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt)));
+				bgpTranslation = new JoiningIterableForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt));
 			}
 		}
 		return bgpTranslation;
 	}
-	
-	//Source: https://www.geeksforgeeks.org/convert-iterator-to-iterable-in-java/
-	// Function to get the Spliterator
-    public static <T> Iterable<T>
-    getIterableFromIterator(Iterator<T> iterator)
-    {
-        return () -> iterator;
-    }
+
 }
