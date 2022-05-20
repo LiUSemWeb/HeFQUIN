@@ -4,22 +4,22 @@ import java.util.Map;
 
 /**
  * Used to represent and contain information about a specific field
- * in the GraphQL query type
+ * in the GraphQL "query" type
  */
 public interface GraphQLEntrypoint {
     /**
-     * @return the GraphQL query fieldname
+     * @return the query field name
      */
     public String getFieldName();
 
     /**
-     * @return the parameter definitions for the entrypoint as a map
-     * consisting of parameter names mapped to parameter value types.
+     * @return the argument definitions for the entrypoint as a map
+     * consisting of argument names mapped to argument value types.
      */
-    public Map<String,String> getParameterDefinitions();
+    public Map<String,String> getArgumentDefinitions();
 
     /**
-     * @return the GraphQL type the entrypoint represents
+     * @return the name of the GraphQL object type that the entrypoint field fetches.
      */
-    public String getType();
+    public String getTypeName();
 }

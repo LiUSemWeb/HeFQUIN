@@ -7,26 +7,26 @@ import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 
 public class GraphQLEndpointImpl implements GraphQLEndpoint {
 
-    // Maps classnames to a map which in turn maps property names to a GraphQLProperty object
-    protected final Map<String, Map<String,GraphQLProperty>> classToProperty;
+    // Maps object type names to a map, which in turn maps field names to GraphQLField objects
+    protected final Map<String, Map<String,GraphQLField>> objectTypeToFields;
 
-    // Maps classnames to a map which in turn maps a GraphQLEntrypointType to a GraphQLEntrypoint
-    protected final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> classToEntrypoint;
+    // Maps object type names to a map, which in turn maps a GraphQLEntrypointType to a GraphQLEntrypoint
+    protected final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> objectTypeToEntrypoint;
 
     // GraphQL Interface
     protected final GraphQLInterface graphqlInterface;
 
-    public GraphQLEndpointImpl(final Map<String, Map<String,GraphQLProperty>> classToProperty,
-            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> classToEntrypoint, 
+    public GraphQLEndpointImpl(final Map<String, Map<String,GraphQLField>> objectTypeToFields,
+            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> objectTypeToEntrypoint, 
             final GraphQLInterface graphqlInterface){
-        this.classToProperty = classToProperty;
-        this.classToEntrypoint = classToEntrypoint;
+        this.objectTypeToFields = objectTypeToFields;
+        this.objectTypeToEntrypoint = objectTypeToEntrypoint;
         this.graphqlInterface = graphqlInterface;
     }
 
@@ -41,51 +41,51 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
     }
 
     @Override
-    public boolean containsClass(final String className) {
-        return classToProperty.containsKey(className);
+    public boolean containsGraphQLObjectType(final String objectTypeName) {
+        return objectTypeToFields.containsKey(objectTypeName);
     }
 
     @Override
-    public boolean containsProperty(final String className, final String propertyName) {
-        if(containsClass(className)){
-            return classToProperty.get(className).containsKey(propertyName);
+    public boolean containsGraphQLField(final String objectTypeName, final String fieldName) {
+        if(containsGraphQLObjectType(objectTypeName)){
+            return objectTypeToFields.get(objectTypeName).containsKey(fieldName);
         }
         return false;
     }
 
     @Override
-    public GraphQLFieldType getPropertyFieldType(final String className, final String propertyName) {
-        if(containsClass(className) && containsProperty(className, propertyName)){
-            return classToProperty.get(className).get(propertyName).getFieldType();
+    public GraphQLFieldType getGraphQLFieldType(final String objectTypeName, final String fieldName) {
+        if(containsGraphQLObjectType(objectTypeName) && containsGraphQLField(objectTypeName, fieldName)){
+            return objectTypeToFields.get(objectTypeName).get(fieldName).getFieldType();
         }
         return null;
     }
 
     @Override
-    public String getPropertyValueType(final String className, final String propertyName) {
-        if(containsClass(className) && containsProperty(className, propertyName)){
-            return classToProperty.get(className).get(propertyName).getValueType();
+    public String getGraphQLFieldValueType(final String objectTypeName, final String fieldName) {
+        if(containsGraphQLObjectType(objectTypeName) && containsGraphQLField(objectTypeName, fieldName)){
+            return objectTypeToFields.get(objectTypeName).get(fieldName).getValueType();
         }
         return null;
     }
 
     @Override
-    public Set<String> getClasses() {
-        return classToProperty.keySet();
+    public Set<String> getGraphQLObjectTypes() {
+        return objectTypeToFields.keySet();
     }
 
     @Override
-    public GraphQLEntrypoint getEntrypoint(final String className, final GraphQLEntrypointType type) {
-        if(containsClass(className) && classToEntrypoint.get(className).containsKey(type)){
-            return classToEntrypoint.get(className).get(type);
+    public GraphQLEntrypoint getEntrypoint(final String objectTypeName, final GraphQLEntrypointType fieldType) {
+        if(containsGraphQLObjectType(objectTypeName) && objectTypeToEntrypoint.get(objectTypeName).containsKey(fieldType)){
+            return objectTypeToEntrypoint.get(objectTypeName).get(fieldType);
         }
         return null;
     }
 
     @Override
-    public Map<String, GraphQLProperty> getClassProperties(final String className) {
-        if(containsClass(className)){
-            return classToProperty.get(className);
+    public Map<String, GraphQLField> getGraphQLObjectFields(final String objectTypeName) {
+        if(containsGraphQLObjectType(objectTypeName)){
+            return objectTypeToFields.get(objectTypeName);
         }
         return null;
     }

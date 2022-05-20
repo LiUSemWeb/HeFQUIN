@@ -9,23 +9,23 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 
 public class GraphQLQueryImpl implements GraphQLQuery {
     protected final TreeSet<String> fieldPaths;
-    protected final JsonObject parameterValues;
-    protected final Map<String, String> parameterDefinitions;
+    protected final JsonObject argumentValues;
+    protected final Map<String, String> argumentDefinitions;
 
-    public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject parameterValues,
-            final Map<String, String> parameterDefinitions) {
+    public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject argumentValues,
+            final Map<String, String> argumentDefinitions) {
         this.fieldPaths = fieldPaths;
-        this.parameterValues = parameterValues;
-        this.parameterDefinitions = parameterDefinitions;
+        this.argumentValues = argumentValues;
+        this.argumentDefinitions = argumentDefinitions;
     }
 
     public String toString() {
         final StringBuilder query = new StringBuilder();
-        if (!parameterDefinitions.isEmpty()) {
+        if (!argumentDefinitions.isEmpty()) {
             query.append("query(");
-            for (final String parameterName : parameterDefinitions.keySet()) {
-                query.append("$").append(parameterName).append(":");
-                query.append(parameterDefinitions.get(parameterName));
+            for (final String argName : argumentDefinitions.keySet()) {
+                query.append("$").append(argName).append(":");
+                query.append(argumentDefinitions.get(argName));
                 query.append(",");
             }
             query.append(")");
@@ -36,8 +36,18 @@ public class GraphQLQueryImpl implements GraphQLQuery {
     }
 
     @Override
-    public JsonObject getParameterValues() {
-        return parameterValues;
+    public TreeSet<String> getFieldPaths() {
+        return fieldPaths;
+    }
+
+    @Override
+    public JsonObject getArgumentValues() {
+        return argumentValues;
+    }
+
+    @Override
+    public Map<String, String> getArgumentDefinitions() {
+        return argumentDefinitions;
     }
 
     protected String buildQueryString() {

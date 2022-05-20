@@ -66,7 +66,7 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 			// Sending post body
 			JsonObject postBody = new JsonObject();
 			postBody.put("query", query.toString());
-			postBody.put("variables", query.getParameterValues());
+			postBody.put("variables", query.getArgumentValues());
 			postBody.put("raw", true);
 			outWriter = new OutputStreamWriter(con.getOutputStream());
 			outWriter.write(postBody.toString());

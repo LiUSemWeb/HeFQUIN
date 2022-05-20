@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLProperty;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
@@ -43,37 +43,37 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 		}
 
 		@Override
-		public boolean containsClass(String className) {
+		public boolean containsGraphQLObjectType(String className) {
 			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
-		public boolean containsProperty(String className, String propertyName) {
+		public boolean containsGraphQLField(String className, String propertyName) {
 			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
-		public GraphQLFieldType getPropertyFieldType(String className, String propertyName) {
+		public GraphQLFieldType getGraphQLFieldType(String className, String propertyName) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public String getPropertyValueType(String className, String propertyName) {
+		public String getGraphQLFieldValueType(String className, String propertyName) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public Set<String> getClasses() {
+		public Set<String> getGraphQLObjectTypes() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public Map<String, GraphQLProperty> getClassProperties(String className) {
+		public Map<String, GraphQLField> getGraphQLObjectFields(String className) {
 			// TODO Auto-generated method stub
 			return null;
 		}
