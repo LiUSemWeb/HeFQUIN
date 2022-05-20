@@ -12,7 +12,6 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServerWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -50,9 +49,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 			return new ExecOpRequestTPFatTPFServer( (TriplePatternRequest) req, (TPFServer) fm );
 		}
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-			if(fm.getVocabularyMapping() != null) {
-				return new ExecOpRequestTPFatBRTPFServerWithTranslation( (TriplePatternRequest) req, (BRTPFServer) fm );
-			}
 			return new ExecOpRequestTPFatBRTPFServer( (TriplePatternRequest) req, (BRTPFServer) fm );
 		}
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
