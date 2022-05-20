@@ -1,12 +1,15 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
+import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPFWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQLWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServerWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
@@ -56,9 +59,9 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 //		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
 //			return new ExecOpRequestTPFatBRTPFServer( (TriplePatternRequest) req, (BRTPFServer) fm );
 //		}
-//		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-//			return new ExecOpRequestBRTPF( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm );
-//		}
+		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+			return new ExecOpRequestBRTPFWithTranslation( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm );
+		}
 		else
 			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
 	}
