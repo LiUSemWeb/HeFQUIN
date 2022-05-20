@@ -1,208 +1,103 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingBuilder;
-
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
-import se.liu.ida.hefquin.engine.data.utils.TriplesToSolMapsConverter;
+import se.liu.ida.hefquin.engine.data.utils.JoiningIterableForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.UnionIterableForSolMaps;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSinkWithTranslation;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
+public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<BindingsRestrictedTriplePatternRequest,BRTPFServer>
 {
 	public ExecOpRequestBRTPFWithTranslation( final BindingsRestrictedTriplePatternRequest req,
 	                           final BRTPFServer fm ) {
 		super( req, fm );
+		assert fm.getVocabularyMapping() != null;	
 	}
 
+	
 	@Override
-	protected BRTPFRequest createPageRequest( final String nextPageURL ) {
-		return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings(), nextPageURL );
-	}
-
-	@Override
-	protected TPFResponse performPageRequest( final BRTPFRequest req,
-	                                          final FederationAccessManager fedAccessMgr )
-			throws FederationAccessException
-	{
+	protected void _execute(IntermediateResultElementSink sink, ExecutionContext execCxt)
+			throws ExecOpExecutionException {
+		
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getTriplePattern());
-		final List<Triple> resList = new ArrayList<>();
-		if(reqTranslation instanceof TriplePattern) {
-			resList.addAll(handleTriplePattern((TriplePattern) reqTranslation, fedAccessMgr));
+		for ( final SolutionMapping sm : handlePattern(reqTranslation, execCxt) ) {
+			sink.send(sm);
 		}
-		
-		else if(reqTranslation instanceof SPARQLUnionPattern) {
-			resList.addAll(handleUnionPattern(((SPARQLUnionPattern) reqTranslation), fedAccessMgr));
-		}
-		
-		else if(reqTranslation instanceof SPARQLGroupPattern) {
-			resList.addAll(handleGroupPattern(((SPARQLGroupPattern) reqTranslation), fedAccessMgr));
-		}
-		
-		else if(reqTranslation instanceof BGP) {
-			resList.addAll(handleBGP((BGP) reqTranslation, fedAccessMgr));
-		}
-		
-		else {
-			throw new FederationAccessException(reqTranslation.toString(), req, fm);
-		}
-		
-		return new TPFResponseImpl(resList, resList, null, fm, req, null);
-	}
-
-	@Override
-	protected Iterator<SolutionMapping> convert( final Iterable<Triple> itTriples ) {
-		return TriplesToSolMapsConverter.convert( itTriples, req.getTriplePattern() );
 	}
 	
-	protected Set<Triple> handleTriplePattern(final TriplePattern tp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, req.getSolutionMappings());
-		final TPFResponse res = FederationAccessUtils.performRequest(fedAccessMgr, newReq, fm);
-		final Set<Triple> tripleTranslation = new HashSet<>();
-		for(final Triple i : res.getPayload()) {
-			tripleTranslation.addAll(translateResultTriple(i, tp));
+	protected Iterable<SolutionMapping> handlePattern(final SPARQLGraphPattern p, final ExecutionContext execCxt) throws ExecOpExecutionException{
+		if (p instanceof TriplePattern) {
+			return handleTriplePattern((TriplePattern) p, execCxt);
+		} else if (p instanceof SPARQLUnionPattern) {
+			return handleUnionPattern(((SPARQLUnionPattern) p), execCxt);
+		} else if (p instanceof SPARQLGroupPattern) {
+			return handleGroupPattern(((SPARQLGroupPattern) p), execCxt);
+		} else if (p instanceof BGP) {
+			return handleBGP(((BGP) p), execCxt);
+		} else {
+			throw new ExecOpExecutionException(p.toString(), this);
 		}
-		return tripleTranslation;
 	}
 	
-	protected Set<Triple> handleUnionPattern(final SPARQLUnionPattern up, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		final Set<Triple> unionTranslation = new HashSet<>();
-		for(final SPARQLGraphPattern i : up.getSubPatterns()) {
-			if (i instanceof TriplePattern) {
-				unionTranslation.addAll(handleTriplePattern(((TriplePattern) i), fedAccessMgr));
-			} else if (i instanceof SPARQLUnionPattern) {
-				unionTranslation.addAll(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
-			} else if (i instanceof SPARQLGroupPattern) {
-				unionTranslation.addAll(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
-			} else if (i instanceof BGP) {
-				unionTranslation.addAll(handleBGP(((BGP) i), fedAccessMgr));
-			} else {
-				throw new FederationAccessException(i.toString(), req, fm);
-			}
+	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt) throws ExecOpExecutionException{
+		
+		final Set<SolutionMapping> translatedReqSM = new HashSet<>();
+		for (final SolutionMapping sm : req.getSolutionMappings()) {
+			translatedReqSM.addAll(fm.getVocabularyMapping().translateSolutionMappingFromGlobal(sm));
+		}
+		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, translatedReqSM);
+		final ExecOpRequestBRTPF op = new ExecOpRequestBRTPF(newReq, fm);
+		final MaterializingIntermediateResultElementSinkWithTranslation sink = new MaterializingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
+		
+		op.execute(sink, execCxt);
+	
+		return sink.getMaterializedIntermediateResult();
+	}
+	
+	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt) throws ExecOpExecutionException {
+		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
+		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt);
+		while(i.hasNext()){
+			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt));
 		}
 		return unionTranslation;
 	}
 	
-	protected Set<Triple> handleGroupPattern(final SPARQLGroupPattern gp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> groupTranslation = null;
-		for(final SPARQLGraphPattern i : gp.getSubPatterns()) {
-			final Set<Triple> partialTranslation = new HashSet<>();
-			if (i instanceof TriplePattern) {
-				partialTranslation.addAll(handleTriplePattern((TriplePattern) i, fedAccessMgr));
-			} else if (i instanceof SPARQLUnionPattern) {
-				partialTranslation.addAll(handleUnionPattern(((SPARQLUnionPattern) i), fedAccessMgr));
-			} else if (i instanceof SPARQLGroupPattern) {
-				partialTranslation.addAll(handleGroupPattern(((SPARQLGroupPattern) i), fedAccessMgr));
-			} else if (i instanceof BGP) {
-				partialTranslation.addAll(handleBGP(((BGP) i), fedAccessMgr));
-			} else {
-				throw new FederationAccessException(i.toString(), req, fm);
-			}
-			
-			if (groupTranslation == null) {
-				groupTranslation = new HashSet<>();
-				groupTranslation.addAll(partialTranslation);
-			} else {
-				groupTranslation.retainAll(partialTranslation);
-			}
+	protected Iterable<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final ExecutionContext execCxt) throws ExecOpExecutionException {
+		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
+		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt);
+		while(i.hasNext()){
+			groupTranslation = new JoiningIterableForSolMaps(groupTranslation, handlePattern(i.next(), execCxt));
 		}
 		return groupTranslation;
 	}
 	
-	protected Set<Triple> handleBGP(final BGP bgp, final FederationAccessManager fedAccessMgr) throws FederationAccessException{
-		Set<Triple> bgpTranslation = null;
+	protected Iterable<SolutionMapping> handleBGP(final BGP bgp, final ExecutionContext execCxt) throws ExecOpExecutionException {
+		Iterable<SolutionMapping> bgpTranslation = null;
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
 			if (bgpTranslation == null) {
-				bgpTranslation = new HashSet<>();
-				bgpTranslation.addAll(handleTriplePattern(i, fedAccessMgr));
+				bgpTranslation = handleTriplePattern(i, execCxt);
 			} else {
-				bgpTranslation.retainAll(handleTriplePattern(i, fedAccessMgr));
+				bgpTranslation = new JoiningIterableForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt));
 			}
 		}
 		return bgpTranslation;
 	}
-	
-	protected Set<Triple> translateResultTriple(final Triple t, final TriplePattern q){
-		final BindingBuilder bb = BindingBuilder.create();
-		final org.apache.jena.graph.Triple jq = q.asJenaTriple();
-		final org.apache.jena.graph.Triple jt = t.asJenaTriple();
-		boolean sVar = false;
-		boolean pVar = false;
-		boolean oVar = false;
-		if (jq.getSubject().isVariable()) {
-			sVar = true;
-			bb.add((Var) jq.getSubject(), jt.getSubject());
-		}
-		if (jq.getPredicate().isVariable()) {
-			pVar = true;
-			bb.add((Var) jq.getPredicate(), jt.getPredicate());
-		}
-		if (jq.getObject().isVariable()) {
-			oVar = true;
-			bb.add((Var) jq.getObject(), jt.getObject());
-		}
-		final SolutionMapping sm = new SolutionMappingImpl(bb.build());
-		
-		Set<Triple> res = new HashSet<>();
-		for (final SolutionMapping k : fm.getVocabularyMapping().translateSolutionMapping(sm)) {
-			final Binding b = k.asJenaBinding();
-			Triple newT = null;
-			
-			if (sVar) {
-				if (pVar) {
-					if (oVar) {
-						newT = new TripleImpl(b.get((Var) jq.getSubject()), b.get((Var) jq.getPredicate()), b.get((Var) jq.getObject()));
-					} else {
-						newT = new TripleImpl(b.get((Var) jq.getSubject()), b.get((Var) jq.getPredicate()), jt.getObject());
-					}
-				} else {
-					if (oVar) {
-						newT = new TripleImpl(b.get((Var) jq.getSubject()), jt.getPredicate(), b.get((Var) jq.getObject()));
-					} else {
-						newT = new TripleImpl(b.get((Var) jq.getSubject()), jt.getPredicate(), jt.getObject());
-					}
-				}
-			} else {
-				if (pVar) {
-					if (oVar) {
-						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), b.get((Var) jq.getObject()));
-					} else {
-						newT = new TripleImpl(jt.getSubject(), b.get((Var) jq.getPredicate()), jt.getObject());
-					}
-				} else {
-					if (oVar) {
-						newT = new TripleImpl(jt.getSubject(), jt.getPredicate(), b.get((Var) jq.getObject()));
-					} else {
-						newT = new TripleImpl(jt.getSubject(), jt.getPredicate(), jt.getObject());
-					}
-				}
-			}
-			
-			res.add(newT);
-		}
-		return res;
-	}
+
 }
 
