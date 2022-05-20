@@ -35,32 +35,33 @@ public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<Bind
 			throws ExecOpExecutionException {
 		
 		final SPARQLGraphPattern reqTranslation = fm.getVocabularyMapping().translateTriplePattern(req.getTriplePattern());
-		for ( final SolutionMapping sm : handlePattern(reqTranslation, execCxt) ) {
-			sink.send(sm);
-		}
-	}
-	
-	protected Iterable<SolutionMapping> handlePattern(final SPARQLGraphPattern p, final ExecutionContext execCxt) throws ExecOpExecutionException{
-		if (p instanceof TriplePattern) {
-			return handleTriplePattern((TriplePattern) p, execCxt);
-		} else if (p instanceof SPARQLUnionPattern) {
-			return handleUnionPattern(((SPARQLUnionPattern) p), execCxt);
-		} else if (p instanceof SPARQLGroupPattern) {
-			return handleGroupPattern(((SPARQLGroupPattern) p), execCxt);
-		} else if (p instanceof BGP) {
-			return handleBGP(((BGP) p), execCxt);
-		} else {
-			throw new ExecOpExecutionException(p.toString(), this);
-		}
-	}
-	
-	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt) throws ExecOpExecutionException{
 		
 		final Set<SolutionMapping> translatedReqSM = new HashSet<>();
 		for (final SolutionMapping sm : req.getSolutionMappings()) {
 			translatedReqSM.addAll(fm.getVocabularyMapping().translateSolutionMappingFromGlobal(sm));
 		}
-		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, translatedReqSM);
+		
+		for ( final SolutionMapping sm : handlePattern(reqTranslation, execCxt, translatedReqSM) ) {
+			sink.send(sm);
+		}
+	}
+	
+	protected Iterable<SolutionMapping> handlePattern(final SPARQLGraphPattern p, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException{
+		if (p instanceof TriplePattern) {
+			return handleTriplePattern((TriplePattern) p, execCxt, sms);
+		} else if (p instanceof SPARQLUnionPattern) {
+			return handleUnionPattern(((SPARQLUnionPattern) p), execCxt, sms);
+		} else if (p instanceof SPARQLGroupPattern) {
+			return handleGroupPattern(((SPARQLGroupPattern) p), execCxt, sms);
+		} else if (p instanceof BGP) {
+			return handleBGP(((BGP) p), execCxt, sms);
+		} else {
+			throw new ExecOpExecutionException(p.toString(), this);
+		}
+	}
+	
+	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException{
+		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, sms);
 		final ExecOpRequestBRTPF op = new ExecOpRequestBRTPF(newReq, fm);
 		final MaterializingIntermediateResultElementSinkWithTranslation sink = new MaterializingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
 		
@@ -69,31 +70,31 @@ public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<Bind
 		return sink.getMaterializedIntermediateResult();
 	}
 	
-	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt) throws ExecOpExecutionException {
+	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException {
 		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
-		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt);
+		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt, sms);
 		while(i.hasNext()){
-			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt));
+			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt, sms));
 		}
 		return unionTranslation;
 	}
 	
-	protected Iterable<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final ExecutionContext execCxt) throws ExecOpExecutionException {
+	protected Iterable<SolutionMapping> handleGroupPattern(final SPARQLGroupPattern gp, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException {
 		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
-		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt);
+		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt, sms);
 		while(i.hasNext()){
-			groupTranslation = new JoiningIterableForSolMaps(groupTranslation, handlePattern(i.next(), execCxt));
+			groupTranslation = new JoiningIterableForSolMaps(groupTranslation, handlePattern(i.next(), execCxt, sms));
 		}
 		return groupTranslation;
 	}
 	
-	protected Iterable<SolutionMapping> handleBGP(final BGP bgp, final ExecutionContext execCxt) throws ExecOpExecutionException {
+	protected Iterable<SolutionMapping> handleBGP(final BGP bgp, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException {
 		Iterable<SolutionMapping> bgpTranslation = null;
 		for(final TriplePattern i : bgp.getTriplePatterns()) {
 			if (bgpTranslation == null) {
-				bgpTranslation = handleTriplePattern(i, execCxt);
+				bgpTranslation = handleTriplePattern(i, execCxt, sms);
 			} else {
-				bgpTranslation = new JoiningIterableForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt));
+				bgpTranslation = new JoiningIterableForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt, sms));
 			}
 		}
 		return bgpTranslation;
