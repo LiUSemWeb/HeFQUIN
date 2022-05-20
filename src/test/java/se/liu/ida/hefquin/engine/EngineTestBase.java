@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
@@ -53,6 +54,11 @@ public abstract class EngineTestBase
 	 * instances will be skipped.
 	 */
 	public static boolean skipLocalNeo4jTests = true;
+
+	/**
+	 * If true, skip tests to local GraphQL endpoint
+	 */
+	public static boolean skipLocalGraphQLTests = true;
 
 
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
@@ -204,6 +210,39 @@ public abstract class EngineTestBase
 
 	}
 
+	protected static class SPARQLEndpointWithVocabularyMappingForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	{
+		final SPARQLEndpointInterface iface;
+		final VocabularyMapping vocabularyMapping;
+
+		public SPARQLEndpointWithVocabularyMappingForTest( final String ifaceURL, final Graph data , final VocabularyMapping vm) {
+			super(data);
+			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+			vocabularyMapping = vm;
+		}
+
+		@Override
+		public SPARQLEndpointInterface getInterface() { return iface; }
+
+		public SolMapsResponse performRequest( final SPARQLRequest req ) {
+			final List<SolutionMapping> result;
+			if ( req instanceof TriplePatternRequest ) {
+				result = getSolutions( (TriplePatternRequest) req);
+			}
+			else if (req.getQueryPattern() instanceof TriplePattern) {
+				result = getSolutions( (TriplePattern) req.getQueryPattern() );
+			} else {
+				result = getSolutions(req.getQueryPattern());
+			}
+			return new SolMapsResponseImpl( result, this, req, new Date() );
+		}
+		
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return vocabularyMapping;
+		}
+
+	}
 
 	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
@@ -352,6 +391,21 @@ public abstract class EngineTestBase
 		}
 	}
 
+	protected static class GraphQLEndpointTest implements GraphQLEndpoint {
+
+		public GraphQLEndpointTest() {}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+
+		@Override
+		public GraphQLInterface getInterface() {
+			return new GraphQLInterfaceImpl("http://localhost:4000/graphql");
+		}
+	}
+
 	protected static class TPFResponseForTest extends TPFResponseImpl
 	{
 		public TPFResponseForTest( final List<Triple> matchingTriples,
@@ -409,7 +463,11 @@ public abstract class EngineTestBase
 				response = new SolMapsResponseImpl( itSolMapsForResponse.next(), fm, req, new Date() );
 			}
 			else {
-				response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
+				if (fm.getVocabularyMapping() != null) {
+					response = ( (SPARQLEndpointWithVocabularyMappingForTest) fm ).performRequest(req);
+				} else {
+					response = ( (SPARQLEndpointForTest) fm ).performRequest(req);
+				}
 			}
 			return CompletableFuture.completedFuture(response);
 		}

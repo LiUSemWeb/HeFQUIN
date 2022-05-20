@@ -181,51 +181,6 @@ public class VocabularyMappingTest
 		p = RDFS.subPropertyOf.asNode();
 		testTriples.add(new Triple(o, p, s));
 		
-		//Predicate Intersection
-		p = OWL.intersectionOf.asNode();
-		Node blank = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, blank));	
-		
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p3");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		blank = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p4");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		//Predicate Union
-		p = OWL.unionOf.asNode();
-		blank = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(s, p, blank));	
-		
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p5");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = NodeFactory.createBlankNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-		blank = o;
-		p = RDF.first.asNode();
-		o = NodeFactory.createURI("p6");
-		testTriples.add(new Triple(blank, p, o));	
-		
-		p = RDF.rest.asNode();
-		o = RDF.nil.asNode();
-		testTriples.add(new Triple(blank, p, o));
-		
-
 		final VocabularyMapping vm = new VocabularyMappingImpl(testTriples);
 		
 		s = NodeFactory.createURI("s");
@@ -236,14 +191,7 @@ public class VocabularyMappingTest
 		List<SPARQLGraphPattern> translationSubPatterns = new ArrayList<>();
 		assertTrue(translation instanceof SPARQLUnionPattern);
 		for(SPARQLGraphPattern i : ((SPARQLUnionPattern) translation).getSubPatterns()) {
-			if(i instanceof SPARQLUnionPattern) {
-				assertTrue(((SPARQLUnionPattern) i).getNumberOfSubPatterns() == 2);
-				for(SPARQLGraphPattern j : ((SPARQLUnionPattern) i).getSubPatterns()) {
-					translationSubPatterns.add(j);
-				}
-			} else {
-				translationSubPatterns.add(i);
-			}
+			translationSubPatterns.add(i);
 		}
 	
 		final List<SPARQLGraphPattern> expectedResults = new ArrayList<>();
@@ -251,20 +199,6 @@ public class VocabularyMappingTest
 		expectedResults.add(new TriplePatternImpl(s, p, o));
 		p = NodeFactory.createURI("Subtype");
 		expectedResults.add(new TriplePatternImpl(s, p, o));
-		
-		//Union subpatterns
-		p = NodeFactory.createURI("p5");
-		expectedResults.add(new TriplePatternImpl(s, p, o));
-		p = NodeFactory.createURI("p6");
-		expectedResults.add(new TriplePatternImpl(s, p, o));
-		
-		final BGPImpl intersection = new BGPImpl();
-		p = NodeFactory.createURI("p3");
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
-		p = NodeFactory.createURI("p4");
-		intersection.addTriplePattern(new TriplePatternImpl(s, p, o));
-		expectedResults.add(intersection);
-		
 		p = NodeFactory.createURI("Not p1");
 		expectedResults.add(new TriplePatternImpl(o, p, s));
 		
@@ -540,5 +474,65 @@ public class VocabularyMappingTest
 		assertEquals(expectedResults, translation);
 		
 	}
+	
+	@Test
+	public void TranslateSolutionMappingFromGlobalTest() throws IOException {
+		final String mappingAsTurtle =
+				  "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
+				+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
+				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
+				+ "@prefix ex:   <http://example.org/> .  \n"
+				+ "ex:n owl:equivalentClass ex:a . "
+				+ "ex:n owl:equivalentProperty ex:b . "
+				+ "ex:n owl:sameAs ex:c . "
+				+ "ex:d rdfs:subPropertyOf ex:n . "
+				+ "ex:e rdfs:subClassOf ex:n . "
+				+ "ex:n owl:unionOf (ex:f ex:g) . ";
+		final Graph mapping = GraphFactory.createDefaultGraph();
+		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
+		final Set<Triple> mappingSet = new HashSet<>( RiotLib.triples(mapping, Node.ANY, Node.ANY, Node.ANY) );
+		
+		final VocabularyMapping vm = new VocabularyMappingImpl(mappingSet);
+		
+		final BindingBuilder testBuilder = BindingBuilder.create();
+		testBuilder.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/n"));
+		
+		final SolutionMapping testSm = new SolutionMappingImpl(testBuilder.build());		
+		Set<SolutionMapping> translation = vm.translateSolutionMappingFromGlobal(testSm);
+		
+		Set<SolutionMapping> expectedResults = new HashSet<>();
+		final BindingBuilder first = BindingBuilder.create();
+		first.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/a"));
+		expectedResults.add(new SolutionMappingImpl(first.build()));
+		
+		final BindingBuilder second = BindingBuilder.create();
+		second.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/b"));
+		expectedResults.add(new SolutionMappingImpl(second.build()));
+		
+		final BindingBuilder third = BindingBuilder.create();
+		third.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/c"));
+		expectedResults.add(new SolutionMappingImpl(third.build()));
+		
+		final BindingBuilder fourth = BindingBuilder.create();
+		fourth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/d"));
+		expectedResults.add(new SolutionMappingImpl(fourth.build()));
+		
+		final BindingBuilder fifth = BindingBuilder.create();
+		fifth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/e"));
+		expectedResults.add(new SolutionMappingImpl(fifth.build()));
+		
+		final BindingBuilder sixth = BindingBuilder.create();
+		sixth.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/f"));
+		expectedResults.add(new SolutionMappingImpl(sixth.build()));
+		
+		final BindingBuilder seventh = BindingBuilder.create();
+		seventh.add(Var.alloc("v"), NodeFactory.createURI("http://example.org/g"));
+		expectedResults.add(new SolutionMappingImpl(seventh.build()));
+
+		assertEquals(expectedResults, translation);
+		
+	}
 
 }
+
+

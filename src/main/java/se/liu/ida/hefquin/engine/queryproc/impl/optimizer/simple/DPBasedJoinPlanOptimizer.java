@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -61,8 +62,11 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         }
 
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
-                        if( plan_left.getRootOperator() instanceof PhysicalOpRequest){
-                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest) plan_left.getRootOperator(), plan_right, candidatePlans );
+                        if ( plan_left.getRootOperator() instanceof PhysicalOpRequest ) {
+                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) plan_left.getRootOperator(), plan_right, candidatePlans );
+                        }
+                        else if ( plan_left.getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
+                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) plan_left.getRootOperator(), plan_right, candidatePlans );
                         }
                     }
 
@@ -140,7 +144,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                 right.add( rightClone );
 
                 if ( leftClone.size() != 0 && rightClone.size() != 0 )
-                    result.add( new Pair( leftClone, rightClone ) );
+                    result.add( new Pair<>( leftClone, rightClone ) );
 
             }
         }
