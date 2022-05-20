@@ -25,6 +25,13 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit( final PhysicalOpRequestWithTranslation<?, ?> op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
+        }
+        
+        @Override
         public void visit( final PhysicalOpBindJoin op ) {
             addTabs();
             builder.append( op.toString() );
@@ -42,6 +49,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
         @Override
         public void visit( final PhysicalOpBindJoinWithFILTER op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append(System.lineSeparator());
+            indentLevel++;
+        }
+
+        @Override
+        public void visit( final PhysicalOpBindJoinWithFILTERandTranslation op ) {
             addTabs();
             builder.append( op.toString() );
             builder.append(System.lineSeparator());
@@ -111,6 +126,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         public void visit(final PhysicalOpRequest<?, ?> op) {
             // nothing to do here
         }
+        
+        @Override
+        public void visit(final PhysicalOpRequestWithTranslation<?, ?> op) {
+            // nothing to do here
+        }
 
         @Override
         public void visit(final PhysicalOpBindJoin op) {
@@ -124,6 +144,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
         @Override
         public void visit(final PhysicalOpBindJoinWithFILTER op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit(final PhysicalOpBindJoinWithFILTERandTranslation op) {
             indentLevel--;
         }
 

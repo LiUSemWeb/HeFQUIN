@@ -40,7 +40,10 @@ public class LogicalToPhysicalOpConverter
 	}
 
 	public static NullaryPhysicalOp convert( final LogicalOpRequest<?,?> lop ) {
-		return new PhysicalOpRequest<>(lop);
+		if ( lop.getFederationMember().getVocabularyMapping() != null )
+			return new PhysicalOpRequestWithTranslation<>(lop);
+		else
+			return new PhysicalOpRequest<>(lop);
 	}
 
 	// --------- unary operators -----------

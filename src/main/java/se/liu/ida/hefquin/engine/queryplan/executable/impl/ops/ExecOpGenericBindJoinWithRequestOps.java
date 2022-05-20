@@ -1,10 +1,13 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Set;
+
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.core.BasicPattern;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -86,6 +89,37 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 			}
 		}
     } // end of helper class MyIntermediateResultElementSink
+	
+	protected static class MyIntermediateResultElementSinkWithTranslation implements IntermediateResultElementSink
+	{
+		protected final IntermediateResultElementSink outputSink;
+		protected final Iterable<SolutionMapping> inputSolutionMappings;
+		protected final VocabularyMapping vocabularyMapping;
+
+		public MyIntermediateResultElementSinkWithTranslation( final IntermediateResultElementSink outputSink,
+		                                        final IntermediateResultBlock input,
+		                                        final VocabularyMapping vm) {
+			this.outputSink = outputSink;
+			this.inputSolutionMappings = input.getSolutionMappings();
+			this.vocabularyMapping = vm;
+		}
+
+		@Override
+		public void send( final SolutionMapping smFromRequest ) {
+			// TODO: this implementation is very inefficient
+			// We need an implementation of IntermediateResultBlock that can
+			// be used like an index.
+			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
+			final Set<SolutionMapping> smFromRequestTranslated = vocabularyMapping.translateSolutionMapping(smFromRequest);
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				for (final SolutionMapping smTranslated : smFromRequestTranslated) {
+					if ( SolutionMappingUtils.compatible(smFromInput, smTranslated) ) {
+						outputSink.send( SolutionMappingUtils.merge(smFromInput,smTranslated) );
+					}
+				}
+			}
+		}
+    }
 
 	// ------- helper function ------
 	/**
