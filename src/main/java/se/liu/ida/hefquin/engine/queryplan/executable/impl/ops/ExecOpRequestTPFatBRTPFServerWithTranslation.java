@@ -12,8 +12,6 @@ public class ExecOpRequestTPFatBRTPFServerWithTranslation extends ExecOpGenericT
 {
 	public ExecOpRequestTPFatBRTPFServerWithTranslation( final TriplePatternRequest req, final BRTPFServer fm ) {
 		super( req, fm );
-		
-		assert fm.getVocabularyMapping() != null;
 	}
 	
 }

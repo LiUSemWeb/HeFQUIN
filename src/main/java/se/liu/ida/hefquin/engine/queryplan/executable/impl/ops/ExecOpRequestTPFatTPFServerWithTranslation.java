@@ -12,8 +12,6 @@ public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTri
 {
 	public ExecOpRequestTPFatTPFServerWithTranslation( final TriplePatternRequest req, final TPFServer fm ) {
 		super( req, fm );
-
-		assert fm.getVocabularyMapping() != null;
 	}
 
 }
