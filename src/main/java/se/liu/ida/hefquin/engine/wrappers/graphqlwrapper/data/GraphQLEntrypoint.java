@@ -22,4 +22,10 @@ public interface GraphQLEntrypoint {
      * @return the name of the GraphQL object type that the entrypoint field fetches.
      */
     public String getTypeName();
+
+    /**
+     * @return an aliased version of the entrypoint where @param counter is used
+     * to make the entrypoint alias unique.
+     */
+    public String getEntrypointAlias(int counter);
 }

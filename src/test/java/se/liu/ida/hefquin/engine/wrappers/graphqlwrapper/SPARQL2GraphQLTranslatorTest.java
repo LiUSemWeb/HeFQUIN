@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static java.util.Map.entry;
 import static org.junit.Assert.assertEquals;
@@ -72,12 +71,12 @@ public class SPARQL2GraphQLTranslatorTest {
     );
 
     // Query entrypoints (query type fields)
-    protected static final GraphQLEntrypoint e1 = new GraphQLEntrypointImpl("author", argDefs1, "Author");
-    protected static final GraphQLEntrypoint e2 = new GraphQLEntrypointImpl("authors", argDefs2, "Author");
-    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new HashMap<>(), "Author");
-    protected static final GraphQLEntrypoint e4 = new GraphQLEntrypointImpl("book", argDefs1, "Book");
-    protected static final GraphQLEntrypoint e5 = new GraphQLEntrypointImpl("books", argDefs3, "Book");
-    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book");
+    protected static final GraphQLEntrypoint e1 = new GraphQLEntrypointImpl("author", argDefs1, "Author",GraphQLEntrypointType.SINGLE);
+    protected static final GraphQLEntrypoint e2 = new GraphQLEntrypointImpl("authors", argDefs2, "Author",GraphQLEntrypointType.FILTERED);
+    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new HashMap<>(), "Author",GraphQLEntrypointType.FULL);
+    protected static final GraphQLEntrypoint e4 = new GraphQLEntrypointImpl("book", argDefs1, "Book",GraphQLEntrypointType.SINGLE);
+    protected static final GraphQLEntrypoint e5 = new GraphQLEntrypointImpl("books", argDefs3, "Book",GraphQLEntrypointType.FILTERED);
+    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book",GraphQLEntrypointType.FULL);
 
     // Translator, config and endpoint
     protected static final String classPrefix = "http://example.org/c/";
@@ -173,7 +172,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_single0:author(id:$var0)/id_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/scalar_title_of_Book:title");
@@ -202,7 +201,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected Result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_full0:allBooks/id_Book:id");
         fieldPaths.add("ep_full0:allBooks/object_authors_of_Book:authors/id_Author:id");
         fieldPaths.add("ep_full0:allBooks/scalar_genre_of_Book:genre");
@@ -239,7 +238,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_single0:author(id:$var0)/id_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/object_authors_of_Book:authors/id_Author:id");
@@ -273,7 +272,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_full0:allAuthors/id_Author:id");
         fieldPaths.add("ep_full0:allAuthors/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_full0:allAuthors/scalar_age_of_Author:age");
@@ -306,7 +305,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/id_Author:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/object_books_of_Author:books/object_authors_of_Book:authors/id_Author:id");
@@ -339,7 +338,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/id_Book:id");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_genre_of_Book:genre");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_title_of_Book:title");
@@ -379,7 +378,7 @@ public class SPARQL2GraphQLTranslatorTest {
         final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
 
         // Expected result
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         fieldPaths.add("ep_single0:author(id:$var0)/id_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/scalar_title_of_Book:title");

@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query;
 
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonObject;
 
@@ -18,10 +18,10 @@ public interface GraphQLQuery extends Query
     public String toString();
 
     /**
-     * @return a TreeSet with the fieldpaths for each field in the query 
+     * @return a Set with the fieldpaths for each field in the query 
      * (objects seperated by /)
      */
-    public TreeSet<String> getFieldPaths();
+    public Set<String> getFieldPaths();
 
     /**
      * @return a jsonobject with the argument names to argument values for the query

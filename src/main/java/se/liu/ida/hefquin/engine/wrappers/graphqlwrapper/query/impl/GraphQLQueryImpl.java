@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
@@ -8,11 +9,11 @@ import org.apache.jena.atlas.json.JsonObject;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 
 public class GraphQLQueryImpl implements GraphQLQuery {
-    protected final TreeSet<String> fieldPaths;
+    protected final Set<String> fieldPaths;
     protected final JsonObject argumentValues;
     protected final Map<String, String> argumentDefinitions;
 
-    public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject argumentValues,
+    public GraphQLQueryImpl(final Set<String> fieldPaths, final JsonObject argumentValues,
             final Map<String, String> argumentDefinitions) {
         this.fieldPaths = fieldPaths;
         this.argumentValues = argumentValues;
@@ -36,7 +37,7 @@ public class GraphQLQueryImpl implements GraphQLQuery {
     }
 
     @Override
-    public TreeSet<String> getFieldPaths() {
+    public Set<String> getFieldPaths() {
         return fieldPaths;
     }
 
@@ -56,7 +57,7 @@ public class GraphQLQueryImpl implements GraphQLQuery {
         StringBuilder path = new StringBuilder();
         int depth = 0;
 
-        for (final String currentPath : fieldPaths) {
+        for (final String currentPath : new TreeSet<>(fieldPaths)) {
 
             final int splitIndex = currentPath.lastIndexOf("/") + 1;
             final String domain = currentPath.substring(0, splitIndex);

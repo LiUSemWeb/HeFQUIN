@@ -79,12 +79,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         }
         // Remove all potential cyclic connector bindings
         final Set<Integer> connectorsToBeRemoved = GraphCycleDetector.determineCyclicConnectors(sgpNodes);
-        for(final int i : connectorsToBeRemoved){
-            connectors.remove(i);
-        }
+        connectors.keySet().removeAll(connectorsToBeRemoved);
 
         // Creating necessary variables for the GraphQL query
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+        final Set<String> fieldPaths = new HashSet<>();
         final JsonObject argumentValues = new JsonObject();
         final Map<String, String> argumentDefinitions = new HashMap<>();
 
@@ -93,12 +91,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         boolean isDeterminable = true;
         for(final Node n : subgraphPatterns.keySet()){
             final String sgpType = determineSgpType(subgraphPatterns.get(n),config);
-            if(!connectors.values().contains(n) && sgpType == null){
-                materializeAll(fieldPaths,subgraphPatterns,connectors,config,endpoint);
+            if(!connectors.containsValue(n) && sgpType == null){
+                materializeAll(fieldPaths,config,endpoint);
                 isDeterminable = false;
                 break;
             }
-            if(!connectors.values().contains(n)){
+            if(!connectors.containsValue(n)){
                 withoutConnector.put(n,sgpType);
             }
         }
@@ -111,33 +109,27 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                 final Map<String,LiteralLabel> sgpArguments = getSgpArguments(subgraphPatterns.get(n),config);
                 final String sgpType = withoutConnector.get(n);
                 final StringBuilder currentPath = new StringBuilder();
-                GraphQLEntrypoint e;
+                final GraphQLEntrypoint e;
 
                 if(hasNecessaryArguments(sgpArguments.keySet(), 
                         endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet(), 
                         true)){
                     // Get single object entrypoint
                     e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.SINGLE);
-                    final StringBuilder entrypointAlias = new StringBuilder("ep_single")
-                    .append(entrypointCounter).append(":").append(e.getFieldName());
-                    currentPath.append(entrypointAlias.toString());
                 }
                 else if(hasNecessaryArguments(sgpArguments.keySet(), 
                         endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet(),
                         false)){
                     // Get filtered list entrypoint
                     e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FILTERED);
-                    final StringBuilder entrypointAlias = new StringBuilder("ep_filtered")
-                    .append(entrypointCounter).append(":").append(e.getFieldName());
-                    currentPath.append(entrypointAlias.toString());
                 }
                 else{
                     // Get full list entrypoint (No argument values)
                     e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FULL);
-                    final StringBuilder entrypointAlias = new StringBuilder("ep_full")
-                    .append(entrypointCounter).append(":").append(e.getFieldName());
-                    currentPath.append(entrypointAlias.toString());
                 }
+
+                final String entrypointAlias = e.getEntrypointAlias(entrypointCounter);
+                currentPath.append(entrypointAlias);
  
                 // If entrypoint has arguments then add them to the currentPath, argumentValues and argumentDefinitions
                 final Map<String,String> entrypointArgDefs = e.getArgumentDefinitions();
@@ -175,12 +167,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Recursive function used to add fields from the TPs in a given SGP
      */
-    protected void addSgp(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
+    protected void addSgp(final Set<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
             final Map<Integer,Node> connectors, final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, 
             final Node subgraphNode, final String currentPath, final String sgpType){
 
         // Necessary id field present in all objects used to indentify the GraphQL object
-        fieldPaths.add(new StringBuilder(currentPath).append("id_").append(sgpType).append(":id").toString());
+        fieldPaths.add(currentPath + "id_" + sgpType + ":id");
 
         // Retrieve necessary information about current sgp
         final boolean addAllFields = hasVariablePredicate(subgraphPatterns.get(subgraphNode));
@@ -221,8 +213,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR,config,endpoint);
 
             for(final String uri : allObjectURI){
-                addEmptyObjectField(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-                    currentPath,sgpType,uri);
+                addEmptyObjectField(fieldPaths,config,endpoint,currentPath,sgpType,uri);
             }
 
             for(final String uri : allScalarURI){
@@ -238,8 +229,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                     final String withoutPrefix = config.removePropertyPrefix(predicate.getURI());
                     final String propertyName = config.removePropertySuffix(withoutPrefix);
                     if(endpoint.getGraphQLFieldType(sgpType,propertyName) == GraphQLFieldType.OBJECT){
-                        addEmptyObjectField(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-                            currentPath,sgpType,predicate.getURI());
+                        addEmptyObjectField(fieldPaths,config,endpoint,currentPath,sgpType,predicate.getURI());
                     }
                     else{
                         addScalarField(fieldPaths,config,currentPath,predicate.getURI());
@@ -253,72 +243,70 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Helper function to add a field to the query that represents a nested object. Fields in that nested 
      * object are added recursively through addSgp
      */
-    protected void addObjectField(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
+    protected void addObjectField(final Set<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
             final Map<Integer,Node> connectors, final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, 
             final Node nestedSubgraphNode, final String currentPath, final String sgpType, final String predicateURI){
 
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final StringBuilder field = new StringBuilder("object_").append(alias).append(":").append(fieldName);
-        final StringBuilder newPath = new StringBuilder(currentPath).append(field).append("/");
+        final String field = "object_" + alias + ":" + fieldName;
+        final String newPath = currentPath + field + "/";
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
         addSgp(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-            nestedSubgraphNode,newPath.toString(),nestedType);
+            nestedSubgraphNode,newPath,nestedType);
     }
 
     /**
      * Helper function to add a field to the query that represents a nested object that only needs an id field (no more recursive calls)
      */
-    protected void addEmptyObjectField(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
-            final Map<Integer,Node> connectors, final GraphQL2RDFConfiguration config,final GraphQLEndpoint endpoint, 
-            final String currentPath, final String sgpType, final String predicateURI){
+    protected void addEmptyObjectField(final Set<String> fieldPaths, final GraphQL2RDFConfiguration config,
+            final GraphQLEndpoint endpoint, final String currentPath, final String sgpType, 
+            final String predicateURI){
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final StringBuilder field = new StringBuilder("object_").append(alias).append(":").append(fieldName);
-        final StringBuilder newPath = new StringBuilder(currentPath).append(field).append("/");
+        final String field = "object_" + alias + ":" + fieldName;
+        final String newPath = currentPath + field + "/";
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
-        final StringBuilder nestedPath = new StringBuilder(newPath).append("id_").append(nestedType).append(":id");
-        fieldPaths.add(nestedPath.toString());
+        final String nestedPath = newPath + "id_" + nestedType + ":id";
+        fieldPaths.add(nestedPath);
     }
 
     /**
      * Helper function to add a field to the query that represents a scalar value
      */
-    protected void addScalarField(final TreeSet<String> fieldPaths, final GraphQL2RDFConfiguration config, 
+    protected void addScalarField(final Set<String> fieldPaths, final GraphQL2RDFConfiguration config, 
             final String currentPath, final String predicateURI){
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final StringBuilder field = new StringBuilder("scalar_").append(alias).append(":").append(fieldName);
-        fieldPaths.add(new StringBuilder(currentPath).append(field.toString()).toString());
+        final String field = "scalar_" + alias + ":" + fieldName;
+        fieldPaths.add(currentPath + field);
     }
 
     /**
      * When everything from the endpoint needs to be fetched
      */
-    protected void materializeAll(final TreeSet<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
-            final Map<Integer,Node> connectors,final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint){
+    protected void materializeAll(final Set<String> fieldPaths,final GraphQL2RDFConfiguration config, 
+            final GraphQLEndpoint endpoint){
         
         int entrypointCounter = 0;
         final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
         for(final String objectTypeName : objectTypeNames){
             // Get the full list entrypoint
             final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
-            final StringBuilder currentPath = new StringBuilder("ep_full")
-            .append(entrypointCounter).append(":").append(e.getFieldName()).append("/");
-            fieldPaths.add(new StringBuilder(currentPath).append("id_").append(objectTypeName).append(":id").toString());
+            final String currentPath = "ep_full" + entrypointCounter + ":" + e.getFieldName() + "/";
+            fieldPaths.add(currentPath + "id_" + objectTypeName + ":id");
 
             final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT,config, endpoint);
             final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR,config, endpoint);
 
             // Add all fields that nests another object
             for(final String uri : allObjectURI){
-                addEmptyObjectField(fieldPaths, subgraphPatterns, 
-                    connectors, config, endpoint, currentPath.toString(), objectTypeName, uri);
+                addEmptyObjectField(fieldPaths,config,endpoint,currentPath,objectTypeName,uri);
             }
             // Add all fields that represent scalar values
             for(final String uri : allScalarURI){
-                addScalarField(fieldPaths,config,currentPath.toString(),uri);
+                addScalarField(fieldPaths,config,currentPath,uri);
             }
 
             ++entrypointCounter;
@@ -353,8 +341,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             else if(predicate.isURI() && predicate.getURI().equals(config.getClassMembershipURI())){
                 if(object.isURI() && object.getURI().startsWith(config.getClassPrefix())){
                     final int splitIndex = config.getClassPrefix().length();
-                    final String sgpType = object.getURI().substring(splitIndex);
-                    return sgpType;
+                    return object.getURI().substring(splitIndex);
                 }
             }
         }
@@ -415,15 +402,15 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Helper function used to convert a LiteralLabel value to a valid jsonvalue
      */
     protected JsonValue literalToJsonValue(final LiteralLabel literal){
-        final Class<?> type = literal.getValue().getClass();
+        final Object value = literal.getValue();
 
-        if(type.equals(int.class)){
+        if(value instanceof Integer){
             return JsonNumber.value((int) literal.getValue());
         }
-        else if(type.equals(boolean.class)){
+        else if(value instanceof Boolean){
             return new JsonBoolean((boolean) literal.getValue());
         }
-        else if(type.equals(double.class) || type.equals(float.class)){
+        else if(value instanceof Double || value instanceof Float){
             return JsonNumber.value((double) literal.getValue());
         }
         else{

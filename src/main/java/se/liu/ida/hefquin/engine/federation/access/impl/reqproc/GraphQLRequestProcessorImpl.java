@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonParseException;
-import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.atlas.json.JSON;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
