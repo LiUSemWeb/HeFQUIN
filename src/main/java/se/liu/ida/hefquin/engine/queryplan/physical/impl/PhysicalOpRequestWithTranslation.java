@@ -59,7 +59,7 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
 			return new ExecOpRequestTPFatBRTPFServerWithTranslation( (TriplePatternRequest) req, (BRTPFServer) fm );
 		}
-		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+		else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
 			return new ExecOpRequestBRTPFWithTranslation( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm );
 		}
 		else
