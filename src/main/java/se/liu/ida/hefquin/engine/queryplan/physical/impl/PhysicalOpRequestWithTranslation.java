@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPFWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQLWithTranslation;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServerWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServerWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -55,11 +56,10 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
 			return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm );
 		}
-		// TODO: we need executable operators for the following cases
-//		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-//			return new ExecOpRequestTPFatBRTPFServer( (TriplePatternRequest) req, (BRTPFServer) fm );
-//		}
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+			return new ExecOpRequestTPFatBRTPFServerWithTranslation( (TriplePatternRequest) req, (BRTPFServer) fm );
+		}
+		else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
 			return new ExecOpRequestBRTPFWithTranslation( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm );
 		}
 		else

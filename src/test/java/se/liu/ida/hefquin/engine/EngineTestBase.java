@@ -317,6 +317,63 @@ public abstract class EngineTestBase
 			return null;
 		}
 	}
+	
+	protected static class BRTPFServerWithVocabularyMappingForTest extends FederationMemberBaseForTest implements BRTPFServer
+	{
+		final VocabularyMapping vm;
+		
+		public BRTPFServerWithVocabularyMappingForTest(Graph data, VocabularyMapping vocabularyMapping) {
+			super(data);
+			vm = vocabularyMapping;
+		}
+		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
+
+		@Override
+		public BRTPFInterface getInterface() { return iface; }
+
+		public TPFResponse performRequest( final TPFRequest req ) {
+			final List<Triple> result = getMatchingTriples(req);
+			return new TPFResponseForTest(result, this, req);
+		}
+		
+		public TPFResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
+			// The implementation in this method is not particularly efficient,
+			// but it is sufficient for the purpose of unit tests.
+			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
+
+			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
+			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
+				final Binding b = sm.asJenaBinding();
+				final Node s = ( jenaTP.getSubject().isVariable() )
+						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
+						: null;
+				final Node p = ( jenaTP.getPredicate().isVariable() )
+						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
+						: null;
+				final Node o = ( jenaTP.getObject().isVariable() )
+						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
+						: null;
+				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
+			}
+
+			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
+			final List<Triple> result = new ArrayList<>();
+			while ( it.hasNext() ) {
+				final org.apache.jena.graph.Triple t = it.next();
+				for ( final org.apache.jena.graph.Triple patternForTest : patternsForTest ) {
+					if ( patternForTest.matches(t) ) {
+						result.add( new TripleImpl(t) );
+						break;
+					}
+				}
+			}
+			return new TPFResponseForTest(result, this, req);
+		}
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return vm;
+		}
+	}
 
 	protected static class Neo4jServerImpl4Test implements Neo4jServer {
 
@@ -424,7 +481,11 @@ public abstract class EngineTestBase
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
 			}
 			else {
-				response = ( (BRTPFServerForTest) fm ).performRequest(req);
+				if (fm.getVocabularyMapping() != null) {
+					response = ( (BRTPFServerWithVocabularyMappingForTest) fm).performRequest(req);
+				} else {
+					response = ( (BRTPFServerForTest) fm ).performRequest(req);
+				}
 			}
 			return CompletableFuture.completedFuture(response);
 		}
