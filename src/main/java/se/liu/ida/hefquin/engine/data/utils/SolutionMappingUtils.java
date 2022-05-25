@@ -186,6 +186,43 @@ public class SolutionMappingUtils
 	}
 
 	/**
+	 * Applies the given vocabulary mapping to each of the solution mappings
+	 * of the given iterable (translating them from the local vocabulary to
+	 * the global vocabulary), collects the resulting solution mappings in a
+	 * list, and returns this list in the end.
+	 *
+	 * Attention: While this function materializes the complete list of all the
+	 * resulting solution mappings, for use cases in which such a materialization
+	 * is not necessary, use {@link RewritingIterableForSolMapsL2G} or
+	 * {@link RewritingIteratorForSolMapsL2G} instead.
+	 */
+	public static List<SolutionMapping> applyVocabularyMappingL2G( final Iterable<SolutionMapping> it,
+	                                                               final VocabularyMapping vm ) {
+		return applyVocabularyMappingL2G( it.iterator(), vm );
+	}
+
+	/**
+	 * Applies the given vocabulary mapping to each of the solution mappings
+	 * of the given iterator (translating them from the local vocabulary to
+	 * the global vocabulary), collects the resulting solution mappings in a
+	 * list, and returns this list in the end.
+	 *
+	 * Attention: While this function materializes the complete list of all the
+	 * resulting solution mappings, for use cases in which such a materialization
+	 * is not necessary, use {@link RewritingIterableForSolMapsL2G} or
+	 * {@link RewritingIteratorForSolMapsL2G} instead.
+	 */
+	public static List<SolutionMapping> applyVocabularyMappingL2G( final Iterator<SolutionMapping> it,
+	                                                               final VocabularyMapping vm ) {
+		final List<SolutionMapping> result = new ArrayList<>();
+		while ( it.hasNext() ) {
+			final SolutionMapping sm = it.next();
+			result.addAll( vm.translateSolutionMapping(sm) );
+		}
+		return result;
+	}
+
+	/**
 	 * Restricts the given Jena binding to the given set of variables.
 	 * Hence, the returned binding will be compatible to the solution
 	 * mapping given as input, but it will be defined only for the variables

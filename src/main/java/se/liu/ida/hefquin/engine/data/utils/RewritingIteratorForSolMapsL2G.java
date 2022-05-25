@@ -5,6 +5,11 @@ import java.util.Iterator;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 
+/**
+ * Attention: if you need a list of all the resulting solution mappings, use
+ * {@link SolutionMappingUtils#applyVocabularyMappingL2G(Iterator, VocabularyMapping)}
+ * instead.
+ */
 public class RewritingIteratorForSolMapsL2G extends RewritingIteratorForSolMapsBase
 {
 	public RewritingIteratorForSolMapsL2G( final Iterator<SolutionMapping> input,
