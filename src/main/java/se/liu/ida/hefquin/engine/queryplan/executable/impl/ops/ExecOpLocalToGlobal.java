@@ -17,8 +17,7 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBase{
 	
 	@Override
 	public int preferredInputBlockSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	@Override
