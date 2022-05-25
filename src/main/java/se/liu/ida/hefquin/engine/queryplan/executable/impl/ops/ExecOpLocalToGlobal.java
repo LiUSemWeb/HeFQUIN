@@ -34,8 +34,7 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBase{
 	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
-		// TODO Auto-generated method stub
-		
+		// This function is empty on purpose. There is nothing to be done here for this operator.
 	}
 	
 }
