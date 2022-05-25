@@ -32,7 +32,7 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBase{
 	}
 
 	@Override
-	protected void _concludeExecution(IntermediateResultElementSink sink, ExecutionContext execCxt)
+	protected void _concludeExecution( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
 		// TODO Auto-generated method stub
 		
