@@ -9,9 +9,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpLocalToGlobal extends UnaryExecutableOpBase{
 
-	VocabularyMapping vocabularyMapping;
+	protected final VocabularyMapping vocabularyMapping;
 	
-	public ExecOpLocalToGlobal(VocabularyMapping mapping) {
+	public ExecOpLocalToGlobal( final VocabularyMapping mapping ) {
+		assert mapping != null;
 		this.vocabularyMapping = mapping;
 	}
 	
