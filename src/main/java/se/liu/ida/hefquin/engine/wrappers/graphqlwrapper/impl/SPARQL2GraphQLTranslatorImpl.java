@@ -6,14 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.jena.atlas.json.JsonBoolean;
 import org.apache.jena.atlas.json.JsonNull;
-import org.apache.jena.atlas.json.JsonNumber;
 import org.apache.jena.atlas.json.JsonObject;
-import org.apache.jena.atlas.json.JsonString;
-import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.LiteralLabel;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
@@ -28,6 +23,8 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.TP;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.URI2GraphQLHelper;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
@@ -37,8 +34,73 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final GraphQLEndpoint endpoint) {
 
         // Initialize necessary data structures
+        final Map<Node, Set<TP>> subgraphPatterns = createSubGraphPatterns(bgp);
+        final Map<Integer, Node> connectors = createConnectors(subgraphPatterns);
+
+        // Creating necessary variables for the GraphQL query
+        final Set<String> fieldPaths = new HashSet<>();
+        final JsonObject argumentValues = new JsonObject();
+        final Map<String, String> argumentDefinitions = new HashMap<>();
+
+        // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
+        final Map<Node,String> withoutConnector = new HashMap<>();
+        boolean isDeterminable = true;
+        for(final Node n : subgraphPatterns.keySet()){
+            final String sgpType = SPARQL2GraphQLHelper.determineSgpType(subgraphPatterns.get(n),config);
+            if(!connectors.containsValue(n) && sgpType == null){
+                materializeAll(fieldPaths,config,endpoint);
+                isDeterminable = false;
+                break;
+            }
+            if(!connectors.containsValue(n)){
+                withoutConnector.put(n,sgpType);
+            }
+        }
+
+        // If materializeAll isn't called, generate query data normally
+        if(isDeterminable){
+            generateQueryData(config, endpoint, subgraphPatterns, connectors, fieldPaths, 
+                argumentValues, argumentDefinitions, withoutConnector);
+        }
+
+        return new GraphQLQueryImpl(fieldPaths, argumentValues, argumentDefinitions);
+    }
+
+    /**
+     * When everything from the endpoint needs to be fetched
+     */
+    protected void materializeAll(final Set<String> fieldPaths,final GraphQL2RDFConfiguration config, 
+            final GraphQLEndpoint endpoint){
+        
+        int entrypointCounter = 0;
+        final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
+        for(final String objectTypeName : objectTypeNames){
+            // Get the full list entrypoint
+            final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
+            final String currentPath = "ep_full" + entrypointCounter + ":" + e.getFieldName() + "/";
+            fieldPaths.add(currentPath + "id_" + objectTypeName + ":id");
+
+            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT,config, endpoint);
+            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR,config, endpoint);
+
+            // Add all fields that nests another object
+            for(final String uri : allObjectURI){
+                SPARQL2GraphQLHelper.addEmptyObjectField(fieldPaths,config,endpoint,currentPath,objectTypeName,uri);
+            }
+            // Add all fields that represent scalar values
+            for(final String uri : allScalarURI){
+                SPARQL2GraphQLHelper.addScalarField(fieldPaths,config,currentPath,uri);
+            }
+
+            ++entrypointCounter;
+        }
+    }
+
+    /**
+     * Creates a subgraphpatterns map using @param bgp
+     */
+    protected Map<Node, Set<TP>> createSubGraphPatterns(final BGP bgp){
         final Map<Node, Set<TP>> subgraphPatterns = new HashMap<>();
-        final Map<Integer, Node> connectors = new HashMap<>();
 
         // Partition BGP into SGPs and give unique integer id to TPs
         final Set<? extends TriplePattern> bgpSet = bgp.getTriplePatterns();
@@ -57,7 +119,14 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             ++idCounter;
         }
 
-        // Check for dependencies between the SGPs and create connectors
+        return subgraphPatterns;
+    }
+
+    /**
+     * Creates a connector map using @param subgraphPatterns
+     */
+    protected Map<Integer,Node> createConnectors(final Map<Node, Set<TP>> subgraphPatterns){
+        final Map<Integer,Node> connectors = new HashMap<>();
         final Map<Node,SGPNode> sgpNodes = new HashMap<>();
         for(final Node subject : subgraphPatterns.keySet()){
             final Set<TP> sgp = subgraphPatterns.get(subject);
@@ -80,362 +149,73 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         // Remove all potential cyclic connector bindings
         final Set<Integer> connectorsToBeRemoved = GraphCycleDetector.determineCyclicConnectors(sgpNodes);
         connectors.keySet().removeAll(connectorsToBeRemoved);
-
-        // Creating necessary variables for the GraphQL query
-        final Set<String> fieldPaths = new HashSet<>();
-        final JsonObject argumentValues = new JsonObject();
-        final Map<String, String> argumentDefinitions = new HashMap<>();
-
-        // Get all SGP without a connector, if they have undeterminable GraphQL type then materializeAll
-        final Map<Node,String> withoutConnector = new HashMap<>();
-        boolean isDeterminable = true;
-        for(final Node n : subgraphPatterns.keySet()){
-            final String sgpType = determineSgpType(subgraphPatterns.get(n),config);
-            if(!connectors.containsValue(n) && sgpType == null){
-                materializeAll(fieldPaths,config,endpoint);
-                isDeterminable = false;
-                break;
-            }
-            if(!connectors.containsValue(n)){
-                withoutConnector.put(n,sgpType);
-            }
-        }
-
-        // If the entire view doesn't need to be materialized
-        if(isDeterminable){
-            int entrypointCounter = 0;
-            int variableCounter = 0;
-            for(final Node n : withoutConnector.keySet()){
-                final Map<String,LiteralLabel> sgpArguments = getSgpArguments(subgraphPatterns.get(n),config);
-                final String sgpType = withoutConnector.get(n);
-                final StringBuilder currentPath = new StringBuilder();
-                final GraphQLEntrypoint e;
-
-                if(hasNecessaryArguments(sgpArguments.keySet(), 
-                        endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet(), 
-                        true)){
-                    // Get single object entrypoint
-                    e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.SINGLE);
-                }
-                else if(hasNecessaryArguments(sgpArguments.keySet(), 
-                        endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet(),
-                        false)){
-                    // Get filtered list entrypoint
-                    e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FILTERED);
-                }
-                else{
-                    // Get full list entrypoint (No argument values)
-                    e = endpoint.getEntrypoint(sgpType,GraphQLEntrypointType.FULL);
-                }
-
-                final String entrypointAlias = e.getEntrypointAlias(entrypointCounter);
-                currentPath.append(entrypointAlias);
- 
-                // If entrypoint has arguments then add them to the currentPath, argumentValues and argumentDefinitions
-                final Map<String,String> entrypointArgDefs = e.getArgumentDefinitions();
-                if(entrypointArgDefs != null && !entrypointArgDefs.isEmpty()){
-                    currentPath.append("(");
-                    for(final String argName : new TreeSet<String>(entrypointArgDefs.keySet())){
-                        final String variableName = "var"+variableCounter;
-                        currentPath.append(argName).append(":$").append(variableName).append(",");
-                        argumentDefinitions.put(variableName,entrypointArgDefs.get(argName));
-                        if(sgpArguments.containsKey(argName)) {
-                            argumentValues.put(variableName,literalToJsonValue(sgpArguments.get(argName)));
-                        }
-                        else{
-                            argumentValues.put(variableName,JsonNull.instance);
-                        }
-                        ++variableCounter;
-                    }
-                    final int lastComma = currentPath.lastIndexOf(",");
-                    currentPath.deleteCharAt(lastComma);
-                    currentPath.append(")");
-                }
-
-                // Start adding fields for nested object(s) using recursion
-                currentPath.append("/");
-                addSgp(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-                    n,currentPath.toString(),sgpType);
-                ++entrypointCounter;
-            }
-        }
-
-        return new GraphQLQueryImpl(fieldPaths, argumentValues, argumentDefinitions);
-    }
-
+        return connectors;
+    } 
 
     /**
-     * Recursive function used to add fields from the TPs in a given SGP
+     * Generates query data for @param fieldPaths, @param argumentValues, @param argumentDefinitions
      */
-    protected void addSgp(final Set<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
-            final Map<Integer,Node> connectors, final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, 
-            final Node subgraphNode, final String currentPath, final String sgpType){
+    protected void generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
+            final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors, final Set<String> fieldPaths,
+            final JsonObject argumentValues, final Map<String,String> argumentDefinitions,final Map<Node,String> withoutConnector){
 
-        // Necessary id field present in all objects used to indentify the GraphQL object
-        fieldPaths.add(currentPath + "id_" + sgpType + ":id");
-
-        // Retrieve necessary information about current sgp
-        final boolean addAllFields = hasVariablePredicate(subgraphPatterns.get(subgraphNode));
-        final Set<TP> tpConnectors = new HashSet<>();
-        for(final TP t : subgraphPatterns.get(subgraphNode)){
-            if(connectors.containsKey(t.getId())){
-                tpConnectors.add(t);
-            }
-        }
-
-        // Add fields that has nested objects to other SGPs using recursion
-        for(final TP currentTP : tpConnectors){
-            final Triple t = currentTP.getTriplePattern().asJenaTriple();
-            final Node nestedSubgraphNode = connectors.get(currentTP.getId());
-            final Node predicate = t.getPredicate();
-
-            if(predicate.isVariable()){
-                // If the current TP predicate is a variable we need to add everything
-                final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,endpoint);
-
-                for(final String uri : allObjectURI){
-                    addObjectField(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-                        nestedSubgraphNode,currentPath,sgpType,uri);
-                }
-
-            }
-            else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
-                // If the current TP predicate is a URI, add the GraphQL field it corresponds to
-                addObjectField(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-                    nestedSubgraphNode,currentPath,sgpType,predicate.getURI());
-            }
-        }
-
-        // Add fields that doesn't link to another SGP, 
-        if(addAllFields){
-            // If variable predicate exist in the current SGP, then query for everything in current object
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.OBJECT,config,endpoint);
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR,config,endpoint);
-
-            for(final String uri : allObjectURI){
-                addEmptyObjectField(fieldPaths,config,endpoint,currentPath,sgpType,uri);
-            }
-
-            for(final String uri : allScalarURI){
-                addScalarField(fieldPaths,config,currentPath,uri);
-            }
-
-        }
-        else{
-            // If no variable predicate exist, only the necessary fields from the SGP have to be added.
-            for(final TP t : subgraphPatterns.get(subgraphNode)){
-                final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
-                if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
-                    final String withoutPrefix = config.removePropertyPrefix(predicate.getURI());
-                    final String propertyName = config.removePropertySuffix(withoutPrefix);
-                    if(endpoint.getGraphQLFieldType(sgpType,propertyName) == GraphQLFieldType.OBJECT){
-                        addEmptyObjectField(fieldPaths,config,endpoint,currentPath,sgpType,predicate.getURI());
-                    }
-                    else{
-                        addScalarField(fieldPaths,config,currentPath,predicate.getURI());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Helper function to add a field to the query that represents a nested object. Fields in that nested 
-     * object are added recursively through addSgp
-     */
-    protected void addObjectField(final Set<String> fieldPaths, final Map<Node,Set<TP>> subgraphPatterns, 
-            final Map<Integer,Node> connectors, final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, 
-            final Node nestedSubgraphNode, final String currentPath, final String sgpType, final String predicateURI){
-
-        final String alias = config.removePropertyPrefix(predicateURI);
-        final String fieldName = config.removePropertySuffix(alias);
-        final String field = "object_" + alias + ":" + fieldName;
-        final String newPath = currentPath + field + "/";
-        final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
-
-        addSgp(fieldPaths,subgraphPatterns,connectors,config,endpoint,
-            nestedSubgraphNode,newPath,nestedType);
-    }
-
-    /**
-     * Helper function to add a field to the query that represents a nested object that only needs an id field (no more recursive calls)
-     */
-    protected void addEmptyObjectField(final Set<String> fieldPaths, final GraphQL2RDFConfiguration config,
-            final GraphQLEndpoint endpoint, final String currentPath, final String sgpType, 
-            final String predicateURI){
-        final String alias = config.removePropertyPrefix(predicateURI);
-        final String fieldName = config.removePropertySuffix(alias);
-        final String field = "object_" + alias + ":" + fieldName;
-        final String newPath = currentPath + field + "/";
-        final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
-        final String nestedPath = newPath + "id_" + nestedType + ":id";
-        fieldPaths.add(nestedPath);
-    }
-
-    /**
-     * Helper function to add a field to the query that represents a scalar value
-     */
-    protected void addScalarField(final Set<String> fieldPaths, final GraphQL2RDFConfiguration config, 
-            final String currentPath, final String predicateURI){
-        final String alias = config.removePropertyPrefix(predicateURI);
-        final String fieldName = config.removePropertySuffix(alias);
-        final String field = "scalar_" + alias + ":" + fieldName;
-        fieldPaths.add(currentPath + field);
-    }
-
-    /**
-     * When everything from the endpoint needs to be fetched
-     */
-    protected void materializeAll(final Set<String> fieldPaths,final GraphQL2RDFConfiguration config, 
-            final GraphQLEndpoint endpoint){
-        
+        // Counters for creating unique variable and entrypoint names
         int entrypointCounter = 0;
-        final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
-        for(final String objectTypeName : objectTypeNames){
-            // Get the full list entrypoint
-            final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
-            final String currentPath = "ep_full" + entrypointCounter + ":" + e.getFieldName() + "/";
-            fieldPaths.add(currentPath + "id_" + objectTypeName + ":id");
+        int variableCounter = 0;
 
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT,config, endpoint);
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR,config, endpoint);
+        // Create an entrypoint for each SGP without an incomming connector binding
+        for (final Node n : withoutConnector.keySet()) {
+            final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getSgpArguments(subgraphPatterns.get(n),config);
+            final String sgpType = withoutConnector.get(n);
+            final StringBuilder currentPath = new StringBuilder();
+            final GraphQLEntrypoint e;
 
-            // Add all fields that nests another object
-            for(final String uri : allObjectURI){
-                addEmptyObjectField(fieldPaths,config,endpoint,currentPath,objectTypeName,uri);
+            // Select entrypoint with regards to if the SGP has the required arguments
+            if (SPARQL2GraphQLHelper.hasNecessaryArguments(sgpArguments.keySet(),
+                    endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet(),
+                    true)) {
+                // Get single object entrypoint
+                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.SINGLE);
+            } else if (SPARQL2GraphQLHelper.hasNecessaryArguments(sgpArguments.keySet(),
+                    endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet(),
+                    false)) {
+                // Get filtered list entrypoint
+                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FILTERED);
+            } else {
+                // Get full list entrypoint (No argument values)
+                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FULL);
             }
-            // Add all fields that represent scalar values
-            for(final String uri : allScalarURI){
-                addScalarField(fieldPaths,config,currentPath,uri);
+
+            // Alias the entrypoint
+            final String entrypointAlias = e.getEntrypointAlias(entrypointCounter);
+            currentPath.append(entrypointAlias);
+
+            // If entrypoint has arguments then add them to the currentPath, argumentValues and argumentDefinitions
+            final Map<String, String> entrypointArgDefs = e.getArgumentDefinitions();
+            if (entrypointArgDefs != null && !entrypointArgDefs.isEmpty()) {
+                currentPath.append("(");
+                for (final String argName : new TreeSet<String>(entrypointArgDefs.keySet())) {
+                    final String variableName = "var" + variableCounter;
+                    currentPath.append(argName).append(":$").append(variableName).append(",");
+                    argumentDefinitions.put(variableName, entrypointArgDefs.get(argName));
+                    if (sgpArguments.containsKey(argName)) {
+                        argumentValues.put(variableName,
+                                SPARQL2GraphQLHelper.literalToJsonValue(sgpArguments.get(argName)));
+                    } else {
+                        argumentValues.put(variableName, JsonNull.instance);
+                    }
+                    ++variableCounter;
+                }
+                final int lastComma = currentPath.lastIndexOf(",");
+                currentPath.deleteCharAt(lastComma);
+                currentPath.append(")");
             }
 
+            // Start adding fields for nested object(s) using recursion
+            currentPath.append("/");
+            SPARQL2GraphQLHelper.addSgp(fieldPaths, subgraphPatterns, connectors, config, endpoint,
+                    n, currentPath.toString(), sgpType);
             ++entrypointCounter;
-        }
-    }
-
-    /**
-     * Helper function which checks if any triple pattern predicate in @param sgp is a variable or blank node, returns true if so
-     */
-    protected boolean hasVariablePredicate(final Set<TP> sgp){
-        for(final TP t : sgp){
-            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
-            if(predicate.isVariable()){
-                return true;
-            }    
-        }
-        return false;
-    }
-
-    /**
-     * Returns the GraphQL object type @param sgp correponds to. 
-     * If the type is undeterminable @return null
-     */
-    protected String determineSgpType(final Set<TP> sgp, final GraphQL2RDFConfiguration config){
-        for(final TP t : sgp){
-            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
-            final Node object = t.getTriplePattern().asJenaTriple().getObject();
-
-            if(predicate.isURI() && predicate.getURI().startsWith(config.getPropertyPrefix())){
-                return config.getClassFromPropertyURI(predicate.getURI());
-            }
-            else if(predicate.isURI() && predicate.getURI().equals(config.getClassMembershipURI())){
-                if(object.isURI() && object.getURI().startsWith(config.getClassPrefix())){
-                    final int splitIndex = config.getClassPrefix().length();
-                    return object.getURI().substring(splitIndex);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return a map consisting of what can be used as arguments from the given @param sgp
-     * The predicate from a TP needs to be a property URI and the object needs to be a literal
-     */
-    protected final Map<String,LiteralLabel> getSgpArguments(final Set<TP> sgp, final GraphQL2RDFConfiguration config){
-        final Map<String,LiteralLabel> args = new HashMap<>();
-        for(final TP t : sgp){
-            final Node predicate = t.getTriplePattern().asJenaTriple().getPredicate();
-            final Node object = t.getTriplePattern().asJenaTriple().getObject();
-
-            if(predicate.isURI() && predicate.getURI().startsWith(config.getPropertyPrefix())){
-                if(object.isLiteral() && object.getLiteral().isWellFormed()){
-                    // Remove prefix and suffix before adding to map
-                    final String s = config.removePropertyPrefix(predicate.toString());
-                    final String argName = config.removePropertySuffix(s);
-                    args.put(argName,object.getLiteral());
-                }
-            }
-        }
-        return args;
-    }
-
-    /**
-     * Checks whether a set of SGP arguments, @param sgpArguments , meets the necessery arguments for
-     * an endpoint @param entrypointArguments . If @param checkAll is true then all arguments from the entrypoint
-     * must exist in the SGP. Otherwise atleast one matching argument is enough as long as @param sgpArguments
-     * isn't an empty set.
-     */
-    protected boolean hasNecessaryArguments(final Set<String> sgpArguments, final Set<String> entrypointArguments, 
-            final boolean checkAll){
-        
-        if(sgpArguments.isEmpty()){
-            return false;
-        }
-
-        if(checkAll){
-            return sgpArguments.containsAll(entrypointArguments);
-        }
-        else{
-            for(final String argName : sgpArguments){
-                if(entrypointArguments.contains(argName)){
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Helper function used to convert a LiteralLabel value to a valid jsonvalue
-     */
-    protected JsonValue literalToJsonValue(final LiteralLabel literal){
-        final Object value = literal.getValue();
-
-        if(value instanceof Integer){
-            return JsonNumber.value((int) literal.getValue());
-        }
-        else if(value instanceof Boolean){
-            return new JsonBoolean((boolean) literal.getValue());
-        }
-        else if(value instanceof Double || value instanceof Float){
-            return JsonNumber.value((double) literal.getValue());
-        }
-        else{
-            return new JsonString((String) literal.getValue());
-        }
-    }
-
-    /**
-     * Wrapper class for a TriplePattern that includes an integer id
-     */
-    private class TP {
-        private final int id;
-        private final TriplePattern triplePattern;
-
-        public TP(final int id, final TriplePattern triplePattern) {
-            this.id = id;
-            this.triplePattern = triplePattern;
-        }
-
-        public final int getId() {
-            return id;
-        }
-
-        public final TriplePattern getTriplePattern(){
-            return triplePattern;
         }
     }
 }
