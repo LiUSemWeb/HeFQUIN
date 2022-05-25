@@ -22,7 +22,7 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBase{
 	}
 
 	@Override
-	protected void _process(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt)
+	protected void _process( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
 		for (final SolutionMapping solution : input.getSolutionMappings() ) {
 			for (final SolutionMapping sm : vocabularyMapping.translateSolutionMapping( solution )) {
