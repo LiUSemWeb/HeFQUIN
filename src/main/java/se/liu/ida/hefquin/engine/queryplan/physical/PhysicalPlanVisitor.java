@@ -20,4 +20,5 @@ public interface PhysicalPlanVisitor {
     void visit(final PhysicalOpBinaryUnion op);
 
     void visit(final PhysicalOpFilter op);
+    void visit(final PhysicalOpLocalToGlobal op);
 }

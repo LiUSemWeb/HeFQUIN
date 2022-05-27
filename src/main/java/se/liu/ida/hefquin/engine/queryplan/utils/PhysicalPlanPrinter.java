@@ -119,6 +119,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
             indentLevel++;
         }
 
+        @Override
+        public void visit( final PhysicalOpLocalToGlobal op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append(System.lineSeparator());
+            indentLevel++;
+        }
+
     }
 
     private class PhysicalPlanPrinterAfterVisitor implements PhysicalPlanVisitor {
@@ -184,6 +192,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
         @Override
         public void visit(final PhysicalOpFilter op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit(final PhysicalOpLocalToGlobal op) {
             indentLevel--;
         }
     }
