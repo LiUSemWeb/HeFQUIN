@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -87,6 +88,14 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			builder.append(System.lineSeparator());
 			indentLevel++;
 		}
+		
+		@Override
+		public void visit(final LogicalOpLocalToGlobal op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel++;
+		}
 	}
 
 	private class LogicalPlanPrinterAfterVisitor implements LogicalPlanVisitor {
@@ -128,6 +137,11 @@ public class LogicalPlanPrinter extends PlanPrinter{
 
 		@Override
 		public void visit(final LogicalOpFilter op) {
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpLocalToGlobal op) {
 			indentLevel--;
 		}
 	}
