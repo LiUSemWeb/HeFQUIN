@@ -16,7 +16,12 @@ public class LogicalOpLocalToGlobal implements UnaryLogicalOp {
 	public void visit(final LogicalPlanVisitor visitor) {
 		visitor.visit(this);
 	}
-	
+
+	@Override
+	public String toString() {
+		return "> l2g " + "(vocab.mapping: " + vocabularyMapping.hashCode() + ")";
+	}
+
 	public VocabularyMapping getVocabularyMapping() {
 		return this.vocabularyMapping;
 	}
