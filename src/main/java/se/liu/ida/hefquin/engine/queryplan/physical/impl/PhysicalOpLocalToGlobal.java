@@ -41,4 +41,9 @@ public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp {
 		return this.logicall2g;
 	}
 
+	@Override
+	public String toString() {
+		return "> l2g " + "(vocab.mapping: " + logicall2g.getVocabularyMapping().hashCode() + ")";
+	}
+
 }
