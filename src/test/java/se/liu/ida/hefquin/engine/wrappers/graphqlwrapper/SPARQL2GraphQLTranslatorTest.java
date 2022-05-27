@@ -9,7 +9,9 @@ import static java.util.Map.entry;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.jena.atlas.json.JsonNull;
+import org.apache.jena.atlas.json.JsonNumber;
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.datatypes.xsd.impl.XSDBaseNumericType;
 import org.apache.jena.datatypes.xsd.impl.XSDBaseStringType;
 import org.apache.jena.graph.Node;
@@ -24,8 +26,10 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
@@ -178,11 +182,9 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/scalar_title_of_Book:title");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_id_of_Author:id");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_name_of_Author:name");
-        final JsonObject argValues = new JsonObject();
-        argValues.put("var0", "auth3");
-        final Map<String,String> argDefinitions = new HashMap<>();
-        argDefinitions.put("var0","ID!");
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth3"), "ID!"));
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
 
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
@@ -213,9 +215,8 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_full1:allAuthors/scalar_age_of_Author:age");
         fieldPaths.add("ep_full1:allAuthors/scalar_id_of_Author:id");
         fieldPaths.add("ep_full1:allAuthors/scalar_name_of_Author:name");
-        final JsonObject argValues = new JsonObject();
-        final Map<String,String> argDefinitions = new HashMap<>();
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
 
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
@@ -247,11 +248,9 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/scalar_nr_pages_of_Book:nr_pages");
         fieldPaths.add("ep_single0:author(id:$var0)/object_books_of_Author:books/scalar_title_of_Book:title");
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_id_of_Author:id");
-        final JsonObject argValues = new JsonObject();
-        argValues.put("var0", "auth3");
-        final Map<String,String> argDefinitions = new HashMap<>();
-        argDefinitions.put("var0","ID!");
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth3"), "ID!"));
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
         
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
@@ -278,9 +277,8 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_full0:allAuthors/scalar_age_of_Author:age");
         fieldPaths.add("ep_full0:allAuthors/scalar_id_of_Author:id");
         fieldPaths.add("ep_full0:allAuthors/scalar_name_of_Author:name");
-        final JsonObject argValues = new JsonObject();
-        final Map<String,String> argDefinitions = new HashMap<>();
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
         
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
@@ -311,13 +309,10 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/object_books_of_Author:books/object_authors_of_Book:authors/id_Author:id");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/object_books_of_Author:books/scalar_nr_pages_of_Book:nr_pages");
         fieldPaths.add("ep_filtered0:authors(age:$var0,name:$var1)/scalar_name_of_Author:name");
-        final JsonObject argValues = new JsonObject();
-        argValues.put("var0", JsonNull.instance);
-        argValues.put("var1", "William Shakespeare");
-        final Map<String,String> argDefinitions = new HashMap<>();
-        argDefinitions.put("var0", "Int");
-        argDefinitions.put("var1", "String");
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        queryArgs.add(new GraphQLArgumentImpl("var0", "age", JsonNull.instance, "Int"));
+        queryArgs.add(new GraphQLArgumentImpl("var1", "name", new JsonString("William Shakespeare"), "String"));
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
         
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
@@ -342,16 +337,12 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/id_Book:id");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_genre_of_Book:genre");
         fieldPaths.add("ep_filtered0:books(genre:$var0,nr_pages:$var1,title:$var2)/scalar_title_of_Book:title");
-        final JsonObject argValues = new JsonObject();
-        argValues.put("var0", "MYSTERY");
-        argValues.put("var1", JsonNull.instance);
-        argValues.put("var2", JsonNull.instance);
-        final Map<String,String> argDefinitions = new HashMap<>();
-        argDefinitions.put("var0", "Genre");
-        argDefinitions.put("var1", "Int");
-        argDefinitions.put("var2", "String");
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
-        
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        queryArgs.add(new GraphQLArgumentImpl("var0", "genre", new JsonString("MYSTERY"), "Genre"));
+        queryArgs.add(new GraphQLArgumentImpl("var1", "nr_pages", JsonNull.instance, "Int"));
+        queryArgs.add(new GraphQLArgumentImpl("var2", "title", JsonNull.instance, "String"));
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
+
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());
         assertEquals(expectedQuery.getArgumentValues(), translatedQuery.getArgumentValues());
@@ -387,13 +378,10 @@ public class SPARQL2GraphQLTranslatorTest {
         fieldPaths.add("ep_single1:author(id:$var1)/object_books_of_Author:books/id_Book:id");
         fieldPaths.add("ep_single1:author(id:$var1)/object_books_of_Author:books/scalar_title_of_Book:title");
         fieldPaths.add("ep_single1:author(id:$var1)/scalar_id_of_Author:id");
-        final JsonObject argValues = new JsonObject();
-        argValues.put("var0", "auth3");
-        argValues.put("var1", "auth4");
-        final Map<String,String> argDefinitions = new HashMap<>();
-        argDefinitions.put("var0", "ID!");
-        argDefinitions.put("var1", "ID!");
-        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, argValues, argDefinitions);
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth3"), "ID!"));
+        queryArgs.add(new GraphQLArgumentImpl("var1", "id", new JsonString("auth4"), "ID!"));
+        final GraphQLQuery expectedQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
 
         // Verify that translated and expected query are identical
         assertEquals(expectedQuery.getFieldPaths(), translatedQuery.getFieldPaths());

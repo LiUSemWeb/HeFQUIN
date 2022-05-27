@@ -26,7 +26,7 @@ public class SPARQL2GraphQLHelper {
             final Node subgraphNode, final String currentPath, final String sgpType){
 
         // Necessary id field present in all objects used to indentify the GraphQL object
-        fieldPaths.add(currentPath + "id_" + sgpType + ":id");
+        fieldPaths.add(GraphQLFieldPathBuilder.addID(currentPath, sgpType));
 
         // Retrieve necessary information about current sgp
         final boolean addAllFields = hasVariablePredicate(subgraphPatterns.get(subgraphNode));
@@ -104,8 +104,7 @@ public class SPARQL2GraphQLHelper {
 
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final String field = "object_" + alias + ":" + fieldName;
-        final String newPath = currentPath + field + "/";
+        final String newPath = GraphQLFieldPathBuilder.addObject(currentPath, alias, fieldName);
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
         addSgp(fieldPaths,subgraphPatterns,connectors,config,endpoint,
@@ -120,11 +119,9 @@ public class SPARQL2GraphQLHelper {
             final String predicateURI){
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final String field = "object_" + alias + ":" + fieldName;
-        final String newPath = currentPath + field + "/";
+        final String newPath = GraphQLFieldPathBuilder.addObject(currentPath, alias, fieldName);
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
-        final String nestedPath = newPath + "id_" + nestedType + ":id";
-        fieldPaths.add(nestedPath);
+        fieldPaths.add(GraphQLFieldPathBuilder.addID(newPath, nestedType));
     }
 
     /**
@@ -134,8 +131,7 @@ public class SPARQL2GraphQLHelper {
             final String currentPath, final String predicateURI){
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final String field = "scalar_" + alias + ":" + fieldName;
-        fieldPaths.add(currentPath + field);
+        fieldPaths.add(GraphQLFieldPathBuilder.addScalar(currentPath, alias, fieldName));
     }
 
 
@@ -204,25 +200,31 @@ public class SPARQL2GraphQLHelper {
      * must exist in the SGP. Otherwise atleast one matching argument is enough as long as @param sgpArguments
      * isn't an empty set.
      */
-    public static boolean hasNecessaryArguments(final Set<String> sgpArguments, final Set<String> entrypointArguments, 
-            final boolean checkAll){
-        
-        if(sgpArguments.isEmpty()){
-            return false;
-        }
 
-        if(checkAll){
-            return sgpArguments.containsAll(entrypointArguments);
-        }
-        else{
-            for(final String argName : sgpArguments){
-                if(entrypointArguments.contains(argName)){
-                    return true;
-                }
+    /**
+     * Check if @param sgpArgumentNames have atleast one match with @param entrypointArgumentNames
+     */
+    public static boolean hasNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+        
+        for(final String argName : sgpArgumentNames){
+            if(entrypointArgumentNames.contains(argName)){
+                return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Check if @param sgpArgumentNames contains all argument name from @param entrypointArgumentNames.
+     * If @param sgpArgumentNames is empty then returns false.
+     */
+    public static boolean hasAllNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+        if(sgpArgumentNames.isEmpty()){
+            return false;
+        }
+
+        return sgpArgumentNames.containsAll(entrypointArgumentNames);
     }
 
     /**

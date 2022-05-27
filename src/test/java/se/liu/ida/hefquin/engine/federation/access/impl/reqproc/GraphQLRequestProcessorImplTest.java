@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
@@ -19,8 +20,10 @@ import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
@@ -88,9 +91,8 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
     @Test
     public void testLocalEndpoint() throws FederationAccessException {
         if (!skipLocalGraphQLTests) {
-            Set<String> fieldPaths = new HashSet<>();
-            Map<String, String> parameterDefinitions = new HashMap<>();
-            JsonObject parameterValues = new JsonObject();
+            final Set<String> fieldPaths = new HashSet<>();
+			final Set<GraphQLArgument> queryArgs = new HashSet<>();
 
             fieldPaths.add("author(id:$id)/name");
             fieldPaths.add("author(id:$id)/books/title");
@@ -98,15 +100,14 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
             fieldPaths.add("books/title");
             fieldPaths.add("books/authors/name");
 
-            parameterDefinitions.put("id", "ID!");
-            parameterValues.put("id", "auth3");
+			queryArgs.add(new GraphQLArgumentImpl("id", "id", new JsonString("auth3"), "ID!"));
 
-            final GraphQLQuery query = new GraphQLQueryImpl(fieldPaths, parameterValues, parameterDefinitions);
+            final GraphQLQuery query = new GraphQLQueryImpl(fieldPaths, queryArgs);
             final GraphQLRequest req = new GraphQLRequestImpl(query);
             final GraphQLEndpoint fm = new GraphQLEndpointTest();
             final GraphQLRequestProcessor processor = new GraphQLRequestProcessorImpl(3000, 3000);
             final JSONResponse response = processor.performRequest(req, fm);
-
+			
             assertEquals(fm, response.getFederationMember());
             assertEquals(req, response.getRequest());
         }
