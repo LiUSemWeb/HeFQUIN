@@ -14,6 +14,7 @@ public interface GraphQLField {
 
     /**
      * @return the GraphQL value type of the field (String,Int,... etc.)
+     * Note: does not include List or Non-nullable identifiers
      */
     public String getValueType();
 
