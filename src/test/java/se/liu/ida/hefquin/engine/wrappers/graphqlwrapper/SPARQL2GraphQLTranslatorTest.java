@@ -9,14 +9,11 @@ import static java.util.Map.entry;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.jena.atlas.json.JsonNull;
-import org.apache.jena.atlas.json.JsonNumber;
-import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.datatypes.xsd.impl.XSDBaseNumericType;
 import org.apache.jena.datatypes.xsd.impl.XSDBaseStringType;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.vocabulary.RDF;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
@@ -101,18 +98,19 @@ public class SPARQL2GraphQLTranslatorTest {
     protected static final Node var9 = NodeFactory.createVariable("author2");
 
     // URI nodes
-    protected static final Node uri1 = NodeFactory.createURI(propertyPrefix + "id_of_Author");
-    protected static final Node uri2 = NodeFactory.createURI(propertyPrefix +"name_of_Author");
-    protected static final Node uri3 = NodeFactory.createURI(propertyPrefix +"age_of_Author");
-    protected static final Node uri4 = NodeFactory.createURI(propertyPrefix +"books_of_Author");
-    protected static final Node uri5 = NodeFactory.createURI(propertyPrefix +"id_of_Book");
-    protected static final Node uri6 = NodeFactory.createURI(propertyPrefix +"title_of_Book");
-    protected static final Node uri7 = NodeFactory.createURI(propertyPrefix +"nr_pages_of_Book");
-    protected static final Node uri8 = NodeFactory.createURI(propertyPrefix +"genre_of_Book");
-    protected static final Node uri9 = NodeFactory.createURI(propertyPrefix +"authors_of_Book");
-    protected static final Node uri10 = NodeFactory.createURI(RDF.type.getURI());
-    protected static final Node uri11 = NodeFactory.createURI(classPrefix + "Author");
-    protected static final Node uri12 = NodeFactory.createURI(classPrefix + "Book");
+    protected static final Node uri1 = NodeFactory.createURI(config.mapFieldToProperty("Author", "id"));
+    protected static final Node uri2 = NodeFactory.createURI(config.mapFieldToProperty("Author", "name"));
+    protected static final Node uri3 = NodeFactory.createURI(config.mapFieldToProperty("Author", "age"));
+    protected static final Node uri4 = NodeFactory.createURI(config.mapFieldToProperty("Author", "books"));
+    protected static final Node uri5 = NodeFactory.createURI(config.mapFieldToProperty("Book", "id"));
+    protected static final Node uri6 = NodeFactory.createURI(config.mapFieldToProperty("Book", "title"));
+    protected static final Node uri7 = NodeFactory.createURI(config.mapFieldToProperty("Book", "nr_pages"));
+    protected static final Node uri8 = NodeFactory.createURI(config.mapFieldToProperty("Book", "genre"));
+    protected static final Node uri9 = NodeFactory.createURI(config.mapFieldToProperty("Book", "authors"));
+    protected static final Node uri10 = NodeFactory.createURI(config.getClassMembershipURI());
+
+    protected static final Node uri11 = NodeFactory.createURI(config.mapTypeToClass("Author"));
+    protected static final Node uri12 = NodeFactory.createURI(config.mapTypeToClass("Book"));
 
     // Literal nodes
     protected static final Node lit1 = NodeFactory.createLiteral("auth3", XSDBaseStringType.XSDstring);

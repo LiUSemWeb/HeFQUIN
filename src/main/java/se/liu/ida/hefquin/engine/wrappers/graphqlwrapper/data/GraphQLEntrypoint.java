@@ -14,7 +14,8 @@ public interface GraphQLEntrypoint {
 
     /**
      * @return the argument definitions for the entrypoint as a map
-     * consisting of argument names mapped to argument value types.
+     * consisting of argument names mapped to GraphQL value types. 
+     * (argument value types can include non-null exclamations)
      */
     public Map<String,String> getArgumentDefinitions();
 

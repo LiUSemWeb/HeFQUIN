@@ -10,6 +10,11 @@ public class GraphQLFieldImpl implements GraphQLField {
 
     public GraphQLFieldImpl(final String name,
             final String valueType, final GraphQLFieldType fieldType){
+
+        assert name != null;
+        assert valueType != null;
+        assert fieldType != null;
+
         this.name = name;
         this.valueType = valueType;
         this.fieldType = fieldType;

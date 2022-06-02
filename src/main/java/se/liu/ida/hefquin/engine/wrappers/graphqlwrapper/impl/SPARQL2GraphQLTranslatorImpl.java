@@ -2,13 +2,13 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.jena.atlas.json.JsonNull;
-import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.impl.LiteralLabel;
 
@@ -19,12 +19,14 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguratio
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.SPARQL2GraphQLTranslator;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLIDPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphQLFieldPathBuilder;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.TP;
@@ -40,62 +42,51 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         final Map<Node, Set<TP>> subgraphPatterns = createSubGraphPatterns(bgp);
         final Map<Integer, Node> connectors = createConnectors(subgraphPatterns);
 
-        // Creating necessary variables for the GraphQL query
-        final Set<String> fieldPaths = new HashSet<>();
-        final Set<GraphQLArgument> queryArgs = new HashSet<>();
-
         // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
         final Map<Node,String> withoutConnector = new HashMap<>();
-        boolean isDeterminable = true;
         for(final Node n : subgraphPatterns.keySet()){
             final String sgpType = SPARQL2GraphQLHelper.determineSgpType(subgraphPatterns.get(n),config);
             if(!connectors.containsValue(n) && sgpType == null){
-                materializeAll(fieldPaths,config,endpoint);
-                isDeterminable = false;
-                break;
+                return materializeAll(config,endpoint);
             }
             if(!connectors.containsValue(n)){
                 withoutConnector.put(n,sgpType);
             }
         }
 
-        // If materializeAll isn't called, generate query data normally
-        if(isDeterminable){
-            generateQueryData(config, endpoint, subgraphPatterns, connectors, fieldPaths, 
-                queryArgs, withoutConnector);
-        }
-
-        return new GraphQLQueryImpl(fieldPaths, queryArgs);
+        return generateQueryData(config, endpoint, subgraphPatterns, connectors, withoutConnector);
     }
 
     /**
-     * When everything from the endpoint needs to be fetched
+     * Genereates a GraphQL query that fetches everyhing from @param endpoint
      */
-    protected void materializeAll(final Set<String> fieldPaths,final GraphQL2RDFConfiguration config, 
-            final GraphQLEndpoint endpoint){
-        
+    protected GraphQLQuery materializeAll(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint){
+
         int entrypointCounter = 0;
+        final Set<String> finishedFieldPaths = new HashSet<>();
         final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
         for(final String objectTypeName : objectTypeNames){
             // Get the full list entrypoint
             final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
-            final String currentPath = GraphQLFieldPathBuilder.addNoArgEntrypoint(e, entrypointCounter);
-            fieldPaths.add(GraphQLFieldPathBuilder.addID(currentPath, objectTypeName));
+            final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
+            finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName));
 
             final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT,config, endpoint);
             final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR,config, endpoint);
 
             // Add all fields that nests another object
             for(final String uri : allObjectURI){
-                SPARQL2GraphQLHelper.addEmptyObjectField(fieldPaths,config,endpoint,currentPath,objectTypeName,uri);
+                finishedFieldPaths.add(SPARQL2GraphQLHelper.addEmptyObjectField(config,endpoint,currentPath,objectTypeName,uri));
             }
             // Add all fields that represent scalar values
             for(final String uri : allScalarURI){
-                SPARQL2GraphQLHelper.addScalarField(fieldPaths,config,currentPath,uri);
+                finishedFieldPaths.add(SPARQL2GraphQLHelper.addScalarField(config,currentPath,uri));
             }
 
             ++entrypointCounter;
         }
+
+        return new GraphQLQueryImpl(finishedFieldPaths,new HashSet<>());
     }
 
     /**
@@ -155,15 +146,18 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     } 
 
     /**
-     * Generates query data for @param fieldPaths, @param queryArgs
+     * Generates a GraphQL query from provided @param subgraphPatterns,connnectors,withoutConnnectors
      */
-    protected void generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors, final Set<String> fieldPaths,
-            final Set<GraphQLArgument> queryArgs, final Map<Node,String> withoutConnector){
+    protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
+            final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors, 
+            final Map<Node,String> withoutConnector){
 
+        final Set<String> fieldPaths = new HashSet<>();
+        final Set<GraphQLArgument> queryArgs = new HashSet<>();
+        
         // Counters for creating unique variable and entrypoint names
         int entrypointCounter = 0;
-        final MutableInt variableCounter = new MutableInt(0);
+        int variableCounter = 0;
 
         // Create an entrypoint for each SGP without an incomming connector binding
         for (final Node n : withoutConnector.keySet()) {
@@ -184,13 +178,38 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                 // Get full list entrypoint (No argument values)
                 e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FULL);
             }
-            
-            final String currentPath = GraphQLFieldPathBuilder.addEntrypoint(e, queryArgs, 
-                sgpArguments, variableCounter, entrypointCounter);
 
-            SPARQL2GraphQLHelper.addSgp(fieldPaths, subgraphPatterns, connectors, config, endpoint,
-                    n, currentPath, sgpType);
+            // Create GraphQLArguments for the current path
+            final Set<GraphQLArgument> pathArguments = new LinkedHashSet<>();
+            final Map<String, String> entrypointArgDefs = e.getArgumentDefinitions();
+
+            if (entrypointArgDefs != null && !entrypointArgDefs.isEmpty()) {
+                for (final String argName : new TreeSet<String>(entrypointArgDefs.keySet())) {
+                    final String variableName = "var" + variableCounter;
+
+                    final String currArgDefinition = entrypointArgDefs.get(argName);
+                    final JsonValue currArgValue;
+
+                    if (sgpArguments.containsKey(argName)) {
+                        currArgValue = SPARQL2GraphQLHelper.literalToJsonValue(sgpArguments.get(argName));
+                    } else {
+                        currArgValue = JsonNull.instance;
+                    }
+
+                    final GraphQLArgument currArg = new GraphQLArgumentImpl(variableName, argName, currArgValue, currArgDefinition);
+                    queryArgs.add(currArg);
+                    pathArguments.add(currArg);
+                    ++variableCounter;
+                }
+            }
+
+            final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
+
+            fieldPaths.addAll(SPARQL2GraphQLHelper.addSgp(subgraphPatterns, connectors, config, endpoint,
+                n, currentPath, sgpType));
             ++entrypointCounter;
         }
+
+        return new GraphQLQueryImpl(fieldPaths, queryArgs);
     }
 }

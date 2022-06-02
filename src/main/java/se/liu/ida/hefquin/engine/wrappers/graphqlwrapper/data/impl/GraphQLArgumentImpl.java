@@ -12,6 +12,11 @@ public class GraphQLArgumentImpl implements GraphQLArgument {
 
     public GraphQLArgumentImpl(final String varName, final String argName, final JsonValue argValue, 
             final String argDefinition){
+        assert varName != null;
+        assert argName != null;
+        assert argValue != null;
+        assert argDefinition != null;
+
         this.varName = varName;
         this.argName = argName;
         this.argValue = argValue;

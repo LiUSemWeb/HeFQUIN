@@ -6,16 +6,29 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 
 public class GraphQLEntrypointImpl implements GraphQLEntrypoint {
 
+    // Name of the query field
     protected final String fieldName;
+
+    // Arguments for the query field mapped as names to their GraphQL definitions (including non-null identifier)
     protected final Map<String,String> argumentDefinitions;
-    protected final String type;
+
+    // Name of the GraphQL type the query field fetches
+    protected final String typeName;
+
+    // Enum describing whether the data fetched is a single object, list of filtered objects or a list of all objects
     protected final GraphQLEntrypointType epType;
 
     public GraphQLEntrypointImpl(final String fieldName, final Map<String,String> argumentDefinitions,
-            final String type, final GraphQLEntrypointType epType){
+            final String typeName, final GraphQLEntrypointType epType){
+
+        assert fieldName != null;
+        assert argumentDefinitions != null;
+        assert typeName != null;
+        assert epType != null;
+        
         this.fieldName = fieldName;
         this.argumentDefinitions = argumentDefinitions;
-        this.type = type;
+        this.typeName = typeName;
         this.epType = epType;
     }
 
@@ -31,7 +44,7 @@ public class GraphQLEntrypointImpl implements GraphQLEntrypoint {
 
     @Override
     public String getTypeName() {
-        return type;
+        return typeName;
     }
 
     @Override
