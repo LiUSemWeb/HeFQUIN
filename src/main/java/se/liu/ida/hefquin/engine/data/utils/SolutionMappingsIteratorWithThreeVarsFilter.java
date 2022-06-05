@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.data.utils;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
@@ -14,13 +13,10 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  * and passes on only the solution mappings that have given values for three
  * variables.
  */
-public class SolutionMappingsIteratorWithThreeVarsFilter implements Iterator<SolutionMapping>
+public class SolutionMappingsIteratorWithThreeVarsFilter extends FilteringIteratorForSolMapsBase
 {
-	protected final Iterator<SolutionMapping> input;
 	protected final Var var1, var2, var3;
 	protected final Node value1, value2, value3;
-
-	protected SolutionMapping nextOutputElement = null;
 
 	public SolutionMappingsIteratorWithThreeVarsFilter(
 			final Iterator<SolutionMapping> input,
@@ -28,7 +24,7 @@ public class SolutionMappingsIteratorWithThreeVarsFilter implements Iterator<Sol
 			final Var var2, final Node value2,
 			final Var var3, final Node value3 )
 	{
-		this.input = input;
+		super(input);
 		this.var1   = var1;
 		this.var2   = var2;
 		this.var3   = var3;
@@ -38,35 +34,21 @@ public class SolutionMappingsIteratorWithThreeVarsFilter implements Iterator<Sol
 	}
 
 	@Override
-	public boolean hasNext() {
-		while ( nextOutputElement == null && input.hasNext() ) {
-			final SolutionMapping nextInputElement = input.next();
+	protected SolutionMapping applyFilter( final SolutionMapping sm ) {
+		final Binding b = sm.asJenaBinding();
+		final Node inputValue1 = b.get(var1);
+		final Node inputValue2 = b.get(var2);
+		final Node inputValue3 = b.get(var3);
 
-			final Binding b = nextInputElement.asJenaBinding();
-			final Node inputValue1 = b.get(var1);
-			final Node inputValue2 = b.get(var2);
-			final Node inputValue3 = b.get(var3);
-
-			if ( inputValue1 == null || inputValue1.equals(value1) ) {
-				if ( inputValue2 == null || inputValue2.equals(value2) ) {
-					if ( inputValue3 == null || inputValue3.equals(value3) ) {
-						nextOutputElement = nextInputElement;
-					}
+		if ( inputValue1 == null || inputValue1.equals(value1) ) {
+			if ( inputValue2 == null || inputValue2.equals(value2) ) {
+				if ( inputValue3 == null || inputValue3.equals(value3) ) {
+					return sm;
 				}
 			}
 		}
 
-		return ( nextOutputElement != null );
+		return null;
 	}
-
-	@Override
-	public SolutionMapping next() {
-		if ( ! hasNext() )
-			throw new NoSuchElementException();
-
-		final SolutionMapping output = nextOutputElement;
-		nextOutputElement = null;
-		return output;
-	};
 
 }

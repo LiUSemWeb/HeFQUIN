@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.data.utils;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
@@ -14,20 +13,18 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  * and passes on only the solution mappings that have given values for two
  * variables.
  */
-public class SolutionMappingsIteratorWithTwoVarsFilter implements Iterator<SolutionMapping>
+public class SolutionMappingsIteratorWithTwoVarsFilter extends FilteringIteratorForSolMapsBase
 {
-	protected final Iterator<SolutionMapping> input;
 	protected final Var var1, var2;
 	protected final Node value1, value2;
 
-	protected SolutionMapping nextOutputElement = null;
 
 	public SolutionMappingsIteratorWithTwoVarsFilter(
 			final Iterator<SolutionMapping> input,
 			final Var var1, final Node value1,
 			final Var var2, final Node value2 )
 	{
-		this.input = input;
+		super(input);
 		this.var1   = var1;
 		this.var2   = var2;
 		this.value1 = value1;
@@ -35,32 +32,18 @@ public class SolutionMappingsIteratorWithTwoVarsFilter implements Iterator<Solut
 	}
 
 	@Override
-	public boolean hasNext() {
-		while ( nextOutputElement == null && input.hasNext() ) {
-			final SolutionMapping nextInputElement = input.next();
+	protected SolutionMapping applyFilter( final SolutionMapping sm ) {
+		final Binding b = sm.asJenaBinding();
+		final Node inputValue1 = b.get(var1);
+		final Node inputValue2 = b.get(var2);
 
-			final Binding b = nextInputElement.asJenaBinding();
-			final Node inputValue1 = b.get(var1);
-			final Node inputValue2 = b.get(var2);
-
-			if ( inputValue1 == null || inputValue1.equals(value1) ) {
-				if ( inputValue2 == null || inputValue2.equals(value2) ) {
-					nextOutputElement = nextInputElement;
-				}
+		if ( inputValue1 == null || inputValue1.equals(value1) ) {
+			if ( inputValue2 == null || inputValue2.equals(value2) ) {
+				return sm;
 			}
 		}
 
-		return ( nextOutputElement != null );
+		return null;
 	}
-
-	@Override
-	public SolutionMapping next() {
-		if ( ! hasNext() )
-			throw new NoSuchElementException();
-
-		final SolutionMapping output = nextOutputElement;
-		nextOutputElement = null;
-		return output;
-	};
 
 }
