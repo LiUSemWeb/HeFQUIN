@@ -7,7 +7,6 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithThreeVarsFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
