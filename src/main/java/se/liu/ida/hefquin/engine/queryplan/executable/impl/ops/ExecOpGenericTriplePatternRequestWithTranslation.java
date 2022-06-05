@@ -4,7 +4,7 @@ import java.util.Iterator;
 import org.apache.jena.sparql.algebra.Op;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.JoiningIteratorForSolMaps;
-import se.liu.ida.hefquin.engine.data.utils.UnionIterableForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.UnionIteratorForSolMaps;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -73,7 +73,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberTyp
 		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
 		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt));
+			unionTranslation = UnionIteratorForSolMaps.createAsIterable(unionTranslation, handlePattern(i.next(), execCxt));
 		}
 		return unionTranslation;
 	}

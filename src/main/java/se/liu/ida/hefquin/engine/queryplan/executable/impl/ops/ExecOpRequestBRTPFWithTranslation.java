@@ -6,7 +6,7 @@ import java.util.Set;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.JoiningIteratorForSolMaps;
-import se.liu.ida.hefquin.engine.data.utils.UnionIterableForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.UnionIteratorForSolMaps;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -74,7 +74,7 @@ public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<Bind
 		final Iterator<SPARQLGraphPattern> i = up.getSubPatterns().iterator();
 		Iterable<SolutionMapping> unionTranslation = handlePattern(i.next(), execCxt, sms);
 		while(i.hasNext()){
-			unionTranslation = new UnionIterableForSolMaps(unionTranslation, handlePattern(i.next(), execCxt, sms));
+			unionTranslation = UnionIteratorForSolMaps.createAsIterable(unionTranslation, handlePattern(i.next(), execCxt, sms));
 		}
 		return unionTranslation;
 	}
