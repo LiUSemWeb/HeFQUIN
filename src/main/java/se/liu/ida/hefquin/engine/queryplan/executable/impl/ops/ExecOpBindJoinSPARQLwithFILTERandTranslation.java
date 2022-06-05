@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.RewritingIterableForSolMapsG2L;
+import se.liu.ida.hefquin.engine.data.utils.RewritingIteratorForSolMapsG2L;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -19,7 +19,7 @@ public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoin
 
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
-		final Iterable<SolutionMapping> translatedSolMaps = new RewritingIterableForSolMapsG2L( solMaps, fm.getVocabularyMapping() );
+		final Iterable<SolutionMapping> translatedSolMaps = RewritingIteratorForSolMapsG2L.createAsIterable( solMaps, fm.getVocabularyMapping() );
 		return super.createExecutableRequestOperator(translatedSolMaps);
 	}	
 
