@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
+import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIteratorOverCollectionOfLists;
 
 /**
  * This is a hash table based implementation of {@link SolutionMappingsIndex}
@@ -102,7 +102,7 @@ public class SolutionMappingsHashTable extends SolutionMappingsIndexBase
 
 	@Override
 	public Iterable<SolutionMapping> getAllSolutionMappings() {
-		return new SolutionMappingsIterableOverCollectionOfLists( map.values() );
+		return SolutionMappingsIteratorOverCollectionOfLists.createAsIterable( map.values() );
 	}
 
 	@Override

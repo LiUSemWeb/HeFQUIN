@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.IteratorFactory;
+import se.liu.ida.hefquin.engine.utils.IteratorFactoryBasedIterable;
 
 /**
  * This is an iterator over all solution mappings contained in a nested
@@ -13,6 +15,11 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  */
 public class SolutionMappingsIteratorOverCollectionOfLists implements Iterator<SolutionMapping>
 {
+	public static Iterable<SolutionMapping> createAsIterable( final Collection<List<SolutionMapping>> c ) {
+		return new IteratorFactoryBasedIterable<>( getFactory(c) );
+}
+
+
 	final protected Iterator<List<SolutionMapping>> itBuckets;
 	protected Iterator<SolutionMapping> itCurBucketElmts;
 
@@ -42,6 +49,16 @@ public class SolutionMappingsIteratorOverCollectionOfLists implements Iterator<S
 			throw new NoSuchElementException();
 
 		return itCurBucketElmts.next();
+	}
+
+
+	public static IteratorFactory<SolutionMapping> getFactory( final Collection<List<SolutionMapping>> c ) {
+		return new IteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator() {
+				return new SolutionMappingsIteratorOverCollectionOfLists(c);
+			}
+		};
 	}
 
 }

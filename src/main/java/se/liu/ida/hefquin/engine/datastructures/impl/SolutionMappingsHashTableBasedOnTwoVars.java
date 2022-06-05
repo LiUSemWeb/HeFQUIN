@@ -7,7 +7,6 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIteratorOverCollectionOfLists;
 
 import java.util.*;
@@ -171,7 +170,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
     public Iterable<SolutionMapping> findSolutionMappings( final Var var, final Node value )
     {
         if ( var.equals(joinVar1) ) {
-            return new SolutionMappingsIterableOverCollectionOfLists( map.get(value).values() );
+            return SolutionMappingsIteratorOverCollectionOfLists.createAsIterable( map.get(value).values() );
         }
         else if ( var.equals(joinVar2) ) {
         	final Iterable<SolutionMapping> it = getAllSolutionMappings();
