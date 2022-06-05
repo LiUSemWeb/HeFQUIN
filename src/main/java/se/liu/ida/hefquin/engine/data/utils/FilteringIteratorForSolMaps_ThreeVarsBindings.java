@@ -7,6 +7,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
 /**
  * This is an iterator of solution mappings that consumes another iterator
@@ -15,6 +17,14 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  */
 public class FilteringIteratorForSolMaps_ThreeVarsBindings extends FilteringIteratorForSolMapsBase
 {
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final Var var1, final Node value1,
+	                                                                  final Var var2, final Node value2,
+	                                                                  final Var var3, final Node value3 ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(var1, value1, var2, value2, var3, value3) );
+	}
+
+
 	protected final Var var1, var2, var3;
 	protected final Node value1, value2, value3;
 
@@ -58,6 +68,18 @@ public class FilteringIteratorForSolMaps_ThreeVarsBindings extends FilteringIter
 		}
 
 		return null;
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Var var1, final Node value1,
+	                                                                   final Var var2, final Node value2,
+	                                                                   final Var var3, final Node value3 ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_ThreeVarsBindings(input, var1, value1, var2, value2, var3, value3);
+			}
+		};
 	}
 
 }

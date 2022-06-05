@@ -4,9 +4,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 
 import java.util.*;
 
@@ -176,15 +176,15 @@ public class SolutionMappingsHashTableBasedOnOneVar extends SolutionMappingsInde
     {
         if ( joinVar.equals(var1) ) {
             final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
-            return new SolutionMappingsIterableWithTwoVarsFilter(it, var2, value2, var3, value3);
+            return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var2, value2, var3, value3);
         }
         else if ( joinVar.equals(var2) ) {
             final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
-            return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var3, value3);
+            return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var1, value1, var3, value3);
         }
         else if ( joinVar.equals(var3) ) {
             final Iterable<SolutionMapping> it = findSolutionMappings(var3, value3);
-            return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var2, value2);
+            return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var1, value1, var2, value2);
         }
         else {
             return findSolutionMappingsLastResort(var1, value1, var2, value2, var3, value3);

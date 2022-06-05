@@ -5,9 +5,9 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIteratorOverCollectionOfLists;
 
 import java.util.*;
@@ -227,7 +227,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
-				return new SolutionMappingsIterableWithTwoVarsFilter(it, var2, value2, var3, value3);
+				return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var2, value2, var3, value3);
 			}
         }
 
@@ -242,7 +242,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
-				return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var3, value3);
+				return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var1, value1, var3, value3);
 			}
         }
 
@@ -257,7 +257,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var3, value3);
-				return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var2, value2);
+				return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var1, value1, var2, value2);
 			}
         }
 
