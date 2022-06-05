@@ -6,6 +6,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
 /**
  * This is an iterator of solution mappings that consumes another iterator
@@ -14,6 +16,13 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  */
 public class FilteringIteratorForSolMaps_OneVarBinding extends FilteringIteratorForSolMapsBase
 {
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final Var var,
+	                                                                  final Node value ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(var, value) );
+	}
+
+
 	protected final Var var;
 	protected final Node value;
 
@@ -35,6 +44,16 @@ public class FilteringIteratorForSolMaps_OneVarBinding extends FilteringIterator
 		}
 
 		return null;
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Var var, final Node value ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_OneVarBinding(input, var, value);
+			}
+		};
 	}
 
 }

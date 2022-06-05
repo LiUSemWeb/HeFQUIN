@@ -6,6 +6,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithThreeVarsFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
@@ -70,7 +71,7 @@ public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 			final Var var, final Node value )
 	{
 		final Iterable<SolutionMapping> it = getAllSolutionMappings();
-		return new SolutionMappingsIterableWithOneVarFilter(it, var, value);
+		return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var, value);
 	}
 
 	/**

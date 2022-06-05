@@ -4,9 +4,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableOverCollectionOfLists;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIteratorOverCollectionOfLists;
 
@@ -174,7 +174,8 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
             return new SolutionMappingsIterableOverCollectionOfLists( map.get(value).values() );
         }
         else if ( var.equals(joinVar2) ) {
-            return new SolutionMappingsIterableWithOneVarFilter( getAllSolutionMappings(), joinVar2, value );
+        	final Iterable<SolutionMapping> it = getAllSolutionMappings();
+            return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, joinVar2, value);
         }
         else {
             return findSolutionMappingsLastResort(var, value);
@@ -192,7 +193,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var2, value2);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var2, value2);
 			}
         }
 
@@ -202,7 +203,7 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var1, value1);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var1, value1);
 			}
         }
 
@@ -218,11 +219,11 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 		if ( var1.equals(joinVar1) ) {
 			if ( var2.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value1, value2);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var3, value3);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var3, value3);
 			}
 			else if ( var3.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value1, value3);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var2, value2);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var2, value2);
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var1, value1);
@@ -233,11 +234,11 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 		if ( var2.equals(joinVar1) ) {
 			if ( var1.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value2, value1);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var3, value3);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var3, value3);
 			}
 			else if ( var3.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value2, value3);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var1, value1);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var1, value1);
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var2, value2);
@@ -248,11 +249,11 @@ public class SolutionMappingsHashTableBasedOnTwoVars extends SolutionMappingsInd
 		if ( var3.equals(joinVar1) ) {
 			if ( var1.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value3, value1);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var2, value2);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var2, value2);
 			}
 			else if ( var2.equals(joinVar2) ) {
 				final Iterable<SolutionMapping> it = returnLookupResultOrEmptyList(value3, value2);
-				return new SolutionMappingsIterableWithOneVarFilter(it, var3, value3);
+				return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var3, value3);
 			}
 			else {
 				final Iterable<SolutionMapping> it = findSolutionMappings(var3, value3);
