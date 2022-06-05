@@ -10,9 +10,22 @@ import org.apache.jena.sparql.expr.VariableNotBoundException;
 import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
 public class FilteringIteratorForSolMaps_ExprList extends FilteringIteratorForSolMapsBase
 {
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final ExprList filterExpressions ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(filterExpressions) );
+	}
+
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final Expr... filterExpressions ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(filterExpressions) );
+	}
+
+
 	protected final ExprList filterExpressions;
 
 	public FilteringIteratorForSolMaps_ExprList( final Iterator<SolutionMapping> input,
@@ -75,6 +88,25 @@ public class FilteringIteratorForSolMaps_ExprList extends FilteringIteratorForSo
 		}
 
 		return sm;
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final ExprList filterExpressions ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_ExprList(input, filterExpressions);
+			}
+		};
+	}
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Expr... filterExpressions ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_ExprList(input, filterExpressions);
+			}
+		};
 	}
 
 }
