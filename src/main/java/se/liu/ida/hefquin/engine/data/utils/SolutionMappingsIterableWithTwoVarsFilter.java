@@ -32,7 +32,7 @@ public class SolutionMappingsIterableWithTwoVarsFilter implements Iterable<Solut
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
-		return new SolutionMappingsIteratorWithTwoVarsFilter( input.iterator(), var1, value1, var2, value2 );
+		return new FilteringIteratorForSolMaps_TwoVarsBindings( input.iterator(), var1, value1, var2, value2 );
 	}
 
 }

@@ -35,7 +35,7 @@ public class SolutionMappingsIterableWithThreeVarsFilter implements Iterable<Sol
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
-		return new SolutionMappingsIteratorWithThreeVarsFilter( input.iterator(), var1, value1, var2, value2, var3, value3 );
+		return new FilteringIteratorForSolMaps_ThreeVarsBindings( input.iterator(), var1, value1, var2, value2, var3, value3 );
 	}
 
 }

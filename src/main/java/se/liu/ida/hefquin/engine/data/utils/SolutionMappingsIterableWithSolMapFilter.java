@@ -21,7 +21,7 @@ public class SolutionMappingsIterableWithSolMapFilter implements Iterable<Soluti
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
-		return new SolutionMappingsIteratorWithSolMapFilter( input.iterator(), sm );
+		return new FilteringIteratorForSolMaps_CompatibleSolMap( input.iterator(), sm );
 	}
 
 }

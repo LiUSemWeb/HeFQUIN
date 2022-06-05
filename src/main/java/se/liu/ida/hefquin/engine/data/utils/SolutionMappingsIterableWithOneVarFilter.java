@@ -26,7 +26,7 @@ public class SolutionMappingsIterableWithOneVarFilter implements Iterable<Soluti
 
 	@Override
 	public Iterator<SolutionMapping> iterator() {
-		return new SolutionMappingsIteratorWithOneVarFilter( input.iterator(), var, value );
+		return new FilteringIteratorForSolMaps_OneVarBinding( input.iterator(), var, value );
 	}
 
 }
