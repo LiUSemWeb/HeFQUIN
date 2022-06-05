@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
 /**
  * This iterator enumerates the result of joining two collections of solution
@@ -15,6 +17,12 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  */
 public class JoiningIteratorForSolMaps implements Iterator<SolutionMapping>
 {
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input1,
+	                                                                  final Iterable<SolutionMapping> input2 ) {
+		return new WrappingIterable<SolutionMapping>(input1, getFactory(input2) );
+	}
+
+
 	protected final Iterable<SolutionMapping> input2;
 
 	protected Iterator<SolutionMapping> it1;
@@ -23,15 +31,20 @@ public class JoiningIteratorForSolMaps implements Iterator<SolutionMapping>
 	protected SolutionMapping currentInputElement;
 	protected SolutionMapping nextOutputElement;
 
-	public JoiningIteratorForSolMaps( final Iterable<SolutionMapping> input1,
+	public JoiningIteratorForSolMaps( final Iterator<SolutionMapping> input1,
 	                                  final Iterable<SolutionMapping> input2 ) {
 		this.input2 = input2;
 
-		it1 = input1.iterator();
+		it1 = input1;
 		it2 = input2.iterator();
 
 		currentInputElement = it1.hasNext() ? it1.next() : null;
 		nextOutputElement   = null;
+	}
+
+	public JoiningIteratorForSolMaps( final Iterable<SolutionMapping> input1,
+	                                  final Iterable<SolutionMapping> input2 ) {
+		this( input1.iterator(), input2 );
 	}
 
 	@Override
@@ -64,6 +77,16 @@ public class JoiningIteratorForSolMaps implements Iterator<SolutionMapping>
 		final SolutionMapping r = nextOutputElement;
 		nextOutputElement = null;
 		return r;
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Iterable<SolutionMapping> input2 ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new JoiningIteratorForSolMaps(input, input2);
+			}
+		};
 	}
 
 }

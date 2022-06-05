@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.Iterator;
 import org.apache.jena.sparql.algebra.Op;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.JoiningIterableForSolMaps;
+import se.liu.ida.hefquin.engine.data.utils.JoiningIteratorForSolMaps;
 import se.liu.ida.hefquin.engine.data.utils.UnionIterableForSolMaps;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -82,7 +82,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberTyp
 		final Iterator<SPARQLGraphPattern> i = gp.getSubPatterns().iterator();
 		Iterable<SolutionMapping> groupTranslation = handlePattern(i.next(), execCxt);
 		while(i.hasNext()){
-			groupTranslation = new JoiningIterableForSolMaps(groupTranslation, handlePattern(i.next(), execCxt));
+			groupTranslation = JoiningIteratorForSolMaps.createAsIterable(groupTranslation, handlePattern(i.next(), execCxt));
 		}
 		return groupTranslation;
 	}
@@ -93,7 +93,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberTyp
 			if (bgpTranslation == null) {
 				bgpTranslation = handleTriplePattern(i, execCxt);
 			} else {
-				bgpTranslation = new JoiningIterableForSolMaps(bgpTranslation, handleTriplePattern(i, execCxt));
+				bgpTranslation = JoiningIteratorForSolMaps.createAsIterable(bgpTranslation, handleTriplePattern(i, execCxt));
 			}
 		}
 		return bgpTranslation;
