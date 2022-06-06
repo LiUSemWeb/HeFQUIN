@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.TP;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.TriplePatternWithID;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.URI2GraphQLHelper;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
@@ -39,7 +39,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final GraphQLEndpoint endpoint) {
 
         // Initialize necessary data structures
-        final Map<Node, Set<TP>> subgraphPatterns = createSubGraphPatterns(bgp);
+        final Map<Node, Set<TriplePatternWithID>> subgraphPatterns = createSubGraphPatterns(bgp);
         final Map<Integer, Node> connectors = createConnectors(subgraphPatterns);
 
         // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
@@ -92,20 +92,20 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Creates a subgraphpatterns map using @param bgp
      */
-    protected Map<Node, Set<TP>> createSubGraphPatterns(final BGP bgp){
-        final Map<Node, Set<TP>> subgraphPatterns = new HashMap<>();
+    protected Map<Node, Set<TriplePatternWithID>> createSubGraphPatterns(final BGP bgp){
+        final Map<Node, Set<TriplePatternWithID>> subgraphPatterns = new HashMap<>();
 
         // Partition BGP into SGPs and give unique integer id to TPs
         final Set<? extends TriplePattern> bgpSet = bgp.getTriplePatterns();
         int idCounter = 0;
         for(final TriplePattern t : bgpSet){
-            final TP wrappedTriplePattern = new TP(idCounter,t);
+            final TriplePatternWithID wrappedTriplePattern = new TriplePatternWithID(idCounter,t);
             final Node subject = t.asJenaTriple().getSubject();
             if(subgraphPatterns.containsKey(subject)){
                 subgraphPatterns.get(subject).add(wrappedTriplePattern);
             }
             else{
-                final Set<TP> sgp = new HashSet<>();
+                final Set<TriplePatternWithID> sgp = new HashSet<>();
                 sgp.add(wrappedTriplePattern);
                 subgraphPatterns.put(subject, sgp);
             }
@@ -118,13 +118,13 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Creates a connector map using @param subgraphPatterns
      */
-    protected Map<Integer,Node> createConnectors(final Map<Node, Set<TP>> subgraphPatterns){
+    protected Map<Integer,Node> createConnectors(final Map<Node, Set<TriplePatternWithID>> subgraphPatterns){
         final Map<Integer,Node> connectors = new HashMap<>();
         final Map<Node,SGPNode> sgpNodes = new HashMap<>();
         for(final Node subject : subgraphPatterns.keySet()){
-            final Set<TP> sgp = subgraphPatterns.get(subject);
-            for(final TP tp : sgp){
-                final Node object = tp.getTriplePattern().asJenaTriple().getObject();
+            final Set<TriplePatternWithID> sgp = subgraphPatterns.get(subject);
+            for(final TriplePatternWithID tp : sgp){
+                final Node object = tp.asJenaTriple().getObject();
                 if(subgraphPatterns.containsKey(object) && ! object.equals(subject)){
                     if(!sgpNodes.containsKey(subject)){
                         sgpNodes.put(subject,new SGPNode());
@@ -149,7 +149,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Generates a GraphQL query from provided @param subgraphPatterns,connnectors,withoutConnnectors
      */
     protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final Map<Node,Set<TP>> subgraphPatterns, final Map<Integer,Node> connectors, 
+            final Map<Node,Set<TriplePatternWithID>> subgraphPatterns, final Map<Integer,Node> connectors, 
             final Map<Node,String> withoutConnector){
 
         final Set<String> fieldPaths = new HashSet<>();
