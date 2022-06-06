@@ -121,24 +121,32 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     protected Map<Integer,Node> createConnectors(final Map<Node, Set<TriplePatternWithID>> subgraphPatterns){
         final Map<Integer,Node> connectors = new HashMap<>();
         final Map<Node,SGPNode> sgpNodes = new HashMap<>();
-        for(final Node subject : subgraphPatterns.keySet()){
-            final Set<TriplePatternWithID> sgp = subgraphPatterns.get(subject);
-            for(final TriplePatternWithID tp : sgp){
+
+        for ( final Node subject : subgraphPatterns.keySet() ) {
+            for ( final TriplePatternWithID tp : subgraphPatterns.get(subject) ) {
                 final Node object = tp.asJenaTriple().getObject();
+
                 if(subgraphPatterns.containsKey(object) && ! object.equals(subject)){
-                    if(!sgpNodes.containsKey(subject)){
-                        sgpNodes.put(subject,new SGPNode());
+                    SGPNode subjectSgpNode = sgpNodes.get(subject);
+                    SGPNode objectSgpNode = sgpNodes.get(object);
+
+                    if ( subjectSgpNode == null ) {
+                        subjectSgpNode = new SGPNode();
+                        sgpNodes.put(subject, subjectSgpNode);
                     }
-                    if(!sgpNodes.containsKey(object)){
-                        sgpNodes.put(object,new SGPNode());
+
+                    if ( objectSgpNode == null ) {
+                        objectSgpNode = new SGPNode();
+                        sgpNodes.put(object, objectSgpNode);
                     }
-                    final SGPNode subjectSgpNode = sgpNodes.get(subject);
-                    final SGPNode objectSgpNode = sgpNodes.get(object);
+
                     subjectSgpNode.addAdjacentNode(tp.getId(),objectSgpNode);
                     connectors.put(tp.getId(), object);
                 }
+
             }
         }
+
         // Remove all potential cyclic connector bindings
         final Set<Integer> connectorsToBeRemoved = GraphCycleDetector.determineCyclicConnectors(sgpNodes);
         connectors.keySet().removeAll(connectorsToBeRemoved);
