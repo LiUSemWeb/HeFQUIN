@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
 /**
  * This iterator enumerates the solution mappings from two other iterators,
@@ -12,6 +14,12 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  */
 public class UnionIteratorForSolMaps implements Iterator<SolutionMapping>
 {
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input1,
+	                                                                  final Iterable<SolutionMapping> input2 ) {
+		return new WrappingIterable<SolutionMapping>(input1, getFactory(input2) );
+	}
+
+
 	protected final Iterator<SolutionMapping> input2;
 
 	protected Iterator<SolutionMapping> currentInput;
@@ -53,6 +61,16 @@ public class UnionIteratorForSolMaps implements Iterator<SolutionMapping>
 		}
 
 		return currentInput.next();
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Iterable<SolutionMapping> input2 ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new UnionIteratorForSolMaps( input, input2.iterator() );
+			}
+		};
 	}
 
 }

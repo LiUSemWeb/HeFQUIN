@@ -28,6 +28,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.Identi
 
 public class PhysicalPlanFactory
 {
+	public static boolean handleVocabMappingsExplicitly = true;
+
 	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
@@ -67,7 +69,7 @@ public class PhysicalPlanFactory
 	public static <R extends DataRetrievalRequest, M extends FederationMember>
 	PhysicalPlan createPlanWithRequest( final LogicalOpRequest<R,M> lop ) {
 		final NullaryPhysicalOp pop;
-		if ( lop.getFederationMember().getVocabularyMapping() != null )
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
 			pop = new PhysicalOpRequestWithTranslation<>(lop);
 		else
 			pop = new PhysicalOpRequest<>(lop);
@@ -100,7 +102,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpTPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoin(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoin(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -109,7 +116,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpTPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			pop = new PhysicalOpBindJoinWithFILTERandTranslation(lop);
+		else
+			pop = new PhysicalOpBindJoinWithFILTER(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -118,7 +130,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpTPAdd lop,
 	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithUNION(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -127,7 +144,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpTPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithVALUES(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -136,7 +158,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpTPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpIndexNestedLoopsJoin(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -145,7 +172,12 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpBGPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpIndexNestedLoopsJoin(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -153,8 +185,13 @@ public class PhysicalPlanFactory
 	 * Creates a plan with a bind join as root operator.
 	 */
 	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpBGPAdd lop,
-															final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
+	                                                         final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			pop = new PhysicalOpBindJoinWithFILTERandTranslation(lop);
+		else
+			pop = new PhysicalOpBindJoinWithFILTER(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -162,8 +199,13 @@ public class PhysicalPlanFactory
 	 * Creates a plan with a bind join as root operator.
 	 */
 	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpBGPAdd lop,
-													   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
+	                                                        final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithUNION(lop);
+
 		return createPlan(pop, subplan);
 	}
 
@@ -171,8 +213,13 @@ public class PhysicalPlanFactory
 	 * Creates a plan with a bind join as root operator.
 	 */
 	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpBGPAdd lop,
-													   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
+	                                                         final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithVALUES(lop);
+
 		return createPlan(pop, subplan);
 	}
 

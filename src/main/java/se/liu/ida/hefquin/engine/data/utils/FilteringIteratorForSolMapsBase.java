@@ -5,30 +5,25 @@ import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
-/**
- * This is an iterator of solution mappings that consumes another iterator
- * and passes on only the solution mappings that are compatible to a given
- * solution mapping.
- */
-public class SolutionMappingsIteratorWithSolMapFilter implements Iterator<SolutionMapping>
+public abstract class FilteringIteratorForSolMapsBase implements Iterator<SolutionMapping>
 {
 	protected final Iterator<SolutionMapping> input;
-	protected final SolutionMapping sm;
 
 	protected SolutionMapping nextOutputElement = null;
 
-	public SolutionMappingsIteratorWithSolMapFilter( final Iterator<SolutionMapping> input, final SolutionMapping sm ) {
+	protected FilteringIteratorForSolMapsBase( final Iterator<SolutionMapping> input ) {
+		assert input != null;
 		this.input = input;
-		this.sm = sm;
+	}
+
+	protected FilteringIteratorForSolMapsBase( final Iterable<SolutionMapping> input ) {
+		this( input.iterator() );
 	}
 
 	@Override
 	public boolean hasNext() {
 		while ( nextOutputElement == null && input.hasNext() ) {
-			final SolutionMapping nextInputElement = input.next();
-			if ( SolutionMappingUtils.compatible(sm, nextInputElement) ) {
-				nextOutputElement = nextInputElement;
-			}
+			nextOutputElement = applyFilter( input.next() );
 		}
 
 		return ( nextOutputElement != null );
@@ -42,6 +37,13 @@ public class SolutionMappingsIteratorWithSolMapFilter implements Iterator<Soluti
 		final SolutionMapping output = nextOutputElement;
 		nextOutputElement = null;
 		return output;
-	};
+	}
+
+	/**
+	 * Returns the given solution mapping if it passes the filter condition
+	 * checked by the subclass. Returns <code>null</code> if the given
+	 * solution mapping does not pass the filter condition.
+	 */
+	protected abstract SolutionMapping applyFilter(SolutionMapping sm);
 
 }

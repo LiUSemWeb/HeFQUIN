@@ -18,8 +18,8 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
 public class FederationAccessManagerWithCacheTest extends EngineTestBase
 {
-	//protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
-	protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;
+	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
+	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;
 
 	@Test
 	public void twoRequestsInSequence()
