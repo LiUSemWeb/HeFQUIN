@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Stream;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
@@ -104,7 +103,8 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     }
 
     /**
-     * @return a Pair consisting of the valuetype (not including list and/or non-nullable identifiers) 
+     * Parses specific introspection data to determine information about a corresponding GraphQL type.
+     * @return a Pair consisting of the GraphQL valuetype (not including list and/or non-nullable identifiers) 
      * and GraphQLFieldType respectively. @param field is a JsonObject and should 
      * contain the keys: "name", "kind" and alternatively "ofType"
      */
