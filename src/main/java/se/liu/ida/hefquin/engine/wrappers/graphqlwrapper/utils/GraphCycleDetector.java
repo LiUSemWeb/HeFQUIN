@@ -1,20 +1,20 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
+
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class GraphCycleDetector {
 
     /**
      * Helper function used to call the DFS function for each SgpNode
      */
-    public static Set<Integer> determineCyclicConnectors(final Map<Node,SGPNode> sgpNodes){
-        final Set<Integer> connectorsToBeRemoved = new HashSet<>();
+    public static Set<TriplePattern> determineCyclicConnectors(final Iterable<SGPNode> sgpNodes){
+        final Set<TriplePattern> connectorsToBeRemoved = new HashSet<>();
 
-        for(final SGPNode n : sgpNodes.values()){
+        for(final SGPNode n : sgpNodes){
             DFS(n,connectorsToBeRemoved);
         }
 
@@ -24,7 +24,7 @@ public class GraphCycleDetector {
     /**
      * DFS algorithm function to determine which connectors are to be removed later
      */
-    protected static boolean DFS(final SGPNode node, final Set<Integer> removeConnectors){
+    protected static boolean DFS(final SGPNode node, final Set<TriplePattern> removeConnectors){
         if(node.isFinished()){
             return false;
         }
@@ -32,11 +32,11 @@ public class GraphCycleDetector {
             return true;
         }
         node.setVisited(true);
-        for(final int connectorId : node.getAdjacentNodes().keySet()){
-            final boolean visited = DFS(node.getAdjacentNodes().get(connectorId), removeConnectors);
+        for(final TriplePattern connector : node.getAdjacentNodes().keySet()){
+            final boolean visited = DFS(node.getAdjacentNodes().get(connector), removeConnectors);
 
             if(visited){
-                removeConnectors.add(connectorId);
+                removeConnectors.add(connector);
             }
         }
 

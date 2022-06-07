@@ -29,7 +29,6 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.TriplePatternWithID;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.URI2GraphQLHelper;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
@@ -39,8 +38,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final GraphQLEndpoint endpoint) {
 
         // Initialize necessary data structures
-        final Map<Node, Set<TriplePatternWithID>> subgraphPatterns = createSubGraphPatterns(bgp);
-        final Map<Integer, Node> connectors = createConnectors(subgraphPatterns);
+        final Map<Node, Set<TriplePattern>> subgraphPatterns = createSubGraphPatterns(bgp);
+        final Map<TriplePattern, Node> connectors = createConnectors(subgraphPatterns);
 
         // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
         final Map<Node,String> withoutConnector = new HashMap<>();
@@ -92,24 +91,21 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Creates a subgraphpatterns map using @param bgp
      */
-    protected Map<Node, Set<TriplePatternWithID>> createSubGraphPatterns(final BGP bgp){
-        final Map<Node, Set<TriplePatternWithID>> subgraphPatterns = new HashMap<>();
+    protected Map<Node, Set<TriplePattern>> createSubGraphPatterns(final BGP bgp){
+        final Map<Node, Set<TriplePattern>> subgraphPatterns = new HashMap<>();
 
         // Partition BGP into SGPs and give unique integer id to TPs
         final Set<? extends TriplePattern> bgpSet = bgp.getTriplePatterns();
-        int idCounter = 0;
         for(final TriplePattern t : bgpSet){
-            final TriplePatternWithID wrappedTriplePattern = new TriplePatternWithID(idCounter,t);
             final Node subject = t.asJenaTriple().getSubject();
             if(subgraphPatterns.containsKey(subject)){
-                subgraphPatterns.get(subject).add(wrappedTriplePattern);
+                subgraphPatterns.get(subject).add(t);
             }
             else{
-                final Set<TriplePatternWithID> sgp = new HashSet<>();
-                sgp.add(wrappedTriplePattern);
+                final Set<TriplePattern> sgp = new HashSet<>();
+                sgp.add(t);
                 subgraphPatterns.put(subject, sgp);
             }
-            ++idCounter;
         }
 
         return subgraphPatterns;
@@ -118,12 +114,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Creates a connector map using @param subgraphPatterns
      */
-    protected Map<Integer,Node> createConnectors(final Map<Node, Set<TriplePatternWithID>> subgraphPatterns){
-        final Map<Integer,Node> connectors = new HashMap<>();
+    protected Map<TriplePattern,Node> createConnectors(final Map<Node, Set<TriplePattern>> subgraphPatterns){
+        final Map<TriplePattern,Node> connectors = new HashMap<>();
         final Map<Node,SGPNode> sgpNodes = new HashMap<>();
 
         for ( final Node subject : subgraphPatterns.keySet() ) {
-            for ( final TriplePatternWithID tp : subgraphPatterns.get(subject) ) {
+            for ( final TriplePattern tp : subgraphPatterns.get(subject) ) {
                 final Node object = tp.asJenaTriple().getObject();
 
                 if(subgraphPatterns.containsKey(object) && ! object.equals(subject)){
@@ -140,15 +136,15 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                         sgpNodes.put(object, objectSgpNode);
                     }
 
-                    subjectSgpNode.addAdjacentNode(tp.getId(),objectSgpNode);
-                    connectors.put(tp.getId(), object);
+                    subjectSgpNode.addAdjacentNode(tp, objectSgpNode);
+                    connectors.put(tp, object);
                 }
 
             }
         }
 
         // Remove all potential cyclic connector bindings
-        final Set<Integer> connectorsToBeRemoved = GraphCycleDetector.determineCyclicConnectors(sgpNodes);
+        final Set<TriplePattern> connectorsToBeRemoved = GraphCycleDetector.determineCyclicConnectors(sgpNodes.values());
         connectors.keySet().removeAll(connectorsToBeRemoved);
         return connectors;
     } 
@@ -157,7 +153,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Generates a GraphQL query from provided @param subgraphPatterns,connnectors,withoutConnnectors
      */
     protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final Map<Node,Set<TriplePatternWithID>> subgraphPatterns, final Map<Integer,Node> connectors, 
+            final Map<Node,Set<TriplePattern>> subgraphPatterns, final Map<TriplePattern,Node> connectors, 
             final Map<Node,String> withoutConnector){
 
         final Set<String> fieldPaths = new HashSet<>();
