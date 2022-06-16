@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
@@ -78,6 +79,11 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op )     {
+			subplanCount++;
+		}
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op )     {
 			subplanCount++;
 		}
 	}
