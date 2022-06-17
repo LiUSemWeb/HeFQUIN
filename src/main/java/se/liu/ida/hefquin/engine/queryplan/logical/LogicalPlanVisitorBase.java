@@ -29,7 +29,7 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 
 	public void visit( final LogicalOpFilter op )     {}
 
-	public void visit(LogicalOpLocalToGlobal op)	{}
+	public void visit( final LogicalOpLocalToGlobal op )	{}
 
-	public void visit(LogicalOpGlobalToLocal op)	{}
+	public void visit( final LogicalOpGlobalToLocal op )	{}
 }
