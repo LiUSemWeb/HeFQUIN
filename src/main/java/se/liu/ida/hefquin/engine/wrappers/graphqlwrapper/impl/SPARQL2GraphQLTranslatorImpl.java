@@ -49,18 +49,23 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
 
         // Determine all star patterns that do not have an incoming connector,
-        // if they have undeterminable GraphQL type then materializeAll
-        final Set<StarPattern> withoutConnectorTmp = determineSPsWithoutIncomingConnector( indexedStarPatterns.values(), connectors );
-        final Map<StarPattern,String> withoutConnector = new HashMap<>();
-        for ( final StarPattern sp : withoutConnectorTmp ) {
-            final String sgpType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
-            if ( sgpType == null ) {
+        final Set<StarPattern> withoutConnector = determineSPsWithoutIncomingConnector( indexedStarPatterns.values(), connectors );
+        // and prepare them to be used as entry points for the GraphQL query.
+        final Set<GraphQLTypedStarPattern> rootStarPatterns = new HashSet<>();
+        for ( final StarPattern sp : withoutConnector ) {
+            final String spType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
+            // If the GraphQL object type for the star pattern cannot
+            // be determined, then we need to return a GraphQL query
+            // that fetches everything from the GraphQL endpoint.
+            if ( spType == null ) {
                 return materializeAll(config, endpoint);
             }
-            withoutConnector.put(sp, sgpType);
+            final GraphQLTypedStarPattern gtsp = (GraphQLTypedStarPattern) sp;
+            gtsp.setGraphQLObjectType(spType);
+            rootStarPatterns.add(gtsp);
         }
 
-        return generateQueryData(config, endpoint, indexedStarPatterns, connectors, withoutConnector);
+        return generateQueryData(config, endpoint, indexedStarPatterns, connectors, rootStarPatterns);
     }
 
     /**
@@ -106,7 +111,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             StarPattern starPattern = result.get(subject);
             if ( starPattern == null ) {
-                starPattern = new StarPattern();
+                starPattern = new GraphQLTypedStarPattern();
                 result.put(subject, starPattern);
             }
 
@@ -179,7 +184,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      */
     protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
             final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
-            final Map<StarPattern,String> withoutConnector){
+            final Set<GraphQLTypedStarPattern> rootStarPatterns){
 
         final Set<String> fieldPaths = new HashSet<>();
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
@@ -189,24 +194,23 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         int variableCounter = 0;
 
         // Create an entrypoint for each star pattern without an incomming connector binding
-        for ( final java.util.Map.Entry<StarPattern, String>  entry : withoutConnector.entrySet() ) {
-            final StarPattern sp = entry.getKey();
+        for ( GraphQLTypedStarPattern sp : rootStarPatterns ) {
             final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getArguments(sp,config);
-            final String sgpType = entry.getValue();
+            final String spType = sp.getGraphQLObjectType();
             final GraphQLEntrypoint e;
 
             // Select entrypoint with regards to if the SGP has the required arguments
             if (SPARQL2GraphQLHelper.hasAllNecessaryArguments(sgpArguments.keySet(),
-                    endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet())) {
+                    endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet())) {
                 // Get single object entrypoint
-                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.SINGLE);
+                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
             } else if (SPARQL2GraphQLHelper.hasNecessaryArguments(sgpArguments.keySet(),
-                    endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet())) {
+                    endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet())) {
                 // Get filtered list entrypoint
-                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FILTERED);
+                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
             } else {
                 // Get full list entrypoint (No argument values)
-                e = endpoint.getEntrypoint(sgpType, GraphQLEntrypointType.FULL);
+                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FULL);
             }
 
             // Create GraphQLArguments for the current path
@@ -236,10 +240,18 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
 
             fieldPaths.addAll(SPARQL2GraphQLHelper.addSgp(sp, indexedStarPatterns, connectors, config, endpoint,
-                currentPath, sgpType));
+                currentPath, spType));
             ++entrypointCounter;
         }
 
         return new GraphQLQueryImpl(fieldPaths, queryArgs);
     }
+
+
+    protected class GraphQLTypedStarPattern extends StarPattern {
+        protected String type;
+        public String getGraphQLObjectType() { return type; }
+        public void setGraphQLObjectType( final String type ) { this.type = type; }
+    }
+
 }
