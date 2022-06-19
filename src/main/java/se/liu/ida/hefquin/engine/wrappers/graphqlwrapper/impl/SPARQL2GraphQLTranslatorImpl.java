@@ -44,12 +44,11 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         //   each triple pattern whose object is the subject of a star
         //   pattern maps to that star pattern
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
-
-        final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, endpoint, indexedStarPatterns, connectors);
-
         // - subset of the star patterns, contains only the ones from
         //   which we need to create entry points for the GraphQL query.
         final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config, endpoint );
+
+        final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, endpoint, indexedStarPatterns, connectors);
 
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
