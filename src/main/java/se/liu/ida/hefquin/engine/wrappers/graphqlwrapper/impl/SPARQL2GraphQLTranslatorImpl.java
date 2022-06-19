@@ -22,7 +22,6 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
@@ -175,21 +174,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         for ( GraphQLTypedStarPattern sp : rootStarPatterns ) {
             final Map<String, LiteralLabel> sgpArguments = helper.getArguments(sp);
             final String spType = sp.getGraphQLObjectType();
-            final GraphQLEntrypoint e;
-
-            // Select entrypoint with regards to if the SGP has the required arguments
-            if (SPARQL2GraphQLHelper.hasAllNecessaryArguments(sgpArguments.keySet(),
-                    helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet())) {
-                // Get single object entrypoint
-                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
-            } else if (SPARQL2GraphQLHelper.hasNecessaryArguments(sgpArguments.keySet(),
-            		helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet())) {
-                // Get filtered list entrypoint
-                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
-            } else {
-                // Get full list entrypoint (No argument values)
-                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FULL);
-            }
+            final GraphQLEntrypoint e = helper.getEntryPoint( spType, sgpArguments.keySet() );
 
             // Create GraphQLArguments for the current path
             final Set<GraphQLArgument> pathArguments = new LinkedHashSet<>();

@@ -46,8 +46,6 @@ public class SPARQL2GraphQLHelper
         this.connectors            = connectors;
     }
 
-    public GraphQLEndpoint getEndpoint() { return endpoint; }
-
 
     /**
      * Generates a GraphQL query that fetches everything from the GraphQL endpoint.
@@ -243,6 +241,27 @@ public class SPARQL2GraphQLHelper
             }
         }
         return args;
+    }
+
+    /**
+     * Returns the relevant entrypoint with regards to if the corresponding
+     * star pattern has the required arguments.
+     */
+    public GraphQLEntrypoint getEntryPoint( final String spType, final Set<String> spArgumentNames ) {
+        // First, try single object entrypoint
+        final GraphQLEntrypoint e1 = endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
+        if ( hasAllNecessaryArguments(spArgumentNames, e1.getArgumentDefinitions().keySet()) ) {
+            return e1;
+        }
+
+        // Next, try filtered list entrypoint
+        final GraphQLEntrypoint e2 = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
+        if ( hasNecessaryArguments(spArgumentNames, e2.getArgumentDefinitions().keySet()) ) {
+            return e2;
+        }
+
+        // Get full list entrypoint (No argument values)
+        return endpoint.getEntrypoint(spType, GraphQLEntrypointType.FULL);
     }
 
     /**
