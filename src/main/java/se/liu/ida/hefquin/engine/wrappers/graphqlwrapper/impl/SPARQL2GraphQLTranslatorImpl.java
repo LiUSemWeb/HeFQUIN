@@ -29,6 +29,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.StarPattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.URI2GraphQLHelper;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
@@ -38,22 +39,27 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final GraphQLEndpoint endpoint) {
 
         // Initialize necessary data structures
-        final Map<Node, Set<TriplePattern>> subgraphPatterns = createSubGraphPatterns(bgp);
-        final Map<TriplePattern, Node> connectors = createConnectors(subgraphPatterns);
+        // - collection of subject-based star patterns of the given
+        //   BGP, indexed by their respective subject nodes
+        final Map<Node, StarPattern> indexedStarPatterns = decomposeIntoStarPatterns(bgp);
+        final Map<TriplePattern, Node> connectors = createConnectors(indexedStarPatterns);
 
         // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
         final Map<Node,String> withoutConnector = new HashMap<>();
-        for(final Node n : subgraphPatterns.keySet()){
-            final String sgpType = SPARQL2GraphQLHelper.determineSgpType(subgraphPatterns.get(n),config);
-            if(!connectors.containsValue(n) && sgpType == null){
-                return materializeAll(config,endpoint);
-            }
-            if(!connectors.containsValue(n)){
-                withoutConnector.put(n,sgpType);
+        for ( final StarPattern sp : indexedStarPatterns.values() ) {
+            final boolean hasConnectors = connectors.containsValue( sp.getSubject() );
+            if ( ! hasConnectors ) {
+                final String sgpType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
+                if ( sgpType == null ) {
+                    return materializeAll(config, endpoint);
+                }
+                else {
+                    withoutConnector.put( sp.getSubject(), sgpType );
+                }
             }
         }
 
-        return generateQueryData(config, endpoint, subgraphPatterns, connectors, withoutConnector);
+        return generateQueryData(config, endpoint, indexedStarPatterns, connectors, withoutConnector);
     }
 
     /**
@@ -89,40 +95,39 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     }
 
     /**
-     * Creates a subgraphpatterns map using @param bgp
+     * Decomposes the given BGP into its subject-based star patterns and returns
+     * the resulting star patterns indexed by their respective subject nodes.
      */
-    protected Map<Node, Set<TriplePattern>> createSubGraphPatterns(final BGP bgp){
-        final Map<Node, Set<TriplePattern>> subgraphPatterns = new HashMap<>();
+    protected Map<Node, StarPattern> decomposeIntoStarPatterns(final BGP bgp){
+        final Map<Node, StarPattern> result = new HashMap<>();
+        for ( final TriplePattern tp : bgp.getTriplePatterns() ){
+            final Node subject = tp.asJenaTriple().getSubject();
 
-        // Partition BGP into SGPs and give unique integer id to TPs
-        final Set<? extends TriplePattern> bgpSet = bgp.getTriplePatterns();
-        for(final TriplePattern t : bgpSet){
-            final Node subject = t.asJenaTriple().getSubject();
-            if(subgraphPatterns.containsKey(subject)){
-                subgraphPatterns.get(subject).add(t);
+            StarPattern starPattern = result.get(subject);
+            if ( starPattern == null ) {
+                starPattern = new StarPattern();
+                result.put(subject, starPattern);
             }
-            else{
-                final Set<TriplePattern> sgp = new HashSet<>();
-                sgp.add(t);
-                subgraphPatterns.put(subject, sgp);
-            }
+
+            starPattern.addTriplePattern(tp);
         }
 
-        return subgraphPatterns;
+        return result;
     }
 
     /**
-     * Creates a connector map using @param subgraphPatterns
+     * Creates a connector map using @param indexedStarPatterns
      */
-    protected Map<TriplePattern,Node> createConnectors(final Map<Node, Set<TriplePattern>> subgraphPatterns){
+    protected Map<TriplePattern,Node> createConnectors( final Map<Node, StarPattern> indexedStarPatterns ) {
         final Map<TriplePattern,Node> connectors = new HashMap<>();
         final Map<Node,SGPNode> sgpNodes = new HashMap<>();
 
-        for ( final Node subject : subgraphPatterns.keySet() ) {
-            for ( final TriplePattern tp : subgraphPatterns.get(subject) ) {
+        for ( final StarPattern sp : indexedStarPatterns.values() ) {
+            final Node subject = sp.getSubject();
+            for ( final TriplePattern tp : sp.getTriplePatterns() ) {
                 final Node object = tp.asJenaTriple().getObject();
 
-                if(subgraphPatterns.containsKey(object) && ! object.equals(subject)){
+                if(indexedStarPatterns.containsKey(object) && ! object.equals(subject)){
                     SGPNode subjectSgpNode = sgpNodes.get(subject);
                     SGPNode objectSgpNode = sgpNodes.get(object);
 
@@ -153,7 +158,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Generates a GraphQL query from provided @param subgraphPatterns,connnectors,withoutConnnectors
      */
     protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final Map<Node,Set<TriplePattern>> subgraphPatterns, final Map<TriplePattern,Node> connectors, 
+            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,Node> connectors, 
             final Map<Node,String> withoutConnector){
 
         final Set<String> fieldPaths = new HashSet<>();
@@ -163,9 +168,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         int entrypointCounter = 0;
         int variableCounter = 0;
 
-        // Create an entrypoint for each SGP without an incomming connector binding
+        // Create an entrypoint for each star pattern without an incomming connector binding
         for (final Node n : withoutConnector.keySet()) {
-            final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getSgpArguments(subgraphPatterns.get(n),config);
+            final StarPattern sp = indexedStarPatterns.get(n);
+            final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getArguments(sp,config);
             final String sgpType = withoutConnector.get(n);
             final GraphQLEntrypoint e;
 
@@ -209,7 +215,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
 
-            fieldPaths.addAll(SPARQL2GraphQLHelper.addSgp(subgraphPatterns, connectors, config, endpoint,
+            fieldPaths.addAll(SPARQL2GraphQLHelper.addSgp(indexedStarPatterns, connectors, config, endpoint,
                 n, currentPath, sgpType));
             ++entrypointCounter;
         }

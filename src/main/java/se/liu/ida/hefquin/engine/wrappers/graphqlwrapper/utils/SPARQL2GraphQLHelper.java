@@ -26,9 +26,9 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLScalar
  */
 public class SPARQL2GraphQLHelper {
     /**
-     * Recursive function used to add fields from the triple patterns in a given SGP
+     * Recursive function used to add fields from the triple patterns in a given star pattern
      */
-    public static Set<String> addSgp(final Map<Node,Set<TriplePattern>> subgraphPatterns, final Map<TriplePattern,Node> connectors, 
+    public static Set<String> addSgp(final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,Node> connectors, 
             final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, final Node subgraphNode, 
             final String currentPath, final String sgpType){
 
@@ -37,12 +37,13 @@ public class SPARQL2GraphQLHelper {
         // Necessary id field present in all objects used to indentify the GraphQL object
         finishedFieldPaths.add(currentPath + new GraphQLIDPath(sgpType));
 
-        // Retrieve necessary information about current sgp
-        final boolean addAllFields = hasVariablePredicate(subgraphPatterns.get(subgraphNode));
+        // Retrieve necessary information about current star pattern
+        final StarPattern sp = indexedStarPatterns.get(subgraphNode);
+        final boolean addAllFields = hasVariablePredicate(sp);
         final Set<TriplePattern> tpConnectors = new HashSet<>();
-        for(final TriplePattern t : subgraphPatterns.get(subgraphNode)){
-            if(connectors.containsKey(t)){
-                tpConnectors.add(t);
+        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
+            if ( connectors.containsKey(tp) ) {
+                tpConnectors.add(tp);
             }
         }
 
@@ -57,19 +58,19 @@ public class SPARQL2GraphQLHelper {
                 final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,endpoint);
 
                 for(final String uri : allObjectURI){
-                    finishedFieldPaths.addAll(addObjectField(subgraphPatterns,connectors,config,endpoint,
+                    finishedFieldPaths.addAll(addObjectField(indexedStarPatterns,connectors,config,endpoint,
                         nestedSubgraphNode,currentPath,sgpType,uri));
                 }
 
             }
             else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
                 // If the current TP predicate is a URI, add the GraphQL field it corresponds to
-                finishedFieldPaths.addAll(addObjectField(subgraphPatterns,connectors,config,endpoint,
+                finishedFieldPaths.addAll(addObjectField(indexedStarPatterns,connectors,config,endpoint,
                     nestedSubgraphNode,currentPath,sgpType,predicate.getURI()));
             }
         }
 
-        // Add fields that doesn't link to another SGP, 
+        // Add fields that do not link to another star pattern
         if(addAllFields){
             // If variable predicate exist in the current SGP, then query for everything in current object
             final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.OBJECT,config,endpoint);
@@ -85,9 +86,9 @@ public class SPARQL2GraphQLHelper {
 
         }
         else{
-            // If no variable predicate exist, only the necessary fields from the SGP have to be added.
-            for(final TriplePattern t : subgraphPatterns.get(subgraphNode)){
-                final Node predicate = t.asJenaTriple().getPredicate();
+            // If no variable predicate exists, only the necessary fields from the star pattern have to be added.
+            for ( final TriplePattern tp : sp.getTriplePatterns() ) {
+                final Node predicate = tp.asJenaTriple().getPredicate();
                 if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
                     final String fieldName = config.mapPropertyToField(predicate.getURI());
                     if(endpoint.getGraphQLFieldType(sgpType,fieldName) == GraphQLFieldType.OBJECT){
@@ -108,7 +109,7 @@ public class SPARQL2GraphQLHelper {
      * Helper function to add a field to the query that represents a nested object. Fields in that nested 
      * object are added recursively through addSgp
      */
-    public static Set<String> addObjectField(final Map<Node,Set<TriplePattern>> subgraphPatterns, final Map<TriplePattern,Node> connectors, 
+    public static Set<String> addObjectField(final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,Node> connectors, 
             final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, final Node nestedSubgraphNode, 
             final String currentPath, final String sgpType, final String predicateURI){
 
@@ -117,7 +118,7 @@ public class SPARQL2GraphQLHelper {
         final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
-        return addSgp(subgraphPatterns,connectors,config,endpoint,
+        return addSgp(indexedStarPatterns,connectors,config,endpoint,
             nestedSubgraphNode,newPath,nestedType);
     }
 
@@ -144,26 +145,25 @@ public class SPARQL2GraphQLHelper {
     }
 
     /**
-     * Helper function which checks if any triple pattern predicate in @param sgp is a variable or blank node, returns true if so
+     * Helper function which checks if any triple pattern predicate in @param sp is a variable or blank node, returns true if so
      */
-    public static boolean hasVariablePredicate(final Set<TriplePattern> sgp){
-        for(final TriplePattern t : sgp){
-            final Node predicate = t.asJenaTriple().getPredicate();
-            if(predicate.isVariable()){
+    public static boolean hasVariablePredicate( final StarPattern sp ){
+        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
+            if ( tp.asJenaTriple().getPredicate().isVariable() ) {
                 return true;
-            }    
+            }
         }
         return false;
     }
 
     /**
-     * Returns the GraphQL object type @param sgp correponds to. 
+     * Returns the GraphQL object type @param sp corresponds to. 
      * If the type is undeterminable @return null
      */
-    public static String determineSgpType(final Set<TriplePattern> sgp, final GraphQL2RDFConfiguration config){
-        for(final TriplePattern t : sgp){
-            final Node predicate = t.asJenaTriple().getPredicate();
-            final Node object = t.asJenaTriple().getObject();
+    public static String determineSgpType( final StarPattern sp, final GraphQL2RDFConfiguration config ) {
+        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
+            final Node predicate = tp.asJenaTriple().getPredicate();
+            final Node object    = tp.asJenaTriple().getObject();
 
             if(predicate.isURI() && config.isValidPropertyURI(predicate.getURI())){
                 return config.mapPropertyToType(predicate.getURI());
@@ -179,14 +179,14 @@ public class SPARQL2GraphQLHelper {
     }
 
     /**
-     * @return a map consisting of what can be used as arguments from the given @param sgp
+     * Returns a map consisting of what can be used as arguments from the given star pattern.
      * The predicate from a TP needs to be a property URI and the object needs to be a literal
      */
-    public static Map<String,LiteralLabel> getSgpArguments(final Set<TriplePattern> sgp, final GraphQL2RDFConfiguration config){
+    public static Map<String,LiteralLabel> getArguments(final StarPattern sp, final GraphQL2RDFConfiguration config){
         final Map<String,LiteralLabel> args = new HashMap<>();
-        for(final TriplePattern t : sgp){
-            final Node predicate = t.asJenaTriple().getPredicate();
-            final Node object = t.asJenaTriple().getObject();
+        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
+            final Node predicate = tp.asJenaTriple().getPredicate();
+            final Node object    = tp.asJenaTriple().getObject();
 
             if(predicate.isURI() && config.isValidPropertyURI(predicate.getURI())){
                 if(object.isLiteral()){
