@@ -51,40 +51,42 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         //   which we need to create entry points for the GraphQL query.
         final Set<GraphQLTypedStarPattern> rootStarPatterns = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config );
 
+        final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, endpoint, indexedStarPatterns, connectors);
+
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
         // from the GraphQL endpoint.
         if ( rootStarPatterns == null ) {
-            return materializeAll(config, endpoint);
+            return materializeAll(helper);
         }
 
-        return generateQueryData(config, endpoint, indexedStarPatterns, connectors, rootStarPatterns);
+        return generateQueryData(helper, rootStarPatterns);
     }
 
     /**
      * Genereates a GraphQL query that fetches everyhing from @param endpoint
      */
-    protected GraphQLQuery materializeAll(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint){
+    protected GraphQLQuery materializeAll( final SPARQL2GraphQLHelper helper ) {
 
         int entrypointCounter = 0;
         final Set<String> finishedFieldPaths = new HashSet<>();
-        final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
+        final Set<String> objectTypeNames = helper.getEndpoint().getGraphQLObjectTypes();
         for(final String objectTypeName : objectTypeNames){
             // Get the full list entrypoint
-            final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
+            final GraphQLEntrypoint e = helper.getEndpoint().getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
             final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
             finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName));
 
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT,config, endpoint);
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR,config, endpoint);
+            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, helper.getConfig(), helper.getEndpoint() );
+            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, helper.getConfig(), helper.getEndpoint() );
 
             // Add all fields that nests another object
             for(final String uri : allObjectURI){
-                finishedFieldPaths.add(SPARQL2GraphQLHelper.addEmptyObjectField(config,endpoint,currentPath,objectTypeName,uri));
+                finishedFieldPaths.add( helper.addEmptyObjectField(currentPath,objectTypeName,uri) );
             }
             // Add all fields that represent scalar values
             for(final String uri : allScalarURI){
-                finishedFieldPaths.add(SPARQL2GraphQLHelper.addScalarField(config,currentPath,uri));
+                finishedFieldPaths.add( helper.addScalarField(currentPath,uri) );
             }
 
             ++entrypointCounter;
@@ -194,10 +196,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     /**
      * Generates a GraphQL query from provided @param indexedStarPatterns,connectors,withoutConnnectors
      */
-    protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
-            final Set<GraphQLTypedStarPattern> rootStarPatterns){
-
+    protected GraphQLQuery generateQueryData( final SPARQL2GraphQLHelper helper,
+                                              final Set<GraphQLTypedStarPattern> rootStarPatterns ) {
         final Set<String> fieldPaths = new HashSet<>();
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         
@@ -207,22 +207,22 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
         // Create an entrypoint for each star pattern without an incomming connector binding
         for ( GraphQLTypedStarPattern sp : rootStarPatterns ) {
-            final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getArguments(sp,config);
+            final Map<String, LiteralLabel> sgpArguments = helper.getArguments(sp);
             final String spType = sp.getGraphQLObjectType();
             final GraphQLEntrypoint e;
 
             // Select entrypoint with regards to if the SGP has the required arguments
             if (SPARQL2GraphQLHelper.hasAllNecessaryArguments(sgpArguments.keySet(),
-                    endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet())) {
+                    helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.SINGLE).getArgumentDefinitions().keySet())) {
                 // Get single object entrypoint
-                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
+                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
             } else if (SPARQL2GraphQLHelper.hasNecessaryArguments(sgpArguments.keySet(),
-                    endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet())) {
+            		helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FILTERED).getArgumentDefinitions().keySet())) {
                 // Get filtered list entrypoint
-                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
+                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
             } else {
                 // Get full list entrypoint (No argument values)
-                e = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FULL);
+                e = helper.getEndpoint().getEntrypoint(spType, GraphQLEntrypointType.FULL);
             }
 
             // Create GraphQLArguments for the current path
@@ -251,8 +251,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
 
-            fieldPaths.addAll(SPARQL2GraphQLHelper.addSgp(sp, indexedStarPatterns, connectors, config, endpoint,
-                currentPath, spType));
+            fieldPaths.addAll( helper.addSgp(sp, currentPath, spType) );
             ++entrypointCounter;
         }
 

@@ -24,15 +24,32 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLScalar
 /**
  * Provides helper functions for creating the necessary data in a GraphQL query.
  */
-public class SPARQL2GraphQLHelper {
+public class SPARQL2GraphQLHelper
+{
+    protected final GraphQL2RDFConfiguration config;
+    protected final GraphQLEndpoint endpoint;
+    protected final Map<Node, StarPattern> indexedStarPatterns;
+    protected final Map<TriplePattern,StarPattern> connectors;
+
+    public SPARQL2GraphQLHelper( final GraphQL2RDFConfiguration config,
+                                 final GraphQLEndpoint endpoint,
+                                 final Map<Node, StarPattern> indexedStarPatterns,
+                                 final Map<TriplePattern, StarPattern> connectors ) {
+        this.config                = config;
+        this.endpoint              = endpoint;
+        this.indexedStarPatterns   = indexedStarPatterns;
+        this.connectors            = connectors;
+    }
+
+    public GraphQL2RDFConfiguration getConfig() { return config; }
+
+    public GraphQLEndpoint getEndpoint() { return endpoint; }
+
+
     /**
      * Recursive function used to add fields from the triple patterns in a given star pattern
      */
-    public static Set<String> addSgp( final StarPattern sp,
-            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
-            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final String currentPath, final String sgpType){
-
+    public Set<String> addSgp( final StarPattern sp, final String currentPath, final String sgpType ){
         final Set<String> finishedFieldPaths = new HashSet<>();
 
         // Necessary id field present in all objects used to indentify the GraphQL object
@@ -58,15 +75,13 @@ public class SPARQL2GraphQLHelper {
                 final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,endpoint);
 
                 for(final String uri : allObjectURI){
-                    finishedFieldPaths.addAll(addObjectField(connectedSP,indexedStarPatterns,connectors,config,endpoint,
-                        currentPath,sgpType,uri));
+                    finishedFieldPaths.addAll(addObjectField(connectedSP,currentPath,sgpType,uri));
                 }
 
             }
             else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
                 // If the current TP predicate is a URI, add the GraphQL field it corresponds to
-                finishedFieldPaths.addAll(addObjectField(connectedSP,indexedStarPatterns,connectors,config,endpoint,
-                    currentPath,sgpType,predicate.getURI()));
+                finishedFieldPaths.addAll(addObjectField(connectedSP,currentPath,sgpType,predicate.getURI()));
             }
         }
 
@@ -77,11 +92,11 @@ public class SPARQL2GraphQLHelper {
             final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR,config,endpoint);
 
             for(final String uri : allObjectURI){
-                finishedFieldPaths.add(addEmptyObjectField(config,endpoint,currentPath,sgpType,uri));
+                finishedFieldPaths.add( addEmptyObjectField(currentPath,sgpType,uri) );
             }
 
             for(final String uri : allScalarURI){
-                finishedFieldPaths.add(addScalarField(config,currentPath,uri));
+                finishedFieldPaths.add( addScalarField(currentPath,uri) );
             }
 
         }
@@ -92,10 +107,10 @@ public class SPARQL2GraphQLHelper {
                 if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
                     final String fieldName = config.mapPropertyToField(predicate.getURI());
                     if(endpoint.getGraphQLFieldType(sgpType,fieldName) == GraphQLFieldType.OBJECT){
-                        finishedFieldPaths.add(addEmptyObjectField(config,endpoint,currentPath,sgpType,predicate.getURI()));
+                        finishedFieldPaths.add( addEmptyObjectField(currentPath,sgpType,predicate.getURI()) );
                     }
                     else{
-                        finishedFieldPaths.add(addScalarField(config,currentPath,predicate.getURI()));
+                        finishedFieldPaths.add( addScalarField(currentPath,predicate.getURI()) );
                     }
                 }
             }
@@ -109,24 +124,24 @@ public class SPARQL2GraphQLHelper {
      * Helper function to add a field to the query that represents a nested object. Fields in that nested 
      * object are added recursively through addSgp
      */
-    public static Set<String> addObjectField( final StarPattern sp,
-            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
-            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
-            final String currentPath, final String sgpType, final String predicateURI){
-
+    protected Set<String> addObjectField( final StarPattern sp,
+                                          final String currentPath,
+                                          final String sgpType,
+                                          final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
-        return addSgp(sp, indexedStarPatterns, connectors, config, endpoint, newPath, nestedType);
+        return addSgp(sp, newPath, nestedType);
     }
 
     /**
      * Helper function to add a field to the query that represents a nested object that only needs an id field (no more recursive calls)
      */
-    public static String addEmptyObjectField(final GraphQL2RDFConfiguration config,final GraphQLEndpoint endpoint, 
-            final String currentPath, final String sgpType, final String predicateURI){
+    public String addEmptyObjectField( final String currentPath,
+                                       final String sgpType,
+                                       final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
@@ -137,8 +152,7 @@ public class SPARQL2GraphQLHelper {
     /**
      * Helper function to add a field to the query that represents a scalar value
      */
-    public static String addScalarField(final GraphQL2RDFConfiguration config, final String currentPath, 
-            final String predicateURI){
+    public String addScalarField( final String currentPath, final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         return currentPath + new GraphQLScalarPath(alias, fieldName);
@@ -182,7 +196,7 @@ public class SPARQL2GraphQLHelper {
      * Returns a map consisting of what can be used as arguments from the given star pattern.
      * The predicate from a TP needs to be a property URI and the object needs to be a literal
      */
-    public static Map<String,LiteralLabel> getArguments(final StarPattern sp, final GraphQL2RDFConfiguration config){
+    public Map<String,LiteralLabel> getArguments( final StarPattern sp ){
         final Map<String,LiteralLabel> args = new HashMap<>();
         for ( final TriplePattern tp : sp.getTriplePatterns() ) {
             final Node predicate = tp.asJenaTriple().getPredicate();
