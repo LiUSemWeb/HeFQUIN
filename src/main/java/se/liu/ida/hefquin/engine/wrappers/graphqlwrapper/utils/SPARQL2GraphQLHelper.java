@@ -16,10 +16,15 @@ import org.apache.jena.graph.impl.LiteralLabel;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLIDPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLObjectPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLScalarPath;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 
 /**
  * Provides helper functions for creating the necessary data in a GraphQL query.
@@ -45,6 +50,37 @@ public class SPARQL2GraphQLHelper
 
     public GraphQLEndpoint getEndpoint() { return endpoint; }
 
+
+    /**
+     * Generates a GraphQL query that fetches everything from the GraphQL endpoint.
+     */
+    public GraphQLQuery materializeAll() {
+        int entrypointCounter = 0;
+        final Set<String> finishedFieldPaths = new HashSet<>();
+        final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
+        for(final String objectTypeName : objectTypeNames){
+            // Get the full list entrypoint
+            final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
+            final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
+            finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName));
+
+            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, config, endpoint );
+            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, config, endpoint );
+
+            // Add all fields that nests another object
+            for(final String uri : allObjectURI){
+                finishedFieldPaths.add( addEmptyObjectField(currentPath,objectTypeName,uri) );
+            }
+            // Add all fields that represent scalar values
+            for(final String uri : allScalarURI){
+                finishedFieldPaths.add( addScalarField(currentPath,uri) );
+            }
+
+            ++entrypointCounter;
+        }
+
+        return new GraphQLQueryImpl(finishedFieldPaths,new HashSet<>());
+    }
 
     /**
      * Recursive function used to add fields from the triple patterns in a given star pattern
@@ -139,7 +175,7 @@ public class SPARQL2GraphQLHelper
     /**
      * Helper function to add a field to the query that represents a nested object that only needs an id field (no more recursive calls)
      */
-    public String addEmptyObjectField( final String currentPath,
+    protected String addEmptyObjectField( final String currentPath,
                                        final String sgpType,
                                        final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
@@ -152,7 +188,7 @@ public class SPARQL2GraphQLHelper
     /**
      * Helper function to add a field to the query that represents a scalar value
      */
-    public String addScalarField( final String currentPath, final String predicateURI ) {
+    protected String addScalarField( final String currentPath, final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         return currentPath + new GraphQLScalarPath(alias, fieldName);
@@ -161,7 +197,7 @@ public class SPARQL2GraphQLHelper
     /**
      * Helper function which checks if any triple pattern predicate in @param sp is a variable or blank node, returns true if so
      */
-    public static boolean hasVariablePredicate( final StarPattern sp ){
+    protected static boolean hasVariablePredicate( final StarPattern sp ){
         for ( final TriplePattern tp : sp.getTriplePatterns() ) {
             if ( tp.asJenaTriple().getPredicate().isVariable() ) {
                 return true;

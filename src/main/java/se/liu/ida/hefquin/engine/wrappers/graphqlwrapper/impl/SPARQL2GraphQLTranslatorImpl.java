@@ -23,15 +23,12 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLIDPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.StarPattern;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.URI2GraphQLHelper;
 
 public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
@@ -57,42 +54,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         // If not, we need to return a GraphQL query that fetches everything
         // from the GraphQL endpoint.
         if ( rootStarPatterns == null ) {
-            return materializeAll(helper);
+            return helper.materializeAll();
         }
 
         return generateQueryData(helper, rootStarPatterns);
-    }
-
-    /**
-     * Genereates a GraphQL query that fetches everyhing from @param endpoint
-     */
-    protected GraphQLQuery materializeAll( final SPARQL2GraphQLHelper helper ) {
-
-        int entrypointCounter = 0;
-        final Set<String> finishedFieldPaths = new HashSet<>();
-        final Set<String> objectTypeNames = helper.getEndpoint().getGraphQLObjectTypes();
-        for(final String objectTypeName : objectTypeNames){
-            // Get the full list entrypoint
-            final GraphQLEntrypoint e = helper.getEndpoint().getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
-            final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
-            finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName));
-
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, helper.getConfig(), helper.getEndpoint() );
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, helper.getConfig(), helper.getEndpoint() );
-
-            // Add all fields that nests another object
-            for(final String uri : allObjectURI){
-                finishedFieldPaths.add( helper.addEmptyObjectField(currentPath,objectTypeName,uri) );
-            }
-            // Add all fields that represent scalar values
-            for(final String uri : allScalarURI){
-                finishedFieldPaths.add( helper.addScalarField(currentPath,uri) );
-            }
-
-            ++entrypointCounter;
-        }
-
-        return new GraphQLQueryImpl(finishedFieldPaths,new HashSet<>());
     }
 
     /**
