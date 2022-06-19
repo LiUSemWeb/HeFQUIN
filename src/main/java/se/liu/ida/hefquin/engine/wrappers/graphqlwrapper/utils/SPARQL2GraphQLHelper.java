@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -203,49 +202,9 @@ public class SPARQL2GraphQLHelper
     }
 
     /**
-     * Returns a map consisting of what can be used as arguments from the given star pattern.
-     * The predicate from a TP needs to be a property URI and the object needs to be a literal
-     */
-    public Map<String,LiteralLabel> getArguments( final StarPattern sp ){
-        final Map<String,LiteralLabel> args = new HashMap<>();
-        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
-            final Node predicate = tp.asJenaTriple().getPredicate();
-            final Node object    = tp.asJenaTriple().getObject();
-
-            if(predicate.isURI() && config.isValidPropertyURI(predicate.getURI())){
-                if(object.isLiteral()){
-                    args.put(config.mapPropertyToField(predicate.toString()),object.getLiteral());
-                }
-            }
-        }
-        return args;
-    }
-
-    /**
-     * Returns the relevant entrypoint with regards to if the corresponding
-     * star pattern has the required arguments.
-     */
-    public GraphQLEntrypoint getEntryPoint( final String spType, final Set<String> spArgumentNames ) {
-        // First, try single object entrypoint
-        final GraphQLEntrypoint e1 = endpoint.getEntrypoint(spType, GraphQLEntrypointType.SINGLE);
-        if ( hasAllNecessaryArguments(spArgumentNames, e1.getArgumentDefinitions().keySet()) ) {
-            return e1;
-        }
-
-        // Next, try filtered list entrypoint
-        final GraphQLEntrypoint e2 = endpoint.getEntrypoint(spType, GraphQLEntrypointType.FILTERED);
-        if ( hasNecessaryArguments(spArgumentNames, e2.getArgumentDefinitions().keySet()) ) {
-            return e2;
-        }
-
-        // Get full list entrypoint (No argument values)
-        return endpoint.getEntrypoint(spType, GraphQLEntrypointType.FULL);
-    }
-
-    /**
      * Check if @param sgpArgumentNames have atleast one match with @param entrypointArgumentNames
      */
-    protected static boolean hasNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+    public static boolean hasNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
         
         for(final String argName : sgpArgumentNames){
             if(entrypointArgumentNames.contains(argName)){
@@ -260,7 +219,7 @@ public class SPARQL2GraphQLHelper
      * Check if @param sgpArgumentNames contains all argument name from @param entrypointArgumentNames.
      * If @param sgpArgumentNames is empty then returns false.
      */
-    protected static boolean hasAllNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+    public static boolean hasAllNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
         if(sgpArgumentNames.isEmpty()){
             return false;
         }

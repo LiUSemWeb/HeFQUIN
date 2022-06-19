@@ -49,7 +49,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
         // - subset of the star patterns, contains only the ones from
         //   which we need to create entry points for the GraphQL query.
-        final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config );
+        final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config, endpoint );
 
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
@@ -139,12 +139,13 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      */
     protected Set<GraphQLQueryRootForStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
                                                                              final Map<TriplePattern, StarPattern> connectors,
-                                                                             final GraphQL2RDFConfiguration cfg ) {
+                                                                             final GraphQL2RDFConfiguration cfg,
+                                                                             final GraphQLEndpoint ep ) {
         final Set<GraphQLQueryRootForStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
-                final GraphQLQueryRootForStarPattern r = new GraphQLQueryRootForStarPattern(cfg, sp);
+                final GraphQLQueryRootForStarPattern r = new GraphQLQueryRootForStarPattern(sp, cfg, ep);
                 // If the GraphQL object type for the current star pattern cannot
                 // be determined, then we can immediately return null.
                 if ( r.getGraphQLObjectType() == null ) {
@@ -171,9 +172,8 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
         // Create an entrypoint for each star pattern without an incomming connector binding
         for ( GraphQLQueryRootForStarPattern r : queryRoots ) {
-            final Map<String, LiteralLabel> sgpArguments = helper.getArguments( r.getStarPattern() );
-            final String spType = r.getGraphQLObjectType();
-            final GraphQLEntrypoint e = helper.getEntryPoint( spType, sgpArguments.keySet() );
+            final Map<String, LiteralLabel> sgpArguments = r.getGraphQLArguments();
+            final GraphQLEntrypoint e = r.getGraphQLEntryPoint();
 
             // Create GraphQLArguments for the current path
             final Set<GraphQLArgument> pathArguments = new LinkedHashSet<>();
@@ -201,7 +201,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
 
-            fieldPaths.addAll( helper.addSgp(r.getStarPattern(), currentPath, spType) );
+            fieldPaths.addAll( helper.addSgp(r.getStarPattern(), currentPath, r.getGraphQLObjectType()) );
             ++entrypointCounter;
         }
 
