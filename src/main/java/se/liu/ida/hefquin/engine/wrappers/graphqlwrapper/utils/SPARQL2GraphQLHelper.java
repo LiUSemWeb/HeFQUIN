@@ -203,28 +203,6 @@ public class SPARQL2GraphQLHelper
     }
 
     /**
-     * Returns the GraphQL object type @param sp corresponds to. 
-     * If the type is undeterminable @return null
-     */
-    public String determineSgpType( final StarPattern sp ) {
-        for ( final TriplePattern tp : sp.getTriplePatterns() ) {
-            final Node predicate = tp.asJenaTriple().getPredicate();
-            final Node object    = tp.asJenaTriple().getObject();
-
-            if(predicate.isURI() && config.isValidPropertyURI(predicate.getURI())){
-                return config.mapPropertyToType(predicate.getURI());
-            }
-            else if(predicate.isURI() && config.isValidMembershipURI(predicate.getURI())){
-                if(object.isURI() && config.isValidClassURI(object.getURI())){
-                    return config.mapClassToType(object.getURI());
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Returns a map consisting of what can be used as arguments from the given star pattern.
      * The predicate from a TP needs to be a property URI and the object needs to be a literal
      */
@@ -267,7 +245,7 @@ public class SPARQL2GraphQLHelper
     /**
      * Check if @param sgpArgumentNames have atleast one match with @param entrypointArgumentNames
      */
-    public static boolean hasNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+    protected static boolean hasNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
         
         for(final String argName : sgpArgumentNames){
             if(entrypointArgumentNames.contains(argName)){
@@ -282,7 +260,7 @@ public class SPARQL2GraphQLHelper
      * Check if @param sgpArgumentNames contains all argument name from @param entrypointArgumentNames.
      * If @param sgpArgumentNames is empty then returns false.
      */
-    public static boolean hasAllNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
+    protected static boolean hasAllNecessaryArguments(final Set<String> sgpArgumentNames, final Set<String> entrypointArgumentNames){
         if(sgpArgumentNames.isEmpty()){
             return false;
         }

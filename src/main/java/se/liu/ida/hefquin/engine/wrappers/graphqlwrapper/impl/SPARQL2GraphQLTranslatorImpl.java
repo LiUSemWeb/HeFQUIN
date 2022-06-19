@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntryp
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphQLQueryRootForStarPattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.StarPattern;
@@ -48,16 +49,16 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
         // - subset of the star patterns, contains only the ones from
         //   which we need to create entry points for the GraphQL query.
-        final Set<GraphQLTypedStarPattern> rootStarPatterns = determineRootStarPatterns( indexedStarPatterns.values(), connectors, helper );
+        final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config );
 
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
         // from the GraphQL endpoint.
-        if ( rootStarPatterns == null ) {
+        if ( queryRoots == null ) {
             return helper.materializeAll();
         }
 
-        return generateQueryData(helper, rootStarPatterns);
+        return generateQueryData(helper, queryRoots);
     }
 
     /**
@@ -71,7 +72,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             StarPattern starPattern = result.get(subject);
             if ( starPattern == null ) {
-                starPattern = new GraphQLTypedStarPattern();
+                starPattern = new StarPattern();
                 result.put(subject, starPattern);
             }
 
@@ -136,23 +137,21 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * If there is at least one such star pattern for which it was not possible,
      * then this function returns <code>null</code>.
      */
-    protected Set<GraphQLTypedStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
-                                                                      final Map<TriplePattern, StarPattern> connectors,
-                                                                      final SPARQL2GraphQLHelper helper ) {
-        final Set<GraphQLTypedStarPattern> result = new HashSet<>();
+    protected Set<GraphQLQueryRootForStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
+                                                                             final Map<TriplePattern, StarPattern> connectors,
+                                                                             final GraphQL2RDFConfiguration cfg ) {
+        final Set<GraphQLQueryRootForStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
-                final String type = helper.determineSgpType(sp);
+                final GraphQLQueryRootForStarPattern r = new GraphQLQueryRootForStarPattern(cfg, sp);
                 // If the GraphQL object type for the current star pattern cannot
                 // be determined, then we can immediately return null.
-                if ( type == null ) {
+                if ( r.getGraphQLObjectType() == null ) {
                     return null;
                 }
 
-                final GraphQLTypedStarPattern gtsp = (GraphQLTypedStarPattern) sp;
-                gtsp.setGraphQLObjectType(type);
-                result.add(gtsp);
+                result.add(r);
             }
         }
         return result;
@@ -162,7 +161,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      * Generates a GraphQL query from provided @param indexedStarPatterns,connectors,withoutConnnectors
      */
     protected GraphQLQuery generateQueryData( final SPARQL2GraphQLHelper helper,
-                                              final Set<GraphQLTypedStarPattern> rootStarPatterns ) {
+                                              final Set<GraphQLQueryRootForStarPattern> queryRoots ) {
         final Set<String> fieldPaths = new HashSet<>();
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         
@@ -171,9 +170,9 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         int variableCounter = 0;
 
         // Create an entrypoint for each star pattern without an incomming connector binding
-        for ( GraphQLTypedStarPattern sp : rootStarPatterns ) {
-            final Map<String, LiteralLabel> sgpArguments = helper.getArguments(sp);
-            final String spType = sp.getGraphQLObjectType();
+        for ( GraphQLQueryRootForStarPattern r : queryRoots ) {
+            final Map<String, LiteralLabel> sgpArguments = helper.getArguments( r.getStarPattern() );
+            final String spType = r.getGraphQLObjectType();
             final GraphQLEntrypoint e = helper.getEntryPoint( spType, sgpArguments.keySet() );
 
             // Create GraphQLArguments for the current path
@@ -202,18 +201,11 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
             final String currentPath = new GraphQLEntrypointPath(e,entrypointCounter,pathArguments).toString();
 
-            fieldPaths.addAll( helper.addSgp(sp, currentPath, spType) );
+            fieldPaths.addAll( helper.addSgp(r.getStarPattern(), currentPath, spType) );
             ++entrypointCounter;
         }
 
         return new GraphQLQueryImpl(fieldPaths, queryArgs);
-    }
-
-
-    protected class GraphQLTypedStarPattern extends StarPattern {
-        protected String type;
-        public String getGraphQLObjectType() { return type; }
-        public void setGraphQLObjectType( final String type ) { this.type = type; }
     }
 
 }
