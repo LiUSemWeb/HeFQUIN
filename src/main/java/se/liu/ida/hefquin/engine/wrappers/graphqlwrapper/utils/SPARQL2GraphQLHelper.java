@@ -28,8 +28,9 @@ public class SPARQL2GraphQLHelper {
     /**
      * Recursive function used to add fields from the triple patterns in a given star pattern
      */
-    public static Set<String> addSgp(final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,Node> connectors, 
-            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, final Node subgraphNode, 
+    public static Set<String> addSgp( final StarPattern sp,
+            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
+            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
             final String currentPath, final String sgpType){
 
         final Set<String> finishedFieldPaths = new HashSet<>();
@@ -38,7 +39,6 @@ public class SPARQL2GraphQLHelper {
         finishedFieldPaths.add(currentPath + new GraphQLIDPath(sgpType));
 
         // Retrieve necessary information about current star pattern
-        final StarPattern sp = indexedStarPatterns.get(subgraphNode);
         final boolean addAllFields = hasVariablePredicate(sp);
         final Set<TriplePattern> tpConnectors = new HashSet<>();
         for ( final TriplePattern tp : sp.getTriplePatterns() ) {
@@ -47,10 +47,10 @@ public class SPARQL2GraphQLHelper {
             }
         }
 
-        // Add fields that has nested objects to other SGPs using recursion
+        // Add fields that has nested objects to other star patterns using recursion
         for(final TriplePattern currentTP : tpConnectors){
             final Triple t = currentTP.asJenaTriple();
-            final Node nestedSubgraphNode = connectors.get(currentTP);
+            final StarPattern connectedSP = connectors.get(currentTP);
             final Node predicate = t.getPredicate();
 
             if(predicate.isVariable()){
@@ -58,15 +58,15 @@ public class SPARQL2GraphQLHelper {
                 final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,endpoint);
 
                 for(final String uri : allObjectURI){
-                    finishedFieldPaths.addAll(addObjectField(indexedStarPatterns,connectors,config,endpoint,
-                        nestedSubgraphNode,currentPath,sgpType,uri));
+                    finishedFieldPaths.addAll(addObjectField(connectedSP,indexedStarPatterns,connectors,config,endpoint,
+                        currentPath,sgpType,uri));
                 }
 
             }
             else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
                 // If the current TP predicate is a URI, add the GraphQL field it corresponds to
-                finishedFieldPaths.addAll(addObjectField(indexedStarPatterns,connectors,config,endpoint,
-                    nestedSubgraphNode,currentPath,sgpType,predicate.getURI()));
+                finishedFieldPaths.addAll(addObjectField(connectedSP,indexedStarPatterns,connectors,config,endpoint,
+                    currentPath,sgpType,predicate.getURI()));
             }
         }
 
@@ -109,8 +109,9 @@ public class SPARQL2GraphQLHelper {
      * Helper function to add a field to the query that represents a nested object. Fields in that nested 
      * object are added recursively through addSgp
      */
-    public static Set<String> addObjectField(final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,Node> connectors, 
-            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint, final Node nestedSubgraphNode, 
+    public static Set<String> addObjectField( final StarPattern sp,
+            final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
+            final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
             final String currentPath, final String sgpType, final String predicateURI){
 
         final String alias = config.removePropertyPrefix(predicateURI);
@@ -118,8 +119,7 @@ public class SPARQL2GraphQLHelper {
         final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
-        return addSgp(indexedStarPatterns,connectors,config,endpoint,
-            nestedSubgraphNode,newPath,nestedType);
+        return addSgp(sp, indexedStarPatterns, connectors, config, endpoint, newPath, nestedType);
     }
 
     /**
