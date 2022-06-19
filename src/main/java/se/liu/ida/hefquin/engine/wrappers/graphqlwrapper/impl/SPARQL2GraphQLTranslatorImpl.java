@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -47,19 +48,16 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         //   pattern maps to that star pattern
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
 
-        // Get all SGPs without a connector, if they have undeterminable GraphQL type then materializeAll
-        final Map<Node,String> withoutConnector = new HashMap<>();
-        for ( final StarPattern sp : indexedStarPatterns.values() ) {
-            final boolean hasConnectors = connectors.containsValue(sp);
-            if ( ! hasConnectors ) {
-                final String sgpType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
-                if ( sgpType == null ) {
-                    return materializeAll(config, endpoint);
-                }
-                else {
-                    withoutConnector.put( sp.getSubject(), sgpType );
-                }
+        // Determine all star patterns that do not have an incoming connector,
+        // if they have undeterminable GraphQL type then materializeAll
+        final Set<StarPattern> withoutConnectorTmp = determineSPsWithoutIncomingConnector( indexedStarPatterns.values(), connectors );
+        final Map<StarPattern,String> withoutConnector = new HashMap<>();
+        for ( final StarPattern sp : withoutConnectorTmp ) {
+            final String sgpType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
+            if ( sgpType == null ) {
+                return materializeAll(config, endpoint);
             }
+            withoutConnector.put(sp, sgpType);
         }
 
         return generateQueryData(config, endpoint, indexedStarPatterns, connectors, withoutConnector);
@@ -159,11 +157,29 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     } 
 
     /**
+     * Returns a subset of the given collection of star patterns by filtering
+     * out every star pattern that has an incoming connector. In other words,
+     * the returned set contains only the star patterns that do not have an
+     * incoming connector.
+     */
+    protected Set<StarPattern> determineSPsWithoutIncomingConnector( final Collection<StarPattern> sps,
+                                                                     final Map<TriplePattern, StarPattern> connectors ) {
+        final Set<StarPattern> result = new HashSet<>();
+        for ( final StarPattern sp : sps ) {
+            final boolean hasConnectors = connectors.containsValue(sp);
+            if ( ! hasConnectors ) {
+                result.add(sp);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Generates a GraphQL query from provided @param indexedStarPatterns,connectors,withoutConnnectors
      */
     protected GraphQLQuery generateQueryData(final GraphQL2RDFConfiguration config, final GraphQLEndpoint endpoint,
             final Map<Node, StarPattern> indexedStarPatterns, final Map<TriplePattern,StarPattern> connectors, 
-            final Map<Node,String> withoutConnector){
+            final Map<StarPattern,String> withoutConnector){
 
         final Set<String> fieldPaths = new HashSet<>();
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
@@ -173,10 +189,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         int variableCounter = 0;
 
         // Create an entrypoint for each star pattern without an incomming connector binding
-        for (final Node n : withoutConnector.keySet()) {
-            final StarPattern sp = indexedStarPatterns.get(n);
+        for ( final java.util.Map.Entry<StarPattern, String>  entry : withoutConnector.entrySet() ) {
+            final StarPattern sp = entry.getKey();
             final Map<String, LiteralLabel> sgpArguments = SPARQL2GraphQLHelper.getArguments(sp,config);
-            final String sgpType = withoutConnector.get(n);
+            final String sgpType = entry.getValue();
             final GraphQLEntrypoint e;
 
             // Select entrypoint with regards to if the SGP has the required arguments
