@@ -47,22 +47,15 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         //   each triple pattern whose object is the subject of a star
         //   pattern maps to that star pattern
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
+        // - subset of the star patterns, contains only the ones from
+        //   which we need to create entry points for the GraphQL query.
+        final Set<GraphQLTypedStarPattern> rootStarPatterns = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config );
 
-        // Determine all star patterns that do not have an incoming connector,
-        final Set<StarPattern> withoutConnector = determineSPsWithoutIncomingConnector( indexedStarPatterns.values(), connectors );
-        // and prepare them to be used as entry points for the GraphQL query.
-        final Set<GraphQLTypedStarPattern> rootStarPatterns = new HashSet<>();
-        for ( final StarPattern sp : withoutConnector ) {
-            final String spType = SPARQL2GraphQLHelper.determineSgpType(sp, config);
-            // If the GraphQL object type for the star pattern cannot
-            // be determined, then we need to return a GraphQL query
-            // that fetches everything from the GraphQL endpoint.
-            if ( spType == null ) {
-                return materializeAll(config, endpoint);
-            }
-            final GraphQLTypedStarPattern gtsp = (GraphQLTypedStarPattern) sp;
-            gtsp.setGraphQLObjectType(spType);
-            rootStarPatterns.add(gtsp);
+        // Check whether it was possible to create suitable root star patterns.
+        // If not, we need to return a GraphQL query that fetches everything
+        // from the GraphQL endpoint.
+        if ( rootStarPatterns == null ) {
+            return materializeAll(config, endpoint);
         }
 
         return generateQueryData(config, endpoint, indexedStarPatterns, connectors, rootStarPatterns);
@@ -162,18 +155,37 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     } 
 
     /**
-     * Returns a subset of the given collection of star patterns by filtering
-     * out every star pattern that has an incoming connector. In other words,
-     * the returned set contains only the star patterns that do not have an
-     * incoming connector.
+     * Returns the star patterns from the given collection that will be used
+     * for creating entry points in the GraphQL query to be generated.
+     *
+     * To this end, the given collection of star patterns is first filtered
+     * to ignore every star pattern that has an incoming connector.
+     * Thereafter, for each of the remaining star patterns (i.e., the ones that
+     * do not have an incoming connector), the corresponding GraphQL object type
+     * is determined and associated with the star pattern before adding it to
+     * the output set.
+     * Finally, the output set is returned only if it was possible to determine
+     * a corresponding GraphQL object type for all of the star patterns therein.
+     * If there is at least one such star pattern for which it was not possible,
+     * then this function returns <code>null</code>.
      */
-    protected Set<StarPattern> determineSPsWithoutIncomingConnector( final Collection<StarPattern> sps,
-                                                                     final Map<TriplePattern, StarPattern> connectors ) {
-        final Set<StarPattern> result = new HashSet<>();
+    protected Set<GraphQLTypedStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
+                                                                      final Map<TriplePattern, StarPattern> connectors,
+                                                                      final GraphQL2RDFConfiguration config ) {
+        final Set<GraphQLTypedStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
-            if ( ! hasConnectors ) {
-                result.add(sp);
+            if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
+                final String type = SPARQL2GraphQLHelper.determineSgpType(sp, config);
+                // If the GraphQL object type for the current star pattern cannot
+                // be determined, then we can immediately return null.
+                if ( type == null ) {
+                    return null;
+                }
+
+                final GraphQLTypedStarPattern gtsp = (GraphQLTypedStarPattern) sp;
+                gtsp.setGraphQLObjectType(type);
+                result.add(gtsp);
             }
         }
         return result;
