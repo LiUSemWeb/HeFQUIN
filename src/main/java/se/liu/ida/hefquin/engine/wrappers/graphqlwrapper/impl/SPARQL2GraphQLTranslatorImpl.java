@@ -44,11 +44,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         //   each triple pattern whose object is the subject of a star
         //   pattern maps to that star pattern
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
-        // - subset of the star patterns, contains only the ones from
-        //   which we need to create entry points for the GraphQL query.
-        final Set<GraphQLTypedStarPattern> rootStarPatterns = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config );
 
         final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, endpoint, indexedStarPatterns, connectors);
+
+        // - subset of the star patterns, contains only the ones from
+        //   which we need to create entry points for the GraphQL query.
+        final Set<GraphQLTypedStarPattern> rootStarPatterns = determineRootStarPatterns( indexedStarPatterns.values(), connectors, helper );
 
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
@@ -138,12 +139,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
      */
     protected Set<GraphQLTypedStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
                                                                       final Map<TriplePattern, StarPattern> connectors,
-                                                                      final GraphQL2RDFConfiguration config ) {
+                                                                      final SPARQL2GraphQLHelper helper ) {
         final Set<GraphQLTypedStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
-                final String type = SPARQL2GraphQLHelper.determineSgpType(sp, config);
+                final String type = helper.determineSgpType(sp);
                 // If the GraphQL object type for the current star pattern cannot
                 // be determined, then we can immediately return null.
                 if ( type == null ) {

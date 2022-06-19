@@ -46,8 +46,6 @@ public class SPARQL2GraphQLHelper
         this.connectors            = connectors;
     }
 
-    public GraphQL2RDFConfiguration getConfig() { return config; }
-
     public GraphQLEndpoint getEndpoint() { return endpoint; }
 
 
@@ -210,7 +208,7 @@ public class SPARQL2GraphQLHelper
      * Returns the GraphQL object type @param sp corresponds to. 
      * If the type is undeterminable @return null
      */
-    public static String determineSgpType( final StarPattern sp, final GraphQL2RDFConfiguration config ) {
+    public String determineSgpType( final StarPattern sp ) {
         for ( final TriplePattern tp : sp.getTriplePatterns() ) {
             final Node predicate = tp.asJenaTriple().getPredicate();
             final Node object    = tp.asJenaTriple().getObject();
