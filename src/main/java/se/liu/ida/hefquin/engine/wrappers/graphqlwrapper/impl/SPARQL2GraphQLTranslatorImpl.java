@@ -140,7 +140,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                                                                              final Map<TriplePattern, StarPattern> connectors,
                                                                              final GraphQL2RDFConfiguration cfg,
                                                                              final GraphQLEndpoint ep ) {
-        final Set<GraphQLQueryRootForStarPattern> result = new HashSet<>();
+        final Set<GraphQLQueryRootForStarPattern> result = new TreeSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
