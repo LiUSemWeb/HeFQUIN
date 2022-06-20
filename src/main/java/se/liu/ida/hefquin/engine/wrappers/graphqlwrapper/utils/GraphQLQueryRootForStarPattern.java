@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntryp
  * functionality for creating the root field of a GraphQL query
  * based on the star pattern.
  */
-public class GraphQLQueryRootForStarPattern
+public class GraphQLQueryRootForStarPattern implements Comparable<GraphQLQueryRootForStarPattern>
 {
 	protected final StarPattern sp;
 	protected final GraphQL2RDFConfiguration config;
@@ -140,4 +140,27 @@ public class GraphQLQueryRootForStarPattern
 		return endpoint.getEntrypoint(type, GraphQLEntrypointType.FULL);
 	}
 
+	@Override
+	public boolean equals(final Object o) {
+		if(this == o){
+			return true;
+		}
+
+		if(!(o instanceof GraphQLQueryRootForStarPattern)){
+			return false;
+		}
+
+		final GraphQLQueryRootForStarPattern that = (GraphQLQueryRootForStarPattern) o;
+		return this.sp.getSubject().equals(that.sp.getSubject());
+	}
+
+	@Override
+	public int hashCode() {
+		return sp.getSubject().hashCode();
+	}
+
+	@Override
+	public int compareTo(final GraphQLQueryRootForStarPattern o) {
+		return this.sp.getSubject().toString().compareTo(o.sp.getSubject().toString());
+	}
 }
