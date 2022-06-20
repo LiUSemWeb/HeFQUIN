@@ -170,7 +170,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         int variableCounter = 0;
 
         // Create an entrypoint for each star pattern without an incomming connector binding
-        for ( GraphQLQueryRootForStarPattern r : new TreeSet<>(queryRoots) ) {
+        for ( GraphQLQueryRootForStarPattern r : queryRoots ) {
             final Map<String, LiteralLabel> sgpArguments = r.getGraphQLArguments();
             final GraphQLEntrypoint e = r.getGraphQLEntryPoint();
 
