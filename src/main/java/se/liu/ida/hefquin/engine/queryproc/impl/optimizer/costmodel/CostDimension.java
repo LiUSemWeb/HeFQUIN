@@ -2,10 +2,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 public class CostDimension
 {
-	public final int weight;
+	public final double weight;
 	public final CostFunctionForPlan costFct;
 
-	public CostDimension( final int weight, final CostFunctionForPlan costFct ) {
+	public CostDimension( final double weight, final CostFunctionForPlan costFct ) {
 		assert costFct != null;
 
 		this.weight = weight;
