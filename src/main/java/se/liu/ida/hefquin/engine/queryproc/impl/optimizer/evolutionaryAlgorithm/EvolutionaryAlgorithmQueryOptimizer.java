@@ -41,9 +41,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
     @Override
     public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-        if( terminateCriterion instanceof TerminateByDistancePercAvgDynamicG ){
-            ((TerminateByDistancePercAvgDynamicG) terminateCriterion).initialize( initialPlan );
-        }
+        terminateCriterion.initialize( initialPlan );
 
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
         return optimize( initialPhysicalPlan );
