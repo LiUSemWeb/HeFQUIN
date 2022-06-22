@@ -32,7 +32,7 @@ public class CFRBasedCostFunctionForPlan implements CostFunctionForPlan
 		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = plan.getSubPlan(i);
 			f = f.thenCombine( initiateCostEstimation(subPlan),
-			                   (total,valueForSubPlan) -> total + valueForSubPlan );
+			                   (total,valueForSubPlan) -> (total < 0 ? Integer.MAX_VALUE : total) + (valueForSubPlan < 0 ? Integer.MAX_VALUE: valueForSubPlan) );
 		}
 
 		return f;
