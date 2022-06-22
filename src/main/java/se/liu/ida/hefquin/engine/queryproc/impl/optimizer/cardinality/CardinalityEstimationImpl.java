@@ -42,7 +42,7 @@ import java.util.function.Supplier;
  * uses the join cardinality estimation approach from the Lusail paper, which
  * is based on variable-specific cardinality estimates. To functionality to
  * obtain the variable-specific cardinality estimates is implemented separately
- * (see {@ink VarSpecificCardinalityEstimation}.
+ * (see {@link VarSpecificCardinalityEstimation}.
  */
 public class CardinalityEstimationImpl implements CardinalityEstimation
 {
@@ -100,7 +100,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         if ( rootOp instanceof LogicalOpUnion ) {
             final CompletableFuture<Integer> future1 = initiateCardinalityEstimation( plan.getSubPlan(0) );
             final CompletableFuture<Integer> future2 = initiateCardinalityEstimation( plan.getSubPlan(1) );
-            return future1.thenCombine( future2, (c1,c2) -> c1 + c2 );
+            return future1.thenCombine( future2, (c1,c2) -> ((c1 < 0? Integer.MAX_VALUE:c1) + (c2 < 0? Integer.MAX_VALUE:c2)) < 0? Integer.MAX_VALUE:(c1 < 0? Integer.MAX_VALUE:c1) + (c2 < 0? Integer.MAX_VALUE:c2) );
         }
 
         final Supplier<Integer> worker;
@@ -155,7 +155,9 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				throw new RuntimeException("Issuing a cardinality request caused an exception.", e);
 			}
 
-			return Integer.valueOf( resps[0].getCardinality() );
+			int intValue = Integer.valueOf( resps[0].getCardinality() );
+			if( intValue < 0 ) intValue = Integer.MAX_VALUE;
+			return intValue;
 		}
 
 		protected TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
@@ -249,7 +251,12 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			int cardinality = 0;
 			for ( int i = 0; i < joinVars.size(); ++i ) {
-				final int c = min( cardinalities1[i].intValue(), cardinalities2[i].intValue() );
+				int intValue1 = cardinalities1[i].intValue();
+				int intValue2 = cardinalities2[i].intValue();
+				if( intValue1 < 0 ) intValue1 = Integer.MAX_VALUE;
+				if( intValue2 < 0 ) intValue2 = Integer.MAX_VALUE;
+
+				final int c = min( intValue1, intValue2 );
 				cardinality = max(c, cardinality);
 			}
 
@@ -287,7 +294,9 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 			int cardinality = 0;
 			for ( int i = 0; i < vars.size(); ++i ) {
-				cardinality = max( cardinalities[i].intValue(), cardinality );
+				int intValue = cardinalities[i].intValue();
+				if( intValue < 0 ) intValue = Integer.MAX_VALUE;
+				cardinality = max( intValue, cardinality );
 			}
 
 			return Integer.valueOf(cardinality);
