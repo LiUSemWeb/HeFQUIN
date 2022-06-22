@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 
@@ -44,6 +45,17 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 		final int result = f.get().intValue();
 		assertEquals(42, result);
+	}
+
+	@Test
+	public void oneRequestOp_negativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests();
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final CompletableFuture<Integer> f = initEstimateForRequestPlan(Integer.MAX_VALUE+1, cardEstimator);
+
+		final int result = f.get().intValue();
+		assertEquals(Integer.MAX_VALUE, result);
 	}
 
 	@Test
@@ -155,6 +167,114 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	}
 
 	@Test
+	public void joinOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createJoinPlan(42, Integer.MAX_VALUE+1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(42, result);
+	}
+
+	@Test
+	public void joinOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createJoinPlan(Integer.MAX_VALUE+2, Integer.MAX_VALUE+1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE, result);
+	}
+
+	@Test
+	public void unionOfTwoRequestOps() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createUnionPlan(42, 13);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(55, result);
+	}
+
+	@Test
+	public void unionOfTwoRequestOps_oneNegativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createUnionPlan(42, Integer.MAX_VALUE+1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE, result);
+	}
+
+	@Test
+	public void unionOfTwoRequestOps_twoNegativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createUnionPlan(Integer.MAX_VALUE+1, Integer.MAX_VALUE+1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE, result);
+	}
+
+	@Test
+	public void unionOfTwoRequestOps_negativeTotalCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createUnionPlan(2, Integer.MAX_VALUE-1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "joinOfTwoRequestOps \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE, result);
+	}
+
+	@Test
 	public void joinOfSameRequestOp() throws InterruptedException, ExecutionException {
 		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
@@ -188,6 +308,24 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		if ( PRINT_TIME ) System.out.println( "oneTPAdd \t milliseconds passed: " + (endTime - startTime) );
 
 		assertEquals(13, result);
+	}
+
+	@Test
+	public void oneTPAdd_oneNegativeCard() throws InterruptedException, ExecutionException {
+		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
+		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
+
+		final PhysicalPlan plan = createTPAddPlan(42, Integer.MAX_VALUE+1);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Integer> f = cardEstimator.initiateCardinalityEstimation(plan);
+		final int result = f.get().intValue();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "oneTPAdd \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(42, result);
 	}
 
 	@Test
@@ -253,6 +391,18 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	                                       final PhysicalPlan subplan2 ) {
 		final LogicalOpJoin joinOp = LogicalOpJoin.getInstance();
 		return PhysicalPlanFactory.createPlan(joinOp, subplan1, subplan2);
+	}
+
+	protected PhysicalPlan createUnionPlan( final int card1, final int card2 ) {
+		final PhysicalPlan subplan1 = createRequestPlan(card1);
+		final PhysicalPlan subplan2 = createRequestPlan(card2);
+		return createUnionPlan(subplan1, subplan2);
+	}
+
+	protected PhysicalPlan createUnionPlan( final PhysicalPlan subplan1,
+										   final PhysicalPlan subplan2 ) {
+		final LogicalOpUnion unionOp = LogicalOpUnion.getInstance();
+		return PhysicalPlanFactory.createPlan(unionOp, subplan1, subplan2);
 	}
 
 	protected PhysicalPlan createTPAddPlan( final int card1, final int card2 ) {
