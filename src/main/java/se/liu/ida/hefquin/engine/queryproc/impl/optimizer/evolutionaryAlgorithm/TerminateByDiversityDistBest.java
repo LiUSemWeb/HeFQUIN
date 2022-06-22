@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 import java.util.List;
@@ -15,19 +16,23 @@ import java.util.List;
 public class TerminateByDiversityDistBest implements TerminationCriterion
 {
     protected final double distBestThreshold;
-    protected final int topK;
-    protected final int nrGenerations;
+    protected final double topK;
+    protected int nrGenerations;
 
-    public TerminateByDiversityDistBest( final double distBestThreshold, final int nrGenerations, final int topK ) {
+    public TerminateByDiversityDistBest( final double distBestThreshold, final double topK ) {
         this.distBestThreshold = distBestThreshold;
         this.topK = topK;
-        this.nrGenerations = nrGenerations;
+    }
+
+    @Override
+    public void initialize( final LogicalPlan plan ){
+        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {
         final int previousGenerationNr = allPreviousGenerations.size();
-        if ( previousGenerationNr + 1 < nrGenerations ) {
+        if ( previousGenerationNr < nrGenerations ) {
             return false;
         }
 
@@ -41,11 +46,10 @@ public class TerminateByDiversityDistBest implements TerminationCriterion
                 return false;
             }
 
+            nrGensForSteadyState++;
             final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
             bestPlanCost = previousGen.bestPlan.getWeight();
             topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( previousGen.plans, topK ).getWeight();
-
-            nrGensForSteadyState++;
         }
 
         return true;

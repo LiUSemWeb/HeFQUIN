@@ -21,6 +21,7 @@ public class TerminateByDistancePercAvgDynamicG implements TerminationCriterion
         this.percAvgThreshold = percAvgThreshold;
     }
 
+    @Override
     public void initialize( final LogicalPlan plan ){
         this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }

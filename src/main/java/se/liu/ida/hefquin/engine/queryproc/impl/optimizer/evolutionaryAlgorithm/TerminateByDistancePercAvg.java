@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 
 /**
@@ -12,11 +14,15 @@ import java.util.List;
 public class TerminateByDistancePercAvg implements TerminationCriterion
 {
     protected final double percAvgThreshold;
-    protected final int nrGenerations;
+    protected int nrGenerations;
 
-    public TerminateByDistancePercAvg( final double percAvgThreshold, final int nrGenerations ) {
+    public TerminateByDistancePercAvg( final double percAvgThreshold ) {
         this.percAvgThreshold = percAvgThreshold;
-        this.nrGenerations = nrGenerations;
+    }
+
+    @Override
+    public void initialize( final LogicalPlan plan ){
+        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 
 /**
@@ -9,11 +11,15 @@ import java.util.List;
 public class TerminatedByCostValue implements TerminationCriterion
 {
     protected final double costValueThreshold;
-    protected final int nrGenerations;
+    protected int nrGenerations;
 
-    public TerminatedByCostValue( final double costValueThreshold, final int nrGenerations ) {
+    public TerminatedByCostValue( final double costValueThreshold ) {
         this.costValueThreshold = costValueThreshold;
-        this.nrGenerations = nrGenerations;
+    }
+
+    @Override
+    public void initialize( final LogicalPlan plan ){
+        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override

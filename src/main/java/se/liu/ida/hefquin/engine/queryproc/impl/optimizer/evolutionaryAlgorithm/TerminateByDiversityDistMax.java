@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 /**
  * Diversity-based termination criterion:
@@ -11,17 +13,21 @@ import java.util.List;
 public class TerminateByDiversityDistMax implements TerminationCriterion
 {
     protected final double distMaxThreshold;
-    protected final int nrGenerations;
+    protected int nrGenerations;
 
-    public TerminateByDiversityDistMax( final double distMaxThreshold, final int nrGenerations ) {
+    public TerminateByDiversityDistMax( final double distMaxThreshold ) {
         this.distMaxThreshold = distMaxThreshold;
-        this.nrGenerations = nrGenerations;
+    }
+
+    @Override
+    public void initialize( final LogicalPlan plan ){
+        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {
         final int previousGenerationNr = allPreviousGenerations.size();
-        if ( previousGenerationNr + 1 < nrGenerations ) {
+        if ( previousGenerationNr < nrGenerations ) {
             return false;
         }
 
@@ -35,10 +41,11 @@ public class TerminateByDiversityDistMax implements TerminationCriterion
                 return false;
             }
 
+            nrGensForSteadyState++;
+
             final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
             bestPlanCost = previousGen.bestPlan.getWeight();
             worstPlanCost = previousGen.worstPlan.getWeight();
-            nrGensForSteadyState++;
         }
 
         return true;

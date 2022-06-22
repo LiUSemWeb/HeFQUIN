@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 /**
  *    termination criterion: number of generations
@@ -10,6 +12,11 @@ public class TerminatedByNumberOfGenerations implements TerminationCriterion{
 
     public TerminatedByNumberOfGenerations( final int generationThreshold ) {
         this.generationThreshold = generationThreshold;
+    }
+
+    @Override
+    public void initialize( final LogicalPlan plan ){
+//       Do nothing
     }
 
     /**

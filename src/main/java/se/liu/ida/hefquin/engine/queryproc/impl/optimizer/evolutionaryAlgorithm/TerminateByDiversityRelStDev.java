@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 import java.util.List;
@@ -13,13 +14,16 @@ import java.util.List;
 public class TerminateByDiversityRelStDev implements TerminationCriterion
 {
     protected final double relStDevThreshold;
-    protected final int nrGenerations;
+    protected int nrGenerations;
 
-    public TerminateByDiversityRelStDev( final double relStDevThreshold, final int nrGenerations ) {
+    public TerminateByDiversityRelStDev( final double relStDevThreshold ) {
         this.relStDevThreshold = relStDevThreshold;
-        this.nrGenerations = nrGenerations;
     }
 
+    @Override
+    public void initialize( final LogicalPlan plan ){
+        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
+    }
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {
