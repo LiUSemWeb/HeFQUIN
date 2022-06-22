@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 
 public interface TerminationCriterion {
@@ -11,5 +13,7 @@ public interface TerminationCriterion {
      */
     boolean readyToTerminate( final Generation currentGeneration,
                               final List<Generation> allPreviousGenerations );
+
+    void initialize( final LogicalPlan plan );
 
 }
