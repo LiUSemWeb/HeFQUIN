@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonNull;
 import org.apache.jena.atlas.json.JsonValue;
@@ -140,7 +139,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
                                                                              final Map<TriplePattern, StarPattern> connectors,
                                                                              final GraphQL2RDFConfiguration cfg,
                                                                              final GraphQLEndpoint ep ) {
-        final Set<GraphQLQueryRootForStarPattern> result = new TreeSet<>();
+        final Set<GraphQLQueryRootForStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
@@ -179,7 +178,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
             final Map<String, String> entrypointArgDefs = e.getArgumentDefinitions();
 
             if (entrypointArgDefs != null && !entrypointArgDefs.isEmpty()) {
-                for (final String argName : new TreeSet<String>(entrypointArgDefs.keySet())) {
+                for (final String argName : entrypointArgDefs.keySet()) {
                     final String variableName = "var" + variableCounter;
 
                     final String currArgDefinition = entrypointArgDefs.get(argName);
