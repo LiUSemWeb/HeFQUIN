@@ -56,6 +56,50 @@ public class CostModelImplTest extends EngineTestBase
 	}
 
 	@Test
+	public void samePlanTwiceInParallel_negativeSingleCost()
+			throws InterruptedException, ExecutionException, CostEstimationException
+	{
+		final PhysicalPlan plan = createSimplePlan();
+		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE+2, SLEEP_MILLIES, 2, 30, SLEEP_MILLIES);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+
+		final Double result1 = f1.get();
+		final Double result2 = f2.get();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "samePlanTwiceInParallel \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE + 60.0, result1.doubleValue(), 0);
+		assertEquals(Integer.MAX_VALUE + 60.0, result2.doubleValue(), 0);
+	}
+
+	@Test
+	public void samePlanTwiceInParallel_checkTotalCost()
+			throws InterruptedException, ExecutionException, CostEstimationException
+	{
+		final PhysicalPlan plan = createSimplePlan();
+		final CostModel costModel = createCostModel(1, Integer.MAX_VALUE-1, SLEEP_MILLIES, 1, Integer.MAX_VALUE-1, SLEEP_MILLIES);
+
+		final long startTime = new Date().getTime();
+
+		final CompletableFuture<Double> f1 = costModel.initiateCostEstimation(plan);
+		final CompletableFuture<Double> f2 = costModel.initiateCostEstimation(plan);
+
+		final Double result1 = f1.get();
+		final Double result2 = f2.get();
+
+		final long endTime = new Date().getTime();
+		if ( PRINT_TIME ) System.out.println( "samePlanTwiceInParallel \t milliseconds passed: " + (endTime - startTime) );
+
+		assertEquals(Integer.MAX_VALUE * 2.0-2, result1.doubleValue(), 0);
+		assertEquals(Integer.MAX_VALUE * 2.0-2, result2.doubleValue(), 0);
+	}
+
+	@Test
 	public void samePlanTwiceInSequence()
 			throws InterruptedException, ExecutionException, CostEstimationException
 	{
@@ -150,8 +194,8 @@ public class CostModelImplTest extends EngineTestBase
 	 * Creates a {@link CostModelImpl} with two fake cost functions
 	 * that always return the given cost values, respectively.
 	 */
-	protected CostModel createCostModel( final int weight1, final int cost1, final long sleepMillis1,
-	                                     final int weight2, final int cost2, final long sleepMillis2 ) {
+	protected CostModel createCostModel( final double weight1, final int cost1, final long sleepMillis1,
+	                                     final double weight2, final int cost2, final long sleepMillis2 ) {
 		final CostDimension[] dims = new CostDimension[] {
 				new CostDimension( weight1, new FakeCostFunctionForPlan(cost1, sleepMillis1) ),
 				new CostDimension( weight2, new FakeCostFunctionForPlan(cost2, sleepMillis2) )
