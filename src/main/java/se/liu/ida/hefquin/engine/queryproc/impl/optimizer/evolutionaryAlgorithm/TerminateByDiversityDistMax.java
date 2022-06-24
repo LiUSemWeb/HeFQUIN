@@ -10,18 +10,22 @@ import java.util.List;
  * and the worst plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistMax implements TerminationCriterion
+public class TerminateByDiversityDistMax extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double distMaxThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityDistMax(distMaxThreshold, plan);
+			}
+		};
+	}
+
+
     protected final double distMaxThreshold;
-    protected int nrGenerations;
 
-    public TerminateByDiversityDistMax( final double distMaxThreshold ) {
+    public TerminateByDiversityDistMax( final double distMaxThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.distMaxThreshold = distMaxThreshold;
-    }
-
-    @Override
-    public void initialize( final LogicalPlan plan ){
-        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override

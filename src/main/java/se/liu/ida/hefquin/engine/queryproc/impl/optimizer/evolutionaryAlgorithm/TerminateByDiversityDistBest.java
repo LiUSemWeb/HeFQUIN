@@ -13,20 +13,24 @@ import java.util.List;
  * and the top-k best plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistBest implements TerminationCriterion
+public class TerminateByDiversityDistBest extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double distBestThreshold, final double topK ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityDistBest(distBestThreshold, topK, plan);
+			}
+		};
+	}
+
+
     protected final double distBestThreshold;
     protected final double topK;
-    protected int nrGenerations;
 
-    public TerminateByDiversityDistBest( final double distBestThreshold, final double topK ) {
+    public TerminateByDiversityDistBest( final double distBestThreshold, final double topK, final LogicalPlan plan ) {
+        super(plan);
         this.distBestThreshold = distBestThreshold;
         this.topK = topK;
-    }
-
-    @Override
-    public void initialize( final LogicalPlan plan ){
-        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override

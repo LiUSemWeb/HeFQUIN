@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationConte
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.TerminationCriterion;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.DPBasedJoinPlanOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.GreedyJoinPlanOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple.JoinPlanOptimizer;
@@ -50,8 +50,8 @@ public class HeFQUINEngineConfig
 	}
 
 	protected QueryOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt ) {
-		final TerminationCriterion termination = new TerminatedByNumberOfGenerations(20);
-		return new EvolutionaryAlgorithmQueryOptimizer(ctxt, 8, 2, termination);
+		final TerminationCriterionFactory tcFactory = TerminatedByNumberOfGenerations.getFactory(20);
+		return new EvolutionaryAlgorithmQueryOptimizer(ctxt, 8, 2, tcFactory);
 	}
 
 }

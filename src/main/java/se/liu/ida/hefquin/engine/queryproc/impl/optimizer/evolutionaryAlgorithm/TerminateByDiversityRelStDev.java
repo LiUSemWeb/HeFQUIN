@@ -11,18 +11,22 @@ import java.util.List;
  * Termination is triggered when the relative standard deviation of the cost values
  * within the current generation is below a given threshold or the N-th generation is reached.
  */
-public class TerminateByDiversityRelStDev implements TerminationCriterion
+public class TerminateByDiversityRelStDev extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double relStDevThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityRelStDev(relStDevThreshold, plan);
+			}
+		};
+	}
+
+
     protected final double relStDevThreshold;
-    protected int nrGenerations;
 
-    public TerminateByDiversityRelStDev( final double relStDevThreshold ) {
+    public TerminateByDiversityRelStDev( final double relStDevThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.relStDevThreshold = relStDevThreshold;
-    }
-
-    @Override
-    public void initialize( final LogicalPlan plan ){
-        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override

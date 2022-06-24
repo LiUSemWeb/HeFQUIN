@@ -11,18 +11,22 @@ import java.util.List;
  * in the current generation and in the previous generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDistancePercBest implements TerminationCriterion
+public class TerminateByDistancePercBest extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double percBestThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDistancePercBest(percBestThreshold, plan);
+			}
+		};
+	}
+
+
     protected final double percBestThreshold;
-    protected int nrGenerations;
 
-    public TerminateByDistancePercBest( final double percBestThreshold ) {
+    public TerminateByDistancePercBest( final double percBestThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.percBestThreshold = percBestThreshold;
-    }
-
-    @Override
-    public void initialize( final LogicalPlan plan ){
-        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override
