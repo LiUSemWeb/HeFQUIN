@@ -10,49 +10,39 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 
 /**
- * Provides helper functions that focuses on conversions from URIs to GraphQL data and vice versa.
+ * Provides helper functions that focuses on conversions from URIs to GraphQL data 
+ * that is then used at a GraphQLEndpoint.
  */
 public class URI2GraphQLHelper {
 
     /**
-     * Takes a class URI ( @param uri ) and extracts the class name by using information 
-     * from @param config , then checks if the name matches a GraphQL object type in @param endpoint
+     * Takes a class URI ( @param uri ) and checks that its valid before getting the GraphQL type name 
+     * from it using @param config, then checks if the name matches a GraphQL object type in @param endpoint
      */
     public static boolean containsClassURI(final String uri, final GraphQL2RDFConfiguration config, 
             final GraphQLEndpoint endpoint){
-
-        final String classPrefix = config.getClassPrefix();
-        if(uri.startsWith(classPrefix)){
-            final String className = uri.substring(classPrefix.length());
-            return endpoint.containsGraphQLObjectType(className);
+        if(config.isValidClassURI(uri)){
+            final String typeName = config.mapClassToType(uri);
+            return endpoint.containsGraphQLObjectType(typeName);
         }
         return false;
     }
 
     /**
-     * Takes a property URI ( @param uri ) and extracts the property and class names 
-     * using @param config. A check whether the property name matches a field for a GraphQL object type
-     * in @param endpoint is then performed (where the class name is assumed to be the GraphQL object type name).
+     * Takes a property URI ( @param uri ) and checks that its valid before getting the GraphQL type and field name
+     * using @param config, then checks whether they matches a field for a GraphQL object type in @param endpoint
      */
     public static boolean containsPropertyURI(final String uri, final GraphQL2RDFConfiguration config, 
             final GraphQLEndpoint endpoint){
 
-        final String removedPrefix = config.removePropertyPrefix(uri);
-        if(removedPrefix == null){
+        if(!config.isValidPropertyURI(uri)){
             return false;
         }
 
-        final String propertyName = config.removePropertySuffix(removedPrefix);
-        if(propertyName == null){
-            return false;
-        }
+        final String typeName = config.mapPropertyToType(uri);
+        final String fieldName = config.mapPropertyToField(uri);
 
-        final String className = config.getClassFromPropertyURI(uri);
-        if(className == null){
-            return false;
-        }
-
-        return endpoint.containsGraphQLField(className, propertyName);
+        return endpoint.containsGraphQLField(typeName, fieldName);
     }
 
     /**
@@ -68,12 +58,7 @@ public class URI2GraphQLHelper {
             final Map<String,GraphQLField> fields = endpoint.getGraphQLObjectFields(objectTypeName);
             for(final String fieldName : fields.keySet()){
                 if(endpoint.getGraphQLFieldType(objectTypeName, fieldName) == fieldType){
-                    final StringBuilder propertyURI = new StringBuilder();
-                    propertyURI.append(config.getPropertyPrefix());
-                    propertyURI.append(fieldName);
-                    propertyURI.append(config.getConnectingText());
-                    propertyURI.append(objectTypeName);
-                    propertyURIs.add(propertyURI.toString());
+                    propertyURIs.add(config.mapFieldToProperty(objectTypeName, fieldName));
                 }
             }
         }
