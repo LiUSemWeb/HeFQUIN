@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 import java.util.List;
@@ -10,16 +11,23 @@ import java.util.List;
  * Termination is triggered when the relative standard deviation of the cost values
  * within the current generation is below a given threshold or the N-th generation is reached.
  */
-public class TerminateByDiversityRelStDev implements TerminationCriterion
+public class TerminateByDiversityRelStDev extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double relStDevThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityRelStDev(relStDevThreshold, plan);
+			}
+		};
+	}
+
+
     protected final double relStDevThreshold;
-    protected final int nrGenerations;
 
-    public TerminateByDiversityRelStDev( final double relStDevThreshold, final int nrGenerations ) {
+    public TerminateByDiversityRelStDev( final double relStDevThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.relStDevThreshold = relStDevThreshold;
-        this.nrGenerations = nrGenerations;
     }
-
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {

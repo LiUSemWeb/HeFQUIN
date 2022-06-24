@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
 
 import java.util.List;
@@ -12,22 +13,30 @@ import java.util.List;
  * and the top-k best plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistBest implements TerminationCriterion
+public class TerminateByDiversityDistBest extends TerminationCriterionBase
 {
-    protected final double distBestThreshold;
-    protected final int topK;
-    protected final int nrGenerations;
+	public static TerminationCriterionFactory getFactory( final double distBestThreshold, final double topK ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityDistBest(distBestThreshold, topK, plan);
+			}
+		};
+	}
 
-    public TerminateByDiversityDistBest( final double distBestThreshold, final int nrGenerations, final int topK ) {
+
+    protected final double distBestThreshold;
+    protected final double topK;
+
+    public TerminateByDiversityDistBest( final double distBestThreshold, final double topK, final LogicalPlan plan ) {
+        super(plan);
         this.distBestThreshold = distBestThreshold;
         this.topK = topK;
-        this.nrGenerations = nrGenerations;
     }
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {
         final int previousGenerationNr = allPreviousGenerations.size();
-        if ( previousGenerationNr + 1 < nrGenerations ) {
+        if ( previousGenerationNr < nrGenerations ) {
             return false;
         }
 
@@ -41,11 +50,10 @@ public class TerminateByDiversityDistBest implements TerminationCriterion
                 return false;
             }
 
+            nrGensForSteadyState++;
             final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
             bestPlanCost = previousGen.bestPlan.getWeight();
             topKPlanCost = PhysicalPlanWithCostUtils.findTopKPlanWithLowestCost( previousGen.plans, topK ).getWeight();
-
-            nrGensForSteadyState++;
         }
 
         return true;

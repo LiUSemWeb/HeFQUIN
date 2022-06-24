@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 
 /**
@@ -9,14 +11,22 @@ import java.util.List;
  * in the current generation and in the previous generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDistancePercBest implements TerminationCriterion
+public class TerminateByDistancePercBest extends TerminationCriterionBase
 {
-    protected final double percBestThreshold;
-    protected final int nrGenerations;
+	public static TerminationCriterionFactory getFactory( final double percBestThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDistancePercBest(percBestThreshold, plan);
+			}
+		};
+	}
 
-    public TerminateByDistancePercBest( final double percBestThreshold, final int nrGenerations ) {
+
+    protected final double percBestThreshold;
+
+    public TerminateByDistancePercBest( final double percBestThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.percBestThreshold = percBestThreshold;
-        this.nrGenerations = nrGenerations;
     }
 
     @Override

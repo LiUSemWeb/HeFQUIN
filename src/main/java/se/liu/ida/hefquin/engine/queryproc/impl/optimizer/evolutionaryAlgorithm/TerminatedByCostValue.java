@@ -1,19 +1,29 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 
 /**
  * Termination is triggered when the lowest-cost plan per generation
  * has not exceeded a specified threshold for a number of generations.
  */
-public class TerminatedByCostValue implements TerminationCriterion
+public class TerminatedByCostValue extends TerminationCriterionBase
 {
-    protected final double costValueThreshold;
-    protected final int nrGenerations;
+	public static TerminationCriterionFactory getFactory( final double costValueThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminatedByCostValue(costValueThreshold, plan);
+			}
+		};
+	}
 
-    public TerminatedByCostValue( final double costValueThreshold, final int nrGenerations ) {
+
+    protected final double costValueThreshold;
+
+    public TerminatedByCostValue( final double costValueThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.costValueThreshold = costValueThreshold;
-        this.nrGenerations = nrGenerations;
     }
 
     @Override

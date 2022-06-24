@@ -12,17 +12,22 @@ import java.util.List;
  * a specified distance threshold for a number of generations.
  * (The nrGenerations is a dynamic number depending on the number of lowest-cost plans).
  */
-public class TerminateByDistancePercAvgDynamicG implements TerminationCriterion
+public class TerminateByDistancePercAvgDynamicG extends TerminationCriterionBase
 {
+	public static TerminationCriterionFactory getFactory( final double percAvgThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDistancePercAvgDynamicG(percAvgThreshold, plan);
+			}
+		};
+	}
+
+
     protected final double percAvgThreshold;
-    protected int nrGenerations;
 
-    public TerminateByDistancePercAvgDynamicG( final double percAvgThreshold ) {
+    public TerminateByDistancePercAvgDynamicG( final double percAvgThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.percAvgThreshold = percAvgThreshold;
-    }
-
-    public void initialize( final LogicalPlan plan ){
-        this.nrGenerations = InitializeNrGeneration.countNumOfOp(plan);
     }
 
     @Override
