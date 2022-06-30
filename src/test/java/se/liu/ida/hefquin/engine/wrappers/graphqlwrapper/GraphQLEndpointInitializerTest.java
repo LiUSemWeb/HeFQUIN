@@ -23,7 +23,7 @@ public class GraphQLEndpointInitializerTest extends EngineTestBase {
 
     @Test
     public void testGraphQLEndpointSetup() throws FederationAccessException{
-        if(skipLocalGraphQLTests){
+        if(!skipLocalGraphQLTests){
             final GraphQLEndpoint endpoint = initializer.initializeEndpoint("http://localhost:4000/graphql");
 
             // Check that all expected GraphQL types have been initialized correctly
