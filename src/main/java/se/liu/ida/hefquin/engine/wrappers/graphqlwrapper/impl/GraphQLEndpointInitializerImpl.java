@@ -53,6 +53,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
         }
     }
 
+    /**
+     * Initializes the GraphQL introspection query to be used.
+     */
     protected GraphQLQuery getQuery(){
         final TreeSet<String> fieldPaths = new TreeSet<>();
 
@@ -103,9 +106,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     }
 
     /**
-     * Parses specific introspection data to determine information about a corresponding GraphQL type.
+     * Parses introspection data to determine information about a specific GraphQL field.
      * @return a Pair consisting of the GraphQL valuetype (not including list and/or non-nullable identifiers) 
-     * and GraphQLFieldType respectively. @param field is a JsonObject and should 
+     * and GraphQLFieldType respectively for the GraphQL type. @param field is a JsonObject and should 
      * contain the keys: "name", "kind" and alternatively "ofType"
      */
     protected Pair<String,GraphQLFieldType> determineTypeInformation(final JsonObject field){
@@ -129,7 +132,7 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
 
 
     /**
-     * Initializes GraphQLEntrypoints by parsing the __schema/queryType.
+     * Initializes GraphQLEntrypoints by parsing the __schema/queryType parts of the json.
      */
     protected Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> parseEntrypoints(final JsonObject data) {
         final Map<String, Map<GraphQLEntrypointType, GraphQLEntrypoint>> objectTypeToEntrypoint = new HashMap<>();

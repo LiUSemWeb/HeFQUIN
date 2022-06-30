@@ -14,13 +14,16 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntryp
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointInitializerImpl;
 
+/**
+ * Unit tests for the GraphQLEndpoint initializer
+ */
 public class GraphQLEndpointInitializerTest extends EngineTestBase {
     
     final GraphQLEndpointInitializer initializer = new GraphQLEndpointInitializerImpl();
 
     @Test
     public void testGraphQLEndpointSetup() throws FederationAccessException{
-        if(!skipLocalGraphQLTests){
+        if(skipLocalGraphQLTests){
             final GraphQLEndpoint endpoint = initializer.initializeEndpoint("http://localhost:4000/graphql");
 
             // Check that all expected GraphQL types have been initialized correctly
