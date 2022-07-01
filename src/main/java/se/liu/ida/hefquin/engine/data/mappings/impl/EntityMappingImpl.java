@@ -15,6 +15,7 @@ import org.apache.jena.vocabulary.OWL2;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.mappings.EntityMapping;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
 public class EntityMappingImpl implements EntityMapping
 {
@@ -60,8 +61,52 @@ public class EntityMappingImpl implements EntityMapping
 
 	@Override
 	public Set<TriplePattern> applyToTriplePattern( final TriplePattern tp ) {
-		// TODO: implement this function
-		return Collections.singleton(tp);
+		final Set<Triple> workingSet = new HashSet<Triple>();
+		if(g2lMap.containsKey(tp.asJenaTriple().getSubject())) {
+			final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getSubject()).iterator();
+			while (it.hasNext()) {
+				final Triple workingTriple = new Triple(it.next(),tp.asJenaTriple().getPredicate(),tp.asJenaTriple().getObject());
+				workingSet.add(workingTriple);
+			}
+		} else {
+			workingSet.add(tp.asJenaTriple());
+		}
+
+		final Set<Triple> workingSet2 = new HashSet<Triple>();
+		if(g2lMap.containsKey(tp.asJenaTriple().getPredicate())) {
+			final Iterator<Triple> it0 = workingSet.iterator();
+			while (it0.hasNext()) {
+				final Triple workingTriple0 = it0.next();
+				final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getPredicate()).iterator();
+				while (it.hasNext()) {
+					final Triple workingTriple = new Triple(workingTriple0.getSubject(),it.next(),workingTriple0.getObject());
+					workingSet2.add(workingTriple);
+				}
+			}
+		} else {
+			workingSet2.addAll(workingSet);
+		}
+		
+
+		final Set<TriplePattern> resultSet = new HashSet<TriplePattern>();
+		if(g2lMap.containsKey(tp.asJenaTriple().getObject())) {
+			final Iterator<Triple> it0 = workingSet2.iterator();
+			while (it0.hasNext()) {
+				final Triple workingTriple0 = it0.next();
+				final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getObject()).iterator();
+				while (it.hasNext()) {
+					final Triple workingTriple = new Triple(workingTriple0.getSubject(),workingTriple0.getPredicate(),it.next());
+					resultSet.add(new TriplePatternImpl(workingTriple));
+				}
+			}
+			return resultSet;
+		} else {
+			final Iterator<Triple> it = workingSet2.iterator();
+			while (it.hasNext()) {
+				resultSet.add(new TriplePatternImpl(it.next()));
+			}
+			return resultSet;
+		}
 	}
 
 	@Override
