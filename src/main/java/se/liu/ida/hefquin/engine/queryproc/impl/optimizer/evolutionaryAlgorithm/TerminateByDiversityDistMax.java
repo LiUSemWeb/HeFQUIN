@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-
 import java.util.List;
+
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 /**
  * Diversity-based termination criterion:
  *

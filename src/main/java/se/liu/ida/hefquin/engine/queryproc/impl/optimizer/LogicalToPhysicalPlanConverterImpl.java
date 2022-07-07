@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;

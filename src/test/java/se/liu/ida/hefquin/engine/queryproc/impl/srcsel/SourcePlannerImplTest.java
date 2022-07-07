@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;

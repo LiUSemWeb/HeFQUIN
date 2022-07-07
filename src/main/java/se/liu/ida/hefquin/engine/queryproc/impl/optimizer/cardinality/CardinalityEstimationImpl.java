@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.access.utils.RequestMemberPair;
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;

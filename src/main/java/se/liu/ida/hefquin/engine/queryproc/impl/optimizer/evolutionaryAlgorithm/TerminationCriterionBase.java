@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;

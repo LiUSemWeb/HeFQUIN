@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan;
+package se.liu.ida.hefquin.engine.queryplan.logical;
 
 import java.util.NoSuchElementException;
 

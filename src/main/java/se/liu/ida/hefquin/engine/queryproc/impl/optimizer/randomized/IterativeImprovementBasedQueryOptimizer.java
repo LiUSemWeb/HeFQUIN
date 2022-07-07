@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;

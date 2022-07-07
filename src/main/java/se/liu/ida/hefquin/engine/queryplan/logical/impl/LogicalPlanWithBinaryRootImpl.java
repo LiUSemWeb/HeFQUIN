@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import java.util.NoSuchElementException;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
 
 public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot

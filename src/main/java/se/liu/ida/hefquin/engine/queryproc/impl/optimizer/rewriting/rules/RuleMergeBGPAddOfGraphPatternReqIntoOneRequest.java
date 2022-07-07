@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;

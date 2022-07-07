@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
 import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;

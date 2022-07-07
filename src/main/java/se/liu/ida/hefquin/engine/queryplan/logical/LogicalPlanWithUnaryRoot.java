@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-
 public interface LogicalPlanWithUnaryRoot extends LogicalPlan
 {
 	@Override

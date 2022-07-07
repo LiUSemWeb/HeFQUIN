@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;

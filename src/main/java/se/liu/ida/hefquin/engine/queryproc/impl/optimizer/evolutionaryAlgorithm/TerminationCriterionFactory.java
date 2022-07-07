@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 
 public interface TerminationCriterionFactory
 {

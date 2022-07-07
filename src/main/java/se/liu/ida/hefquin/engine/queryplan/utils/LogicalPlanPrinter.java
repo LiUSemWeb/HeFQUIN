@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
