@@ -37,7 +37,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.IteratorBasedQueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
@@ -317,7 +317,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
-		final QueryPlanCompiler planCompiler = new QueryPlanCompilerImpl(ctxt);
+		final QueryPlanCompiler planCompiler = new IteratorBasedQueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();

@@ -30,7 +30,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.IteratorBasedQueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
@@ -75,7 +75,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
-		final QueryPlanCompiler compiler = new QueryPlanCompilerImpl(ctxt);
+		final QueryPlanCompiler compiler = new IteratorBasedQueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
 	}

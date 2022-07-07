@@ -22,11 +22,11 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
-public class QueryPlanCompilerImpl implements QueryPlanCompiler
+public class IteratorBasedQueryPlanCompilerImpl implements QueryPlanCompiler
 {
 	protected final QueryProcContext ctxt;
 
-	public QueryPlanCompilerImpl( final QueryProcContext ctxt ) {
+	public IteratorBasedQueryPlanCompilerImpl( final QueryProcContext ctxt ) {
 		assert ctxt != null;
 		this.ctxt = ctxt;
 	}
