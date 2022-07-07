@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
@@ -18,17 +16,12 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
-public class IteratorBasedQueryPlanCompilerImpl implements QueryPlanCompiler
+public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 {
-	protected final QueryProcContext ctxt;
-
 	public IteratorBasedQueryPlanCompilerImpl( final QueryProcContext ctxt ) {
-		assert ctxt != null;
-		this.ctxt = ctxt;
+		super(ctxt);
 	}
 
 	@Override
@@ -79,15 +72,6 @@ public class IteratorBasedQueryPlanCompilerImpl implements QueryPlanCompiler
 		{
 			throw new IllegalArgumentException();
 		}
-	}
-
-	protected ExecutionContext createExecContext() {
-		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
-			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
-			@Override public CostModel getCostModel() { return ctxt.getCostModel(); }
-			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
-		};
 	}
 
 	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {
