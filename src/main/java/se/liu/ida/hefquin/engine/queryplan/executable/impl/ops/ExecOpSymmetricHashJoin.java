@@ -57,7 +57,12 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    public int preferredInputBlockSize() {
+    public int preferredInputBlockSizeFromChild1() {
+        return 1;
+    }
+
+    @Override
+    public int preferredInputBlockSizeFromChild2() {
         return 1;
     }
 

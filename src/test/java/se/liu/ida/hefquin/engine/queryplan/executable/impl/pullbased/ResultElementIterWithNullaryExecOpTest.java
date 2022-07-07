@@ -94,11 +94,6 @@ public class ResultElementIterWithNullaryExecOpTest
 		}
 
 		@Override
-		public int preferredInputBlockSize() {
-			return 1;
-		}
-
-		@Override
 		public void resetStats() {
 		}
 

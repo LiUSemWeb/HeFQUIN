@@ -68,10 +68,10 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 					subPlan2.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan1 = compile(subPlan1, execCxt);
-			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator( elmtIterSubPlan1, execOp.preferredInputBlockSize() );
+			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator( elmtIterSubPlan1, execOp.preferredInputBlockSizeFromChild1() );
 
 			final ResultElementIterator elmtIterSubPlan2 = compile(subPlan2, execCxt);
-			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator( elmtIterSubPlan2, execOp.preferredInputBlockSize() );
+			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator( elmtIterSubPlan2, execOp.preferredInputBlockSizeFromChild2() );
 
 			return new ResultElementIterWithBinaryExecOp(execOp, blockIterSubPlan1, blockIterSubPlan2, execCxt);
 		}

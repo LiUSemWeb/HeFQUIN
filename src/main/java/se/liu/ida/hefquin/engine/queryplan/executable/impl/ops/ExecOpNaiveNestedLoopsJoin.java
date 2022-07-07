@@ -14,10 +14,16 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
     protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
     @Override
-    public int preferredInputBlockSize() {
+    public int preferredInputBlockSizeFromChild1() {
         // Since this algorithm processes the input solution mappings
         // sequentially (one at a time), and input block size of 1 may
         // reduce the response time of the overall execution process.
+        return 1;
+    }
+
+    @Override
+    public int preferredInputBlockSizeFromChild2() {
+        // same rationale here
         return 1;
     }
 

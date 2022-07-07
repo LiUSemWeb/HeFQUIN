@@ -13,6 +13,6 @@ public interface NullaryExecutableOp extends ExecutableOperator,
 	 * Executes this operator and sends the produced
 	 * result elements (if any) to the given sink.
 	 */
-	void execute( final IntermediateResultElementSink sink,
-	              final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	void execute( IntermediateResultElementSink sink,
+	              ExecutionContext execCxt ) throws ExecOpExecutionException;
 }

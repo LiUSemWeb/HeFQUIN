@@ -11,6 +11,24 @@ public interface BinaryExecutableOp extends ExecutableOperator,
                                             IntermediateResultElementProducer
 {
 	/**
+	 * Returns the preferred block size of input blocks that are
+	 * passed to this executable operator from the first operand.
+	 *
+	 * A query planner may use this number as an optimization
+	 * hint but it does not have to use it.
+	 */
+	int preferredInputBlockSizeFromChild1();
+
+	/**
+	 * Returns the preferred block size of input blocks that are
+	 * passed to this executable operator from the second operand.
+	 *
+	 * A query planner may use this number as an optimization
+	 * hint but it does not have to use it.
+	 */
+	int preferredInputBlockSizeFromChild2();
+
+	/**
 	 * Returns true if this operator is implemented based on
 	 * the assumption that the COMPLETE input from the first
 	 * operand has been sent to it before input from the
@@ -36,18 +54,17 @@ public interface BinaryExecutableOp extends ExecutableOperator,
 	 * and sends the produced result elements (if any) to the
 	 * given sink.
 	 */
-	void processBlockFromChild1(
-			final IntermediateResultBlock input,
-            final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	void processBlockFromChild1( IntermediateResultBlock input,
+	                             IntermediateResultElementSink sink,
+	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
 	 * Finishes up any processing related to the input coming
-	 * from the first operand and sends the produced result
+	 * from the first operand and sends the remaining result
 	 * elements (if any) to the given sink.
 	 */
-	void wrapUpForChild1( final IntermediateResultElementSink sink,
-	                      final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	void wrapUpForChild1( IntermediateResultElementSink sink,
+	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
 	 * Processes the given input coming from the second operand
@@ -59,14 +76,13 @@ public interface BinaryExecutableOp extends ExecutableOperator,
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
 	 * has not been called yet.
 	 */
-	void processBlockFromChild2(
-			final IntermediateResultBlock input,
-            final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	void processBlockFromChild2( IntermediateResultBlock input,
+	                             IntermediateResultElementSink sink,
+	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
 	 * Finishes up any processing related to the input coming
-	 * from the second operand and sends the produced result
+	 * from the second operand and sends the remaining result
 	 * elements (if any) to the given sink.
 	 *
 	 * May throw {@link IllegalStateException} for operators for which
@@ -74,6 +90,6 @@ public interface BinaryExecutableOp extends ExecutableOperator,
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
 	 * has not been called yet.
 	 */
-	void wrapUpForChild2( final IntermediateResultElementSink sink,
-	                      final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	void wrapUpForChild2( IntermediateResultElementSink sink,
+	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
 }
