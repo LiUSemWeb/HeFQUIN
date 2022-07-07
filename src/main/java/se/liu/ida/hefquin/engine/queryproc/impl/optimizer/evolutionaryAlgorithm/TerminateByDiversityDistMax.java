@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
+
 import java.util.List;
 /**
  * Diversity-based termination criterion:
@@ -8,20 +10,28 @@ import java.util.List;
  * and the worst plan within each generation has not exceeded
  * a specified distance threshold for a number of generations.
  */
-public class TerminateByDiversityDistMax implements TerminationCriterion
+public class TerminateByDiversityDistMax extends TerminationCriterionBase
 {
-    protected final double distMaxThreshold;
-    protected final int nrGenerations;
+	public static TerminationCriterionFactory getFactory( final double distMaxThreshold ) {
+		return new TerminationCriterionFactory() {
+			@Override public TerminationCriterion createInstance( final LogicalPlan plan ) {
+				return new TerminateByDiversityDistMax(distMaxThreshold, plan);
+			}
+		};
+	}
 
-    public TerminateByDiversityDistMax( final double distMaxThreshold, final int nrGenerations ) {
+
+    protected final double distMaxThreshold;
+
+    public TerminateByDiversityDistMax( final double distMaxThreshold, final LogicalPlan plan ) {
+        super(plan);
         this.distMaxThreshold = distMaxThreshold;
-        this.nrGenerations = nrGenerations;
     }
 
     @Override
     public boolean readyToTerminate( final Generation currentGeneration, final List<Generation> allPreviousGenerations ) {
         final int previousGenerationNr = allPreviousGenerations.size();
-        if ( previousGenerationNr + 1 < nrGenerations ) {
+        if ( previousGenerationNr < nrGenerations ) {
             return false;
         }
 
@@ -35,10 +45,11 @@ public class TerminateByDiversityDistMax implements TerminationCriterion
                 return false;
             }
 
+            nrGensForSteadyState++;
+
             final Generation previousGen = allPreviousGenerations.get( previousGenerationNr-nrGensForSteadyState );
             bestPlanCost = previousGen.bestPlan.getWeight();
             worstPlanCost = previousGen.worstPlan.getWeight();
-            nrGensForSteadyState++;
         }
 
         return true;

@@ -19,9 +19,9 @@ import java.util.*;
 
 public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     protected final QueryOptimizationContext ctxt;
+    protected final TerminationCriterionFactory tcFactory;
     protected final int nmCandidates;
     protected final int nmSurvivors;
-    protected final TerminationCriterion terminateCriterion;
 
     protected final RandomizedSelection<RuleApplication> ruleRandomizedSelect = new RandomizedSelection<>();
     protected final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
@@ -29,27 +29,26 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 
     public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
                                                 final int nmCandidates, final int nmSurvivors,
-                                                final TerminationCriterion terminateCriterion) {
+                                                final TerminationCriterionFactory tcFactory ) {
         assert ctxt != null;
+        assert tcFactory != null;
         assert (nmCandidates - nmSurvivors) > 0;
 
         this.ctxt = ctxt;
+        this.tcFactory = tcFactory;
         this.nmCandidates = nmCandidates;
         this.nmSurvivors = nmSurvivors;
-        this.terminateCriterion = terminateCriterion;
     }
 
     @Override
     public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
-        if( terminateCriterion instanceof TerminateByDistancePercAvgDynamicG ){
-            ((TerminateByDistancePercAvgDynamicG) terminateCriterion).initialize( initialPlan );
-        }
-
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
-        return optimize( initialPhysicalPlan );
+        return optimize( initialPhysicalPlan, tcFactory.createInstance(initialPlan) );
     }
 
-    public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan plan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final PhysicalPlan plan,
+                                                                final TerminationCriterion tc )
+                                                                        throws QueryOptimizationException {
         final PlanRewritingUtils ruleApplicationCache = new PlanRewritingUtils( new RuleInstances() );
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
@@ -60,7 +59,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         final List<List<Double>> costOfPlansAllGens = new ArrayList<>();
         final List<List<Integer>> hashcodeOfPlansAllGens = new ArrayList<>();
 
-        while( ! terminateCriterion.readyToTerminate( currentGen, previousGenerations ) ) {
+        while ( ! tc.readyToTerminate(currentGen, previousGenerations) ) {
             previousGenerations.add(currentGen);
 
             if ( ctxt.isExperimentRun() ) {

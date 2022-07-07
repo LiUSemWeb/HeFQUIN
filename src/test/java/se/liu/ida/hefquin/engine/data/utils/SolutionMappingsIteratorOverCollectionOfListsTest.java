@@ -7,7 +7,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertFalse;
 
-public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForSolutionMappingsIterableWithFilter
+public class SolutionMappingsIteratorOverCollectionOfListsTest extends TestsForSolutionMappingsIterableWithFilter
 {
     @Test
     public void oneList() {
@@ -15,7 +15,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( getSolMapListWithTwoVar() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z1", var3 );
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z2", var3 );
@@ -30,7 +30,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( getSolMapListWithTwoVar() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z1", var3 );
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z2", var3 );
@@ -50,7 +50,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( getSolMapListWithThreeVar() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z1", var3 );
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z2", var3 );
@@ -70,7 +70,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( new ArrayList<>() );  // <--- empty list second
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z1", var3 );
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z2", var3 );
@@ -86,7 +86,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( getSolMapListWithTwoVar() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z1", var3 );
         assertHasNext( it, "http://example.org/y1", var2, "http://example.org/z2", var3 );
@@ -102,7 +102,7 @@ public class SolutionMappingsIterableOverCollectionOfListsTest extends TestsForS
         solMapCollection.add( new ArrayList<>() );
 
         // Iterate over all solution mappings contained in a collection
-        final Iterator<SolutionMapping> it = new SolutionMappingsIterableOverCollectionOfLists(solMapCollection).iterator();
+        final Iterator<SolutionMapping> it = new SolutionMappingsIteratorOverCollectionOfLists(solMapCollection);
 
         assertFalse( it.hasNext() );
     }

@@ -33,12 +33,6 @@ public interface GraphQL2RDFConfiguration {
     public String getClassMembershipURI();
 
     /**
-     * @return the class name associated with the property URI: @param uri
-     * Otherwise return null if unable (invalid property URI)
-     */
-    public String getClassFromPropertyURI(final String uri);
-
-    /**
      * Function to remove the prefix from the property URI: @param uri
      * Otherwise return null if unable (invalid property URI)
      */
@@ -50,4 +44,51 @@ public interface GraphQL2RDFConfiguration {
      * Otherwise return null if unable (invalid property URI)
      */
     public String removePropertySuffix(final String uri);
+
+    /**
+     * Verifies that @param uri is valid
+     * (Has correct class prefix)
+     */
+    public boolean isValidClassURI(final String uri);
+
+    /**
+     * Verifies that @param uri is valid
+     * (Has correct property prefix, and connecting text)
+     */
+    public boolean isValidPropertyURI(final String uri);
+
+    /**
+     * Verifies that @param uri is valid
+     * (Has correct membership uri)
+     */
+    public boolean isValidMembershipURI(final String uri);
+
+    /**
+     * Maps an rdfs class uri to a GraphQL type
+     * Return null if URI is invalid (not a class URI)
+     */
+    public String mapClassToType(final String uri);
+
+    /**
+     * Maps a GraphQL type to an rdfs class uri
+     */
+    public String mapTypeToClass(final String type);
+
+    /**
+     * Maps an rdf property URI to a GraphQL field
+     * Return null if URI is invalid (not a property URI)
+     */
+    public String mapPropertyToField(final String uri);
+
+    /**
+     * Maps an rdf property URI to a GraphQL type
+     * Return null if URI is invalid (not a property URI)
+     */
+    public String mapPropertyToType(final String uri);
+
+    /**
+     * Maps a GraphQL object type and field to an rdf property URI
+     */
+    public String mapFieldToProperty(final String type, final String field);
+
 }

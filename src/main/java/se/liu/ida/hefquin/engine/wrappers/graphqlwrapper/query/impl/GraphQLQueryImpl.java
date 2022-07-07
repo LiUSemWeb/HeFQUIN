@@ -1,31 +1,32 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
 
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 
 public class GraphQLQueryImpl implements GraphQLQuery {
-    protected final TreeSet<String> fieldPaths;
-    protected final JsonObject argumentValues;
-    protected final Map<String, String> argumentDefinitions;
+    protected final Set<String> fieldPaths;
+    protected final Set<GraphQLArgument> queryArgs;
 
-    public GraphQLQueryImpl(final TreeSet<String> fieldPaths, final JsonObject argumentValues,
-            final Map<String, String> argumentDefinitions) {
+    public GraphQLQueryImpl(final Set<String> fieldPaths, final Set<GraphQLArgument> queryArgs) {
         this.fieldPaths = fieldPaths;
-        this.argumentValues = argumentValues;
-        this.argumentDefinitions = argumentDefinitions;
+        this.queryArgs = queryArgs;
     }
 
     public String toString() {
         final StringBuilder query = new StringBuilder();
-        if (!argumentDefinitions.isEmpty()) {
+        if (!queryArgs.isEmpty()) {
             query.append("query(");
-            for (final String argName : argumentDefinitions.keySet()) {
+            final Map<String,String> argDefs = getArgumentDefinitions();
+            for (final String argName : argDefs.keySet()) {
                 query.append("$").append(argName).append(":");
-                query.append(argumentDefinitions.get(argName));
+                query.append(argDefs.get(argName));
                 query.append(",");
             }
             query.append(")");
@@ -36,18 +37,26 @@ public class GraphQLQueryImpl implements GraphQLQuery {
     }
 
     @Override
-    public TreeSet<String> getFieldPaths() {
+    public Set<String> getFieldPaths() {
         return fieldPaths;
     }
 
     @Override
     public JsonObject getArgumentValues() {
-        return argumentValues;
+        final JsonObject obj = new JsonObject();
+        for(final GraphQLArgument e : queryArgs){
+            obj.put(e.getVariableName(),e.getArgValue());
+        }
+        return obj;
     }
 
     @Override
     public Map<String, String> getArgumentDefinitions() {
-        return argumentDefinitions;
+        Map<String,String> argDefs = new HashMap<>();
+        for(final GraphQLArgument e : queryArgs){
+            argDefs.put(e.getVariableName(), e.getArgDefinition());
+        }
+        return argDefs;
     }
 
     protected String buildQueryString() {
@@ -56,7 +65,7 @@ public class GraphQLQueryImpl implements GraphQLQuery {
         StringBuilder path = new StringBuilder();
         int depth = 0;
 
-        for (final String currentPath : fieldPaths) {
+        for (final String currentPath : new TreeSet<>(fieldPaths)) {
 
             final int splitIndex = currentPath.lastIndexOf("/") + 1;
             final String domain = currentPath.substring(0, splitIndex);

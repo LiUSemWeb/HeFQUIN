@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.data.utils;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
@@ -11,21 +10,37 @@ import org.apache.jena.sparql.expr.VariableNotBoundException;
 import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.WrappingIterable;
+import se.liu.ida.hefquin.engine.utils.WrappingIteratorFactory;
 
-public class FilteringIteratorForSolMaps_ExprList implements Iterator<SolutionMapping>
+public class FilteringIteratorForSolMaps_ExprList extends FilteringIteratorForSolMapsBase
 {
-	protected final Iterator<SolutionMapping> input;
-	protected final ExprList filterExpressions;
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final ExprList filterExpressions ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(filterExpressions) );
+	}
 
-	protected SolutionMapping nextOutputElement = null;
+	public static WrappingIterable<SolutionMapping> createAsIterable( final Iterable<SolutionMapping> input,
+	                                                                  final Expr... filterExpressions ) {
+		return new WrappingIterable<SolutionMapping>(input, getFactory(filterExpressions) );
+	}
+
+
+	protected final ExprList filterExpressions;
 
 	public FilteringIteratorForSolMaps_ExprList( final Iterator<SolutionMapping> input,
 	                                             final ExprList filterExpressions ) {
-		assert input != null;
-		assert filterExpressions != null;
+		super(input);
 
-		this.input = input;
+		assert filterExpressions != null;
+		assert ! filterExpressions.isEmpty();
+
 		this.filterExpressions = filterExpressions;
+	}
+
+	public FilteringIteratorForSolMaps_ExprList( final Iterator<SolutionMapping> input,
+	                                             final Expr... filterExpressions ) {
+		this( input, createExprList(filterExpressions) );
 	}
 
 	public FilteringIteratorForSolMaps_ExprList( final Iterable<SolutionMapping> input,
@@ -33,30 +48,24 @@ public class FilteringIteratorForSolMaps_ExprList implements Iterator<SolutionMa
 		this( input.iterator(), filterExpressions );
 	}
 
-	@Override
-	public boolean hasNext() {
-		while ( nextOutputElement == null && input.hasNext() ) {
-			nextOutputElement = applyFilter( input.next() );
+	public FilteringIteratorForSolMaps_ExprList( final Iterable<SolutionMapping> input,
+	                                             final Expr... filterExpressions ) {
+		this( input, createExprList(filterExpressions) );
+	}
+
+	protected static ExprList createExprList( final Expr... filterExpressions ) {
+		assert filterExpressions.length > 0;
+
+		final ExprList l = new ExprList();
+		for ( int i = 0; i < filterExpressions.length; ++i ) {
+			assert filterExpressions[i] != null;
+			l.add( filterExpressions[i] );
 		}
-
-		return ( nextOutputElement != null );
+		return l;
 	}
+
 
 	@Override
-	public SolutionMapping next() {
-		if ( ! hasNext() )
-			throw new NoSuchElementException();
-
-		final SolutionMapping output = nextOutputElement;
-		nextOutputElement = null;
-		return output;
-	}
-
-	/**
-	 * Returns the given solution mapping if it passes the filter condition.
-	 * Returns <code>null</code> if the given solution mapping does not pass
-	 * the filter condition.
-	 */
 	protected SolutionMapping applyFilter( final SolutionMapping sm ) {
 		// Verify that the given solution mapping satisfies each of the filter expressions
 		final Binding jsm = sm.asJenaBinding();
@@ -79,6 +88,25 @@ public class FilteringIteratorForSolMaps_ExprList implements Iterator<SolutionMa
 		}
 
 		return sm;
+	}
+
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final ExprList filterExpressions ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_ExprList(input, filterExpressions);
+			}
+		};
+	}
+
+	public static WrappingIteratorFactory<SolutionMapping> getFactory( final Expr... filterExpressions ) {
+		return new WrappingIteratorFactory<SolutionMapping>() {
+			@Override
+			public Iterator<SolutionMapping> createIterator(final Iterator<SolutionMapping> input) {
+				return new FilteringIteratorForSolMaps_ExprList(input, filterExpressions);
+			}
+		};
 	}
 
 }

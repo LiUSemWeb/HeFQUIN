@@ -6,9 +6,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithOneVarFilter;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithThreeVarsFilter;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingsIterableWithTwoVarsFilter;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBinding;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_ThreeVarsBindings;
+import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
@@ -70,7 +70,7 @@ public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 			final Var var, final Node value )
 	{
 		final Iterable<SolutionMapping> it = getAllSolutionMappings();
-		return new SolutionMappingsIterableWithOneVarFilter(it, var, value);
+		return FilteringIteratorForSolMaps_OneVarBinding.createAsIterable(it, var, value);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 			final Var var2, final Node value2 )
 	{
 		final Iterable<SolutionMapping> it = getAllSolutionMappings();
-		return new SolutionMappingsIterableWithTwoVarsFilter(it, var1, value1, var2, value2);
+		return FilteringIteratorForSolMaps_TwoVarsBindings.createAsIterable(it, var1, value1, var2, value2);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 			final Var var3, final Node value3 )
 	{
 		final Iterable<SolutionMapping> it = getAllSolutionMappings();
-		return new SolutionMappingsIterableWithThreeVarsFilter(it, var1, value1, var2, value2, var3, value3);
+		return FilteringIteratorForSolMaps_ThreeVarsBindings.createAsIterable(it, var1, value1, var2, value2, var3, value3);
 	}
 
 }

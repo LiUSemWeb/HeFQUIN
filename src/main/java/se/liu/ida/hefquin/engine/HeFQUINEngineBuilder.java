@@ -73,7 +73,7 @@ public class HeFQUINEngineBuilder
 
 		ctxt.set( HeFQUINConstants.sysFederationCatalog, fedCatalog );
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
-
+		ctxt.set( HeFQUINConstants.sysIsExperimentRun, true );
 		return new MyEngine();
 	}
 

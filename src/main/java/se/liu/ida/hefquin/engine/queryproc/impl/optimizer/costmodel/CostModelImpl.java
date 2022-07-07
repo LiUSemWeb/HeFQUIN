@@ -25,12 +25,12 @@ public class CostModelImpl implements CostModel
     public static CostDimension[] getDefaultDimensions( final CardinalityEstimation cardEstimation ) {
         if ( dfltDimensions == null ) {
             dfltDimensions = new CostDimension[] {
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfRequests(cardEstimation)) ),
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInRequests(cardEstimation)) ),
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInRequests(cardEstimation)) ),
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInResponses(cardEstimation)) ),
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInResponses(cardEstimation)) ),
-                new CostDimension( 1, new CFRBasedCostFunctionForPlan(new CFRNumberOfProcessedSolMaps(cardEstimation)) )
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfRequests(cardEstimation)) ),
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInRequests(cardEstimation)) ),
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInRequests(cardEstimation)) ),
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInResponses(cardEstimation)) ),
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInResponses(cardEstimation)) ),
+                new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfProcessedSolMaps(cardEstimation)) )
             };
     	}
 
@@ -77,9 +77,9 @@ public class CostModelImpl implements CostModel
         CompletableFuture<Double> f = CompletableFuture.completedFuture( Double.valueOf(0) );
         for ( int i = 0; i < dimensions.length; ++i ) {
             final CostFunctionForPlan costFct = dimensions[i].costFct;
-            final int weight = dimensions[i].weight;
+            final double weight = dimensions[i].weight;
             f = f.thenCombine( costFct.initiateCostEstimation(plan),
-                               (aggregate,costValue) -> aggregate + weight * costValue );
+                               (aggregate,costValue) -> aggregate + weight * (costValue < 0 ? Integer.MAX_VALUE: costValue) );
         }
 
         return f;

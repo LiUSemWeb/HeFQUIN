@@ -90,13 +90,17 @@ public class PhysicalPlanWithCostUtils {
         return worstPlan;
     }
 
-    public static PhysicalPlanWithCost findTopKPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost, final int k ) {
+    public static PhysicalPlanWithCost findTopKPlanWithLowestCost( final List<PhysicalPlanWithCost> plansWithCost, final double p ) {
         final List<PhysicalPlanWithCost> plans = new ArrayList<>(plansWithCost);
+        int k = Math.max(1, (int) ( plansWithCost.size() * p));
 
         PhysicalPlanWithCost topKPlan = findPlanWithLowestCost(plans);
-        for( int i = 1; i < k; i++ ) {
-            plans.remove(topKPlan);
+        plans.remove(topKPlan);
+        int i = 1;
+        while( i < k && plans.size() != 0 ) {
+            i++;
             topKPlan = findPlanWithLowestCost(plans);
+            plans.remove(topKPlan);
         }
 
         return topKPlan;
