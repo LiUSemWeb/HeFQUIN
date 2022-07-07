@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
+import org.apache.jena.query.QueryType;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -31,13 +31,52 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 
 public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitializer {
 
+    // Introspection constant variables used to build the GraphQL introspection paths
+    // and also parse the JSON results with
+    static final protected String iSchema = "__schema";
+    static final protected String iName = "name";
+    static final protected String iKind = "kind";
+    static final protected String iType = "type";
+    static final protected String iTypes = "types";
+    static final protected String iOfType = "ofType";
+    static final protected String iFields = "fields";
+    static final protected String iQueryType = "queryType";
+    static final protected String iQueryArgs = "args";
+    static final protected String iSubscriptionType = "subscriptionType";
+    static final protected String iMutationType = "mutationType";
+
+    // Base sub-path segment for introspection querying
+    static final protected String schemaPath = iSchema + "/";
+
+    // Field paths segments for the GraphQL types
+    static final protected String typePath1 = schemaPath + iTypes + "/";
+    static final protected String typePath2 = typePath1 + iFields + "/";
+    static final protected String typePath3 = typePath2 + iType + "/";
+
+    // Field path segments for the GraphQL "query" type
+    static final protected String queryTypePath1 = schemaPath + iQueryType + "/";
+    static final protected String queryTypePath2 = queryTypePath1 + iFields + "/";
+    static final protected String queryTypePath3 = queryTypePath2 + iType + "/";
+
+    static final protected String queryTypeArgsPath1 = queryTypePath2 + iQueryArgs + "/";
+    static final protected String queryTypeArgsPath2 = queryTypeArgsPath1 + iType + "/";
+
+    static final protected String ofTypePath = iOfType + "/";
+
+    // Misc. paths used to filter what graphql types not to include
+    static final protected String subscriptionPath = schemaPath + iSubscriptionType + "/";
+    static final protected String mutationPath = schemaPath + iMutationType + "/";
+
     @Override
-    public GraphQLEndpoint initializeEndpoint(final String url) throws FederationAccessException {
+    public GraphQLEndpoint initializeEndpoint(  final String url,
+                                                final int connectionTimeout,
+                                                final int readTimeout) throws FederationAccessException {
+
         final GraphQLInterface iface = new GraphQLInterfaceImpl(url);
         final GraphQLEndpoint tmpEndpoint = new GraphQLEndpointImpl(null, null, iface);
-        final GraphQLRequestProcessor requestProcessor = new GraphQLRequestProcessorImpl(5000,5000);
-        final GraphQLQuery query = getQuery();
-        final GraphQLRequest req = new GraphQLRequestImpl(query);
+        final GraphQLRequestProcessor requestProcessor = new GraphQLRequestProcessorImpl(connectionTimeout,readTimeout);
+        final GraphQLQuery introspectionQuery = getIntrospectionQuery();
+        final GraphQLRequest req = new GraphQLRequestImpl(introspectionQuery);
         final JSONResponse response;
         try {
             response = requestProcessor.performRequest(req, tmpEndpoint);
@@ -54,19 +93,19 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     }
 
     /**
-     * Initializes the GraphQL introspection query to be used.
+     * @return the GraphQL introspection query to be used.
      */
-    protected GraphQLQuery getQuery(){
-        final TreeSet<String> fieldPaths = new TreeSet<>();
+    protected static GraphQLQuery getIntrospectionQuery(){
+        final Set<String> fieldPaths = new HashSet<>();
 
         // Name and kind of type (OBJECT, SCALAR etc.)
-        fieldPaths.add("__schema/types/name");
-        fieldPaths.add("__schema/types/kind");
+        fieldPaths.add(typePath1 + iName);
+        fieldPaths.add(typePath1 + iKind);
 
         // Fields information
-        fieldPaths.add("__schema/types/fields/name");
-        fieldPaths.add("__schema/types/fields/type/name");
-        fieldPaths.add("__schema/types/fields/type/kind");
+        fieldPaths.add(typePath2 + iName);
+        fieldPaths.add(typePath3 + iName);
+        fieldPaths.add(typePath3 + iKind);
 
         /*
             If introspection type/kind is a "LIST" or "NON_NULL" then the use of introspection
@@ -74,35 +113,42 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
             would allow correct unwrapping of potential Non-nullable lists with non-nullable objects/scalars
             (i.e. [typeName!]!)
         */
-        fieldPaths.add("__schema/types/fields/type/ofType/name");
-        fieldPaths.add("__schema/types/fields/type/ofType/kind");
-        fieldPaths.add("__schema/types/fields/type/ofType/ofType/name");
-        fieldPaths.add("__schema/types/fields/type/ofType/ofType/kind");
-        fieldPaths.add("__schema/types/fields/type/ofType/ofType/ofType/name");
-        fieldPaths.add("__schema/types/fields/type/ofType/ofType/ofType/kind");
+        fieldPaths.add(typePath3 + ofTypePath + iName);
+        fieldPaths.add(typePath3 + ofTypePath + iKind);
+        fieldPaths.add(typePath3 + ofTypePath + ofTypePath + iName);
+        fieldPaths.add(typePath3 + ofTypePath + ofTypePath + iKind);
+        fieldPaths.add(typePath3 + ofTypePath + ofTypePath + ofTypePath + iName);
+        fieldPaths.add(typePath3 + ofTypePath + ofTypePath + ofTypePath + iKind);
 
+        // ------------------------------------------------------
         // Query type information for creating GraphQLEntrypoints
-        fieldPaths.add("__schema/queryType/name");
-        fieldPaths.add("__schema/queryType/fields/name");
-        fieldPaths.add("__schema/queryType/fields/type/name");
-        fieldPaths.add("__schema/queryType/fields/type/kind");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/name");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/kind");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/ofType/name");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/ofType/kind");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/ofType/ofType/name");
-        fieldPaths.add("__schema/queryType/fields/type/ofType/ofType/ofType/kind");
-        fieldPaths.add("__schema/queryType/fields/args/name");
-        fieldPaths.add("__schema/queryType/fields/args/type/name");
-        fieldPaths.add("__schema/queryType/fields/args/type/kind");
-        fieldPaths.add("__schema/queryType/fields/args/type/ofType/name");
-        fieldPaths.add("__schema/queryType/fields/args/type/ofType/kind");
+        fieldPaths.add(queryTypePath1 + iName);
+        fieldPaths.add(queryTypePath2 + iName);
+        fieldPaths.add(queryTypePath3 + iName);
+        fieldPaths.add(queryTypePath3 + iKind);
 
+        // "Unwrap" query type
+        fieldPaths.add(queryTypePath3 + ofTypePath + iName);
+        fieldPaths.add(queryTypePath3 + ofTypePath + iKind);
+        fieldPaths.add(queryTypePath3 + ofTypePath + ofTypePath + iName);
+        fieldPaths.add(queryTypePath3 + ofTypePath + ofTypePath + iKind);
+        fieldPaths.add(queryTypePath3 + ofTypePath + ofTypePath + ofTypePath + iName);
+        fieldPaths.add(queryTypePath3 + ofTypePath + ofTypePath + ofTypePath + iKind);
+
+        // ------------------------------------------------------
+        // query type args
+        fieldPaths.add(queryTypeArgsPath1 + iName);
+        fieldPaths.add(queryTypeArgsPath2 + iName);
+        fieldPaths.add(queryTypeArgsPath2 + iKind);
+        fieldPaths.add(queryTypeArgsPath2 + ofTypePath + iName);
+        fieldPaths.add(queryTypeArgsPath2 + ofTypePath + iKind);
+
+        // ------------------------------------------------------
         // Types to ignore when parsing and initializing types
-        fieldPaths.add("__schema/subscriptionType/name");
-        fieldPaths.add("__schema/mutationType/name");
+        fieldPaths.add(subscriptionPath + iName);
+        fieldPaths.add(mutationPath + iName);
 
-        return new GraphQLQueryImpl(fieldPaths, new JsonObject(), new HashMap<>());
+        return new GraphQLQueryImpl(fieldPaths, new HashSet<>());
     }
 
     /**
@@ -113,13 +159,16 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
      */
     protected Pair<String,GraphQLFieldType> determineTypeInformation(final JsonObject field){
 
+        // ofTypePath segment without '/' at the end
+        final String ofTypeKey = ofTypePath.substring(0,ofTypePath.length() - 1);
+
         // If current object is a wrapper type (i.e. LIST or NON-NULLABLE) use recursion
-        if(field.hasKey("ofType") && !field.get("ofType").isNull()){
-            return determineTypeInformation(field.getObj("ofType"));
+        if(field.hasKey(ofTypeKey) && !field.get(ofTypeKey).isNull()){
+            return determineTypeInformation(field.getObj(ofTypeKey));
         }
 
-        final String name = field.getString("name");
-        final String kind = field.getString("kind");
+        final String name = field.getString(iName);
+        final String kind = field.getString(iKind);
         final GraphQLFieldType fieldType;
         if(kind.equals("OBJECT")){
             fieldType = GraphQLFieldType.OBJECT;
@@ -136,23 +185,23 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
      */
     protected Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> parseEntrypoints(final JsonObject data) {
         final Map<String, Map<GraphQLEntrypointType, GraphQLEntrypoint>> objectTypeToEntrypoint = new HashMap<>();
-        final JsonObject queryType = data.getObj("__schema").getObj("queryType");
+        final JsonObject queryType = data.getObj(iSchema).getObj(iQueryType);
 
-        for (final JsonObject field : queryType.getArray("fields").toArray(JsonObject[]::new)) {
-            final String fieldName = field.getString("name");
+        for (final JsonObject field : queryType.getArray(iFields).toArray(JsonObject[]::new)) {
+            final String fieldName = field.getString(iName);
 
             // Get arguments for field
             final Map<String, String> argumentDefinitions = new HashMap<>();
 
-            for (final JsonObject argument : field.getArray("args").toArray(JsonObject[]::new)) {
+            for (final JsonObject argument : field.getArray(iQueryArgs).toArray(JsonObject[]::new)) {
                 // System.out.println(argument.toString());
-                final String argName = argument.getString("name");
-                final JsonObject argType = argument.getObj("type");
-                if (argType.get("ofType").isNull()) {
-                    argumentDefinitions.put(argName, argType.getString("name"));
+                final String argName = argument.getString(iName);
+                final JsonObject argType = argument.getObj(iType);
+                if (argType.get(iOfType).isNull()) {
+                    argumentDefinitions.put(argName, argType.getString(iName));
                 } else {
-                    final String nonNullable = argType.getString("kind").equals("NON_NULL") ? "!" : "";
-                    argumentDefinitions.put(argName, argType.getObj("ofType").getString("name") + nonNullable);
+                    final String nonNullable = argType.getString(iKind).equals("NON_NULL") ? "!" : "";
+                    argumentDefinitions.put(argName, argType.getObj(iOfType).getString(iName) + nonNullable);
                 }
             }
 
@@ -167,9 +216,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
             }
 
             // Get type of field
-            final Pair<String, GraphQLFieldType> fieldInfo = determineTypeInformation(field.getObj("type"));
+            final Pair<String, GraphQLFieldType> fieldInfo = determineTypeInformation(field.getObj(iType));
             final GraphQLEntrypoint entrypoint = new GraphQLEntrypointImpl(fieldName, argumentDefinitions,
-                    fieldInfo.object1);
+                    fieldInfo.object1, epType);
 
             if (!objectTypeToEntrypoint.containsKey(fieldInfo.object1)) {
                 objectTypeToEntrypoint.put(fieldInfo.object1, new HashMap<>());
@@ -188,39 +237,39 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
 
         // Types that shouldn't be initialized (queryType,mutationType,subscriptionType etc)
         final Set<String> typesToSkip = new HashSet<>();
-        final JsonValue queryType = data.getObj("__schema").get("queryType");
-        final JsonValue subscriptionType = data.getObj("__schema").get("subscriptionType");
-        final JsonValue mutationType = data.getObj("__schema").get("mutationType");
+        final JsonValue queryType = data.getObj(iSchema).get(iQueryType);
+        final JsonValue subscriptionType = data.getObj(iSchema).get(iSubscriptionType);
+        final JsonValue mutationType = data.getObj(iSchema).get(iMutationType);
         if(!queryType.isNull()){
-            typesToSkip.add(queryType.getAsObject().getString("name"));
+            typesToSkip.add(queryType.getAsObject().getString(iName));
         }
         if(!subscriptionType.isNull()){
-            typesToSkip.add(subscriptionType.getAsObject().getString("name"));
+            typesToSkip.add(subscriptionType.getAsObject().getString(iName));
         }
         if(!mutationType.isNull()){
-            typesToSkip.add(mutationType.getAsObject().getString("name"));
+            typesToSkip.add(mutationType.getAsObject().getString(iName));
         }
 
 
         // Initialize GraphQL object types and their respective fields
-        for (final JsonObject type : data.getObj("__schema").getArray("types").toArray(JsonObject[]::new)) {
+        for (final JsonObject type : data.getObj(iSchema).getArray(iTypes).toArray(JsonObject[]::new)) {
 
             // Filter away JsonObjects that aren't of the GraphQL type OBJECT
-            final String typeKind = type.getString("kind");
+            final String typeKind = type.getString(iKind);
             if (typeKind == null || !typeKind.equals("OBJECT")) {
                 continue;
             }
             // Filter away JsonObjects that are GraphQL standard types
-            final String typeName = type.getString("name");
+            final String typeName = type.getString(iName);
             if (typeName == null || typeName.startsWith("__") || typesToSkip.contains(typeName)) {
                 continue;
             }
 
             final Map<String, GraphQLField> fields = new HashMap<>();
 
-            for (final JsonObject field : type.getArray("fields").toArray(JsonObject[]::new)) {
-                final String fieldName = field.getString("name");
-                final Pair<String, GraphQLFieldType> fieldInfo = determineTypeInformation(field.getObj("type"));
+            for (final JsonObject field : type.getArray(iFields).toArray(JsonObject[]::new)) {
+                final String fieldName = field.getString(iName);
+                final Pair<String, GraphQLFieldType> fieldInfo = determineTypeInformation(field.getObj(iType));
                 fields.put(fieldName, new GraphQLFieldImpl(fieldName, fieldInfo.object1, fieldInfo.object2));
             }
 

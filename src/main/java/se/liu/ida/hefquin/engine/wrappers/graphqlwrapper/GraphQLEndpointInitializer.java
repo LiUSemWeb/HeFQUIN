@@ -8,5 +8,8 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
  */
 public interface GraphQLEndpointInitializer {
     
-    public GraphQLEndpoint initializeEndpoint(final String url) throws FederationAccessException;
+    public GraphQLEndpoint initializeEndpoint(  final String url,
+                                                final int connectionTimeout,
+                                                final int readTimeout ) 
+                                                throws FederationAccessException;
 }
