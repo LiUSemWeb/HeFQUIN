@@ -10,13 +10,13 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;

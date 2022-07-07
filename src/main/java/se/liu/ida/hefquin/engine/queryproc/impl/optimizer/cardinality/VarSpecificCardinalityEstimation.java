@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public interface VarSpecificCardinalityEstimation
 {

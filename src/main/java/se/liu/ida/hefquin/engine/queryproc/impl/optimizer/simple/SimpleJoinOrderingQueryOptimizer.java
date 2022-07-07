@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;

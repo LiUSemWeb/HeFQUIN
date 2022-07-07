@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public class ExpectedVariablesUtils
 {

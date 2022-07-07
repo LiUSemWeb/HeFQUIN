@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 
 /**
  * This interface is a base for such types of physical

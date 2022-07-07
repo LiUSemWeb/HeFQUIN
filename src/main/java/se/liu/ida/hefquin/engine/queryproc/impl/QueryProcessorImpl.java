@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl;
 
 import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;

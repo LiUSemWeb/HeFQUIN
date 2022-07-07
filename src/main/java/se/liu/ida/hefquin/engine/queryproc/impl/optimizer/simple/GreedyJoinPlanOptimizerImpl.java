@@ -6,7 +6,7 @@ import java.util.HashMap;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;

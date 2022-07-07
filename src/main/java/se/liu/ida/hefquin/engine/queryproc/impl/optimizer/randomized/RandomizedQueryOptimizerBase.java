@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;

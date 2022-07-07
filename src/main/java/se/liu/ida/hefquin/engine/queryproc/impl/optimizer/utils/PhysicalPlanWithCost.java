@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 public class PhysicalPlanWithCost implements RandomizedSelection.WeightedObject {

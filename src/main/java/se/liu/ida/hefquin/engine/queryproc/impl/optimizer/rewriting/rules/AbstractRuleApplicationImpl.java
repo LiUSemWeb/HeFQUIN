@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import java.util.Arrays;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;

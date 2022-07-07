@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public class DataStructureForStoringPlansOfSubsets {
     protected Map< Integer, Map<List<PhysicalPlan>, PhysicalPlan> > map=new HashMap<>();

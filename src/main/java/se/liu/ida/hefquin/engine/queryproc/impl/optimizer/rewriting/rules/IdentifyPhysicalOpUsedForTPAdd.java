@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 /**

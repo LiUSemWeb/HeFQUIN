@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-
 public class PhysicalPlanWalker {
 
     public static void walk(final PhysicalPlan plan, final PhysicalPlanVisitor beforeVisitor,

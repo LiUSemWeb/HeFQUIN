@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
@@ -16,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultEleme
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterWithNullaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterWithUnaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;

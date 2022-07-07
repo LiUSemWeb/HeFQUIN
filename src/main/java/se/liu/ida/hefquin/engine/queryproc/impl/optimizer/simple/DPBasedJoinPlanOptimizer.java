@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;

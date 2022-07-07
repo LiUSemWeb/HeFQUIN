@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public interface RewritingRule
 {

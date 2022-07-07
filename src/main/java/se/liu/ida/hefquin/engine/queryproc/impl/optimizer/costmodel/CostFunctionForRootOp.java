@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 /**
  * Implementations of this interface represent functions that determine

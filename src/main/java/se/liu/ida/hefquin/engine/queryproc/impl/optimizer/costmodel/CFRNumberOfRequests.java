@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 

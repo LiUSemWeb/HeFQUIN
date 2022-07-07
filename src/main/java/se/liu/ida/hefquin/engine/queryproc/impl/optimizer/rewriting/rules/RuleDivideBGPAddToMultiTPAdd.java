@@ -2,11 +2,11 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 

@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm;
 
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;

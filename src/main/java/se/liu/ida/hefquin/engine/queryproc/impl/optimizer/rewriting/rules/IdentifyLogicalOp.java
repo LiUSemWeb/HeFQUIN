@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
 public class IdentifyLogicalOp {

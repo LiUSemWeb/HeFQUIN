@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithBinaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 

@@ -6,8 +6,8 @@ import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
 public class IdentifyTypeOfRequestUsedForReq {

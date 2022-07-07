@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public interface QueryPlanCompiler
 {

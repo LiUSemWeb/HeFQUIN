@@ -5,7 +5,6 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
@@ -14,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 

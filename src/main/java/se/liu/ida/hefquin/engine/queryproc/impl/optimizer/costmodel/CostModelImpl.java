@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel;
 
-import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
