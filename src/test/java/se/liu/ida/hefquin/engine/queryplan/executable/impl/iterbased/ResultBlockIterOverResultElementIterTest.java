@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,6 +11,8 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterOverResultElementIter;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterator;
 
 public class ResultBlockIterOverResultElementIterTest
 {

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -11,6 +11,9 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterOverResultElementIter;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 

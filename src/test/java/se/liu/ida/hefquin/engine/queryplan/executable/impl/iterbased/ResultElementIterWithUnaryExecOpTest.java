@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,6 +13,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithUnaryExecOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ResultElementIterWithUnaryExecOpTest

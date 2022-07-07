@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 

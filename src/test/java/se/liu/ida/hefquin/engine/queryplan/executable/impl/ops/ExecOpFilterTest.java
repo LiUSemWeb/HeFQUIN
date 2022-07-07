@@ -19,8 +19,8 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.TestUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.TestUtils;
 
 public class ExecOpFilterTest
 {
