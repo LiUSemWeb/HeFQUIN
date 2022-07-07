@@ -5,11 +5,11 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
-public class PullBasedPlan implements ExecutablePlan
+public class IteratorBasedExecutablePlanImpl implements ExecutablePlan
 {
 	protected final ResultElementIterator it;
 
-	public PullBasedPlan( final ResultElementIterator it ) {
+	public IteratorBasedExecutablePlanImpl( final ResultElementIterator it ) {
 		assert it != null;
 		this.it = it;
 	}

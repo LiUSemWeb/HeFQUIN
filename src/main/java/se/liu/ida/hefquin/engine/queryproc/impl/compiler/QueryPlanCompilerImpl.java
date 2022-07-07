@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBui
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.PullBasedPlan;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.IteratorBasedExecutablePlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultBlockIterOverResultElementIter;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultBlockIterator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.ResultElementIterWithBinaryExecOp;
@@ -37,7 +37,7 @@ public class QueryPlanCompilerImpl implements QueryPlanCompiler
 	{
 		final ExecutionContext execCxt = createExecContext();
 		final ResultElementIterator it = compile( qep, execCxt );
-		return new PullBasedPlan(it);
+		return new IteratorBasedExecutablePlanImpl(it);
 	}
 
 	protected ResultElementIterator compile( final PhysicalPlan qep,
