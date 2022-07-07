@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
  * An implementation of {@link IntermediateResultElementSink}
  * that collects all solution mappings that are sent to it. The
  * collected solution mappings can then be accessed by calling
- * {@link #getMaterializedIntermediateResult()}.
+ * {@link #getCollectedSolutionMappings()}.
  *
  * Attention, this implementation is not thread safe.
  */
@@ -30,7 +30,7 @@ public class MaterializingIntermediateResultElementSink
 	 * calling {@link #clear()}) or, if it has not been cleared so
 	 * far, since it was created.
 	 */
-	public Iterable<SolutionMapping> getMaterializedIntermediateResult() {
+	public Iterable<SolutionMapping> getCollectedSolutionMappings() {
 		return l;
 	}
 
