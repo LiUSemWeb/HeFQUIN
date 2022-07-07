@@ -91,4 +91,18 @@ public interface GraphQL2RDFConfiguration {
      */
     public String mapFieldToProperty(final String type, final String field);
 
+    /**
+     * @return the prefix used by the id key in the expected json.
+     */
+    public String getJsonIDKeyPrefix();
+
+    /**
+     * @return the prefix used by object keys in the expected json.
+     */
+    public String getJsonObjectKeyPrefix();
+
+    /**
+     * @return the prefix used by scalar keys in the expected json.
+     */
+    public String getJsonScalarKeyPrefix();
 }

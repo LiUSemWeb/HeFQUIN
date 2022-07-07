@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,45 +8,35 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 import org.apache.jena.datatypes.xsd.impl.XSDPlainType;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionMappings;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraph;
 
 /**
  * An implementation of the JSON2SolutionMappings approach
  */
-public class JSON2SolutionMappingsImpl implements JSON2SolutionMappings {
+public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
 
     final protected GraphQL2RDFConfiguration config;
     final protected GraphQLEndpoint endpoint;
 
-    public JSON2SolutionMappingsImpl(final GraphQL2RDFConfiguration config, 
+    public JSON2SolutionGraphImpl(final GraphQL2RDFConfiguration config, 
                                      final GraphQLEndpoint endpoint){
         this.config = config;
         this.endpoint = endpoint;
     }
 
     @Override
-    public List<SolutionMapping> translateJSON( final JSONResponse jsonResponse, 
-                                                final SPARQLQuery originalQuery ) throws ParseException {
+    public Model translateJSON( final JSONResponse jsonResponse) throws ParseException {
 
         final JsonObject outerJson = jsonResponse.getJsonObject();
-        final Query jenaQuery = originalQuery.asJenaQuery();
         final Model solutionGraph = ModelFactory.createDefaultModel();
-        final List<SolutionMapping> solutionMappings = new ArrayList<>();
         
         // Maps a GraphQL type then its ID to a blank node representing the GraphQL object
         final Map<BlankNodeID,Resource> blankNodes = new HashMap<>();
@@ -78,15 +66,7 @@ public class JSON2SolutionMappingsImpl implements JSON2SolutionMappings {
             }
         }
 
-        // Get the solution mappings
-        try (final QueryExecution qexec = QueryExecutionFactory.create(jenaQuery, solutionGraph)) {
-            final ResultSet results = qexec.execSelect();
-            for (; results.hasNext();) {
-                solutionMappings.add(new SolutionMappingImpl(results.nextBinding()));
-            }
-        }
-
-        return solutionMappings;
+        return solutionGraph;
     }
 
     /**
@@ -99,7 +79,11 @@ public class JSON2SolutionMappingsImpl implements JSON2SolutionMappings {
                                  final Model solutionGraph) throws ParseException {
 
         // Get the key that represent the current json objects id
-        final String idKey = root.keySet().stream().filter(s -> s.startsWith("id")).findAny().orElse(null);
+        final String idKey = root.keySet()
+            .stream()
+            .filter(s -> s.startsWith(config.getJsonIDKeyPrefix()))
+            .findAny()
+            .orElse(null);
 
         if(idKey == null){
             throw new ParseException("JsonObject root did not provide a valid id key.");
@@ -137,7 +121,7 @@ public class JSON2SolutionMappingsImpl implements JSON2SolutionMappings {
                 continue;
             }
 
-            if(value.isArray() && key.startsWith("object")){
+            if(value.isArray() && key.startsWith(config.getJsonObjectKeyPrefix())){
                 // Value is array of objects
                 for(final JsonValue arrayObject : value.getAsArray()){
                     if(arrayObject.isNull()){
@@ -154,7 +138,7 @@ public class JSON2SolutionMappingsImpl implements JSON2SolutionMappings {
                     solutionGraph.createProperty(config.mapFieldToProperty(graphqlType,graphqlFieldName)),
                     parseJSON(value.getAsObject(),blankNodes,solutionGraph));
             }
-            else if(value.isArray() && key.startsWith("scalar")){
+            else if(value.isArray() && key.startsWith(config.getJsonScalarKeyPrefix())){
                 // Value is array of scalar values
                 for(final JsonValue arrayScalar : value.getAsArray()){
                     if(arrayScalar.isNull()){

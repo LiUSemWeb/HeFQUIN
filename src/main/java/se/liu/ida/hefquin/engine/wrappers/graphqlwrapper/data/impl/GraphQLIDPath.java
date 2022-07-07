@@ -8,14 +8,17 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLFieldPath;
 public class GraphQLIDPath implements GraphQLFieldPath {
     
     protected final String type;
+    protected final String prefix;
 
-    public GraphQLIDPath(final String type){
+    public GraphQLIDPath(final String type, final String prefix){
         assert type != null;
+        assert prefix != null;
         this.type = type;
+        this.prefix = prefix;
     }
 
     @Override
     public String toString() {
-        return "id_" + type + ":id";
+        return prefix + type + ":id";
     }
 }

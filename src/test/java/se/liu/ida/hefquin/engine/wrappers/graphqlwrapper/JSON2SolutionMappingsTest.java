@@ -14,6 +14,7 @@ import org.apache.jena.datatypes.xsd.impl.XSDPlainType;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
@@ -33,12 +34,12 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 
 /**
- * Unit tests for JSON2SolutionMappingsImpl
+ * Unit tests for JSON2SolutionGraph and SolutionGraph2SolutionMappings
  */
 public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     
     @Test
-    public void test1() throws ParseException {
+    public void test1() throws ParseException, RuntimeException {
 
         // The original SPARQL query
         final String queryString = 
@@ -115,7 +116,10 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         final JSONResponse response = new JSONResponseImpl(jsonObject, endpoint,req, new Date());
         
         // Translated JSON to solution mappings
-        final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(jsonTranslator.translateJSON(response, sparqlQuery));
+        final Model solutionGraph = jsonTranslator.translateJSON(response);
+        final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
+            solutionGraphTranslator.querySolutionGraph(solutionGraph, sparqlQuery)
+        );
 
         // The expected solution mappings
         final Set<SolutionMapping> expectedSolutionMappings = new HashSet<>();
@@ -143,7 +147,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     }
 
     @Test
-    public void test2() throws ParseException{
+    public void test2() throws ParseException, RuntimeException {
 
         // The original SPARQL query
         final String queryString = 
@@ -187,7 +191,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
             "data": {
                 "ep_single0": {
                     "id_Author": "auth6",
-                    "objects_books": [
+                    "object_books": [
                         {
                             "id_Book": "book9",
                             "scalar_nr_pages": 978,
@@ -203,7 +207,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
                 },
                 "ep_single1": {
                     "id_Author": "auth7",
-                    "objects_books": [
+                    "object_books": [
                         {
                             "id_Book": "book9",
                             "scalar_nr_pages": 978,
@@ -216,10 +220,10 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         }
         */
         final String jsonString = 
-            "{\"data\": {\"ep_single0\": {\"id_Author\": \"auth6\",\"objects_books\": [{\"id_Book\": \"book9\"," +
+            "{\"data\": {\"ep_single0\": {\"id_Author\": \"auth6\",\"object_books\": [{\"id_Book\": \"book9\"," +
             "\"scalar_nr_pages\": 978,\"scalar_title\": \"The imaginary book for this example\"},{" +
             "\"id_Book\": \"book10\",\"scalar_nr_pages\": 486,\"scalar_title\": \"Another funny book\"}]," +
-            "\"scalar_id\": \"auth6\"},\"ep_single1\": {\"id_Author\": \"auth7\",\"objects_books\": [{" +
+            "\"scalar_id\": \"auth6\"},\"ep_single1\": {\"id_Author\": \"auth7\",\"object_books\": [{" +
             "\"id_Book\": \"book9\",\"scalar_nr_pages\": 978,\"scalar_title\": \"The imaginary book for this example\"" +
             "}],\"scalar_id\": \"auth7\"}}}";
 
@@ -227,7 +231,10 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         final JSONResponse response = new JSONResponseImpl(jsonObject, endpoint,req, new Date());
         
         // Translated JSON to solution mappings
-        final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(jsonTranslator.translateJSON(response, sparqlQuery));
+        final Model solutionGraph = jsonTranslator.translateJSON(response);
+        final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
+            solutionGraphTranslator.querySolutionGraph(solutionGraph, sparqlQuery)
+        );
         
         // The expected solution mappings
         final Set<SolutionMapping> expectedSolutionMappings = new HashSet<>();

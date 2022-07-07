@@ -6,10 +6,16 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguratio
 
 public class DefaultGraphQL2RDFConfiguration implements GraphQL2RDFConfiguration {
 
+    // RDF prefixes and configurations
     protected final String classPrefix;
     protected final String propertyPrefix;
     protected final String connectingText = "_of_";
     protected final String membershipURI = RDF.type.getURI();
+
+    // Prefixes used by the expected JSON keys
+    protected final String jsonIDKeyPrefix = "id_";
+    protected final String jsonObjectKeyPrefix = "object_";
+    protected final String jsonScalarKeyPrefix = "scalar_";
     
     public DefaultGraphQL2RDFConfiguration(){
         this.classPrefix = "http://example.org/c/";
@@ -114,5 +120,20 @@ public class DefaultGraphQL2RDFConfiguration implements GraphQL2RDFConfiguration
     @Override
     public String mapFieldToProperty(final String type, final String field) {
         return propertyPrefix + field + connectingText + type;
+    }
+
+    @Override
+    public String getJsonIDKeyPrefix() {
+        return jsonIDKeyPrefix;
+    }
+
+    @Override
+    public String getJsonObjectKeyPrefix() {
+        return jsonObjectKeyPrefix;
+    }
+
+    @Override
+    public String getJsonScalarKeyPrefix() {
+        return jsonScalarKeyPrefix;
     }
 }

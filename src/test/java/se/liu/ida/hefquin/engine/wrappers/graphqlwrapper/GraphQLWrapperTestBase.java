@@ -21,57 +21,59 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldI
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.DefaultGraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.JSON2SolutionMappingsImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.JSON2SolutionGraphImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SPARQL2GraphQLTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SolutionGraph2SolutionMappingImpl;
 
 /**
- * Collection of useful data structures for when testing GraphQL wrapper modules.
+ * Collection of useful data structures for when testing GraphQL wrapper
+ * modules.
  */
 public class GraphQLWrapperTestBase {
     // Author test fields
-    protected static final GraphQLField a1 = new GraphQLFieldImpl("id","ID!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField a2 = new GraphQLFieldImpl("name","String!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField a3 = new GraphQLFieldImpl("age","Int!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField a4 = new GraphQLFieldImpl("books","Book",GraphQLFieldType.OBJECT);
+    protected static final GraphQLField a1 = new GraphQLFieldImpl("id", "ID!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField a2 = new GraphQLFieldImpl("name", "String!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField a3 = new GraphQLFieldImpl("age", "Int!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField a4 = new GraphQLFieldImpl("books", "Book", GraphQLFieldType.OBJECT);
 
     // Book test fields
-    protected static final GraphQLField b1 = new GraphQLFieldImpl("id","ID!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField b2 = new GraphQLFieldImpl("title","String!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField b3 = new GraphQLFieldImpl("nr_pages","Int!",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField b4 = new GraphQLFieldImpl("genre","Genre",GraphQLFieldType.SCALAR);
-    protected static final GraphQLField b5 = new GraphQLFieldImpl("authors","Author",GraphQLFieldType.OBJECT);
+    protected static final GraphQLField b1 = new GraphQLFieldImpl("id", "ID!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField b2 = new GraphQLFieldImpl("title", "String!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField b3 = new GraphQLFieldImpl("nr_pages", "Int!", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField b4 = new GraphQLFieldImpl("genre", "Genre", GraphQLFieldType.SCALAR);
+    protected static final GraphQLField b5 = new GraphQLFieldImpl("authors", "Author", GraphQLFieldType.OBJECT);
 
     // Argument definitions for entrypoints
-    protected static final Map<String,String> argDefs1 = Map.ofEntries(
-        entry("id", "ID!")
-    );
+    protected static final Map<String, String> argDefs1 = Map.ofEntries(entry("id", "ID!"));
 
-    protected static final Map<String,String> argDefs2 = Map.ofEntries(
-        entry("name","String"),
-        entry("age","Int")
-    );
+    protected static final Map<String, String> argDefs2 = Map.ofEntries(entry("name", "String"), entry("age", "Int"));
 
-    protected static final Map<String,String> argDefs3 = Map.ofEntries(
-        entry("title","String"),
-        entry("nr_pages","Int"),
-        entry("genre","Genre")
-    );
+    protected static final Map<String, String> argDefs3 = Map.ofEntries(entry("title", "String"),
+            entry("nr_pages", "Int"), entry("genre", "Genre"));
 
     // Query entrypoints (query type fields)
-    protected static final GraphQLEntrypoint e1 = new GraphQLEntrypointImpl("author", argDefs1, "Author",GraphQLEntrypointType.SINGLE);
-    protected static final GraphQLEntrypoint e2 = new GraphQLEntrypointImpl("authors", argDefs2, "Author",GraphQLEntrypointType.FILTERED);
-    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new HashMap<>(), "Author",GraphQLEntrypointType.FULL);
-    protected static final GraphQLEntrypoint e4 = new GraphQLEntrypointImpl("book", argDefs1, "Book",GraphQLEntrypointType.SINGLE);
-    protected static final GraphQLEntrypoint e5 = new GraphQLEntrypointImpl("books", argDefs3, "Book",GraphQLEntrypointType.FILTERED);
-    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book",GraphQLEntrypointType.FULL);
+    protected static final GraphQLEntrypoint e1 = new GraphQLEntrypointImpl("author", argDefs1, "Author",
+            GraphQLEntrypointType.SINGLE);
+    protected static final GraphQLEntrypoint e2 = new GraphQLEntrypointImpl("authors", argDefs2, "Author",
+            GraphQLEntrypointType.FILTERED);
+    protected static final GraphQLEntrypoint e3 = new GraphQLEntrypointImpl("allAuthors", new HashMap<>(), "Author",
+            GraphQLEntrypointType.FULL);
+    protected static final GraphQLEntrypoint e4 = new GraphQLEntrypointImpl("book", argDefs1, "Book",
+            GraphQLEntrypointType.SINGLE);
+    protected static final GraphQLEntrypoint e5 = new GraphQLEntrypointImpl("books", argDefs3, "Book",
+            GraphQLEntrypointType.FILTERED);
+    protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book",
+            GraphQLEntrypointType.FULL);
 
     // Translator, config and endpoint
     protected static final String classPrefix = "http://example.org/c/";
     protected static final String propertyPrefix = "http://example.org/p/";
     protected static final SPARQL2GraphQLTranslator translator = new SPARQL2GraphQLTranslatorImpl();
-    protected static final GraphQL2RDFConfiguration config = new DefaultGraphQL2RDFConfiguration(classPrefix, propertyPrefix);
+    protected static final GraphQL2RDFConfiguration config = new DefaultGraphQL2RDFConfiguration(classPrefix,
+            propertyPrefix);
     protected static final GraphQLEndpoint endpoint = initializeGraphQLTestEndpoint();
-    protected static final JSON2SolutionMappings jsonTranslator = new JSON2SolutionMappingsImpl(config, endpoint);
+    protected static final JSON2SolutionGraph jsonTranslator = new JSON2SolutionGraphImpl(config, endpoint);
+    protected static final SolutionGraph2SolutionMappings solutionGraphTranslator = new SolutionGraph2SolutionMappingImpl();
 
     // Variables nodes
     protected static final Node var1 = NodeFactory.createVariable("author");
