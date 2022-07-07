@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutablePlan;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 
 public interface ExecutionEngine
 {

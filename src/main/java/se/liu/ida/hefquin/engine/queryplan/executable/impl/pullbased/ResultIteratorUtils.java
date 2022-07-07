@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutablePlanStatsImpl;
 
 public class ResultIteratorUtils

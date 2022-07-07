@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan;
 
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public interface PhysicalOperator

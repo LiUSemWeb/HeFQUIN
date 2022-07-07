@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionStatsImpl;

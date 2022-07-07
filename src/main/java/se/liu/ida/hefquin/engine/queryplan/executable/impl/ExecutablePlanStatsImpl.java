@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public class ExecutablePlanStatsImpl extends StatsImpl implements ExecutablePlanStats

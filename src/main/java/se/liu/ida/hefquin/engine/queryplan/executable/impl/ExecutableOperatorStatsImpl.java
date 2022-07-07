@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public class ExecutableOperatorStatsImpl extends StatsImpl implements ExecutableOperatorStats

@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.execution;
 
-import se.liu.ida.hefquin.engine.queryplan.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
