@@ -26,9 +26,19 @@ public class MaterializingIntermediateResultElementSink
 
 	/**
 	 * Returns an iterable over the solution mappings that have been
-	 * collected in this sink since it was created.
+	 * collected in this sink since the last time it was cleared (by
+	 * calling {@link #clear()}) or, if it has not been cleared so
+	 * far, since it was created.
 	 */
 	public Iterable<SolutionMapping> getMaterializedIntermediateResult() {
 		return l;
+	}
+
+	/**
+	 * Clears this sink by removing all solution mappings that have
+	 * so far been collected in this sink.
+	 */
+	public void clear() {
+		l.clear();
 	}
 }
