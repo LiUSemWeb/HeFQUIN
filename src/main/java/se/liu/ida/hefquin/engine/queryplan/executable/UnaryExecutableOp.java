@@ -2,8 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public interface UnaryExecutableOp extends ExecutableOperator,
-                                           IntermediateResultElementProducer
+public interface UnaryExecutableOp extends ExecutableOperator
 {
 	/**
 	 * Returns the preferred block size of input blocks

@@ -2,8 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public interface NullaryExecutableOp extends ExecutableOperator,
-                                             IntermediateResultElementProducer
+public interface NullaryExecutableOp extends ExecutableOperator
 {
 	/**
 	 * Executes this operator and sends the produced
