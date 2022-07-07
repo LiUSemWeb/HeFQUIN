@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**

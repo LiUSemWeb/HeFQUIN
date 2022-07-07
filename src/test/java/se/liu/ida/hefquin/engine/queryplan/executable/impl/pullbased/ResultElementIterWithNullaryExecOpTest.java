@@ -12,7 +12,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ResultElementIterWithNullaryExecOpTest

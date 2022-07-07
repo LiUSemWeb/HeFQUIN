@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatte
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 import java.util.HashSet;
 import java.util.Set;

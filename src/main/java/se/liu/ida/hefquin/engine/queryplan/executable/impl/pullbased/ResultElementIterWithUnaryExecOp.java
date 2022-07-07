@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 

@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpBindJoinSPARQLwithFILTERandTranslationTest extends TestsForTPAddAlgorithmsWithTranslation<SPARQLEndpoint>{

@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;

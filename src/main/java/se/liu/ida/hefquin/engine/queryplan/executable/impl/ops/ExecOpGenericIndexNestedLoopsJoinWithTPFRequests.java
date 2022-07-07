@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequest
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberType extends FederationMember>
            extends ExecOpGenericIndexNestedLoopsJoinWithRequestOps<TriplePattern,MemberType>

@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.NaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;

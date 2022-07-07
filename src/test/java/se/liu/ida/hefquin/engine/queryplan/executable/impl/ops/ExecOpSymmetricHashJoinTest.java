@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpSymmetricHashJoinTest extends TestsForJoinAlgorithms{

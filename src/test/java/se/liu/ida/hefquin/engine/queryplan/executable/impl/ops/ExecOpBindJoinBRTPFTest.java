@@ -6,6 +6,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer>

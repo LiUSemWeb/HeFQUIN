@@ -5,7 +5,7 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BinaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;

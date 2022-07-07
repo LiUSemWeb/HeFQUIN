@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 
 /**
