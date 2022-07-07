@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
@@ -287,12 +287,12 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 	                                             final IntermediateResultBlock input2 )
 			 throws ExecutionException
 	{
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		
 		final BinaryExecutableOp op = createExecOpForTest();
 		op.processBlockFromChild1(input1, sink, null);
 		op.processBlockFromChild2(input2, sink, null);
-		return sink.getMaterializedIntermediateResult().iterator();
+		return sink.getCollectedSolutionMappings().iterator();
 	}
 
 	protected abstract BinaryExecutableOp createExecOpForTest() ;

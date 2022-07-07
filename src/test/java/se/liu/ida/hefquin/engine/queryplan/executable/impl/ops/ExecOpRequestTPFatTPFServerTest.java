@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
@@ -45,7 +45,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 				new TriplePatternRequestImpl(tp),
 				getDBpediaTPFServer() );
 
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final FederationAccessManager fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager();
 		final ExecutionContext execCxt = new ExecutionContext() {
@@ -57,7 +57,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 
 		op.execute(sink, execCxt);
 
-		final Collection<SolutionMapping> res = (Collection<SolutionMapping>) sink.getMaterializedIntermediateResult();
+		final Collection<SolutionMapping> res = (Collection<SolutionMapping>) sink.getCollectedSolutionMappings();
 		assertTrue( res.size() > 100 );
 	}
 
@@ -70,11 +70,11 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest() );
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );
 
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();

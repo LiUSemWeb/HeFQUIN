@@ -32,7 +32,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
@@ -58,7 +58,7 @@ public class ExecOpRequestTPFWithTranslationTest extends ExecOpTestBase {
 		final ExecOpRequestTPFatBRTPFServerWithTranslation op = new ExecOpRequestTPFatBRTPFServerWithTranslation(
 				new TriplePatternRequestImpl(tp),
 				new BRTPFServerWithVocabularyMappingForTest(g, createVocabularyMappingForTests()) );
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );
 		
@@ -73,7 +73,7 @@ public class ExecOpRequestTPFWithTranslationTest extends ExecOpTestBase {
 		expectedResults.add(new SolutionMappingImpl(second.build()));
 
 		//Results
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();		
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();		
 		final Set<SolutionMapping> results = new HashSet<>();
 		while (it.hasNext()) {
 			results.add(it.next());

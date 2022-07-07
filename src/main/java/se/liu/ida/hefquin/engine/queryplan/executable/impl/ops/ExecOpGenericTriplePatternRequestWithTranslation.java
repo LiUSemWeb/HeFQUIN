@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSinkWithTranslation;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSinkWithTranslation;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberType extends FederationMember> extends ExecOpGenericRequest<TriplePatternRequest, MemberType>{
@@ -55,7 +55,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberTyp
 	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt) throws ExecOpExecutionException{
 		
 		final TriplePatternRequest newReq = new TriplePatternRequestImpl(tp);
-		final MaterializingIntermediateResultElementSinkWithTranslation sink = new MaterializingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
+		final CollectingIntermediateResultElementSinkWithTranslation sink = new CollectingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
 		if (fm instanceof TPFServer) {
 			final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(newReq, (TPFServer) fm);
 			op.execute(sink, execCxt);		
@@ -66,7 +66,7 @@ public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberTyp
 			throw new ExecOpExecutionException(Op.class.toString(), this);
 		}
 		
-		return sink.getMaterializedIntermediateResult();
+		return sink.getCollectedSolutionMappings();
 	}
 	
 	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt) throws ExecOpExecutionException {

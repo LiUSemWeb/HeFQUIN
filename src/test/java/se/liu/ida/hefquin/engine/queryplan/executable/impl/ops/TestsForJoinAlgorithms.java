@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 import java.util.HashSet;
@@ -631,7 +631,7 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 			final IntermediateResultBlock input2,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final BinaryExecutableOp op = createExecOpForTest(inputVars);
 
@@ -640,7 +640,7 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 		op.processBlockFromChild2(input2, sink, null);
 		op.wrapUpForChild2(sink, null);
 
-		return sink.getMaterializedIntermediateResult().iterator();
+		return sink.getCollectedSolutionMappings().iterator();
 	}
 
 	protected abstract BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars );

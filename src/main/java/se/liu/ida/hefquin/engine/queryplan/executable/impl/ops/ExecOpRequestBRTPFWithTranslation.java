@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSinkWithTranslation;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSinkWithTranslation;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<BindingsRestrictedTriplePatternRequest,BRTPFServer>
@@ -63,11 +63,11 @@ public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<Bind
 	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException{
 		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, sms);
 		final ExecOpRequestBRTPF op = new ExecOpRequestBRTPF(newReq, fm);
-		final MaterializingIntermediateResultElementSinkWithTranslation sink = new MaterializingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
+		final CollectingIntermediateResultElementSinkWithTranslation sink = new CollectingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
 		
 		op.execute(sink, execCxt);
 	
-		return sink.getMaterializedIntermediateResult();
+		return sink.getCollectedSolutionMappings();
 	}
 	
 	protected Iterable<SolutionMapping> handleUnionPattern(final SPARQLUnionPattern up, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException {

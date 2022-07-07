@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
  *
  * Attention, this implementation is not thread safe.
  */
-public class MaterializingIntermediateResultElementSink
+public class CollectingIntermediateResultElementSink
                              implements IntermediateResultElementSink
 {
 	protected final List<SolutionMapping> l = new ArrayList<>();

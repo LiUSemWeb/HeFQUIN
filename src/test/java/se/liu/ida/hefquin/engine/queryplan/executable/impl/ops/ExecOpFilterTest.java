@@ -19,14 +19,14 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased.TestUtils;
 
 public class ExecOpFilterTest
 {
 	@Test
 	public void filter_Numbers() {
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
@@ -50,13 +50,13 @@ public class ExecOpFilterTest
 			e.printStackTrace();
 		}
 
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, 8, x);
 		assertHasNext( it, 9, x); // See that 9 made it and 12 did not, as 9 < 10 is true whereas 12 < 10 is false.
 	}
 	@Test
 	public void filter_Unbound() {
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
@@ -78,14 +78,14 @@ public class ExecOpFilterTest
 			e.printStackTrace();
 		}
 
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, 8, x);
 		assertFalse( it.hasNext() ); // Despite 9 being less than 10, there shouldn't be anything more because there is no x, only y.
 	}
 
 	@Test
 	public void filter_Dates() {
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr after2019 = ExprUtils.parse("?x > \"2019-12-31\"^^xsd:date");
 
@@ -115,7 +115,7 @@ public class ExecOpFilterTest
 			e.printStackTrace();
 		}
 
-		final Iterator<SolutionMapping> it = sink.getMaterializedIntermediateResult().iterator();
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, "2020-10-20", x);
 		assertHasNext( it, "2021-02-01", x);
 		assertHasNext( it, "2020-01-01", x);

@@ -24,7 +24,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.MaterializingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
@@ -445,7 +445,7 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
-		final MaterializingIntermediateResultElementSink sink = new MaterializingIntermediateResultElementSink();
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final MemberType fm = createFedMemberForTest(dataForMember);
 
@@ -453,7 +453,7 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
-		return sink.getMaterializedIntermediateResult().iterator();
+		return sink.getCollectedSolutionMappings().iterator();
 	}
 
 	protected abstract MemberType createFedMemberForTest( Graph dataForMember );

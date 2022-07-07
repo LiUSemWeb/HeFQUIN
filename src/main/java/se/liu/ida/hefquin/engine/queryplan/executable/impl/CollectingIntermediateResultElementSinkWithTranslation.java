@@ -6,12 +6,12 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 
-public class MaterializingIntermediateResultElementSinkWithTranslation extends MaterializingIntermediateResultElementSink
+public class CollectingIntermediateResultElementSinkWithTranslation extends CollectingIntermediateResultElementSink
 {
 	protected final VocabularyMapping vm;
 	protected final List<SolutionMapping> l = new ArrayList<>();
 
-	public MaterializingIntermediateResultElementSinkWithTranslation( final VocabularyMapping vm ) {
+	public CollectingIntermediateResultElementSinkWithTranslation( final VocabularyMapping vm ) {
 		assert vm != null;
 		this.vm = vm;
 	}
