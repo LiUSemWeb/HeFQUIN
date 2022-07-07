@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementProducer;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -16,7 +15,4 @@ public interface NullaryExecutableOp extends ExecutableOperator,
 	 */
 	void execute( final IntermediateResultElementSink sink,
 	              final ExecutionContext execCxt ) throws ExecOpExecutionException;
-
-	@Override
-	ExecutableOperatorStats getStats();
 }

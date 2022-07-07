@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.queryplan.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementProducer;
@@ -77,7 +76,4 @@ public interface BinaryExecutableOp extends ExecutableOperator,
 	 */
 	void wrapUpForChild2( final IntermediateResultElementSink sink,
 	                      final ExecutionContext execCxt ) throws ExecOpExecutionException;
-
-	@Override
-	ExecutableOperatorStats getStats();
 }
