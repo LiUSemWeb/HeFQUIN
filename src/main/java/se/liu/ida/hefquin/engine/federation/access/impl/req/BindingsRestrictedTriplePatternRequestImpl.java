@@ -51,6 +51,14 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 	}
 
 	@Override
+	public int hashCode(){
+		int code = tp.hashCode();
+		for( SolutionMapping solm: solMaps )
+			code = code ^ solm.hashCode();
+		return code;
+	}
+
+	@Override
 	public TriplePattern getTriplePattern() {
 		return tp;
 	}

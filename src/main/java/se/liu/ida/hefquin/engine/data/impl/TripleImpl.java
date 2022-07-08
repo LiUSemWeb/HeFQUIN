@@ -4,6 +4,8 @@ import org.apache.jena.graph.Node;
 
 import se.liu.ida.hefquin.engine.data.Triple;
 
+import java.util.Objects;
+
 public class TripleImpl implements Triple
 {
 	protected final org.apache.jena.graph.Triple jenaObj;
@@ -20,6 +22,11 @@ public class TripleImpl implements Triple
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof Triple && ((Triple) o).asJenaTriple().equals(jenaObj);
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hash( jenaObj );
 	}
 
 	@Override

@@ -18,6 +18,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
+import java.util.Objects;
+
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                        implements NullaryPhysicalOpForLogicalOp
 {
@@ -31,6 +33,11 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof PhysicalOpRequest<?,?> && ((PhysicalOpRequest<?,?>) o).lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode(){
+		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override

@@ -31,6 +31,11 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 		return false;
 	}
 
+	@Override
+	public int hashCode() {
+		return jenaPatternElement.hashCode();
+	}
+
 	public Element asJenaElement() {
 		return jenaPatternElement;
 	}

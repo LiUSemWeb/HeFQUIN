@@ -32,6 +32,11 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 			return oo.fm.equals(fm) && oo.tp.equals(tp); 
 	}
 
+	@Override
+	public int hashCode(){
+		return fm.hashCode() ^ tp.hashCode();
+	}
+
 	public FederationMember getFederationMember() {
 		return fm;
 	}

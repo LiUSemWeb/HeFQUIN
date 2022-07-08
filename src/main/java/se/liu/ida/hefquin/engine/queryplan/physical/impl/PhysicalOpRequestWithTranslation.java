@@ -18,6 +18,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
+import java.util.Objects;
+
 /**
  * This class represents a (physical) request operator that rewrites its
  * request based on the vocabulary mapping associated with the given
@@ -39,6 +41,11 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof PhysicalOpRequestWithTranslation<?,?> && ((PhysicalOpRequestWithTranslation<?,?>) o).lop.equals(lop);
+	}
+
+	@Override
+	public int hashCode(){
+		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override

@@ -34,6 +34,11 @@ public class PhysicalPlanWithNullaryRootImpl implements PhysicalPlanWithNullaryR
 	}
 
 	@Override
+	public int hashCode(){
+		return rootOp.hashCode();
+	}
+
+	@Override
 	public NullaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}
