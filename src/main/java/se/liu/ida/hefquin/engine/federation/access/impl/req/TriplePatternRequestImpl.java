@@ -5,6 +5,8 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
+import java.util.Objects;
+
 public class TriplePatternRequestImpl implements TriplePatternRequest
 {
 	protected final TriplePattern tp;
@@ -18,6 +20,11 @@ public class TriplePatternRequestImpl implements TriplePatternRequest
 	public boolean equals( final Object o ) {
 		return o instanceof TriplePatternRequest
 				&& ((TriplePatternRequest) o).getQueryPattern().equals(tp);
+	}
+
+	@Override
+	public int hashCode(){
+		return tp.hashCode() ^ Objects.hash(super.getClass().getName() );
 	}
 
 	@Override

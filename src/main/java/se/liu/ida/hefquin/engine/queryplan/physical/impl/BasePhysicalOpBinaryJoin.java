@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLogicalOp
@@ -23,6 +24,11 @@ public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLog
 	public boolean equals( final Object o ) {
 		return o instanceof BinaryPhysicalOpForLogicalOp
 				&& ((BinaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
+	}
+
+	@Override
+	public int hashCode(){
+		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
 	@Override

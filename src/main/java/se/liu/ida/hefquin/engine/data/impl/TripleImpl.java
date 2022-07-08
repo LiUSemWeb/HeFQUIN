@@ -23,6 +23,11 @@ public class TripleImpl implements Triple
 	}
 
 	@Override
+	public int hashCode(){
+		return jenaObj.hashCode();
+	}
+
+	@Override
 	public org.apache.jena.graph.Triple asJenaTriple() {
 		return jenaObj;
 	}

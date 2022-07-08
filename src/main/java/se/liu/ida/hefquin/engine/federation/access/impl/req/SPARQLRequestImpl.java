@@ -47,6 +47,14 @@ public class SPARQLRequestImpl implements SPARQLRequest
 	}
 
 	@Override
+	public int hashCode(){
+		if ( pattern == null )
+			return query.hashCode();
+		else
+			return pattern.hashCode();
+	}
+
+	@Override
 	public SPARQLGraphPattern getQueryPattern() {
 		return pattern;
 	}

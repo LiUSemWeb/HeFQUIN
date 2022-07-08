@@ -26,6 +26,11 @@ public abstract class BasePhysicalOpMultiwayJoin implements NaryPhysicalOpForLog
 	}
 
 	@Override
+	public int hashCode(){
+		return lop.hashCode();
+	}
+
+	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(inputVars);
 		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(inputVars);

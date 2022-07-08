@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -30,6 +31,11 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
 	public boolean equals( final Object o ) {
 		return o instanceof UnaryPhysicalOpForLogicalOp
 				&& ((UnaryPhysicalOpForLogicalOp) o).getLogicalOperator().equals(lop);
+	}
+
+	@Override
+	public int hashCode(){
+		return lop.hashCode() ^ Objects.hash( this.getClass().getName() );
 	}
 
     @Override
