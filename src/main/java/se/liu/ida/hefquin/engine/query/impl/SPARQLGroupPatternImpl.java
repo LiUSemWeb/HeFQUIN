@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
@@ -47,6 +48,15 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 			return false;
 
 		return ((SPARQLGroupPattern) other).getSubPatterns().equals(subPatterns);
+	}
+
+	@Override
+	public int hashCode() {
+		int code = Objects.hash( super.getClass().getName() );
+		for( SPARQLGraphPattern p: subPatterns){
+			code = code ^ p.hashCode();
+		}
+		return code;
 	}
 
 }

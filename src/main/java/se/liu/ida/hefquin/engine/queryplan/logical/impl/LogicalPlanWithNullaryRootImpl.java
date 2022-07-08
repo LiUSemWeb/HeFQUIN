@@ -28,6 +28,11 @@ public class LogicalPlanWithNullaryRootImpl implements LogicalPlanWithNullaryRoo
 	}
 
 	@Override
+	public int hashCode(){
+		return rootOp.hashCode();
+	}
+
+	@Override
 	public NullaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

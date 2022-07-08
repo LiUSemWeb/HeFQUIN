@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
+import java.util.Objects;
+
 public class LogicalOpJoin implements BinaryLogicalOp
 {
 	protected static LogicalOpJoin singleton = new LogicalOpJoin();
@@ -14,6 +16,11 @@ public class LogicalOpJoin implements BinaryLogicalOp
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof LogicalOpJoin; 
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hash( this.getClass().getName() );
 	}
 
 	@Override

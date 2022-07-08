@@ -40,6 +40,11 @@ public class PhysicalPlanWithUnaryRootImpl implements PhysicalPlanWithUnaryRoot
 	}
 
 	@Override
+	public int hashCode(){
+		return rootOp.hashCode() ^ subPlan.hashCode();
+	}
+
+	@Override
 	public UnaryPhysicalOp getRootOperator() {
 		return rootOp;
 	}

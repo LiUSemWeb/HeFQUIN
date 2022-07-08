@@ -20,6 +20,11 @@ public class BGPRequestImpl implements BGPRequest
 	}
 
 	@Override
+	public int hashCode(){
+		return bgp.hashCode();
+	}
+
+	@Override
 	public BGP getQueryPattern() {
 		return bgp;
 	}

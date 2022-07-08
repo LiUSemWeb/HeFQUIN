@@ -48,6 +48,15 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 	}
 
 	@Override
+	public int hashCode(){
+		int code = rootOp.hashCode();
+		final Iterator<LogicalPlan> it = subPlans.iterator();
+		while ( it.hasNext() )
+			code = code ^ it.next().hashCode();
+		return code;
+	}
+
+	@Override
 	public NaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

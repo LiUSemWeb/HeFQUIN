@@ -31,6 +31,11 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 			return oo.fm.equals(fm) && oo.req.equals(req); 
 	}
 
+	@Override
+	public int hashCode(){
+		return fm.hashCode() ^ req.hashCode();
+	}
+
 	public MemberType getFederationMember() {
 		return fm;
 	}

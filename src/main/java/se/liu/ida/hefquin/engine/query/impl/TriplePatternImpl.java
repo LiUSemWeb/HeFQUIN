@@ -60,6 +60,6 @@ public class TriplePatternImpl implements TriplePattern
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(jenaObj);
+		return jenaObj.hashCode();
 	}
 }

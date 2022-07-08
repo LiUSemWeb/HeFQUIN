@@ -32,6 +32,11 @@ public class LogicalOpFilter implements UnaryLogicalOp
 		return oo.filterExpressions.equals(filterExpressions); 
 	}
 
+	@Override
+	public int hashCode(){
+		return filterExpressions.hashCode();
+	}
+
 	public ExprList getFilterExpressions() {
 		return filterExpressions;
 	}

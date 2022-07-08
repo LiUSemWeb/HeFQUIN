@@ -4,6 +4,8 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 
+import java.util.Objects;
+
 public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
 {
 	protected final String url;
@@ -37,6 +39,11 @@ public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
 	public boolean equals( final Object o ) {
 		return o instanceof SPARQLEndpointInterface
 				&& ((SPARQLEndpointInterface) o).getURL().equals(url);
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hash( super.getClass().getName() ) ^ Objects.hash(url);
 	}
 
 	@Override

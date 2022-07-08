@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.federation.access.impl.req;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
+import java.util.Objects;
+
 public class Neo4jRequestImpl implements Neo4jRequest {
 
     protected final String cypherQuery;
@@ -16,6 +18,11 @@ public class Neo4jRequestImpl implements Neo4jRequest {
 	public boolean equals( final Object o ) {
 		return o instanceof Neo4jRequest && ((Neo4jRequest) o).getCypherQuery().equals(cypherQuery);
 	}
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(cypherQuery);
+    }
 
     @Override
     public ExpectedVariables getExpectedVariables() {

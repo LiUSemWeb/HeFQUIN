@@ -28,6 +28,11 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
 	}
 
 	@Override
+	public int hashCode(){
+		return lop.hashCode();
+	}
+
+	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 

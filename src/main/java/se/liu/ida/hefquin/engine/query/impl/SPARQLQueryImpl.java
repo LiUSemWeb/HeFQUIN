@@ -35,6 +35,11 @@ public class SPARQLQueryImpl implements SPARQLQuery
 	}
 
 	@Override
+	public int hashCode() {
+		return jenaQuery.hashCode();
+	}
+
+	@Override
 	public Query asJenaQuery() {
 		return jenaQuery;
 	}

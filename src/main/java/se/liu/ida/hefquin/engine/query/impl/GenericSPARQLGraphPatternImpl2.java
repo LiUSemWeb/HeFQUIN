@@ -31,6 +31,11 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 		return false;
 	}
 
+	@Override
+	public int hashCode() {
+		return jenaPatternOp.hashCode();
+	}
+
 	/**
 	 * Avoid using this function. It converts the internal {@link Op} object
 	 * back into an {@link Element}, which might not work correctly in all

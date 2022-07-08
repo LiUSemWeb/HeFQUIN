@@ -34,6 +34,11 @@ public class LogicalPlanWithUnaryRootImpl implements LogicalPlanWithUnaryRoot
 	}
 
 	@Override
+	public int hashCode(){
+		return rootOp.hashCode() ^ subPlan.hashCode();
+	}
+
+	@Override
 	public UnaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

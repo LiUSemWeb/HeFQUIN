@@ -32,6 +32,11 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 			return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
 	}
 
+	@Override
+	public int hashCode(){
+		return fm.hashCode() ^ bgp.hashCode();
+	}
+
 	public FederationMember getFederationMember() {
 		return fm;
 	} 

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -60,6 +61,15 @@ public class PhysicalPlanWithNaryRootImpl implements PhysicalPlanWithNaryRoot
 		}
 
 		return true;
+	}
+
+	@Override
+	public int hashCode(){
+		int code = rootOp.hashCode();
+		final Iterator<PhysicalPlan> it = subPlans.iterator();
+		while ( it.hasNext() )
+			code = code ^ it.next().hashCode();
+		return code;
 	}
 
 	@Override

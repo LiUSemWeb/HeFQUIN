@@ -39,6 +39,11 @@ public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot
 	}
 
 	@Override
+	public int hashCode(){
+		return rootOp.hashCode() ^ subPlan1.hashCode() ^ subPlan2.hashCode();
+	}
+
+	@Override
 	public BinaryLogicalOp getRootOperator() {
 		return rootOp;
 	}

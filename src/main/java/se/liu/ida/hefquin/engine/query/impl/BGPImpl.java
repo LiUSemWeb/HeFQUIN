@@ -58,6 +58,10 @@ public class BGPImpl implements BGP
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(tps);
+		int code = Objects.hash( super.getClass().getName() );
+		for( TriplePattern tp: tps){
+			code = code ^ tp.hashCode();
+		}
+		return code;
 	}
 }

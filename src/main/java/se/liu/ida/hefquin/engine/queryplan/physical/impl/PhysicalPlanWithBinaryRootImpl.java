@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
@@ -42,6 +43,11 @@ public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoo
 			return oo.getRootOperator().equals(rootOp)
 					&& oo.getSubPlan1().equals(subPlan1)
 					&& oo.getSubPlan2().equals(subPlan2); 
+	}
+
+	@Override
+	public int hashCode(){
+		return rootOp.hashCode() ^ subPlan1.hashCode() ^ subPlan2.hashCode();
 	}
 
 	@Override
