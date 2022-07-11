@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
@@ -22,7 +23,7 @@ public class GraphQLEndpointInitializerTest extends EngineTestBase {
     final GraphQLEndpointInitializer initializer = new GraphQLEndpointInitializerImpl();
 
     @Test
-    public void testGraphQLEndpointSetup() throws FederationAccessException{
+    public void testGraphQLEndpointSetup() throws FederationAccessException, ParseException {
         if(!skipLocalGraphQLTests){
             final GraphQLEndpoint endpoint = initializer.initializeEndpoint("http://localhost:4000/graphql",
                 5000,5000);

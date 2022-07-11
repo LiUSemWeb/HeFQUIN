@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
-import org.apache.jena.query.QueryType;
+import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -70,7 +70,7 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     @Override
     public GraphQLEndpoint initializeEndpoint(  final String url,
                                                 final int connectionTimeout,
-                                                final int readTimeout) throws FederationAccessException {
+                                                final int readTimeout) throws FederationAccessException, ParseException {
 
         final GraphQLInterface iface = new GraphQLInterfaceImpl(url);
         final GraphQLEndpoint tmpEndpoint = new GraphQLEndpointImpl(null, null, iface);
@@ -152,12 +152,16 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     }
 
     /**
-     * Parses introspection data to determine information about a specific GraphQL field.
-     * @return a Pair consisting of the GraphQL valuetype (not including list and/or non-nullable identifiers) 
-     * and GraphQLFieldType respectively for the GraphQL type. @param field is a JsonObject and should 
-     * contain the keys: "name", "kind" and alternatively "ofType"
+     * Parses introspection data to determine information about a specific GraphQL
+     * field.
+     * 
+     * @return a Pair consisting of the GraphQL valuetype (not including list and/or
+     *         non-nullable identifiers) and GraphQLFieldType respectively for the
+     *         GraphQL type. @param field is a JsonObject and should contain the
+     *         keys: "name", "kind" and alternatively "ofType"
+     * @throws ParseException
      */
-    protected Pair<String,GraphQLFieldType> determineTypeInformation(final JsonObject field){
+    protected Pair<String, GraphQLFieldType> determineTypeInformation(final JsonObject field) throws ParseException {
 
         // ofTypePath segment without '/' at the end
         final String ofTypeKey = ofTypePath.substring(0,ofTypePath.length() - 1);
@@ -170,11 +174,15 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
         final String name = field.getString(iName);
         final String kind = field.getString(iKind);
         final GraphQLFieldType fieldType;
+
         if(kind.equals("OBJECT")){
             fieldType = GraphQLFieldType.OBJECT;
         }
-        else{
+        else if(kind.equals("SCALAR") || kind.equals("ENUM")){
             fieldType = GraphQLFieldType.SCALAR;
+        }
+        else{
+            throw new ParseException("The \"kind\" value of the provided json object is invalid");
         }
         return new Pair<String,GraphQLFieldType>(name,fieldType);
     }
@@ -183,7 +191,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     /**
      * Initializes GraphQLEntrypoints by parsing the __schema/queryType parts of the json.
      */
-    protected Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> parseEntrypoints(final JsonObject data) {
+    protected Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> parseEntrypoints(final JsonObject data) 
+            throws ParseException{
+
         final Map<String, Map<GraphQLEntrypointType, GraphQLEntrypoint>> objectTypeToEntrypoint = new HashMap<>();
         final JsonObject queryType = data.getObj(iSchema).getObj(iQueryType);
 
@@ -232,7 +242,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     /**
      * Initializes the available GraphQL types and fields received from the response.
      */
-    protected Map<String, Map<String, GraphQLField>> parseTypesAndFields(final JsonObject data) {
+    protected Map<String, Map<String, GraphQLField>> parseTypesAndFields(final JsonObject data) 
+            throws ParseException {
+
         final Map<String, Map<String, GraphQLField>> objectTypeToFields = new HashMap<>();
 
         // Types that shouldn't be initialized (queryType,mutationType,subscriptionType etc)
