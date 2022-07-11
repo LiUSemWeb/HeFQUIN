@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonException;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
@@ -39,7 +40,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     
     @Test
-    public void test1() throws ParseException, RuntimeException {
+    public void test1() throws ParseException, JsonException, RuntimeException {
 
         // The original SPARQL query
         final String queryString = 
@@ -147,7 +148,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     }
 
     @Test
-    public void test2() throws ParseException, RuntimeException {
+    public void test2() throws ParseException, JsonException, RuntimeException {
 
         // The original SPARQL query
         final String queryString = 

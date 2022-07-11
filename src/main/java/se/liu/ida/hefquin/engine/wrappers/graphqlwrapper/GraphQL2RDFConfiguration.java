@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper;
 
+import org.apache.jena.atlas.json.JsonException;
+
 /**
  * Used to represent a URI configuration.
  */
@@ -105,4 +107,11 @@ public interface GraphQL2RDFConfiguration {
      * @return the prefix used by scalar keys in the expected json.
      */
     public String getJsonScalarKeyPrefix();
+
+    /**
+     * @return the json key without its prefix.
+     * Works for keys with the defined prefixes from this current config (id,scalar,object)
+     * @throws JsonException if the provided @param key did not have one of the pre-defined prefixes.
+     */
+    public String removeJsonKeyPrefix(final String key) throws JsonException;
 }

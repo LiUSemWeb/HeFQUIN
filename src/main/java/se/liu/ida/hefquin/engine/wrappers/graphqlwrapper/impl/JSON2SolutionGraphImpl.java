@@ -2,11 +2,12 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
+import org.apache.jena.atlas.json.JsonException;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
+import org.apache.jena.atlas.lib.PairOfSameType;
 import org.apache.jena.datatypes.xsd.impl.XSDPlainType;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -33,13 +34,13 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
     }
 
     @Override
-    public Model translateJSON( final JSONResponse jsonResponse) throws ParseException {
+    public Model translateJSON( final JSONResponse jsonResponse) throws ParseException, JsonException {
 
         final JsonObject outerJson = jsonResponse.getJsonObject();
         final Model solutionGraph = ModelFactory.createDefaultModel();
         
-        // Maps a GraphQL type then its ID to a blank node representing the GraphQL object
-        final Map<BlankNodeID,Resource> blankNodes = new HashMap<>();
+        // Maps a GraphQL <ID,Type> to a blank node representing the GraphQL object
+        final Map<PairOfSameType<String>,Resource> blankNodes = new HashMap<>();
 
         // Verify that the JSONResponse contains correct data throw error
         if(!outerJson.hasKey("data")){
@@ -75,8 +76,8 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
      * @throws ParseException if the json object does not contain a valid "id" key.
      */
     protected Resource parseJSON(final JsonObject root, 
-                                 final Map<BlankNodeID,Resource> blankNodes, 
-                                 final Model solutionGraph) throws ParseException {
+                                 final Map<PairOfSameType<String>,Resource> blankNodes, 
+                                 final Model solutionGraph) throws ParseException, JsonException{
 
         // Get the key that represent the current json objects id
         final String idKey = root.keySet()
@@ -91,9 +92,8 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
 
         // Initialize the necessary data needed for parsing the current json object
         final String graphqlID = root.getString(idKey);
-        root.keySet().remove(idKey);
-        final String graphqlType = removeJsonKeyPrefix(idKey);
-        final BlankNodeID currentNodeID = new BlankNodeID(graphqlID, graphqlType);
+        final String graphqlType = config.removeJsonKeyPrefix(idKey);
+        final PairOfSameType<String> currentNodeID = new PairOfSameType<String>(graphqlID, graphqlType);
         final Resource currentBlankNode;
 
         // Create the blank node associated with the GraphQL type and id (if none exist yet)
@@ -115,7 +115,7 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
         */
         for(final String key : root.keySet()){
             final JsonValue value = root.get(key);
-            final String graphqlFieldName = removeJsonKeyPrefix(key);
+            final String graphqlFieldName = config.removeJsonKeyPrefix(key);
 
             if(value.isNull()){
                 continue;
@@ -132,7 +132,7 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
                         parseJSON(arrayObject.getAsObject(),blankNodes,solutionGraph));
                 }
             }
-            else if(value.isObject()){
+            else if(value.isObject() && key.startsWith(config.getJsonObjectKeyPrefix())){
                 // Value is a single object
                 currentBlankNode.addProperty(
                     solutionGraph.createProperty(config.mapFieldToProperty(graphqlType,graphqlFieldName)),
@@ -150,7 +150,7 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
                     
                 }
             }
-            else if(value.isPrimitive()){
+            else if(value.isPrimitive() && key.startsWith(config.getJsonScalarKeyPrefix())){
                 // Value is a single scalar value
                 currentBlankNode.addLiteral(
                     solutionGraph.createProperty(config.mapFieldToProperty(graphqlType,graphqlFieldName)), 
@@ -159,14 +159,6 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
         }
 
         return currentBlankNode;
-    }
-
-    /**
-     * Removes the prefix from the json key @param key
-     */
-    protected String removeJsonKeyPrefix(final String key){
-        final int splitIndex = key.indexOf("_") + 1;
-        return key.substring(splitIndex);
     }
 
     /**
@@ -195,39 +187,6 @@ public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
                 return model.createTypedLiteral(primitive.getAsNumber().value(), XSDPlainType.XSDdouble);
             default:
                 return model.createTypedLiteral(primitive.getAsString().value(), XSDPlainType.XSDstring);
-        }
-    }
-
-    /**
-     * Utility class used to represent a double valued key for Maps etc.
-     */
-    protected class BlankNodeID {
-        final String graphqlID;
-        final String graphqlType;
-
-        public BlankNodeID(final String graphqlID, final String graphqlType){
-            this.graphqlID = graphqlID;
-            this.graphqlType = graphqlType;
-        }
-
-        @Override
-        public boolean equals(final Object o){
-            if(this == o){
-                return true;
-            }
-
-            if(!(o instanceof BlankNodeID)){
-                return false;
-            }
-
-            final BlankNodeID that = (BlankNodeID) o;
-
-            return this.graphqlID.equals(that.graphqlID) && this.graphqlType.equals(that.graphqlType);
-        }
-
-        @Override
-        public int hashCode(){
-            return Objects.hash(graphqlID,graphqlType);
         }
     }
 }
