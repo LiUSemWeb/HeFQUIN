@@ -62,8 +62,9 @@ public class EntityMappingImpl implements EntityMapping
 	@Override
 	public Set<TriplePattern> applyToTriplePattern( final TriplePattern tp ) {
 		final Set<Triple> workingSet = new HashSet<Triple>();
-		if(g2lMap.containsKey(tp.asJenaTriple().getSubject())) {
-			final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getSubject()).iterator();
+		final Set<Node> localSubjects = g2lMap.get( tp.asJenaTriple().getSubject() );
+		if( localSubjects != null ) {
+			final Iterator<Node> it = localSubjects.iterator();
 			while (it.hasNext()) {
 				final Triple workingTriple = new Triple(it.next(),tp.asJenaTriple().getPredicate(),tp.asJenaTriple().getObject());
 				workingSet.add(workingTriple);
