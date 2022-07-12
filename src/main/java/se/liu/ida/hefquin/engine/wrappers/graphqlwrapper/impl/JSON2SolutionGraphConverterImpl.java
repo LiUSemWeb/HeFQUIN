@@ -17,17 +17,17 @@ import org.apache.jena.rdf.model.Resource;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraph;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraphConverter;
 
 /**
  * An implementation of the JSON2SolutionMappings approach
  */
-public class JSON2SolutionGraphImpl implements JSON2SolutionGraph {
+public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConverter {
 
     final protected GraphQL2RDFConfiguration config;
     final protected GraphQLEndpoint endpoint;
 
-    public JSON2SolutionGraphImpl(final GraphQL2RDFConfiguration config, 
+    public JSON2SolutionGraphConverterImpl(final GraphQL2RDFConfiguration config, 
                                      final GraphQLEndpoint endpoint){
         this.config = config;
         this.endpoint = endpoint;

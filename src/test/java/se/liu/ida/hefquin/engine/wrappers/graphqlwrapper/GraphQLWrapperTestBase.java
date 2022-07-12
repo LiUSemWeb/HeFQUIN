@@ -21,9 +21,9 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldI
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.DefaultGraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.JSON2SolutionGraphImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.JSON2SolutionGraphConverterImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SPARQL2GraphQLTranslatorImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SolutionGraph2SolutionMappingImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLSolutionGraphSolverImpl;
 
 /**
  * Collection of useful data structures for when testing GraphQL wrapper
@@ -72,8 +72,8 @@ public class GraphQLWrapperTestBase {
     protected static final GraphQL2RDFConfiguration config = new DefaultGraphQL2RDFConfiguration(classPrefix,
             propertyPrefix);
     protected static final GraphQLEndpoint endpoint = initializeGraphQLTestEndpoint();
-    protected static final JSON2SolutionGraph jsonTranslator = new JSON2SolutionGraphImpl(config, endpoint);
-    protected static final SolutionGraph2SolutionMappings solutionGraphTranslator = new SolutionGraph2SolutionMappingImpl();
+    protected static final JSON2SolutionGraphConverter jsonTranslator = new JSON2SolutionGraphConverterImpl(config, endpoint);
+    protected static final GraphQLSolutionGraphSolver solutionGraphTranslator = new GraphQLSolutionGraphSolverImpl();
 
     // Variables nodes
     protected static final Node var1 = NodeFactory.createVariable("author");

@@ -7,14 +7,14 @@ import org.apache.jena.rdf.model.Model;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 
-public interface SolutionGraph2SolutionMappings {
+public interface GraphQLSolutionGraphSolver {
     
     /**
-     * Queries @param solutionGraph using @param query and
+     * Queries @param solutionGraph using the SELECT query @param query and
      * @return a list of corresponding solution mappings.
      * @throws RunTimeException if for some reason the execution of the query over the
      * given solutionGraph did not work correctly.
      */
-    public List<SolutionMapping> querySolutionGraph(final Model solutionGraph, 
-                                                    final SPARQLQuery query) throws RuntimeException;
+    public List<SolutionMapping> execSelectQuery(final Model solutionGraph, 
+                                                 final SPARQLQuery query);
 }

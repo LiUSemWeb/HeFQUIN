@@ -119,7 +119,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         // Translated JSON to solution mappings
         final Model solutionGraph = jsonTranslator.translateJSON(response);
         final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
-            solutionGraphTranslator.querySolutionGraph(solutionGraph, sparqlQuery)
+            solutionGraphTranslator.execSelectQuery(solutionGraph, sparqlQuery)
         );
 
         // The expected solution mappings
@@ -234,7 +234,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         // Translated JSON to solution mappings
         final Model solutionGraph = jsonTranslator.translateJSON(response);
         final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
-            solutionGraphTranslator.querySolutionGraph(solutionGraph, sparqlQuery)
+            solutionGraphTranslator.execSelectQuery(solutionGraph, sparqlQuery)
         );
         
         // The expected solution mappings

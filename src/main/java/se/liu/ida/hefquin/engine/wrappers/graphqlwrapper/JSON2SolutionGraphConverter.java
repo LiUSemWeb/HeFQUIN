@@ -6,7 +6,7 @@ import org.apache.jena.atlas.json.JsonException;
 
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 
-public interface JSON2SolutionGraph {
+public interface JSON2SolutionGraphConverter {
     
     /**
      * Translates a JSON response @param jsonResponse to a solution graph (model) containing
