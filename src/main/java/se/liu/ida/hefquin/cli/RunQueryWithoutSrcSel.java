@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.cli;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
@@ -57,9 +60,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	@Override
 	protected void exec() {
+		final ExecutorService execServiceForPlanTasks = modEngineConfig.getConfig().createExecutorServiceForPlanTasks();
+
 		final HeFQUINEngine e = new HeFQUINEngineBuilder()
 				.setConfiguration( modEngineConfig.getConfig() )
 				.setFederationCatalog( modFederation.getFederationCatalog() )
+				.setExecutorServiceForPlanTasks(execServiceForPlanTasks)
 				.build();
 
 		final Query query = getQuery();
@@ -82,6 +88,17 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			final long time = modTime.endTimer();
 			System.err.println("Time: " + modTime.timeStr(time) + " sec");
 		}
+
+		execServiceForPlanTasks.shutdownNow();
+System.out.println("Shutting down " + execServiceForPlanTasks.isShutdown() + " " + execServiceForPlanTasks.isTerminated() );
+		try {
+			execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+System.err.println("Terminating the thread pool was interrupted." );
+			ex.printStackTrace();
+		}
+System.out.println("Shutting down " + execServiceForPlanTasks.isShutdown() + " " + execServiceForPlanTasks.isTerminated() );
 
 		if ( queryProcStats != null && contains(argQueryProcStats) ) {
 			StatsPrinter.print(queryProcStats, System.err, true);

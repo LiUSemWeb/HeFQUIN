@@ -10,21 +10,20 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
 public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 {
 	protected final LinkedList<ExecPlanTask> tasks;
-	protected ExecutorService threadPool = null;
+	protected ExecutorService threadPool;
 
-	public TaskBasedExecutablePlanImpl( final LinkedList<ExecPlanTask> tasks ) {
+	public TaskBasedExecutablePlanImpl( final LinkedList<ExecPlanTask> tasks, final ExecutionContext ctx ) {
 		assert ! tasks.isEmpty();
 		this.tasks = tasks;
-	}
 
-	public void setThreadPool( final ExecutorService threadPool ) {
-		this.threadPool = threadPool;
+		threadPool = ctx.getExecutorServiceForPlanTasks();
 	}
 
 	@Override

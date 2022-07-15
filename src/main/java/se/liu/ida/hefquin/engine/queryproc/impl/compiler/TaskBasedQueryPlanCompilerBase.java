@@ -20,9 +20,10 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
+		final ExecutionContext execCtxt = createExecContext();
 		final LinkedList<ExecPlanTask> tasks = new LinkedList<>();
-		createTasks( qep, tasks, 1, createExecContext() );
-		return new TaskBasedExecutablePlanImpl(tasks);
+		createTasks(qep, tasks, 1, execCtxt);
+		return new TaskBasedExecutablePlanImpl(tasks, execCtxt);
 	}
 
 	protected void createTasks( final PhysicalPlan qep,

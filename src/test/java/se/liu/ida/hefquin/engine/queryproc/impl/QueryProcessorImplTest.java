@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -17,6 +19,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.HeFQUINEngineConfig;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -353,9 +356,13 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
+		final HeFQUINEngineConfig config = new HeFQUINEngineConfig();
+		final ExecutorService execServiceForPlanTasks = config.createExecutorServiceForPlanTasks();
+
 		final QueryProcContext procCxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
@@ -366,6 +373,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
@@ -384,6 +392,15 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 
 		qProc.processQuery(query, resultSink);
+
+		execServiceForPlanTasks.shutdownNow();
+		try {
+			execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+System.err.println("Terminating the thread pool was interrupted." );
+			ex.printStackTrace();
+		}
 
 		return resultSink.getSolMapsIter();
 	}

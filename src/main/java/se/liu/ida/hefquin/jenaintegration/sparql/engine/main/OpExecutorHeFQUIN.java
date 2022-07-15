@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
@@ -60,6 +61,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
 		final Boolean isExperimentRun = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
@@ -69,6 +71,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);

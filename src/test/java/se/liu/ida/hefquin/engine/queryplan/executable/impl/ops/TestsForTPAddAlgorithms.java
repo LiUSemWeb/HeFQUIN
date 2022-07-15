@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -439,6 +440,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};

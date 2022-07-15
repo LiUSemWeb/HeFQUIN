@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
@@ -22,9 +23,10 @@ import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class HeFQUINEngineBuilder
 {
-	protected HeFQUINEngineConfig config             = null;
-	protected FederationCatalog fedCatalog           = null;
-	protected FederationAccessManager fedAccessMgr   = null;
+	protected HeFQUINEngineConfig config               = null;
+	protected FederationCatalog fedCatalog             = null;
+	protected FederationAccessManager fedAccessMgr     = null;
+	protected ExecutorService execServiceForPlanTasks  = null;
 
 	/**
 	 * mandatory
@@ -56,6 +58,17 @@ public class HeFQUINEngineBuilder
 		return this;
 	}
 
+	/**
+	 * mandatory
+	 */
+	public HeFQUINEngineBuilder setExecutorServiceForPlanTasks( final ExecutorService es ) {
+		if ( es == null )
+			throw new IllegalArgumentException();
+
+		this.execServiceForPlanTasks = es;
+		return this;
+	}
+
 	public HeFQUINEngine build() {
 		if ( config == null )
 			throw new IllegalStateException("no HeFQUINEngineConfig specified");
@@ -66,6 +79,9 @@ public class HeFQUINEngineBuilder
 		if ( fedAccessMgr == null )
 			setDefaultFederationAccessManager();
 
+		if ( execServiceForPlanTasks == null )
+			throw new IllegalStateException("no ExecutorService for plan tasks specified");
+
 		final Context ctxt = ARQ.getContext();
 		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
 
@@ -74,6 +90,7 @@ public class HeFQUINEngineBuilder
 		ctxt.set( HeFQUINConstants.sysFederationCatalog, fedCatalog );
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
 		ctxt.set( HeFQUINConstants.sysIsExperimentRun, true );
+		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );
 		return new MyEngine();
 	}
 
