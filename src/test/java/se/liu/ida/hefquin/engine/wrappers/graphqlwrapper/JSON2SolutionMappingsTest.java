@@ -33,6 +33,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryExecutionException;
 
 /**
  * Unit tests for JSON2SolutionGraph and SolutionGraph2SolutionMappings
@@ -40,7 +41,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     
     @Test
-    public void test1() throws ParseException, JsonException, RuntimeException {
+    public void test1() throws ParseException, JsonException, QueryExecutionException {
 
         // The original SPARQL query
         final String queryString = 
@@ -148,7 +149,7 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
     }
 
     @Test
-    public void test2() throws ParseException, JsonException, RuntimeException {
+    public void test2() throws ParseException, JsonException, QueryExecutionException {
 
         // The original SPARQL query
         final String queryString = 

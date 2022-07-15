@@ -12,12 +12,13 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSolutionGraphSolver;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryExecutionException;
 
 public class GraphQLSolutionGraphSolverImpl implements GraphQLSolutionGraphSolver {
 
     @Override
     public List<SolutionMapping> execSelectQuery(final Model solutionGraph, 
-                                                 final SPARQLQuery query) {
+                                                 final SPARQLQuery query) throws QueryExecutionException {
         final List<SolutionMapping> solutionMappings = new ArrayList<>();
 
         try (final QueryExecution qexec = QueryExecutionFactory.create(query.asJenaQuery(), solutionGraph)) {
@@ -27,7 +28,7 @@ public class GraphQLSolutionGraphSolverImpl implements GraphQLSolutionGraphSolve
             }
         }
         catch(final RuntimeException e){
-            throw new RuntimeException("Something went wrong while querying the RDF solution graph generated from the GraphQL endpoint!",e);
+            throw new QueryExecutionException("Something went wrong while querying the RDF solution graph generated from the GraphQL endpoint!",e);
         }
 
         return solutionMappings;
