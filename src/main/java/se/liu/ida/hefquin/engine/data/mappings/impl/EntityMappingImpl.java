@@ -33,28 +33,28 @@ public class EntityMappingImpl implements EntityMapping
 		// corresponding local URI
 		final Iterator<Triple> it = mappingDescription.find(Node.ANY, OWL2.sameAs.asNode(), Node.ANY);
 		while ( it.hasNext() ) {
-			if(g2lMap.containsKey(it.next().getSubject())) {
+			final Triple workingTriple = it.next();
+			if ( ! workingTriple.getSubject().isURI() || ! workingTriple.getObject().isURI() ) {
+				continue;
+			}
+			final Set<Node> locals = g2lMap.get(workingTriple.getSubject());
+			if(locals != null) {
 				// There is already at least one local URI for this global URI,
 				// We don't want to override it, so we'll add the new one to the set.
-				final Set<Node> locals = g2lMap.get(it.next().getSubject());
-				locals.add(it.next().getObject());
-				g2lMap.replace(it.next().getSubject(),locals);
+				locals.add(workingTriple.getObject());
 			} else {
 				// g2lmap doesn't contain any local URI for this global yet
-				final Set<Node> locals = new HashSet<Node>();
-				locals.add(it.next().getObject());
-				g2lMap.put(it.next().getSubject(),locals);
+				final Set<Node> localSet = new HashSet<Node>();
+				localSet.add(workingTriple.getObject());
 			}
 			
 			// The same for l2g.
-			if(l2gMap.containsKey(it.next().getObject())) {
-				final Set<Node> globals = l2gMap.get(it.next().getObject());
-				globals.add(it.next().getSubject());
-				l2gMap.replace(it.next().getObject(),globals);
+			final Set<Node> globals = l2gMap.get(workingTriple.getObject());
+			if(globals != null) {
+				globals.add(workingTriple.getSubject());
 			} else {
-				final Set<Node> globals = new HashSet<Node>();
-				globals.add(it.next().getSubject());
-				l2gMap.put(it.next().getObject(),globals);
+				final Set<Node> newGlobalSet = new HashSet<Node>();
+				newGlobalSet.add(workingTriple.getSubject());
 			}
 		}
 	}
@@ -64,47 +64,27 @@ public class EntityMappingImpl implements EntityMapping
 		final Set<Triple> workingSet = new HashSet<Triple>();
 		final Set<Node> localSubjects = g2lMap.get( tp.asJenaTriple().getSubject() );
 		if( localSubjects != null ) {
-			final Iterator<Node> it = localSubjects.iterator();
-			while (it.hasNext()) {
-				final Triple workingTriple = new Triple(it.next(),tp.asJenaTriple().getPredicate(),tp.asJenaTriple().getObject());
+			for (final Node localSubject : localSubjects) {
+				final Triple workingTriple = new Triple(localSubject,tp.asJenaTriple().getPredicate(), tp.asJenaTriple().getObject());
 				workingSet.add(workingTriple);
 			}
 		} else {
 			workingSet.add(tp.asJenaTriple());
 		}
-
-		final Set<Triple> workingSet2 = new HashSet<Triple>();
-		if(g2lMap.containsKey(tp.asJenaTriple().getPredicate())) {
-			final Iterator<Triple> it0 = workingSet.iterator();
-			while (it0.hasNext()) {
-				final Triple workingTriple0 = it0.next();
-				final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getPredicate()).iterator();
-				while (it.hasNext()) {
-					final Triple workingTriple = new Triple(workingTriple0.getSubject(),it.next(),workingTriple0.getObject());
-					workingSet2.add(workingTriple);
-				}
-			}
-		} else {
-			workingSet2.addAll(workingSet);
-		}
 		
-
 		final Set<TriplePattern> resultSet = new HashSet<TriplePattern>();
+		final Set<Node> localObjects = g2lMap.get(tp.asJenaTriple().getObject());
 		if(g2lMap.containsKey(tp.asJenaTriple().getObject())) {
-			final Iterator<Triple> it0 = workingSet2.iterator();
-			while (it0.hasNext()) {
-				final Triple workingTriple0 = it0.next();
-				final Iterator<Node> it = g2lMap.get(tp.asJenaTriple().getObject()).iterator();
-				while (it.hasNext()) {
-					final Triple workingTriple = new Triple(workingTriple0.getSubject(),workingTriple0.getPredicate(),it.next());
-					resultSet.add(new TriplePatternImpl(workingTriple));
+			for (final Triple workingTriple : workingSet) {
+				for (final Node localObject : localObjects) {
+					final Triple resultTriple = new Triple(workingTriple.getSubject(), workingTriple.getPredicate(), localObject);
+					resultSet.add(new TriplePatternImpl(resultTriple));
 				}
 			}
 			return resultSet;
 		} else {
-			final Iterator<Triple> it = workingSet2.iterator();
-			while (it.hasNext()) {
-				resultSet.add(new TriplePatternImpl(it.next()));
+			for (final Triple workingTriple : workingSet ) {
+				resultSet.add(new TriplePatternImpl(workingTriple));
 			}
 			return resultSet;
 		}
