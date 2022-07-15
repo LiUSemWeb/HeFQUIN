@@ -7,18 +7,18 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLFieldPath;
  */
 public class GraphQLObjectPath implements GraphQLFieldPath {
 
-    protected final String alias;
     protected final String fieldName;
+    protected final String prefix;
 
-    public GraphQLObjectPath(final String alias, final String fieldName){
-        assert alias != null;
+    public GraphQLObjectPath(final String fieldName, final String prefix){
         assert fieldName != null;
-        this.alias = alias;
+        assert prefix != null;
         this.fieldName = fieldName;
+        this.prefix = prefix;
     }
 
     @Override
     public String toString() {
-        return "object_" + alias + ":" + fieldName + "/";
+        return prefix + fieldName + ":" + fieldName + "/";
     }
 }

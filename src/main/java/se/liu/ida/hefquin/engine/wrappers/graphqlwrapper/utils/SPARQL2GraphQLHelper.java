@@ -45,7 +45,6 @@ public class SPARQL2GraphQLHelper
         this.connectors            = connectors;
     }
 
-
     /**
      * Generates a GraphQL query that fetches everything from the GraphQL endpoint.
      */
@@ -57,7 +56,7 @@ public class SPARQL2GraphQLHelper
             // Get the full list entrypoint
             final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
             final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
-            finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName));
+            finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName,config.getJsonIDKeyPrefix()));
 
             final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, config, endpoint );
             final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, config, endpoint );
@@ -84,7 +83,7 @@ public class SPARQL2GraphQLHelper
         final Set<String> finishedFieldPaths = new HashSet<>();
 
         // Necessary id field present in all objects used to indentify the GraphQL object
-        finishedFieldPaths.add(currentPath + new GraphQLIDPath(sgpType));
+        finishedFieldPaths.add(currentPath + new GraphQLIDPath(sgpType,config.getJsonIDKeyPrefix()));
 
         // Retrieve necessary information about current star pattern
         final boolean addAllFields = hasVariablePredicate(sp);
@@ -161,7 +160,7 @@ public class SPARQL2GraphQLHelper
                                           final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
+        final String newPath = currentPath + new GraphQLObjectPath(fieldName,config.getJsonObjectKeyPrefix());
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
 
         return addSgp(sp, newPath, nestedType);
@@ -175,9 +174,9 @@ public class SPARQL2GraphQLHelper
                                        final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        final String newPath = currentPath + new GraphQLObjectPath(alias, fieldName);
+        final String newPath = currentPath + new GraphQLObjectPath(fieldName,config.getJsonObjectKeyPrefix());
         final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
-        return newPath + new GraphQLIDPath(nestedType);
+        return newPath + new GraphQLIDPath(nestedType,config.getJsonIDKeyPrefix());
     }
 
     /**
@@ -186,7 +185,7 @@ public class SPARQL2GraphQLHelper
     protected String addScalarField( final String currentPath, final String predicateURI ) {
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
-        return currentPath + new GraphQLScalarPath(alias, fieldName);
+        return currentPath + new GraphQLScalarPath(fieldName,config.getJsonScalarKeyPrefix());
     }
 
     /**

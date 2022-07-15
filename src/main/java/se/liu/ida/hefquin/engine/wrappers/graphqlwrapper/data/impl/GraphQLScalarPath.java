@@ -7,18 +7,18 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLFieldPath;
  */
 public class GraphQLScalarPath implements GraphQLFieldPath {
 
-    protected final String alias;
     protected final String fieldName;
+    protected final String prefix;
 
-    public GraphQLScalarPath(final String alias, final String fieldName){
-        assert alias != null;
+    public GraphQLScalarPath(final String fieldName, final String prefix){
         assert fieldName != null;
-        this.alias = alias;
+        assert prefix != null;
         this.fieldName = fieldName;
+        this.prefix = prefix;
     }
 
     @Override
     public String toString() {
-        return "scalar_" + alias + ":" + fieldName;
+        return prefix + fieldName + ":" + fieldName;
     }
 }
