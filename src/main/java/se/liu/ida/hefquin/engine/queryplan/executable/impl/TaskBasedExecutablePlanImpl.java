@@ -44,7 +44,6 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 			final ExecPlanTask task = it.next();
 			try {
 				futures[--i] = threadPool.submit(task);
-System.out.println("Task #" + i + " submitted; running: " + tasks.get(i).isRunning() );
 			}
 			catch ( final RejectedExecutionException e ) {
 				// if submitting one of the tasks failed, try to
@@ -88,7 +87,6 @@ System.out.println("Task #" + i + " submitted; running: " + tasks.get(i).isRunni
 			throw new ExecutionException("Consuming the solution mappings caused an exception.", e);
 		}
 
-System.out.println("Result consumed" );
 		// check whether all tasks have completed successfully and kill
 		// the ones that are still running (which they should not), again
 		// we start from the task of the root operator to avoid causing
@@ -107,7 +105,6 @@ System.out.println("Result consumed" );
 				else
 					System.err.println("Task #" + j + " is not completed but has not failed and is also not running anymore.");
 			}
-else System.out.println("Task #" + j + " is completed.");
 
 			final Future<?> future = futures[j];
 			if ( ! future.isDone() ) {
