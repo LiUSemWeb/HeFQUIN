@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.utils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -23,13 +24,13 @@ import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 public class FederationAccessUtils
 {
-	public static FederationAccessManager getDefaultFederationAccessManager() {
+	public static FederationAccessManager getDefaultFederationAccessManager( final ExecutorService execServiceForFedAccess ) {
 		final SPARQLRequestProcessor  reqProcSPARQL   = new SPARQLRequestProcessorImpl();
 		final TPFRequestProcessor     reqProcTPF      = new TPFRequestProcessorImpl();
 		final BRTPFRequestProcessor   reqProcBRTPF    = new BRTPFRequestProcessorImpl();
 		final Neo4jRequestProcessor   reqProcNeo4j    = new Neo4jRequestProcessorImpl();
 
-		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
+		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
 		final FederationAccessManager fedAccessMgrWithCache = new FederationAccessManagerWithCache(fedAccessMgrWithoutCache, 100);
 		return fedAccessMgrWithCache;
 	}

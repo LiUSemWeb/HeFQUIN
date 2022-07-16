@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.sparql.engine.binding.Binding;
 
@@ -24,6 +25,7 @@ public class TestUtils extends EngineTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};

@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.jena.sparql.util.Context;
 
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
@@ -17,8 +20,20 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class HeFQUINEngineConfig
 {
+	public static int DEFAULT_THREAD_POOL_SIZE = 10;
+
 	public void initializeContext( final Context ctxt ) {
 		ctxt.set( HeFQUINConstants.sysQueryOptimizerFactory, createQueryOptimizerFactory() );
+	}
+
+	public ExecutorService createExecutorServiceForPlanTasks() {
+		return Executors.newCachedThreadPool();
+		//return Executors.newFixedThreadPool(20);
+	}
+
+	public ExecutorService createExecutorServiceForFedAccess() {
+		//return Executors.newCachedThreadPool();
+		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 	}
 
 	protected QueryOptimizerFactory createQueryOptimizerFactory() {

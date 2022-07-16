@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
+import java.util.concurrent.ExecutorService;
+
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -22,6 +24,7 @@ public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
 			@Override public CostModel getCostModel() { return ctxt.getCostModel(); }
 			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return ctxt.getExecutorServiceForPlanTasks(); }
 		};
 	}
 

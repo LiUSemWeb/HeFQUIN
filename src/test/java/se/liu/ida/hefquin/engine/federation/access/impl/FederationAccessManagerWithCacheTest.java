@@ -5,8 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.graph.NodeFactory;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
@@ -21,6 +26,26 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;
 
+	protected static ExecutorService execServiceForFedAccess;
+
+	@BeforeClass
+	public static void createExecService() {
+		final int numberOfThreads = 10;
+		execServiceForFedAccess = Executors.newFixedThreadPool(numberOfThreads);
+	}
+
+	@AfterClass
+	public static void tearDownExecService() {
+		execServiceForFedAccess.shutdownNow();
+		try {
+			execServiceForFedAccess.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+			System.err.println("Terminating the thread pool was interrupted." );
+			ex.printStackTrace();
+		}
+	}
+
 	@Test
 	public void twoRequestsInSequence()
 			throws FederationAccessException, InterruptedException, ExecutionException
@@ -32,7 +57,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -61,7 +86,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final TPFServer fm1 = new TPFServerForTest();
 		final TPFServer fm2 = new TPFServerForTest();
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
 		final long startTime = new Date().getTime();
 
@@ -94,7 +119,7 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 			fms[i] = new TPFServerForTest();
 		}
 
-		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(SLEEP_MILLIES);
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
 
 		@SuppressWarnings("unchecked")
 		final CompletableFuture<TPFResponse>[] futures = new CompletableFuture[n];
@@ -116,9 +141,10 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 
 	// ------------ helper code ------------
 
-	protected static FederationAccessManagerWithCache createFedAccessMgrForTests( final long sleepMillis ) {
+	protected static FederationAccessManagerWithCache createFedAccessMgrForTests( final ExecutorService execServiceForFedAccess,
+	                                                                              final long sleepMillis ) {
 		return new FederationAccessManagerWithCache(
-				AsyncFederationAccessManagerImplTest.createFedAccessMgrForTests(sleepMillis),
+				AsyncFederationAccessManagerImplTest.createFedAccessMgrForTests(execServiceForFedAccess, sleepMillis),
 				10 );
 	}
 

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -17,6 +19,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.HeFQUINEngineConfig;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -37,7 +40,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.IteratorBasedQueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
@@ -175,6 +178,61 @@ public class QueryProcessorImplTest extends EngineTestBase
 	}
 
 	@Test
+	public void unionOverTwoTriplePatterns() throws QueryProcException {
+		// setting up
+		final String queryString = "SELECT * WHERE {"
+				+ "{ SERVICE <http://example.org/tpf1> { ?x <http://example.org/p1> ?y } }"
+				+ "UNION"
+				+ "{ SERVICE <http://example.org/tpf2> { ?x <http://example.org/p1> ?y } }"
+				+ "}";
+
+		final Graph dataForMember1 = GraphFactory.createGraphMem();
+		dataForMember1.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p1"),
+				NodeFactory.createURI("http://example.org/o1")) );
+
+		final Graph dataForMember2 = GraphFactory.createGraphMem();
+		dataForMember2.add( Triple.create(
+				NodeFactory.createURI("http://example.org/s"),
+				NodeFactory.createURI("http://example.org/p1"),
+				NodeFactory.createURI("http://example.org/o2")) );
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
+		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
+
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+
+		final Iterator<SolutionMapping> it = processQuery(queryString, fedCat, fedAccessMgr);
+
+		// checking
+		assertTrue( it.hasNext() );
+
+		final Binding sm1 = it.next().asJenaBinding();
+		assertEquals( 2, sm1.size() );
+		final Var varX = Var.alloc("x");
+		final Var varY = Var.alloc("y");
+		assertTrue( sm1.contains(varX) );
+		assertTrue( sm1.contains(varY) );
+		assertEquals( "http://example.org/s", sm1.get(varX).getURI() );
+		final String uriY1 = sm1.get(varY).getURI();
+		assertTrue( uriY1.equals("http://example.org/o1") || uriY1.equals("http://example.org/o2") );
+
+		assertTrue( it.hasNext() );
+
+		final Binding sm2 = it.next().asJenaBinding();
+		assertEquals( 2, sm2.size() );
+		assertTrue( sm2.contains(varX) );
+		assertTrue( sm2.contains(varY) );
+		assertEquals( "http://example.org/s", sm2.get(varX).getURI() );
+		final String uriY2 = sm2.get(varY).getURI();
+		assertTrue( uriY2.equals("http://example.org/o1") || uriY2.equals("http://example.org/o2") );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
 	public void oneTPFoneTriplePatternWithFilterInside() throws QueryProcException {
 		// setting up
 		final String queryString = "SELECT * WHERE { "
@@ -296,9 +354,13 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
+		final HeFQUINEngineConfig config = new HeFQUINEngineConfig();
+		final ExecutorService execServiceForPlanTasks = config.createExecutorServiceForPlanTasks();
+
 		final QueryProcContext procCxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
@@ -309,6 +371,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
@@ -317,13 +380,25 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
-		final QueryPlanCompiler planCompiler = new IteratorBasedQueryPlanCompilerImpl(ctxt);
+		final QueryPlanCompiler planCompiler = new
+				//IteratorBasedQueryPlanCompilerImpl(ctxt);
+				//PullBasedQueryPlanCompilerImpl(ctxt);
+				PushBasedQueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 
 		qProc.processQuery(query, resultSink);
+
+		execServiceForPlanTasks.shutdownNow();
+		try {
+			execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+System.err.println("Terminating the thread pool was interrupted." );
+			ex.printStackTrace();
+		}
 
 		return resultSink.getSolMapsIter();
 	}

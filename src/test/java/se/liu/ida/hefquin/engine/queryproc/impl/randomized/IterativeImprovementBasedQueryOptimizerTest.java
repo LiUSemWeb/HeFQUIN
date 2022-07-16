@@ -29,6 +29,7 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 
 
@@ -93,6 +94,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		return new QueryOptimizationContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public boolean isExperimentRun() { return true; }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
@@ -30,7 +31,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.IteratorBasedQueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
@@ -58,6 +59,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
 		final Boolean isExperimentRun = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
@@ -67,6 +69,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
 			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 		};
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
@@ -75,7 +78,10 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
-		final QueryPlanCompiler compiler = new IteratorBasedQueryPlanCompilerImpl(ctxt);
+		final QueryPlanCompiler compiler = new
+				//IteratorBasedQueryPlanCompilerImpl(ctxt);
+				//PullBasedQueryPlanCompilerImpl(ctxt);
+				PushBasedQueryPlanCompilerImpl(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
 	}

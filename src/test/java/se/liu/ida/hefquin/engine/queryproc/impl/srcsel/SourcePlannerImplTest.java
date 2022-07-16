@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.ExecutorService;
+
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryFactory;
 import org.junit.Test;
@@ -152,6 +154,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};

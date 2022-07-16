@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.cli;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
@@ -57,9 +60,14 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	@Override
 	protected void exec() {
+		final ExecutorService execServiceForPlanTasks = modEngineConfig.getConfig().createExecutorServiceForPlanTasks();
+		final ExecutorService execServiceForFedAccess = modEngineConfig.getConfig().createExecutorServiceForFedAccess();
+
 		final HeFQUINEngine e = new HeFQUINEngineBuilder()
 				.setConfiguration( modEngineConfig.getConfig() )
 				.setFederationCatalog( modFederation.getFederationCatalog() )
+				.setExecutorServiceForFederationAccess(execServiceForFedAccess)
+				.setExecutorServiceForPlanTasks(execServiceForPlanTasks)
 				.build();
 
 		final Query query = getQuery();
@@ -81,6 +89,25 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.err.println("Time: " + modTime.timeStr(time) + " sec");
+		}
+
+		execServiceForPlanTasks.shutdownNow();
+		execServiceForFedAccess.shutdownNow();
+
+		try {
+			execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+			System.err.println("Terminating the thread pool for query plan tasks was interrupted." );
+			ex.printStackTrace();
+		}
+
+		try {
+			execServiceForFedAccess.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+			System.err.println("Terminating the thread pool for federation access was interrupted." );
+			ex.printStackTrace();
 		}
 
 		if ( queryProcStats != null && contains(argQueryProcStats) ) {

@@ -8,11 +8,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -31,6 +36,26 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {
+	protected static ExecutorService execServiceForFedAccess;
+
+	@BeforeClass
+	public static void createExecService() {
+		final int numberOfThreads = 10;
+		execServiceForFedAccess = Executors.newFixedThreadPool(numberOfThreads);
+	}
+
+	@AfterClass
+	public static void tearDownExecService() {
+		execServiceForFedAccess.shutdownNow();
+		try {
+			execServiceForFedAccess.awaitTermination(500L, TimeUnit.MILLISECONDS);
+		}
+		catch ( final InterruptedException ex )  {
+			System.err.println("Terminating the thread pool was interrupted." );
+			ex.printStackTrace();
+		}
+	}
+
 	@Test
 	public void testOnline() throws ExecOpExecutionException {
 		if ( skipLiveWebTests ) { return; }
@@ -47,10 +72,11 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final FederationAccessManager fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager();
+		final FederationAccessManager fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager(execServiceForFedAccess);
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
@@ -107,6 +133,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
