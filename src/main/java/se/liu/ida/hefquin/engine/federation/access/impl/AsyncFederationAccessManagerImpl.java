@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -18,8 +17,6 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProces
 
 public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBase2
 {
-	public static int DEFAULT_THREAD_POOL_SIZE = 10;
-
 	protected final ExecutorService threadPool;
 
 	// stats
@@ -33,22 +30,15 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	protected AtomicLong completedNeo4jRequests   = new AtomicLong(0L);
 
 	public AsyncFederationAccessManagerImpl(
-			final SPARQLRequestProcessor reqProcSPARQL,
-			final TPFRequestProcessor reqProcTPF,
-			final BRTPFRequestProcessor reqProcBRTPF,
-			final Neo4jRequestProcessor reqProcNeo4j) {
-		this(DEFAULT_THREAD_POOL_SIZE, reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
-	}
-
-	public AsyncFederationAccessManagerImpl(
-			final int threadPoolSize,
+			final ExecutorService execService,
 			final SPARQLRequestProcessor reqProcSPARQL,
 			final TPFRequestProcessor reqProcTPF,
 			final BRTPFRequestProcessor reqProcBRTPF,
 			final Neo4jRequestProcessor reqProcNeo4j) {
 		super(reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
 
-		threadPool = Executors.newFixedThreadPool(threadPoolSize);
+		assert execService != null;
+		threadPool = execService;
 	}
 
 	@Override

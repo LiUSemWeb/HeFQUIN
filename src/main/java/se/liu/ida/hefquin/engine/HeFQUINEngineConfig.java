@@ -20,13 +20,20 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class HeFQUINEngineConfig
 {
+	public static int DEFAULT_THREAD_POOL_SIZE = 10;
+
 	public void initializeContext( final Context ctxt ) {
 		ctxt.set( HeFQUINConstants.sysQueryOptimizerFactory, createQueryOptimizerFactory() );
 	}
 
 	public ExecutorService createExecutorServiceForPlanTasks() {
 		return Executors.newCachedThreadPool();
-		//return  Executors.newFixedThreadPool(20);
+		//return Executors.newFixedThreadPool(20);
+	}
+
+	public ExecutorService createExecutorServiceForFedAccess() {
+		//return Executors.newCachedThreadPool();
+		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 	}
 
 	protected QueryOptimizerFactory createQueryOptimizerFactory() {

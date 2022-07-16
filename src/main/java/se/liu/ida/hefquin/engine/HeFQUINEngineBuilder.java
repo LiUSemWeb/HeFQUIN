@@ -26,6 +26,7 @@ public class HeFQUINEngineBuilder
 	protected HeFQUINEngineConfig config               = null;
 	protected FederationCatalog fedCatalog             = null;
 	protected FederationAccessManager fedAccessMgr     = null;
+	protected ExecutorService execServiceForFedAccess  = null;
 	protected ExecutorService execServiceForPlanTasks  = null;
 
 	/**
@@ -61,6 +62,17 @@ public class HeFQUINEngineBuilder
 	/**
 	 * mandatory
 	 */
+	public HeFQUINEngineBuilder setExecutorServiceForFederationAccess( final ExecutorService es ) {
+		if ( es == null )
+			throw new IllegalArgumentException();
+
+		this.execServiceForFedAccess = es;
+		return this;
+	}
+
+	/**
+	 * mandatory
+	 */
 	public HeFQUINEngineBuilder setExecutorServiceForPlanTasks( final ExecutorService es ) {
 		if ( es == null )
 			throw new IllegalArgumentException();
@@ -75,6 +87,9 @@ public class HeFQUINEngineBuilder
 
 		if ( fedCatalog == null )
 			throw new IllegalStateException("no FederationCatalog specified");
+
+		if ( execServiceForFedAccess == null )
+			throw new IllegalStateException("no ExecutorService for federation access specified");
 
 		if ( fedAccessMgr == null )
 			setDefaultFederationAccessManager();
@@ -96,7 +111,7 @@ public class HeFQUINEngineBuilder
 
 
 	protected void setDefaultFederationAccessManager() {
-		this.fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager();
+		this.fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager(execServiceForFedAccess);
 	}
 
 	protected static class MyEngine implements HeFQUINEngine {
