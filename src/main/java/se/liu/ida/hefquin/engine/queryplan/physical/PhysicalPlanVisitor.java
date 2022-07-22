@@ -2,24 +2,27 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
-public interface PhysicalPlanVisitor {
-    void visit(final PhysicalOpRequest<?,?> op);
-    void visit(final PhysicalOpRequestWithTranslation<?,?> op);
+public interface PhysicalPlanVisitor
+{
+	void visit( PhysicalOpRequest<?,?> op );
+	void visit( PhysicalOpRequestWithTranslation<?,?> op );
 
-    void visit(final PhysicalOpBindJoin op);
-    void visit(final PhysicalOpBindJoinWithVALUES op);
-    void visit(final PhysicalOpBindJoinWithUNION op);
-    void visit(final PhysicalOpBindJoinWithFILTER op);
-    void visit(final PhysicalOpBindJoinWithFILTERandTranslation op);
-    void visit(final PhysicalOpNaiveNestedLoopsJoin op);
-    void visit(final PhysicalOpIndexNestedLoopsJoin op);
+	void visit( PhysicalOpBindJoin op );
+	void visit( PhysicalOpBindJoinWithVALUES op );
+	void visit( PhysicalOpBindJoinWithUNION op );
+	void visit( PhysicalOpBindJoinWithFILTER op );
+	void visit( PhysicalOpBindJoinWithFILTERandTranslation op );
+	void visit( PhysicalOpNaiveNestedLoopsJoin op );
+	void visit( PhysicalOpIndexNestedLoopsJoin op );
 
-    void visit(final PhysicalOpHashJoin op);
-    void visit(final PhysicalOpSymmetricHashJoin op);
+	void visit( PhysicalOpHashJoin op );
+	void visit( PhysicalOpSymmetricHashJoin op );
 
-    void visit(final PhysicalOpBinaryUnion op);
+	void visit( PhysicalOpHashRJoin op );
 
-    void visit(final PhysicalOpFilter op);
-    void visit(final PhysicalOpLocalToGlobal op);
-    void visit(final PhysicalOpGlobalToLocal op);
+	void visit( PhysicalOpBinaryUnion op );
+
+	void visit( PhysicalOpFilter op );
+	void visit( PhysicalOpLocalToGlobal op );
+	void visit( PhysicalOpGlobalToLocal op );
 }
