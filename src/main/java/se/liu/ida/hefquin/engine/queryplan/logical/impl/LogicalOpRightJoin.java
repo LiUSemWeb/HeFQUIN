@@ -7,9 +7,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
 public class LogicalOpRightJoin implements BinaryLogicalOp
 {
-	protected static LogicalOpJoin singleton = new LogicalOpJoin();
+	protected static LogicalOpRightJoin singleton = new LogicalOpRightJoin();
 
-	public static LogicalOpJoin getInstance() { return singleton; }
+	public static LogicalOpRightJoin getInstance() { return singleton; }
 
 	protected LogicalOpRightJoin() {}
 
