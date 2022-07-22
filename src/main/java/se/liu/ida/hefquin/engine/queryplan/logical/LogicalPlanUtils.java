@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -37,54 +38,37 @@ public class LogicalPlanUtils
 		}
 		
 		@Override
-		public void visit( final LogicalOpRequest<?,?> op )        {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpRequest<?,?> op )  { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpTPAdd op )             {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpTPAdd op )         { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpBGPAdd op )            {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpBGPAdd op )        { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpJoin op )              {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpJoin op )          { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpUnion op )             {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpLeftJoin op )      { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpMultiwayJoin op )      {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpUnion op )         { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpMultiwayUnion op )     {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpMultiwayJoin op )  { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpFilter op )     {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpMultiwayUnion op ) { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpLocalToGlobal op )     {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpFilter op )        { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpGlobalToLocal op )     {
-			subplanCount++;
-		}
+		public void visit( final LogicalOpLocalToGlobal op ) { subplanCount++; }
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op ) { subplanCount++; }
 	}
 
 	static public class SourceAssignmentChecker extends LogicalPlanVisitorBase {
@@ -112,6 +96,11 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpJoin op ) {
+			isSourceAssignment = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpLeftJoin op ) {
 			isSourceAssignment = false;
 		}
 
