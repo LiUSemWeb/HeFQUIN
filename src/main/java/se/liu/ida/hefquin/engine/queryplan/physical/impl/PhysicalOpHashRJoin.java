@@ -10,15 +10,15 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLeftJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpLeftJoin lop;
+	protected final LogicalOpRightJoin lop;
 
-	protected PhysicalOpHashRJoin(final LogicalOpLeftJoin lop ) {
+	public PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}

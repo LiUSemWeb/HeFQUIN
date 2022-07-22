@@ -5,17 +5,17 @@ import java.util.Objects;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpLeftJoin implements BinaryLogicalOp
+public class LogicalOpRightJoin implements BinaryLogicalOp
 {
 	protected static LogicalOpJoin singleton = new LogicalOpJoin();
 
 	public static LogicalOpJoin getInstance() { return singleton; }
 
-	protected LogicalOpLeftJoin() {}
+	protected LogicalOpRightJoin() {}
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof LogicalOpLeftJoin; 
+		return o instanceof LogicalOpRightJoin; 
 	}
 
 	@Override
