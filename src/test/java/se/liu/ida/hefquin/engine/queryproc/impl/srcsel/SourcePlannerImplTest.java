@@ -7,20 +7,25 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -142,6 +147,112 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		final TriplePatternRequest req2 = (TriplePatternRequest) subRootOp2.getRequest();
 		assertEqualTriplePatternsVUV( "x", "http://example.org/p2", "z", req2 );
+	}
+
+	@Test
+	public void optionalOutsideService() throws SourcePlanningException {
+		// setup
+		final String queryString = "SELECT * WHERE {"
+				+ "  SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
+				+ "  OPTIONAL"
+				+ "  { SERVICE <http://example.org> { ?z <http://example.org/q> ?y } }"
+				+ "}";
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest() );
+
+		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
+
+		// tests
+		assertEquals( 2, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpRightJoin );
+
+		final LogicalPlan subplan1 = plan.getSubPlan(0); 
+		assertEquals( 0, subplan1.numberOfSubPlans() );
+		assertTrue( subplan1.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp1 = (LogicalOpRequest<?,?>) subplan1.getRootOperator();
+		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req1 );
+
+		final LogicalPlan subplan2 = plan.getSubPlan(1); 
+		assertEquals( 0, subplan2.numberOfSubPlans() );
+		assertTrue( subplan2.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp2 = (LogicalOpRequest<?,?>) subplan2.getRootOperator();
+		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req2 );
+	}
+
+	@Test
+	public void optionalInsideServiceTPF() throws SourcePlanningException {
+		// setup
+		final String queryString = "SELECT * WHERE {"
+				+ "  SERVICE <http://example.org> {"
+				+ "    { ?x <http://example.org/p> ?y } OPTIONAL { ?z <http://example.org/q> ?y }"
+				+ "  }"
+				+ "}";
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest() );
+
+		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
+
+		// tests
+		assertEquals( 2, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpRightJoin );
+
+		final LogicalPlan subplan1 = plan.getSubPlan(0); 
+		assertEquals( 0, subplan1.numberOfSubPlans() );
+		assertTrue( subplan1.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp1 = (LogicalOpRequest<?,?>) subplan1.getRootOperator();
+		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req1 );
+
+		final LogicalPlan subplan2 = plan.getSubPlan(1); 
+		assertEquals( 0, subplan2.numberOfSubPlans() );
+		assertTrue( subplan2.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp2 = (LogicalOpRequest<?,?>) subplan2.getRootOperator();
+		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req2 );
+	}
+
+	@Test
+	public void optionalInsideServiceSPARQL() throws SourcePlanningException {
+		// setup
+		final String queryString = "SELECT * WHERE {"
+				+ "  SERVICE <http://example.org> {"
+				+ "    { ?x <http://example.org/p> ?y } OPTIONAL { ?z <http://example.org/q> ?y }"
+				+ "  }"
+				+ "}";
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new SPARQLEndpointForTest() );
+
+		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
+
+		// tests
+		assertEquals( 0, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp = (LogicalOpRequest<?,?>) plan.getRootOperator();
+		assertTrue( rootOp.getRequest() instanceof SPARQLRequest );
+
+		final SPARQLRequest req = (SPARQLRequest) rootOp.getRequest();
+		assertTrue( req.getQueryPattern() instanceof GenericSPARQLGraphPatternImpl2 );
+
+		final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) req.getQueryPattern() ).asJenaOp();
+		assertTrue( jenaOp instanceof OpLeftJoin );
 	}
 
 

@@ -8,6 +8,7 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpUnion;
@@ -32,6 +33,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
@@ -88,6 +91,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( jenaOp instanceof OpJoin ) {
 			return createPlanForJoin( (OpJoin) jenaOp );
 		}
+		else if ( jenaOp instanceof OpLeftJoin ) {
+			return createPlanForLeftJoin( (OpLeftJoin) jenaOp );
+		}
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp );
 		}
@@ -119,6 +125,17 @@ public class SourcePlannerImpl implements SourcePlanner
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
 		return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp ) {
+		if ( jenaOp.getExprs() != null && ! jenaOp.getExprs().isEmpty() ) {
+			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
+		}
+
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+		final LogicalOpRightJoin rootOp = LogicalOpRightJoin.getInstance();
+		return new LogicalPlanWithBinaryRootImpl(rootOp, rightSubPlan, leftSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp ) {
@@ -165,6 +182,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		if ( jenaOp instanceof OpJoin ) {
 			return createPlanForJoin( (OpJoin) jenaOp, fm );
 		}
+		else if ( jenaOp instanceof OpLeftJoin ) {
+			return createPlanForLeftJoin( (OpLeftJoin) jenaOp, fm );
+		}
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp, fm );
 		}
@@ -183,6 +203,17 @@ public class SourcePlannerImpl implements SourcePlanner
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
 		return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp, final FederationMember fm ) {
+		if ( jenaOp.getExprs() != null && ! jenaOp.getExprs().isEmpty() ) {
+			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
+		}
+
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
+		final LogicalOpRightJoin rootOp = LogicalOpRightJoin.getInstance();
+		return new LogicalPlanWithBinaryRootImpl(rootOp, rightSubPlan, leftSubPlan);
 	}
 
 	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp, final FederationMember fm ) {
