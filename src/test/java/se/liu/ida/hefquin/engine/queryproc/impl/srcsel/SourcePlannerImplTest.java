@@ -24,8 +24,8 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -165,7 +165,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		// tests
 		assertEquals( 2, plan.numberOfSubPlans() );
-		assertTrue( plan.getRootOperator() instanceof LogicalOpRightJoin );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayLeftJoin );
 
 		final LogicalPlan subplan1 = plan.getSubPlan(0); 
 		assertEquals( 0, subplan1.numberOfSubPlans() );
@@ -175,7 +175,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
 
 		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
-		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req1 );
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req1 );
 
 		final LogicalPlan subplan2 = plan.getSubPlan(1); 
 		assertEquals( 0, subplan2.numberOfSubPlans() );
@@ -185,7 +185,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
 
 		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
-		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req2 );
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req2 );
 	}
 
 	@Test
@@ -204,7 +204,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		// tests
 		assertEquals( 2, plan.numberOfSubPlans() );
-		assertTrue( plan.getRootOperator() instanceof LogicalOpRightJoin );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayLeftJoin );
 
 		final LogicalPlan subplan1 = plan.getSubPlan(0); 
 		assertEquals( 0, subplan1.numberOfSubPlans() );
@@ -214,7 +214,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
 
 		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
-		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req1 );
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req1 );
 
 		final LogicalPlan subplan2 = plan.getSubPlan(1); 
 		assertEquals( 0, subplan2.numberOfSubPlans() );
@@ -224,7 +224,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
 
 		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
-		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req2 );
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req2 );
 	}
 
 	@Test
@@ -253,6 +253,106 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 		final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) req.getQueryPattern() ).asJenaOp();
 		assertTrue( jenaOp instanceof OpLeftJoin );
+	}
+
+	@Test
+	public void optionalSequence() throws SourcePlanningException {
+		// setup
+		final String queryString = "SELECT * WHERE {"
+				+ "  SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
+				+ "  OPTIONAL"
+				+ "  { SERVICE <http://example.org> { ?z <http://example.org/q> ?y } }"
+				+ "  OPTIONAL"
+				+ "  { SERVICE <http://example.org> { ?v <http://example.org/r> ?y } }"
+				+ "}";
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest() );
+
+		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
+
+		// tests
+		assertEquals( 3, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayLeftJoin );
+
+		final LogicalPlan subplan1 = plan.getSubPlan(0); 
+		assertEquals( 0, subplan1.numberOfSubPlans() );
+		assertTrue( subplan1.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp1 = (LogicalOpRequest<?,?>) subplan1.getRootOperator();
+		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req1 );
+
+		final LogicalPlan subplan2 = plan.getSubPlan(1); 
+		assertEquals( 0, subplan2.numberOfSubPlans() );
+		assertTrue( subplan2.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp2 = (LogicalOpRequest<?,?>) subplan2.getRootOperator();
+		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req2 );
+
+		final LogicalPlan subplan3 = plan.getSubPlan(2); 
+		assertEquals( 0, subplan3.numberOfSubPlans() );
+		assertTrue( subplan3.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp3 = (LogicalOpRequest<?,?>) subplan3.getRootOperator();
+		assertTrue( rootOp3.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req3 = (TriplePatternRequest) rootOp3.getRequest();
+		assertEqualTriplePatternsVUV( "v", "http://example.org/r", "y", req3 );
+	}
+
+
+	@Test
+	public void optionalNesting() throws SourcePlanningException {
+		// setup
+		final String queryString = "SELECT * WHERE {"
+				+ "  SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
+				+ "  OPTIONAL {"
+				+ "    SERVICE <http://example.org> { ?z <http://example.org/q> ?y }"
+				+ "    OPTIONAL"
+				+ "    { SERVICE <http://example.org> { ?v <http://example.org/r> ?y } }"
+				+ "  }"
+				+ "}";
+		
+		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		fedCat.addMember( "http://example.org", new TPFServerForTest() );
+
+		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
+
+		// tests
+		assertEquals( 2, plan.numberOfSubPlans() );
+		assertTrue( plan.getRootOperator() instanceof LogicalOpMultiwayLeftJoin );
+
+		final LogicalPlan subplan1 = plan.getSubPlan(0); 
+		assertEquals( 0, subplan1.numberOfSubPlans() );
+		assertTrue( subplan1.getRootOperator() instanceof LogicalOpRequest<?,?> );
+
+		final LogicalOpRequest<?,?> rootOp1 = (LogicalOpRequest<?,?>) subplan1.getRootOperator();
+		assertTrue( rootOp1.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req1 = (TriplePatternRequest) rootOp1.getRequest();
+		assertEqualTriplePatternsVUV( "x", "http://example.org/p", "y", req1 );
+
+		final LogicalPlan subplan2 = plan.getSubPlan(1); 
+		assertEquals( 2, subplan2.numberOfSubPlans() );
+		assertTrue( subplan2.getRootOperator() instanceof LogicalOpMultiwayLeftJoin );
+
+		final LogicalOpRequest<?,?> rootOp2 = (LogicalOpRequest<?,?>) subplan2.getSubPlan(0).getRootOperator();
+		assertTrue( rootOp2.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req2 = (TriplePatternRequest) rootOp2.getRequest();
+		assertEqualTriplePatternsVUV( "z", "http://example.org/q", "y", req2 );
+
+		final LogicalOpRequest<?,?> rootOp3 = (LogicalOpRequest<?,?>) subplan2.getSubPlan(1).getRootOperator();
+		assertTrue( rootOp3.getRequest() instanceof TriplePatternRequest );
+
+		final TriplePatternRequest req3 = (TriplePatternRequest) rootOp3.getRequest();
+		assertEqualTriplePatternsVUV( "v", "http://example.org/r", "y", req3 );
 	}
 
 

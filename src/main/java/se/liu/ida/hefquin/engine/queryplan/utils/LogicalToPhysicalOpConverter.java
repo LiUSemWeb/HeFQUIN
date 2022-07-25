@@ -134,11 +134,16 @@ public class LogicalToPhysicalOpConverter
 
 	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
 		if (      lop instanceof LogicalOpMultiwayJoin )  return convert( (LogicalOpMultiwayJoin) lop );
+		else if ( lop instanceof LogicalOpMultiwayLeftJoin ) return convert( (LogicalOpMultiwayLeftJoin) lop );
 		else if ( lop instanceof LogicalOpMultiwayUnion ) return convert( (LogicalOpMultiwayUnion) lop );
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
 	public static NaryPhysicalOp convert( final LogicalOpMultiwayJoin lop ) {
+		throw new UnsupportedOperationException();
+	}
+
+	public static NaryPhysicalOp convert( final LogicalOpMultiwayLeftJoin lop ) {
 		throw new UnsupportedOperationException();
 	}
 

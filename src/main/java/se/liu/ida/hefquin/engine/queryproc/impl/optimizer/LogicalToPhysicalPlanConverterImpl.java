@@ -13,12 +13,15 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -102,6 +105,9 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		if ( lop instanceof LogicalOpMultiwayJoin ) {
 			return createPhysicalPlanForMultiwayJoin( (LogicalOpMultiwayJoin) lop, children, keepMultiwayJoins );
 		}
+		else if ( lop instanceof LogicalOpMultiwayLeftJoin ) {
+			return createPhysicalPlanForMultiwayLeftJoin( (LogicalOpMultiwayLeftJoin) lop, children, keepMultiwayJoins );
+		}
 		else if ( lop instanceof LogicalOpMultiwayUnion ) {
 			// TODO: remove this else-if branch, including the method that it
 			// calls, once we have a physical operator for multiway union 
@@ -148,6 +154,50 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 					currentSubPlan,
 					children.get(i) );
 			}
+		}
+
+		return currentSubPlan;
+	}
+
+	protected PhysicalPlan createPhysicalPlanForMultiwayLeftJoin( final LogicalOpMultiwayLeftJoin lop,
+	                                                              final List<PhysicalPlan> children,
+	                                                              final boolean keepMultiwayJoins )
+	{
+		if ( children.size() == 1 ) {
+			return children.get(0);
+		}
+
+		if ( keepMultiwayJoins ) {
+			final NaryPhysicalOp pop = new BasePhysicalOpMultiwayLeftJoin(lop) {
+				@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
+				@Override public NaryExecutableOp createExecOp(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+			};
+			return PhysicalPlanFactory.createPlan(pop, children);
+		}
+
+//		Multiway left joins are converted to right-deep plan of right outer joins:
+//		For join operators, use tpOptAdd and bgpOptAdd when possible; otherwise, binary joins are used by default.
+
+		// The first child of the multiway left join is the non-optional part
+		// and, thus, is used as the right input to the first right outer join.
+		PhysicalPlan currentSubPlan = children.get(0);
+		for ( int i = 1; i < children.size(); ++i ) {
+//			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
+//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+//						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
+//						currentSubPlan );
+//			}
+//			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
+//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+//						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
+//						children.get(i) );
+//			}
+//			else {
+				currentSubPlan = createPhysicalPlanWithBinaryRoot(
+					LogicalOpRightJoin.getInstance(),
+					children.get(i),
+					currentSubPlan );
+//			}
 		}
 
 		return currentSubPlan;
