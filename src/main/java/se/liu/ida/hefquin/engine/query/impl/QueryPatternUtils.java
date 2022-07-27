@@ -11,6 +11,7 @@ import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
@@ -178,7 +179,7 @@ public class QueryPatternUtils
 		if ( op instanceof OpBGP ) {
 			return getVariablesInPattern( (OpBGP) op);
 		}
-		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
+		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getVariablesInPattern( (Op2) op );
 		}
 		else if ( op instanceof OpService ){
@@ -257,7 +258,7 @@ public class QueryPatternUtils
 		if ( op instanceof OpBGP ) {
 			return getNumberOfVarOccurrences( (OpBGP) op);
 		}
-		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
+		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getNumberOfVarOccurrences( (Op2) op );
 		}
 		else if ( op instanceof OpService ){
@@ -283,7 +284,7 @@ public class QueryPatternUtils
 		if ( op instanceof OpBGP ) {
 			return getNumberOfTermOccurrences( (OpBGP) op);
 		}
-		else if ( op instanceof OpJoin || op instanceof OpUnion ) {
+		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getNumberOfTermOccurrences( (Op2) op );
 		}
 		else if ( op instanceof OpService ){

@@ -112,8 +112,9 @@ public class LogicalToPhysicalOpConverter
 	// --------- binary operators -----------
 
 	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
-		if (      lop instanceof LogicalOpJoin )  return convert( (LogicalOpJoin) lop );
-		else if ( lop instanceof LogicalOpUnion ) return convertUnion( (LogicalOpUnion) lop );
+		if (      lop instanceof LogicalOpJoin )     return convert( (LogicalOpJoin) lop );
+		else if ( lop instanceof LogicalOpUnion )    return convert( (LogicalOpUnion) lop );
+		else if ( lop instanceof LogicalOpRightJoin ) return convert( (LogicalOpRightJoin) lop );
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
@@ -121,19 +122,28 @@ public class LogicalToPhysicalOpConverter
 		return new PhysicalOpSymmetricHashJoin(lop);
 	}
 
-	public static BinaryPhysicalOp convertUnion( final LogicalOpUnion lop ) {
+	public static BinaryPhysicalOp convert( final LogicalOpUnion lop ) {
 		return new PhysicalOpBinaryUnion(lop);
+	}
+
+	public static BinaryPhysicalOp convert( final LogicalOpRightJoin lop ) {
+		return new PhysicalOpHashRJoin(lop);
 	}
 
 	// --------- n-ary operators -----------
 
 	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
 		if (      lop instanceof LogicalOpMultiwayJoin )  return convert( (LogicalOpMultiwayJoin) lop );
+		else if ( lop instanceof LogicalOpMultiwayLeftJoin ) return convert( (LogicalOpMultiwayLeftJoin) lop );
 		else if ( lop instanceof LogicalOpMultiwayUnion ) return convert( (LogicalOpMultiwayUnion) lop );
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
 	public static NaryPhysicalOp convert( final LogicalOpMultiwayJoin lop ) {
+		throw new UnsupportedOperationException();
+	}
+
+	public static NaryPhysicalOp convert( final LogicalOpMultiwayLeftJoin lop ) {
 		throw new UnsupportedOperationException();
 	}
 

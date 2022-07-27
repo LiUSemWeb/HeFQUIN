@@ -88,7 +88,7 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
-        public void visit( final PhysicalOpHashJoin op) {
+        public void visit( final PhysicalOpHashJoin op ) {
             addTabs();
             builder.append( op.toString() );
             builder.append(System.lineSeparator());
@@ -100,6 +100,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
             addTabs();
             builder.append( op.toString() );
             builder.append(System.lineSeparator());
+            indentLevel++;
+        }
+
+        @Override
+        public void visit( final PhysicalOpHashRJoin op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
             indentLevel++;
         }
 
@@ -184,12 +192,17 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
-        public void visit(PhysicalOpHashJoin physicalOpHashJoin) {
+        public void visit( final PhysicalOpHashJoin op ) {
             indentLevel--;
         }
 
         @Override
-        public void visit(final PhysicalOpSymmetricHashJoin op) {
+        public void visit( final PhysicalOpSymmetricHashJoin op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit( final PhysicalOpHashRJoin op ) {
             indentLevel--;
         }
 

@@ -20,8 +20,9 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
 
     protected boolean child1InputComplete = false;
 
-    public ExecOpHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ) {
-    	// determine the certain join variables
+    public ExecOpHashJoin( final ExpectedVariables inputVars1,
+                           final ExpectedVariables inputVars2 ) {
+        // determine the certain join variables
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 
         // set up the core part of the index first; it is built on the certain join variables
@@ -66,32 +67,44 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    protected void _processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild1( final IntermediateResultBlock input,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
         for ( final SolutionMapping smL : input.getSolutionMappings() ) {
             index.add(smL);
         }
     }
 
     @Override
-    protected void _wrapUpForChild1( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
+                                     final ExecutionContext execCxt ) {
         this.child1InputComplete = true;
     }
 
     @Override
-    protected void _processBlockFromChild2( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _processBlockFromChild2( final IntermediateResultBlock input,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
         if (child1InputComplete == false){
             throw new IllegalStateException();
         }
         for ( final SolutionMapping smR : input.getSolutionMappings() ) {
-            final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
-            for ( final SolutionMapping smL : matchSolMapL ){
-                sink.send(SolutionMappingUtils.merge(smL, smR));
-            }
+            _processSolMapFromChild2(smR, sink, execCxt);
+        }
+    }
+
+    protected void _processSolMapFromChild2( final SolutionMapping smR,
+                                             final IntermediateResultElementSink sink,
+                                             final ExecutionContext execCxt ) {
+        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
+        for ( final SolutionMapping smL : matchSolMapL ){
+            sink.send( SolutionMappingUtils.merge(smL,smR) );
         }
     }
 
     @Override
-    protected void _wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
+    protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
+                                     final ExecutionContext execCxt ) {
         // nothing to be done here
     }
 }

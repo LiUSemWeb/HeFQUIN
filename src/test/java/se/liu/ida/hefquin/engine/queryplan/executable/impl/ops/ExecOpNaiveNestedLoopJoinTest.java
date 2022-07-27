@@ -5,8 +5,8 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
-public class ExecOpNaiveNestedLoopJoinTest extends TestsForJoinAlgorithms{
-
+public class ExecOpNaiveNestedLoopJoinTest extends TestsForInnerJoinAlgorithms
+{
     @Test
     public void joinWithOneJoinVariable() throws ExecutionException { _joinWithOneJoinVariable(); }
 
