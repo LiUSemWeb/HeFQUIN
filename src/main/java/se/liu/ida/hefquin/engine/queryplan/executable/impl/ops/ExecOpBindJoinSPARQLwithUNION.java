@@ -57,18 +57,22 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 		return new ExecOpRequestSPARQL(request, fm);
 	}
 
-	protected Op createUnion(final Iterable<SolutionMapping> solMaps) {
-		if (varsInSubQuery.isEmpty()) return representQueryPatternAsJenaOp(query);
+	protected Op createUnion( final Iterable<SolutionMapping> solMaps ) {
+		if ( varsInSubQuery.isEmpty() ) {
+			return QueryPatternUtils.convertToJenaOp(query);
+		}
 
 		final Set<Expr> conjunctions = new HashSet<>();
 		boolean solMapsContainBlankNodes = false;
-		for ( final SolutionMapping s : solMaps) {
+		for ( final SolutionMapping s : solMaps ) {
 			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInSubQuery);
 			// If the current solution mapping does not have any variables in common with
 			// the triple pattern of this operator, then every matching triple is a join partner
 			// for the current solution mapping. Hence, in this case, we may simply retrieve
 			// all matching triples (i.e., no need for putting together the UNION pattern).
-			if (b.size() == 0) return representQueryPatternAsJenaOp(query);
+			if ( b.size() == 0 ) {
+				return QueryPatternUtils.convertToJenaOp(query);
+			}
 
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
 				solMapsContainBlankNodes = true;
@@ -90,13 +94,13 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 		}
 
 		if ( conjunctions.isEmpty() ) {
-			return solMapsContainBlankNodes ? null : representQueryPatternAsJenaOp(query);
+			return solMapsContainBlankNodes ? null : QueryPatternUtils.convertToJenaOp(query);
 		}
 
 		Op union = null;
-		for (final Expr conjunction : conjunctions) {
-			final Op filter = OpFilter.filter(conjunction, representQueryPatternAsJenaOp(query));
-			if (union == null) {
+		for ( final Expr conjunction : conjunctions ) {
+			final Op filter = OpFilter.filter( conjunction, QueryPatternUtils.convertToJenaOp(query) );
+			if ( union == null ) {
 				union = filter;
 			} else {
 				union = new OpUnion(union, filter);

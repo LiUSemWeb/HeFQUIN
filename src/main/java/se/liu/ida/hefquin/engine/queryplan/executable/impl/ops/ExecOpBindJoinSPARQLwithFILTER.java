@@ -60,7 +60,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 
 	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
 		if ( varsInSubQuery.isEmpty() ) {
-			return representQueryPatternAsJenaOp(query);
+			return QueryPatternUtils.convertToJenaOp(query);
 		}
 		Expr disjunction = null;
 		boolean solMapsContainBlankNodes = false;
@@ -93,10 +93,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		}
 
 		if ( disjunction == null ) {
-			return solMapsContainBlankNodes ? null : representQueryPatternAsJenaOp(query);
+			return solMapsContainBlankNodes ? null : QueryPatternUtils.convertToJenaOp(query);
 		}
 
-		return OpFilter.filter(disjunction, representQueryPatternAsJenaOp(query));
+		return OpFilter.filter( disjunction, QueryPatternUtils.convertToJenaOp(query) );
 	}
 
 }

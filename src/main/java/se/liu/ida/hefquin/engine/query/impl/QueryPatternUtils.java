@@ -13,6 +13,7 @@ import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.op.Op2;
@@ -63,6 +64,35 @@ public class QueryPatternUtils
 			tps.add( new TriplePatternImpl(tp.asTriple()) );
 		}
 		return new BGPImpl(tps);
+	}
+
+	/**
+	 * Returns a representation of the given graph pattern as
+	 * an object of the {@link Op} interface of the Jena API.
+	 */
+	public static Op convertToJenaOp( final SPARQLGraphPattern pattern ) {
+		if ( pattern instanceof TriplePattern) {
+			final Triple triple = ( (TriplePattern) pattern ).asJenaTriple();
+			return new OpTriple(triple);
+		}
+		else if ( pattern instanceof BGP ) {
+			final Set<? extends TriplePattern> tps = ( (BGP) pattern ).getTriplePatterns();
+			final BasicPattern bgp = new BasicPattern();
+			for ( final TriplePattern tp : tps ) {
+				bgp.add( tp.asJenaTriple() );
+			}
+			return new OpBGP(bgp);
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			@SuppressWarnings("deprecation")
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) pattern ).asJenaOp();
+			return jenaOp;
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			return ( (GenericSPARQLGraphPatternImpl2) pattern ).asJenaOp();
+		}
+
+		throw new IllegalArgumentException( "Unsupported type of graph pattern: " + pattern.getClass().getName() );
 	}
 
 	public static Element convertToJenaElement( final SPARQLGraphPattern p ) {

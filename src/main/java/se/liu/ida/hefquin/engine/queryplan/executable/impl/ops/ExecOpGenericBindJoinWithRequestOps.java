@@ -2,20 +2,11 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Set;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpTriple;
-import org.apache.jena.sparql.core.BasicPattern;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -121,38 +112,5 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 			}
 		}
     }
-
-	// ------- helper function ------
-	/**
-	 * Returns a representation of this query pattern as an
-	 * object of the interface {@link Op} of the Jena API.
-	 */
-	protected Op representQueryPatternAsJenaOp( final QueryType query ) {
-		if ( query instanceof SPARQLGraphPattern ) {
-			if ( query instanceof TriplePattern) {
-				return new OpTriple( ((TriplePattern)query).asJenaTriple());
-			}
-			else if (query instanceof BGP) {
-				final BasicPattern bgp = new BasicPattern();
-				for ( final TriplePattern tp : ((BGP) query).getTriplePatterns() ) {
-					bgp.add( tp.asJenaTriple() );
-				}
-				return new OpBGP(bgp);
-			}
-			else if ( query instanceof GenericSPARQLGraphPatternImpl1 ) {
-				@SuppressWarnings("deprecation")
-				final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) query ).asJenaOp();
-				return jenaOp;
-			}
-			else if ( query instanceof GenericSPARQLGraphPatternImpl2 ) {
-				return ( (GenericSPARQLGraphPatternImpl2) query ).asJenaOp();
-			}
-			else {
-				throw new UnsupportedOperationException( query.getClass().getName() );
-			}
-		}
-		else
-			throw new IllegalArgumentException("Unsupported type of query pattern: " + query.getClass().getName() );
-	}
 
 }
