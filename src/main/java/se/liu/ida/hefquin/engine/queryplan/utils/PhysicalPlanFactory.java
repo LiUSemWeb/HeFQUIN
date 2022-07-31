@@ -486,7 +486,7 @@ public class PhysicalPlanFactory
 	                                                                   final PhysicalPlan subplan,
 	                                                                   final List<PhysicalPlan> plans ) {
 		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
-			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
 
 			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
 			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
@@ -495,7 +495,7 @@ public class PhysicalPlanFactory
 
 		}
 		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
-			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
 			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
 
 			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();
@@ -512,7 +512,7 @@ public class PhysicalPlanFactory
 	                                                                   final PhysicalPlan subplan,
 	                                                                   final List<PhysicalPlan> plans ) {
 		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
-			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
 
 			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
 			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
@@ -521,7 +521,7 @@ public class PhysicalPlanFactory
 
 		}
 		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
-			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createUnaryLopFromReq(req);
+			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
 			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
 
 			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();

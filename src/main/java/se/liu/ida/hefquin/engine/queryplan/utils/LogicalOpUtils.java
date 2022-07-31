@@ -183,7 +183,7 @@ public class LogicalOpUtils {
         }
     }
 
-    public static UnaryLogicalOp createUnaryLopFromReq( final PhysicalOperator op ) {
+    public static UnaryLogicalOp createLogicalAddOpFromPhysicalReqOp( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
 
         if ( lop instanceof LogicalOpRequest ) {

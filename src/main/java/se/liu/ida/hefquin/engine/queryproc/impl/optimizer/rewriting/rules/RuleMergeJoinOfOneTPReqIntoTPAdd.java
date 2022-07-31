@@ -37,11 +37,11 @@ public class RuleMergeJoinOfOneTPReqIntoTPAdd extends AbstractRewritingRuleImpl{
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
                 if ( IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest( subPlanOp1 ) ) {
-                    final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp1 );
+                    final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp( subPlanOp1 );
                     return PhysicalPlanFactory.createPlan(newRoot, subPlan2);
                 }
                 else if ( IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest( subPlanOp2 ) ) {
-                    final UnaryLogicalOp newRoot = LogicalOpUtils.createUnaryLopFromReq( subPlanOp2 );
+                    final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp( subPlanOp2 );
                     return PhysicalPlanFactory.createPlan(newRoot, subPlan1);
                 }
                 else  {

@@ -140,12 +140,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		for ( int i = 1; i < children.size(); ++i ) {
 			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
+						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(children.get(i).getRootOperator()),
 						currentSubPlan );
 			}
 			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
+						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(currentSubPlan.getRootOperator()),
 						children.get(i) );
 			}
 			else {

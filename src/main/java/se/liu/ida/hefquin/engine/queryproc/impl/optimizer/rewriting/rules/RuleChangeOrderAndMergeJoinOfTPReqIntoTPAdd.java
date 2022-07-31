@@ -42,13 +42,13 @@ public class RuleChangeOrderAndMergeJoinOfTPReqIntoTPAdd extends AbstractRewriti
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
                 if ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(subPlanOp2) ) {
-                    final UnaryLogicalOp tpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp2);
+                    final UnaryLogicalOp tpAdd = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(subPlanOp2);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( tpAdd, subPlan1.getSubPlan(1) );
 
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
                 }
                 else if ( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(subPlanOp1) ) {
-                    final UnaryLogicalOp tpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp1);
+                    final UnaryLogicalOp tpAdd = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(subPlanOp1);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan(tpAdd, subPlan2.getSubPlan(0));
 
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1));
