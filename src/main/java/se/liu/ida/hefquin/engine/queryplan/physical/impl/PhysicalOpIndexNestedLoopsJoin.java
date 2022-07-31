@@ -15,6 +15,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoin
 {
+	protected static final boolean useOuterJoinSemantics = false;
+
 	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPAdd lop ) {
 		super(lop);
 	}
@@ -37,9 +39,9 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final FederationMember fm = tpAdd.getFederationMember();
 
 			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, false );
+				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics );
 			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, false );
+				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
 			else if ( fm instanceof SPARQLEndpoint )
 				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm );
 			else
