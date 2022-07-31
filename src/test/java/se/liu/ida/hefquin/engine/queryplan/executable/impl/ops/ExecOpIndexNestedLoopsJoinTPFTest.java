@@ -13,17 +13,17 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 {
 	@Test
 	public void tpWithJoinOnObject() throws ExecutionException {
-//		_tpWithJoinOnObject();
+		_tpWithJoinOnObject();
 	}
 
 	@Test
 	public void tpWithJoinOnSubjectAndObject() throws ExecutionException {
-//		_tpWithJoinOnSubjectAndObject();
+		_tpWithJoinOnSubjectAndObject();
 	}
 
 	@Test
 	public void tpWithoutJoinVariable() throws ExecutionException {
-//		_tpWithoutJoinVariable();
+		_tpWithoutJoinVariable();
 	}
 
 	@Test
@@ -50,6 +50,6 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	@Override
 	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final TPFServer fm,
 													final ExpectedVariables expectedVariables) {
-		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm);
+		return new ExecOpIndexNestedLoopsJoinTPF(tp, fm, false);
 	}
 }

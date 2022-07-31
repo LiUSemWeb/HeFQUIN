@@ -30,8 +30,13 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
                                                     MemberType extends FederationMember>
               extends ExecOpGenericIndexNestedLoopsJoinBase<QueryType,MemberType>
 {
-	public ExecOpGenericIndexNestedLoopsJoinWithRequestOps( final QueryType query, final MemberType fm ) {
+	protected final boolean useOuterJoinSemantics;
+
+	protected ExecOpGenericIndexNestedLoopsJoinWithRequestOps( final QueryType query,
+	                                                           final MemberType fm,
+	                                                           final boolean useOuterJoinSemantics ) {
 		super(query, fm);
+		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
 	@Override
@@ -126,14 +131,22 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 		return new Runnable() {
 			@Override
 			public void run() {
-				final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(outputSink, smFromInput);
+				final MyIntermediateResultElementSink mySink;
+				if ( useOuterJoinSemantics ) {
+					mySink = new MyIntermediateResultElementSinkOuterJoin(outputSink, smFromInput);
+				}
+				else {
+					mySink = new MyIntermediateResultElementSink(outputSink, smFromInput);
+				}
 
 				try {
 					reqOp.execute(mySink, execCxt);
 				}
 				catch ( final ExecOpExecutionException e ) {
 					throw new RuntimeException("Executing a request operator used by this index nested loops join caused an exception.", e);
-				}				
+				}
+
+				mySink.flush();
 			}
 		};
 	}
@@ -156,6 +169,30 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 		public void send( final SolutionMapping smFromRequest ) {
 			outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 		}
-    } // end of helper class MyIntermediateResultElementSink
+
+		public void flush() { }
+	}
+
+	protected static class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
+	{
+		protected boolean hasJoinPartner = false;
+
+		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
+		                                                 final SolutionMapping smFromInput ) {
+			super(outputSink, smFromInput);
+		}
+
+		@Override
+		public void send( final SolutionMapping smFromRequest ) {
+			super.send(smFromRequest);
+			hasJoinPartner = true;
+		}
+
+		public void flush() {
+			if ( ! hasJoinPartner ) {
+				outputSink.send(smFromInput);
+			}
+		}
+    }
 
 }

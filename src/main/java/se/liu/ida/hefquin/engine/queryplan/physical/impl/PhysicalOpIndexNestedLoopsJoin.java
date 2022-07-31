@@ -37,9 +37,9 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final FederationMember fm = tpAdd.getFederationMember();
 
 			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm );
+				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, false );
 			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm );
+				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, false );
 			else if ( fm instanceof SPARQLEndpoint )
 				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm );
 			else
