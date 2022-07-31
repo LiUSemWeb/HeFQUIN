@@ -64,26 +64,36 @@ public class EntityMappingImpl implements EntityMapping
 	@Override
 	public Set<TriplePattern> applyToTriplePattern( final TriplePattern tp ) {
 		final Set<Triple> workingSet = new HashSet<Triple>();
-		final Set<Node> localSubjects = g2lMap.get( tp.asJenaTriple().getSubject() );
-		if( localSubjects != null ) {
-			for (final Node localSubject : localSubjects) {
-				final Triple workingTriple = new Triple(localSubject,tp.asJenaTriple().getPredicate(), tp.asJenaTriple().getObject());
-				workingSet.add(workingTriple);
+		if(tp.asJenaTriple().getSubject().isURI()) {
+			final Set<Node> localSubjects = g2lMap.get( tp.asJenaTriple().getSubject() );
+			if( localSubjects != null ) {
+				for (final Node localSubject : localSubjects) {
+					final Triple workingTriple = new Triple(localSubject,tp.asJenaTriple().getPredicate(), tp.asJenaTriple().getObject());
+					workingSet.add(workingTriple);
+				}
+			} else {
+				workingSet.add(tp.asJenaTriple());
 			}
 		} else {
 			workingSet.add(tp.asJenaTriple());
 		}
-		
 		final Set<TriplePattern> resultSet = new HashSet<TriplePattern>();
-		final Set<Node> localObjects = g2lMap.get(tp.asJenaTriple().getObject());
-		if(g2lMap.containsKey(tp.asJenaTriple().getObject())) {
-			for (final Triple workingTriple : workingSet) {
-				for (final Node localObject : localObjects) {
-					final Triple resultTriple = new Triple(workingTriple.getSubject(), workingTriple.getPredicate(), localObject);
-					resultSet.add(new TriplePatternImpl(resultTriple));
+			if(tp.asJenaTriple().getObject().isURI()) {
+			final Set<Node> localObjects = g2lMap.get(tp.asJenaTriple().getObject());
+			if(g2lMap.containsKey(tp.asJenaTriple().getObject())) {
+				for (final Triple workingTriple : workingSet) {
+					for (final Node localObject : localObjects) {
+						final Triple resultTriple = new Triple(workingTriple.getSubject(), workingTriple.getPredicate(), localObject);
+						resultSet.add(new TriplePatternImpl(resultTriple));
+					}
 				}
+				return resultSet;
+			} else {
+				for (final Triple workingTriple : workingSet ) {
+					resultSet.add(new TriplePatternImpl(workingTriple));
+				}
+				return resultSet;
 			}
-			return resultSet;
 		} else {
 			for (final Triple workingTriple : workingSet ) {
 				resultSet.add(new TriplePatternImpl(workingTriple));
