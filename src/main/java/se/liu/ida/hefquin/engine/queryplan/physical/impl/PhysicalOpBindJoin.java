@@ -7,18 +7,25 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 {
-	protected static final boolean useOuterJoinSemantics = false;
-
     public PhysicalOpBindJoin( final LogicalOpTPAdd lop ) {
+        super(lop);
+    }
+
+    public PhysicalOpBindJoin( final LogicalOpTPOptAdd lop ) {
         super(lop);
     }
 
     // not supported at the moment
     //public PhysicalOpBindJoin( final LogicalOpBGPAdd lop ) {
+    //    super(lop);
+    //}
+    //
+    //public PhysicalOpBindJoin( final LogicalOpBGPOptAdd lop ) {
     //    super(lop);
     //}
 
@@ -33,11 +40,21 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
         if ( lop instanceof LogicalOpTPAdd ) {
             final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
             final FederationMember fm = tpAdd.getFederationMember();
+            final boolean useOuterJoinSemantics = false;
 
             if ( fm instanceof BRTPFServer )
                 return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
-                //else if ( fm instanceof SPARQLEndpoint)
-                //	return new ExecOpBindJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm );
+            else
+                throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+
+        }
+        else if ( lop instanceof LogicalOpTPOptAdd ) {
+            final LogicalOpTPOptAdd tpAdd = (LogicalOpTPOptAdd) lop;
+            final FederationMember fm = tpAdd.getFederationMember();
+            final boolean useOuterJoinSemantics = true;
+
+            if ( fm instanceof BRTPFServer )
+                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
             else
                 throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 

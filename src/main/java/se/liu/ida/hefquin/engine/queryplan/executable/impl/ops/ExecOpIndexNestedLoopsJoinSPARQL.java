@@ -15,8 +15,16 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNod
 
 public class ExecOpIndexNestedLoopsJoinSPARQL extends ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
-	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
+	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
+	                                         final SPARQLEndpoint fm,
+	                                         final boolean useOuterJoinSemantics ) {
 		super( query, fm );
+
+		// TODO extend this implementation to support outer join semantics similar
+		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps
+		// TODO when done, extend ExecOpIndexNestedLoopsJoinSPARQLTest accordingly
+		if ( useOuterJoinSemantics )
+			throw new UnsupportedOperationException();
 	}
 
 	@Override
