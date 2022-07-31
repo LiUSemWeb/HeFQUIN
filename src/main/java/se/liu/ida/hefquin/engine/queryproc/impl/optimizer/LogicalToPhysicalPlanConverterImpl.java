@@ -182,22 +182,17 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		// and, thus, is used as the right input to the first right outer join.
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-//			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
-//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-//						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
-//						currentSubPlan );
-//			}
-//			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
-//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-//						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
-//						children.get(i) );
-//			}
-//			else {
+			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
+				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+						LogicalOpUtils.createLogicalOptAddOpFromPhysicalReqOp(children.get(i).getRootOperator()),
+						currentSubPlan );
+			}
+			else {
 				currentSubPlan = createPhysicalPlanWithBinaryRoot(
 					LogicalOpRightJoin.getInstance(),
 					children.get(i),
 					currentSubPlan );
-//			}
+			}
 		}
 
 		return currentSubPlan;
