@@ -54,7 +54,8 @@ public class EntityMappingImpl implements EntityMapping
 			if(globals != null) {
 				globals.add(workingTriple.getSubject());
 			} else {
-				final Set<Node> newGlobalSet = new HashSet<Node>();
+				final Set<Node> newGlobalSet = new HashSet<>();
+				l2gMap.put( workingTriple.getObject(), newGlobalSet );
 				newGlobalSet.add(workingTriple.getSubject());
 			}
 		}
