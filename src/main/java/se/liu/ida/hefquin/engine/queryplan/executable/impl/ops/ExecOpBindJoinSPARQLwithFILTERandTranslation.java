@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.utils.RewritingIteratorForSolMapsG2L;
@@ -14,16 +16,17 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoinSPARQLwithFILTER{
 	
 	public ExecOpBindJoinSPARQLwithFILTERandTranslation( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 
 		assert fm.getVocabularyMapping() != null;
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
 		final VocabularyMapping vm = fm.getVocabularyMapping();
 		final Iterable<SolutionMapping> translatedSMs = RewritingIteratorForSolMapsG2L.createAsIterable(solMaps, vm);
-		return super.createExecutableRequestOperator(translatedSMs);
+		return super.createExecutableRequestOperator(translatedSMs, unjoinableInputSMs);
 	}
 
 	@Override
@@ -32,7 +35,7 @@ public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoin
 	                         final ExecutionContext execCxt)
 			throws ExecOpExecutionException
 	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings() );
+		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings(), null );
 		if ( reqOp != null ) {
 			final IntermediateResultElementSink mySink = new MyIntermediateResultElementSinkWithTranslation(sink, input, fm.getVocabularyMapping());
 			try {

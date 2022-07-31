@@ -32,24 +32,31 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 {
 	protected final Set<Var> varsInSubQuery;
 
-	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
-	public ExecOpBindJoinSPARQLwithFILTER( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final BGP query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
-	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
-		final Op op = createFilter(solMaps, query, varsInSubQuery);
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		final Op op = createFilter(solMaps, query, varsInSubQuery, unjoinableInputSMs);
 		if ( op == null ) {
 			return null;
 		}
@@ -61,12 +68,6 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 
 
 	// ---- helper functions ---------
-
-	public static Op createFilter( final Iterable<SolutionMapping> solMaps,
-	                               final SPARQLGraphPattern pattern,
-	                               final Set<Var> varsInPattern ) {
-		return createFilter(solMaps, pattern, varsInPattern, null);
-	}
 
 	public static Op createFilter( final Iterable<SolutionMapping> solMaps,
 	                               final SPARQLGraphPattern pattern,

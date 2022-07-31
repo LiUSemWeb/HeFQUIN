@@ -11,6 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 {
+	protected static final boolean useOuterJoinSemantics = false;
+
     public PhysicalOpBindJoin( final LogicalOpTPAdd lop ) {
         super(lop);
     }
@@ -33,7 +35,7 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
             final FederationMember fm = tpAdd.getFederationMember();
 
             if ( fm instanceof BRTPFServer )
-                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm );
+                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
                 //else if ( fm instanceof SPARQLEndpoint)
                 //	return new ExecOpBindJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm );
             else

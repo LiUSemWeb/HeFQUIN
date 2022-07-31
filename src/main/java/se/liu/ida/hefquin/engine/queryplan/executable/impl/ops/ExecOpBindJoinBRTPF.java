@@ -19,31 +19,28 @@ public class ExecOpBindJoinBRTPF extends ExecOpGenericBindJoinWithRequestOps<Tri
 {
     protected final Set<Var> varsInTP;
 
-    public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm ) {
-        super(tp, fm);
+    public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm, final boolean useOuterJoinSemantics ) {
+        super(tp, fm, useOuterJoinSemantics);
 
         varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
 
-	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
-		final Set<SolutionMapping> restrictedSolMaps = restrictSolMaps(inputSolMaps, varsInTP);
 
-		if ( restrictedSolMaps.isEmpty() ) {
+	@Override
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP, unjoinableInputSMs);
+
+		if ( restrictedSMs.isEmpty() ) {
 			return null;
 		}
 
-		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSolMaps );
+		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSMs );
 		return new ExecOpRequestBRTPF(req, fm);
 	}
 
 
 	// ---- helper functions ---------
-
-	public static Set<SolutionMapping> restrictSolMaps( final Iterable<SolutionMapping> inputSolMaps,
-	                                                    final Set<Var> joinVars ) {
-		return restrictSolMaps(inputSolMaps, joinVars, null);
-	}
 
 	public static Set<SolutionMapping> restrictSolMaps( final Iterable<SolutionMapping> inputSolMaps,
 	                                                    final Set<Var> joinVars,

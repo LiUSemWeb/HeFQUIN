@@ -30,22 +30,27 @@ public class ExecOpBindJoinSPARQLwithVALUES extends ExecOpGenericBindJoinWithReq
 	protected final List<Var> varsInSubQuery;
 	
 	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithVALUES( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		if ( unjoinableInputSMs != null ) {
+			throw new UnsupportedOperationException();
+		}
+
 		final Set<Binding> bindings = new HashSet<>();
 		for ( final SolutionMapping s : solMaps ) {
 			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );

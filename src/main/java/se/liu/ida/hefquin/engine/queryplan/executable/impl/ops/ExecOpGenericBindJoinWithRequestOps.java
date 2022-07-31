@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -30,8 +33,13 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
                                                           MemberType extends FederationMember>
            extends ExecOpGenericBindJoinBase<QueryType,MemberType>
 {
-	public ExecOpGenericBindJoinWithRequestOps( final QueryType query, final MemberType fm ) {
+	protected final boolean useOuterJoinSemantics;
+
+	public ExecOpGenericBindJoinWithRequestOps( final QueryType query,
+	                                            final MemberType fm,
+	                                            final boolean useOuterJoinSemantics ) {
 		super(query, fm);
+		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
 	@Override
@@ -40,19 +48,40 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 	                         final ExecutionContext execCxt)
 			throws ExecOpExecutionException
 	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings() );
+		final List<SolutionMapping> unjoinableInputSMs;
+		if ( useOuterJoinSemantics )
+			unjoinableInputSMs = new ArrayList<>();
+		else
+			unjoinableInputSMs = null;
+
+		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings(), unjoinableInputSMs );
+
+		if ( useOuterJoinSemantics ) {
+			for ( final SolutionMapping sm : unjoinableInputSMs ) {
+				sink.send(sm);
+			}
+		}
+
 		if ( reqOp != null ) {
-			final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, input);
+			final MyIntermediateResultElementSink mySink;
+			if ( useOuterJoinSemantics )
+				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, input);
+			else
+				mySink = new MyIntermediateResultElementSink(sink, input);
+
 			try {
 				reqOp.execute(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
 			}
+
+			mySink.flush();
 		}
 	}
 
-	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
+	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps,
+	                                                                        List<SolutionMapping> unjoinableInputSMs );
 
 
 	// ------- helper classes ------
@@ -80,8 +109,51 @@ public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Quer
 				}
 			}
 		}
-    } // end of helper class MyIntermediateResultElementSink
-	
+
+		public void flush() { }
+
+	} // end of helper class MyIntermediateResultElementSink
+
+
+	protected static class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
+	{
+		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
+
+		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
+		                                                 final IntermediateResultBlock input ) {
+			super(outputSink, input);
+		}
+
+		@Override
+		public void send( final SolutionMapping smFromRequest ) {
+			// TODO: this implementation is very inefficient
+			// We need an implementation of IntermediateResultBlock that can
+			// be used like an index.
+			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
+					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+					inputSolutionMappingsWithJoinPartners.add(smFromInput);
+				}
+			}
+		}
+
+		/**
+		 * Sends to the output sink all input solution
+		 * mappings that did not have a join partner.
+		 */
+		@Override
+		public void flush() {
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				if ( ! inputSolutionMappingsWithJoinPartners.contains(smFromInput) ) {
+					outputSink.send(smFromInput);
+				}
+			}
+		}
+
+	} // end of helper class MyIntermediateResultElementSinkOuterJoin
+
+
 	protected static class MyIntermediateResultElementSinkWithTranslation implements IntermediateResultElementSink
 	{
 		protected final IntermediateResultElementSink outputSink;

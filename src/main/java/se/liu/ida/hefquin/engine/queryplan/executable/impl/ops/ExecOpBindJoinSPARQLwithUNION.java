@@ -31,22 +31,27 @@ public class ExecOpBindJoinSPARQLwithUNION extends ExecOpGenericBindJoinWithRequ
 	protected final List<Var> varsInSubQuery;
 
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+		super(query, fm, false);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		if ( unjoinableInputSMs != null ) {
+			throw new UnsupportedOperationException();
+		}
+
 		final Op op = createUnion(solMaps);
 		if ( op == null ) {
 			return null;
