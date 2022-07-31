@@ -44,7 +44,8 @@ public class EntityMappingImpl implements EntityMapping
 				locals.add(workingTriple.getObject());
 			} else {
 				// g2lmap doesn't contain any local URI for this global yet
-				final Set<Node> localSet = new HashSet<Node>();
+				final Set<Node> localSet = new HashSet<>();
+				g2lMap.put( workingTriple.getSubject(), localSet );
 				localSet.add(workingTriple.getObject());
 			}
 			
