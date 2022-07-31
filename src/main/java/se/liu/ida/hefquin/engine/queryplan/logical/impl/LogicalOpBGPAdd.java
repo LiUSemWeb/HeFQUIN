@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 public class LogicalOpBGPAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
-
 	protected final BGP bgp;
 
 	public LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
@@ -20,29 +19,29 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		this.bgp = bgp;
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpBGPAdd) )
-			return false;
-
-		final LogicalOpBGPAdd oo = (LogicalOpBGPAdd) o;
-		if ( oo == this )
-			return true;
-		else
-			return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
-	}
-
-	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ bgp.hashCode();
-	}
-
 	public FederationMember getFederationMember() {
 		return fm;
 	} 
 
 	public BGP getBGP() {
 		return bgp;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this )
+			return true;
+
+		if ( ! (o instanceof LogicalOpBGPAdd) )
+			return false;
+
+		final LogicalOpBGPAdd oo = (LogicalOpBGPAdd) o;
+		return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
+	}
+
+	@Override
+	public int hashCode(){
+		return fm.hashCode() ^ bgp.hashCode();
 	}
 
 	@Override

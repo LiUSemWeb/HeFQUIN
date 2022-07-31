@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 public class LogicalOpTPAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
-
 	protected final TriplePattern tp;
 
 	public LogicalOpTPAdd( final FederationMember fm, final TriplePattern tp ) {
@@ -20,29 +19,29 @@ public class LogicalOpTPAdd implements UnaryLogicalOp
 		this.tp = tp;
 	}
 
-	@Override
-	public boolean equals( final Object o ) {
-		if ( ! (o instanceof LogicalOpTPAdd) )
-			return false;
-
-		final LogicalOpTPAdd oo = (LogicalOpTPAdd) o;
-		if ( oo == this )
-			return true;
-		else
-			return oo.fm.equals(fm) && oo.tp.equals(tp); 
-	}
-
-	@Override
-	public int hashCode(){
-		return fm.hashCode() ^ tp.hashCode();
-	}
-
 	public FederationMember getFederationMember() {
 		return fm;
 	}
 
 	public TriplePattern getTP() {
 		return tp;
+	}
+
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this )
+			return true;
+
+		if ( ! (o instanceof LogicalOpTPAdd) )
+			return false;
+
+		final LogicalOpTPAdd oo = (LogicalOpTPAdd) o;
+		return oo.fm.equals(fm) && oo.tp.equals(tp); 
+	}
+
+	@Override
+	public int hashCode(){
+		return fm.hashCode() ^ tp.hashCode();
 	}
 
 	@Override
