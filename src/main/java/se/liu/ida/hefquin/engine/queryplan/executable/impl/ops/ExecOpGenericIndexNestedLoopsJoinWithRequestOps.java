@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
@@ -45,14 +46,34 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 	protected void _process(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) throws ExecOpExecutionException
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		@SuppressWarnings("unchecked")
-		final CompletableFuture<Void>[] futures = new CompletableFuture[input.size()];
+		final CompletableFuture<?>[] futures = initiateProcessing(input, sink, execCxt);
+
+		// wait for all the futures to be completed
+		if ( futures.length > 0 ) {
+			try {
+				CompletableFuture.allOf(futures).get();
+			}
+			catch ( final InterruptedException e ) {
+				throw new ExecOpExecutionException("interruption of the futures that run the executable operators", e, this);
+			}
+			catch ( final ExecutionException e ) {
+				throw new ExecOpExecutionException("The execution of the futures that run the executable operators caused an exception.", e, this);
+			}
+		}
+	}
+
+	protected CompletableFuture<?>[] initiateProcessing(
+			final IntermediateResultBlock input,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		final CompletableFuture<?>[] futures = new CompletableFuture[input.size()];
 
 		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			final CompletableFuture<Void> f = initiateProcessing(sm, sink, execCxt);
+			final CompletableFuture<?> f = initiateProcessing(sm, sink, execCxt);
 			if ( f == null ) {
 				// this may happen if the current solution mapping contains
 				// a blank node for any of the variables that is used when
@@ -61,54 +82,61 @@ public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
 			}
 
 			futures[i] = f;
-			++i;
+			i++;
 		}
 
-		final CompletableFuture<Void>[] futures2;
 		if ( i < futures.length ) {
 			// This case may occur if we have skipped any of the
 			// iteration steps of the previous loop because any
-			// of the requests created in the loop was null.
-			futures2 = Arrays.copyOf(futures, i);
+			// of the futures obtained in that loop was null.
+			return Arrays.copyOf(futures, i);
 		}
 		else {
-			futures2 = futures;
-		}
-
-		// wait for all the futures to be completed
-		try {
-			CompletableFuture.allOf(futures2).get();
-		}
-		catch ( final InterruptedException e ) {
-			throw new ExecOpExecutionException("interruption of the futures that run the executable operators", e, this);
-		}
-		catch ( final ExecutionException e ) {
-			throw new ExecOpExecutionException("The execution of the futures that run the executable operators.", e, this);
+			return futures;
 		}
 	}
 
-	protected CompletableFuture<Void> initiateProcessing(
+	protected CompletableFuture<?> initiateProcessing(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
 		if ( reqOp == null ) {
+			// this may happen if the given solution mapping
+			// contains a blank node for any of the variables
+			// that is used when creating the request
 			return null;
 		}
 
-		final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(sink, sm);
-		return CompletableFuture.runAsync( () -> {
-			try {
-				reqOp.execute(mySink, execCxt);
-			}
-			catch ( final ExecOpExecutionException e ) {
-				throw new RuntimeException("Executing a request operator used by this index nested loops join caused an exception.", e);
-			}
-		});
+		final Runnable processor = createProcessor(reqOp, sm, sink, execCxt);
+		final ExecutorService execService = execCxt.getExecutorServiceForPlanTasks();
+		if ( execService != null )
+			return CompletableFuture.runAsync(processor, execService);
+		else
+			return CompletableFuture.runAsync(processor);
 	}
 
 	protected abstract NullaryExecutableOp createExecutableRequestOperator( SolutionMapping sm );
+
+	protected Runnable createProcessor( final NullaryExecutableOp reqOp,
+	                                    final SolutionMapping smFromInput,
+	                                    final IntermediateResultElementSink outputSink,
+	                                    final ExecutionContext execCxt ) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				final IntermediateResultElementSink mySink = new MyIntermediateResultElementSink(outputSink, smFromInput);
+
+				try {
+					reqOp.execute(mySink, execCxt);
+				}
+				catch ( final ExecOpExecutionException e ) {
+					throw new RuntimeException("Executing a request operator used by this index nested loops join caused an exception.", e);
+				}				
+			}
+		};
+	}
 
 
 	// ------- helper classes ------
