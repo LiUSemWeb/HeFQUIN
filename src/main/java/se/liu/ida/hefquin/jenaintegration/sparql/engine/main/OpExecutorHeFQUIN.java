@@ -132,6 +132,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	}
 
 	@Override
+	protected QueryIterator execute( final OpConditional opConditional, final QueryIterator input ) {
+		if ( isSupportedOp(opConditional) ) {
+			return executeSupportedOp( opConditional, input );
+		}
+		else {
+			return super.execute(opConditional, input);
+		}
+	}
+
+	@Override
 	protected QueryIterator execute( final OpFilter opFilter, final QueryIterator input ) {
 		if ( isSupportedOp(opFilter) ) {
 			return executeSupportedOp( opFilter, input );
@@ -143,7 +153,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpService opService, final QueryIterator input ) {
-		return executeSupportedOp( opService, input );
+		if ( isSupportedOp(opService) ) {
+			return executeSupportedOp( opService, input );
+		}
+		else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 
@@ -250,7 +265,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
 
-	    @Override public void visit(OpConditional opCond)         { unsupportedOpFound = true; }
+	    @Override public void visit(OpConditional opCond)         {} // supported
 
 	    @Override public void visit(OpMinus opMinus)              { unsupportedOpFound = true; }
 
