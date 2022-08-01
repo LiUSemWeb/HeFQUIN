@@ -10,7 +10,9 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
 public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpForLogicalOp
@@ -52,8 +54,16 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
 			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
 		}
+		else if ( lop instanceof LogicalOpTPOptAdd ) {
+			final LogicalOpTPOptAdd tpAdd = (LogicalOpTPOptAdd) lop;
+			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
+		}
 		else if ( lop instanceof LogicalOpBGPAdd ) {
 			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
+			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
+		}
+		else if ( lop instanceof LogicalOpBGPOptAdd ) {
+			final LogicalOpBGPOptAdd bgpAdd = (LogicalOpBGPOptAdd) lop;
 			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
 		}
 		else
