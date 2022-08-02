@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
  * This implementation handles pagination of the TPF; that is, it requests all
  * the pages, one after another.
  */
-public class ExecOpRequestTPFatTPFServerWithTranslation extends ExecOpGenericTriplePatternRequestWithTranslation<TPFServer>
+public class ExecOpRequestTPFatTPFServerWithTranslation extends BaseForExecOpTriplePatternRequestWithTranslation<TPFServer>
 {
 	public ExecOpRequestTPFatTPFServerWithTranslation( final TriplePatternRequest req, final TPFServer fm ) {
 		super( req, fm );

@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 
-public class ExecOpRequestBRTPF extends ExecOpGenericRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
+public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {
 	public ExecOpRequestBRTPF( final BindingsRestrictedTriplePatternRequest req,
 	                           final BRTPFServer fm ) {

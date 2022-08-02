@@ -14,10 +14,10 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
  * Base class for implementations of request operators with triple
  * pattern requests that are broken into TPF requests to handle paging.
  */
-public abstract class ExecOpGenericTriplePatternRequestWithTPF<MemberType extends FederationMember>
-       extends ExecOpGenericRequestWithTPFPaging<TriplePatternRequest,MemberType,TPFRequest>
+public abstract class BaseForExecOpTriplePatternRequestWithTPF<MemberType extends FederationMember>
+       extends BaseForExecOpRequestWithTPFPaging<TriplePatternRequest,MemberType,TPFRequest>
 {
-	public ExecOpGenericTriplePatternRequestWithTPF( final TriplePatternRequest req, final MemberType fm ) {
+	public BaseForExecOpTriplePatternRequestWithTPF( final TriplePatternRequest req, final MemberType fm ) {
 		super( req, fm );
 	}
 

@@ -29,13 +29,13 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * which may be the case if the block size is greater than what the
  * server can/wants to handle.
  */
-public abstract class ExecOpGenericBindJoinWithRequestOps<QueryType extends Query,
+public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
                                                           MemberType extends FederationMember>
-           extends ExecOpGenericBindJoinBase<QueryType,MemberType>
+           extends BaseForExecOpBindJoin<QueryType,MemberType>
 {
 	protected final boolean useOuterJoinSemantics;
 
-	public ExecOpGenericBindJoinWithRequestOps( final QueryType query,
+	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
 	                                            final boolean useOuterJoinSemantics ) {
 		super(query, fm);

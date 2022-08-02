@@ -7,12 +7,12 @@ import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 
-public abstract class ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<QueryType extends Query,
+public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<QueryType extends Query,
                                                                            MemberType extends FederationMember,
                                                                            ReqType extends DataRetrievalRequest>
-     extends ExecOpGenericIndexNestedLoopsJoinWithRequests<QueryType,MemberType,ReqType,SolMapsResponse>
+     extends BaseForExecOpIndexNestedLoopsJoinWithRequests<QueryType,MemberType,ReqType,SolMapsResponse>
 {
-	public ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query, final MemberType fm ) {
+	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query, final MemberType fm ) {
 		super( query, fm );
 	}
 

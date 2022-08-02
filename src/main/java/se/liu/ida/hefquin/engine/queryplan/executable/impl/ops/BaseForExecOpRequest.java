@@ -7,13 +7,13 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 /**
  * Base class for implementations of request operators.
  */
-public abstract class ExecOpGenericRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
+public abstract class BaseForExecOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends NullaryExecutableOpBase
 {
 	protected final ReqType req;
 	protected final MemberType fm;
 
-	public ExecOpGenericRequest( final ReqType req, final MemberType fm ) {
+	public BaseForExecOpRequest( final ReqType req, final MemberType fm ) {
 		assert req != null;
 		assert fm != null;
 

@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
 
-public class ExecOpIndexNestedLoopsJoinSPARQL extends ExecOpGenericIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
+public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
 	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
 	                                         final SPARQLEndpoint fm,

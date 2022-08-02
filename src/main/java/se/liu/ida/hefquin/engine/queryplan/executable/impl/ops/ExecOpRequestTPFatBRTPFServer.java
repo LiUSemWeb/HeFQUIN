@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
  * This implementation handles pagination of the TPF; that is, it requests all
  * the pages, one after another.
  */
-public class ExecOpRequestTPFatBRTPFServer extends ExecOpGenericTriplePatternRequestWithTPF<BRTPFServer>
+public class ExecOpRequestTPFatBRTPFServer extends BaseForExecOpTriplePatternRequestWithTPF<BRTPFServer>
 {
 	public ExecOpRequestTPFatBRTPFServer( final TriplePatternRequest req, final BRTPFServer fm ) {
 		super( req, fm );

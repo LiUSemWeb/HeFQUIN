@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSinkWithTranslation;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpRequestBRTPFWithTranslation extends ExecOpGenericRequest<BindingsRestrictedTriplePatternRequest,BRTPFServer>
+public class ExecOpRequestBRTPFWithTranslation extends BaseForExecOpRequest<BindingsRestrictedTriplePatternRequest,BRTPFServer>
 {
 	public ExecOpRequestBRTPFWithTranslation( final BindingsRestrictedTriplePatternRequest req,
 	                           final BRTPFServer fm ) {
