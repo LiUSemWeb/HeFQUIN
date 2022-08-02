@@ -192,7 +192,10 @@ public class LogicalOpUtils {
             throw new IllegalArgumentException( "unsupported type of logical operator: " + lop.getClass().getName() );
         }
 
-        final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) lop;
+        return createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?, ?>) lop );
+    }
+
+    public static UnaryLogicalOp createLogicalAddOpFromLogicalReqOp( final LogicalOpRequest<?, ?> reqOp ) {
         final DataRetrievalRequest req = reqOp.getRequest();
         final FederationMember fm = reqOp.getFederationMember();
 
