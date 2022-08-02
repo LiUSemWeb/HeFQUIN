@@ -7,8 +7,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 public class ExecOpIndexNestedLoopsJoinTPF extends ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<TPFServer>
 {
-	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query, final TPFServer fm ) {
-		super( query, fm );
+	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
+	                                      final TPFServer fm,
+	                                      final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 	}
 
 	@Override

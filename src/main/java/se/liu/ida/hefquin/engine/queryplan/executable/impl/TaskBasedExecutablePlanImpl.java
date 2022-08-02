@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -13,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
+import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 {
@@ -126,4 +128,13 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 		return null;
 	}
 
+	public void print( final PrintStream str ) {
+		int j = 0;
+		for ( final ExecPlanTask t : tasks ) {
+			str.println( "Task #" + j );
+			StatsPrinter.print( t.getStats(), str, true );
+
+			j++;
+		}
+	}
 }

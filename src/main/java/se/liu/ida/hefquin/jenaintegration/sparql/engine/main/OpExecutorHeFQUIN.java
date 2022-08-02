@@ -20,6 +20,8 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
@@ -34,8 +36,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
@@ -132,6 +132,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	}
 
 	@Override
+	protected QueryIterator execute( final OpConditional opConditional, final QueryIterator input ) {
+		if ( isSupportedOp(opConditional) ) {
+			return executeSupportedOp( opConditional, input );
+		}
+		else {
+			return super.execute(opConditional, input);
+		}
+	}
+
+	@Override
 	protected QueryIterator execute( final OpFilter opFilter, final QueryIterator input ) {
 		if ( isSupportedOp(opFilter) ) {
 			return executeSupportedOp( opFilter, input );
@@ -143,7 +153,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	@Override
 	protected QueryIterator execute( final OpService opService, final QueryIterator input ) {
-		return executeSupportedOp( opService, input );
+		if ( isSupportedOp(opService) ) {
+			return executeSupportedOp( opService, input );
+		}
+		else {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 
@@ -250,7 +265,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
 
-	    @Override public void visit(OpConditional opCond)         { unsupportedOpFound = true; }
+	    @Override public void visit(OpConditional opCond)         {} // supported
 
 	    @Override public void visit(OpMinus opMinus)              { unsupportedOpFound = true; }
 

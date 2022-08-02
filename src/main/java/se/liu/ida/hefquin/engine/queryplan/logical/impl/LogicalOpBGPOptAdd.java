@@ -5,12 +5,12 @@ import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBGPAdd implements UnaryLogicalOp
+public class LogicalOpBGPOptAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final BGP bgp;
 
-	public LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
+	public LogicalOpBGPOptAdd( final FederationMember fm, final BGP bgp ) {
 		assert fm != null;
 		assert bgp != null;
 		assert fm.getInterface().supportsBGPRequests();
@@ -32,10 +32,10 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		if ( o == this )
 			return true;
 
-		if ( ! (o instanceof LogicalOpBGPAdd) )
+		if ( ! (o instanceof LogicalOpBGPOptAdd) )
 			return false;
 
-		final LogicalOpBGPAdd oo = (LogicalOpBGPAdd) o;
+		final LogicalOpBGPOptAdd oo = (LogicalOpBGPOptAdd) o;
 		return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
 	}
 
@@ -54,7 +54,7 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		final int codeOfBGP = bgp.toString().hashCode();
 		final int codeOfFm = fm.getInterface().toString().hashCode();
 
-		return "> bgpAdd" +
+		return "> bgpOptAdd" +
 				"[" + codeOfBGP + ", "+ codeOfFm + "]"+
 				" ( "
 				+ bgp.toString()

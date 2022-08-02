@@ -40,13 +40,13 @@ public class RuleChangeOrderAndMergeJoinOfBGPReqIntoBGPAdd extends AbstractRewri
                 final PhysicalOperator subPlanOp2 = subPlan2.getRootOperator();
 
                 if ( IdentifyLogicalOp.isJoin(subPlanOp1) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp2) ) {
-                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp2);
+                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(subPlanOp2);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan1.getSubPlan(1));
 
                     return PhysicalPlanFactory.createPlan( rootOp, subPlan1.getSubPlan(0), newSubPlan);
                 }
                 else if ( IdentifyLogicalOp.isJoin(subPlanOp2) && IdentifyTypeOfRequestUsedForReq.isBGPRequest(subPlanOp1) ) {
-                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createUnaryLopFromReq(subPlanOp1);
+                    final UnaryLogicalOp bgpAdd = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(subPlanOp1);
                     final PhysicalPlan newSubPlan = PhysicalPlanFactory.createPlan( bgpAdd, subPlan2.getSubPlan(0) );
 
                     return PhysicalPlanFactory.createPlan( rootOp, newSubPlan, subPlan2.getSubPlan(1));

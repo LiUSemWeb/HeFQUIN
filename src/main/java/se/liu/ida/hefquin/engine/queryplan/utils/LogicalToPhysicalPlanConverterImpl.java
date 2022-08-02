@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
+package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -138,21 +137,23 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 //		For join operators, use tpAdd and bgpAdd when possible; otherwise, binary joins are used by default.
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
+			final PhysicalPlan nextChild = children.get(i);
+			final PhysicalOperator rootOpOfNextChild = nextChild.getRootOperator();
+			if( rootOpOfNextChild instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
+						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(rootOpOfNextChild),
 						currentSubPlan );
 			}
 			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
-						children.get(i) );
+						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(currentSubPlan.getRootOperator()),
+						nextChild );
 			}
 			else {
 				currentSubPlan = createPhysicalPlanWithBinaryRoot(
 					LogicalOpJoin.getInstance(),
 					currentSubPlan,
-					children.get(i) );
+					nextChild );
 			}
 		}
 
@@ -179,25 +180,24 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 //		For join operators, use tpOptAdd and bgpOptAdd when possible; otherwise, binary joins are used by default.
 
 		// The first child of the multiway left join is the non-optional part
-		// and, thus, is used as the right input to the first right outer join.
+		// and, thus, is used as the right input to the first right outer join
+		// (second case below) or as the input to the tpOptAdd/bgpOptAdd (first
+		// case below).
 		PhysicalPlan currentSubPlan = children.get(0);
 		for ( int i = 1; i < children.size(); ++i ) {
-//			if( children.get(i).getRootOperator() instanceof PhysicalOpRequest ){
-//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-//						LogicalOpUtils.createUnaryLopFromReq(children.get(i).getRootOperator()),
-//						currentSubPlan );
-//			}
-//			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
-//				currentSubPlan = createPhysicalPlanWithUnaryRoot(
-//						LogicalOpUtils.createUnaryLopFromReq(currentSubPlan.getRootOperator()),
-//						children.get(i) );
-//			}
-//			else {
+			final PhysicalPlan nextChild = children.get(i);
+			final PhysicalOperator rootOpOfNextChild = nextChild.getRootOperator();
+			if( rootOpOfNextChild instanceof PhysicalOpRequest ){
+				currentSubPlan = createPhysicalPlanWithUnaryRoot(
+						LogicalOpUtils.createLogicalOptAddOpFromPhysicalReqOp(rootOpOfNextChild),
+						currentSubPlan );
+			}
+			else {
 				currentSubPlan = createPhysicalPlanWithBinaryRoot(
 					LogicalOpRightJoin.getInstance(),
-					children.get(i),
+					nextChild,
 					currentSubPlan );
-//			}
+			}
 		}
 
 		return currentSubPlan;

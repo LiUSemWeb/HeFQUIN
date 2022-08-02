@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -31,24 +32,31 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 {
 	protected final Set<Var> varsInSubQuery;
 
-	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
-	public ExecOpBindJoinSPARQLwithFILTER( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final BGP query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
-	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm);
+	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
-		final Op op = createFilter(solMaps);
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		final Op op = createFilter(solMaps, query, varsInSubQuery, unjoinableInputSMs);
 		if ( op == null ) {
 			return null;
 		}
@@ -58,16 +66,28 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		return new ExecOpRequestSPARQL(request, fm);
 	}
 
-	protected Op createFilter( final Iterable<SolutionMapping> solMaps ) {
-		if ( varsInSubQuery.isEmpty() ) {
-			return representQueryPatternAsJenaOp(query);
+
+	// ---- helper functions ---------
+
+	public static Op createFilter( final Iterable<SolutionMapping> solMaps,
+	                               final SPARQLGraphPattern pattern,
+	                               final Set<Var> varsInPattern,
+	                               final List<SolutionMapping> unjoinableInputSMs ) {
+		if ( varsInPattern.isEmpty() ) {
+			return QueryPatternUtils.convertToJenaOp(pattern);
 		}
+
 		Expr disjunction = null;
 		boolean solMapsContainBlankNodes = false;
-		for (final SolutionMapping s : solMaps) {
-			final Binding b = SolutionMappingUtils.restrict(s.asJenaBinding(), varsInSubQuery);
+		for ( final SolutionMapping s : solMaps ) {
+			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInPattern );
+
 			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
 				solMapsContainBlankNodes = true;
+				if ( unjoinableInputSMs != null ) {
+					unjoinableInputSMs.add(s);
+				}
+
 				continue;
 			}
 
@@ -93,10 +113,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends ExecOpGenericBindJoinWithReq
 		}
 
 		if ( disjunction == null ) {
-			return solMapsContainBlankNodes ? null : representQueryPatternAsJenaOp(query);
+			return solMapsContainBlankNodes ? null : QueryPatternUtils.convertToJenaOp(pattern);
 		}
 
-		return OpFilter.filter(disjunction, representQueryPatternAsJenaOp(query));
+		return OpFilter.filter( disjunction, QueryPatternUtils.convertToJenaOp(pattern) );
 	}
 
 }

@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -18,36 +19,44 @@ public class ExecOpBindJoinBRTPF extends ExecOpGenericBindJoinWithRequestOps<Tri
 {
     protected final Set<Var> varsInTP;
 
-    public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm ) {
-        super(tp, fm);
+    public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm, final boolean useOuterJoinSemantics ) {
+        super(tp, fm, useOuterJoinSemantics);
 
         varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
 
+
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
-		final BindingsRestrictedTriplePatternRequest req = createRequest(inputSolMaps);
-		if ( req == null ) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps,
+	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
+		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP, unjoinableInputSMs);
+
+		if ( restrictedSMs.isEmpty() ) {
 			return null;
 		}
 
+		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSMs );
 		return new ExecOpRequestBRTPF(req, fm);
 	}
 
-	protected BindingsRestrictedTriplePatternRequest createRequest( final Iterable<SolutionMapping> inputSolMaps ) {
+
+	// ---- helper functions ---------
+
+	public static Set<SolutionMapping> restrictSolMaps( final Iterable<SolutionMapping> inputSolMaps,
+	                                                    final Set<Var> joinVars,
+	                                                    final List<SolutionMapping> unjoinableInputSMs ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
 		for ( final SolutionMapping sm : inputSolMaps ) {
-			final SolutionMapping sm2 = SolutionMappingUtils.restrict(sm, varsInTP);
+			final SolutionMapping sm2 = SolutionMappingUtils.restrict(sm, joinVars);
 			if ( ! SolutionMappingUtils.containsBlankNodes(sm2) ) {
 				restrictedSolMaps.add(sm2);
 			}
+			else if ( unjoinableInputSMs != null ){
+				unjoinableInputSMs.add(sm);
+			}
 		}
 
-		if ( restrictedSolMaps.isEmpty() ) {
-			return null;
-		}
-
-		return new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSolMaps );
+		return restrictedSolMaps;
 	}
 
 }

@@ -73,7 +73,6 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 					// notify the potentially waiting consuming thread of it
 					availableResultBlocks.add( blockBuilder.finishCurrentBlock() );
 					setStatus(Status.COMPLETED_NOT_CONSUMED);
-					availableResultBlocks.notify();
 				}
 				else {
 					// no more output solution mappings; set the completion
@@ -84,6 +83,7 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 					else
 						setStatus(Status.COMPLETED_NOT_CONSUMED);
 				}
+				availableResultBlocks.notify();
 			}
 		}
 	}

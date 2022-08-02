@@ -41,7 +41,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
  */
 public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMember> extends ExecOpTestBase
 {
-	protected void _tpWithJoinOnObject() throws ExecutionException {
+	protected void _tpWithJoinOnObject( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -83,7 +83,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -133,7 +133,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	}
 
-	protected void _tpWithJoinOnSubjectAndObject() throws ExecutionException {
+	protected void _tpWithJoinOnSubjectAndObject( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -172,7 +172,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -209,7 +209,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue(b2Found);
 	}
 
-	protected void _tpWithoutJoinVariable() throws ExecutionException {
+	protected void _tpWithoutJoinVariable( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -244,7 +244,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
 		assertTrue( it.hasNext() );
 		final Binding b1 = it.next().asJenaBinding();
@@ -265,7 +265,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _tpWithEmptyInput() throws ExecutionException {
+	protected void _tpWithEmptyInput( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
 
@@ -290,12 +290,12 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
 		assertFalse( it.hasNext() );
 	}
 
-	protected void _tpWithEmptySolutionMappingAsInput() throws ExecutionException {
+	protected void _tpWithEmptySolutionMappingAsInput( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -323,7 +323,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
 		// checking
 		final Set<Binding> result = new HashSet<>();
@@ -357,7 +357,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue(b2Found);
 	}
 
-	protected void _tpWithEmptyResponses() throws ExecutionException {
+	protected void _tpWithEmptyResponses( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -384,12 +384,45 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			public Set<Var> getPossibleVariables() {
 				return new HashSet<>();
 			}
-		});
+		}, useOuterJoinSemantics);
 
-		assertFalse( it.hasNext() );
+		// checking
+		if ( useOuterJoinSemantics ) {
+			final Set<Binding> result = new HashSet<>();
+
+			assertTrue( it.hasNext() );
+			result.add( it.next().asJenaBinding() );
+
+			assertTrue( it.hasNext() );
+			result.add( it.next().asJenaBinding() );
+
+			assertFalse( it.hasNext() );
+
+			boolean b1Found = false;
+			boolean b2Found = false;
+			for ( final Binding b : result ) {
+				assertEquals( 1, b.size() );
+
+				if ( b.get(var1).getURI().equals("http://example.org/x1") ) {
+					b1Found = true;
+				}
+				else if ( b.get(var1).getURI().equals("http://example.org/x2") ) {
+					b2Found = true;
+				}
+				else {
+					fail( "Unexpected URI for ?v1: " + b.get(var1).getURI() );
+				}
+			}
+
+			assertTrue(b1Found);
+			assertTrue(b2Found);
+		}
+		else {  // useOuterJoinSemantics == false
+			assertFalse( it.hasNext() );
+		}
 	}
 	
-	protected void _tpWithSpuriousDuplicates() {
+	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
@@ -424,7 +457,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 					set.add(var2);
 					return set;
 				}
-			});
+			}, useOuterJoinSemantics);
 		});
 	}
 
@@ -434,7 +467,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final IntermediateResultBlock input,
 			final Graph dataForMember,
 			final TriplePattern tp,
-			final ExpectedVariables expectedVariables) throws ExecutionException
+			final ExpectedVariables expectedVariables,
+			final boolean useOuterJoinSemantics ) throws ExecutionException
 	{
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final ExecutionContext execCxt = new ExecutionContext() {
@@ -448,7 +482,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 		final MemberType fm = createFedMemberForTest(dataForMember);
 
-		final UnaryExecutableOp op = createExecOpForTest(tp, fm, expectedVariables);
+		final UnaryExecutableOp op = createExecOpForTest(tp, fm, expectedVariables, useOuterJoinSemantics);
 		op.process(input, sink, execCxt);
 		op.concludeExecution(sink, execCxt);
 
@@ -457,5 +491,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	protected abstract MemberType createFedMemberForTest( Graph dataForMember );
 
-	protected abstract UnaryExecutableOp createExecOpForTest(TriplePattern tp, MemberType fm, ExpectedVariables expectedVariables);
+	protected abstract UnaryExecutableOp createExecOpForTest( TriplePattern tp,
+	                                                          MemberType fm,
+	                                                          ExpectedVariables expectedVariables,
+	                                                          boolean useOuterJoinSemantics );
 }

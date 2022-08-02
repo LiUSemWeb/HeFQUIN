@@ -7,12 +7,10 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 
 /**
- * An implementation of {@link IntermediateResultElementSink}
+ * A (thread-safe) implementation of {@link IntermediateResultElementSink}
  * that collects all solution mappings that are sent to it. The
  * collected solution mappings can then be accessed by calling
  * {@link #getCollectedSolutionMappings()}.
- *
- * Attention, this implementation is not thread safe.
  */
 public class CollectingIntermediateResultElementSink
                              implements IntermediateResultElementSink
@@ -21,7 +19,9 @@ public class CollectingIntermediateResultElementSink
 
 	@Override
 	public void send( final SolutionMapping element ) {
-		l.add(element);
+		synchronized (l) {
+			l.add(element);
+		}
 	}
 
 	/**
@@ -31,7 +31,9 @@ public class CollectingIntermediateResultElementSink
 	 * far, since it was created.
 	 */
 	public Iterable<SolutionMapping> getCollectedSolutionMappings() {
-		return l;
+		synchronized (l) {
+			return new ArrayList<>(l);
+		}
 	}
 
 	/**
@@ -39,6 +41,8 @@ public class CollectingIntermediateResultElementSink
 	 * so far been collected in this sink.
 	 */
 	public void clear() {
-		l.clear();
+		synchronized (l) {
+			l.clear();
+		}
 	}
 }

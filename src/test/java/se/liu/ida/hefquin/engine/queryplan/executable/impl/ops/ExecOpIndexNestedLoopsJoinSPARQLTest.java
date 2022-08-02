@@ -13,32 +13,32 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 {
 	@Test
 	public void tpWithJoinOnObject() throws ExecutionException {
-		_tpWithJoinOnObject();
+		_tpWithJoinOnObject(false);
 	}
 
 	@Test
 	public void tpWithJoinOnSubjectAndObject() throws ExecutionException {
-		_tpWithJoinOnSubjectAndObject();
+		_tpWithJoinOnSubjectAndObject(false);
 	}
 
 	@Test
 	public void tpWithoutJoinVariable() throws ExecutionException {
-		_tpWithoutJoinVariable();
+		_tpWithoutJoinVariable(false);
 	}
 
 	@Test
 	public void tpWithEmptyInput() throws ExecutionException {
-		_tpWithEmptyInput();
+		_tpWithEmptyInput(false);
 	}
 
 	@Test
 	public void tpWithEmptySolutionMappingAsInput() throws ExecutionException {
-		_tpWithEmptySolutionMappingAsInput();
+		_tpWithEmptySolutionMappingAsInput(false);
 	}
 
 	@Test
 	public void tpWithEmptyResponses() throws ExecutionException {
-		_tpWithEmptyResponses();
+		_tpWithEmptyResponses(false);
 	}
 
 
@@ -48,8 +48,10 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 	}
 
 	@Override
-	protected UnaryExecutableOp createExecOpForTest(final TriplePattern tp, final SPARQLEndpoint fm,
-													final ExpectedVariables expectedVariables) {
-		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm);
+	protected UnaryExecutableOp createExecOpForTest( final TriplePattern tp,
+	                                                 final SPARQLEndpoint fm,
+	                                                 final ExpectedVariables expectedVariables,
+	                                                 final boolean useOuterJoinSemantics ) {
+		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm, useOuterJoinSemantics);
 	}
 }

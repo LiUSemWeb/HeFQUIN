@@ -7,8 +7,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 public class ExecOpIndexNestedLoopsJoinBRTPF extends ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<BRTPFServer>
 {
-	public ExecOpIndexNestedLoopsJoinBRTPF( final TriplePattern query, final BRTPFServer fm ) {
-		super( query, fm );
+	public ExecOpIndexNestedLoopsJoinBRTPF( final TriplePattern query,
+	                                        final BRTPFServer fm,
+	                                        final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 	}
 
 	@Override

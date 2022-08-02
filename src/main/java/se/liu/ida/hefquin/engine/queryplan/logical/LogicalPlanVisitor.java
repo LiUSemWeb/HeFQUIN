@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -11,6 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoi
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 public interface LogicalPlanVisitor
@@ -19,6 +21,9 @@ public interface LogicalPlanVisitor
 
 	void visit( final LogicalOpTPAdd op );
 	void visit( final LogicalOpBGPAdd op );
+
+	void visit( final LogicalOpTPOptAdd op );
+	void visit( final LogicalOpBGPOptAdd op );
 
 	void visit( final LogicalOpJoin op );
 	void visit( final LogicalOpRightJoin op );

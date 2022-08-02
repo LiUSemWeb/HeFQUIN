@@ -1,30 +1,30 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBGPAdd implements UnaryLogicalOp
+public class LogicalOpTPOptAdd implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
-	protected final BGP bgp;
+	protected final TriplePattern tp;
 
-	public LogicalOpBGPAdd( final FederationMember fm, final BGP bgp ) {
+	public LogicalOpTPOptAdd( final FederationMember fm, final TriplePattern tp ) {
 		assert fm != null;
-		assert bgp != null;
-		assert fm.getInterface().supportsBGPRequests();
+		assert tp != null;
+		assert fm.getInterface().supportsTriplePatternRequests();
 
 		this.fm = fm;
-		this.bgp = bgp;
+		this.tp = tp;
 	}
 
 	public FederationMember getFederationMember() {
 		return fm;
-	} 
+	}
 
-	public BGP getBGP() {
-		return bgp;
+	public TriplePattern getTP() {
+		return tp;
 	}
 
 	@Override
@@ -32,16 +32,16 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 		if ( o == this )
 			return true;
 
-		if ( ! (o instanceof LogicalOpBGPAdd) )
+		if ( ! (o instanceof LogicalOpTPOptAdd) )
 			return false;
 
-		final LogicalOpBGPAdd oo = (LogicalOpBGPAdd) o;
-		return oo.fm.equals(fm) && oo.bgp.equals(bgp); 
+		final LogicalOpTPOptAdd oo = (LogicalOpTPOptAdd) o;
+		return oo.fm.equals(fm) && oo.tp.equals(tp); 
 	}
 
 	@Override
 	public int hashCode(){
-		return fm.hashCode() ^ bgp.hashCode();
+		return fm.hashCode() ^ tp.hashCode();
 	}
 
 	@Override
@@ -51,13 +51,13 @@ public class LogicalOpBGPAdd implements UnaryLogicalOp
 
 	@Override
 	public String toString(){
-		final int codeOfBGP = bgp.toString().hashCode();
+		final int codeOfTP = tp.toString().hashCode();
 		final int codeOfFm = fm.getInterface().toString().hashCode();
 
-		return "> bgpAdd" +
-				"[" + codeOfBGP + ", "+ codeOfFm + "]"+
+		return "> tpOptAdd" +
+				"[" + codeOfTP + ", "+ codeOfFm + "]"+
 				" ( "
-				+ bgp.toString()
+				+ tp.toString()
 				+ ", "
 				+ fm.getInterface().toString()
 				+ " )";

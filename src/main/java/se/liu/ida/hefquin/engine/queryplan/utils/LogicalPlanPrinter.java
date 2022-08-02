@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
@@ -14,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoi
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 public class LogicalPlanPrinter extends PlanPrinter{
@@ -46,6 +48,22 @@ public class LogicalPlanPrinter extends PlanPrinter{
 
 		@Override
 		public void visit(final LogicalOpBGPAdd op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpTPOptAdd op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel++;
+		}
+
+		@Override
+		public void visit(final LogicalOpBGPOptAdd op) {
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
@@ -139,6 +157,16 @@ public class LogicalPlanPrinter extends PlanPrinter{
 
 		@Override
 		public void visit(final LogicalOpBGPAdd op) {
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpTPOptAdd op) {
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpBGPOptAdd op) {
 			indentLevel--;
 		}
 

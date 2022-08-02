@@ -12,8 +12,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberType extends FederationMember>
            extends ExecOpGenericIndexNestedLoopsJoinWithRequestOps<TriplePattern,MemberType>
 {
-	public ExecOpGenericIndexNestedLoopsJoinWithTPFRequests( final TriplePattern query, final MemberType fm ) {
-		super( query, fm );
+	protected ExecOpGenericIndexNestedLoopsJoinWithTPFRequests( final TriplePattern query,
+	                                                            final MemberType fm,
+	                                                            final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 	}
 
 	@Override

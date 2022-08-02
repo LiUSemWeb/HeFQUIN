@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpConditional;
 import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
@@ -95,6 +96,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( jenaOp instanceof OpLeftJoin ) {
 			return createPlanForLeftJoin( (OpLeftJoin) jenaOp );
 		}
+		else if ( jenaOp instanceof OpConditional ) {
+			return createPlanForLeftJoin( (OpConditional) jenaOp );
+		}
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp );
 		}
@@ -133,6 +137,12 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
 		}
 
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForLeftJoin( final OpConditional jenaOp ) {
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
 		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
@@ -185,6 +195,9 @@ public class SourcePlannerImpl implements SourcePlanner
 		else if ( jenaOp instanceof OpLeftJoin ) {
 			return createPlanForLeftJoin( (OpLeftJoin) jenaOp, fm );
 		}
+		else if ( jenaOp instanceof OpConditional ) {
+			return createPlanForLeftJoin( (OpConditional) jenaOp, fm );
+		}
 		else if ( jenaOp instanceof OpUnion ) {
 			return createPlanForUnion( (OpUnion) jenaOp, fm );
 		}
@@ -210,6 +223,12 @@ public class SourcePlannerImpl implements SourcePlanner
 			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
 		}
 
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
+		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
+	}
+
+	protected LogicalPlan createPlanForLeftJoin( final OpConditional jenaOp, final FederationMember fm ) {
 		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), fm );
 		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), fm );
 		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
