@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -10,9 +11,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 {
-	public ExecOpParallelMultiwayLeftJoin( final List<LogicalOpRequest<?,?>> optionalParts ) {
-		// TODO ...
-		
+	protected final List<LogicalOpRequest<?,?>> optionalParts;
+
+	public ExecOpParallelMultiwayLeftJoin( final List<LogicalOpRequest<?,?>> optionalParts,
+	                                       final ExpectedVariables inputVarsFromNonOptionalPart ) {
+		assert ! optionalParts.isEmpty();
+		this.optionalParts = optionalParts;
 	}
 
 	@Override
