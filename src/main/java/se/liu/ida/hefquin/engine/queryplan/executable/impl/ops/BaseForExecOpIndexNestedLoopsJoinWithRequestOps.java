@@ -107,10 +107,16 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 			final ExecutionContext execCxt) throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
+
 		if ( reqOp == null ) {
 			// this may happen if the given solution mapping
 			// contains a blank node for any of the variables
 			// that is used when creating the request
+
+			if ( useOuterJoinSemantics ) {
+				sink.send(sm);
+			}
+
 			return null;
 		}
 
