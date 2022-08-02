@@ -421,7 +421,51 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			assertFalse( it.hasNext() );
 		}
 	}
-	
+
+	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		final Var var1 = Var.alloc("v1");
+
+		final Node p     = NodeFactory.createURI("http://example.org/p");
+		final Node uri   = NodeFactory.createURI("http://example.org/x1");
+		final Node bnode = NodeFactory.createBlankNode();
+
+		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, bnode) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1, p, uri);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(bnode, p, uri) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() {
+				final Set<Var> set = new HashSet<>();
+				set.add(var1);
+				return set;
+			}
+
+			@Override
+			public Set<Var> getPossibleVariables() {
+				return new HashSet<>();
+			}
+		}, useOuterJoinSemantics);
+
+		// checking
+		if ( useOuterJoinSemantics ) {
+			assertTrue( it.hasNext() );
+
+			final Binding b = it.next().asJenaBinding();
+			assertEquals( 1, b.size() );
+			assertTrue( b.get(var1).isBlank() );
+
+			assertFalse( it.hasNext() );
+		}
+		else { // useOuterJoinSemantics  == null
+			assertFalse( it.hasNext() );
+		}
+	}
+
 	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");

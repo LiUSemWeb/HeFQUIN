@@ -41,6 +41,11 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 		_tpWithEmptyResponses(false);
 	}
 
+	@Test
+	public void tpWithIllegalBNodeJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(false);
+	}
+
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {

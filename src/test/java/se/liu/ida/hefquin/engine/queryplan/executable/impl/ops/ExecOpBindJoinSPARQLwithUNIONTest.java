@@ -44,6 +44,11 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 	}
 
 	@Test
+	public void tpWithIllegalBNodeJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(false);
+	}
+
+	@Test
 	public void tpWithSpuriousDuplicates() throws ExecutionException {
 		_tpWithSpuriousDuplicates(false);
 	}

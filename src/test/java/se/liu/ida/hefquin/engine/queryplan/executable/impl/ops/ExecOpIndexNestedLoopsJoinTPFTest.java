@@ -70,6 +70,16 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 		_tpWithEmptyResponses(true);
 	}
 
+	@Test
+	public void tpWithIllegalBNodeJoin_InnerJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(false);
+	}
+
+	@Test
+	public void tpWithIllegalBNodeJoin_OuterJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(true);
+	}
+
 
 	@Override
 	protected TPFServer createFedMemberForTest( final Graph dataForMember ) {

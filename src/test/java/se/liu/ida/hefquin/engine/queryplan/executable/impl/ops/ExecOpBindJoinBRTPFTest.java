@@ -70,6 +70,16 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 		_tpWithEmptyResponses(true);
 	}
 
+	@Test
+	public void tpWithIllegalBNodeJoin_InnerJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(false);
+	}
+
+	@Test
+	public void tpWithIllegalBNodeJoin_OuterJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(true);
+	}
+
 
 	@Override
 	protected BRTPFServer createFedMemberForTest( final Graph dataForMember ) {
