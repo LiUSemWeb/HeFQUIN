@@ -11,13 +11,13 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public abstract class ExecOpGenericSolMapsRequest<ReqType extends DataRetrievalRequest,
+public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalRequest,
                                                   MemberType extends FederationMember>
-                extends ExecOpGenericRequest<ReqType,MemberType>
+                extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private long timeAfterResponse = 0L;
 
-	public ExecOpGenericSolMapsRequest( final ReqType req, final MemberType fm ) {
+	public BaseForExecOpSolMapsRequest( final ReqType req, final MemberType fm ) {
 		super( req, fm );
 	}
 

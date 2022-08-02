@@ -23,16 +23,16 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * loops join algorithm of potential subclasses of this base class. 
  *
  * For an abstract base class that issues requests directly (instead of using
- * request operators), use {@link ExecOpGenericIndexNestedLoopsJoinWithRequests}.
+ * request operators), use {@link BaseForExecOpIndexNestedLoopsJoinWithRequests}.
  */
-public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequestOps<
+public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
                                                     QueryType extends Query,
                                                     MemberType extends FederationMember>
-              extends ExecOpGenericIndexNestedLoopsJoinBase<QueryType,MemberType>
+              extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
 	protected final boolean useOuterJoinSemantics;
 
-	protected ExecOpGenericIndexNestedLoopsJoinWithRequestOps( final QueryType query,
+	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics ) {
 		super(query, fm);

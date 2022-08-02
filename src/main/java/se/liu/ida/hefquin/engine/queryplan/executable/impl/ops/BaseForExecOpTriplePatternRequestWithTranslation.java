@@ -20,9 +20,9 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSinkWithTranslation;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public abstract class ExecOpGenericTriplePatternRequestWithTranslation<MemberType extends FederationMember> extends ExecOpGenericRequest<TriplePatternRequest, MemberType>{
+public abstract class BaseForExecOpTriplePatternRequestWithTranslation<MemberType extends FederationMember> extends BaseForExecOpRequest<TriplePatternRequest, MemberType>{
 	
-	public ExecOpGenericTriplePatternRequestWithTranslation( final TriplePatternRequest req, final MemberType fm) {
+	public BaseForExecOpTriplePatternRequestWithTranslation( final TriplePatternRequest req, final MemberType fm) {
 		super( req, fm );
 
 		assert fm.getVocabularyMapping() != null;

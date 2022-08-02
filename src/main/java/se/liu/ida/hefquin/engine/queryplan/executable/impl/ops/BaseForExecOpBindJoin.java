@@ -8,14 +8,14 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * An abstract base class for implementations of the bind join algorithm.
  */
-public abstract class ExecOpGenericBindJoinBase<QueryType extends Query,
+public abstract class BaseForExecOpBindJoin<QueryType extends Query,
                                                 MemberType extends FederationMember>
         extends UnaryExecutableOpBase
 {
     protected final QueryType query;
     protected final MemberType fm;
 
-    public ExecOpGenericBindJoinBase( final QueryType query, final MemberType fm ) {
+    public BaseForExecOpBindJoin( final QueryType query, final MemberType fm ) {
         assert query != null;
         assert fm != null;
 

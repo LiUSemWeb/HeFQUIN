@@ -18,15 +18,15 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * Base class for implementations of paging-based request operators
  * where pages are {@link TPFResponse} objects.
  */
-public abstract class ExecOpGenericRequestWithTPFPaging<
+public abstract class BaseForExecOpRequestWithTPFPaging<
                                   ReqType extends DataRetrievalRequest,
                                   MemberType extends FederationMember,
                                   PageReqType extends DataRetrievalRequest>
-       extends ExecOpGenericRequest<ReqType,MemberType>
+       extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private int numberOfPageRequestsIssued = 0;
 
-	public ExecOpGenericRequestWithTPFPaging( final ReqType req, final MemberType fm ) {
+	public BaseForExecOpRequestWithTPFPaging( final ReqType req, final MemberType fm ) {
 		super( req, fm );
 	}
 

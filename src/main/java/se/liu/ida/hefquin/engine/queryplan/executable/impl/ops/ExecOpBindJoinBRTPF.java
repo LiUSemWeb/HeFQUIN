@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class ExecOpBindJoinBRTPF extends ExecOpGenericBindJoinWithRequestOps<TriplePattern,BRTPFServer>
+public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
     protected final Set<Var> varsInTP;
 

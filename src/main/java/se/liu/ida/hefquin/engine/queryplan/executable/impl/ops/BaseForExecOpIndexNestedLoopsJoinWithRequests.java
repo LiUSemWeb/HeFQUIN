@@ -23,19 +23,19 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * requests directly and, then, using response processors.
  *
  * An alternative option to this base class is the abstract base class
- * {@link ExecOpGenericIndexNestedLoopsJoinWithRequestOps} which relies
+ * {@link BaseForExecOpIndexNestedLoopsJoinWithRequestOps} which relies
  * on executable request operators rather than issuing requests directly.
  * This option may come handy in cases in which a single request per 
  * input solution mapping is not enough because of paging.
  */
-public abstract class ExecOpGenericIndexNestedLoopsJoinWithRequests<
+public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
                             QueryType extends Query,
                             MemberType extends FederationMember,
                             ReqType extends DataRetrievalRequest,
                             RespType extends DataRetrievalResponse>
-             extends ExecOpGenericIndexNestedLoopsJoinBase<QueryType,MemberType>
+             extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
-	public ExecOpGenericIndexNestedLoopsJoinWithRequests( final QueryType query, final MemberType fm ) {
+	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query, final MemberType fm ) {
 		super(query, fm);
 	}
 

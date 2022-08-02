@@ -35,7 +35,7 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 
-public class ExecOpRequestSPARQLWithTranslation extends ExecOpGenericSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
+public class ExecOpRequestSPARQLWithTranslation extends BaseForExecOpSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
 {
 	public ExecOpRequestSPARQLWithTranslation( final SPARQLRequest req, final SPARQLEndpoint fm ) {
 		super( req, fm );

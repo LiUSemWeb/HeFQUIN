@@ -13,14 +13,14 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * Base class for implementations of request operators with requests
  * that have to be broken into multiple requests to handle paging.
  */
-public abstract class ExecOpGenericRequestWithPaging<
+public abstract class BaseForExecOpRequestWithPaging<
                                   ReqType extends DataRetrievalRequest,
                                   MemberType extends FederationMember,
                                   PageReqType extends DataRetrievalRequest,
                                   PageRespType extends DataRetrievalResponse>
-                extends ExecOpGenericRequest<ReqType,MemberType>
+                extends BaseForExecOpRequest<ReqType,MemberType>
 {
-	public ExecOpGenericRequestWithPaging( final ReqType req, final MemberType fm ) {
+	public BaseForExecOpRequestWithPaging( final ReqType req, final MemberType fm ) {
 		super( req, fm );
 	}
 

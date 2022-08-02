@@ -8,14 +8,14 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * An abstract base class for implementations of the (external) index nested loops join algorithm.
  */
-public abstract class ExecOpGenericIndexNestedLoopsJoinBase<QueryType extends Query,
+public abstract class BaseForExecOpIndexNestedLoopsJoin<QueryType extends Query,
                                                             MemberType extends FederationMember>
                    extends UnaryExecutableOpBase
 {
 	protected final QueryType query;
 	protected final MemberType fm;
 
-	public ExecOpGenericIndexNestedLoopsJoinBase( final QueryType query, final MemberType fm ) {
+	public BaseForExecOpIndexNestedLoopsJoin( final QueryType query, final MemberType fm ) {
 		assert query != null;
 		assert fm != null;
 

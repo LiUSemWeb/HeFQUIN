@@ -9,10 +9,10 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
-public abstract class ExecOpGenericIndexNestedLoopsJoinWithTPFRequests<MemberType extends FederationMember>
-           extends ExecOpGenericIndexNestedLoopsJoinWithRequestOps<TriplePattern,MemberType>
+public abstract class BaseForExecOpIndexNestedLoopsJoinWithTPFRequests<MemberType extends FederationMember>
+           extends BaseForExecOpIndexNestedLoopsJoinWithRequestOps<TriplePattern,MemberType>
 {
-	protected ExecOpGenericIndexNestedLoopsJoinWithTPFRequests( final TriplePattern query,
+	protected BaseForExecOpIndexNestedLoopsJoinWithTPFRequests( final TriplePattern query,
 	                                                            final MemberType fm,
 	                                                            final boolean useOuterJoinSemantics ) {
 		super(query, fm, useOuterJoinSemantics);
