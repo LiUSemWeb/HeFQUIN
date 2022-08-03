@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBa
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.*;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
@@ -83,10 +84,15 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 // should also use that set to figure out which of the solution mappings can
 // be ignored for the parallel process of the workers. In fact, figuring this
 // out was the whole point of 'bindingsForJoinVariable'.
+		GenericIntermediateResultBlockImpl inputForParallelProcess = new GenericIntermediateResultBlockImpl();
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
 			final List<Node> bindings = new ArrayList<>( joinVars.size() );
 			for ( final Var v : joinVars ) {
 				bindings.add( sm.asJenaBinding().get(v) );
+			}
+
+			if( !bindingsForJoinVariable.contains(bindings) ){
+				inputForParallelProcess.add(sm);
 			}
 
 			bindingsForJoinVariable.add( bindings );
@@ -97,7 +103,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
 			final Worker w = new Worker( optionalParts.get(i),
 			                             indexes.get(i),
-			                             input,
+										 inputForParallelProcess,
 			                             inputVarsFromNonOptionalPart,
 			                             execCxt );
 			futures[i] = CompletableFuture.runAsync( w, execCxt.getExecutorServiceForPlanTasks() );
@@ -146,7 +152,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 				}
 				output = nextOutput;
 			}
-			// An else branch is not needed. If the are no join partners
+			// An else branch is not needed. If there are no join partners
 			// in the current index, just continue using the 'output'
 			// from the previous merge stage.
 		}
