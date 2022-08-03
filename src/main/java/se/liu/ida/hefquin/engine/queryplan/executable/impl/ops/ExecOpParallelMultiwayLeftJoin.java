@@ -79,25 +79,44 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 	protected void _process( final IntermediateResultBlock input,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		// Populate values for join variables into the set 'bindingsForJoinVariable'
-// TODO: The loop should not only populate 'bindingsForJoinVariable' but it
-// should also use that set to figure out which of the solution mappings can
-// be ignored for the parallel process of the workers. In fact, figuring this
-// out was the whole point of 'bindingsForJoinVariable'.
-		GenericIntermediateResultBlockImpl inputForParallelProcess = new GenericIntermediateResultBlockImpl();
+		final IntermediateResultBlock inputForParallelProcess = determineInputForParallelProcess(input);
+
+		if ( inputForParallelProcess.size() > 0 ) {
+			parallelPhase(inputForParallelProcess, execCxt);
+		}
+
+		mergePhase( input.getSolutionMappings(), sink );
+	}
+
+	/**
+	 * Preprocess the given {@link IntermediateResultBlock} to identify the
+	 * input solution mappings that do not need to be considered during the
+	 * parallel phase of the algorithm (because they have bindings for the
+	 * join variables such that there already was an earlier input solution
+	 * mapping with the same bindings). The {@link IntermediateResultBlock}
+	 * returned by this function contains only the solution mappings from
+	 * the given block that need to be considered.
+	 */
+	protected IntermediateResultBlock determineInputForParallelProcess( final IntermediateResultBlock input ) {
+		final GenericIntermediateResultBlockImpl inputForParallelProcess = new GenericIntermediateResultBlockImpl();
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
 			final List<Node> bindings = new ArrayList<>( joinVars.size() );
 			for ( final Var v : joinVars ) {
 				bindings.add( sm.asJenaBinding().get(v) );
 			}
 
-			if( !bindingsForJoinVariable.contains(bindings) ){
+			if( ! bindingsForJoinVariable.contains(bindings) ) {
 				inputForParallelProcess.add(sm);
 			}
 
 			bindingsForJoinVariable.add( bindings );
 		}
 
+		return inputForParallelProcess;
+	}
+
+	protected void parallelPhase( final IntermediateResultBlock inputForParallelProcess,
+	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		// begin the parallel phase by starting the workers for the optional parts
 		final CompletableFuture<?>[] futures = new CompletableFuture<?>[ optionalParts.size() ];
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
@@ -121,20 +140,16 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 				throw new ExecOpExecutionException("The execution of the futures that run the executable operators caused an exception.", e, this);
 			}
 		}
-
-		// merge phase
-		for( final SolutionMapping inputSol : input.getSolutionMappings() ) {
-			final Set<SolutionMapping> solMaps = merge(inputSol);
-			for ( final SolutionMapping sol : solMaps ) {
-				sink.send(sol);
-			}
-		}
 	}
 
-	@Override
-	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		// nothing to be done here
+	protected void mergePhase( final Iterable<SolutionMapping> inputSolMaps,
+	                           final IntermediateResultElementSink sink ) {
+		for( final SolutionMapping inputSolMap : inputSolMaps ) {
+			final Set<SolutionMapping> outputSolMaps = merge(inputSolMap);
+			for ( final SolutionMapping outputSolMap : outputSolMaps ) {
+				sink.send(outputSolMap);
+			}
+		}
 	}
 
 	protected Set<SolutionMapping> merge( final SolutionMapping inputSol ) {
@@ -158,6 +173,12 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		}
 
 		return output;
+	}
+
+	@Override
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		// nothing to be done here
 	}
 
 
