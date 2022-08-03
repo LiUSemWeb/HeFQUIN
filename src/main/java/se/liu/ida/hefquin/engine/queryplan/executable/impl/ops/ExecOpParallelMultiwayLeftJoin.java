@@ -25,38 +25,47 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 {
-	protected final List<LogicalOpRequest<?,?>> optionalParts;
-	protected final Set<Var> joinVars;
 	protected final ExpectedVariables inputVarsFromNonOptionalPart;
-	protected final List<SolutionMappingsIndex> indexes = new ArrayList<>();
+	protected final List<LogicalOpRequest<?,?>> optionalParts;
+	 
+	protected final List<SolutionMappingsIndex> indexes; // will contain as many entries as optionalParts
+	protected final List<Var> joinVars; // using a list gives us a deterministic iteration order
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
-	public ExecOpParallelMultiwayLeftJoin( final List<LogicalOpRequest<?,?>> optionalParts,
-	                                       final ExpectedVariables inputVarsFromNonOptionalPart ) {
+	public ExecOpParallelMultiwayLeftJoin( final ExpectedVariables inputVarsFromNonOptionalPart,
+	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
 		assert ! optionalParts.isEmpty();
+
 		this.optionalParts = optionalParts;
 		this.inputVarsFromNonOptionalPart = inputVarsFromNonOptionalPart;
 
-//		Get join variables
-		ExpectedVariables varsFromOptionalPart = optionalParts.get(0).getRequest().getExpectedVariables();
-		this.joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( inputVarsFromNonOptionalPart, varsFromOptionalPart );
+		// determine the join variables
+		// (assumption: the join variable(s) are the same for all optional parts)
+		final ExpectedVariables varsFromOptionalPart = optionalParts.get(0).getRequest().getExpectedVariables();
+		final Set<Var> joinVarsSet = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVarsFromNonOptionalPart, varsFromOptionalPart);
+		this.joinVars = new ArrayList<Var>( joinVarsSet );
 
-//		Create indexes structure based on number of join variables, for each optional part
-		for( int i = 0; i < optionalParts.size(); i ++ ) {
-//			TODO: What if no join variable exists?
-			if ( joinVars.size() == 1 ) {
-				final Var joinVar = joinVars.iterator().next();
+		// create index for each optional part; the index implementation
+		// to be used depends on the number of join variables
+//		TODO: What if no join variable exists?
+		indexes = new ArrayList<>( optionalParts.size() );
+		if ( joinVars.size() == 1 ) {
+			final Var joinVar = joinVars.get(0);
+			for( int i = 0; i < optionalParts.size(); i ++ ) {
 				indexes.add( new SolutionMappingsHashTableBasedOnOneVar(joinVar) );
-			} else if ( joinVars.size() == 2 ) {
-				final Iterator<Var> liVar = joinVars.iterator();
-				final Var joinVar1 = liVar.next();
-				final Var joinVar2 = liVar.next();
-
+			}
+		}
+		else if ( joinVars.size() == 2 ) {
+			final Var joinVar1 = joinVars.get(0);
+			final Var joinVar2 = joinVars.get(1);
+			for( int i = 0; i < optionalParts.size(); i ++ ) {
 				indexes.add( new SolutionMappingsHashTableBasedOnTwoVars(joinVar1, joinVar2) );
-			} else {
+			}
+		}
+		else {
+			for( int i = 0; i < optionalParts.size(); i ++ ) {
 				indexes.add( new SolutionMappingsHashTable(joinVars) );
 			}
-//
 		}
 	}
 
@@ -69,27 +78,32 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 	protected void _process( final IntermediateResultBlock input,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
-//		Populate values for join variables into the set 'bindingsForJoinVariable'
+		// Populate values for join variables into the set 'bindingsForJoinVariable'
+// TODO: The loop should not only populate 'bindingsForJoinVariable' but it
+// should also use that set to figure out which of the solution mappings can
+// be ignored for the parallel process of the workers. In fact, figuring this
+// out was the whole point of 'bindingsForJoinVariable'.
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			List<Node> bindings = new ArrayList<>();
-
-			final Iterator<Var> liVar = joinVars.iterator();
-			while( liVar.hasNext() ){
-				bindings.add( sm.asJenaBinding().get( liVar.next()) );
+			final List<Node> bindings = new ArrayList<>( joinVars.size() );
+			for ( final Var v : joinVars ) {
+				bindings.add( sm.asJenaBinding().get(v) );
 			}
+
 			bindingsForJoinVariable.add( bindings );
 		}
 
+		// begin the parallel phase by starting the workers for the optional parts
 		final CompletableFuture<?>[] futures = new CompletableFuture<?>[ optionalParts.size() ];
 		for ( int i = 0; i < optionalParts.size(); i++ ) {
-			final LogicalOpRequest<?,?> req = optionalParts.get(i);
-			final SolutionMappingsIndex index = indexes.get(i);
-
-			Worker w = new Worker( req, index, input, inputVarsFromNonOptionalPart, execCxt);
+			final Worker w = new Worker( optionalParts.get(i),
+			                             indexes.get(i),
+			                             input,
+			                             inputVarsFromNonOptionalPart,
+			                             execCxt );
 			futures[i] = CompletableFuture.runAsync( w, execCxt.getExecutorServiceForPlanTasks() );
 		}
 
-		// wait for all the futures to be completed
+		// wait until the parallel phase is completed
 		if ( futures.length > 0 ) {
 			try {
 				CompletableFuture.allOf(futures).get();
@@ -102,13 +116,13 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 			}
 		}
 
-		for( SolutionMapping inputSol : input.getSolutionMappings() ) {
-			Set<SolutionMapping> solMaps = merge( inputSol, indexes );
-			for ( SolutionMapping sol : solMaps){
+		// merge phase
+		for( final SolutionMapping inputSol : input.getSolutionMappings() ) {
+			final Set<SolutionMapping> solMaps = merge(inputSol);
+			for ( final SolutionMapping sol : solMaps ) {
 				sink.send(sol);
 			}
 		}
-
 	}
 
 	@Override
@@ -117,85 +131,67 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		// nothing to be done here
 	}
 
-	protected Set<SolutionMapping> merge( final SolutionMapping inputSol, final List<SolutionMappingsIndex> indexes ){
+	protected Set<SolutionMapping> merge( final SolutionMapping inputSol ) {
 		Set<SolutionMapping> output = new HashSet<>();
 		output.add(inputSol);
 
-		for( SolutionMappingsIndex intermediateResults: indexes ){
-			final Set<SolutionMapping> temp = new HashSet<>();
-
-			final Iterable<SolutionMapping> partners = intermediateResults.getJoinPartners( inputSol );
+		for ( final SolutionMappingsIndex index: indexes ) {
+			final Iterable<SolutionMapping> partners = index.getJoinPartners(inputSol);
 			if( partners != null ){
-				for ( SolutionMapping inSol: output ) {
-					for (SolutionMapping sol : partners) {
-						temp.add( SolutionMappingUtils.merge(inSol, sol) );
+				final Set<SolutionMapping> nextOutput = new HashSet<>();
+				for ( final SolutionMapping inSol: output ) {
+					for ( final SolutionMapping sol : partners ) {
+						nextOutput.add( SolutionMappingUtils.merge(inSol,sol) );
 					}
 				}
-				output.clear();
-				output.addAll(temp);
+				output = nextOutput;
 			}
-//			else
-//				Do nothing, return current output
+			// An else branch is not needed. If the are no join partners
+			// in the current index, just continue using the 'output'
+			// from the previous merge stage.
 		}
+
 		return output;
 	}
 
 
 	protected static class Worker implements Runnable {
-		protected final LogicalOpRequest<?,?> req;
-		protected final SolutionMappingsIndex index;
+		protected final UnaryExecutableOp execOp;
+		protected final IntermediateResultElementSink mySink;
 		protected final IntermediateResultBlock input;
-		protected final ExpectedVariables inputVarsFromNonOptionalPart;
 		protected final ExecutionContext execCxt;
 
 		public Worker( final LogicalOpRequest<?,?> req,
-					   final SolutionMappingsIndex index,
-					   final IntermediateResultBlock input,
-					   final ExpectedVariables inputVarsFromNonOptionalPart,
-					   final ExecutionContext execCxt) {
-			this.req = req;
-			this.index = index;
-			this.inputVarsFromNonOptionalPart = inputVarsFromNonOptionalPart;
+		               final SolutionMappingsIndex index,
+		               final IntermediateResultBlock input,
+		               final ExpectedVariables inputVarsFromNonOptionalPart,
+		               final ExecutionContext execCxt ) {
 			this.input = input;
 			this.execCxt = execCxt;
+
+			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
+			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop);
+			this.execOp = addPop.createExecOp(inputVarsFromNonOptionalPart);
+
+			this.mySink = new IntermediateResultElementSink() {
+				@Override
+				public void send( final SolutionMapping sm ) {
+					index.add(sm);
+				}
+			};
 		}
 
 		@Override
 		public void run() {
-			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
-			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addOp);
-
-			final UnaryExecutableOp exe = addPop.createExecOp( inputVarsFromNonOptionalPart );
-			final MyIntermediateResultElementSink mySink = new MyIntermediateResultElementSink(index);
-
 			try {
-				exe.process( input, mySink, execCxt );
-			} catch (ExecOpExecutionException e) {
+				execOp.process(input, mySink, execCxt);
+			} catch ( final ExecOpExecutionException e ) {
+// TODO: this exception must be handled properly such that we have a chance to
+// actually catch something in the main processing thread that has started this
+// worker thread
 				e.printStackTrace();
 			}
-
-			mySink.flush();
 		}
-		
-	}
-
-	protected static class MyIntermediateResultElementSink implements IntermediateResultElementSink
-	{
-		protected final SolutionMappingsIndex index;
-//		protected final IntermediateResultBlock input;
-
-		public MyIntermediateResultElementSink( final SolutionMappingsIndex index ) {
-			this.index = index;
-//			this.input = input;
-		}
-
-		@Override
-		public void send( final SolutionMapping smFromRequest ) {
-//			No need to merge with input solution mappings at this step?
-			index.add( smFromRequest );
-		}
-
-		public void flush() { }
 	}
 
 }
