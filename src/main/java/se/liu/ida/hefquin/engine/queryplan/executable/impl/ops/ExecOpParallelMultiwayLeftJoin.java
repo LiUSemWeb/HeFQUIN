@@ -34,6 +34,11 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
 	public ExecOpParallelMultiwayLeftJoin( final ExpectedVariables inputVarsFromNonOptionalPart,
+	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
+		this( inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
+	}
+
+	public ExecOpParallelMultiwayLeftJoin( final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
 		assert ! optionalParts.isEmpty();
 
