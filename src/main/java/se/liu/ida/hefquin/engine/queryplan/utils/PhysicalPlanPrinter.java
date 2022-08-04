@@ -88,6 +88,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
+            indentLevel++;
+        }
+
+        @Override
         public void visit( final PhysicalOpHashJoin op ) {
             addTabs();
             builder.append( op.toString() );
@@ -188,6 +196,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
         @Override
         public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit(final PhysicalOpParallelMultiLeftJoin op) {
             indentLevel--;
         }
 

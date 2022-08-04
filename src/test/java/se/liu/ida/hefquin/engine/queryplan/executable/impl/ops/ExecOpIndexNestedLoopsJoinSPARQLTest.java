@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.concurrent.ExecutorService;
+
 import org.apache.jena.graph.Graph;
 import org.junit.Test;
 
@@ -41,10 +43,20 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 		_tpWithEmptyResponses(false);
 	}
 
+	@Test
+	public void tpWithIllegalBNodeJoin() throws ExecutionException {
+		_tpWithIllegalBNodeJoin(false);
+	}
+
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest( final Graph dataForMember ) {
 		return new SPARQLEndpointForTest(dataForMember);
+	}
+
+	@Override
+	protected ExecutorService getExecutorServiceForTest() {
+		return null;
 	}
 
 	@Override
