@@ -179,11 +179,13 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		// Before going to the generic option that works for all cases,
 		// check whether we have a case in which the parallel multi-left-
 		// join can be used.
-		final List<LogicalOpRequest<?,?>> optionalParts = PhysicalOpParallelMultiLeftJoin.checkApplicability(children);
-		if ( optionalParts != null ) {
-			// If the parallel multi-left-join can indeed be used, do so.
-			final UnaryPhysicalOp rootOp = new PhysicalOpParallelMultiLeftJoin(optionalParts);
-			return PhysicalPlanFactory.createPlan( rootOp, children.get(0) );
+		if ( children.size() > 2 ) {
+			final List<LogicalOpRequest<?,?>> optionalParts = PhysicalOpParallelMultiLeftJoin.checkApplicability(children);
+			if ( optionalParts != null ) {
+				// If the parallel multi-left-join can indeed be used, do so.
+				final UnaryPhysicalOp rootOp = new PhysicalOpParallelMultiLeftJoin(optionalParts);
+				return PhysicalPlanFactory.createPlan( rootOp, children.get(0) );
+			}
 		}
 
 		// Now comes the generic option that works for all cases.
