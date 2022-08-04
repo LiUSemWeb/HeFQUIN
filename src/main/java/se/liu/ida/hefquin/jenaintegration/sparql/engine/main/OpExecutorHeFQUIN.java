@@ -60,7 +60,10 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
 		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
-		final Boolean isExperimentRun = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
+
+		final Boolean printLogicalPlans  = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintLogicalPlans, false);
+		final Boolean printPhysicalPlans = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintPhysicalPlans, false);
+		final Boolean isExperimentRun    = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
 
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
 
@@ -77,7 +80,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final QueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
 		final QueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
-		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer);
+		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer, printLogicalPlans, printPhysicalPlans);
 		final QueryPlanCompiler compiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);

@@ -28,6 +28,8 @@ public class HeFQUINEngineBuilder
 	protected FederationAccessManager fedAccessMgr     = null;
 	protected ExecutorService execServiceForFedAccess  = null;
 	protected ExecutorService execServiceForPlanTasks  = null;
+	protected boolean printLogicalPlan        = false;
+	protected boolean printPhysicalPlan       = false;
 
 	/**
 	 * mandatory
@@ -81,6 +83,22 @@ public class HeFQUINEngineBuilder
 		return this;
 	}
 
+	/**
+	 * optional
+	 */
+	public HeFQUINEngineBuilder enablePrintingOfLogicalPlans( final boolean printLogicalPlan ) {
+		this.printLogicalPlan = printLogicalPlan;
+		return this;
+	}
+
+	/**
+	 * optional
+	 */
+	public HeFQUINEngineBuilder enablePrintingOfPhysicalPlans( final boolean printPhysicalPlan ) {
+		this.printPhysicalPlan = printPhysicalPlan;
+		return this;
+	}
+
 	public HeFQUINEngine build() {
 		if ( config == null )
 			throw new IllegalStateException("no HeFQUINEngineConfig specified");
@@ -105,6 +123,8 @@ public class HeFQUINEngineBuilder
 		ctxt.set( HeFQUINConstants.sysFederationCatalog, fedCatalog );
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
 		ctxt.set( HeFQUINConstants.sysIsExperimentRun, true );
+		ctxt.set( HeFQUINConstants.sysPrintLogicalPlans, printLogicalPlan );
+		ctxt.set( HeFQUINConstants.sysPrintPhysicalPlans, printPhysicalPlan );
 		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );
 		return new MyEngine();
 	}
