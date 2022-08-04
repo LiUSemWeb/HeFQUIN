@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
+import se.liu.ida.hefquin.engine.datastructures.impl.SolutionMappingsIndexNoJoinVars;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.*;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
@@ -55,12 +56,17 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		// to be used depends on the number of join variables
 //		TODO: What if no join variable exists?
 		indexes = new ArrayList<>( optionalParts.size() );
-		if ( joinVars.size() == 1 ) {
-			final Var joinVar = joinVars.get(0);
+		if ( joinVars.size() == 0 ) {
 			for( int i = 0; i < optionalParts.size(); i ++ ) {
-				indexes.add( new SolutionMappingsHashTableBasedOnOneVar(joinVar) );
+				indexes.add( new SolutionMappingsIndexNoJoinVars() );
 			}
 		}
+		else if ( joinVars.size() == 1 ) {
+				final Var joinVar = joinVars.get(0);
+				for( int i = 0; i < optionalParts.size(); i ++ ) {
+					indexes.add( new SolutionMappingsHashTableBasedOnOneVar(joinVar) );
+				}
+			}
 		else if ( joinVars.size() == 2 ) {
 			final Var joinVar1 = joinVars.get(0);
 			final Var joinVar2 = joinVars.get(1);
@@ -162,12 +168,14 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		output.add(inputSol);
 
 		for ( final SolutionMappingsIndex index: indexes ) {
-			final Iterable<SolutionMapping> partners = index.getJoinPartners(inputSol);
-			if( partners != null ){
+			final Iterator<SolutionMapping> itPartners = index.getJoinPartners(inputSol).iterator();
+
+			if ( itPartners.hasNext() ) { // if there is at least one join partner from the index
 				final Set<SolutionMapping> nextOutput = new HashSet<>();
-				for ( final SolutionMapping inSol: output ) {
-					for ( final SolutionMapping sol : partners ) {
-						nextOutput.add( SolutionMappingUtils.merge(inSol,sol) );
+				while ( itPartners.hasNext() ) {
+					final SolutionMapping partner = itPartners.next();
+					for ( final SolutionMapping inSol: output ) {
+						nextOutput.add( SolutionMappingUtils.merge(inSol,partner) );
 					}
 				}
 				output = nextOutput;
