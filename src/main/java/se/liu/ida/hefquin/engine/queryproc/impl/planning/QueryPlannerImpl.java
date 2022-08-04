@@ -45,7 +45,11 @@ public class QueryPlannerImpl implements QueryPlanner
 
 		final long t3 = System.currentTimeMillis();
 
-		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t3-t1, t2-t1, t3-t2, saAndStats.object2, planAndStats.object2 );
+		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t3-t1, t2-t1, t3-t2,
+		                                                               saAndStats.object2,
+		                                                               saAndStats.object1,
+		                                                               planAndStats.object2,
+		                                                               planAndStats.object1 );
 
 		return new Pair<>(planAndStats.object1, myStats);
 	}
