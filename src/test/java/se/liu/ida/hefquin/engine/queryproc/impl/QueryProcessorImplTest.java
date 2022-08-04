@@ -379,7 +379,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final QueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
-		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer);
+		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer, false, false);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);

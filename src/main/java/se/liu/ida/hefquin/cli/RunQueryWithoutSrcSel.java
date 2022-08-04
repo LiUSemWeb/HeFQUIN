@@ -33,6 +33,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
+	protected final ArgDecl argPrintLogicalPlan = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
+	protected final ArgDecl argPrintPhysicalPlan = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
 	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "queryProcStats");
 	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "fedAccessStats");
 
@@ -49,6 +51,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modResults);
 		addModule(modEngineConfig);
 
+		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan used for the query optimization");
+		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan used for the query execution");
 		add(argQueryProcStats, "--queryProcStats", "Print out statistics about the query execution process");
 		add(argFedAccessStats, "--fedAccessStats", "Print out statistics of the federation access manager");
 	}
@@ -68,6 +72,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 				.setFederationCatalog( modFederation.getFederationCatalog() )
 				.setExecutorServiceForFederationAccess(execServiceForFedAccess)
 				.setExecutorServiceForPlanTasks(execServiceForPlanTasks)
+				.enablePrintingOfLogicalPlans( contains(argPrintLogicalPlan) )
+				.enablePrintingOfPhysicalPlans( contains(argPrintPhysicalPlan) )
 				.build();
 
 		final Query query = getQuery();
