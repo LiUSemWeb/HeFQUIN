@@ -60,10 +60,11 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		_tpWithEmptyInput(true);
 	}
 
-	@Test
-	public void tpWithEmptySolutionMappingAsInput() throws ExecutionException {
-		_tpWithEmptySolutionMappingAsInput(true);
-	}
+// This test does not make much sense for the ExecOpParallelMultiwayLeftJoin
+//	@Test
+//	public void tpWithEmptySolutionMappingAsInput() throws ExecutionException {
+//		_tpWithEmptySolutionMappingAsInput(true);
+//	}
 
 	@Test
 	public void tpWithEmptyResponses() throws ExecutionException {
