@@ -518,7 +518,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
 			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
 		};
@@ -534,6 +534,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 	}
 
 	protected abstract MemberType createFedMemberForTest( Graph dataForMember );
+
+	protected abstract ExecutorService getExecutorServiceForTest();
 
 	protected abstract UnaryExecutableOp createExecOpForTest( TriplePattern tp,
 	                                                          MemberType fm,

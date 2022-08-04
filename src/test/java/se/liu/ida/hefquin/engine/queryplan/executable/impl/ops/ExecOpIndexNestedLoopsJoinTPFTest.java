@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.concurrent.ExecutorService;
+
 import org.apache.jena.graph.Graph;
 import org.junit.Test;
 
@@ -84,6 +86,11 @@ public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<T
 	@Override
 	protected TPFServer createFedMemberForTest( final Graph dataForMember ) {
 		return new TPFServerForTest(dataForMember);
+	}
+
+	@Override
+	protected ExecutorService getExecutorServiceForTest() {
+		return null;
 	}
 
 	@Override
