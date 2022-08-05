@@ -7,6 +7,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
+import se.liu.ida.hefquin.engine.utils.Stats;
 
 /**
  * Base class for implementations of {@link SolutionMappingsIndex}
@@ -21,6 +22,16 @@ public class WrappingSolutionMappingsIndex implements SolutionMappingsIndex
 	public WrappingSolutionMappingsIndex( final SolutionMappingsIndex wrappedIndex ) {
 		assert wrappedIndex != null;
 		this.wrappedIndex = wrappedIndex;
+	}
+
+	@Override
+	public Stats getStats() {
+		return wrappedIndex.getStats();
+	}
+
+	@Override
+	public void resetStats() {
+		wrappedIndex.resetStats();
 	}
 
 	@Override

@@ -10,9 +10,21 @@ import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_OneVarBi
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_ThreeVarsBindings;
 import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_TwoVarsBindings;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
+import se.liu.ida.hefquin.engine.utils.Stats;
 
 public abstract class SolutionMappingsIndexBase implements SolutionMappingsIndex
 {
+	@Override
+	public Stats getStats() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void resetStats() {
+		// TODO
+	}
+
 	@Override
 	public boolean containsAll( final Collection<?> c ) {
 		for ( Object o : c ) {

@@ -7,6 +7,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
 /**
  * Implementations of this interface can be used as an index for
@@ -18,7 +19,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
  * that are explicitly restricted to index sets of solution mappings
  * (rather than multisets).
  */
-public interface SolutionMappingsIndex extends Collection<SolutionMapping>
+public interface SolutionMappingsIndex extends Collection<SolutionMapping>, StatsProvider
 {
 	/**
 	 * Returns an iterator over all solution mappings in this index
