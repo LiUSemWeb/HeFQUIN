@@ -116,16 +116,17 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
-			@Override public Set<Var> getPossibleVariables() {
+			@Override public Set<Var> getCertainVariables() {
 				final Set<Var> set = new HashSet<>();
 				set.add(var0);
 				return set;
 			}
 
-			@Override public Set<Var> getCertainVariables() {
+			@Override public Set<Var> getPossibleVariables() {
 				final Set<Var> set = new HashSet<>();
 				return set;
 			}
+
 		};
 
 		// set up everything for the first optional part
