@@ -60,6 +60,20 @@ public abstract class EngineTestBase
 	public static boolean skipLocalGraphQLTests = true;
 
 
+	/**
+	 * Asserts that the solution mappings being iterated over are exactly the same, in any order, as the ones contained within the list.
+	 * All solution mappings in the list must be found in the iterator, to the same amount.
+	 */
+	protected void assertFullComposition( final Iterator<SolutionMapping> it,
+										  final List<SolutionMapping> inputList)
+	{
+		final List<SolutionMapping> list = new ArrayList<>(inputList);
+		while (it.hasNext()) {
+			assertTrue(list.remove(it.next()));
+		}
+		assertTrue(list.isEmpty());
+	}
+	
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
 	                              final String expectedURIforV1, final Var v1,
 	                              final String expectedURIforV2, final Var v2 )
