@@ -83,7 +83,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 
 	@Override
 	public int preferredInputBlockSize() {
-		return 30;
+		return 10;
 	}
 
 	@Override
