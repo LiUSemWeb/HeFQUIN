@@ -69,6 +69,8 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 
     @Override
     protected void _wrapUpForChild2( final IntermediateResultElementSink sink, final ExecutionContext execCxt ) {
-        // nothing to be done here
+        // clear the list of collected first-input solution
+        // mappings to enable the GC to release memory early
+        inputLHS.clear();
     }
 }

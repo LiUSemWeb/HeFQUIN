@@ -10,14 +10,20 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.utils.Stats;
 
 import java.util.*;
 
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
-
     protected final SolutionMappingsIndex indexForChild1;
     protected final SolutionMappingsIndex indexForChild2;
+
+    protected Stats statsOfIndexForChild1 = null;
+    protected Stats statsOfIndexForChild2 = null;
+
+    protected boolean child1InputComplete = false;
+    protected boolean child2InputComplete = false;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1, final ExpectedVariables inputVars2 ) {
         // determine the certain join variables
@@ -85,7 +91,11 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
     @Override
     protected void _wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
-        // nothing to do here
+        child1InputComplete = true;
+
+        if ( child2InputComplete ) {
+            wrapUp();
+        }
     }
 
     @Override
@@ -102,6 +112,20 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
     @Override
     protected void _wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
-        // nothing to do here
+        child2InputComplete = true;
+
+        if ( child1InputComplete ) {
+            wrapUp();
+        }
+    }
+
+    protected void wrapUp() {
+        // clear both indexes to enable the GC to release memory early,
+        // but make sure we keep the final stats of the indexes
+        statsOfIndexForChild1 = indexForChild1.getStats();
+        statsOfIndexForChild2 = indexForChild2.getStats();
+
+        indexForChild1.clear();
+        indexForChild2.clear();
     }
 }
