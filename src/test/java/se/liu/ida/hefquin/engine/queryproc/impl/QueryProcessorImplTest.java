@@ -33,7 +33,6 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -354,7 +353,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
-		final HeFQUINEngineConfig config = new HeFQUINEngineConfig();
+		final HeFQUINEngineConfig config = new HeFQUINEngineConfig(false, false);
 		final ExecutorService execServiceForPlanTasks = config.createExecutorServiceForPlanTasks();
 
 		final QueryProcContext procCxt = new QueryProcContext() {
@@ -365,7 +364,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 			@Override public boolean isExperimentRun() { return false; }
 		};
 
-		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final LogicalToPhysicalPlanConverter l2pConverter = config.createLogicalToPhysicalPlanConverter();
 		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
 
 		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {

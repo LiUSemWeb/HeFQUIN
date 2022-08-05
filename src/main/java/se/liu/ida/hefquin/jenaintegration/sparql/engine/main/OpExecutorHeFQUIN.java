@@ -21,7 +21,6 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
@@ -59,13 +58,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
 		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
+		final LogicalToPhysicalPlanConverter l2pConverter = execCxt.getContext().get(HeFQUINConstants.sysLogicalToPhysicalPlanConverter);
 		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
 
 		final Boolean printLogicalPlans  = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintLogicalPlans, false);
 		final Boolean printPhysicalPlans = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintPhysicalPlans, false);
 		final Boolean isExperimentRun    = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
-
-		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
 
 		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }

@@ -17,17 +17,19 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class HeFQUINEngineBuilder
 {
-	protected HeFQUINEngineConfig config               = null;
-	protected FederationCatalog fedCatalog             = null;
-	protected FederationAccessManager fedAccessMgr     = null;
-	protected ExecutorService execServiceForFedAccess  = null;
-	protected ExecutorService execServiceForPlanTasks  = null;
+	protected HeFQUINEngineConfig config                    = null;
+	protected FederationCatalog fedCatalog                  = null;
+	protected FederationAccessManager fedAccessMgr          = null;
+	protected LogicalToPhysicalPlanConverter l2pConverter   = null;
+	protected ExecutorService execServiceForFedAccess       = null;
+	protected ExecutorService execServiceForPlanTasks       = null;
 	protected boolean printLogicalPlan        = false;
 	protected boolean printPhysicalPlan       = false;
 
@@ -58,6 +60,14 @@ public class HeFQUINEngineBuilder
 	 */
 	public HeFQUINEngineBuilder setFederationAccessManager( final FederationAccessManager fedAccessMgr ) {
 		this.fedAccessMgr = fedAccessMgr;
+		return this;
+	}
+
+	/**
+	 * optional
+	 */
+	public HeFQUINEngineBuilder setLogicalToPhysicalPlanConverter( final LogicalToPhysicalPlanConverter l2pConverter ) {
+		this.l2pConverter = l2pConverter;
 		return this;
 	}
 
@@ -112,6 +122,9 @@ public class HeFQUINEngineBuilder
 		if ( fedAccessMgr == null )
 			setDefaultFederationAccessManager();
 
+		if ( l2pConverter == null )
+			setLogicalToPhysicalPlanConverter( config.createLogicalToPhysicalPlanConverter() );
+
 		if ( execServiceForPlanTasks == null )
 			throw new IllegalStateException("no ExecutorService for plan tasks specified");
 
@@ -122,7 +135,8 @@ public class HeFQUINEngineBuilder
 
 		ctxt.set( HeFQUINConstants.sysFederationCatalog, fedCatalog );
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
-		ctxt.set( HeFQUINConstants.sysIsExperimentRun, true );
+		ctxt.set( HeFQUINConstants.sysLogicalToPhysicalPlanConverter, l2pConverter );
+		ctxt.set( HeFQUINConstants.sysIsExperimentRun, false );
 		ctxt.set( HeFQUINConstants.sysPrintLogicalPlans, printLogicalPlan );
 		ctxt.set( HeFQUINConstants.sysPrintPhysicalPlans, printPhysicalPlan );
 		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );

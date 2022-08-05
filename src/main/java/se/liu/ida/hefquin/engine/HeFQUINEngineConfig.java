@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.jena.sparql.util.Context;
 
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -21,9 +23,22 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 public class HeFQUINEngineConfig
 {
 	public static int DEFAULT_THREAD_POOL_SIZE = 10;
+	public final boolean LogicalToPhysicalPlanConverter_ignorePhysicalOpsForLogicalAddOps;
+	public final boolean LogicalToPhysicalPlanConverter_ignoreParallelMultiLeftJoin;
+
+	public HeFQUINEngineConfig( final boolean LogicalToPhysicalPlanConverter_ignorePhysicalOpsForLogicalAddOps,
+	                            final boolean LogicalToPhysicalPlanConverter_ignoreParallelMultiLeftJoin ) {
+		this.LogicalToPhysicalPlanConverter_ignorePhysicalOpsForLogicalAddOps = LogicalToPhysicalPlanConverter_ignorePhysicalOpsForLogicalAddOps;
+		this.LogicalToPhysicalPlanConverter_ignoreParallelMultiLeftJoin = LogicalToPhysicalPlanConverter_ignoreParallelMultiLeftJoin;
+	}
 
 	public void initializeContext( final Context ctxt ) {
 		ctxt.set( HeFQUINConstants.sysQueryOptimizerFactory, createQueryOptimizerFactory() );
+	}
+
+	public LogicalToPhysicalPlanConverter createLogicalToPhysicalPlanConverter() {
+		return new LogicalToPhysicalPlanConverterImpl( LogicalToPhysicalPlanConverter_ignorePhysicalOpsForLogicalAddOps,
+		                                               LogicalToPhysicalPlanConverter_ignoreParallelMultiLeftJoin );
 	}
 
 	public ExecutorService createExecutorServiceForPlanTasks() {

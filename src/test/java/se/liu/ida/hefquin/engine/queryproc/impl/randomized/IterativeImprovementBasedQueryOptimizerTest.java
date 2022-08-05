@@ -81,7 +81,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 	protected QueryOptimizationContext createContextForTest() {
 		final FederationCatalog fedCat = new FederationCatalogForTest();
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl();
+		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl(true, true);
 
 		final CostModel costModel = new CostModel() {
 			@Override

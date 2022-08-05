@@ -1,11 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
@@ -31,10 +27,18 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJ
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpParallelMultiLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
+	protected final boolean ignorePhysicalOpsForLogicalAddOps;
+	protected final boolean ignoreParallelMultiLeftJoin;
+
+	public LogicalToPhysicalPlanConverterImpl( final boolean ignorePhysicalOpsForLogicalAddOps,
+	                                           final boolean ignoreParallelMultiLeftJoin ) {
+		this.ignorePhysicalOpsForLogicalAddOps = ignorePhysicalOpsForLogicalAddOps;
+		this.ignoreParallelMultiLeftJoin = ignoreParallelMultiLeftJoin;
+	}
+
 	@Override
 	public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
 		final List<PhysicalPlan> children = convertChildren(lp, keepMultiwayJoins);
@@ -147,12 +151,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		for ( int i = 1; i < children.size(); ++i ) {
 			final PhysicalPlan nextChild = children.get(i);
 			final PhysicalOperator rootOpOfNextChild = nextChild.getRootOperator();
-			if( rootOpOfNextChild instanceof PhysicalOpRequest ){
+			if( ! ignorePhysicalOpsForLogicalAddOps && rootOpOfNextChild instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
 						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(rootOpOfNextChild),
 						currentSubPlan );
 			}
-			else if ( currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
+			else if ( ! ignorePhysicalOpsForLogicalAddOps && currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
 						LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(currentSubPlan.getRootOperator()),
 						nextChild );
@@ -179,7 +183,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		// Before going to the generic option that works for all cases,
 		// check whether we have a case in which the parallel multi-left-
 		// join can be used.
-		if ( children.size() > 2 ) {
+		if ( ! ignoreParallelMultiLeftJoin && children.size() > 2 ) {
 			final List<LogicalOpRequest<?,?>> optionalParts = PhysicalOpParallelMultiLeftJoin.checkApplicability(children);
 			if ( optionalParts != null ) {
 				// If the parallel multi-left-join can indeed be used, do so.
@@ -209,7 +213,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		for ( int i = 1; i < children.size(); ++i ) {
 			final PhysicalPlan nextChild = children.get(i);
 			final PhysicalOperator rootOpOfNextChild = nextChild.getRootOperator();
-			if( rootOpOfNextChild instanceof PhysicalOpRequest ){
+			if( ! ignorePhysicalOpsForLogicalAddOps && rootOpOfNextChild instanceof PhysicalOpRequest ){
 				currentSubPlan = createPhysicalPlanWithUnaryRoot(
 						LogicalOpUtils.createLogicalOptAddOpFromPhysicalReqOp(rootOpOfNextChild),
 						currentSubPlan );
@@ -223,71 +227,6 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 		}
 
 		return currentSubPlan;
-	}
-
-	/**
-	 * Checks whether we have a case in which the parallel multi-left-join can
-	 * be used. If so, this method returns the optional parts of that multi-left-
-	 * join. If not, this method returns <code>null</code>.
-	 */
-	protected static List<LogicalOpRequest<?,?>> getOptionalPartsForParallelMultiLeftJoin( final List<PhysicalPlan> children )
-	{
-		final List<LogicalOpRequest<?,?>> optionalParts = new ArrayList<>( children.size()-1 );
-		final List<ExpectedVariables> expVarsOfOptionalParts = new ArrayList<>( children.size()-1 );
-
-		final Iterator<PhysicalPlan> it = children.iterator();
-		final PhysicalPlan firstChildPlan = it.next(); // the non-optional part
-
-		// condition 1: every non-optional part is just a request operator
-		while ( it.hasNext() ) {
-			final PhysicalOperator childRootOp = it.next().getRootOperator();
-			final LogicalOpRequest<?,?> reqOp;
-			if ( childRootOp instanceof PhysicalOpRequest<?,?> ) {
-				reqOp = ((PhysicalOpRequest<?,?>) childRootOp).getLogicalOperator();
-			}
-			else if ( childRootOp instanceof PhysicalOpRequestWithTranslation<?,?>  ) {
-				reqOp = ((PhysicalOpRequestWithTranslation<?,?>) childRootOp).getLogicalOperator();
-			}
-			else {
-				return null;
-			}
-
-			optionalParts.add(reqOp);
-			expVarsOfOptionalParts.add( reqOp.getRequest().getExpectedVariables() );
-		}
-
-		// condition 2: the join variable(s) between the non-optional part
-		//              and an optional part must be the same for each of
-		//              the optional parts
-		final ExpectedVariables expVarsNonOptPart = firstChildPlan.getExpectedVariables();
-
-		final Iterator<ExpectedVariables> it2 = expVarsOfOptionalParts.iterator();
-		final ExpectedVariables expVarsFirstOptPart = it2.next();
-		final Set<Var> joinVarsFirstOptPart = ExpectedVariablesUtils.intersectionOfAllVariables(expVarsNonOptPart, expVarsFirstOptPart);
-
-		while ( it2.hasNext() ) {
-			final ExpectedVariables expVarsNextOptPart = it2.next();
-			final Set<Var> joinVarsNextOptPart = ExpectedVariablesUtils.intersectionOfAllVariables(expVarsNonOptPart, expVarsNextOptPart);
-			if ( ! joinVarsNextOptPart.equals(joinVarsFirstOptPart) ) {
-				return null;
-			}
-		}
-
-		// condition 3: the only variables that different optional parts
-		//              have in common are the join variable(s)
-		// hence, we need to do a pairwise comparison
-		for ( int i = 0; i < expVarsOfOptionalParts.size()-1; i++ ) {
-			final ExpectedVariables iExpVarsOptPart = expVarsOfOptionalParts.get(i);
-			for ( int j = i+1; j < expVarsOfOptionalParts.size(); j++ ) {
-				final ExpectedVariables jExpVarsOptPart = expVarsOfOptionalParts.get(j);
-				final Set<Var> test = ExpectedVariablesUtils.intersectionOfAllVariables(iExpVarsOptPart, jExpVarsOptPart);
-				if ( ! test.equals(joinVarsFirstOptPart) ) {
-					return null;
-				}
-			}
-		}
-
-		return optionalParts;
 	}
 
 	protected PhysicalPlan createPhysicalPlanForMultiwayUnion( final LogicalOpMultiwayUnion lop, final List<PhysicalPlan> children ) {
