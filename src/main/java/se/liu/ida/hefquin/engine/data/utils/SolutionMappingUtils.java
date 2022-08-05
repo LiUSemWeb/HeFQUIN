@@ -32,9 +32,17 @@ public class SolutionMappingUtils
 	/**
 	 * Creates a solution mapping based on the given {@link QuerySolution}.
 	 */
+	@SuppressWarnings("unused")
 	public static SolutionMapping createSolutionMapping( final QuerySolution s )
 	{
-		return new SolutionMappingImpl( BindingLib.asBinding(s) );
+		final Binding b = BindingLib.asBinding(s);
+		if ( true ) {
+			final BindingBuilder bb = BindingBuilder.create();
+			b.forEach( (var,node) -> bb.add(var, node) );
+			return new SolutionMappingImpl( bb.build() );
+		}
+		else
+			return new SolutionMappingImpl(b);
 	}
 
 	/**
