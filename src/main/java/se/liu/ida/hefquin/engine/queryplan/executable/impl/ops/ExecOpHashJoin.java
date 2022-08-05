@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.utils.Stats;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -17,8 +18,10 @@ import java.util.Set;
 public class ExecOpHashJoin extends BinaryExecutableOpBase
 {
     protected final SolutionMappingsIndex index;
+    protected Stats statsOfIndex = null;
 
     protected boolean child1InputComplete = false;
+    protected boolean child2InputComplete = false;
 
     public ExecOpHashJoin( final ExpectedVariables inputVars1,
                            final ExpectedVariables inputVars2 ) {
@@ -105,6 +108,12 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     @Override
     protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
                                      final ExecutionContext execCxt ) {
-        // nothing to be done here
+        child2InputComplete = true;
+
+        // clear the index to enable the GC to release memory early,
+        // but make sure we keep the final stats of the index
+        statsOfIndex = index.getStats();
+        index.clear();
     }
+
 }
