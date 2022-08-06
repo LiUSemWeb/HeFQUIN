@@ -26,32 +26,22 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
-public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
+public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
-	protected final List<Var> varsInSubQuery;
-
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm ) {
 		super(query, fm, false);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm ) {
 		super(query, fm, false);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
 		super(query, fm, false);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
-	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
-		if ( unjoinableInputSMs != null ) {
-			throw new UnsupportedOperationException();
-		}
-
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Op op = createUnion(solMaps);
 		if ( op == null ) {
 			return null;

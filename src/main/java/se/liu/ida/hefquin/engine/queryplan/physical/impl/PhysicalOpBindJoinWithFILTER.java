@@ -74,8 +74,14 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 		}
 
+		return createExecOp(pt, fm, useOuterJoinSemantics);
+	}
+
+	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
+	                                          final FederationMember fm,
+	                                          final boolean useOuterJoinSemantics ) {
 		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithFILTER( pt, (SPARQLEndpoint) fm, useOuterJoinSemantics );
+			return new ExecOpBindJoinSPARQLwithFILTER( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

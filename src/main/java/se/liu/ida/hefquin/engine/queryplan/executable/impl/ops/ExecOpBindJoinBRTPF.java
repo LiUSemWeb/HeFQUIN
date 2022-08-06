@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTr
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,11 +26,14 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
         varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
 
+	@Override
+	protected Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps ) {
+		return extractUnjoinableInputSMs(solMaps, varsInTP);
+	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps,
-	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
-		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP, unjoinableInputSMs);
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
+		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP);
 
 		if ( restrictedSMs.isEmpty() ) {
 			return null;
@@ -43,17 +47,12 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	// ---- helper functions ---------
 
 	public static Set<SolutionMapping> restrictSolMaps( final Iterable<SolutionMapping> inputSolMaps,
-	                                                    final Set<Var> joinVars,
-	                                                    final List<SolutionMapping> unjoinableInputSMs ) {
+	                                                    final Set<Var> joinVars ) {
 		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
 		for ( final SolutionMapping sm : inputSolMaps ) {
 			final SolutionMapping sm2 = SolutionMappingUtils.restrict(sm, joinVars);
-			if ( ! SolutionMappingUtils.containsBlankNodes(sm2) ) {
-				restrictedSolMaps.add(sm2);
-			}
-			else if ( unjoinableInputSMs != null ){
-				unjoinableInputSMs.add(sm);
-			}
+			assert ! SolutionMappingUtils.containsBlankNodes(sm2);
+			restrictedSolMaps.add(sm2);
 		}
 
 		return restrictedSolMaps;
