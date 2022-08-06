@@ -27,7 +27,7 @@ public abstract class BaseForExecOpBindJoin<QueryType extends Query,
     public int preferredInputBlockSize() {
         // This algorithm can process a sequence of input solution mappings.
         // To find a trade-off between #request and dataRecv, the size block size can be optimized in query planning
-        return 10;
+        return 30;
     }
 
     @Override
