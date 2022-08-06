@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.algebra.Op;
@@ -28,35 +26,29 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
-public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
+public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 {
-	protected final Set<Var> varsInSubQuery;
-
 	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query,
 	                                       final SPARQLEndpoint fm,
 	                                       final boolean useOuterJoinSemantics ) {
 		super(query, fm, useOuterJoinSemantics);
-		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final BGP query,
 	                                       final SPARQLEndpoint fm,
 	                                       final boolean useOuterJoinSemantics ) {
 		super(query, fm, useOuterJoinSemantics);
-		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
 	                                       final boolean useOuterJoinSemantics ) {
 		super(query, fm, useOuterJoinSemantics);
-		varsInSubQuery = QueryPatternUtils.getVariablesInPattern(query);
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps,
-	                                                               final List<SolutionMapping> unjoinableInputSMs ) {
-		final Op op = createFilter(solMaps, query, varsInSubQuery, unjoinableInputSMs);
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+		final Op op = createFilter(solMaps);
 		if ( op == null ) {
 			return null;
 		}
@@ -69,27 +61,16 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinWithReq
 
 	// ---- helper functions ---------
 
-	public static Op createFilter( final Iterable<SolutionMapping> solMaps,
-	                               final SPARQLGraphPattern pattern,
-	                               final Set<Var> varsInPattern,
-	                               final List<SolutionMapping> unjoinableInputSMs ) {
-		if ( varsInPattern.isEmpty() ) {
-			return QueryPatternUtils.convertToJenaOp(pattern);
+	public Op createFilter( final Iterable<SolutionMapping> solMaps ) {
+		if ( varsInSubQuery.isEmpty() ) {
+			return QueryPatternUtils.convertToJenaOp(query);
 		}
 
 		Expr disjunction = null;
-		boolean solMapsContainBlankNodes = false;
 		for ( final SolutionMapping s : solMaps ) {
-			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInPattern );
+			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );
 
-			if ( SolutionMappingUtils.containsBlankNodes(b) ) {
-				solMapsContainBlankNodes = true;
-				if ( unjoinableInputSMs != null ) {
-					unjoinableInputSMs.add(s);
-				}
-
-				continue;
-			}
+			assert ! SolutionMappingUtils.containsBlankNodes(b);
 
 			Expr conjunction = null;
 			final Iterator<Var> vars = b.vars(); 
@@ -113,10 +94,10 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinWithReq
 		}
 
 		if ( disjunction == null ) {
-			return solMapsContainBlankNodes ? null : QueryPatternUtils.convertToJenaOp(pattern);
+			return QueryPatternUtils.convertToJenaOp(query);
 		}
 
-		return OpFilter.filter( disjunction, QueryPatternUtils.convertToJenaOp(pattern) );
+		return OpFilter.filter( disjunction, QueryPatternUtils.convertToJenaOp(query) );
 	}
 
 }

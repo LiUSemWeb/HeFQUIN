@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
@@ -15,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
  * Abstract base class to implement bind joins by using request operators.
@@ -35,11 +38,18 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 {
 	protected final boolean useOuterJoinSemantics;
 
+	/**
+	 * The number of solution mappings that this operator uses for each
+	 * of the bind join requests. This number may be adapted at runtime.
+	 */
+	protected int requestBlockSize;
+
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
 	                                            final boolean useOuterJoinSemantics ) {
 		super(query, fm);
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
+		this.requestBlockSize = preferredInputBlockSize();
 	}
 
 	@Override
@@ -48,13 +58,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	                         final ExecutionContext execCxt)
 			throws ExecOpExecutionException
 	{
-		final List<SolutionMapping> unjoinableInputSMs;
-		if ( useOuterJoinSemantics )
-			unjoinableInputSMs = new ArrayList<>();
-		else
-			unjoinableInputSMs = null;
-
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator( input.getSolutionMappings(), unjoinableInputSMs );
+		final Pair<List<SolutionMapping>, List<SolutionMapping>> splitInput = extractUnjoinableInputSMs( input.getSolutionMappings() );
+		final List<SolutionMapping> unjoinableInputSMs = splitInput.object1;
+		final List<SolutionMapping> joinableInputSMs   = splitInput.object2;
 
 		if ( useOuterJoinSemantics ) {
 			for ( final SolutionMapping sm : unjoinableInputSMs ) {
@@ -62,12 +68,22 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			}
 		}
 
+		_process( joinableInputSMs, sink, execCxt );
+	}
+
+	protected void _process( final Iterable<SolutionMapping> joinableInputSMs,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt)
+			throws ExecOpExecutionException
+	{
+		final NullaryExecutableOp reqOp = createExecutableRequestOperator(joinableInputSMs);
+
 		if ( reqOp != null ) {
 			final MyIntermediateResultElementSink mySink;
 			if ( useOuterJoinSemantics )
-				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, input);
+				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, joinableInputSMs);
 			else
-				mySink = new MyIntermediateResultElementSink(sink, input);
+				mySink = new MyIntermediateResultElementSink(sink, joinableInputSMs);
 
 			try {
 				reqOp.execute(mySink, execCxt);
@@ -80,8 +96,44 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 	}
 
-	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps,
-	                                                                        List<SolutionMapping> unjoinableInputSMs );
+	/**
+	 * Splits the given collection of solution mappings into two such that the
+	 * first list contains all the solution mappings that are guaranteed not to
+	 * have any join partner and the second list contains the rest of the given
+	 * input solution mappings (which may have join partners). Typically, the
+	 * solution mappings that are guaranteed not to have join partners are the
+	 * ones that have a blank node for one of the join variables.
+	 */
+	protected abstract Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( Iterable<SolutionMapping> solMaps );
+
+	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
+
+	/**
+	 * This function may be used to implement {@link #extractUnjoinableInputSMs(Iterable).
+	 */
+	protected Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps,
+	                                                                                        final Iterable<Var> potentialJoinVars ) {
+		final List<SolutionMapping> unjoinable = new ArrayList<>();
+		final List<SolutionMapping> joinable   = new ArrayList<>();
+
+		for ( final SolutionMapping sm : solMaps) {
+			boolean isJoinable = true;
+			for ( final Var joinVar : potentialJoinVars ) {
+				final Node joinValue = sm.asJenaBinding().get(joinVar);
+				if ( joinValue != null && joinValue.isBlank() ) {
+					isJoinable = false;
+					break;
+				}
+			}
+
+			if ( isJoinable )
+				joinable.add(sm);
+			else
+				unjoinable.add(sm);
+		}
+
+		return new Pair<>(unjoinable, joinable);
+	}
 
 
 	// ------- helper classes ------
@@ -92,15 +144,15 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
 
 		public MyIntermediateResultElementSink( final IntermediateResultElementSink outputSink,
-		                                        final IntermediateResultBlock input ) {
+		                                        final Iterable<SolutionMapping> inputSolutionMappings ) {
 			this.outputSink = outputSink;
-			this.inputSolutionMappings = input.getSolutionMappings();
+			this.inputSolutionMappings = inputSolutionMappings;
 		}
 
 		@Override
 		public void send( final SolutionMapping smFromRequest ) {
 			// TODO: this implementation is very inefficient
-			// We need an implementation of IntermediateResultBlock that can
+			// We need an implementation of inputSolutionMappings that can
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -120,14 +172,14 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
 
 		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
-		                                                 final IntermediateResultBlock input ) {
-			super(outputSink, input);
+		                                                 final Iterable<SolutionMapping> inputSolutionMappings ) {
+			super(outputSink, inputSolutionMappings);
 		}
 
 		@Override
 		public void send( final SolutionMapping smFromRequest ) {
 			// TODO: this implementation is very inefficient
-			// We need an implementation of IntermediateResultBlock that can
+			// We need an implementation of inputSolutionMappings that can
 			// be used like an index.
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -152,37 +204,5 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 	} // end of helper class MyIntermediateResultElementSinkOuterJoin
-
-
-	protected static class MyIntermediateResultElementSinkWithTranslation implements IntermediateResultElementSink
-	{
-		protected final IntermediateResultElementSink outputSink;
-		protected final Iterable<SolutionMapping> inputSolutionMappings;
-		protected final VocabularyMapping vocabularyMapping;
-
-		public MyIntermediateResultElementSinkWithTranslation( final IntermediateResultElementSink outputSink,
-		                                        final IntermediateResultBlock input,
-		                                        final VocabularyMapping vm) {
-			this.outputSink = outputSink;
-			this.inputSolutionMappings = input.getSolutionMappings();
-			this.vocabularyMapping = vm;
-		}
-
-		@Override
-		public void send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of IntermediateResultBlock that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
-			final Set<SolutionMapping> smFromRequestTranslated = vocabularyMapping.translateSolutionMapping(smFromRequest);
-			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-				for (final SolutionMapping smTranslated : smFromRequestTranslated) {
-					if ( SolutionMappingUtils.compatible(smFromInput, smTranslated) ) {
-						outputSink.send( SolutionMappingUtils.merge(smFromInput,smTranslated) );
-					}
-				}
-			}
-		}
-    }
 
 }
