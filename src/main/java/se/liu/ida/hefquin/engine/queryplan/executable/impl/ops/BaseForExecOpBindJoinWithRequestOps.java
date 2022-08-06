@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -55,8 +56,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	@Override
 	protected void _process( final IntermediateResultBlock input,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt)
-			throws ExecOpExecutionException
+	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final Pair<List<SolutionMapping>, List<SolutionMapping>> splitInput = extractUnjoinableInputSMs( input.getSolutionMappings() );
 		final List<SolutionMapping> unjoinableInputSMs = splitInput.object1;
@@ -73,8 +73,26 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	protected void _process( final Iterable<SolutionMapping> joinableInputSMs,
 	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt)
-			throws ExecOpExecutionException
+	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		final Iterator<SolutionMapping> it = joinableInputSMs.iterator();
+		while ( it.hasNext() ) {
+			// create next chunk of input solution mappings to be processed
+			final List<SolutionMapping> nextChunkOfInput = new ArrayList<>(requestBlockSize);
+			int chunkSize = 0;
+			while ( chunkSize < requestBlockSize && it.hasNext() ) {
+				nextChunkOfInput.add( it.next() );
+				chunkSize++;
+			}
+
+			// process the created chunk of input solution mappings
+			_processWithoutSplittingInputFirst(nextChunkOfInput, sink, execCxt);
+		}
+	}
+
+	protected void _processWithoutSplittingInputFirst( final List<SolutionMapping> joinableInputSMs,
+	                                                   final IntermediateResultElementSink sink,
+	                                                   final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(joinableInputSMs);
 
