@@ -61,19 +61,25 @@ public abstract class EngineTestBase
 
 
 	/**
-	 * Asserts that the solution mappings being iterated over are exactly the same, in any order, as the ones contained within the list.
-	 * All solution mappings in the list must be found in the iterator, to the same amount.
+	 * Asserts that the solution mappings returned by the given iterator are
+	 * exactly the same, in any order, as the ones contained in the given list.
+	 * All solution mappings in the list must be found in the iterator, to the
+	 * same amount.
 	 */
-	protected void assertFullComposition( final Iterator<SolutionMapping> it,
-										  final List<SolutionMapping> inputList)
+	public void assertFullComposition( final Iterator<SolutionMapping> it,
+	                                   final List<SolutionMapping> expected )
 	{
-		final List<SolutionMapping> list = new ArrayList<>(inputList);
+		final List<SolutionMapping> list = new ArrayList<>(expected);
 		while (it.hasNext()) {
-			assertTrue(list.remove(it.next()));
+			final SolutionMapping sm = it.next();
+			assertTrue( "Unexpected solution mapping returned by the iterator: " + sm.asJenaBinding().toString(),
+			            list.remove(sm) );
 		}
-		assertTrue(list.isEmpty());
+
+		assertTrue( "The iterator did not return " + list.size() + " of the expected solution mappings; for instance, the following mapping was missing: " + list.get(0).asJenaBinding().toString(),
+		            list.isEmpty() );
 	}
-	
+
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
 	                              final String expectedURIforV1, final Var v1,
 	                              final String expectedURIforV2, final Var v2 )
