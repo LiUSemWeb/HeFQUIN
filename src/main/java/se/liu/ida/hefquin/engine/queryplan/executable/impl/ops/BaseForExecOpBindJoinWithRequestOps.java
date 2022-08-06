@@ -23,15 +23,17 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 /**
  * Abstract base class to implement bind joins by using request operators.
  *
- * Note that executing the request operator is a blocking operation within
- * the algorithm implemented by this class. However, it does not matter
- * because this bind join algorithm uses only one request for any given
- * {@link IntermediateResultBlock}. Issuing the request directly (and then
- * using a response processor) would also be blocking because we would have
- * to wait for the response processor. Attention: things may look different
- * if we have to do multiple requests per {@link IntermediateResultBlock},
- * which may be the case if the block size is greater than what the
- * server can/wants to handle.
+ * Instead of simply using every input block of solution mappings to directly
+ * create a corresponding bind-join request, this implementation can split the
+ * input block into smaller blocks for the requests. On top of that, this
+ * implementation automatically reduces the block size for requests in case
+ * a request operator fails and, then, the implementation even tries to
+ * re-process (with the reduced request block size) the input solution
+ * mappings for which the request operator failed.
+ *
+ * A potential downside of this capability is that, if this algorithm has
+ * to execute multiple requests per input block, then these requests are
+ * executed sequentially.
  */
 public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
                                                           MemberType extends FederationMember>
@@ -44,6 +46,12 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 * of the bind join requests. This number may be adapted at runtime.
 	 */
 	protected int requestBlockSize;
+
+	/**
+	 * The minimum value to which {@link #requestBlockSize} can be reduced.
+	 */
+	protected static final int minimumRequestBlockSize = 5;
+
 
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
@@ -107,10 +115,38 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 				reqOp.execute(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
-				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+				final boolean requestBlockSizeReduced = reduceRequestBlockSize();
+				if ( requestBlockSizeReduced && ! mySink.hasObtainedInputAlready() ) {
+					// If the request operator did not yet sent any solution
+					// mapping to the sink, then we can retry to process the
+					// given list of input solution mappings with the reduced
+					// request block size.
+					_process(joinableInputSMs, mySink, execCxt);
+				}
+				else {
+					throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+				}
 			}
 
 			mySink.flush();
+		}
+	}
+
+	/**
+	 * Reduces {@link #requestBlockSize} to its current value divided
+	 * by 2 if the resulting value would still be greater or equal to
+	 * {@link #minimumRequestBlockSize}. In this case, this function
+	 * returns <code>true</code>. Otherwise, the function returns
+	 * <code>false</code> without reducing {@link #requestBlockSize}.
+	 */
+	protected boolean reduceRequestBlockSize() {
+		final int newRequestBlockSize = requestBlockSize / 2;
+		if ( newRequestBlockSize < minimumRequestBlockSize ) {
+			return false;
+		}
+		else {
+			requestBlockSize = newRequestBlockSize;
+			return true;
 		}
 	}
 
@@ -160,6 +196,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	{
 		protected final IntermediateResultElementSink outputSink;
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
+		private boolean inputObtained = false;
 
 		public MyIntermediateResultElementSink( final IntermediateResultElementSink outputSink,
 		                                        final Iterable<SolutionMapping> inputSolutionMappings ) {
@@ -168,7 +205,12 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 		@Override
-		public void send( final SolutionMapping smFromRequest ) {
+		public final void send( final SolutionMapping smFromRequest ) {
+			inputObtained = true;
+			_send(smFromRequest);
+		}
+
+		protected void _send( final SolutionMapping smFromRequest ) {
 			// TODO: this implementation is very inefficient
 			// We need an implementation of inputSolutionMappings that can
 			// be used like an index.
@@ -181,6 +223,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 		public void flush() { }
+
+		public final boolean hasObtainedInputAlready() { return inputObtained; }
 
 	} // end of helper class MyIntermediateResultElementSink
 
@@ -195,7 +239,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 		@Override
-		public void send( final SolutionMapping smFromRequest ) {
+		public void _send( final SolutionMapping smFromRequest ) {
 			// TODO: this implementation is very inefficient
 			// We need an implementation of inputSolutionMappings that can
 			// be used like an index.
