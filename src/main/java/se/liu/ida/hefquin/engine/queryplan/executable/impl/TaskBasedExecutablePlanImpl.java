@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -126,6 +128,17 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 	public ExecutablePlanStats getStats() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Exception> getExceptionsCaughtDuringExecution() {
+		final List<Exception> allExceptions = new ArrayList<>();
+		for ( final ExecPlanTask t : tasks ) {
+			final List<Exception> exceptionsOfTask = ( (ExecPlanTaskBase) t ).getExceptionsCaughtDuringExecution();
+			allExceptions.addAll(exceptionsOfTask);
+		}
+
+		return allExceptions;
 	}
 
 	public void print( final PrintStream str ) {

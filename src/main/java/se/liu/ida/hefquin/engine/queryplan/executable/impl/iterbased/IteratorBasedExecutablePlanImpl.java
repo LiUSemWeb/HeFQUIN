@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -34,6 +36,11 @@ public class IteratorBasedExecutablePlanImpl implements ExecutablePlan
 	@Override
 	public ExecutablePlanStats getStats() {
 		return ResultIteratorUtils.tryGetStatsOfProducingSubPlan(it);
+	}
+
+	@Override
+	public List<Exception> getExceptionsCaughtDuringExecution() {
+		return ResultIteratorUtils.tryGetExceptionsOfProducingSubPlan(it);
 	}
 
 }
