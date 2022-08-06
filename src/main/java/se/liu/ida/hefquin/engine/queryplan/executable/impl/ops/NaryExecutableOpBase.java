@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 /**
  * Top-level base class for all implementations of {@link NaryExecutableOp}.
  */
-public abstract class NaryExecutableOpBase implements NaryExecutableOp
+public abstract class NaryExecutableOpBase extends BaseForExecOps implements NaryExecutableOp
 {
 
 	@Override

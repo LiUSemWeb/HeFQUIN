@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * Top-level base class for all implementations of {@link UnaryExecutableOp}.
  */
-public abstract class UnaryExecutableOpBase implements UnaryExecutableOp
+public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp
 {
 	private boolean executionConcluded          = false;
 	private int numberOfInputBlocksProcessed    = 0;
@@ -25,10 +25,15 @@ public abstract class UnaryExecutableOpBase implements UnaryExecutableOp
 	@Override
 	public final void process( final IntermediateResultBlock input,
 	                           final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	                           final ExecutionContext execCxt ) {
 		timeAtCurrentProcStart = System.currentTimeMillis();
 
-		_process(input, sink, execCxt);
+		try {
+			_process(input, sink, execCxt);
+		}
+		catch ( ExecOpExecutionException e ) {
+			recordExceptionCaughtDuringExecution(e);
+		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentProcStart;
 

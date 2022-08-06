@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * Top-level base class for all implementations of {@link BinaryExecutableOp}.
  */
-public abstract class BinaryExecutableOpBase implements BinaryExecutableOp
+public abstract class BinaryExecutableOpBase extends BaseForExecOps implements BinaryExecutableOp
 {
 	private boolean leftInputConsumed           = false;
 	private boolean rightInputConsumed          = false;
@@ -34,11 +34,16 @@ public abstract class BinaryExecutableOpBase implements BinaryExecutableOp
 	public final void processBlockFromChild1(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final ExecutionContext execCxt )
 	{
 		timeAtCurrentLeftProcStart = System.currentTimeMillis();
 
-		_processBlockFromChild1(input, sink, execCxt);
+		try {
+			_processBlockFromChild1(input, sink, execCxt);
+		}
+		catch ( ExecOpExecutionException e ) {
+			recordExceptionCaughtDuringExecution(e);
+		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentLeftProcStart;
 
@@ -61,11 +66,16 @@ public abstract class BinaryExecutableOpBase implements BinaryExecutableOp
 	public final void processBlockFromChild2(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final ExecutionContext execCxt )
 	{
 		timeAtCurrentRightProcStart = System.currentTimeMillis();
 
-		_processBlockFromChild2(input, sink, execCxt);
+		try {
+			_processBlockFromChild2(input, sink, execCxt);
+		}
+		catch ( ExecOpExecutionException e ) {
+			recordExceptionCaughtDuringExecution(e);
+		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentRightProcStart;
 
