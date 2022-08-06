@@ -13,8 +13,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoinSPARQLwithFILTER{
 	
-	public ExecOpBindJoinSPARQLwithFILTERandTranslation( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithFILTERandTranslation( final SPARQLGraphPattern query,
+	                                                     final SPARQLEndpoint fm,
+	                                                     final boolean useOuterJoinSemantics ) {
+		super(query, fm, useOuterJoinSemantics);
 
 		assert fm.getVocabularyMapping() != null;
 	}

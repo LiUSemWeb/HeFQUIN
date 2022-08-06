@@ -2,26 +2,38 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTERandTranslation;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpBindJoinWithFILTERandTranslation extends BasePhysicalOpSingleInputJoin
+public class PhysicalOpBindJoinWithFILTERandTranslation extends PhysicalOpBindJoinWithFILTER
 {
 	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpTPAdd lop ) {
 		super(lop);
 
-		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+		assert lop.getFederationMember().getVocabularyMapping() != null;
+	}
+
+	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpTPOptAdd lop ) {
+		super(lop);
+
 		assert lop.getFederationMember().getVocabularyMapping() != null;
 	}
 
 	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpBGPAdd lop ) {
 		super(lop);
 
-		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+		assert lop.getFederationMember().getVocabularyMapping() != null;
+	}
+
+	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpBGPOptAdd lop ) {
+		super(lop);
+
 		assert lop.getFederationMember().getVocabularyMapping() != null;
 	}
 
@@ -32,27 +44,13 @@ public class PhysicalOpBindJoinWithFILTERandTranslation extends BasePhysicalOpSi
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
-		if ( lop instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
-			final FederationMember fm = tpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpBindJoinSPARQLwithFILTERandTranslation( tpAdd.getTP(), (SPARQLEndpoint) fm );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
-			final FederationMember fm = bgpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpBindJoinSPARQLwithFILTERandTranslation( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
-			else
-				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-		}
+	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
+	                                          final FederationMember fm,
+	                                          final boolean useOuterJoinSemantics ) {
+		if ( fm instanceof SPARQLEndpoint )
+			return new ExecOpBindJoinSPARQLwithFILTERandTranslation( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics );
 		else
-			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
+			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
 
 	@Override
