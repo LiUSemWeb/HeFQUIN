@@ -19,22 +19,25 @@ public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinW
 
 	public BaseForExecOpBindJoinSPARQL( final TriplePattern query,
 	                                    final SPARQLEndpoint fm,
-	                                    final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                    final boolean useOuterJoinSemantics,
+	                                    final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public BaseForExecOpBindJoinSPARQL( final BGP query,
 	                                    final SPARQLEndpoint fm,
-	                                    final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                    final boolean useOuterJoinSemantics,
+	                                    final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 
 	public BaseForExecOpBindJoinSPARQL( final SPARQLGraphPattern query,
 	                                    final SPARQLEndpoint fm,
-	                                    final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                    final boolean useOuterJoinSemantics,
+	                                    final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
 	}
 

@@ -15,8 +15,10 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
  */
 public class ExecOpRequestTPFatBRTPFServer extends BaseForExecOpTriplePatternRequestWithTPF<BRTPFServer>
 {
-	public ExecOpRequestTPFatBRTPFServer( final TriplePatternRequest req, final BRTPFServer fm ) {
-		super( req, fm );
+	public ExecOpRequestTPFatBRTPFServer( final TriplePatternRequest req,
+	                                      final BRTPFServer fm,
+	                                      final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

@@ -75,7 +75,7 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 
 		final LogicalOpTPAdd tpadd = new LogicalOpTPAdd(fm, tp);
 		final PhysicalOpBindJoinWithUNION bindjoin = new PhysicalOpBindJoinWithUNION(tpadd);
-		return bindjoin.createExecOp(expectedVariables);
+		return bindjoin.createExecOp(false, expectedVariables);
 	}
 
 }

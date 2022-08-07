@@ -24,8 +24,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpRequestBRTPFWithTranslation extends BaseForExecOpRequest<BindingsRestrictedTriplePatternRequest,BRTPFServer>
 {
 	public ExecOpRequestBRTPFWithTranslation( final BindingsRestrictedTriplePatternRequest req,
-	                           final BRTPFServer fm ) {
-		super( req, fm );
+	                                          final BRTPFServer fm,
+	                                          final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 		assert fm.getVocabularyMapping() != null;	
 	}
 
@@ -60,13 +61,15 @@ public class ExecOpRequestBRTPFWithTranslation extends BaseForExecOpRequest<Bind
 		}
 	}
 	
-	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt, final Set<SolutionMapping> sms) throws ExecOpExecutionException{
+	protected Iterable<SolutionMapping> handleTriplePattern( final TriplePattern tp,
+	                                                         final ExecutionContext execCxt,
+	                                                         final Set<SolutionMapping> sms ) throws ExecOpExecutionException {
 		final BRTPFRequest newReq = new BRTPFRequestImpl(tp, sms);
-		final ExecOpRequestBRTPF op = new ExecOpRequestBRTPF(newReq, fm);
+		final ExecOpRequestBRTPF op = new ExecOpRequestBRTPF(newReq, fm, false);
 		final CollectingIntermediateResultElementSinkWithTranslation sink = new CollectingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
-		
+
 		op.execute(sink, execCxt);
-	
+
 		return sink.getCollectedSolutionMappings();
 	}
 	

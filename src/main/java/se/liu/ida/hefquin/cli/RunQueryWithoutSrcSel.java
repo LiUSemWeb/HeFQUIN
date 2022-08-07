@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.cli;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +22,7 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.utils.Stats;
 import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
@@ -81,15 +83,34 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		modTime.startTimer();
 
-		QueryProcStats queryProcStats = null;
+		Pair<QueryProcStats, List<Exception>> statsAndExceptions = null;
 
 		try {
-			queryProcStats = e.executeQuery(query, resFmt);
+			statsAndExceptions = e.executeQuery(query, resFmt);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );
+		}
+
+		if ( statsAndExceptions != null && ! statsAndExceptions.object2.isEmpty() ) {
+			final int numberOfExceptions = statsAndExceptions.object2.size();
+			System.err.println("Attention: The query result may be incomplete because the following " + numberOfExceptions + " exceptions were caught when executing the query plan.");
+			System.err.println();
+			for ( int i = 0; i < numberOfExceptions; i++ ) {
+				final Exception ex = statsAndExceptions.object2.get(i);
+				System.err.println( (i+1) + " " + ex.getClass().getName() + ": " + ex.getMessage() );
+				if ( ex.getCause() != null ) {
+					System.err.println("    ... caused by the following chain of exceptions:");
+					Throwable cause = ex.getCause();
+					while ( cause != null ) {
+						System.err.println( "       " + cause.getClass().getName() + ": " + cause.getMessage() );
+						cause = cause.getCause();
+					}
+				}
+				System.err.println();
+			}
 		}
 
 		if ( modTime.timingEnabled() ) {
@@ -116,8 +137,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace();
 		}
 
-		if ( queryProcStats != null && contains(argQueryProcStats) ) {
-			StatsPrinter.print(queryProcStats, System.err, true);
+		if ( statsAndExceptions != null && contains(argQueryProcStats) ) {
+			StatsPrinter.print(statsAndExceptions.object1, System.err, true);
 		}
 
 		if ( contains(argFedAccessStats) ) {

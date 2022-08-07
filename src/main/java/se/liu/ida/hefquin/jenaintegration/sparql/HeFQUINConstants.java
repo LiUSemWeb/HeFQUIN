@@ -16,5 +16,7 @@ public class HeFQUINConstants {
     public static final Symbol sysIsExperimentRun         = Symbol.create(systemVarNS+"isExperimentRun");
     public static final Symbol sysPrintLogicalPlans       = Symbol.create(systemVarNS+"printLogicalPlans");
     public static final Symbol sysPrintPhysicalPlans      = Symbol.create(systemVarNS+"printPhysicalPlans");
+
     public static final Symbol sysQueryProcStats          = Symbol.create(systemVarNS+"queryProcStats");
+    public static final Symbol sysQueryProcExceptions     = Symbol.create(systemVarNS+"queryProcExceptions");
 }

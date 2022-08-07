@@ -19,10 +19,11 @@ public class PhysicalOpSymmetricHashJoin extends BasePhysicalOpBinaryJoin
 	}
 
     @Override
-    public BinaryExecutableOp createExecOp( final ExpectedVariables ... inputVars ) {
+    public BinaryExecutableOp createExecOp( final boolean collectExceptions,
+                                            final ExpectedVariables ... inputVars ) {
         assert inputVars.length == 2;
 
-        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1] );
+        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions );
     }
 
     @Override

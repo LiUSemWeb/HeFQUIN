@@ -15,7 +15,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoin<QueryType extends Query,
 	protected final QueryType query;
 	protected final MemberType fm;
 
-	public BaseForExecOpIndexNestedLoopsJoin( final QueryType query, final MemberType fm ) {
+	public BaseForExecOpIndexNestedLoopsJoin( final QueryType query, final MemberType fm, final boolean collectExceptions ) {
+		super(collectExceptions);
+
 		assert query != null;
 		assert fm != null;
 

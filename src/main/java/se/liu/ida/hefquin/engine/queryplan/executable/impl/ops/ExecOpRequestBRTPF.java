@@ -17,8 +17,9 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {
 	public ExecOpRequestBRTPF( final BindingsRestrictedTriplePatternRequest req,
-	                           final BRTPFServer fm ) {
-		super( req, fm );
+	                           final BRTPFServer fm,
+	                           final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

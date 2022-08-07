@@ -22,8 +22,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class BaseForExecOpTriplePatternRequestWithTranslation<MemberType extends FederationMember> extends BaseForExecOpRequest<TriplePatternRequest, MemberType>{
 	
-	public BaseForExecOpTriplePatternRequestWithTranslation( final TriplePatternRequest req, final MemberType fm) {
-		super( req, fm );
+	public BaseForExecOpTriplePatternRequestWithTranslation( final TriplePatternRequest req,
+	                                                         final MemberType fm,
+	                                                         final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 
 		assert fm.getVocabularyMapping() != null;
 	}
@@ -52,15 +54,15 @@ public abstract class BaseForExecOpTriplePatternRequestWithTranslation<MemberTyp
 		}
 	}
 	
-	protected Iterable<SolutionMapping> handleTriplePattern(final TriplePattern tp, final ExecutionContext execCxt) throws ExecOpExecutionException{
-		
+	protected Iterable<SolutionMapping> handleTriplePattern( final TriplePattern tp,
+	                                                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		final TriplePatternRequest newReq = new TriplePatternRequestImpl(tp);
 		final CollectingIntermediateResultElementSinkWithTranslation sink = new CollectingIntermediateResultElementSinkWithTranslation(fm.getVocabularyMapping());
 		if (fm instanceof TPFServer) {
-			final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(newReq, (TPFServer) fm);
+			final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(newReq, (TPFServer) fm, false);
 			op.execute(sink, execCxt);		
 		} else if (fm instanceof BRTPFServer) {
-			final ExecOpRequestTPFatBRTPFServer op = new ExecOpRequestTPFatBRTPFServer(newReq, (BRTPFServer) fm);
+			final ExecOpRequestTPFatBRTPFServer op = new ExecOpRequestTPFatBRTPFServer(newReq, (BRTPFServer) fm, false);
 			op.execute(sink, execCxt);
 		} else {
 			throw new ExecOpExecutionException(Op.class.toString(), this);

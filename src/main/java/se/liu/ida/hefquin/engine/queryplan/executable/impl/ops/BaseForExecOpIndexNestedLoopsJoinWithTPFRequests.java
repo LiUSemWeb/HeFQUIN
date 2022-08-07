@@ -14,8 +14,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 {
 	protected BaseForExecOpIndexNestedLoopsJoinWithTPFRequests( final TriplePattern query,
 	                                                            final MemberType fm,
-	                                                            final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                                            final boolean useOuterJoinSemantics,
+	                                                            final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	@Override

@@ -26,8 +26,8 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 {
 	private int numberOfPageRequestsIssued = 0;
 
-	public BaseForExecOpRequestWithTPFPaging( final ReqType req, final MemberType fm ) {
-		super( req, fm );
+	public BaseForExecOpRequestWithTPFPaging( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

@@ -28,16 +28,16 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
-	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm);
+		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
 	protected Op createUnion( final Iterable<SolutionMapping> solMaps ) {

@@ -23,8 +23,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
-	public BaseForExecOpTriplesRequest( final ReqType req, final MemberType fm ) {
-		super( req, fm );
+	public BaseForExecOpTriplesRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

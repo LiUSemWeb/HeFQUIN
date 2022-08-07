@@ -10,6 +10,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class UnaryExecutableOpBaseWithIterator extends UnaryExecutableOpBase
 {
+	public UnaryExecutableOpBaseWithIterator( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
+
 	@Override
 	public int preferredInputBlockSize() {
 		return 1;

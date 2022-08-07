@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
@@ -71,6 +72,10 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	}
 
 	protected abstract ExecutableOperator getExecOp();
+
+	public List<Exception> getExceptionsCaughtDuringExecution() {
+		return getExecOp().getExceptionsCaughtDuringExecution();
+	}
 
 	@Override
 	public boolean isRunning() {

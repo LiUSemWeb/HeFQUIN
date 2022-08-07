@@ -11,12 +11,17 @@ public interface PhysicalOperator
 	 * has to create a new {@link ExecutableOperator} object each
 	 * time it is called.
 	 *
+	 * The given collectExceptions flag is passed to the executable
+	 * operator and determines whether that operator collects its
+	 * exceptions (see {@link ExecutableOperator#getExceptionsCaughtDuringExecution()})
+	 * or throws them immediately.
+	 *
 	 * The number of {@link ExpectedVariables} objects passed as
 	 * arguments to this method must be in line with the degree of
 	 * this operator (e.g., for a unary operator, exactly one such
 	 * object must be passed).
 	 */
-	ExecutableOperator createExecOp( ExpectedVariables ... inputVars );
+	ExecutableOperator createExecOp( boolean collectExceptions, ExpectedVariables ... inputVars );
 
 	/**
 	 * Returns the variables that can be expected in the solution

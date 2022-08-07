@@ -15,8 +15,10 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
  */
 public class ExecOpRequestTPFatTPFServer extends BaseForExecOpTriplePatternRequestWithTPF<TPFServer>
 {
-	public ExecOpRequestTPFatTPFServer( final TriplePatternRequest req, final TPFServer fm ) {
-		super( req, fm );
+	public ExecOpRequestTPFatTPFServer( final TriplePatternRequest req,
+	                                    final TPFServer fm,
+	                                    final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

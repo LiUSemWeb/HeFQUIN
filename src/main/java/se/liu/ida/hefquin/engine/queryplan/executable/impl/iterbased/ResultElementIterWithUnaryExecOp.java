@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -28,6 +30,10 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 
 	public ExecutablePlanStats tryGetStatsOfInput() {
 		return ResultIteratorUtils.tryGetStatsOfProducingSubPlan( opRunnerThread.getInput() );
+	}
+
+	public List<Exception> tryGetExceptionsOfInput() {
+		return ResultIteratorUtils.tryGetExceptionsOfProducingSubPlan( opRunnerThread.getInput() );
 	}
 
 	@Override

@@ -25,16 +25,16 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 {
-	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithVALUES( final BGP query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithVALUES( final BGP query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query, final SPARQLEndpoint fm ) {
-		super(query, fm, false);
+	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+		super(query, fm, false, collectExceptions);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		final Op op = OpSequence.create( OpTable.create(table), QueryPatternUtils.convertToJenaOp(query) );
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm);
+		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
 }

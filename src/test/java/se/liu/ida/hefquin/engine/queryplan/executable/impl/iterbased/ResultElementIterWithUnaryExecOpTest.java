@@ -13,8 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithUnaryExecOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOps;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ResultElementIterWithUnaryExecOpTest
@@ -109,8 +108,10 @@ public class ResultElementIterWithUnaryExecOpTest
 		}
 	}
 
-	protected static class UnaryExecutableOp2ForTest implements UnaryExecutableOp
+	protected static class UnaryExecutableOp2ForTest extends BaseForExecOps implements UnaryExecutableOp
 	{
+		public UnaryExecutableOp2ForTest() { super(false); }
+
 		@Override
 		public void process( final IntermediateResultBlock input,
 		                     final IntermediateResultElementSink sink,

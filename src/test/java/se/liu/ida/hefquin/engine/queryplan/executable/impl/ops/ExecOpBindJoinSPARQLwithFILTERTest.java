@@ -98,7 +98,7 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinSPARQLwithFILTER(tp, fm, useOuterJoinSemantics);
+		return new ExecOpBindJoinSPARQLwithFILTER(tp, fm, useOuterJoinSemantics, false);
 	}
 
 }

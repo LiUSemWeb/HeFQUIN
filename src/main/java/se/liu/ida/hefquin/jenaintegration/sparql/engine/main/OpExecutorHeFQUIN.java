@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.QueryExecException;
@@ -40,6 +41,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.Cardinalit
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class OpExecutorHeFQUIN extends OpExecutor
@@ -197,16 +199,17 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			}
 
 			final MaterializingQueryResultSinkImpl sink = new MaterializingQueryResultSinkImpl();
-			final QueryProcStats stats;
+			final Pair<QueryProcStats, List<Exception>> statsAndExceptions;
 
 			try {
-				stats = qProc.processQuery( new GenericSPARQLGraphPatternImpl2(opForStage), sink );
+				statsAndExceptions = qProc.processQuery( new GenericSPARQLGraphPatternImpl2(opForStage), sink );
 			}
 			catch ( final QueryProcException ex ) {
 				throw new QueryExecException("Processing the query operator using HeFQUIN failed.", ex);
 			}
 
-			execCxt.getContext().set( HeFQUINConstants.sysQueryProcStats, stats );
+			execCxt.getContext().set( HeFQUINConstants.sysQueryProcStats,      statsAndExceptions.object1 );
+			execCxt.getContext().set( HeFQUINConstants.sysQueryProcExceptions, statsAndExceptions.object2 );
 
 			return new WrappingQueryIterator( sink.getSolMapsIter() );
 		}

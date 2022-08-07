@@ -45,7 +45,8 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final ExpectedVariables... inputVars ) {
 		final SPARQLGraphPattern pt;
 		final FederationMember fm;
 		final boolean useOuterJoinSemantics;
@@ -74,14 +75,15 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 		}
 
-		return createExecOp(pt, fm, useOuterJoinSemantics);
+		return createExecOp(pt, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
 	                                          final FederationMember fm,
-	                                          final boolean useOuterJoinSemantics ) {
+	                                          final boolean useOuterJoinSemantics,
+	                                          final boolean collectExceptions ) {
 		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithFILTER( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics );
+			return new ExecOpBindJoinSPARQLwithFILTER( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

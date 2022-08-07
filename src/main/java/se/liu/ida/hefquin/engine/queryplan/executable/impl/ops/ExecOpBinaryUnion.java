@@ -7,6 +7,10 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 {
+	public ExecOpBinaryUnion( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
+
 	@Override
 	public int preferredInputBlockSizeFromChild1() {
 		// Since this algorithm processes the input solution mappings

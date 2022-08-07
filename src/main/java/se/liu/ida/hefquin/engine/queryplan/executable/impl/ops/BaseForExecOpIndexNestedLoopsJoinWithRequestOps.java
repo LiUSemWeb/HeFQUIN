@@ -34,8 +34,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
-	                                                           final boolean useOuterJoinSemantics ) {
-		super(query, fm);
+	                                                           final boolean useOuterJoinSemantics,
+	                                                           final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 

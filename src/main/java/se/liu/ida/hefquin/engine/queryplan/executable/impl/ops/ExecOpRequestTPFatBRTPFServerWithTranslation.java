@@ -10,8 +10,10 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
  */
 public class ExecOpRequestTPFatBRTPFServerWithTranslation extends BaseForExecOpTriplePatternRequestWithTranslation<BRTPFServer>
 {
-	public ExecOpRequestTPFatBRTPFServerWithTranslation( final TriplePatternRequest req, final BRTPFServer fm ) {
-		super( req, fm );
+	public ExecOpRequestTPFatBRTPFServerWithTranslation( final TriplePatternRequest req,
+	                                                     final BRTPFServer fm,
+	                                                     final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 	
 }

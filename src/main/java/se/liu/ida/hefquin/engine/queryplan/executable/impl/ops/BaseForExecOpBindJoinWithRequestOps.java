@@ -55,8 +55,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
-	                                            final boolean useOuterJoinSemantics ) {
-		super(query, fm);
+	                                            final boolean useOuterJoinSemantics,
+	                                            final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.requestBlockSize = preferredInputBlockSize();
 	}
@@ -160,6 +161,10 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 */
 	protected abstract Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( Iterable<SolutionMapping> solMaps );
 
+	/**
+	 * The returned operator should be created such that it throws exceptions
+	 * instead of collecting them.
+	 */
 	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
 
 	/**

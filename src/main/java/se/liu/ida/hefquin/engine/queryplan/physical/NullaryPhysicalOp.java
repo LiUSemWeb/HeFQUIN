@@ -6,5 +6,5 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 public interface NullaryPhysicalOp extends PhysicalOperator
 {
 	@Override
-	NullaryExecutableOp createExecOp( ExpectedVariables ... inputVars );
+	NullaryExecutableOp createExecOp( boolean collectExceptions, ExpectedVariables ... inputVars );
 }

@@ -38,14 +38,14 @@ public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 	{
 		if ( qep.numberOfSubPlans() == 0 )
 		{
-			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp();
+			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true);
 			return new ResultElementIterWithNullaryExecOp(execOp, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 1 )
 		{
 			final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( subPlan.getExpectedVariables() );
+			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
 			final ResultBlockIterator blockIterSubPlan = createBlockIterator( elmtIterSubPlan, execOp.preferredInputBlockSize() );
@@ -57,6 +57,7 @@ public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 			final PhysicalPlan subPlan2 = qep.getSubPlan(1);
 
 			final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
+					true,
 					subPlan1.getExpectedVariables(),
 					subPlan2.getExpectedVariables() );
 

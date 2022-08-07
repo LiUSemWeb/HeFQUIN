@@ -40,7 +40,8 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final ExpectedVariables ... inputVars )
 	{
 		if ( lop instanceof LogicalOpTPAdd ) {
 			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
@@ -48,11 +49,11 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final boolean useOuterJoinSemantics = false;
 
 			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics, collectExceptions );
 			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
 			else if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
@@ -62,11 +63,11 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final boolean useOuterJoinSemantics = true;
 
 			if ( fm instanceof TPFServer )
-				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinTPF( tpAdd.getTP(), (TPFServer) fm, useOuterJoinSemantics, collectExceptions );
 			else if ( fm instanceof BRTPFServer )
-				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
 			else if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinSPARQL( tpAdd.getTP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
@@ -76,7 +77,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final boolean useOuterJoinSemantics = false;
 
 			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
@@ -86,7 +87,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 			final boolean useOuterJoinSemantics = true;
 
 			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics );
+				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}

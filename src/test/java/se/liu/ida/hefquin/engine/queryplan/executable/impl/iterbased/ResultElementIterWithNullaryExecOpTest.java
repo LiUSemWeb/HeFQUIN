@@ -13,8 +13,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithNullaryExecOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOps;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ResultElementIterWithNullaryExecOpTest
@@ -72,15 +71,17 @@ public class ResultElementIterWithNullaryExecOpTest
 						TestUtils.createExecContextForTests() );
 	}
 
-	protected static class NullaryExecutableOpForTest implements NullaryExecutableOp
+	protected static class NullaryExecutableOpForTest extends BaseForExecOps implements NullaryExecutableOp
 	{
 		final List<SolutionMapping> list;
 
 		public NullaryExecutableOpForTest() {
+			super(false);
 			list = null;
 		}
 
 		public NullaryExecutableOpForTest( final SolutionMapping[] elements ) {
+			super(false);
 			list = Arrays.asList(elements);
 		}
 

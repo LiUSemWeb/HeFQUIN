@@ -20,8 +20,8 @@ public abstract class BaseForExecOpRequestWithPaging<
                                   PageRespType extends DataRetrievalResponse>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
-	public BaseForExecOpRequestWithPaging( final ReqType req, final MemberType fm ) {
-		super( req, fm );
+	public BaseForExecOpRequestWithPaging( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

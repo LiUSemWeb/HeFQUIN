@@ -29,7 +29,7 @@ public class ExecOpBinaryUnionTest extends TestsForUnionAlgorithms {
 
 	@Override
 	protected BinaryExecutableOp createExecOpForTest() {
-		return new ExecOpBinaryUnion();
+		return new ExecOpBinaryUnion(false);
 	}
 	
 }

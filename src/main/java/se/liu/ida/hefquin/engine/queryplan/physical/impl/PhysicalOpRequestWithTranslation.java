@@ -54,20 +54,21 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 	}
 
 	@Override
-	public NullaryExecutableOp createExecOp( final ExpectedVariables ... inputVars ) {
+	public NullaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                         final ExpectedVariables ... inputVars ) {
 		final ReqType req = lop.getRequest();
 		final MemberType fm = lop.getFederationMember();
 		if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
-			return new ExecOpRequestSPARQLWithTranslation( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+			return new ExecOpRequestSPARQLWithTranslation( (SPARQLRequest) req, (SPARQLEndpoint) fm, collectExceptions );
 		}
 		else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
-			return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm );
+			return new ExecOpRequestTPFatTPFServerWithTranslation( (TriplePatternRequest) req, (TPFServer) fm, collectExceptions );
 		}
 		else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-			return new ExecOpRequestTPFatBRTPFServerWithTranslation( (TriplePatternRequest) req, (BRTPFServer) fm );
+			return new ExecOpRequestTPFatBRTPFServerWithTranslation( (TriplePatternRequest) req, (BRTPFServer) fm, collectExceptions );
 		}
 		else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
-			return new ExecOpRequestBRTPFWithTranslation( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm );
+			return new ExecOpRequestBRTPFWithTranslation( (BindingsRestrictedTriplePatternRequest) req, (BRTPFServer) fm, collectExceptions );
 		}
 		else
 			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");

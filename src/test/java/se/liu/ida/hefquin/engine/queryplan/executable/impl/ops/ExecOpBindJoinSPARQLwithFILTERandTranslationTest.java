@@ -58,7 +58,7 @@ public class ExecOpBindJoinSPARQLwithFILTERandTranslationTest extends TestsForTP
 	protected UnaryExecutableOp createExecOpForTest(TriplePattern tp, SPARQLEndpoint fm,
 													final ExpectedVariables expectedVariables) {
 		final boolean useOuterJoinSemantics = false;
-		return new ExecOpBindJoinSPARQLwithFILTERandTranslation(tp, fm, useOuterJoinSemantics);
+		return new ExecOpBindJoinSPARQLwithFILTERandTranslation(tp, fm, useOuterJoinSemantics, false);
 	}
 	
 	public static VocabularyMapping createVocabularyMappingForTests() {

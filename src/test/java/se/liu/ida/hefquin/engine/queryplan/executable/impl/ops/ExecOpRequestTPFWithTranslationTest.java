@@ -51,7 +51,8 @@ public class ExecOpRequestTPFWithTranslationTest extends ExecOpTestBase {
 		
 		final ExecOpRequestTPFatBRTPFServerWithTranslation op = new ExecOpRequestTPFatBRTPFServerWithTranslation(
 				new TriplePatternRequestImpl(tp),
-				new BRTPFServerWithVocabularyMappingForTest(g, createVocabularyMappingForTests()) );
+				new BRTPFServerWithVocabularyMappingForTest(g, createVocabularyMappingForTests()),
+				false );
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );

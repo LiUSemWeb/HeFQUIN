@@ -10,11 +10,15 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * Top-level base class for all implementations of {@link NullaryExecutableOp}.
  */
-public abstract class NullaryExecutableOpBase implements NullaryExecutableOp
+public abstract class NullaryExecutableOpBase extends BaseForExecOps implements NullaryExecutableOp
 {
 	private int numberOfInvocations = 0;
 	protected long timeAtExecStart  = 0L;
 	protected long timeAtExecEnd    = 0L;
+
+	public NullaryExecutableOpBase( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
 
 	@Override
 	public final void execute( final IntermediateResultElementSink sink,
@@ -23,7 +27,17 @@ public abstract class NullaryExecutableOpBase implements NullaryExecutableOp
 		numberOfInvocations++;
 		timeAtExecStart = System.currentTimeMillis();
 
-		_execute(sink, execCxt);
+		if ( collectExceptions ) {
+			try {
+				_execute(sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_execute(sink, execCxt);
+		}
 
 		timeAtExecEnd = System.currentTimeMillis();
 	}

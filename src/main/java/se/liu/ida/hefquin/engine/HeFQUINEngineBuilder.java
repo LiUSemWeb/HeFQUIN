@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.ARQ;
@@ -19,6 +20,7 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
@@ -149,13 +151,15 @@ public class HeFQUINEngineBuilder
 	}
 
 	protected static class MyEngine implements HeFQUINEngine {
+		@SuppressWarnings("unchecked")
 		@Override
-		public QueryProcStats executeQuery( final Query query, final ResultsFormat outputFormat, final PrintStream output ) {
+		public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query, final ResultsFormat outputFormat, final PrintStream output ) {
 			final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
 			final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
 			QueryExecUtils.executeQuery(query, qe, outputFormat, output);
 
-			return (QueryProcStats) qe.getContext().get( HeFQUINConstants.sysQueryProcStats );
+			return new Pair<>( (QueryProcStats) qe.getContext().get(HeFQUINConstants.sysQueryProcStats),
+			                   (List<Exception>) qe.getContext().get(HeFQUINConstants.sysQueryProcExceptions) );
 		}
 		
 	}

@@ -30,20 +30,23 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 {
 	public ExecOpBindJoinSPARQLwithFILTER( final TriplePattern query,
 	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final BGP query,
 	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	@Override
@@ -55,7 +58,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm);
+		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
 

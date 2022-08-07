@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpUnion;
@@ -20,7 +19,6 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
@@ -37,8 +35,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 
 public class ExecOpRequestSPARQLWithTranslation extends BaseForExecOpSolMapsRequest<SPARQLRequest, SPARQLEndpoint>
 {
-	public ExecOpRequestSPARQLWithTranslation( final SPARQLRequest req, final SPARQLEndpoint fm ) {
-		super( req, fm );
+	public ExecOpRequestSPARQLWithTranslation( final SPARQLRequest req,
+	                                           final SPARQLEndpoint fm,
+	                                           final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override
@@ -68,6 +68,7 @@ public class ExecOpRequestSPARQLWithTranslation extends BaseForExecOpSolMapsRequ
 			reqTranslation = handleUnion((SPARQLUnionPattern) query);
 		}
 		else if (query instanceof GenericSPARQLGraphPatternImpl1) {
+			@SuppressWarnings("deprecation")
 			final Op gp = ((GenericSPARQLGraphPatternImpl1) query).asJenaOp();
 			reqTranslation = handleOp(gp);		
 		}

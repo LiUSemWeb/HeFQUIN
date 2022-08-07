@@ -9,13 +9,14 @@ public class ExecOpIndexNestedLoopsJoinBRTPF extends BaseForExecOpIndexNestedLoo
 {
 	public ExecOpIndexNestedLoopsJoinBRTPF( final TriplePattern query,
 	                                        final BRTPFServer fm,
-	                                        final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                        final boolean useOuterJoinSemantics,
+	                                        final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	@Override
-	protected NullaryExecutableOp createRequestOperator(TriplePatternRequest req) {
-		return new ExecOpRequestTPFatBRTPFServer(req, fm);
+	protected NullaryExecutableOp createRequestOperator( final TriplePatternRequest req ) {
+		return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
 	}
 
 }

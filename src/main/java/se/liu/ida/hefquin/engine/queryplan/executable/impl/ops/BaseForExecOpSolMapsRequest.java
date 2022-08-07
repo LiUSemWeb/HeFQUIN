@@ -17,8 +17,8 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 {
 	private long timeAfterResponse = 0L;
 
-	public BaseForExecOpSolMapsRequest( final ReqType req, final MemberType fm ) {
-		super( req, fm );
+	public BaseForExecOpSolMapsRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

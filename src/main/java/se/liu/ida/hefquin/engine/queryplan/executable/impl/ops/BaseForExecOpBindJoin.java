@@ -15,7 +15,8 @@ public abstract class BaseForExecOpBindJoin<QueryType extends Query,
     protected final QueryType query;
     protected final MemberType fm;
 
-    public BaseForExecOpBindJoin( final QueryType query, final MemberType fm ) {
+    public BaseForExecOpBindJoin( final QueryType query, final MemberType fm, final boolean collectExceptions ) {
+        super(collectExceptions);
         assert query != null;
         assert fm != null;
 
