@@ -1,9 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -53,7 +54,7 @@ public class QueryProcessorImpl implements QueryProcessor
 	public ExecutionEngine getExecutionEngine() { return execEngine; }
 
 	@Override
-	public QueryProcStats processQuery( final Query query, final QueryResultSink resultSink )
+	public Pair<QueryProcStats, List<Exception>> processQuery( final Query query, final QueryResultSink resultSink )
 			throws QueryProcException
 	{
 		final long t1 = System.currentTimeMillis();
@@ -75,11 +76,10 @@ public class QueryProcessorImpl implements QueryProcessor
 			                                                                   qepAndStats.object1)[0];
 			myStats.put("costOfSelectedPlan", costOfSelectedPlan);
 
-			System.out.println("Selected query plan: \n" + PhysicalPlanPrinter.print(qepAndStats.object1));
 			StatsPrinter.print( myStats, System.out, true );
 		}
 
-		return myStats;
+		return new Pair<>( myStats, prg.getExceptionsCaughtDuringExecution() );
 	}
 
 }
