@@ -103,7 +103,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 
 	protected static class DummyPhysicalOperatorForTest implements PhysicalOperatorForLogicalOperator {
 		@Override
-		public ExecutableOperator createExecOp(ExpectedVariables... inputVars) {
+		public ExecutableOperator createExecOp(boolean collectExceptions, ExpectedVariables... inputVars) {
 			return null;
 		}
 

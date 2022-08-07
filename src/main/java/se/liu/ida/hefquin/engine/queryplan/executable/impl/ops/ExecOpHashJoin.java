@@ -24,7 +24,10 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     protected boolean child2InputComplete = false;
 
     public ExecOpHashJoin( final ExpectedVariables inputVars1,
-                           final ExpectedVariables inputVars2 ) {
+                           final ExpectedVariables inputVars2,
+                           final boolean collectExceptions ) {
+        super(collectExceptions);
+
         // determine the certain join variables
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);
 

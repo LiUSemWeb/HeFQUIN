@@ -25,6 +25,10 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {
     protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
+    public ExecOpNaiveNestedLoopsJoin( final boolean collectExceptions ) {
+        super(collectExceptions);
+    }
+
     @Override
     public int preferredInputBlockSizeFromChild1() {
         // Since this algorithm processes the input solution mappings

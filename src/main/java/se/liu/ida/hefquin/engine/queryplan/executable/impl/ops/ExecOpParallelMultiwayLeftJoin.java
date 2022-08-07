@@ -34,13 +34,17 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 	protected final List<Var> joinVars; // using a list gives us a deterministic iteration order
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
-	public ExecOpParallelMultiwayLeftJoin( final ExpectedVariables inputVarsFromNonOptionalPart,
+	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
-		this( inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
+		this( collectExceptions, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
 	}
 
-	public ExecOpParallelMultiwayLeftJoin( final ExpectedVariables inputVarsFromNonOptionalPart,
+	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
+		super(collectExceptions);
+
 		assert ! optionalParts.isEmpty();
 
 		this.optionalParts = optionalParts;
@@ -211,7 +215,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 
 			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
 			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop);
-			this.execOp = addPop.createExecOp(inputVarsFromNonOptionalPart);
+			this.execOp = addPop.createExecOp(false, inputVarsFromNonOptionalPart);
 
 			this.mySink = new IntermediateResultElementSink() {
 				@Override
@@ -225,11 +229,9 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 		public void run() {
 			try {
 				execOp.process(input, mySink, execCxt);
-			} catch ( final ExecOpExecutionException e ) {
-// TODO: this exception must be handled properly such that we have a chance to
-// actually catch something in the main processing thread that has started this
-// worker thread
-				e.printStackTrace();
+			}
+			catch ( final ExecOpExecutionException e ) {
+				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);
 			}
 		}
 	}

@@ -17,8 +17,10 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 public abstract class BaseForExecOpTriplePatternRequestWithTPF<MemberType extends FederationMember>
        extends BaseForExecOpRequestWithTPFPaging<TriplePatternRequest,MemberType,TPFRequest>
 {
-	public BaseForExecOpTriplePatternRequestWithTPF( final TriplePatternRequest req, final MemberType fm ) {
-		super( req, fm );
+	public BaseForExecOpTriplePatternRequestWithTPF( final TriplePatternRequest req,
+	                                                 final MemberType fm,
+	                                                 final boolean collectExceptions ) {
+		super( req, fm, collectExceptions );
 	}
 
 	@Override

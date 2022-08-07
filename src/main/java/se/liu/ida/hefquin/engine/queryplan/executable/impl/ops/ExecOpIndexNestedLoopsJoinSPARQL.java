@@ -17,8 +17,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 {
 	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
 	                                         final SPARQLEndpoint fm,
-	                                         final boolean useOuterJoinSemantics ) {
-		super( query, fm );
+	                                         final boolean useOuterJoinSemantics,
+	                                         final boolean collectExceptions ) {
+		super( query, fm, collectExceptions );
 
 		// TODO extend this implementation to support outer join semantics similar
 		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps

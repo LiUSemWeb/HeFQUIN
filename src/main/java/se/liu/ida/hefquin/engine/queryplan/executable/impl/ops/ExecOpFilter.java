@@ -12,14 +12,18 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithIterator
 {
 	protected final ExprList filterExpressions;
 
-	public ExecOpFilter( final ExprList filterExpressions ) {
+	public ExecOpFilter( final ExprList filterExpressions, final boolean collectExceptions ) {
+		super(collectExceptions);
+
 		assert filterExpressions != null;
 		assert ! filterExpressions.isEmpty();
 
 		this.filterExpressions = filterExpressions;
 	}
 
-	public ExecOpFilter( final Expr filterExpression ) {
+	public ExecOpFilter( final Expr filterExpression, final boolean collectExceptions ) {
+		super(collectExceptions);
+
 		assert filterExpression != null;
 
 		this.filterExpressions = new ExprList(filterExpression);

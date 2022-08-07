@@ -116,10 +116,11 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp( final ExpectedVariables... inputVars ) {
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		return new ExecOpParallelMultiwayLeftJoin( inputVars[0], optionalParts );
+		return new ExecOpParallelMultiwayLeftJoin( collectExceptions, inputVars[0], optionalParts );
 	}
 
 	@Override

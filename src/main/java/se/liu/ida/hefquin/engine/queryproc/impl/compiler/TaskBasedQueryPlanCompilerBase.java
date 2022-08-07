@@ -33,14 +33,14 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 		final ExecPlanTask newTask;
 		if ( qep.numberOfSubPlans() == 0 )
 		{
-			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp();
+			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true);
 			newTask = createTaskForNullaryExecOp(execOp, execCxt, preferredOutputBlockSize);
 		}
 		else if ( qep.numberOfSubPlans() == 1 )
 		{
 			final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( subPlan.getExpectedVariables() );
+			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
 
 			createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
 			final ExecPlanTask childTask = tasks.getFirst();
@@ -53,6 +53,7 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 			final PhysicalPlan subPlan2 = qep.getSubPlan(1);
 
 			final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
+					true,
 					subPlan1.getExpectedVariables(),
 					subPlan2.getExpectedVariables() );
 

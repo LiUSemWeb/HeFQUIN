@@ -30,7 +30,8 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp(final ExpectedVariables... inputVars) {
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final ExpectedVariables... inputVars ) {
 		assert  inputVars.length == 1;
 		if (! inputVars[0].getPossibleVariables().isEmpty()){
 			// The executable operator for this physical operator (i.e., ExecOpBindJoinSPARQLwithUNION)
@@ -44,7 +45,7 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 			final FederationMember fm = tpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpBindJoinSPARQLwithUNION( tpAdd.getTP(), (SPARQLEndpoint) fm );
+				return new ExecOpBindJoinSPARQLwithUNION( tpAdd.getTP(), (SPARQLEndpoint) fm, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
@@ -53,7 +54,7 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 			final FederationMember fm = bgpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint )
-				return new ExecOpBindJoinSPARQLwithUNION( bgpAdd.getBGP(), (SPARQLEndpoint) fm );
+				return new ExecOpBindJoinSPARQLwithUNION( bgpAdd.getBGP(), (SPARQLEndpoint) fm, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}

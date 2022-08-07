@@ -10,7 +10,9 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithIterator
 {
 	protected final VocabularyMapping vm;
 
-	public ExecOpGlobalToLocal( final VocabularyMapping vm ) {
+	public ExecOpGlobalToLocal( final VocabularyMapping vm, final boolean collectExceptions ) {
+		super(collectExceptions);
+
 		assert vm != null;
 		this.vm = vm;
 	}

@@ -6,5 +6,5 @@ import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 public interface BinaryPhysicalOp extends PhysicalOperator
 {
 	@Override
-	BinaryExecutableOp createExecOp( ExpectedVariables ... inputVars );
+	BinaryExecutableOp createExecOp( boolean collectExceptions, ExpectedVariables ... inputVars );
 }

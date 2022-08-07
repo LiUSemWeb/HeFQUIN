@@ -9,13 +9,14 @@ public class ExecOpIndexNestedLoopsJoinTPF extends BaseForExecOpIndexNestedLoops
 {
 	public ExecOpIndexNestedLoopsJoinTPF( final TriplePattern query,
 	                                      final TPFServer fm,
-	                                      final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                      final boolean useOuterJoinSemantics,
+	                                      final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	@Override
-	protected NullaryExecutableOp createRequestOperator(TriplePatternRequest req) {
-		return new ExecOpRequestTPFatTPFServer(req, fm);
+	protected NullaryExecutableOp createRequestOperator( final TriplePatternRequest req ) {
+		return new ExecOpRequestTPFatTPFServer(req, fm, false);
 	}
 
 }

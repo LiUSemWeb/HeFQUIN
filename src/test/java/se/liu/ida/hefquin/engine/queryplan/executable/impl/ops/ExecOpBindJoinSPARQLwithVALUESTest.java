@@ -75,7 +75,7 @@ public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<
 
 		final LogicalOpTPAdd tpAdd = new LogicalOpTPAdd(fm, tp);
 		final PhysicalOpBindJoinWithVALUES physicalOp = new PhysicalOpBindJoinWithVALUES(tpAdd);
-		return physicalOp.createExecOp(expectedVariables);
+		return physicalOp.createExecOp(false, expectedVariables);
 	}
 
 }

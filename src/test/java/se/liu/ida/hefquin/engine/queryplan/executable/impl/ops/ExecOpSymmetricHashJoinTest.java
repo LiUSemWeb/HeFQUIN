@@ -26,6 +26,6 @@ public class ExecOpSymmetricHashJoinTest extends TestsForInnerJoinAlgorithms
     protected BinaryExecutableOp createExecOpForTest(final ExpectedVariables... inputVars) {
         assert inputVars.length == 2;
 
-        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1] );
+        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], false);
     }
 }

@@ -20,8 +20,11 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 {
     protected final Set<Var> varsInTP;
 
-    public ExecOpBindJoinBRTPF( final TriplePattern tp, final BRTPFServer fm, final boolean useOuterJoinSemantics ) {
-        super(tp, fm, useOuterJoinSemantics);
+    public ExecOpBindJoinBRTPF( final TriplePattern tp,
+                                final BRTPFServer fm,
+                                final boolean useOuterJoinSemantics,
+                                final boolean collectExceptions ) {
+        super(tp, fm, useOuterJoinSemantics, collectExceptions );
 
         varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
     }
@@ -40,7 +43,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 		}
 
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSMs );
-		return new ExecOpRequestBRTPF(req, fm);
+		return new ExecOpRequestBRTPF(req, fm, false);
 	}
 
 

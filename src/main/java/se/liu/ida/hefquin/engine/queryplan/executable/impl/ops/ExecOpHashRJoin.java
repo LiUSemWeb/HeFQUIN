@@ -22,8 +22,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public class ExecOpHashRJoin extends ExecOpHashJoin {
 
 	public ExecOpHashRJoin( final ExpectedVariables inputVars1,
-	                        final ExpectedVariables inputVars2 ) {
-		super(inputVars1, inputVars2);
+	                        final ExpectedVariables inputVars2,
+	                        final boolean collectExceptions ) {
+		super(inputVars1, inputVars2, collectExceptions);
 	}
 
 	@Override

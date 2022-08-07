@@ -12,8 +12,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
                                                                            ReqType extends DataRetrievalRequest>
      extends BaseForExecOpIndexNestedLoopsJoinWithRequests<QueryType,MemberType,ReqType,SolMapsResponse>
 {
-	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query, final MemberType fm ) {
-		super( query, fm );
+	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query,
+	                                                             final MemberType fm,
+	                                                             final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
 	}
 
 	@Override

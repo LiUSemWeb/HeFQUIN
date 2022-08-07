@@ -35,7 +35,8 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 	}
 
     @Override
-    public UnaryExecutableOp createExecOp( final ExpectedVariables ... inputVars )
+    public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+                                           final ExpectedVariables ... inputVars )
     {
         if ( lop instanceof LogicalOpTPAdd ) {
             final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
@@ -43,7 +44,7 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
             final boolean useOuterJoinSemantics = false;
 
             if ( fm instanceof BRTPFServer )
-                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
+                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
             else
                 throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 
@@ -54,7 +55,7 @@ public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
             final boolean useOuterJoinSemantics = true;
 
             if ( fm instanceof BRTPFServer )
-                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics );
+                return new ExecOpBindJoinBRTPF( tpAdd.getTP(), (BRTPFServer) fm, useOuterJoinSemantics, collectExceptions );
             else
                 throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 

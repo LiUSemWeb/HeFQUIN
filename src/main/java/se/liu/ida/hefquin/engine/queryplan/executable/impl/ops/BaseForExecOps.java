@@ -8,7 +8,18 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 
 public abstract class BaseForExecOps implements ExecutableOperator
 {
+	/**
+	 * If <code>true</code>, then the subclasses are expected to collect exceptions (by
+	 * calling {@link #recordExceptionCaughtDuringExecution(Exception)}); otherwise, they
+	 * are expected to throw the exceptions immediately.
+	 */
+	protected final boolean collectExceptions;
+
 	private List<Exception> exceptionsCaughtDuringExecution = null;
+
+	public BaseForExecOps( final boolean collectExceptions ) {
+		this.collectExceptions = collectExceptions;
+	}
 
 	@Override
 	public List<Exception> getExceptionsCaughtDuringExecution() {

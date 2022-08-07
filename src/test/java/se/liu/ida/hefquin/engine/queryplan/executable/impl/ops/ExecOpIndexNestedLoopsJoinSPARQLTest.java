@@ -64,6 +64,6 @@ public class ExecOpIndexNestedLoopsJoinSPARQLTest extends TestsForTPAddAlgorithm
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm, useOuterJoinSemantics);
+		return new ExecOpIndexNestedLoopsJoinSPARQL(tp, fm, useOuterJoinSemantics, false);
 	}
 }

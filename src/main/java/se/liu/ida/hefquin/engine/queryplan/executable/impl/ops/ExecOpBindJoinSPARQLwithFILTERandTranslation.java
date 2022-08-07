@@ -15,8 +15,9 @@ public class ExecOpBindJoinSPARQLwithFILTERandTranslation extends ExecOpBindJoin
 	
 	public ExecOpBindJoinSPARQLwithFILTERandTranslation( final SPARQLGraphPattern query,
 	                                                     final SPARQLEndpoint fm,
-	                                                     final boolean useOuterJoinSemantics ) {
-		super(query, fm, useOuterJoinSemantics);
+	                                                     final boolean useOuterJoinSemantics,
+	                                                     final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 
 		assert fm.getVocabularyMapping() != null;
 	}

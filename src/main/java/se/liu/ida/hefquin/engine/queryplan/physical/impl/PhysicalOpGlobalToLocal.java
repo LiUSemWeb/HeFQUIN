@@ -32,8 +32,9 @@ public class PhysicalOpGlobalToLocal implements UnaryPhysicalOpForLogicalOp {
 	}
 
 	@Override
-	public UnaryExecutableOp createExecOp(final ExpectedVariables... inputVars) {
-		return new ExecOpGlobalToLocal( logicalg2l.getVocabularyMapping() );
+	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final ExpectedVariables... inputVars ) {
+		return new ExecOpGlobalToLocal( logicalg2l.getVocabularyMapping(), collectExceptions );
 	}
 
 	@Override

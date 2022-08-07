@@ -16,18 +16,27 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	protected long timeAtExecStart  = 0L;
 	protected long timeAtExecEnd    = 0L;
 
+	public NullaryExecutableOpBase( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
+
 	@Override
 	public final void execute( final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt )
+	                           final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		numberOfInvocations++;
 		timeAtExecStart = System.currentTimeMillis();
 
-		try {
-			_execute(sink, execCxt);
+		if ( collectExceptions ) {
+			try {
+				_execute(sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
 		}
-		catch ( ExecOpExecutionException e ) {
-			recordExceptionCaughtDuringExecution(e);
+		else {
+			_execute(sink, execCxt);
 		}
 
 		timeAtExecEnd = System.currentTimeMillis();

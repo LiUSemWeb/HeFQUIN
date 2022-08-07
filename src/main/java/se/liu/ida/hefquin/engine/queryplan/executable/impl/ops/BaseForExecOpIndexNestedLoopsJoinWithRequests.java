@@ -35,8 +35,10 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
                             RespType extends DataRetrievalResponse>
              extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
-	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query, final MemberType fm ) {
-		super(query, fm);
+	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
+	                                                      final MemberType fm,
+	                                                      final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
 	}
 
 	@Override

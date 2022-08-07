@@ -21,18 +21,26 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	private long maxProcessingTime              = 0L;
 	protected long timeAtCurrentProcStart       = 0L;
 
+	public UnaryExecutableOpBase( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
 
 	@Override
 	public final void process( final IntermediateResultBlock input,
 	                           final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) {
+	                           final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		timeAtCurrentProcStart = System.currentTimeMillis();
 
-		try {
-			_process(input, sink, execCxt);
+		if ( collectExceptions ) {
+			try {
+				_process(input, sink, execCxt);
+			}
+			catch ( ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
 		}
-		catch ( ExecOpExecutionException e ) {
-			recordExceptionCaughtDuringExecution(e);
+		else {
+			_process(input, sink, execCxt);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentProcStart;

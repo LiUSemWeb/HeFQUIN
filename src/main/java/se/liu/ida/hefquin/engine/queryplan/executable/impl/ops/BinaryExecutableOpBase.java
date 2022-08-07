@@ -30,19 +30,28 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	private long maxRightProcessingTime              = 0L;
 	protected long timeAtCurrentRightProcStart       = 0L;
 
+	public BinaryExecutableOpBase( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
+
 	@Override
 	public final void processBlockFromChild1(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		timeAtCurrentLeftProcStart = System.currentTimeMillis();
 
-		try {
-			_processBlockFromChild1(input, sink, execCxt);
+		if ( collectExceptions ) {
+			try {
+				_processBlockFromChild1(input, sink, execCxt);
+			}
+			catch ( ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
 		}
-		catch ( ExecOpExecutionException e ) {
-			recordExceptionCaughtDuringExecution(e);
+		else {
+			_processBlockFromChild1(input, sink, execCxt);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentLeftProcStart;
@@ -66,15 +75,20 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	public final void processBlockFromChild2(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt )
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		timeAtCurrentRightProcStart = System.currentTimeMillis();
 
-		try {
-			_processBlockFromChild2(input, sink, execCxt);
+		if ( collectExceptions ) {
+			try {
+				_processBlockFromChild2(input, sink, execCxt);
+			}
+			catch ( ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
 		}
-		catch ( ExecOpExecutionException e ) {
-			recordExceptionCaughtDuringExecution(e);
+		else {
+			_processBlockFromChild2(input, sink, execCxt);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentRightProcStart;

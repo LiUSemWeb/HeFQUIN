@@ -43,7 +43,7 @@ public class ExecOpFilterTest
 		resultBlock.add(sol12); // 12 is added before 9. This should not pass the filter. 9 should be after 8.
 		resultBlock.add(sol9);
 		
-		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10);
+		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
 		filterLessThan10.process( resultBlock, sink, TestUtils.createExecContextForTests() );
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
@@ -67,7 +67,7 @@ public class ExecOpFilterTest
 		resultBlock.add(sol8);
 		resultBlock.add(sol9);
 		
-		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10);
+		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
 		filterLessThan10.process( resultBlock, sink, TestUtils.createExecContextForTests() );
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
@@ -100,7 +100,7 @@ public class ExecOpFilterTest
 		resultBlock.add(solNYE);
 		resultBlock.add(solNYD);
 
-		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019);
+		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019, false);
 		filterAfter2019.process( resultBlock, sink, TestUtils.createExecContextForTests() );
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();

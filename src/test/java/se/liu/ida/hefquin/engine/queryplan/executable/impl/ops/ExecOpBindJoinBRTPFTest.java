@@ -98,6 +98,6 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 	                                                 final BRTPFServer fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinBRTPF(tp, fm, useOuterJoinSemantics);
+		return new ExecOpBindJoinBRTPF(tp, fm, useOuterJoinSemantics, false);
 	}
 }

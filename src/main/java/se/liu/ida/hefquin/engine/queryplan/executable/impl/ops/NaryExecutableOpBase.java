@@ -9,6 +9,9 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
  */
 public abstract class NaryExecutableOpBase extends BaseForExecOps implements NaryExecutableOp
 {
+	public NaryExecutableOpBase( final boolean collectExceptions ) {
+		super(collectExceptions);
+	}
 
 	@Override
 	public void resetStats() {

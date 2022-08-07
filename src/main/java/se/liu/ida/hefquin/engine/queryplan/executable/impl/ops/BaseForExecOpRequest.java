@@ -13,7 +13,9 @@ public abstract class BaseForExecOpRequest<ReqType extends DataRetrievalRequest,
 	protected final ReqType req;
 	protected final MemberType fm;
 
-	public BaseForExecOpRequest( final ReqType req, final MemberType fm ) {
+	public BaseForExecOpRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
+		super(collectExceptions);
+
 		assert req != null;
 		assert fm != null;
 

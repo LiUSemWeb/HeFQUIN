@@ -46,9 +46,10 @@ public class PhysicalOpBindJoinWithFILTERandTranslation extends PhysicalOpBindJo
 	@Override
 	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
 	                                          final FederationMember fm,
-	                                          final boolean useOuterJoinSemantics ) {
+	                                          final boolean useOuterJoinSemantics,
+	                                          final boolean collectExceptions ) {
 		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithFILTERandTranslation( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics );
+			return new ExecOpBindJoinSPARQLwithFILTERandTranslation( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

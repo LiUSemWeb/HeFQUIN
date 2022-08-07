@@ -110,6 +110,8 @@ public class ResultElementIterWithUnaryExecOpTest
 
 	protected static class UnaryExecutableOp2ForTest extends BaseForExecOps implements UnaryExecutableOp
 	{
+		public UnaryExecutableOp2ForTest() { super(false); }
+
 		@Override
 		public void process( final IntermediateResultBlock input,
 		                     final IntermediateResultElementSink sink,
