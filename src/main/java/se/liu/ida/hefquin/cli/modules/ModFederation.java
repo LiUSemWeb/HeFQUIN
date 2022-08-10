@@ -28,8 +28,8 @@ public class ModFederation extends ModBase
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
-        cmdLine.getUsage().startCategory("Federation specification") ;
-        cmdLine.add(sparqlEndpointDecl,   "--considerSPARQLEndpoint",  "URI of a SPARQL endpoint that is part of the federation");
+        cmdLine.getUsage().startCategory("Federation") ;
+        cmdLine.add(sparqlEndpointDecl,   "--considerSPARQLEndpoint",  "URI of a SPARQL endpoint that is part of the federation (can be used multiple times for multiple endpoints)");
 	}
 
 	@Override

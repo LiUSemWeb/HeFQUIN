@@ -17,7 +17,7 @@ public class ModEngineConfig extends ModBase
 
 	@Override
 	public void registerWith( final CmdGeneral cmdLine ) {
-		cmdLine.getUsage().startCategory("HeFQUIN engine configuration") ;
+		cmdLine.getUsage().startCategory("Configuration options for HeFQUIN engine") ;
 
 		cmdLine.add(ignorePhysicalOpsForLogicalAddOpsDecl, "--ignorePhysicalOpsForLogicalAddOps",
 		            "When converting logical to physical plan, do not try to use physical operators for tpAdd");

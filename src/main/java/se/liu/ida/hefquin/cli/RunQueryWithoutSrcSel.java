@@ -47,21 +47,22 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	public RunQueryWithoutSrcSel( final String[] argv ) {
 		super(argv);
 
-		addModule(modTime);
-		addModule(modQuery);
-		addModule(modFederation);
-		addModule(modResults);
 		addModule(modEngineConfig);
+		addModule(modTime);
+		addModule(modResults);
 
 		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan used for the query optimization");
 		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan used for the query execution");
-		add(argQueryProcStats, "--queryProcStats", "Print out statistics about the query execution process");
-		add(argFedAccessStats, "--fedAccessStats", "Print out statistics of the federation access manager");
+		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
+		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
+
+		addModule(modQuery);
+		addModule(modFederation);
 	}
 
 	@Override
 	protected String getSummary() {
-		return getCommandName()+" --query=<query>";
+		return getCommandName()+" --query=<query> --considerSPARQLEndpoint=<endpoint URI>";
 	}
 
 	@Override
