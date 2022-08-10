@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
@@ -35,10 +37,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
-	protected final ArgDecl argPrintLogicalPlan = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
-	protected final ArgDecl argPrintPhysicalPlan = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
-	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "queryProcStats");
-	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "fedAccessStats");
+	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
+	protected final ArgDecl argPrintLogicalPlan   = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
+	protected final ArgDecl argPrintPhysicalPlan  = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
+	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
+	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
 
 	public static void main( final String... argv ) {
 		new RunQueryWithoutSrcSel(argv).mainRun();
@@ -51,6 +54,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modTime);
 		addModule(modResults);
 
+		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
 		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan used for the query optimization");
 		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan used for the query execution");
 		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
@@ -84,10 +88,16 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		modTime.startTimer();
 
+		final PrintStream out;
+		if ( contains(argSuppressResultPrintout) )
+			out = NullPrintStream.NULL_PRINT_STREAM;
+		else
+			out = System.out;
+
 		Pair<QueryProcStats, List<Exception>> statsAndExceptions = null;
 
 		try {
-			statsAndExceptions = e.executeQuery(query, resFmt);
+			statsAndExceptions = e.executeQuery(query, resFmt, out);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
