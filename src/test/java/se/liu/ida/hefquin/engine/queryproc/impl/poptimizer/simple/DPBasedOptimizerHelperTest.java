@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.DynamicProgramming;
+package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
