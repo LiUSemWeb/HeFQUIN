@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
@@ -78,7 +78,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
 
 		final QueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
-		final QueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
+		final PhysicalQueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer, printLogicalPlans, printPhysicalPlans);
 		final QueryPlanCompiler compiler = new

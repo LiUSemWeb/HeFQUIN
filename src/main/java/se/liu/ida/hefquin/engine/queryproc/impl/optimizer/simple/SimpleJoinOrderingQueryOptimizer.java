@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
  * not hard-coded but, instead, can be specified by means of providing
  * an implementation of {@link JoinPlanOptimizer}.
  */
-public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
+public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
 {
 	protected final JoinPlanOptimizer joinPlanOptimizer;
     protected final QueryOptimizationContext ctxt;

@@ -7,7 +7,7 @@ import org.apache.jena.sparql.util.Context;
 
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
@@ -56,7 +56,7 @@ public class HeFQUINEngineConfig
 		// similar things) should be created based on a config file.
 		return new QueryOptimizerFactory() {
 			@Override
-			public QueryOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
+			public PhysicalQueryOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
 				return createQueryOptimizerWithoutOptimization(ctxt);
 //				return createGreedyJoinPlanOptimizer(ctxt);
 //				return createDPBasedJoinPlanOptimizer(ctxt);
@@ -65,21 +65,21 @@ public class HeFQUINEngineConfig
 		};
 	}
 
-	protected QueryOptimizer createQueryOptimizerWithoutOptimization( final QueryOptimizationContext ctxt ) {
+	protected PhysicalQueryOptimizer createQueryOptimizerWithoutOptimization( final QueryOptimizationContext ctxt ) {
 		return new QueryOptimizerImpl(ctxt);
 	}
 
-	protected QueryOptimizer createGreedyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+	protected PhysicalQueryOptimizer createGreedyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
 		final JoinPlanOptimizer joinOpt = new GreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 
-	protected QueryOptimizer createDPBasedJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+	protected PhysicalQueryOptimizer createDPBasedJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
 		final JoinPlanOptimizer joinOpt = new DPBasedJoinPlanOptimizer(ctxt);
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 
-	protected QueryOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt ) {
+	protected PhysicalQueryOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt ) {
 		final TerminationCriterionFactory tcFactory = TerminatedByNumberOfGenerations.getFactory(20);
 		return new EvolutionaryAlgorithmQueryOptimizer(ctxt, 8, 2, tcFactory);
 	}
