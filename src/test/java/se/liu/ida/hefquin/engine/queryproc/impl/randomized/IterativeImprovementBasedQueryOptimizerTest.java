@@ -14,15 +14,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.IterativeImprovementBasedQueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.StoppingConditionByNumberOfGenerations;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.StoppingConditionForIterativeImprovement;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.IterativeImprovementBasedQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionByNumberOfGenerations;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionForIterativeImprovement;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RewritingRule;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 
 import static org.junit.Assert.*;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 {
 	@Test
-	public void iiOptimizerTest1() throws QueryOptimizationException {
+	public void iiOptimizerTest1() throws PhysicalQueryOptimizationException {
 		// set up everything for the test
 		final PhysicalPlan initialPlan = new DummyPlanForTest(10);
 		final PhysicalPlan plan1 = new DummyPlanForTest(8);

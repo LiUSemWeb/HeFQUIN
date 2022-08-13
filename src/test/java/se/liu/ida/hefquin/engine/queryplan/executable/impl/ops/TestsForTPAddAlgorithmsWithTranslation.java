@@ -28,7 +28,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateRe
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends FederationMember> extends ExecOpTestBase {
 

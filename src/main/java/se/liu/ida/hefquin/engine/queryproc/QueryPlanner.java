@@ -10,5 +10,5 @@ public interface QueryPlanner
 
 	SourcePlanner getSourcePlanner();
 
-	QueryOptimizer getOptimizer();
+	PhysicalQueryOptimizer getOptimizer();
 }

@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlock
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterator;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public class TestUtils extends EngineTestBase
 {

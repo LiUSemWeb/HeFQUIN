@@ -24,7 +24,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
 
 public class PhysicalPlanFactory
 {
