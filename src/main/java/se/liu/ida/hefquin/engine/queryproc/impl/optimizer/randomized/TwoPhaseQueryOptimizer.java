@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
@@ -25,7 +25,7 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 
 	@Override
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan )
-			throws QueryOptimizationException {
+			throws PhysicalQueryOptimizationException {
 		final PhysicalPlan halfwayPlan = optimizer1.optimize(initialPlan).object1;
 		final PhysicalPlan finalPlan = optimizer2.optimize(halfwayPlan,LogicalPlanUtils.countSubplans(initialPlan),0.1).object1;
 

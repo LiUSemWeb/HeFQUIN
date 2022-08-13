@@ -1,13 +1,13 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 
 /**
  * An exception that occurred during the process
  * of estimating the cost of a given plan.
  */
-public class CostEstimationException extends QueryOptimizationException
+public class CostEstimationException extends PhysicalQueryOptimizationException
 {
 	private static final long serialVersionUID = -4430461958184061161L;
 

@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
@@ -24,7 +24,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 	}
 
 	@Override
-	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
 		final PhysicalPlan initialPP = context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false);
 		final int numberOfSubplans = LogicalPlanUtils.countSubplans(initialPlan);
 		return optimize(initialPP, numberOfSubplans);
@@ -32,13 +32,13 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 
 
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
-	                                                            final int numberOfSubplans ) throws QueryOptimizationException {
+	                                                            final int numberOfSubplans ) throws PhysicalQueryOptimizationException {
 		return optimize(initialPlan, numberOfSubplans, 2.0);
 	}
 
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
 	                                                            final int numberOfSubplans,
-	                                                            final double temperatureModifier) throws QueryOptimizationException {
+	                                                            final double temperatureModifier) throws PhysicalQueryOptimizationException {
 		// The first plan, which is currently the best plan we know of.
 		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
 		PhysicalPlanWithCost currentPlan = bestPlan;

@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -41,14 +41,14 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
     }
 
     @Override
-    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
         return optimize( initialPhysicalPlan, tcFactory.createInstance(initialPlan) );
     }
 
     public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan plan,
                                                                 final TerminationCriterion tc )
-                                                                        throws QueryOptimizationException {
+                                                                        throws PhysicalQueryOptimizationException {
         final PlanRewritingUtils ruleApplicationCache = new PlanRewritingUtils( new RuleInstances() );
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
@@ -100,7 +100,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
 		return new Pair<>(bestPlan.getPlan(), myStats);
     }
 
-    protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws QueryOptimizationException {
+    protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws PhysicalQueryOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
@@ -120,7 +120,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements QueryOptimizer {
         return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), currentGen) );
     }
 
-    protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws QueryOptimizationException {
+    protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws PhysicalQueryOptimizationException {
         final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen.plans );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 

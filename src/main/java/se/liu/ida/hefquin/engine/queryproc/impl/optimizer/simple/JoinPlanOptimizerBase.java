@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer.simple;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 
 /**
  * An abstract base class for implementations of {@link JoinPlanOptimizer}.
@@ -12,7 +12,7 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 {
 	@Override
 	public final PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans )
-			throws QueryOptimizationException
+			throws PhysicalQueryOptimizationException
 	{
 		// no need to use the enumeration algorithm if there is only one subplan
 		if ( subplans.size() == 1 ) {
@@ -27,7 +27,7 @@ public abstract class JoinPlanOptimizerBase implements JoinPlanOptimizer
 
 	protected interface EnumerationAlgorithm
 	{
-		PhysicalPlan getResultingPlan() throws QueryOptimizationException;
+		PhysicalPlan getResultingPlan() throws PhysicalQueryOptimizationException;
 	}
 
 }

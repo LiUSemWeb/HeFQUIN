@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
@@ -37,7 +37,7 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
     }
 
     @Override
-    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException {
+    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
         final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
@@ -47,7 +47,7 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
 		return new Pair<>(bestPlan, myStats);
     }
 
-    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws QueryOptimizationException {
+    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {
         final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan);
 
         if ( hasMultiwayJoinAsRoot(plan) ){
@@ -61,7 +61,7 @@ public class SimpleJoinOrderingQueryOptimizer implements QueryOptimizer
         }
     }
 
-    protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan ) throws QueryOptimizationException {
+    protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {
         final int numChildren = plan.numberOfSubPlans();
         final PhysicalPlan[] children = new PhysicalPlan[numChildren];
         for ( int i = 0; i < numChildren; ++i ) {

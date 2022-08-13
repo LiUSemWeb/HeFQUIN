@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.CostEstimationUtils;
 
@@ -38,7 +38,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		}
 
 		@Override
-		public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
+		public PhysicalPlan getResultingPlan() throws PhysicalQueryOptimizationException {
 			PhysicalPlan currentPlan = chooseFirstSubplan();
 
 			while ( subplans.size() > 0 ){
@@ -53,7 +53,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		 * their respective costs (as estimated by using the {@link #costModel})
 		 * and returns the one with the lowest estimated cost.
 		 */
-		protected PhysicalPlan chooseFirstSubplan() throws QueryOptimizationException {
+		protected PhysicalPlan chooseFirstSubplan() throws PhysicalQueryOptimizationException {
 			final Double[] costs = CostEstimationUtils.getEstimates(costModel, subplans);
 
 			int indexOfBestPlan = 0;
@@ -77,7 +77,7 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 		 * constructed in this way.
 		 */
 		protected PhysicalPlan addNextBestJoin( final PhysicalPlan currentPlan )
-				throws QueryOptimizationException
+				throws PhysicalQueryOptimizationException
 		{
 			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = createNextPossiblePlans(currentPlan);
 

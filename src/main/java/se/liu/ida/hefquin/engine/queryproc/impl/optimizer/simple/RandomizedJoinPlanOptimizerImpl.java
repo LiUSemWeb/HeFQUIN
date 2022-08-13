@@ -5,7 +5,7 @@ import java.util.Random;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 
 public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer
 {
@@ -15,7 +15,7 @@ public class RandomizedJoinPlanOptimizerImpl implements JoinPlanOptimizer
 	protected final Random random = new Random();
 	
 	@Override
-	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans ) throws QueryOptimizationException {
+	public PhysicalPlan determineJoinPlan( final List<PhysicalPlan> subplans ) throws PhysicalQueryOptimizationException {
 		int indexOfRandomPlan = random.nextInt(subplans.size()); // nextInt returns an int between 0 (inclusive) and size (exclusive).
 
 		PhysicalPlan currentPlan = subplans.get(indexOfRandomPlan); // Picks out one plan to be the first, at random.

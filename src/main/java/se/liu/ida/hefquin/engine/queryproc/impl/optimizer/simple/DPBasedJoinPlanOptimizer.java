@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
@@ -35,7 +35,7 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
         }
 
         @Override
-        public PhysicalPlan getResultingPlan() throws QueryOptimizationException {
+        public PhysicalPlan getResultingPlan() throws PhysicalQueryOptimizationException {
 
             // Create a data structure that will be used to store the optimal plan for each subset of (sub)plans.
             final DataStructureForStoringPlansOfSubsets optPlan = new DataStructureForStoringPlansOfSubsets();

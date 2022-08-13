@@ -6,5 +6,5 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public interface QueryOptimizer
 {
-	Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws QueryOptimizationException;
+	Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException;
 }
