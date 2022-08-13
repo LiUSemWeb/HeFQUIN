@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.optimizer;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -17,13 +17,13 @@ public class QueryOptimizerImpl implements QueryOptimizer
 	}
 
 	@Override
-	public Pair<PhysicalPlan, QueryOptimizationStats> optimize( final LogicalPlan initialPlan )
+	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan )
 			throws QueryOptimizationException
 	{
 		final boolean keepMultiwayJoins = false;
 		final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 
-		final QueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
+		final PhysicalQueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
 
 		return new Pair<>(initialPhysicalPlan, myStats);
 

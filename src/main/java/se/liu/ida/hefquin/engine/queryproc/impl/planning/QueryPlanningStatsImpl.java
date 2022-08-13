@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 import se.liu.ida.hefquin.engine.utils.StatsImpl;
@@ -22,7 +22,7 @@ public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningSt
 	                               final long queryOptimizationTime,
 	                               final SourcePlanningStats sourcePlanningStats,
 	                               final LogicalPlan resultingSourceAssignment,
-	                               final QueryOptimizationStats queryOptimizationStats,
+	                               final PhysicalQueryOptimizationStats queryOptimizationStats,
 	                               final PhysicalPlan resultingPhysicalPlan )
 	{
 		put( enOverallPlanningTime, Long.valueOf(overallQueryPlanningTime) );
@@ -61,8 +61,8 @@ public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningSt
 	}
 
 	@Override
-	public QueryOptimizationStats getQueryOptimizationStats() {
-		return (QueryOptimizationStats) getEntry(enOptimizationStats);
+	public PhysicalQueryOptimizationStats getQueryOptimizationStats() {
+		return (PhysicalQueryOptimizationStats) getEntry(enOptimizationStats);
 	}
 
 	@Override

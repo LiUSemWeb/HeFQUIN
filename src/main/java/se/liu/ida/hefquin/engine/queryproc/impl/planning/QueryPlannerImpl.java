@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryproc.QueryOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
@@ -53,7 +53,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		final long t2 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, QueryOptimizationStats> planAndStats = optimizer.optimize( saAndStats.object1 );
+		final Pair<PhysicalPlan, PhysicalQueryOptimizationStats> planAndStats = optimizer.optimize( saAndStats.object1 );
 
 		final long t3 = System.currentTimeMillis();
 

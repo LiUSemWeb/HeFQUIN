@@ -12,6 +12,6 @@ public interface QueryPlanningStats extends Stats
 
 	SourcePlanningStats getSourcePlanningStats();
 	LogicalPlan getResultingSourceAssignment();
-	QueryOptimizationStats getQueryOptimizationStats();
+	PhysicalQueryOptimizationStats getQueryOptimizationStats();
 	PhysicalPlan getResultingPhysicalPlan();
 }
