@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public class SourcePlannerImplTest extends EngineTestBase
 {

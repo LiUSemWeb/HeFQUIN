@@ -43,12 +43,12 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
 
 public class QueryProcessorImplTest extends EngineTestBase

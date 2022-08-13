@@ -32,7 +32,7 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {

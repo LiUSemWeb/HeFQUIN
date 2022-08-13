@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 
 public interface PhysicalQueryOptimizerFactory
 {

@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public interface QueryProcContext
 {

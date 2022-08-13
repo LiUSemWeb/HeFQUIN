@@ -15,14 +15,14 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.IterativeImprovementBasedQueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.StoppingConditionByNumberOfGenerations;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.randomized.StoppingConditionForIterativeImprovement;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RewritingRule;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.IterativeImprovementBasedQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionByNumberOfGenerations;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionForIterativeImprovement;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RewritingRule;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 
 import static org.junit.Assert.*;
 
