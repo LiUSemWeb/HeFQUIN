@@ -7,11 +7,11 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
-public class QueryOptimizerImpl implements PhysicalQueryOptimizer
+public class PhysicalQueryOptimizerImpl implements PhysicalQueryOptimizer
 {
 	protected final QueryOptimizationContext ctxt;
 
-	public QueryOptimizerImpl( final QueryOptimizationContext ctxt ) {
+	public PhysicalQueryOptimizerImpl( final QueryOptimizationContext ctxt ) {
 		assert ctxt != null;
 		this.ctxt = ctxt;
 	}

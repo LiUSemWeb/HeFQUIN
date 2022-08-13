@@ -45,7 +45,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
@@ -377,7 +377,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
-		final PhysicalQueryOptimizer optimizer = new QueryOptimizerImpl(ctxt);
+		final PhysicalQueryOptimizer optimizer = new PhysicalQueryOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, optimizer, false, false);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);

@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterI
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
@@ -66,7 +66,7 @@ public class HeFQUINEngineConfig
 	}
 
 	protected PhysicalQueryOptimizer createQueryOptimizerWithoutOptimization( final QueryOptimizationContext ctxt ) {
-		return new QueryOptimizerImpl(ctxt);
+		return new PhysicalQueryOptimizerImpl(ctxt);
 	}
 
 	protected PhysicalQueryOptimizer createGreedyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
