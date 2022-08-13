@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
@@ -20,19 +21,22 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 public class QueryPlannerImpl implements QueryPlanner
 {
 	protected final SourcePlanner sourcePlanner;
-	protected final PhysicalQueryOptimizer optimizer;
+	protected final LogicalOptimizer loptimizer;
+	protected final PhysicalQueryOptimizer poptimizer;
 	protected final boolean printLogicalPlan;
 	protected final boolean printPhysicalPlan;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
-	                         final PhysicalQueryOptimizer optimizer,
+	                         final LogicalOptimizer loptimizer, // may be null
+	                         final PhysicalQueryOptimizer poptimizer,
 	                         final boolean printLogicalPlan,
 	                         final boolean printPhysicalPlan ) {
 		assert sourcePlanner != null;
-		assert optimizer != null;
+		assert poptimizer != null;
 
 		this.sourcePlanner = sourcePlanner;
-		this.optimizer = optimizer;
+		this.loptimizer = loptimizer;
+		this.poptimizer = poptimizer;
 		this.printLogicalPlan = printLogicalPlan;
 		this.printPhysicalPlan = printPhysicalPlan;
 	}
@@ -41,7 +45,10 @@ public class QueryPlannerImpl implements QueryPlanner
 	public SourcePlanner getSourcePlanner() { return sourcePlanner; }
 
 	@Override
-	public PhysicalQueryOptimizer getOptimizer() { return optimizer; }
+	public LogicalOptimizer getLogicalOptimizer() { return loptimizer; }
+
+	@Override
+	public PhysicalQueryOptimizer getPhysicalOptimizer() { return poptimizer; }
 
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query ) throws QueryPlanningException {
@@ -53,19 +60,30 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		final long t2 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, PhysicalQueryOptimizationStats> planAndStats = optimizer.optimize( saAndStats.object1 );
+		final LogicalPlan lp;
+		if ( loptimizer != null ) {
+			final boolean keepNaryOperators = true;
+			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators);
+		}
+		else {
+			lp = saAndStats.object1;
+		}
 
 		final long t3 = System.currentTimeMillis();
+		final Pair<PhysicalPlan, PhysicalQueryOptimizationStats> planAndStats = poptimizer.optimize(lp);
+
+		final long t4 = System.currentTimeMillis();
 
 		if ( printPhysicalPlan ) {
 			System.out.println( PhysicalPlanPrinter.print(planAndStats.object1) );
 		}
 
-		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t3-t1, t2-t1, t3-t2,
+		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,
 		                                                               saAndStats.object2,
 		                                                               saAndStats.object1,
-		                                                               planAndStats.object2,
-		                                                               planAndStats.object1 );
+		                                                               lp,
+		                                                               planAndStats.object1,
+		                                                               planAndStats.object2 );
 
 		return new Pair<>(planAndStats.object1, myStats);
 	}

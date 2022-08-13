@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
+import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
@@ -35,6 +36,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
@@ -77,10 +79,12 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
 
-		final PhysicalQueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
-		final PhysicalQueryOptimizer optimizer = optimizerFactory.createQueryOptimizer(ctxt);
+		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
 
-		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, optimizer, printLogicalPlans, printPhysicalPlans);
+		final PhysicalQueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
+		final PhysicalQueryOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);
+
+		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, loptimizer, poptimizer, printLogicalPlans, printPhysicalPlans);
 		final QueryPlanCompiler compiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);
