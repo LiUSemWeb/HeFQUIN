@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.utils.PhysicalPlanWithCostUtils;
@@ -78,7 +78,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 			temperature *= 0.95;
 		}
 
-		final PhysicalQueryOptimizationStats myStats = new QueryOptimizationStatsImpl();
+		final PhysicalQueryOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
 
 		return new Pair<>( bestPlan.getPlan(), myStats );
 	}

@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
@@ -42,7 +42,7 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
         final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
 
-        final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
+        final PhysicalQueryOptimizationStatsImpl myStats = new PhysicalQueryOptimizationStatsImpl();
 
 		return new Pair<>(bestPlan, myStats);
     }

@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.QueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.optimizer.rewriting.RuleInstances;
@@ -87,7 +87,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
         }
         final PhysicalPlanWithCost bestPlan = currentGen.bestPlan;
 
-        final QueryOptimizationStatsImpl myStats = new QueryOptimizationStatsImpl();
+        final PhysicalQueryOptimizationStatsImpl myStats = new PhysicalQueryOptimizationStatsImpl();
         myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
         myStats.put( "costOfSelectedPlan", bestPlan.getWeight() );
 
