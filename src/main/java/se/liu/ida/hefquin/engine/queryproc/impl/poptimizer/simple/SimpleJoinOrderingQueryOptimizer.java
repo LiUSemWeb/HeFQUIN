@@ -24,7 +24,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
  */
 public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
 {
-	protected final JoinPlanOptimizer joinPlanOptimizer;
+    protected final JoinPlanOptimizer joinPlanOptimizer;
     protected final QueryOptimizationContext ctxt;
 
     public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer,
@@ -37,6 +37,11 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
     }
 
     @Override
+    public boolean assumesLogicalMultiwayJoins() {
+        return true;
+    }
+
+    @Override
     public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
@@ -44,7 +49,7 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
 
         final PhysicalQueryOptimizationStatsImpl myStats = new PhysicalQueryOptimizationStatsImpl();
 
-		return new Pair<>(bestPlan, myStats);
+        return new Pair<>(bestPlan, myStats);
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {

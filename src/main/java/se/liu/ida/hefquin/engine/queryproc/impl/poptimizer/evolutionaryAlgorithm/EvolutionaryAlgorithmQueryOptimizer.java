@@ -41,6 +41,11 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
     }
 
     @Override
+    public boolean assumesLogicalMultiwayJoins() {
+        return false;
+    }
+
+    @Override
     public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
         return optimize( initialPhysicalPlan, tcFactory.createInstance(initialPlan) );

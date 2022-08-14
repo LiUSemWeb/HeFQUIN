@@ -17,6 +17,11 @@ public class PhysicalQueryOptimizerImpl implements PhysicalQueryOptimizer
 	}
 
 	@Override
+	public boolean assumesLogicalMultiwayJoins() {
+		return false;
+	}
+
+	@Override
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan )
 			throws PhysicalQueryOptimizationException
 	{

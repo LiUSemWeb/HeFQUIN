@@ -6,5 +6,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public interface PhysicalQueryOptimizer
 {
+	boolean assumesLogicalMultiwayJoins();
+
 	Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException;
 }

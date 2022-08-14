@@ -33,6 +33,11 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 	}
 
 	@Override
+	public boolean assumesLogicalMultiwayJoins() {
+		return true;
+	}
+
+	@Override
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
 		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,true) );
 	}

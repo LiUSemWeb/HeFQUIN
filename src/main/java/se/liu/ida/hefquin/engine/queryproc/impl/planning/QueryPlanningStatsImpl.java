@@ -11,28 +11,34 @@ public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningSt
 {
 	protected static final String enOverallPlanningTime  = "overallQueryPlanningTime";
 	protected static final String enSrcPlanningTime      = "sourcePlanningTime";
-	protected static final String enOptimizationTime     = "queryOptimizationTime";
+	protected static final String enLogicalOptimizationTime     = "logicalOptimizationTime";
+	protected static final String enPhysicalOptimizationTime    = "physicalOptimizationTime";
 	protected static final String enSrcPlanningStats     = "sourcePlanningStats";
 	protected static final String enSrcAssignment        = "resultingSourceAssignment";
+	protected static final String enLogicalOptimizationResult   = "resultingLogicalPlan";
+	protected static final String enPhysicalOptimizationResult  = "resultingPhysicalPlan";
 	protected static final String enOptimizationStats    = "queryOptimizationStats";
-	protected static final String enOptimizationResult   = "resultingPhysicalPlan";
 
 	public QueryPlanningStatsImpl( final long overallQueryPlanningTime,
 	                               final long sourcePlanningTime,
-	                               final long queryOptimizationTime,
+	                               final long logicalOptimizationTime,
+	                               final long physicalOptimizationTime,
 	                               final SourcePlanningStats sourcePlanningStats,
 	                               final LogicalPlan resultingSourceAssignment,
-	                               final PhysicalQueryOptimizationStats queryOptimizationStats,
-	                               final PhysicalPlan resultingPhysicalPlan )
+	                               final LogicalPlan resultingLogicalPlan,
+	                               final PhysicalPlan resultingPhysicalPlan,
+	                               final PhysicalQueryOptimizationStats queryOptimizationStats )
 	{
 		put( enOverallPlanningTime, Long.valueOf(overallQueryPlanningTime) );
 		put( enSrcPlanningTime,     Long.valueOf(sourcePlanningTime) );
-		put( enOptimizationTime,    Long.valueOf(queryOptimizationTime) );
+		put( enLogicalOptimizationTime,    Long.valueOf(logicalOptimizationTime) );
+		put( enPhysicalOptimizationTime,   Long.valueOf(physicalOptimizationTime) );
 
 		put( enSrcPlanningStats,   sourcePlanningStats );
 		put( enSrcAssignment,      resultingSourceAssignment );
+		put( enLogicalOptimizationResult,  resultingLogicalPlan );
+		put( enPhysicalOptimizationResult, resultingPhysicalPlan );
 		put( enOptimizationStats,  queryOptimizationStats );
-		put( enOptimizationResult, resultingPhysicalPlan );
 	}
 
 	@Override
@@ -46,8 +52,13 @@ public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningSt
 	}
 
 	@Override
-	public long getQueryOptimizationTime() {
-		return (Long) getEntry(enOptimizationTime);
+	public long getLogicalOptimizationTime() {
+		return (Long) getEntry(enLogicalOptimizationTime);
+	}
+
+	@Override
+	public long getPhysicalOptimizationTime() {
+		return (Long) getEntry(enPhysicalOptimizationTime);
 	}
 
 	@Override
@@ -61,13 +72,18 @@ public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningSt
 	}
 
 	@Override
+	public LogicalPlan getResultingLogicalPlan() {
+		return (LogicalPlan) getEntry(enLogicalOptimizationResult);
+	}
+
+	@Override
 	public PhysicalQueryOptimizationStats getQueryOptimizationStats() {
 		return (PhysicalQueryOptimizationStats) getEntry(enOptimizationStats);
 	}
 
 	@Override
 	public PhysicalPlan getResultingPhysicalPlan() {
-		return (PhysicalPlan) getEntry(enOptimizationResult);
+		return (PhysicalPlan) getEntry(enPhysicalOptimizationResult);
 	}
 
 }
