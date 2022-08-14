@@ -24,6 +24,11 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 	}
 
 	@Override
+	public boolean assumesLogicalMultiwayJoins() {
+		return false;
+	}
+
+	@Override
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
 		final PhysicalPlan initialPP = context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false);
 		final int numberOfSubplans = LogicalPlanUtils.countSubplans(initialPlan);

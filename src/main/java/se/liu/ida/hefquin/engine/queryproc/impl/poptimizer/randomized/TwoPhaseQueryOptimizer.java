@@ -24,6 +24,11 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 	}
 
 	@Override
+	public boolean assumesLogicalMultiwayJoins() {
+		return optimizer1.assumesLogicalMultiwayJoins();
+	}
+
+	@Override
 	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan )
 			throws PhysicalQueryOptimizationException {
 		final PhysicalPlan halfwayPlan = optimizer1.optimize(initialPlan).object1;

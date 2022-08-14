@@ -62,7 +62,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t2 = System.currentTimeMillis();
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
-			final boolean keepNaryOperators = true;
+			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
 			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators);
 		}
 		else {
