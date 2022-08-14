@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
@@ -29,21 +29,21 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 	}
 
 	@Override
-	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
+	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
 		final PhysicalPlan initialPP = context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false);
 		final int numberOfSubplans = LogicalPlanUtils.countSubplans(initialPlan);
 		return optimize(initialPP, numberOfSubplans);
 	}
 
 
-	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
-	                                                            final int numberOfSubplans ) throws PhysicalQueryOptimizationException {
+	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan,
+	                                                            final int numberOfSubplans ) throws PhysicalOptimizationException {
 		return optimize(initialPlan, numberOfSubplans, 2.0);
 	}
 
-	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan initialPlan,
+	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan,
 	                                                            final int numberOfSubplans,
-	                                                            final double temperatureModifier) throws PhysicalQueryOptimizationException {
+	                                                            final double temperatureModifier) throws PhysicalOptimizationException {
 		// The first plan, which is currently the best plan we know of.
 		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
 		PhysicalPlanWithCost currentPlan = bestPlan;
@@ -83,7 +83,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 			temperature *= 0.95;
 		}
 
-		final PhysicalQueryOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
+		final PhysicalOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
 
 		return new Pair<>( bestPlan.getPlan(), myStats );
 	}

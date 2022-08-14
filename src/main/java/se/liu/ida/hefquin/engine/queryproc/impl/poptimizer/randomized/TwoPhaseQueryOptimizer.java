@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
@@ -29,12 +29,12 @@ public class TwoPhaseQueryOptimizer extends RandomizedQueryOptimizerBase {
 	}
 
 	@Override
-	public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan )
-			throws PhysicalQueryOptimizationException {
+	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan )
+			throws PhysicalOptimizationException {
 		final PhysicalPlan halfwayPlan = optimizer1.optimize(initialPlan).object1;
 		final PhysicalPlan finalPlan = optimizer2.optimize(halfwayPlan,LogicalPlanUtils.countSubplans(initialPlan),0.1).object1;
 
-		final PhysicalQueryOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
+		final PhysicalOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
 
 		return new Pair<>( finalPlan, myStats );
 	}

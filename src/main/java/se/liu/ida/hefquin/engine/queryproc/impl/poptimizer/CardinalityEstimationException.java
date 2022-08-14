@@ -1,13 +1,13 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 
 /**
  * An exception that occurred during the process of estimating the
  * cardinality of the result that will be produced by a given plan.
  */
-public class CardinalityEstimationException extends PhysicalQueryOptimizationException
+public class CardinalityEstimationException extends PhysicalOptimizationException
 {
 	private static final long serialVersionUID = 4926298334556900658L;
 
