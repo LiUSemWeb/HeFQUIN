@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.PlanRewritingUtils;
@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
 
-public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimizer {
+public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
     protected final QueryOptimizationContext ctxt;
     protected final TerminationCriterionFactory tcFactory;
     protected final int nmCandidates;

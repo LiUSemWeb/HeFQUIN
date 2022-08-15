@@ -4,5 +4,5 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationCont
 
 public interface PhysicalQueryOptimizerFactory
 {
-	PhysicalQueryOptimizer createQueryOptimizer( QueryOptimizationContext ctxt );
+	PhysicalOptimizer createQueryOptimizer( QueryOptimizationContext ctxt );
 }

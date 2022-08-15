@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
@@ -22,13 +22,13 @@ public class QueryPlannerImpl implements QueryPlanner
 {
 	protected final SourcePlanner sourcePlanner;
 	protected final LogicalOptimizer loptimizer;
-	protected final PhysicalQueryOptimizer poptimizer;
+	protected final PhysicalOptimizer poptimizer;
 	protected final boolean printLogicalPlan;
 	protected final boolean printPhysicalPlan;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
-	                         final PhysicalQueryOptimizer poptimizer,
+	                         final PhysicalOptimizer poptimizer,
 	                         final boolean printLogicalPlan,
 	                         final boolean printPhysicalPlan ) {
 		assert sourcePlanner != null;
@@ -48,7 +48,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	public LogicalOptimizer getLogicalOptimizer() { return loptimizer; }
 
 	@Override
-	public PhysicalQueryOptimizer getPhysicalOptimizer() { return poptimizer; }
+	public PhysicalOptimizer getPhysicalOptimizer() { return poptimizer; }
 
 	@Override
 	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query ) throws QueryPlanningException {

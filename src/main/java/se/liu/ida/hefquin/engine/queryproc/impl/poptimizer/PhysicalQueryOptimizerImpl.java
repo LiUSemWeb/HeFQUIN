@@ -4,10 +4,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
-public class PhysicalQueryOptimizerImpl implements PhysicalQueryOptimizer
+public class PhysicalQueryOptimizerImpl implements PhysicalOptimizer
 {
 	protected final QueryOptimizationContext ctxt;
 

@@ -12,5 +12,5 @@ public interface QueryPlanner
 
 	LogicalOptimizer getLogicalOptimizer();
 
-	PhysicalQueryOptimizer getPhysicalOptimizer();
+	PhysicalOptimizer getPhysicalOptimizer();
 }
