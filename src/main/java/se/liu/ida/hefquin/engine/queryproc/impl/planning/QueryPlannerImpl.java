@@ -23,12 +23,14 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final SourcePlanner sourcePlanner;
 	protected final LogicalOptimizer loptimizer;
 	protected final PhysicalOptimizer poptimizer;
+	protected final boolean printSourceAssignment;
 	protected final boolean printLogicalPlan;
 	protected final boolean printPhysicalPlan;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
 	                         final PhysicalOptimizer poptimizer,
+	                         final boolean printSourceAssignment,
 	                         final boolean printLogicalPlan,
 	                         final boolean printPhysicalPlan ) {
 		assert sourcePlanner != null;
@@ -37,6 +39,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		this.sourcePlanner = sourcePlanner;
 		this.loptimizer = loptimizer;
 		this.poptimizer = poptimizer;
+		this.printSourceAssignment = printSourceAssignment;
 		this.printLogicalPlan = printLogicalPlan;
 		this.printPhysicalPlan = printPhysicalPlan;
 	}
@@ -55,7 +58,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t1 = System.currentTimeMillis();
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
 
-		if ( printLogicalPlan ) {
+		if ( printSourceAssignment ) {
 			System.out.println( LogicalPlanPrinter.print(saAndStats.object1) );
 		}
 
@@ -67,6 +70,10 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 		else {
 			lp = saAndStats.object1;
+		}
+
+		if ( printLogicalPlan ) {
+			System.out.println( LogicalPlanPrinter.print(lp) );
 		}
 
 		final long t3 = System.currentTimeMillis();

@@ -65,6 +65,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final LogicalToPhysicalPlanConverter l2pConverter = execCxt.getContext().get(HeFQUINConstants.sysLogicalToPhysicalPlanConverter);
 		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
 
+		final Boolean printSourceAssignments = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintSourceAssignments, false);
 		final Boolean printLogicalPlans  = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintLogicalPlans, false);
 		final Boolean printPhysicalPlans = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintPhysicalPlans, false);
 		final Boolean isExperimentRun    = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
@@ -84,7 +85,11 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final PhysicalOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
 		final PhysicalOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
-		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, loptimizer, poptimizer, printLogicalPlans, printPhysicalPlans);
+		final QueryPlanner planner = new QueryPlannerImpl( srcPlanner,
+		                                                   loptimizer,
+		                                                   poptimizer,
+		                                                   printSourceAssignments,
+		                                                   printLogicalPlans,printPhysicalPlans );
 		final QueryPlanCompiler compiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);

@@ -32,6 +32,7 @@ public class HeFQUINEngineBuilder
 	protected LogicalToPhysicalPlanConverter l2pConverter   = null;
 	protected ExecutorService execServiceForFedAccess       = null;
 	protected ExecutorService execServiceForPlanTasks       = null;
+	protected boolean printSourceAssignment   = false;
 	protected boolean printLogicalPlan        = false;
 	protected boolean printPhysicalPlan       = false;
 
@@ -98,6 +99,14 @@ public class HeFQUINEngineBuilder
 	/**
 	 * optional
 	 */
+	public HeFQUINEngineBuilder enablePrintingOfSourceAssignments( final boolean printSourceAssignment ) {
+		this.printSourceAssignment = printSourceAssignment;
+		return this;
+	}
+
+	/**
+	 * optional
+	 */
 	public HeFQUINEngineBuilder enablePrintingOfLogicalPlans( final boolean printLogicalPlan ) {
 		this.printLogicalPlan = printLogicalPlan;
 		return this;
@@ -139,6 +148,7 @@ public class HeFQUINEngineBuilder
 		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
 		ctxt.set( HeFQUINConstants.sysLogicalToPhysicalPlanConverter, l2pConverter );
 		ctxt.set( HeFQUINConstants.sysIsExperimentRun, false );
+		ctxt.set( HeFQUINConstants.sysPrintSourceAssignments, printSourceAssignment );
 		ctxt.set( HeFQUINConstants.sysPrintLogicalPlans, printLogicalPlan );
 		ctxt.set( HeFQUINConstants.sysPrintPhysicalPlans, printPhysicalPlan );
 		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );

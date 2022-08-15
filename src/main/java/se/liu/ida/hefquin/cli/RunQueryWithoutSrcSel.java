@@ -38,6 +38,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
+	protected final ArgDecl argPrintSourceAssignment  = new ArgDecl(ArgDecl.NoValue, "printSourceAssignment");
 	protected final ArgDecl argPrintLogicalPlan   = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
 	protected final ArgDecl argPrintPhysicalPlan  = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
 	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
@@ -55,8 +56,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modResults);
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
-		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan used for the query optimization");
-		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan used for the query execution");
+		add(argPrintSourceAssignment, "--printSourceAssignment", "Print out the source assignment used as input to the query optimization");
+		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan produced by the logical query optimization");
+		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan produced by the physical query optimization and used for the query execution");
 		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
 		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
 
@@ -79,6 +81,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 				.setFederationCatalog( modFederation.getFederationCatalog() )
 				.setExecutorServiceForFederationAccess(execServiceForFedAccess)
 				.setExecutorServiceForPlanTasks(execServiceForPlanTasks)
+				.enablePrintingOfSourceAssignments( contains(argPrintSourceAssignment) )
 				.enablePrintingOfLogicalPlans( contains(argPrintLogicalPlan) )
 				.enablePrintingOfPhysicalPlans( contains(argPrintPhysicalPlan) )
 				.build();
