@@ -25,7 +25,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizerFactory;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
@@ -81,7 +81,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
 
-		final PhysicalQueryOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
+		final PhysicalOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
 		final PhysicalOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);
 
 		final QueryPlanner planner = new QueryPlannerImpl(srcPlanner, loptimizer, poptimizer, printLogicalPlans, printPhysicalPlans);

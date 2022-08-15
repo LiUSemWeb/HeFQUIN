@@ -8,7 +8,7 @@ import org.apache.jena.sparql.util.Context;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizerFactory;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
@@ -51,10 +51,10 @@ public class HeFQUINEngineConfig
 		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 	}
 
-	protected PhysicalQueryOptimizerFactory createQueryOptimizerFactory() {
+	protected PhysicalOptimizerFactory createQueryOptimizerFactory() {
 		// TODO: Instead of hard-coding the following, the optimizer (and
 		// similar things) should be created based on a config file.
-		return new PhysicalQueryOptimizerFactory() {
+		return new PhysicalOptimizerFactory() {
 			@Override
 			public PhysicalOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
 				return createQueryOptimizerWithoutOptimization(ctxt);
