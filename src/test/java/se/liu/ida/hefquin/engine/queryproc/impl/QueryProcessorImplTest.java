@@ -35,7 +35,7 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -47,7 +47,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
@@ -380,7 +380,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
-		final PhysicalQueryOptimizer poptimizer = new PhysicalQueryOptimizerImpl(ctxt);
+		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, false, false);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);

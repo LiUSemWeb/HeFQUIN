@@ -6,13 +6,13 @@ import java.util.Random;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 
-public abstract class RandomizedQueryOptimizerBase implements PhysicalQueryOptimizer
+public abstract class RandomizedQueryOptimizerBase implements PhysicalOptimizer
 {
 	protected final Random rng = new Random();
 

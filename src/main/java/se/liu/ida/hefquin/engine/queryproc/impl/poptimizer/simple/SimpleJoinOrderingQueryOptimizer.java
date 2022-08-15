@@ -6,10 +6,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
  * not hard-coded but, instead, can be specified by means of providing
  * an implementation of {@link JoinPlanOptimizer}.
  */
-public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
+public class SimpleJoinOrderingQueryOptimizer implements PhysicalOptimizer
 {
     protected final JoinPlanOptimizer joinPlanOptimizer;
     protected final QueryOptimizationContext ctxt;
@@ -42,17 +42,17 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
     }
 
     @Override
-    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
+    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
         final boolean keepMultiwayJoins = true;
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
         final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
 
-        final PhysicalQueryOptimizationStatsImpl myStats = new PhysicalQueryOptimizationStatsImpl();
+        final PhysicalOptimizationStatsImpl myStats = new PhysicalOptimizationStatsImpl();
 
         return new Pair<>(bestPlan, myStats);
     }
 
-    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {
+    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalOptimizationException {
         final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan);
 
         if ( hasMultiwayJoinAsRoot(plan) ){
@@ -66,7 +66,7 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalQueryOptimizer
         }
     }
 
-    protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {
+    protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan ) throws PhysicalOptimizationException {
         final int numChildren = plan.numberOfSubPlans();
         final PhysicalPlan[] children = new PhysicalPlan[numChildren];
         for ( int i = 0; i < numChildren; ++i ) {

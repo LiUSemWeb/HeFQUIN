@@ -2,10 +2,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorith
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
 
-public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimizer {
+public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
     protected final QueryOptimizationContext ctxt;
     protected final TerminationCriterionFactory tcFactory;
     protected final int nmCandidates;
@@ -46,14 +46,14 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
     }
 
     @Override
-    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalQueryOptimizationException {
+    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
         final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
         return optimize( initialPhysicalPlan, tcFactory.createInstance(initialPlan) );
     }
 
-    public Pair<PhysicalPlan, PhysicalQueryOptimizationStats> optimize( final PhysicalPlan plan,
+    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan plan,
                                                                 final TerminationCriterion tc )
-                                                                        throws PhysicalQueryOptimizationException {
+                                                                        throws PhysicalOptimizationException {
         final PlanRewritingUtils ruleApplicationCache = new PlanRewritingUtils( new RuleInstances() );
         // initialize the first generation
         Generation currentGen = generateFirstGen( plan, ruleApplicationCache );
@@ -92,7 +92,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
         }
         final PhysicalPlanWithCost bestPlan = currentGen.bestPlan;
 
-        final PhysicalQueryOptimizationStatsImpl myStats = new PhysicalQueryOptimizationStatsImpl();
+        final PhysicalOptimizationStatsImpl myStats = new PhysicalOptimizationStatsImpl();
         myStats.put( "numberOfGenerations", previousGenerations.size() + 1 );
         myStats.put( "costOfSelectedPlan", bestPlan.getWeight() );
 
@@ -105,7 +105,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
 		return new Pair<>(bestPlan.getPlan(), myStats);
     }
 
-    protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws PhysicalQueryOptimizationException {
+    protected Generation generateFirstGen( final PhysicalPlan plan, final PlanRewritingUtils cache ) throws PhysicalOptimizationException {
         final List<PhysicalPlan> currentGen = new ArrayList<>();
         currentGen.add(plan);
 
@@ -125,7 +125,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalQueryOptimiz
         return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), currentGen) );
     }
 
-    protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws PhysicalQueryOptimizationException {
+    protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws PhysicalOptimizationException {
         final Set<PhysicalPlanWithCost> parentSet = new HashSet<>( currentGen.plans );
         final List<PhysicalPlan> newCandidates = new ArrayList<>();
 

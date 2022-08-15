@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -10,23 +10,23 @@ import java.util.List;
 
 public class PhysicalPlanWithCostUtils {
     
-    public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm, final PhysicalPlan plan ) throws PhysicalQueryOptimizationException {
+    public static PhysicalPlanWithCost annotatePlanWithCost( final CostModel cm, final PhysicalPlan plan ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates(cm, plan);
         } catch ( final CostEstimationException e ) {
-            throw new PhysicalQueryOptimizationException( "Determining the cost for the plan caused an exception.", e.getCause() );
+            throw new PhysicalOptimizationException( "Determining the cost for the plan caused an exception.", e.getCause() );
         }
 
         return new PhysicalPlanWithCost( plan, costs[0] );
     }
 
-    public static List<PhysicalPlanWithCost> annotatePlansWithCost(final CostModel cost, final List<PhysicalPlan> plans ) throws PhysicalQueryOptimizationException {
+    public static List<PhysicalPlanWithCost> annotatePlansWithCost(final CostModel cost, final List<PhysicalPlan> plans ) throws PhysicalOptimizationException {
         final Double[] costs;
         try {
             costs = CostEstimationUtils.getEstimates( cost, plans );
         } catch ( final CostEstimationException e ) {
-            throw new PhysicalQueryOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
+            throw new PhysicalOptimizationException( "Determining the cost for plans caused an exception.", e.getCause() );
         }
 
         final List<PhysicalPlanWithCost> plansWithCost = new ArrayList<>( );

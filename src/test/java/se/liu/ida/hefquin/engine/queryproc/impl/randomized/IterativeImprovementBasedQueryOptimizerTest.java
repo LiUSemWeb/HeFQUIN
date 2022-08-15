@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalQueryOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.IterativeImprovementBasedQueryOptimizer;
@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 {
 	@Test
-	public void iiOptimizerTest1() throws PhysicalQueryOptimizationException {
+	public void iiOptimizerTest1() throws PhysicalOptimizationException {
 		// set up everything for the test
 		final PhysicalPlan initialPlan = new DummyPlanForTest(10);
 		final PhysicalPlan plan1 = new DummyPlanForTest(8);
