@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalQueryOptimizationStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.RandomizedJoinPlanOptimizerImpl;
@@ -82,7 +82,7 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 			generation++;
 		}
 
-		final PhysicalOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
+		final PhysicalOptimizationStats myStats = new PhysicalOptimizationStatsImpl();
 
 		return new Pair<>( bestPlan.getPlan(), myStats );
 	}

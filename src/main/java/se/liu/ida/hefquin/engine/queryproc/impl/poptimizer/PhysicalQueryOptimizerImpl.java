@@ -28,7 +28,7 @@ public class PhysicalQueryOptimizerImpl implements PhysicalOptimizer
 		final boolean keepMultiwayJoins = false;
 		final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert(initialPlan, keepMultiwayJoins);
 
-		final PhysicalOptimizationStats myStats = new PhysicalQueryOptimizationStatsImpl();
+		final PhysicalOptimizationStats myStats = new PhysicalOptimizationStatsImpl();
 
 		return new Pair<>(initialPhysicalPlan, myStats);
 
