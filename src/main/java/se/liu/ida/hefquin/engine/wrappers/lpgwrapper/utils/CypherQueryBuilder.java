@@ -50,6 +50,6 @@ public class CypherQueryBuilder {
     }
 
     public CypherMatchQuery build() {
-        return new CypherMatchQueryImpl(matches, conditions, returns);
+        return new CypherMatchQueryImpl(matches, conditions, null, returns);
     }
 }

@@ -77,7 +77,7 @@ public class CypherQueryUtils {
                 returns.add(r);
             }
         }
-        return new CypherMatchQueryImpl(matches, conditions, returns);
+        return new CypherMatchQueryImpl(matches, conditions, null, returns);
     }
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherMatchQuery q2) {
