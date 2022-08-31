@@ -9,15 +9,20 @@ import java.util.List;
 public class UnwindIteratorImpl implements UnwindIterator {
 
     protected final CypherVar innerVar;
+    //TODO: this should be a CypherExpression
     protected final String listExpression;
     protected final List<WhereCondition> filters;
     protected final List<String> returnExpressions;
+    protected final CypherVar alias;
 
-    public UnwindIteratorImpl(CypherVar innerVar, String listExpression, List<WhereCondition> filters, List<String> returnExpressions) {
+    public UnwindIteratorImpl(final CypherVar innerVar, final String listExpression,
+                              final List<WhereCondition> filters, final List<String> returnExpressions,
+                              final CypherVar alias) {
         this.innerVar = innerVar;
         this.listExpression = listExpression;
         this.filters = filters;
         this.returnExpressions = returnExpressions;
+        this.alias = alias;
     }
 
     public CypherVar getInnerVar() {
