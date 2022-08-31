@@ -67,8 +67,9 @@ public class GraphQLQueryRootForStarPattern
 	/**
 	 * Returns the relevant entry point with regards to if the corresponding
 	 * star pattern has the required arguments.
+	 * @throws QueryTranslatingException if no valid entrypoint was found.
 	 */
-	public final GraphQLEntrypoint getGraphQLEntryPoint() {
+	public final GraphQLEntrypoint getGraphQLEntryPoint() throws QueryTranslatingException {
 		if ( graphqlEntryPoint == null ) {
 			graphqlEntryPoint = determineGraphQLEntryPoint();
 		}
@@ -116,7 +117,7 @@ public class GraphQLQueryRootForStarPattern
 		return args;
 	}
 
-	protected GraphQLEntrypoint determineGraphQLEntryPoint() {
+	protected GraphQLEntrypoint determineGraphQLEntryPoint() throws QueryTranslatingException {
 		final String type = getGraphQLObjectType();
 		if ( type == null ) {
 			throw new IllegalStateException();
@@ -126,18 +127,24 @@ public class GraphQLQueryRootForStarPattern
 
 		// First, try single-object entry point
 		final GraphQLEntrypoint e1 = endpoint.getEntrypoint(type, GraphQLEntrypointType.SINGLE);
-		if ( SPARQL2GraphQLHelper.hasAllNecessaryArguments(argNames, e1.getArgumentDefinitions().keySet()) ) {
+		if (e1 != null && SPARQL2GraphQLHelper.hasAllNecessaryArguments(argNames, e1.getArgumentDefinitions().keySet()) ) {
 			return e1;
-			}
+		}
 
 		// Next, try filtered list entry point
 		final GraphQLEntrypoint e2 = endpoint.getEntrypoint(type, GraphQLEntrypointType.FILTERED);
-		if ( SPARQL2GraphQLHelper.hasNecessaryArguments(argNames, e2.getArgumentDefinitions().keySet()) ) {
+		if (e2 != null && SPARQL2GraphQLHelper.hasNecessaryArguments(argNames, e2.getArgumentDefinitions().keySet()) ) {
 			return e2;
 		}
 
 		// Get full list entry point (No argument values)
-		return endpoint.getEntrypoint(type, GraphQLEntrypointType.FULL);
+		final GraphQLEntrypoint e3 = endpoint.getEntrypoint(type, GraphQLEntrypointType.FULL);
+
+		if(e3 == null){
+			throw new QueryTranslatingException("No valid entrypoint for the star pattern was found!");
+		}
+		
+		return e3;
 	}
 
 	@Override
