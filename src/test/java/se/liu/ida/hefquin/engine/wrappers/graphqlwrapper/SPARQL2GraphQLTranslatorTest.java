@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryTranslatingException;
 
 /**
  * Verifies functionality of SPARQL2GraphQLTranslatorImpl
@@ -27,7 +28,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
 
     @Test
-    public void test1(){
+    public void test1() throws QueryTranslatingException{
         /**
          * ?author p:id_of_Author    "auth3" .
          * ?author p:name_of_Author  ?name .
@@ -64,7 +65,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test2(){
+    public void test2() throws QueryTranslatingException{
         /**
          * ?s ?p ?o .
          */
@@ -103,7 +104,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test3(){
+    public void test3() throws QueryTranslatingException{
         /**
          * ?author p:id_of_Author    "auth3" .
          * ?author p:books_of_Author ?book .
@@ -141,7 +142,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test4(){
+    public void test4() throws QueryTranslatingException{
         /**
          * ?s rdf:type c:Author .
          * ?s ?p       ?o .
@@ -170,7 +171,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test5(){
+    public void test5() throws QueryTranslatingException{
         /**
          * ?author p:books_of_Author  ?book .
          * ?author p:name_of_Author   "William Shakespeare" .
@@ -211,7 +212,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test6(){
+    public void test6() throws QueryTranslatingException{
         /**
          * ?book p:genre_of_Book "MYSTERY" .
          * ?book p:title_of_Book ?title .
@@ -246,7 +247,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
     }
 
     @Test
-    public void test7(){
+    public void test7() throws QueryTranslatingException{
         /**
          * ?author  p:id_of_Author      "auth3";
          *          p:books_of_Author   ?book .
