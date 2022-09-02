@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
+
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
@@ -27,6 +29,35 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LogicalOpUtils {
+	
+	public static LogicalOperator RW(final LogicalOpRequest<?, ?> req) {
+		final FederationMember fm = req.getFederationMember();
+		final VocabularyMapping vm = fm.getVocabularyMapping();
+		// Get P from req, use reqtype?
+		// If it's not a TP, return as-is or throw error?
+		// newP = ApplyVocabularyMapping(tp,vm)
+		// return rewriteReqOf(newP, fm)
+		
+		return req;
+	}
+	
+	public static LogicalOperator rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
+		if (fm.getInterface().supportsBGPRequests()) { // Are all interfaces which support BGP requests SPARQL endpoints? Based on the assumption that there are two types of interfaces: TPF-server and SPARQL-endpoint, and TPF-servers do not.
+			// return req(P,fm);
+		} // If not, continue.
+		
+		// If P is a TP
+		// Create request and return
+		
+		// If P is a BGP
+		// Do stuff and return
+		
+		// If P is UP
+		
+		// If P GP
+		
+		return null; // Return statement. When this algorithm is finished, an error should be thrown if it for some reason gets here.
+	}
 
     /**
      * Creates a BGP by merging two sets of triple patterns,
