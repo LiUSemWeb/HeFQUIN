@@ -9,19 +9,24 @@ import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
@@ -30,31 +35,53 @@ import java.util.Set;
 
 public class LogicalOpUtils {
 	
-	public static LogicalOperator RW(final LogicalOpRequest<?, ?> req) {
+	public static LogicalPlan RW(final LogicalOpRequest<?, ?> req) {
 		final FederationMember fm = req.getFederationMember();
 		final VocabularyMapping vm = fm.getVocabularyMapping();
-		// Get P from req, use reqtype?
-		// If it's not a TP, return as-is or throw error?
-		// newP = ApplyVocabularyMapping(tp,vm)
-		// return rewriteReqOf(newP, fm)
 		
-		return req;
+		if(!(req.getRequest() instanceof TriplePatternRequest)) {
+			// If it's not a TP, return as-is or throw error?
+		}
+		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest(); // Cast the request to be a TriplePatternRequest.
+		final TriplePattern tp = tpreq.getQueryPattern(); // Get the tp.
+		
+		// ApplyVocabularyMapping(tp,vm)
+		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
+		
+		return rewriteReqOf(newP, fm);
+		
 	}
 	
-	public static LogicalOperator rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
+	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
 		if (fm.getInterface().supportsBGPRequests()) { // Are all interfaces which support BGP requests SPARQL endpoints? Based on the assumption that there are two types of interfaces: TPF-server and SPARQL-endpoint, and TPF-servers do not.
-			// return req(P,fm);
+			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
+			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
+			return newPlan;
 		} // If not, continue.
 		
-		// If P is a TP
-		// Create request and return
+		if(P instanceof TriplePattern){
+			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
+			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
+			return newPlan;
+		}
 		
-		// If P is a BGP
-		// Do stuff and return
+		if(P instanceof BGP) {
+			// Create something regarding multijoin
+			for (TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
+				// Add them into the multi-join-related thing.
+			}
+			// Return
+		}
 		
-		// If P is UP
+		if(P instanceof SPARQLUnionPattern) {
+			// Multiunion
+		}
 		
-		// If P GP
+		if(P instanceof SPARQLGroupPattern) {
+			// Multijoin
+		}
 		
 		return null; // Return statement. When this algorithm is finished, an error should be thrown if it for some reason gets here.
 	}
