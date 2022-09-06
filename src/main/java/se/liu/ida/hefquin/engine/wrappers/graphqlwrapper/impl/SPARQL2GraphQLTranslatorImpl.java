@@ -25,6 +25,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphCycleDetector;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.GraphQLQueryRootForStarPattern;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryTranslatingException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SGPNode;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.SPARQL2GraphQLHelper;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.StarPattern;
@@ -33,7 +34,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
     @Override
     public GraphQLQuery translateBGP(final BGP bgp, final GraphQL2RDFConfiguration config,
-            final GraphQLEndpoint endpoint) {
+            final GraphQLEndpoint endpoint) throws QueryTranslatingException {
 
         // Initialize necessary data structures
         // - collection of subject-based star patterns of the given
@@ -158,9 +159,10 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
     /**
      * Generates a GraphQL query from provided @param indexedStarPatterns,connectors,withoutConnnectors
+     * @throws QueryTranslatingException if no valid entrypoint for a star pattern was found.
      */
     protected GraphQLQuery generateQueryData( final SPARQL2GraphQLHelper helper,
-                                              final Set<GraphQLQueryRootForStarPattern> queryRoots ) {
+                                              final Set<GraphQLQueryRootForStarPattern> queryRoots ) throws QueryTranslatingException {
         final Set<String> fieldPaths = new HashSet<>();
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         

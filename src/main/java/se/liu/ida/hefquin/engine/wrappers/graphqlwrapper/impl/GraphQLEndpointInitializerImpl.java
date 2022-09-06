@@ -175,7 +175,7 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
         final String kind = field.getString(iKind);
         final GraphQLFieldType fieldType;
 
-        if(kind.equals("OBJECT")){
+        if(kind.equals("OBJECT") || kind.equals("INTERFACE")){
             fieldType = GraphQLFieldType.OBJECT;
         }
         else if(kind.equals("SCALAR") || kind.equals("ENUM")){
@@ -266,9 +266,9 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
         // Initialize GraphQL object types and their respective fields
         for (final JsonObject type : data.getObj(iSchema).getArray(iTypes).toArray(JsonObject[]::new)) {
 
-            // Filter away JsonObjects that aren't of the GraphQL type OBJECT
+            // Filter away JsonObjects that aren't of the GraphQL type OBJECT or INTERFACE
             final String typeKind = type.getString(iKind);
-            if (typeKind == null || !typeKind.equals("OBJECT")) {
+            if (typeKind == null || !(typeKind.equals("OBJECT") || typeKind.equals("INTERFACE"))) {
                 continue;
             }
             // Filter away JsonObjects that are GraphQL standard types
