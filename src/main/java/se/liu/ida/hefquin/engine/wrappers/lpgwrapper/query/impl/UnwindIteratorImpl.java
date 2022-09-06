@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
 
 import java.util.List;
+import java.util.Objects;
 
 public class UnwindIteratorImpl implements UnwindIterator {
 
@@ -54,5 +55,19 @@ public class UnwindIteratorImpl implements UnwindIterator {
         return alias;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnwindIteratorImpl that = (UnwindIteratorImpl) o;
+        return innerVar.equals(that.innerVar) && listExpression.equals(that.listExpression)
+                && Objects.equals(filters, that.filters)
+                && Objects.equals(returnExpressions, that.returnExpressions)
+                && alias.equals(that.alias);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(innerVar, listExpression, filters, returnExpressions, alias);
+    }
 }
