@@ -168,16 +168,13 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
 
             // Check if type has an id field
             if(!fields.containsKey("id")){
-                System.out.println("Type: " + type + " is removed due to not having an id field!");
                 typesToRemove.add(type);
                 continue;
             }
 
             // Check if type has atleast one valid entrypoint
             if(!entrypoints.containsKey(type) || entrypoints.get(type).isEmpty()){
-                System.out.println("Type: " + type + " is removed due to not having a valid entrypoint!");
                 typesToRemove.add(type);
-                continue;
             }
         }
 
@@ -197,7 +194,6 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
 
                 // Check if value type of current field is a type that will be removed
                 if(fieldInfo.getFieldType() == GraphQLFieldType.OBJECT && typesToRemove.contains(fieldInfo.getValueType())){
-                    System.out.println("Field: " + field + " from type: " + type + " was removed!");
                     fieldsToRemove.add(field);
                 }
             }

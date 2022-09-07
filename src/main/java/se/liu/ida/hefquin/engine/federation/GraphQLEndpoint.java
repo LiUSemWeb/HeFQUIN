@@ -59,8 +59,4 @@ public interface GraphQLEndpoint extends FederationMember {
      */
     public GraphQLEntrypoint getEntrypoint(final String objectTypeName, final GraphQLEntrypointType fieldType);
 
-    /*
-     * Uses System.out to print information about the endpoint such as GraphQL object types and their fields.
-     */
-    public void printInformation();
 }

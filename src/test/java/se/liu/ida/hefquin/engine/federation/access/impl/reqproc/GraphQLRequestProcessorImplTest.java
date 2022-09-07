@@ -85,11 +85,6 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 			return null;
 		}
 
-		@Override
-		public void printInformation() {
-			// TODO Auto-generated method stub
-			
-		}
 	}
 
     @Test
