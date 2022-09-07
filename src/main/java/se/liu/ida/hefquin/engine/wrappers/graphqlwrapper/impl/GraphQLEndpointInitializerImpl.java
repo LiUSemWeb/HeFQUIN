@@ -85,10 +85,8 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
                 throw new FederationAccessException("Error at endpoint.", req, tmpEndpoint);
             }
             final JsonObject data = jsonObject.getObj("data");
-            final Map<String, Map<String, GraphQLField>> typesAndFields = parseTypesAndFields(data);
-            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> entrypoints = parseEntrypoints(data);
 
-            return validateTypesAndEntrypoints(typesAndFields, entrypoints,iface);
+            return validateTypesAndEntrypoints(parseTypesAndFields(data),parseEntrypoints(data),iface);
         } 
         catch (final FederationAccessException e) {
             throw e;
