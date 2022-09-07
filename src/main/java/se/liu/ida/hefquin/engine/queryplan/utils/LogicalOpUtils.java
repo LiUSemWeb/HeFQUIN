@@ -69,7 +69,7 @@ public class LogicalOpUtils {
 		
 		if(P instanceof BGP) {
 			// Create something regarding multijoin
-			for (TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
+			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
 				// Add them into the multi-join-related thing.
 			}
 			// Return
