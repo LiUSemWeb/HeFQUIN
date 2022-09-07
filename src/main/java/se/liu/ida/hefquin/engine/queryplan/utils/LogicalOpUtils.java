@@ -83,7 +83,7 @@ public class LogicalOpUtils {
 			// Multijoin
 		}
 		
-		return null; // Return statement. When this algorithm is finished, an error should be thrown if it for some reason gets here.
+		throw new IllegalArgumentException( P.getClass().getName() );
 	}
 
     /**
