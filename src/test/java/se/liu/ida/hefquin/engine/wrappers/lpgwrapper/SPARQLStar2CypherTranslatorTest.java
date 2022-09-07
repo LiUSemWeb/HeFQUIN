@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
@@ -43,6 +44,57 @@ public class SPARQLStar2CypherTranslatorTest {
 
     final LPGNode node22 = new LPGNode("22", null, null);
     final LPGNode node23 = new LPGNode("23", null, null);
+
+    @Test
+    public void translateNodeLabelLabelTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple tp = new Triple(conf.mapNode(node22), conf.getLabel(), conf.mapNodeLabel("Person"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(tp), conf).object1;
+        assertEquals(
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new NodeLabelCondition(a1, "Person"))
+                        .add(new CountLargerThanZeroReturnStatement(a2))
+                        .build(),
+                translation
+        );
+    }
+
+    @Test
+    public void translateNodePropertyLiteralTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple tp = new Triple(conf.mapNode(node22), conf.mapProperty("name"),
+                NodeFactory.createLiteral("Uma Thurman"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(tp), conf).object1;
+        assertEquals(
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new PropertyValueCondition(a1, "name", "Uma Thurman"))
+                        .add(new CountLargerThanZeroReturnStatement(a2))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void translateNodeRelationshipNodeTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple tp = new Triple(conf.mapNode(node22), conf.mapEdgeLabel("directed"), conf.mapNode(node23));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(tp), conf).object1;
+        assertEquals(
+                new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a1, a2, a3))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new EdgeLabelCondition(a2, "directed"))
+                        .add(new NodeIDCondition(a3, "23"))
+                        .add(new CountLargerThanZeroReturnStatement(a4))
+                        .build(),
+                translation);
+    }
 
     @Test
     public void translateVarPropertyLiteralTest() {
