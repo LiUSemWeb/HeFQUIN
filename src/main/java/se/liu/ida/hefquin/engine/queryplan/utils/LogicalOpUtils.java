@@ -40,7 +40,7 @@ public class LogicalOpUtils {
 		final VocabularyMapping vm = fm.getVocabularyMapping();
 		
 		if(!(req.getRequest() instanceof TriplePatternRequest)) {
-			// If it's not a TP, return as-is or throw error?
+			throw new UnsupportedOperationException( "no support for " + req.getRequest().getClass().getName() );
 		}
 		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest(); // Cast the request to be a TriplePatternRequest.
 		final TriplePattern tp = tpreq.getQueryPattern(); // Get the tp.
