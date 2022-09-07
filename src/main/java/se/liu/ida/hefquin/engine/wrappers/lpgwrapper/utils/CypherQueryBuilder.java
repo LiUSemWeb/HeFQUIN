@@ -1,9 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.ReturnStatement;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
 
 import java.util.ArrayList;
@@ -13,11 +10,13 @@ public class CypherQueryBuilder {
 
     private final List<MatchClause> matches;
     private final List<WhereCondition> conditions;
+    private final List<UnwindIterator> iterators;
     private final List<ReturnStatement> returns;
 
     public CypherQueryBuilder() {
         this.matches = new ArrayList<>();
         this.conditions = new ArrayList<>();
+        this.iterators = new ArrayList<>();
         this.returns = new ArrayList<>();
     }
 
@@ -31,6 +30,11 @@ public class CypherQueryBuilder {
         return this;
     }
 
+    public CypherQueryBuilder addIterator(final UnwindIterator iterator) {
+        this.iterators.add(iterator);
+        return this;
+    }
+
     public CypherQueryBuilder addReturn(final ReturnStatement ret) {
         this.returns.add(ret);
         return this;
@@ -41,6 +45,8 @@ public class CypherQueryBuilder {
             this.addMatch((MatchClause) clause);
         } else if (clause instanceof WhereCondition) {
             this.addCondition((WhereCondition) clause);
+        } else if (clause instanceof UnwindIterator) {
+            this.addIterator((UnwindIterator) clause);
         } else if (clause instanceof ReturnStatement) {
             this.addReturn((ReturnStatement) clause);
         } else {
