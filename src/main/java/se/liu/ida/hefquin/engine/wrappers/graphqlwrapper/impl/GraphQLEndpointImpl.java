@@ -76,7 +76,9 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
 
     @Override
     public GraphQLEntrypoint getEntrypoint(final String objectTypeName, final GraphQLEntrypointType fieldType) {
-        if(containsGraphQLObjectType(objectTypeName) && objectTypeToEntrypoint.get(objectTypeName).containsKey(fieldType)){
+        if(containsGraphQLObjectType(objectTypeName) && objectTypeToEntrypoint.containsKey(objectTypeName) && 
+                objectTypeToEntrypoint.get(objectTypeName).containsKey(fieldType)){
+                    
             return objectTypeToEntrypoint.get(objectTypeName).get(fieldType);
         }
         return null;
@@ -88,5 +90,42 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
             return objectTypeToFields.get(objectTypeName);
         }
         return null;
+    }
+
+    @Override
+    public void printInformation() {
+
+        // Print object types and fields
+        System.out.println("Object types and fields\n");
+        for(final String typeName : objectTypeToFields.keySet()){
+            System.out.println("Object type: " + typeName);
+                final Map<String,GraphQLField> fields = objectTypeToFields.get(typeName);
+                for(final String fieldName : fields.keySet()){
+                    final GraphQLField currentField = fields.get(fieldName);
+                    System.out.println("---- Field name: " + fieldName);
+                    System.out.println("---- ---- Value type: " + currentField.getValueType());
+                    System.out.println("---- ---- Field type: " + currentField.getFieldType());
+                }
+            System.out.println("\n");
+        }
+
+        System.out.println("==================================================================\n");
+        System.out.println("Entrypoints\n");
+
+        for(final String typeName : objectTypeToEntrypoint.keySet()){
+            System.out.println("Entrypoint for type: " + typeName);
+            final Map<GraphQLEntrypointType,GraphQLEntrypoint> entrypoints = objectTypeToEntrypoint.get(typeName);
+            for(final GraphQLEntrypointType epType : entrypoints.keySet()){
+                System.out.println("---- Entrypoint Type: " + epType.toString());
+                System.out.println("---- Entrypoint field name: " + entrypoints.get(epType).getFieldName());
+                System.out.println("---- Args:");
+                final Map<String,String> argDefs = entrypoints.get(epType).getArgumentDefinitions();
+                for(String argName: argDefs.keySet()){
+                    System.out.println("---- ---- " + argName + " of type " + argDefs.get(argName));
+                }
+            }
+            System.out.println("\n");
+        }
+        
     }
 }
