@@ -42,8 +42,8 @@ public class LogicalOpUtils {
 		if(!(req.getRequest() instanceof TriplePatternRequest)) {
 			throw new UnsupportedOperationException( "no support for " + req.getRequest().getClass().getName() );
 		}
-		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest(); // Cast the request to be a TriplePatternRequest.
-		final TriplePattern tp = tpreq.getQueryPattern(); // Get the tp.
+		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest();
+		final TriplePattern tp = tpreq.getQueryPattern();
 		
 		// ApplyVocabularyMapping(tp,vm)
 		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
