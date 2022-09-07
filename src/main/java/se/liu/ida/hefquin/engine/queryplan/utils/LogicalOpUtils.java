@@ -53,7 +53,7 @@ public class LogicalOpUtils {
 	}
 	
 	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
-		if (fm.getInterface().supportsBGPRequests()) { // Are all interfaces which support BGP requests SPARQL endpoints? Based on the assumption that there are two types of interfaces: TPF-server and SPARQL-endpoint, and TPF-servers do not.
+		if ( fm.getInterface().supportsBGPRequests() ) {
 			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
 			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
