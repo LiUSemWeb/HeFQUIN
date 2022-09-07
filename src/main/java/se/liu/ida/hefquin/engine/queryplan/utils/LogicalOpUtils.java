@@ -5,11 +5,13 @@ import org.apache.jena.sparql.syntax.*;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
@@ -53,7 +55,7 @@ public class LogicalOpUtils {
 	}
 	
 	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
-		if (fm.getInterface().supportsBGPRequests()) { // Are all interfaces which support BGP requests SPARQL endpoints? Based on the assumption that there are two types of interfaces: TPF-server and SPARQL-endpoint, and TPF-servers do not.
+		if (fm instanceof SPARQLEndpoint) { // Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future. For now, we will not assume that third types of interfaces will necessarily support all patterns.
 			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
 			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
@@ -61,7 +63,7 @@ public class LogicalOpUtils {
 		} // If not, continue.
 		
 		if(P instanceof TriplePattern){
-			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
+			final TriplePatternRequest reqP = new TriplePatternRequestImpl((TriplePattern)P);
 			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
 			return newPlan;
