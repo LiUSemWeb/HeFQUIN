@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.UnwindIteratorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
@@ -36,7 +37,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                         final LPG2RDFConfiguration configuration,
                                                         final CypherVarGenerator gen,
                                                         final Set<Node> certainNodes,
-                                                        final Set<Node> certainEdgelabels,
+                                                        final Set<Node> certainEdgeLabels,
                                                         final Set<Node> certainNodeLabels,
                                                         final Set<Node> certainPropertyNames,
                                                         final Set<Node> certainPropertyValues) {
@@ -272,13 +273,14 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar xvar = gen.getAnonVar();
         final String literal = o.getLiteralValue().toString();
         final CypherVar iterVar = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(xvar))
                 .add(new NodeIDCondition(xvar, configuration.unmapNode(s).getId()))
-                //.add(new UnwindIteratorImpl(new CypherVar("k"), "KEYS("+xvar.toString()+")", xvar.toString()+"[k]='"literal+"'", iterVar)
-                //.add(new FilterEmptyPropertyListsCondition(xvar, literal))
-                //.add(new FilteredPropertiesReturnStatement(xvar, literal, gen.getRetVar(p)))
-                .add(new VariableReturnStatement(iterVar, gen.getRetVar(p)))
+                .add(new UnwindIteratorImpl(innerVar, "KEYS("+xvar+")",
+                        Collections.singletonList(new PropertyValueConditionWithVar(xvar, innerVar, literal)),
+                        Collections.singletonList("k"), iterVar))
+                .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
                 .build();
     }
 
@@ -372,13 +374,16 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                final LPG2RDFConfiguration configuration, final CypherVarGenerator gen,
                                                final Set<Node> certainNodes) {
         final CypherVar svar = gen.getVarFor(s);
+        final CypherVar innerVar = new CypherVar("k");
+        final CypherVar iterVar = gen.getAnonVar();
+        final CypherVar iterVar2 = gen.getAnonVar();
         final String literal = o.getLiteralValue().toString();
         final CypherMatchQuery q = new CypherQueryBuilder()
                                         .add(new NodeMatchClause(svar))
-                                        //.add(new UnwindIteratorImpl(...))
+                                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+svar+")",
+                                                null, Collections.singletonList("k"), iterVar))
                                         .add(new VariableReturnStatement(svar, gen.getRetVar(s)))
-                                        //.add(new FilterEmptyPropertyListsCondition(svar, literal))
-                                        //.add(new FilteredPropertiesReturnStatement(svar, literal, gen.getRetVar(p)))
+                                        .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
                                         .build();
         if (certainNodes.contains(s)) {
             return q;
@@ -387,10 +392,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
-                        //.add(new UnwindIteratorImpl(...))
-                        //.add(new FilterEmptyPropertyListsCondition(sedge.get(1), literal))
+                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+sedge.get(1)+")",
+                                null, Collections.singletonList("k"), iterVar2))
                         .add(new TripleMapReturnStatement(sedge.get(0), sedge.get(1), sedge.get(2), gen.getRetVar(s)))
-                        //.add(new FilteredPropertiesReturnStatement(sedge.get(1), literal, gen.getRetVar(p)))
+                        .add(new VariableGetItemReturnStatement(iterVar2 , 0, gen.getRetVar(p)))
                         .build(),
                 q
         );
@@ -405,8 +410,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar a3 = gen.getAnonVar();
         final CypherVar a4 = gen.getAnonVar();
         final CypherVar a5 = gen.getAnonVar();
+        final CypherVar iterVar = gen.getAnonVar();
         final CypherVar pvar = gen.getVarFor(p);
         final CypherVar ovar = gen.getVarFor(o);
+        final CypherVar innerVar = new CypherVar("k");
         if (certainNodes.contains(o)){
             return new CypherQueryBuilder()
                     //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
@@ -426,9 +433,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
                         .add(new NodeIDCondition(a2, node.getId()))
-                        //.add(new UnwindIterator(returns keys and values))
-                        //.addReturn(new PropertyListReturnStatement(a2, gen.getRetVar(p)))
-                        //.addReturn(new AllPropertyValuesReturnStatement(a2, gen.getRetVar(o)))
+                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+a2+")", null,
+                                List.of("k", a2+"[k]"), iterVar))
+                        .add(new VariableGetItemReturnStatement(a2, 0, gen.getRetVar(p)))
+                        .add(new VariableGetItemReturnStatement(a2, 1, gen.getRetVar(o)))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a3, a4, a5))
@@ -460,6 +468,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar a6 = gen.getAnonVar();
         final CypherVar a7 = gen.getAnonVar();
         final CypherVar a8 = gen.getAnonVar();
+        final CypherVar iterVar = gen.getAnonVar();
+        final CypherVar iterVar2 = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
         return new CypherUnionQueryImpl(
                 q,
                 new CypherQueryBuilder()
@@ -470,18 +481,19 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a5))
+                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+a5+")", null,
+                                List.of("k", a5+"[k]"), iterVar))
                         .add(new VariableReturnStatement(a5, gen.getRetVar(s)))
-                        //.add(new UnwindIterator(returns properties and values AS au))
-                        //.add(new ReturnStatement("au[0] AS ap"))
-                        //.add(new ReturnStatement("au[1] AS ao"))
-                        //.add(new PropertyListReturnStatement(a5, gen.getRetVar(p)))
-                        //.add(new AllPropertyValuesReturnStatement(a5, gen.getRetVar(o)))
+                        .add(new VariableGetItemReturnStatement(a5, 0, gen.getRetVar(p)))
+                        .add(new VariableGetItemReturnStatement(a5, 1, gen.getRetVar(o)))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a6, a7, a8))
+                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+a7+")", null,
+                                List.of("k", a7+"[k]"), iterVar2))
                         .add(new TripleMapReturnStatement(a6, a7, a8, gen.getRetVar(s)))
-                        .add(new PropertyListReturnStatement(a7, gen.getRetVar(p)))
-                        .add(new AllPropertyValuesReturnStatement(a7, gen.getRetVar(o)))
+                        .add(new VariableGetItemReturnStatement(a7, 0, gen.getRetVar(p)))
+                        .add(new VariableGetItemReturnStatement(a7, 1, gen.getRetVar(o)))
                         .build()
         );
     }
