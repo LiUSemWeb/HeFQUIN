@@ -1,10 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.ReturnStatement;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,19 +9,23 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
 
     final protected List<MatchClause> matches;
     final protected List<WhereCondition> conditions;
+
+    final protected List<UnwindIterator> iterators;
     final protected List<ReturnStatement> returnExprs;
 
     public CypherMatchQueryImpl() {
         matches = new ArrayList<>();
         conditions = new ArrayList<>();
         returnExprs = new ArrayList<>();
+        iterators = new ArrayList<>();
     }
 
     public CypherMatchQueryImpl(final List<MatchClause> matches, final List<WhereCondition> conditions,
-                                final List<ReturnStatement> returnExprs) {
+                                final List<UnwindIterator> iterators, final List<ReturnStatement> returnExprs) {
         this.matches = matches;
         this.conditions = conditions;
         this.returnExprs = returnExprs;
+        this.iterators = iterators;
     }
 
     @Override
@@ -36,6 +36,11 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     @Override
     public List<WhereCondition> getConditions() {
         return conditions;
+    }
+
+    @Override
+    public List<UnwindIterator> getIterators() {
+        return iterators;
     }
 
     @Override

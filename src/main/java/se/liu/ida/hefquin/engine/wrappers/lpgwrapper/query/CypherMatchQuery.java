@@ -8,8 +8,8 @@ import java.util.List;
  * MATCH (x)
  * MATCH (a)-[b]->(c)
  * WHERE a:CLASS AND b.property='value'
- * RETURN x AS n1, c AS n2
- *
+ * UNWIND KEYS(a) AS k
+ * RETURN x AS n1, c AS n2, k AS key
  * can be represented with this interface.
  */
 public interface CypherMatchQuery extends CypherQuery {
@@ -28,6 +28,13 @@ public interface CypherMatchQuery extends CypherQuery {
      * @return a list of WhereCondition objects
      */
     List<WhereCondition> getConditions();
+
+    /**
+     * Obtains a list of iterator expressions, of the form list AS var, present on the query.
+     * For the example query, this method returns a list of one iterator: KEYS(a) AS k
+     * @return a list of UnwindIterator objects
+     */
+    List<UnwindIterator> getIterators();
 
     /**
      * Obtains a list of expressions with optional aliases that represent the columns being returned by the query.
