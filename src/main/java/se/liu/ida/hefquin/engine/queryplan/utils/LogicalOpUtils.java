@@ -77,7 +77,7 @@ public class LogicalOpUtils {
 		
 		if(P instanceof TriplePattern){
 			final TriplePatternRequest reqP = new TriplePatternRequestImpl((TriplePattern)P);
-			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<>(fm,reqP);
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
 			return newPlan;
 		}
