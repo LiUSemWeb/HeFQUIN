@@ -70,7 +70,7 @@ public class LogicalOpUtils {
 	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
 		if (fm instanceof SPARQLEndpoint) { // Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future. For now, we will not assume that third types of interfaces will necessarily support all patterns.
 			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
-			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, reqP );
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
 			return newPlan;
 		} // If not, continue.
