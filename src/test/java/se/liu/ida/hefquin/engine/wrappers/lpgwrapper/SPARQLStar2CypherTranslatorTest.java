@@ -544,4 +544,168 @@ public class SPARQLStar2CypherTranslatorTest {
                 translation);
     }
 
+    @Test
+    public void certainLabelNodeVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var o = Var.alloc("o");
+        final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"), o);
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet,
+                        Collections.singleton(o), emptySet, emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new LiteralValueReturnStatement("label", ret1))
+                        .add(new LabelsReturnStatement(a1, ret2))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void certainLabelVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var o = Var.alloc("o");
+        final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), o);
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet,
+                        Collections.singleton(o), emptySet, emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .addMatch(new NodeMatchClause(a4))
+                        .add(new VariableReturnStatement(a4, ret1))
+                        .add(new LiteralValueReturnStatement("label", ret2))
+                        .add(new LabelsReturnStatement(a4, ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void certainPropertyNodeVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(conf.mapNode(node22), p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet, emptySet,
+                        Collections.singleton(p), emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                                .add(new NodeMatchClause(a2))
+                                .add(new NodeIDCondition(a2, "22"))
+                                .add(new UnwindIteratorImpl(vark, "KEYS("+a2+")", null,
+                                        List.of("k", a2+"[k]"), a3))
+                                .add(new VariableGetItemReturnStatement(a3, 0, ret1))
+                                .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                                .build(),
+                translation);
+    }
+
+    @Test
+    public void certainPropertyNodeVarVarTest2() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var o = Var.alloc("o");
+        final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"), o);
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet, emptySet,
+                        emptySet, Collections.singleton(o)).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a2))
+                        .add(new NodeIDCondition(a2, "22"))
+                        .add(new UnwindIteratorImpl(vark, "KEYS("+a2+")", null,
+                                List.of("k", a2+"[k]"), a3))
+                        .add(new VariableGetItemReturnStatement(a3, 0, ret1))
+                        .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void certainPropertyVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(Var.alloc("s"), p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet, emptySet,
+                        Collections.singleton(p), emptySet).object1;
+        assertEquals(
+                new CypherUnionQueryImpl(
+                        new CypherQueryBuilder()
+                                .add(new NodeMatchClause(a5))
+                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
+                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new VariableReturnStatement(a5, ret1))
+                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
+                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .build(),
+                        new CypherQueryBuilder()
+                                .add(new EdgeMatchClause(a7, a8, a9))
+                                .add(new UnwindIteratorImpl(vark, "KEYS("+a8+")",
+                                        null, List.of("k", a8+"[k]"), a10))
+                                .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
+                                .add(new VariableGetItemReturnStatement(a10, 0, ret2))
+                                .add(new VariableGetItemReturnStatement(a10, 1, ret3))
+                                .build()),
+                translation);
+    }
+
+    @Test
+    public void certainPropertyVarVarVarTest2() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var o = Var.alloc("o");
+        final Triple t = new Triple(Var.alloc("s"), Var.alloc("p"), o);
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet, emptySet,
+                        emptySet, Collections.singleton(o)).object1;
+        assertEquals(
+                new CypherUnionQueryImpl(
+                        new CypherQueryBuilder()
+                                .add(new NodeMatchClause(a5))
+                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
+                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new VariableReturnStatement(a5, ret1))
+                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
+                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .build(),
+                        new CypherQueryBuilder()
+                                .add(new EdgeMatchClause(a7, a8, a9))
+                                .add(new UnwindIteratorImpl(vark, "KEYS("+a8+")",
+                                        null, List.of("k", a8+"[k]"), a10))
+                                .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
+                                .add(new VariableGetItemReturnStatement(a10, 0, ret2))
+                                .add(new VariableGetItemReturnStatement(a10, 1, ret3))
+                                .build()),
+                translation);
+    }
+
+    @Test
+    public void certainEdgeNodeVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(conf.mapNode(node22), p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet,
+                        Collections.singleton(p), emptySet, emptySet, emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                                .add(new EdgeMatchClause(a4, a5, a6))
+                                .add(new NodeIDCondition(a4, "22"))
+                                .add(new RelationshipTypeReturnStatement(a5, ret1))
+                                .add(new VariableReturnStatement(a6, ret2))
+                                .build(),
+                translation);
+    }
+
+    @Test
+    public void certainEdgeVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(Var.alloc("s"), p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet,
+                        Collections.singleton(p), emptySet, emptySet, emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                                .add(new EdgeMatchClause(a1, a2, a3))
+                                .add(new VariableReturnStatement(a1, ret1))
+                                .add(new RelationshipTypeReturnStatement(a2, ret2))
+                                .add(new VariableReturnStatement(a3, ret3))
+                                .build(),
+                translation);
+    }
+
 }
