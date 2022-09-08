@@ -532,7 +532,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new VariableGetItemReturnStatement(iterVar2, 1, gen.getRetVar(o)))
                 .build();
         if (certainNodes.contains(s)){
-            return new CypherUnionQueryImpl(qNodeLabels, qNodeProperties, qEdgeProperties);
+            return new CypherUnionQueryImpl(qEdges, qNodeLabels, qNodeProperties);
         }
         if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)) {
             return new CypherUnionQueryImpl(qNodeProperties, qEdgeProperties);
