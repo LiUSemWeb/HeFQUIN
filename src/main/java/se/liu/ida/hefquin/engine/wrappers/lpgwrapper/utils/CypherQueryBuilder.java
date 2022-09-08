@@ -56,6 +56,6 @@ public class CypherQueryBuilder {
     }
 
     public CypherMatchQuery build() {
-        return new CypherMatchQueryImpl(matches, conditions, null, returns);
+        return new CypherMatchQueryImpl(matches, conditions, iterators, returns);
     }
 }
