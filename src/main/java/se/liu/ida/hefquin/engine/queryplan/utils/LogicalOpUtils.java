@@ -97,12 +97,13 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof SPARQLUnionPattern) {
-			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
-			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
+			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) P).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
+
+			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
 			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
 			return newPlan;
 		}
