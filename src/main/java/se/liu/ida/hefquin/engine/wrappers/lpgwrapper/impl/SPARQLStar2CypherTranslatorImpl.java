@@ -25,12 +25,22 @@ import java.util.*;
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
     @Override
+    public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(TriplePattern tp, LPG2RDFConfiguration conf) {
+        return translateTriplePattern(tp, conf, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+                new HashSet<>(), new HashSet<>());
+    }
+
+    @Override
     public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
-                                                                          final LPG2RDFConfiguration conf) {
+                                                                          final LPG2RDFConfiguration conf,
+                                                                          final Set<Node> certainNodes,
+                                                                          final Set<Node> certainEdgeLabels,
+                                                                          final Set<Node> certainNodeLabels,
+                                                                          final Set<Node> certainPropertyNames,
+                                                                          final Set<Node> certainPropertyValues) {
         final CypherVarGenerator generator = new CypherVarGenerator();
-        //TODO: receive the sets as an argument. left for the combination PR
-        return new Pair<>(translateTriplePattern(tp, conf, generator, new HashSet<>(), new HashSet<>(),
-                new HashSet<>(), new HashSet<>(), new HashSet<>()), generator.getReverseMap());
+        return new Pair<>(translateTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
+                certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
 
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,

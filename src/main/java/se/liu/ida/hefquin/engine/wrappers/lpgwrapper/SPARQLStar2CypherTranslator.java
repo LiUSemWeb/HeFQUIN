@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface SPARQLStar2CypherTranslator {
 
@@ -19,5 +20,17 @@ public interface SPARQLStar2CypherTranslator {
      */
     Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
                                                                    final LPG2RDFConfiguration conf);
+
+    /**
+     * Translates a triple pattern to a Cypher query, using restricted rules based on the different
+     * boundedness properties the variables might have
+     */
+    Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
+                                                                   final LPG2RDFConfiguration conf,
+                                                                   final Set<Node> certainNodes,
+                                                                   final Set<Node> certainEdgeLabels,
+                                                                   final Set<Node> certainNodeLabels,
+                                                                   final Set<Node> certainPropertyNames,
+                                                                   final Set<Node> certainPropertyValues);
 
 }
