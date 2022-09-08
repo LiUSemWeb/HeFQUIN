@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class UnwindIteratorImpl implements UnwindIterator {
 
@@ -70,4 +71,24 @@ public class UnwindIteratorImpl implements UnwindIterator {
     public int hashCode() {
         return Objects.hash(innerVar, listExpression, filters, returnExpressions, alias);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("UNWIND [")
+                .append(innerVar)
+                .append(" IN ")
+                .append(listExpression);
+        if (filters != null && !filters.isEmpty()) {
+            System.out.println("hola");
+            builder.append(" WHERE ");
+            builder.append(filters.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
+        }
+        builder.append(" | [")
+                .append(String.join(", ", returnExpressions))
+                .append("]] AS ")
+                .append(alias);
+        return builder.toString();
+    }
+
 }

@@ -74,17 +74,8 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
         }
         if (iterators!=null && iterators.size()>0) {
             for (final UnwindIterator it : iterators) {
-                builder.append("UNWIND [")
-                        .append(it.getInnerVar())
-                        .append(" IN ")
-                        .append(it.getListExpression());
-                if (it.getFilters() != null && !it.getFilters().isEmpty()) {
-                    builder.append(" WHERE ");
-                    builder.append(it.getFilters().stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
-                }
-                builder.append(" | ")
-                        .append(String.join(", ", it.getReturnExpressions()))
-                        .append("]]\n");
+                builder.append(it);
+                builder.append("\n");
             }
         }
         if (returnExprs.size()>0) {
