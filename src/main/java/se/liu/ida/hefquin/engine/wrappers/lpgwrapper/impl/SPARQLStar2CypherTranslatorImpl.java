@@ -455,14 +455,14 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar a1 = gen.getAnonVar();
         final CypherVar a2 = gen.getAnonVar();
         final CypherVar a3 = gen.getAnonVar();
-        final CypherMatchQuery q = new CypherQueryBuilder()
+        final CypherMatchQuery qEdges = new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new VariableReturnStatement(a1, gen.getRetVar(s)))
                 .add(new RelationshipTypeReturnStatement(a2, gen.getRetVar(p)))
                 .add(new VariableReturnStatement(a3, gen.getRetVar(o)))
                 .build();
         if (certainNodes.contains(s) && certainNodes.contains(o)) {
-            return q;
+            return qEdges;
         }
 
         final CypherVar a4 = gen.getAnonVar();
@@ -473,30 +473,31 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar a9 = gen.getAnonVar();
         final CypherVar iterVar2 = gen.getAnonVar();
         final CypherVar innerVar = new CypherVar("k");
-        return new CypherUnionQueryImpl(
-                q,
-                new CypherQueryBuilder()
-                        .add(new NodeMatchClause(a4))
-                        .add(new VariableReturnStatement(a4, gen.getRetVar(s)))
-                        .add(new LiteralValueReturnStatement("label", gen.getRetVar(p)))
-                        .add(new LabelsReturnStatement(a4, gen.getRetVar(o)))
-                        .build(),
-                new CypherQueryBuilder()
-                        .add(new NodeMatchClause(a5))
-                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+a5+")", null,
-                                List.of("k", a5+"[k]"), iterVar))
-                        .add(new VariableReturnStatement(a5, gen.getRetVar(s)))
-                        .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
-                        .add(new VariableGetItemReturnStatement(iterVar, 1, gen.getRetVar(o)))
-                        .build(),
-                new CypherQueryBuilder()
-                        .add(new EdgeMatchClause(a7, a8, a9))
-                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+a8+")", null,
-                                List.of("k", a8+"[k]"), iterVar2))
-                        .add(new TripleMapReturnStatement(a7, a8, a9, gen.getRetVar(s)))
-                        .add(new VariableGetItemReturnStatement(iterVar2, 0, gen.getRetVar(p)))
-                        .add(new VariableGetItemReturnStatement(iterVar2, 1, gen.getRetVar(o)))
-                        .build()
-        );
+        final CypherMatchQuery qNodeLabels = new CypherQueryBuilder()
+                .add(new NodeMatchClause(a4))
+                .add(new VariableReturnStatement(a4, gen.getRetVar(s)))
+                .add(new LiteralValueReturnStatement("label", gen.getRetVar(p)))
+                .add(new LabelsReturnStatement(a4, gen.getRetVar(o)))
+                .build();
+        final CypherMatchQuery qNodeProperties = new CypherQueryBuilder()
+                .add(new NodeMatchClause(a5))
+                .add(new UnwindIteratorImpl(innerVar, "KEYS("+a5+")", null,
+                        List.of("k", a5+"[k]"), iterVar))
+                .add(new VariableReturnStatement(a5, gen.getRetVar(s)))
+                .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
+                .add(new VariableGetItemReturnStatement(iterVar, 1, gen.getRetVar(o)))
+                .build();
+        final CypherMatchQuery qEdgeProperties = new CypherQueryBuilder()
+                .add(new EdgeMatchClause(a7, a8, a9))
+                .add(new UnwindIteratorImpl(innerVar, "KEYS("+a8+")", null,
+                        List.of("k", a8+"[k]"), iterVar2))
+                .add(new TripleMapReturnStatement(a7, a8, a9, gen.getRetVar(s)))
+                .add(new VariableGetItemReturnStatement(iterVar2, 0, gen.getRetVar(p)))
+                .add(new VariableGetItemReturnStatement(iterVar2, 1, gen.getRetVar(o)))
+                .build();
+        if (certainNodes.contains(s)){
+            return new CypherUnionQueryImpl(qNodeLabels, qNodeProperties, qEdgeProperties);
+        }
+        return new CypherUnionQueryImpl(qEdges, qNodeLabels, qNodeProperties, qEdgeProperties);
     }
 }
