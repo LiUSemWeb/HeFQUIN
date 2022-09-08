@@ -83,14 +83,15 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof BGP) {
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
+			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
 				final TriplePatternRequest reqP = new TriplePatternRequestImpl(tp);
-				final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+				final LogicalOpRequest<TriplePatternRequest, FederationMember> req = new LogicalOpRequest<>(fm,reqP);
 				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(req);
 				subPlans.add(subPlan);
 			}
+
+			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
 			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
 			return newPlan;
 		}
