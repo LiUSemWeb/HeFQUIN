@@ -85,7 +85,8 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
                 throw new FederationAccessException("Error at endpoint.", req, tmpEndpoint);
             }
             final JsonObject data = jsonObject.getObj("data");
-            return new GraphQLEndpointImpl(parseTypesAndFields(data), parseEntrypoints(data), iface);
+
+            return validateTypesAndEntrypoints(parseTypesAndFields(data),parseEntrypoints(data),iface);
         } 
         catch (final FederationAccessException e) {
             throw e;
@@ -152,6 +153,63 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     }
 
     /**
+     * Removes the types, fields and entrypoints from the @param typesAndFields and @param entrypoints
+     * and notes their removal if they don't meet the criteria for the approach. (each type needs an id field etc.)
+     */
+    protected GraphQLEndpoint validateTypesAndEntrypoints(final Map<String, Map<String, GraphQLField>> typesAndFields,
+            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> entrypoints,
+            final GraphQLInterface iface){
+
+        final Set<String> typesToRemove = new HashSet<>();
+
+        // Check if any types needs to be removed
+        for(final String type : typesAndFields.keySet()){
+            final Map<String,GraphQLField> fields = typesAndFields.get(type);
+
+            // Check if type has an id field
+            if(!fields.containsKey("id")){
+                typesToRemove.add(type);
+                continue;
+            }
+
+            // Check if type has atleast one valid entrypoint
+            if(!entrypoints.containsKey(type) || entrypoints.get(type).isEmpty()){
+                typesToRemove.add(type);
+            }
+        }
+
+        // Remove fields that links to types that will be removed
+        for(final String type : typesAndFields.keySet()) {
+
+            // If entire type is to be removed, skip removing individual fields
+            if(typesToRemove.contains(type)){
+                continue;
+            }
+
+            final Map<String,GraphQLField> fields = typesAndFields.get(type);
+            final Set<String> fieldsToRemove = new HashSet<>();
+
+            for(final String field : fields.keySet()){
+                final GraphQLField fieldInfo = fields.get(field);
+
+                // Check if value type of current field is a type that will be removed
+                if(fieldInfo.getFieldType() == GraphQLFieldType.OBJECT && typesToRemove.contains(fieldInfo.getValueType())){
+                    fieldsToRemove.add(field);
+                }
+            }
+
+            // Remove fields from type
+            fields.keySet().removeAll(fieldsToRemove);
+        }
+
+        // Remove specific types and their entrypoints
+        typesAndFields.keySet().removeAll(typesToRemove);
+        entrypoints.keySet().removeAll(typesToRemove);
+
+        return new GraphQLEndpointImpl(typesAndFields,entrypoints,iface);
+    }
+
+    /**
      * Parses introspection data to determine information about a specific GraphQL
      * field.
      * 
@@ -204,7 +262,6 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
             final Map<String, String> argumentDefinitions = new HashMap<>();
 
             for (final JsonObject argument : field.getArray(iQueryArgs).toArray(JsonObject[]::new)) {
-                // System.out.println(argument.toString());
                 final String argName = argument.getString(iName);
                 final JsonObject argType = argument.getObj(iType);
                 if (argType.get(iOfType).isNull()) {

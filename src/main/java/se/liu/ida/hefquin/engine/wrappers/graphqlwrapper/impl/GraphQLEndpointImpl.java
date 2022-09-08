@@ -76,7 +76,9 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
 
     @Override
     public GraphQLEntrypoint getEntrypoint(final String objectTypeName, final GraphQLEntrypointType fieldType) {
-        if(containsGraphQLObjectType(objectTypeName) && objectTypeToEntrypoint.get(objectTypeName).containsKey(fieldType)){
+        if(containsGraphQLObjectType(objectTypeName) && objectTypeToEntrypoint.containsKey(objectTypeName) && 
+                objectTypeToEntrypoint.get(objectTypeName).containsKey(fieldType)){
+                    
             return objectTypeToEntrypoint.get(objectTypeName).get(fieldType);
         }
         return null;

@@ -54,7 +54,11 @@ public class SPARQL2GraphQLHelper
         final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
         for(final String objectTypeName : objectTypeNames){
             // Get the full list entrypoint
+            
             final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
+            if(e == null){
+                continue;
+            }
             final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
             finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName,config.getJsonIDKeyPrefix()));
 

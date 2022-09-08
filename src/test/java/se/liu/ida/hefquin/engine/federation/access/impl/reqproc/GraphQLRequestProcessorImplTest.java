@@ -2,12 +2,10 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonString;
 import org.junit.Test;
 
@@ -86,6 +84,7 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
 	}
 
     @Test

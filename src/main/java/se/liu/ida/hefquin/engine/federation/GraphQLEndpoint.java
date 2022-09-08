@@ -58,4 +58,5 @@ public interface GraphQLEndpoint extends FederationMember {
      * If the parameter names provided doesn't correspond to an object type or a GraphQLEntrypointType for the endpoint return null.
      */
     public GraphQLEntrypoint getEntrypoint(final String objectTypeName, final GraphQLEntrypointType fieldType);
+
 }
