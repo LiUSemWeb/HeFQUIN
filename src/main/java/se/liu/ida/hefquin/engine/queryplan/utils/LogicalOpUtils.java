@@ -48,14 +48,15 @@ public class LogicalOpUtils {
 	 * and can be handled by the federation member's interface.
 	 */
 	public static LogicalPlan RW(final LogicalOpRequest<?, ?> req) {
-		final FederationMember fm = req.getFederationMember();
-		final VocabularyMapping vm = fm.getVocabularyMapping();
-		
 		if(!(req.getRequest() instanceof TriplePatternRequest)) {
 			throw new UnsupportedOperationException( "no support for " + req.getRequest().getClass().getName() );
 		}
+
 		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest();
 		final TriplePattern tp = tpreq.getQueryPattern();
+
+		final FederationMember fm = req.getFederationMember();
+		final VocabularyMapping vm = fm.getVocabularyMapping();
 		
 		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
 		
