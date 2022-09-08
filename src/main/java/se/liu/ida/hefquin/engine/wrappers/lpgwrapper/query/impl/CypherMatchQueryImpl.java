@@ -22,6 +22,9 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
 
     public CypherMatchQueryImpl(final List<MatchClause> matches, final List<WhereCondition> conditions,
                                 final List<UnwindIterator> iterators, final List<ReturnStatement> returnExprs) {
+        assert matches != null;
+        assert  returnExprs != null;
+
         this.matches = matches;
         this.conditions = conditions;
         this.returnExprs = returnExprs;
@@ -64,10 +67,25 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
             builder.append(matches.stream().map(Objects::toString).collect(Collectors.joining("\n")));
             builder.append("\n");
         }
-        if (conditions.size()>0) {
+        if (conditions!=null && conditions.size()>0) {
             builder.append("WHERE ");
             builder.append(conditions.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
             builder.append("\n");
+        }
+        if (iterators!=null && iterators.size()>0) {
+            for (final UnwindIterator it : iterators) {
+                builder.append("UNWIND [")
+                        .append(it.getInnerVar())
+                        .append(" IN ")
+                        .append(it.getListExpression());
+                if (it.getFilters() != null && !it.getFilters().isEmpty()) {
+                    builder.append(" WHERE ");
+                    builder.append(it.getFilters().stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
+                }
+                builder.append(" | ")
+                        .append(String.join(", ", it.getReturnExpressions()))
+                        .append("]]\n");
+            }
         }
         if (returnExprs.size()>0) {
             builder.append("RETURN ");
@@ -79,13 +97,13 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CypherMatchQueryImpl)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         CypherMatchQueryImpl that = (CypherMatchQueryImpl) o;
-        return matches.equals(that.matches) && conditions.equals(that.conditions) && returnExprs.equals(that.returnExprs);
+        return matches.equals(that.matches) && Objects.equals(conditions, that.conditions) && Objects.equals(iterators, that.iterators) && returnExprs.equals(that.returnExprs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(matches, conditions, returnExprs);
+        return Objects.hash(matches, conditions, iterators, returnExprs);
     }
 }
