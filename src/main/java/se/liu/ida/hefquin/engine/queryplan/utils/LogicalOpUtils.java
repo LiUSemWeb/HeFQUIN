@@ -110,12 +110,13 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof SPARQLGroupPattern) {
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
+			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) P).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
+
+			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
 			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
 			return newPlan;
 		}
