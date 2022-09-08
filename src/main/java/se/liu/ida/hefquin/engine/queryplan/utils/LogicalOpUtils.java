@@ -25,18 +25,28 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LogicalOpUtils {
 	
+	/**
+	 * Rewrites a non-triple-pattern request operator to a logical plan
+	 * where all request operators use local vocabulary
+	 * and can be handled by the federation member's interface.
+	 */
 	public static LogicalPlan RW(final LogicalOpRequest<?, ?> req) {
 		final FederationMember fm = req.getFederationMember();
 		final VocabularyMapping vm = fm.getVocabularyMapping();
@@ -47,13 +57,16 @@ public class LogicalOpUtils {
 		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest();
 		final TriplePattern tp = tpreq.getQueryPattern();
 		
-		// ApplyVocabularyMapping(tp,vm)
 		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
 		
 		return rewriteReqOf(newP, fm);
 		
 	}
 	
+	/**
+	 * Creates a logical plan where all requests are TriplePatternRequests
+	 * for use when a federation member's interface is a TPF-server.
+	 */
 	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
 		if (fm instanceof SPARQLEndpoint) { // Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future. For now, we will not assume that third types of interfaces will necessarily support all patterns.
 			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
@@ -70,19 +83,38 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof BGP) {
-			// Create something regarding multijoin
+			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
+			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
 			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
-				// Add them into the multi-join-related thing.
+				final TriplePatternRequest reqP = new TriplePatternRequestImpl(tp);
+				final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<SPARQLRequest, FederationMember>(fm,reqP);
+				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(req);
+				subPlans.add(subPlan);
 			}
-			// Return
+			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
+			return newPlan;
 		}
 		
 		if(P instanceof SPARQLUnionPattern) {
-			// Multiunion
+			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
+			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
+			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) P).getSubPatterns() ) {
+				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
+				subPlans.add(subPlan);
+			}
+			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
+			return newPlan;
 		}
 		
 		if(P instanceof SPARQLGroupPattern) {
-			// Multijoin
+			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
+			final List<LogicalPlan> subPlans = new ArrayList<LogicalPlan>();
+			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) P).getSubPatterns() ) {
+				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
+				subPlans.add(subPlan);
+			}
+			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
+			return newPlan;
 		}
 		
 		throw new IllegalArgumentException( P.getClass().getName() );
