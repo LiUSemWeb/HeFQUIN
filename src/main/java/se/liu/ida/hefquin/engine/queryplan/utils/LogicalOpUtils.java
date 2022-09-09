@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -84,6 +85,12 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof BGP) {
+			if ( fm.getInterface().supportsBGPRequests() ) {
+				final BGPRequest BGPreq = new BGPRequestImpl(((BGP)P));
+				final LogicalOpRequest<BGPRequest, FederationMember> req = new LogicalOpRequest<>(fm,BGPreq);
+				final LogicalPlan BGPplan = new LogicalPlanWithNullaryRootImpl(req);
+				return BGPplan;
+			}
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
 				final TriplePatternRequest reqP = new TriplePatternRequestImpl(tp);
