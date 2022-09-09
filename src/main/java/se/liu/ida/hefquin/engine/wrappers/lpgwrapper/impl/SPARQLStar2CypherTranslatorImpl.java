@@ -4,6 +4,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
@@ -39,18 +40,73 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                                           final Set<Node> certainPropertyNames,
                                                                           final Set<Node> certainPropertyValues) {
         final CypherVarGenerator generator = new CypherVarGenerator();
-        return new Pair<>(translateTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
+        return new Pair<>(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
 
+    protected static CypherQuery handleTriplePattern(final TriplePattern pattern,
+                                                     final LPG2RDFConfiguration configuration,
+                                                     final CypherVarGenerator gen,
+                                                     final Set<Node> certainNodes,
+                                                     final Set<Node> certainEdgeLabels,
+                                                     final Set<Node> certainNodeLabels,
+                                                     final Set<Node> certainPropertyNames,
+                                                     final Set<Node> certainPropertyValues) {
+        final Triple b = pattern.asJenaTriple();
+        final Node s = b.getSubject();
+        if (!s.isNodeTriple()) {
+            return translateTriplePattern(pattern, configuration, gen, certainNodes, certainEdgeLabels,
+                    certainNodeLabels, certainPropertyNames, certainPropertyValues, false);
+        }
+        final CypherQuery translation = translateTriplePattern(new TriplePatternImpl(s.getTriple()),
+                configuration, gen, certainNodes, certainEdgeLabels, certainNodeLabels, certainPropertyNames,
+                certainPropertyValues, true);
+        if (!(translation instanceof CypherMatchQuery)){
+            return null; //TODO throw exception
+        }
+        final CypherMatchQuery innerTPTranslation = (CypherMatchQuery) translation;
+        final Node p = b.getPredicate();
+        final Node o = b.getObject();
+
+        final CypherVar edgeVar = ((EdgeMatchClause) innerTPTranslation.getMatches().get(0)).getEdge();
+
+        final CypherQueryBuilder builder = new CypherQueryBuilder().addAll(innerTPTranslation);
+        final CypherVar k = new CypherVar("k");
+        if (configuration.mapsToProperty(p) && o.isLiteral()) {
+            builder.add(new PropertyValueCondition(edgeVar, configuration.unmapProperty(p),
+                    o.getLiteralValue().toString()));
+        } else if (p.isVariable() && o.isLiteral()) {
+            final CypherVar iterVar = gen.getAnonVar();
+            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")",
+                    List.of(new PropertyValueConditionWithVar(edgeVar, k, o.getLiteralValue().toString())),
+                    List.of("k"), iterVar))
+                    .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)));
+        } else if (configuration.mapsToProperty(p) && o.isVariable()) {
+            builder.add(new PropertyEXISTSCondition(edgeVar, configuration.unmapProperty(p)));
+            builder.add(new PropertyValueReturnStatement(edgeVar, configuration.unmapProperty(p),
+                    gen.getRetVar(o)));
+        } else if (p.isVariable() && o.isVariable()) {
+            final CypherVar iterVar = gen.getAnonVar();
+            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")",
+                    List.of(new PropertyValueConditionWithVar(edgeVar, k, o.getLiteralValue().toString())),
+                    List.of("k", iterVar+"[k]"), iterVar))
+                    .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
+                    .add(new VariableGetItemReturnStatement(iterVar, 1, gen.getRetVar(o)));
+        } else {
+            return null;
+        }
+        return builder.build();
+    }
+
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
-                                                        final LPG2RDFConfiguration configuration,
-                                                        final CypherVarGenerator gen,
-                                                        final Set<Node> certainNodes,
-                                                        final Set<Node> certainEdgeLabels,
-                                                        final Set<Node> certainNodeLabels,
-                                                        final Set<Node> certainPropertyNames,
-                                                        final Set<Node> certainPropertyValues) {
+                                                      final LPG2RDFConfiguration configuration,
+                                                      final CypherVarGenerator gen,
+                                                      final Set<Node> certainNodes,
+                                                      final Set<Node> certainEdgeLabels,
+                                                      final Set<Node> certainNodeLabels,
+                                                      final Set<Node> certainPropertyNames,
+                                                      final Set<Node> certainPropertyValues,
+                                                      final boolean edgeCompatible) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
         final Node p = b.getPredicate();
