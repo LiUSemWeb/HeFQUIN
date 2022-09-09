@@ -106,7 +106,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                       final Set<Node> certainNodeLabels,
                                                       final Set<Node> certainPropertyNames,
                                                       final Set<Node> certainPropertyValues,
-                                                      final boolean edgeCompatible) {
+                                                      final boolean isEdgeCompatible) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
         final Node p = b.getPredicate();
@@ -184,12 +184,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             else if(p.isVariable() && o.isVariable()) {
                 if (configuration.mapsToNode(s)) {
                     return getNodeVarVar(s, p, o, configuration, gen, certainNodes, certainNodeLabels,
-                            certainPropertyNames, certainPropertyValues, certainEdgeLabels);
+                            certainPropertyNames, certainPropertyValues, certainEdgeLabels, isEdgeCompatible);
                 }
             }
         } else {
             return getVarVarVar(s, p, o, configuration, gen, certainNodes, certainNodeLabels,
-                    certainPropertyNames, certainPropertyValues, certainEdgeLabels);
+                    certainPropertyNames, certainPropertyValues, certainEdgeLabels, isEdgeCompatible);
         }
         return null;
     }
@@ -477,12 +477,13 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                final Set<Node> certainNodeLabels,
                                                final Set<Node> certainPropertyNames,
                                                final Set<Node> certainPropertyValues,
-                                               final Set<Node> certainEdgeLabels) {
+                                               final Set<Node> certainEdgeLabels,
+                                               final boolean isEdgeCompatible) {
         final LPGNode node = configuration.unmapNode(s);
         final CypherVar pvar = gen.getVarFor(p);
         final CypherVar ovar = gen.getVarFor(o);
         final CypherVar a1 = gen.getAnonVar();
-        if (certainNodes.contains(o)){
+        if (certainNodes.contains(o) || isEdgeCompatible){
             return new CypherQueryBuilder()
                     //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .add(new EdgeMatchClause(a1, pvar, ovar))
@@ -539,7 +540,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                               final Set<Node> certainNodes,
                                               final Set<Node> certainNodeLabels,
                                               final Set<Node> certainPropertyNames,
-                                              final Set<Node> certainPropertyValues, Set<Node> certainEdgeLabels) {
+                                              final Set<Node> certainPropertyValues,
+                                              final Set<Node> certainEdgeLabels,
+                                              final boolean isEdgeCompatible) {
         final CypherVar a1 = gen.getAnonVar();
         final CypherVar a2 = gen.getAnonVar();
         final CypherVar a3 = gen.getAnonVar();
@@ -549,7 +552,8 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new RelationshipTypeReturnStatement(a2, gen.getRetVar(p)))
                 .add(new VariableReturnStatement(a3, gen.getRetVar(o)))
                 .build();
-        if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)) {
+        if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)
+        || isEdgeCompatible) {
             return qEdges;
         }
 
