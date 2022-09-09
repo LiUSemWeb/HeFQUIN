@@ -82,6 +82,9 @@ public class LogicalOpUtils {
 		} // If not, continue.
 		
 		if(P instanceof TriplePattern){
+			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
+			}
 			final TriplePatternRequest reqP = new TriplePatternRequestImpl((TriplePattern)P);
 			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<>(fm,reqP);
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
@@ -111,6 +114,9 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof SPARQLUnionPattern) {
+			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
+			}
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) P).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
@@ -123,6 +129,9 @@ public class LogicalOpUtils {
 		}
 		
 		if(P instanceof SPARQLGroupPattern) {
+			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
+			}
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) P).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
