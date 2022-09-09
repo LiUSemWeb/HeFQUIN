@@ -90,6 +90,8 @@ public class LogicalOpUtils {
 				final LogicalOpRequest<BGPRequest, FederationMember> req = new LogicalOpRequest<>(fm,BGPreq);
 				final LogicalPlan BGPplan = new LogicalPlanWithNullaryRootImpl(req);
 				return BGPplan;
+			} else if ( !fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
 			}
 			final List<LogicalPlan> subPlans = new ArrayList<>();
 			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
