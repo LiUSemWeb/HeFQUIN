@@ -70,7 +70,11 @@ public class LogicalOpUtils {
 	 * for use when a federation member's interface is a TPF-server.
 	 */
 	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
-		if (fm instanceof SPARQLEndpoint) { // Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future. For now, we will not assume that third types of interfaces will necessarily support all patterns.
+		// Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future.
+		// For now, we will not assume that third types of interfaces will necessarily support all patterns.
+
+		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
+		if ( fm instanceof SPARQLEndpoint ) {
 			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
 			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, reqP );
 			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
