@@ -41,109 +41,99 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LogicalOpUtils {
-	
+public class LogicalOpUtils
+{
 	/**
-	 * Rewrites a non-triple-pattern request operator to a logical plan
-	 * where all request operators use local vocabulary
-	 * and can be handled by the federation member's interface.
+	 * Rewrites the given request operator (with a triple pattern request) into
+	 * a logical plan that uses the local vocabulary of the federation member of
+	 * the request.
 	 */
-	public static LogicalPlan RW(final LogicalOpRequest<?, ?> req) {
-		if(!(req.getRequest() instanceof TriplePatternRequest)) {
-			throw new UnsupportedOperationException( "no support for " + req.getRequest().getClass().getName() );
-		}
+	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalOpRequest<TriplePatternRequest, ?> reqOp ) {
+		final TriplePatternRequest tpReq = reqOp.getRequest();
+		final TriplePattern tp = tpReq.getQueryPattern();
 
-		final TriplePatternRequest tpreq = (TriplePatternRequest) req.getRequest();
-		final TriplePattern tp = tpreq.getQueryPattern();
-
-		final FederationMember fm = req.getFederationMember();
+		final FederationMember fm = reqOp.getFederationMember();
 		final VocabularyMapping vm = fm.getVocabularyMapping();
-		
+
 		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
-		
-		return rewriteReqOf(newP, fm);
-		
+
+		if ( newP.equals(tp) ) {
+			return new LogicalPlanWithNullaryRootImpl(reqOp);
+		}
+		else {
+			return rewriteReqOf(newP, fm);
+		}
 	}
-	
+
 	/**
 	 * Creates a logical plan where all requests are TriplePatternRequests
 	 * for use when a federation member's interface is a TPF-server.
 	 */
-	public static LogicalPlan rewriteReqOf(final SPARQLGraphPattern P, final FederationMember fm) {
+	public static LogicalPlan rewriteReqOf( final SPARQLGraphPattern pattern, final FederationMember fm ) {
 		// Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future.
 		// For now, we will not assume that third types of interfaces will necessarily support all patterns.
 
 		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
 		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest reqP = new SPARQLRequestImpl(P);
+			final SPARQLRequest reqP = new SPARQLRequestImpl(pattern);
 			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, reqP );
-			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
-			return newPlan;
-		} // If not, continue.
-		
-		if(P instanceof TriplePattern){
-			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
-			}
-			final TriplePatternRequest reqP = new TriplePatternRequestImpl((TriplePattern)P);
-			final LogicalOpRequest<SPARQLRequest, FederationMember> req = new LogicalOpRequest<>(fm,reqP);
-			final LogicalPlan newPlan = new LogicalPlanWithNullaryRootImpl(req);
-			return newPlan;
+			return new LogicalPlanWithNullaryRootImpl(req);
 		}
-		
-		if(P instanceof BGP) {
+		else if( pattern instanceof TriplePattern ) {
+			if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The given federation member has the following interface type which does not support triple pattern requests: " + fm.getInterface().getClass().getName() );
+			}
+
+			final TriplePatternRequest req = new TriplePatternRequestImpl( (TriplePattern) pattern );
+			final LogicalOpRequest<TriplePatternRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
+			return new LogicalPlanWithNullaryRootImpl(reqOp);
+		}
+		else if( pattern instanceof BGP ) {
+			final BGP bgp = (BGP) pattern;
+
 			if ( fm.getInterface().supportsBGPRequests() ) {
-				final BGPRequest BGPreq = new BGPRequestImpl(((BGP)P));
-				final LogicalOpRequest<BGPRequest, FederationMember> req = new LogicalOpRequest<>(fm,BGPreq);
-				final LogicalPlan BGPplan = new LogicalPlanWithNullaryRootImpl(req);
-				return BGPplan;
-			} else if ( !fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
-			}
-			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final TriplePattern tp : ((BGP) P).getTriplePatterns() ) {
-				final TriplePatternRequest reqP = new TriplePatternRequestImpl(tp);
-				final LogicalOpRequest<TriplePatternRequest, FederationMember> req = new LogicalOpRequest<>(fm,reqP);
-				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(req);
-				subPlans.add(subPlan);
+				final BGPRequest req = new BGPRequestImpl(bgp);
+				final LogicalOpRequest<BGPRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
+				return new LogicalPlanWithNullaryRootImpl(reqOp);
 			}
 
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
-			return newPlan;
-		}
-		
-		if(P instanceof SPARQLUnionPattern) {
-			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
+			if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
+				throw new IllegalArgumentException( "The given federation member has the following interface type which does not support triple pattern requests: " + fm.getInterface().getClass().getName() );
 			}
+
 			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) P).getSubPatterns() ) {
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
+				final LogicalOpRequest<TriplePatternRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
+				return new LogicalPlanWithNullaryRootImpl(reqOp);
+			}
+
+			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
+			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
+		}
+		else if( pattern instanceof SPARQLUnionPattern ) {
+			final List<LogicalPlan> subPlans = new ArrayList<>();
+			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) pattern).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
 
-			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
-			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
-			return newPlan;
+			final LogicalOpMultiwayUnion muRootOp = LogicalOpMultiwayUnion.getInstance();
+			return new LogicalPlanWithNaryRootImpl(muRootOp, subPlans);
 		}
-		
-		if(P instanceof SPARQLGroupPattern) {
-			if ( !fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The federation member does not support TP-requests!" );
-			}
+		else if( pattern instanceof SPARQLGroupPattern ) {
 			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) P).getSubPatterns() ) {
+			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) pattern).getSubPatterns() ) {
 				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
 				subPlans.add(subPlan);
 			}
 
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final LogicalPlan newPlan = new LogicalPlanWithNaryRootImpl(newRoot, subPlans);
-			return newPlan;
+			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
+			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
 		}
-		
-		throw new IllegalArgumentException( P.getClass().getName() );
+		else {
+			throw new IllegalArgumentException( pattern.getClass().getName() );
+		}
 	}
 
     /**
