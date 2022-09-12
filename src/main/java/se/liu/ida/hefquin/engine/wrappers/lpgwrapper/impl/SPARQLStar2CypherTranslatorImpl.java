@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -18,6 +19,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchC
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryCombinator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.*;
@@ -41,6 +43,57 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVarGenerator generator = new CypherVarGenerator();
         return new Pair<>(translateTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
+    }
+
+    @Override
+    public Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf) {
+        final Set<Node> certainNodes = new HashSet<>();
+        final Set<Node> certainEdgeLabels = new HashSet<>();
+        final Set<Node> certainNodeLabels = new HashSet<>();
+        final Set<Node> certainPropertyNames = new HashSet<>();
+        final Set<Node> certainPropertyValues = new HashSet<>();
+        for (final TriplePattern tp : bgp.getTriplePatterns()) {
+            final Node s = tp.asJenaTriple().getSubject();
+            final Node p = tp.asJenaTriple().getPredicate();
+            final Node o = tp.asJenaTriple().getObject();
+            if (s.isVariable()) {
+                if (conf.isLabelIRI(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
+                    certainNodes.add(s);
+                }
+            }
+            if (o.isVariable()) {
+                if (conf.mapsToEdgeLabel(p)){
+                    certainNodes.add(o);
+                }
+                if (conf.isLabelIRI(p)) {
+                    certainNodeLabels.add(o);
+                }
+                if (conf.mapsToProperty(p) || s.isNodeTriple()) {
+                    certainPropertyValues.add(o);
+                }
+            }
+            if (p.isVariable()) {
+                if (conf.mapsToNode(o)) {
+                    certainEdgeLabels.add(p);
+                }
+                if (o.isLiteral() || s.isNodeTriple()) {
+                    certainPropertyNames.add(p);
+                }
+            }
+        }
+
+        CypherQuery result = null;
+        final CypherVarGenerator gen = new CypherVarGenerator();
+        for (final TriplePattern tp : bgp.getTriplePatterns()) {
+            CypherQuery tpTranslation = translateTriplePattern(tp, conf, gen, certainNodes,
+                    certainEdgeLabels, certainNodeLabels, certainPropertyNames, certainPropertyValues);
+            if (result == null){
+                result = tpTranslation;
+            } else {
+                result = CypherQueryCombinator.combine(result, tpTranslation);
+            }
+        }
+        return new Pair<>(result, gen.getReverseMap());
     }
 
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
