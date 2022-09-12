@@ -87,9 +87,8 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     gen.getRetVar(o)));
         } else if (p.isVariable() && o.isVariable()) {
             final CypherVar iterVar = gen.getAnonVar();
-            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")",
-                    List.of(new PropertyValueConditionWithVar(edgeVar, k, o.getLiteralValue().toString())),
-                    List.of("k", iterVar+"[k]"), iterVar))
+            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")", null,
+                    List.of("k", edgeVar+"[k]"), iterVar))
                     .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
                     .add(new VariableGetItemReturnStatement(iterVar, 1, gen.getRetVar(o)));
         } else {
