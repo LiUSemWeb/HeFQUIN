@@ -33,6 +33,11 @@ public class RelationshipTypeReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "TYPE("+relationshipVar+")";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof RelationshipTypeReturnStatement)) return false;

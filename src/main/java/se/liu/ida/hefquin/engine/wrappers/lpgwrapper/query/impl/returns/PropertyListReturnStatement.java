@@ -31,6 +31,11 @@ public class PropertyListReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "";
+    }
+
+    @Override
     public String toString() {
         return "KEYS(" + var.getName() + ")" + (alias != null? " AS "+ alias.getName() : "");
     }

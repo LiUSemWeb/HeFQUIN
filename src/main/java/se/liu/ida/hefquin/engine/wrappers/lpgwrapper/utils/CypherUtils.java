@@ -68,7 +68,7 @@ public class CypherUtils {
             return isPropertyColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isPropertyColumn(q, colName)) {
                     return true;
                 }
@@ -81,7 +81,7 @@ public class CypherUtils {
     }
 
     public static boolean isPropertyColumn( final CypherMatchQuery query, final CypherVar colName ) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
+        final List<ReturnStatement> returns = query.getReturnStatements();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && (r instanceof PropertyListReturnStatement
                                              || r instanceof FilteredPropertiesReturnStatement)) {
@@ -96,7 +96,7 @@ public class CypherUtils {
             return isLabelColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isLabelColumn(q, colName)) {
                     return true;
                 }
@@ -109,7 +109,7 @@ public class CypherUtils {
     }
 
     public static boolean isLabelColumn(final CypherMatchQuery query, final CypherVar colName) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
+        final List<ReturnStatement> returns = query.getReturnStatements();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
                 return true;
@@ -123,7 +123,7 @@ public class CypherUtils {
             return isRelationshipTypeColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isRelationshipTypeColumn(q, colName)) {
                     return true;
                 }
@@ -136,7 +136,7 @@ public class CypherUtils {
     }
 
     public static boolean isRelationshipTypeColumn(final CypherMatchQuery query, final CypherVar colName) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
+        final List<ReturnStatement> returns = query.getReturnStatements();
         for (final ReturnStatement r : returns) {
             if (colName.equals(r.getAlias()) && r instanceof RelationshipTypeReturnStatement) {
                 return true;

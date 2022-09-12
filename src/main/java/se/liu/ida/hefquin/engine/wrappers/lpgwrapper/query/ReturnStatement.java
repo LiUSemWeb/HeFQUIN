@@ -17,7 +17,13 @@ public interface ReturnStatement {
 
     /**
      * @return the optional alias variable of the return statement, or null if it is not defined
-     * For instance, this method for RETURN label(x) as l returns l
+     * For instance, this method for RETURN labels(x) as l returns l
      */
     CypherVar getAlias();
+
+    /**
+     * Returns the Cypher expression being returned by the statement.
+     * For instance, this method for RETURN labels(x) as l returns the String "labels(x)"
+     */
+    String getExpression();
 }

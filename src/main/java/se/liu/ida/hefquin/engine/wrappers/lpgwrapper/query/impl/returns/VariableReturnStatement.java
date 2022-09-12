@@ -37,6 +37,11 @@ public class VariableReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return returnVar.getName();
+    }
+
+    @Override
     public String toString() {
         return returnVar.getName() + ( alias != null? " AS "+ alias.getName() : "");
     }

@@ -47,8 +47,13 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     @Override
-    public List<ReturnStatement> getReturnExprs() {
+    public List<ReturnStatement> getReturnStatements() {
         return returnExprs;
+    }
+
+    @Override
+    public List<CypherVar> getAliases() {
+        return returnExprs.stream().map(ReturnStatement::getAlias).collect(Collectors.toList());
     }
 
     @Override

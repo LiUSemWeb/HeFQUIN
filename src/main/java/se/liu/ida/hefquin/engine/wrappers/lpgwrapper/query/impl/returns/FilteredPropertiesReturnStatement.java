@@ -34,6 +34,11 @@ public class FilteredPropertiesReturnStatement implements ReturnStatement {
         return alias;
     }
 
+    @Override
+    public String getExpression() {
+        return "";
+    }
+
     public String getFilterValue() {
         return filterValue;
     }

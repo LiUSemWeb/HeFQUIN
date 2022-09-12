@@ -51,4 +51,8 @@ public class NodeMatchClause implements MatchClause {
     public int hashCode() {
         return Objects.hash(node);
     }
+
+    public CypherVar getNode() {
+        return node;
+    }
 }

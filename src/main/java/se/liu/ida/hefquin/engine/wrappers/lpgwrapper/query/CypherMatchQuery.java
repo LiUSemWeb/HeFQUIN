@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -41,6 +42,7 @@ public interface CypherMatchQuery extends CypherQuery {
      * For the example query, this method returns a list with 2 elements, representing the 2 columns being returned
      * @return a list of ReturnStatement objects
      */
-    List<ReturnStatement> getReturnExprs();
+    List<ReturnStatement> getReturnStatements();
 
+    List<CypherVar> getAliases();
 }

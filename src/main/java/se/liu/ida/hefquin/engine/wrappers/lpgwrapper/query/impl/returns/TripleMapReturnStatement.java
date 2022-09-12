@@ -42,13 +42,18 @@ public class TripleMapReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "{s: "+source+", e: "+ edge + ", t: "+target+"}";
+    }
+
+    @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append("{source: ")
+        res.append("{s: ")
                 .append(source.getName())
-                .append(", edge: TYPE(")
+                .append(", e: TYPE(")
                 .append(edge.getName())
-                .append("), target: ")
+                .append("), t: ")
                 .append(target.getName())
                 .append("}");
         if( alias != null ) {
