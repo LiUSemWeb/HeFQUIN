@@ -5,7 +5,10 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
+import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
@@ -21,6 +24,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -706,6 +710,24 @@ public class SPARQLStar2CypherTranslatorTest {
                                 .add(new VariableReturnStatement(a3, ret3))
                                 .build(),
                 translation);
+    }
+
+    @Test
+    public void translateBGPTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var m = Var.alloc("m");
+        final Var p = Var.alloc("p");
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(new Triple(m, conf.getLabel(), conf.mapNodeLabel("Movie"))),
+                new TriplePatternImpl(new Triple(p, conf.getLabel(), conf.mapNodeLabel("Person"))),
+                new TriplePatternImpl(new Triple(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman"))),
+                new TriplePatternImpl(new Triple(m, conf.mapProperty("released"), NodeFactory.createLiteral("2004"))),
+                new TriplePatternImpl(new Triple(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
+                        conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")))
+        );
+        final Pair<CypherQuery, Map<CypherVar, Node>> translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateBGP(bgp, conf);
+        System.out.println(translation.object1); //null, since we don't have nested translations here
     }
 
 }
