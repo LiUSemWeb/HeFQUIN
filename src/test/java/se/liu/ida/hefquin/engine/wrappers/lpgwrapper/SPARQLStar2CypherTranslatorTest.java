@@ -5,11 +5,11 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Triple;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
+import org.junit.Before;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
@@ -22,15 +22,17 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchC
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
 public class SPARQLStar2CypherTranslatorTest {
+
+    CypherVarGenerator gen;
 
     final CypherVar v1 = new CypherVar("cpvar1");
     final CypherVar v2 = new CypherVar("cpvar2");
@@ -60,6 +62,11 @@ public class SPARQLStar2CypherTranslatorTest {
     final LPGNode node23 = new LPGNode("23", null, null);
 
     final Set<Node> emptySet = Collections.emptySet();
+
+    @Before
+    public void resetVarGenerator() {
+        gen = new CypherVarGenerator();
+    }
 
     @Test
     public void translateNodeLabelLabelTest() {
@@ -798,13 +805,24 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(new Triple(m, conf.getLabel(), conf.mapNodeLabel("Movie"))),
                 new TriplePatternImpl(new Triple(p, conf.getLabel(), conf.mapNodeLabel("Person"))),
                 new TriplePatternImpl(new Triple(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman"))),
-                new TriplePatternImpl(new Triple(m, conf.mapProperty("released"), NodeFactory.createLiteral("2004"))),
+                new TriplePatternImpl(new Triple(m, conf.mapProperty("released"), Var.alloc("y"))),
                 new TriplePatternImpl(new Triple(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
                         conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")))
         );
-        final Pair<CypherQuery, Map<CypherVar, Node>> translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateBGP(bgp, conf);
-        System.out.println(translation.object1); //null, since we don't have nested translations here
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(v2, a1, v1))
+                        .add(new PropertyEXISTSCondition(v1, "released"))
+                        .add(new EdgeLabelCondition(a1, "ACTED_IN"))
+                        .add(new PropertyValueCondition(a1, "source", "IMDB"))
+                        .add(new NodeLabelCondition(v2, "Person"))
+                        .add(new PropertyValueCondition(v2, "name", "Uma Thurman"))
+                        .add(new NodeLabelCondition(v1, "Movie"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new PropertyValueReturnStatement(v1, "released", ret2))
+                        .add(new VariableReturnStatement(v2, ret3))
+                        .build(),
+                translation);
     }
 
 }

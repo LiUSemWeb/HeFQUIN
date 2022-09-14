@@ -30,14 +30,14 @@ public class CypherQueryCombinator {
 
         final List<MatchClause> matches1 = q1.getMatches();
         final List<MatchClause> matches2 = q2.getMatches();
-        final List<NodeMatchClause> nodes1 = matches1.stream().filter(x->x instanceof NodeMatchClause)
-                .map(x->(NodeMatchClause) x).collect(Collectors.toList());
-        final List<NodeMatchClause> nodes2 = matches2.stream().filter(x->x instanceof NodeMatchClause)
-                .map(x->(NodeMatchClause) x).collect(Collectors.toList());
-        final List<EdgeMatchClause> edges1 = matches1.stream().filter(x->x instanceof EdgeMatchClause)
-                .map(x->(EdgeMatchClause) x).collect(Collectors.toList());
-        final List<EdgeMatchClause> edges2 = matches1.stream().filter(x->x instanceof EdgeMatchClause)
-                .map(x->(EdgeMatchClause) x).collect(Collectors.toList());
+        final List<NodeMatchClause> nodes1 = matches1.stream().filter(x -> x instanceof NodeMatchClause)
+                .map(x -> (NodeMatchClause) x).collect(Collectors.toList());
+        final List<NodeMatchClause> nodes2 = matches2.stream().filter(x -> x instanceof NodeMatchClause)
+                .map(x -> (NodeMatchClause) x).collect(Collectors.toList());
+        final List<EdgeMatchClause> edges1 = matches1.stream().filter(x -> x instanceof EdgeMatchClause)
+                .map(x -> (EdgeMatchClause) x).collect(Collectors.toList());
+        final List<EdgeMatchClause> edges2 = matches2.stream().filter(x -> x instanceof EdgeMatchClause)
+                .map(x -> (EdgeMatchClause) x).collect(Collectors.toList());
         for (final EdgeMatchClause m : edges1){
             builder.add(m);
         }
@@ -78,7 +78,7 @@ public class CypherQueryCombinator {
                 builder.add(r);
             }
         }
-        return null;
+        return builder.build();
     }
 
     private static CypherUnionQuery combineUnionMatch(final CypherUnionQuery q1, final CypherMatchQuery q2) {

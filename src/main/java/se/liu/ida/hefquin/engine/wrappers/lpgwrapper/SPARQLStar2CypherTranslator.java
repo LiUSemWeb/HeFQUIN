@@ -28,7 +28,8 @@ public interface SPARQLStar2CypherTranslator {
      */
     Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
                                                                    final LPG2RDFConfiguration conf,
-                                                                   CypherVarGenerator gen, final Set<Node> certainNodes,
+                                                                   final CypherVarGenerator generator,
+                                                                   final Set<Node> certainNodes,
                                                                    final Set<Node> certainEdgeLabels,
                                                                    final Set<Node> certainNodeLabels,
                                                                    final Set<Node> certainPropertyNames,

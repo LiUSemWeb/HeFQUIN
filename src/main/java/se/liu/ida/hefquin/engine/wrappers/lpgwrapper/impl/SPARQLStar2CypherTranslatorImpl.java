@@ -87,13 +87,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
     @Override
     public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
                                                                           final LPG2RDFConfiguration conf,
-                                                                          final CypherVarGenerator gen,
+                                                                          final CypherVarGenerator generator,
                                                                           final Set<Node> certainNodes,
                                                                           final Set<Node> certainEdgeLabels,
                                                                           final Set<Node> certainNodeLabels,
                                                                           final Set<Node> certainPropertyNames,
                                                                           final Set<Node> certainPropertyValues) {
-        final CypherVarGenerator generator = new CypherVarGenerator();
         return new Pair<>(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
