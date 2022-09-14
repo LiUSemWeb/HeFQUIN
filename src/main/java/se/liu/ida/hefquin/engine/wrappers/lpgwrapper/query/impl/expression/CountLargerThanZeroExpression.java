@@ -8,4 +8,14 @@ public class CountLargerThanZeroExpression implements BooleanCypherExpression{
     public Set<CypherVar> getVars() {
         return Collections.emptySet();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof CountLargerThanZeroExpression;
+    }
+
+    @Override
+    public String toString() {
+        return "COUNT(*) > 0";
+    }
 }

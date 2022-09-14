@@ -8,11 +8,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.FilteredPropertiesReturnStatement;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.LabelsReturnStatement;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.RelationshipTypeReturnStatement;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,8 +57,9 @@ public class CypherUtils {
 
     /**
      * This method checks if a given cypher query has a given column name, and if said column is from type
-     * {@link PropertyListReturnStatement}. If the query is a {@link CypherUnionQuery}, the method just checks if
+     * PropertyListReturnStatement. If the query is a {@link CypherUnionQuery}, the method just checks if
      * any of the {@link CypherMatchQuery} of the union satisfies the condition.
+     * This class will be deprecated.
      */
     public static boolean isPropertyColumn(final CypherQuery query, final CypherVar colName) {
         if (query instanceof CypherMatchQuery) {
@@ -82,10 +79,10 @@ public class CypherUtils {
     }
 
     public static boolean isPropertyColumn( final CypherMatchQuery query, final CypherVar colName ) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
-        for (final ReturnStatement r : returns) {
-            if (colName.equals(r.getAlias()) && (r instanceof PropertyListReturnStatement
-                                             || r instanceof FilteredPropertiesReturnStatement)) {
+        final List<AliasedExpression> returns = query.getReturnExprs();
+        for (final AliasedExpression r : returns) {
+            if (colName.equals(r.getAlias()) && (r.getExpression() instanceof PropertyAccessExpression
+                                             || r.getExpression() instanceof PropertyAccessWithVarExpression)) {
                 return true;
             }
         }
@@ -110,9 +107,9 @@ public class CypherUtils {
     }
 
     public static boolean isLabelColumn(final CypherMatchQuery query, final CypherVar colName) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
-        for (final ReturnStatement r : returns) {
-            if (colName.equals(r.getAlias()) && r instanceof LabelsReturnStatement) {
+        final List<AliasedExpression> returns = query.getReturnExprs();
+        for (final AliasedExpression r : returns) {
+            if (colName.equals(r.getAlias()) && r.getExpression() instanceof LabelsExpression) {
                 return true;
             }
         }
@@ -137,9 +134,9 @@ public class CypherUtils {
     }
 
     public static boolean isRelationshipTypeColumn(final CypherMatchQuery query, final CypherVar colName) {
-        final List<ReturnStatement> returns = query.getReturnExprs();
-        for (final ReturnStatement r : returns) {
-            if (colName.equals(r.getAlias()) && r instanceof RelationshipTypeReturnStatement) {
+        final List<AliasedExpression> returns = query.getReturnExprs();
+        for (final AliasedExpression r : returns) {
+            if (colName.equals(r.getAlias()) && r.getExpression() instanceof TypeExpression) {
                 return true;
             }
         }

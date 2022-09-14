@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class CypherQueryBuilder {
     private final List<MatchClause> matches;
     private final List<WhereCondition> conditions;
     private final List<UnwindIterator> iterators;
-    private final List<ReturnStatement> returns;
+    private final List<AliasedExpression> returns;
 
     public CypherQueryBuilder() {
         this.matches = new ArrayList<>();
@@ -35,7 +36,7 @@ public class CypherQueryBuilder {
         return this;
     }
 
-    public CypherQueryBuilder addReturn(final ReturnStatement ret) {
+    public CypherQueryBuilder addReturn(final AliasedExpression ret) {
         this.returns.add(ret);
         return this;
     }
@@ -47,8 +48,8 @@ public class CypherQueryBuilder {
             this.addCondition((WhereCondition) clause);
         } else if (clause instanceof UnwindIterator) {
             this.addIterator((UnwindIterator) clause);
-        } else if (clause instanceof ReturnStatement) {
-            this.addReturn((ReturnStatement) clause);
+        } else if (clause instanceof AliasedExpression) {
+            this.addReturn((AliasedExpression) clause);
         } else {
             throw new IllegalArgumentException("Provided object is not a CypherQuery Clause");
         }
@@ -69,7 +70,7 @@ public class CypherQueryBuilder {
         for (final UnwindIterator i : q.getIterators()) {
             this.addIterator(i);
         }
-        for (final ReturnStatement r : q.getReturnExprs()) {
+        for (final AliasedExpression r : q.getReturnExprs()) {
             this.addReturn(r);
         }
         return this;

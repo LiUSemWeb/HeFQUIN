@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.ReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
@@ -66,13 +66,13 @@ public class CypherQueryUtils {
                 conditions.add(c);
             }
         }
-        final List<ReturnStatement> returns = new ArrayList<>();
-        for ( final ReturnStatement r : q1.getReturnExprs() ) {
+        final List<AliasedExpression> returns = new ArrayList<>();
+        for ( final AliasedExpression r : q1.getReturnExprs() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
             }
         }
-        for ( final ReturnStatement r : q2.getReturnExprs() ) {
+        for ( final AliasedExpression r : q2.getReturnExprs() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
             }

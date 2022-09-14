@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.*;
@@ -12,7 +13,7 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     final protected List<WhereCondition> conditions;
 
     final protected List<UnwindIterator> iterators;
-    final protected List<ReturnStatement> returnExprs;
+    final protected List<AliasedExpression> returnExprs;
 
     public CypherMatchQueryImpl() {
         matches = new ArrayList<>();
@@ -22,7 +23,7 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     public CypherMatchQueryImpl(final List<MatchClause> matches, final List<WhereCondition> conditions,
-                                final List<UnwindIterator> iterators, final List<ReturnStatement> returnExprs) {
+                                final List<UnwindIterator> iterators, final List<AliasedExpression> returnExprs) {
         assert matches != null;
         assert  returnExprs != null;
 
@@ -48,7 +49,7 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     @Override
-    public List<ReturnStatement> getReturnExprs() {
+    public List<AliasedExpression> getReturnExprs() {
         return returnExprs;
     }
 
