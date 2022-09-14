@@ -44,6 +44,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
 
+    /**
+     * This method handles the translation of a given triple pattern, distinguishing the cases where the
+     * triple pattern is nested or non-nested. If the triple pattern is non-nested, this method returns
+     * the direct translation of it. If the triple pattern is nested, it first translates the embedded
+     * triple pattern, and then adds conditions, iterators or return statements depending on the case.
+     */
     protected static CypherQuery handleTriplePattern(final TriplePattern pattern,
                                                      final LPG2RDFConfiguration configuration,
                                                      final CypherVarGenerator gen,
@@ -97,6 +103,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return builder.build();
     }
 
+    /**
+     * This method translates non-nested triple patterns into Cypher, leveraging knowledge of properties that
+     * the variables in the triple pattern may hold like boundedness to given LPG elements or edge-compatibility.
+     */
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
                                                       final LPG2RDFConfiguration configuration,
                                                       final CypherVarGenerator gen,
