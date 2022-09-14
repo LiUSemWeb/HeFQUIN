@@ -58,4 +58,20 @@ public class CypherQueryBuilder {
     public CypherMatchQuery build() {
         return new CypherMatchQueryImpl(matches, conditions, iterators, returns);
     }
+
+    public CypherQueryBuilder addAll(final CypherMatchQuery q) {
+        for (final MatchClause m : q.getMatches()){
+            this.addMatch(m);
+        }
+        for (final WhereCondition c : q.getConditions()) {
+            this.addCondition(c);
+        }
+        for (final UnwindIterator i : q.getIterators()) {
+            this.addIterator(i);
+        }
+        for (final ReturnStatement r : q.getReturnExprs()) {
+            this.addReturn(r);
+        }
+        return this;
+    }
 }

@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,7 @@ public interface SPARQLStar2CypherTranslator {
      */
     Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
                                                                    final LPG2RDFConfiguration conf,
-                                                                   final Set<Node> certainNodes,
+                                                                   CypherVarGenerator gen, final Set<Node> certainNodes,
                                                                    final Set<Node> certainEdgeLabels,
                                                                    final Set<Node> certainNodeLabels,
                                                                    final Set<Node> certainPropertyNames,
