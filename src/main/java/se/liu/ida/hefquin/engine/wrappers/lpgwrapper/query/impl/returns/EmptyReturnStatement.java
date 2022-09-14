@@ -23,6 +23,11 @@ public class EmptyReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "\"\"";
+    }
+
+    @Override
     public String toString() {
         return "\"\"" + (alias != null? " AS " + alias.getName() : "");
     }

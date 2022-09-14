@@ -38,6 +38,11 @@ public class PropertyValueReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return var+"."+property;
+    }
+
+    @Override
     public String toString() {
         return var.getName() + "." + property + (alias != null? " AS " + alias.getName() : "");
     }

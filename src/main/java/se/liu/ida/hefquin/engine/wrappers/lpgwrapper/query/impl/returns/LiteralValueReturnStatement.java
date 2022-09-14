@@ -31,6 +31,11 @@ public class LiteralValueReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return value;
+    }
+
+    @Override
     public String toString() {
         return "'" + value + "'" + (alias != null? " AS " + alias.getName() : "");
     }

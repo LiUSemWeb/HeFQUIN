@@ -32,6 +32,11 @@ public class AllPropertyValuesReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "";
+    }
+
+    @Override
     public String toString() {
         return "[" + innerVar + " IN KEYS(" + var.getName() + ") | " + var.getName() + "[" + innerVar + "]]"
                 +(alias != null ? " AS " + alias.getName() : "");

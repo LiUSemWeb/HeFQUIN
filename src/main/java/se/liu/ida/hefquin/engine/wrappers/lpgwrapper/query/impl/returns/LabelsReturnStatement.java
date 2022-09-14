@@ -31,6 +31,11 @@ public class LabelsReturnStatement implements ReturnStatement {
     }
 
     @Override
+    public String getExpression() {
+        return "head(labels("+node+"))";
+    }
+
+    @Override
     public String toString() {
         return "head(labels(" + node.getName() + "))" + (alias != null? " AS " + alias.getName() : "");
     }

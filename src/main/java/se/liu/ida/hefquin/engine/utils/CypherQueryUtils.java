@@ -67,12 +67,12 @@ public class CypherQueryUtils {
             }
         }
         final List<ReturnStatement> returns = new ArrayList<>();
-        for ( final ReturnStatement r : q1.getReturnExprs() ) {
+        for ( final ReturnStatement r : q1.getReturnStatements() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
             }
         }
-        for ( final ReturnStatement r : q2.getReturnExprs() ) {
+        for ( final ReturnStatement r : q2.getReturnStatements() ) {
             if (!returns.contains(r) && compatibleVars(r.getVars(), matchVars)) {
                 returns.add(r);
             }
@@ -82,7 +82,7 @@ public class CypherQueryUtils {
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherMatchQuery q2) {
         final List<CypherMatchQuery> union = new ArrayList<>();
-        for (final CypherMatchQuery q : q1.getUnion()) {
+        for (final CypherMatchQuery q : q1.getSubqueries()) {
             final CypherMatchQuery combination = combine(q, q2);
             if (!union.contains(combination)) {
                 union.add(combination);
@@ -97,8 +97,8 @@ public class CypherQueryUtils {
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherUnionQuery q2) {
         final List<CypherMatchQuery> union = new ArrayList<>();
-        for (final CypherMatchQuery q3 : q1.getUnion()) {
-            for (final CypherMatchQuery q4 : q2.getUnion()){
+        for (final CypherMatchQuery q3 : q1.getSubqueries()) {
+            for (final CypherMatchQuery q4 : q2.getSubqueries()){
                 final CypherMatchQuery combination = combine(q3, q4);
                 if (!union.contains(combination)) {
                     union.add(combination);

@@ -69,7 +69,7 @@ public class CypherQueryBuilder {
         for (final UnwindIterator i : q.getIterators()) {
             this.addIterator(i);
         }
-        for (final ReturnStatement r : q.getReturnExprs()) {
+        for (final ReturnStatement r : q.getReturnStatements()) {
             this.addReturn(r);
         }
         return this;

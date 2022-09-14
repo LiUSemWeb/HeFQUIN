@@ -25,5 +25,5 @@ public interface CypherUnionQuery extends CypherQuery {
      * query, this method returns a list with two elements, one representing each MATCH query.
      * @return a List of CypherMatchQuery objects
      */
-    List<CypherMatchQuery> getUnion();
+    List<CypherMatchQuery> getSubqueries();
 }

@@ -43,4 +43,9 @@ public class CountLargerThanZeroReturnStatement implements ReturnStatement {
     public CypherVar getAlias() {
         return alias;
     }
+
+    @Override
+    public String getExpression() {
+        return "COUNT(*) > 0";
+    }
 }
