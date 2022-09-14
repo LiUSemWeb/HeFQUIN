@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.FilteredPropertiesReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.LabelsReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.PropertyListReturnStatement;

@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.ReturnStatement;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;

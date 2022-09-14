@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import org.apache.jena.graph.Node;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.ArrayList;
 import java.util.HashMap;

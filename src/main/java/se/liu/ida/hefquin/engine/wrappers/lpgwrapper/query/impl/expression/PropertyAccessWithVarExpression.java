@@ -1,0 +1,43 @@
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+
+import java.util.Objects;
+import java.util.Set;
+
+public class PropertyAccessWithVarExpression implements CypherExpression {
+
+    protected final CypherVar var;
+    protected final CypherVar innerVar;
+
+    public PropertyAccessWithVarExpression(final CypherVar var, final CypherVar innerVar) {
+        assert var != null;
+        assert innerVar != null;
+
+        this.var = var;
+        this.innerVar = innerVar;
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Set.of(var, innerVar);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PropertyAccessWithVarExpression that = (PropertyAccessWithVarExpression) o;
+        return var.equals(that.var) && innerVar.equals(that.innerVar);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(var, innerVar);
+    }
+
+    @Override
+    public String toString() {
+        return var + "[" + innerVar + "]";
+    }
+}

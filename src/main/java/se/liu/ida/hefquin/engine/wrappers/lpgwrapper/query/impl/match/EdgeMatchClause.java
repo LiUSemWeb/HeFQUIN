@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 
 import java.util.HashSet;
@@ -76,7 +76,7 @@ public class EdgeMatchClause implements MatchClause {
         final Set<CypherVar> vars = new HashSet<>();
         vars.add(sourceNode);
         vars.add(targetNode);
-        if (edge != null) vars.add(edge);
+        vars.add(edge);
         return vars;
     }
 }
