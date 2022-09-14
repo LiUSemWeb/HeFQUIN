@@ -4,6 +4,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
@@ -39,18 +40,82 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                                           final Set<Node> certainPropertyNames,
                                                                           final Set<Node> certainPropertyValues) {
         final CypherVarGenerator generator = new CypherVarGenerator();
-        return new Pair<>(translateTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
+        return new Pair<>(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
 
+    /**
+     * This method handles the translation of a given triple pattern, distinguishing the cases where the
+     * triple pattern is nested or non-nested. If the triple pattern is non-nested, this method returns
+     * the direct translation of it. If the triple pattern is nested, it first translates the embedded
+     * triple pattern, and then adds conditions, iterators or return statements depending on the case.
+     */
+    protected static CypherQuery handleTriplePattern(final TriplePattern pattern,
+                                                     final LPG2RDFConfiguration configuration,
+                                                     final CypherVarGenerator gen,
+                                                     final Set<Node> certainNodes,
+                                                     final Set<Node> certainEdgeLabels,
+                                                     final Set<Node> certainNodeLabels,
+                                                     final Set<Node> certainPropertyNames,
+                                                     final Set<Node> certainPropertyValues) {
+        final Triple b = pattern.asJenaTriple();
+        final Node s = b.getSubject();
+        if (!s.isNodeTriple()) {
+            return translateTriplePattern(pattern, configuration, gen, certainNodes, certainEdgeLabels,
+                    certainNodeLabels, certainPropertyNames, certainPropertyValues, false);
+        }
+        final CypherQuery translation = translateTriplePattern(new TriplePatternImpl(s.getTriple()),
+                configuration, gen, certainNodes, certainEdgeLabels, certainNodeLabels, certainPropertyNames,
+                certainPropertyValues, true);
+        if (!(translation instanceof CypherMatchQuery)){
+            return null; //TODO throw exception
+        }
+        final CypherMatchQuery innerTPTranslation = (CypherMatchQuery) translation;
+        final Node p = b.getPredicate();
+        final Node o = b.getObject();
+
+        final CypherVar edgeVar = ((EdgeMatchClause) innerTPTranslation.getMatches().get(0)).getEdge();
+
+        final CypherQueryBuilder builder = new CypherQueryBuilder().addAll(innerTPTranslation);
+        final CypherVar k = new CypherVar("k");
+        if (configuration.mapsToProperty(p) && o.isLiteral()) {
+            builder.add(new PropertyValueCondition(edgeVar, configuration.unmapProperty(p),
+                    o.getLiteralValue().toString()));
+        } else if (p.isVariable() && o.isLiteral()) {
+            final CypherVar iterVar = gen.getAnonVar();
+            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")",
+                    List.of(new PropertyValueConditionWithVar(edgeVar, k, o.getLiteralValue().toString())),
+                    List.of("k"), iterVar))
+                    .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)));
+        } else if (configuration.mapsToProperty(p) && o.isVariable()) {
+            builder.add(new PropertyEXISTSCondition(edgeVar, configuration.unmapProperty(p)));
+            builder.add(new PropertyValueReturnStatement(edgeVar, configuration.unmapProperty(p),
+                    gen.getRetVar(o)));
+        } else if (p.isVariable() && o.isVariable()) {
+            final CypherVar iterVar = gen.getAnonVar();
+            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")", null,
+                    List.of("k", edgeVar+"[k]"), iterVar))
+                    .add(new VariableGetItemReturnStatement(iterVar, 0, gen.getRetVar(p)))
+                    .add(new VariableGetItemReturnStatement(iterVar, 1, gen.getRetVar(o)));
+        } else {
+            return null;
+        }
+        return builder.build();
+    }
+
+    /**
+     * This method translates non-nested triple patterns into Cypher, leveraging knowledge of properties that
+     * the variables in the triple pattern may hold like boundedness to given LPG elements or edge-compatibility.
+     */
     protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
-                                                        final LPG2RDFConfiguration configuration,
-                                                        final CypherVarGenerator gen,
-                                                        final Set<Node> certainNodes,
-                                                        final Set<Node> certainEdgeLabels,
-                                                        final Set<Node> certainNodeLabels,
-                                                        final Set<Node> certainPropertyNames,
-                                                        final Set<Node> certainPropertyValues) {
+                                                      final LPG2RDFConfiguration configuration,
+                                                      final CypherVarGenerator gen,
+                                                      final Set<Node> certainNodes,
+                                                      final Set<Node> certainEdgeLabels,
+                                                      final Set<Node> certainNodeLabels,
+                                                      final Set<Node> certainPropertyNames,
+                                                      final Set<Node> certainPropertyValues,
+                                                      final boolean isEdgeCompatible) {
         final Triple b = pattern.asJenaTriple();
         final Node s = b.getSubject();
         final Node p = b.getPredicate();
@@ -128,12 +193,12 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             else if(p.isVariable() && o.isVariable()) {
                 if (configuration.mapsToNode(s)) {
                     return getNodeVarVar(s, p, o, configuration, gen, certainNodes, certainNodeLabels,
-                            certainPropertyNames, certainPropertyValues, certainEdgeLabels);
+                            certainPropertyNames, certainPropertyValues, certainEdgeLabels, isEdgeCompatible);
                 }
             }
         } else {
             return getVarVarVar(s, p, o, configuration, gen, certainNodes, certainNodeLabels,
-                    certainPropertyNames, certainPropertyValues, certainEdgeLabels);
+                    certainPropertyNames, certainPropertyValues, certainEdgeLabels, isEdgeCompatible);
         }
         return null;
     }
@@ -421,12 +486,13 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                final Set<Node> certainNodeLabels,
                                                final Set<Node> certainPropertyNames,
                                                final Set<Node> certainPropertyValues,
-                                               final Set<Node> certainEdgeLabels) {
+                                               final Set<Node> certainEdgeLabels,
+                                               final boolean isEdgeCompatible) {
         final LPGNode node = configuration.unmapNode(s);
         final CypherVar pvar = gen.getVarFor(p);
         final CypherVar ovar = gen.getVarFor(o);
         final CypherVar a1 = gen.getAnonVar();
-        if (certainNodes.contains(o)){
+        if (certainNodes.contains(o) || isEdgeCompatible){
             return new CypherQueryBuilder()
                     //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .add(new EdgeMatchClause(a1, pvar, ovar))
@@ -483,7 +549,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                               final Set<Node> certainNodes,
                                               final Set<Node> certainNodeLabels,
                                               final Set<Node> certainPropertyNames,
-                                              final Set<Node> certainPropertyValues, Set<Node> certainEdgeLabels) {
+                                              final Set<Node> certainPropertyValues,
+                                              final Set<Node> certainEdgeLabels,
+                                              final boolean isEdgeCompatible) {
         final CypherVar a1 = gen.getAnonVar();
         final CypherVar a2 = gen.getAnonVar();
         final CypherVar a3 = gen.getAnonVar();
@@ -493,7 +561,8 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new RelationshipTypeReturnStatement(a2, gen.getRetVar(p)))
                 .add(new VariableReturnStatement(a3, gen.getRetVar(o)))
                 .build();
-        if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)) {
+        if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)
+        || isEdgeCompatible) {
             return qEdges;
         }
 

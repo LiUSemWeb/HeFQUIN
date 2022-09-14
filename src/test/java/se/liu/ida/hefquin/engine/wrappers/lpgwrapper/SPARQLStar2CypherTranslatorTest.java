@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Node_Triple;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
@@ -117,15 +118,15 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
-                            .add(new NodeMatchClause(v1))
-                            .add(new PropertyValueCondition(v1, "name", "Quentin Tarantino"))
-                            .add(new VariableReturnStatement(v1, ret1))
-                            .build(),
+                                .add(new NodeMatchClause(v1))
+                                .add(new PropertyValueCondition(v1, "name", "Quentin Tarantino"))
+                                .add(new VariableReturnStatement(v1, ret1))
+                                .build(),
                         new CypherQueryBuilder()
-                            .add(new EdgeMatchClause(src1, edge1, tgt1))
-                            .add(new PropertyValueCondition(edge1, "name", "Quentin Tarantino"))
-                            .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
-                            .build())
+                                .add(new EdgeMatchClause(src1, edge1, tgt1))
+                                .add(new PropertyValueCondition(edge1, "name", "Quentin Tarantino"))
+                                .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
+                                .build())
                 , translation);
     }
 
@@ -137,10 +138,10 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new NodeMatchClause(v1))
-                    .add(new NodeLabelCondition(v1, "Person"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .build(),
+                        .add(new NodeMatchClause(v1))
+                        .add(new NodeLabelCondition(v1, "Person"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .build(),
                 translation);
     }
 
@@ -152,11 +153,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new EdgeMatchClause(v1, a1, a2))
-                    .add(new NodeIDCondition(a2, "22"))
-                    .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .build(),
+                        .add(new EdgeMatchClause(v1, a1, a2))
+                        .add(new NodeIDCondition(a2, "22"))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .build(),
                 translation);
     }
 
@@ -168,10 +169,10 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new NodeMatchClause(v1))
-                    .add(new NodeIDCondition(v1, "22"))
-                    .add(new LabelsReturnStatement(v1, ret1))
-                    .build(),
+                        .add(new NodeMatchClause(v1))
+                        .add(new NodeIDCondition(v1, "22"))
+                        .add(new LabelsReturnStatement(v1, ret1))
+                        .build(),
                 translation);
     }
 
@@ -183,11 +184,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new NodeMatchClause(a1))
-                    .add(new NodeIDCondition(a1, "22"))
-                    .add(new PropertyEXISTSCondition(a1, "name"))
-                    .add(new PropertyValueReturnStatement(a1, "name", ret1))
-                    .build(),
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new PropertyEXISTSCondition(a1, "name"))
+                        .add(new PropertyValueReturnStatement(a1, "name", ret1))
+                        .build(),
                 translation);
     }
 
@@ -199,11 +200,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new EdgeMatchClause(a1, a2, v1))
-                    .add(new NodeIDCondition(a1, "22"))
-                    .add(new EdgeLabelCondition(a2, "DIRECTED"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .build(),
+                        .add(new EdgeMatchClause(a1, a2, v1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new EdgeLabelCondition(a2, "DIRECTED"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .build(),
                 translation);
     }
 
@@ -215,18 +216,18 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new EdgeMatchClause(a1, v1, a2))
-                    .add(new NodeIDCondition(a1, "22"))
-                    .add(new NodeIDCondition(a2, "23"))
-                    .add(new RelationshipTypeReturnStatement(v1, ret1))
-                    .build(),
+                        .add(new EdgeMatchClause(a1, v1, a2))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new NodeIDCondition(a2, "23"))
+                        .add(new RelationshipTypeReturnStatement(v1, ret1))
+                        .build(),
                 translation);
     }
 
     @Test
     public void translateNodeVarLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
-        final Triple t = new Triple( conf.mapNode(node22), Var.alloc("p"),
+        final Triple t = new Triple(conf.mapNode(node22), Var.alloc("p"),
                 NodeFactory.createLiteral("Quentin Tarantino"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
@@ -234,11 +235,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeIDCondition(a1, "22"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS("+a1+")",
+                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a1 + ")",
                                 List.of(new PropertyValueConditionWithVar(a1, vark, "Quentin Tarantino")),
                                 List.of("k"), a2))
                         .add(new VariableGetItemReturnStatement(a2, 0, ret1))
-                    .build(),
+                        .build(),
                 translation);
     }
 
@@ -266,10 +267,10 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new NodeMatchClause(v1))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .add(new LabelsReturnStatement(v1, ret2))
-                    .build(),
+                        .add(new NodeMatchClause(v1))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new LabelsReturnStatement(v1, ret2))
+                        .build(),
                 translation);
     }
 
@@ -281,11 +282,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new EdgeMatchClause(v1, a1, v2))
-                    .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .add(new VariableReturnStatement(v2, ret2))
-                    .build(),
+                        .add(new EdgeMatchClause(v1, a1, v2))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableReturnStatement(v2, ret2))
+                        .build(),
                 translation);
     }
 
@@ -319,11 +320,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new NodeMatchClause(v1))
-                    .add(new NodeLabelCondition(v1, "Person"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .add(new LiteralValueReturnStatement("label", ret2))
-                    .build(),
+                        .add(new NodeMatchClause(v1))
+                        .add(new NodeLabelCondition(v1, "Person"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new LiteralValueReturnStatement("label", ret2))
+                        .build(),
                 translation);
     }
 
@@ -335,11 +336,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
                 new CypherQueryBuilder()
-                    .add(new EdgeMatchClause(v1, v2, a1))
-                    .add(new NodeIDCondition(a1, "22"))
-                    .add(new VariableReturnStatement(v1, ret1))
-                    .add(new RelationshipTypeReturnStatement(v2, ret2))
-                    .build(),
+                        .add(new EdgeMatchClause(v1, v2, a1))
+                        .add(new NodeIDCondition(a1, "22"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new RelationshipTypeReturnStatement(v2, ret2))
+                        .build(),
                 translation);
     }
 
@@ -353,7 +354,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(src1, edge1, tgt1))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+edge1+")",
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + edge1 + ")",
                                         List.of(new PropertyValueConditionWithVar(edge1, vark, "The Matrix")),
                                         List.of("k"), a2))
                                 .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
@@ -361,7 +362,7 @@ public class SPARQLStar2CypherTranslatorTest {
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(v1))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+v1+")",
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + v1 + ")",
                                         List.of(new PropertyValueConditionWithVar(v1, vark, "The Matrix")),
                                         List.of("k"), a1))
                                 .add(new VariableReturnStatement(v1, ret1))
@@ -387,8 +388,8 @@ public class SPARQLStar2CypherTranslatorTest {
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a2))
                                 .add(new NodeIDCondition(a2, "22"))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a2+")", null,
-                                        List.of("k", a2+"[k]"), a3))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
+                                        List.of("k", a2 + "[k]"), a3))
                                 .add(new VariableGetItemReturnStatement(a3, 0, ret1))
                                 .add(new VariableGetItemReturnStatement(a3, 1, ret2))
                                 .build(),
@@ -423,16 +424,16 @@ public class SPARQLStar2CypherTranslatorTest {
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
-                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
+                                        null, List.of("k", a5 + "[k]"), a6))
                                 .add(new VariableReturnStatement(a5, ret1))
                                 .add(new VariableGetItemReturnStatement(a6, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a6, 1, ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a8+")",
-                                        null, List.of("k", a8+"[k]"), a10))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
+                                        null, List.of("k", a8 + "[k]"), a10))
                                 .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
                                 .add(new VariableGetItemReturnStatement(a10, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a10, 1, ret3))
@@ -467,13 +468,13 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf, Collections.singleton(s),
                         emptySet, emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
-                .add(new NodeMatchClause(v1))
-                .add(new UnwindIteratorImpl(vark, "KEYS("+v1+")",
-                        List.of(new PropertyValueConditionWithVar(v1, vark, "The Matrix")),
-                        List.of("k"), a1))
-                .add(new VariableReturnStatement(v1, ret1))
-                .add(new VariableGetItemReturnStatement(a1, 0, ret2))
-                .build(),
+                        .add(new NodeMatchClause(v1))
+                        .add(new UnwindIteratorImpl(vark, "KEYS(" + v1 + ")",
+                                List.of(new PropertyValueConditionWithVar(v1, vark, "The Matrix")),
+                                List.of("k"), a1))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableGetItemReturnStatement(a1, 0, ret2))
+                        .build(),
                 translation);
     }
 
@@ -517,8 +518,8 @@ public class SPARQLStar2CypherTranslatorTest {
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
-                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
+                                        null, List.of("k", a5 + "[k]"), a6))
                                 .add(new VariableReturnStatement(a5, ret1))
                                 .add(new VariableGetItemReturnStatement(a6, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a6, 1, ret3))
@@ -536,11 +537,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf, Set.of(s, o),
                         emptySet, emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
-                                .add(new EdgeMatchClause(a1, a2, a3))
-                                .add(new VariableReturnStatement(a1, ret1))
-                                .add(new RelationshipTypeReturnStatement(a2, ret2))
-                                .add(new VariableReturnStatement(a3, ret3))
-                                .build(),
+                        .add(new EdgeMatchClause(a1, a2, a3))
+                        .add(new VariableReturnStatement(a1, ret1))
+                        .add(new RelationshipTypeReturnStatement(a2, ret2))
+                        .add(new VariableReturnStatement(a3, ret3))
+                        .build(),
                 translation);
     }
 
@@ -587,13 +588,13 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet, emptySet, emptySet,
                         Collections.singleton(p), emptySet).object1;
         assertEquals(new CypherQueryBuilder()
-                                .add(new NodeMatchClause(a2))
-                                .add(new NodeIDCondition(a2, "22"))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a2+")", null,
-                                        List.of("k", a2+"[k]"), a3))
-                                .add(new VariableGetItemReturnStatement(a3, 0, ret1))
-                                .add(new VariableGetItemReturnStatement(a3, 1, ret2))
-                                .build(),
+                        .add(new NodeMatchClause(a2))
+                        .add(new NodeIDCondition(a2, "22"))
+                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
+                                List.of("k", a2 + "[k]"), a3))
+                        .add(new VariableGetItemReturnStatement(a3, 0, ret1))
+                        .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                        .build(),
                 translation);
     }
 
@@ -608,8 +609,8 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
                         .add(new NodeIDCondition(a2, "22"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS("+a2+")", null,
-                                List.of("k", a2+"[k]"), a3))
+                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
+                                List.of("k", a2 + "[k]"), a3))
                         .add(new VariableGetItemReturnStatement(a3, 0, ret1))
                         .add(new VariableGetItemReturnStatement(a3, 1, ret2))
                         .build(),
@@ -628,16 +629,16 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
-                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
+                                        null, List.of("k", a5 + "[k]"), a6))
                                 .add(new VariableReturnStatement(a5, ret1))
                                 .add(new VariableGetItemReturnStatement(a6, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a6, 1, ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a8+")",
-                                        null, List.of("k", a8+"[k]"), a10))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
+                                        null, List.of("k", a8 + "[k]"), a10))
                                 .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
                                 .add(new VariableGetItemReturnStatement(a10, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a10, 1, ret3))
@@ -657,16 +658,16 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a5+")",
-                                        null, List.of("k", a5+"[k]"), a6))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
+                                        null, List.of("k", a5 + "[k]"), a6))
                                 .add(new VariableReturnStatement(a5, ret1))
                                 .add(new VariableGetItemReturnStatement(a6, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a6, 1, ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS("+a8+")",
-                                        null, List.of("k", a8+"[k]"), a10))
+                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
+                                        null, List.of("k", a8 + "[k]"), a10))
                                 .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
                                 .add(new VariableGetItemReturnStatement(a10, 0, ret2))
                                 .add(new VariableGetItemReturnStatement(a10, 1, ret3))
@@ -683,11 +684,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet,
                         Collections.singleton(p), emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
-                                .add(new EdgeMatchClause(a4, a5, a6))
-                                .add(new NodeIDCondition(a4, "22"))
-                                .add(new RelationshipTypeReturnStatement(a5, ret1))
-                                .add(new VariableReturnStatement(a6, ret2))
-                                .build(),
+                        .add(new EdgeMatchClause(a4, a5, a6))
+                        .add(new NodeIDCondition(a4, "22"))
+                        .add(new RelationshipTypeReturnStatement(a5, ret1))
+                        .add(new VariableReturnStatement(a6, ret2))
+                        .build(),
                 translation);
     }
 
@@ -700,11 +701,87 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf, emptySet,
                         Collections.singleton(p), emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
-                                .add(new EdgeMatchClause(a1, a2, a3))
-                                .add(new VariableReturnStatement(a1, ret1))
-                                .add(new RelationshipTypeReturnStatement(a2, ret2))
-                                .add(new VariableReturnStatement(a3, ret3))
-                                .build(),
+                        .add(new EdgeMatchClause(a1, a2, a3))
+                        .add(new VariableReturnStatement(a1, ret1))
+                        .add(new RelationshipTypeReturnStatement(a2, ret2))
+                        .add(new VariableReturnStatement(a3, ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void translateTriplePropertyLiteralTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
+        final Triple t = new Triple(new Node_Triple(inner), conf.mapProperty("certainty"),
+                NodeFactory.createLiteral("0.8"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(v1, a1, v2))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new PropertyValueCondition(a1, "certainty", "0.8"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableReturnStatement(v2, ret2))
+                .build(),
+                translation);
+    }
+
+    @Test
+    public void translateTriplePropertyVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
+        final Triple t = new Triple(new Node_Triple(inner), conf.mapProperty("certainty"), Var.alloc("c"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(v1, a1, v2))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new PropertyEXISTSCondition(a1, "certainty"))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableReturnStatement(v2, ret2))
+                        .add(new PropertyValueReturnStatement(a1, "certainty", ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void translateTripleVarLiteralTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
+        final Triple t = new Triple(new Node_Triple(inner), Var.alloc("p"), NodeFactory.createLiteral("0.8"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(v1, a1, v2))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new UnwindIteratorImpl(vark, "KEYS("+a1+")",
+                                List.of(new PropertyValueConditionWithVar(a1, vark, "0.8")),
+                                List.of("k"), a2))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableReturnStatement(v2, ret2))
+                        .add(new VariableGetItemReturnStatement(a2, 0, ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void translateTripleVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
+        final Triple t = new Triple(new Node_Triple(inner), Var.alloc("p"), Var.alloc("l"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(v1, a1, v2))
+                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
+                        .add(new UnwindIteratorImpl(vark, "KEYS("+a1+")", null,
+                                List.of("k", a1+"[k]"), a2))
+                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableReturnStatement(v2, ret2))
+                        .add(new VariableGetItemReturnStatement(a2, 0, ret3))
+                        .add(new VariableGetItemReturnStatement(a2, 1, new CypherVar("ret4")))
+                        .build(),
                 translation);
     }
 

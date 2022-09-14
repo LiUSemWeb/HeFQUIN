@@ -80,7 +80,6 @@ public class UnwindIteratorImpl implements UnwindIterator {
                 .append(" IN ")
                 .append(listExpression);
         if (filters != null && !filters.isEmpty()) {
-            System.out.println("hola");
             builder.append(" WHERE ");
             builder.append(filters.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
         }
