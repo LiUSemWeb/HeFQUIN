@@ -802,13 +802,13 @@ public class SPARQLStar2CypherTranslatorTest {
         final Var m = Var.alloc("m");
         final Var p = Var.alloc("p");
         final BGP bgp = new BGPImpl(
-                new TriplePatternImpl(new Triple(m, conf.getLabel(), conf.mapNodeLabel("Movie"))),
-                new TriplePatternImpl(new Triple(p, conf.getLabel(), conf.mapNodeLabel("Person"))),
-                new TriplePatternImpl(new Triple(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman"))),
-                new TriplePatternImpl(new Triple(m, conf.mapProperty("released"), Var.alloc("y"))),
-                new TriplePatternImpl(new Triple(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
-                        conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")))
-        );
+                new TriplePatternImpl(m, conf.getLabel(), conf.mapNodeLabel("Movie")),
+                new TriplePatternImpl(p, conf.getLabel(), conf.mapNodeLabel("Person")),
+                new TriplePatternImpl(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman")),
+                new TriplePatternImpl(m, conf.mapProperty("released"), Var.alloc("y")),
+                new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
+                        conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")
+        ));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v2, a1, v1))
@@ -821,6 +821,28 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new VariableReturnStatement(v1, ret1))
                         .add(new PropertyValueReturnStatement(v1, "released", ret2))
                         .add(new VariableReturnStatement(v2, ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void joinOnLiteralsTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var l = Var.alloc("l");
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(conf.mapNode(node23), conf.mapProperty("name"), l),
+                new TriplePatternImpl(conf.mapNode(node22), conf.mapProperty("name"), l)
+        );
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeMatchClause(a2))
+                        .add(new NodeIDCondition(a1, "23"))
+                        .add(new PropertyEXISTSCondition(a1, "name"))
+                        .add(new NodeIDCondition(a2, "22"))
+                        .add(new PropertyEXISTSCondition(a2, "name"))
+                        .add(new JoinCondition(a2+".name", a1+".name"))
+                        .add(new PropertyValueReturnStatement(a1, "name", ret1))
                         .build(),
                 translation);
     }
