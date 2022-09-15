@@ -13,7 +13,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.UnwindIteratorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.UnwindIteratorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
@@ -82,9 +82,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     o.getLiteralValue().toString()));
         } else if (p.isVariable() && o.isLiteral()) {
             final CypherVar iterVar = gen.getAnonVar();
-            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")",
-                    List.of(new PropertyValueConditionWithVar(edgeVar, k, o.getLiteralValue().toString())),
-                    List.of("k"), iterVar))
+            builder.add(new UnwindIteratorImpl(k, new KeysExpression(edgeVar),
+                    List.of(new EqualityExpression(new PropertyAccessWithVarExpression(edgeVar, k),
+                                new LiteralExpression(o.getLiteralValue().toString()))),
+                    List.of(k), iterVar))
                     .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)));
         } else if (configuration.mapsToProperty(p) && o.isVariable()) {
             builder.add(new PropertyEXISTSCondition(edgeVar, configuration.unmapProperty(p)));
@@ -92,8 +93,8 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     new PropertyAccessExpression(edgeVar, configuration.unmapProperty(p)), gen.getRetVar(o)));
         } else if (p.isVariable() && o.isVariable()) {
             final CypherVar iterVar = gen.getAnonVar();
-            builder.add(new UnwindIteratorImpl(k, "KEYS("+edgeVar+")", null,
-                    List.of("k", edgeVar+"[k]"), iterVar))
+            builder.add(new UnwindIteratorImpl(k, new KeysExpression(edgeVar), null,
+                    List.of(k, new PropertyAccessWithVarExpression(edgeVar, k)), iterVar))
                     .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
                     .add(new AliasedExpression(new GetItemExpression(iterVar, 1), gen.getRetVar(o)));
         } else {
@@ -354,9 +355,11 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(xvar))
                 .add(new NodeIDCondition(xvar, configuration.unmapNode(s).getId()))
-                .add(new UnwindIteratorImpl(innerVar, "KEYS("+xvar+")",
-                        Collections.singletonList(new PropertyValueConditionWithVar(xvar, innerVar, literal)),
-                        Collections.singletonList("k"), iterVar))
+                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(xvar),
+                        List.of(new EqualityExpression(
+                                new PropertyAccessWithVarExpression(xvar, innerVar),
+                                new LiteralExpression(literal))),
+                        List.of(innerVar), iterVar))
                 .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
                 .build();
     }
@@ -458,9 +461,11 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final String literal = o.getLiteralValue().toString();
         final CypherMatchQuery q = new CypherQueryBuilder()
                                         .add(new NodeMatchClause(svar))
-                                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+svar+")",
-                                                List.of(new PropertyValueConditionWithVar(svar, innerVar, literal)),
-                                                Collections.singletonList("k"), iterVar))
+                                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(svar),
+                                                List.of(new EqualityExpression(
+                                                        new PropertyAccessWithVarExpression(svar, innerVar),
+                                                        new LiteralExpression(literal))),
+                                                List.of(innerVar), iterVar))
                                         .add(new AliasedExpression(svar, gen.getRetVar(s)))
                                         .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
                                         .build();
@@ -471,9 +476,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
-                        .add(new UnwindIteratorImpl(innerVar, "KEYS("+sedge.get(1)+")",
-                                List.of(new PropertyValueConditionWithVar(sedge.get(1), innerVar, literal)),
-                                Collections.singletonList("k"), iterVar2))
+                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(sedge.get(1)),
+                                List.of(new EqualityExpression(
+                                        new PropertyAccessWithVarExpression(sedge.get(1), innerVar),
+                                        new LiteralExpression(literal))), List.of(innerVar), iterVar2))
                         .add(new AliasedExpression(new TripleMapExpression(sedge.get(0), sedge.get(1), sedge.get(2)),
                                 gen.getRetVar(s)))
                         .add(new AliasedExpression(new GetItemExpression(iterVar2 , 0), gen.getRetVar(p)))
@@ -533,15 +539,14 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherMatchQuery qProperties = new CypherQueryBuilder()
                 .add(new NodeMatchClause(a2))
                 .add(new NodeIDCondition(a2, node.getId()))
-                .add(new UnwindIteratorImpl(innerVar, "KEYS("+a2+")", null,
-                        List.of("k", a2+"[k]"), iterVar))
+                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a2), null,
+                        List.of(innerVar, new PropertyAccessWithVarExpression(a2, innerVar)), iterVar))
                 .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
                 .add(new AliasedExpression(new GetItemExpression(iterVar, 1), gen.getRetVar(o)))
                 .build();
         if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)){
             return qProperties;
         }
-
         return new CypherUnionQueryImpl(qLabels, qProperties, qEdges);
     }
 
@@ -588,16 +593,16 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar innerVar = new CypherVar("k");
         final CypherMatchQuery qNodeProperties = new CypherQueryBuilder()
                 .add(new NodeMatchClause(a5))
-                .add(new UnwindIteratorImpl(innerVar, "KEYS("+a5+")", null,
-                        List.of("k", a5+"[k]"), iterVar))
+                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a5), null,
+                        List.of(innerVar, new PropertyAccessWithVarExpression(a5, innerVar)), iterVar))
                 .add(new AliasedExpression(a5, gen.getRetVar(s)))
                 .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
                 .add(new AliasedExpression(new GetItemExpression(iterVar, 1), gen.getRetVar(o)))
                 .build();
         final CypherMatchQuery qEdgeProperties = new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a7, a8, a9))
-                .add(new UnwindIteratorImpl(innerVar, "KEYS("+a8+")", null,
-                        List.of("k", a8+"[k]"), iterVar2))
+                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a8), null,
+                        List.of(innerVar, new PropertyAccessWithVarExpression(a8, innerVar)), iterVar2))
                 .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), gen.getRetVar(s)))
                 .add(new AliasedExpression(new GetItemExpression(iterVar2, 0), gen.getRetVar(p)))
                 .add(new AliasedExpression(new GetItemExpression(iterVar2, 1), gen.getRetVar(o)))
