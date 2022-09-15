@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ public interface CypherMatchQuery extends CypherQuery {
      * conditions, representing a:CLASS and b.property='value'.
      * @return a list of WhereCondition objects
      */
-    List<WhereCondition> getConditions();
+    List<BooleanCypherExpression> getConditions();
 
     /**
      * Obtains a list of iterator expressions, of the form list AS var, present on the query.
@@ -45,4 +47,5 @@ public interface CypherMatchQuery extends CypherQuery {
      */
     List<AliasedExpression> getReturnExprs();
 
+    List<CypherVar> getAliases();
 }

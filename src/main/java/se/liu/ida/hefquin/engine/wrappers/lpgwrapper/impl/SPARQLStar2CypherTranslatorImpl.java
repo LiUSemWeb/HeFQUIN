@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -18,6 +19,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryCombinator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.*;
@@ -25,20 +27,71 @@ import java.util.*;
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
     @Override
+    public Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf) {
+        final Set<Node> certainNodes = new HashSet<>();
+        final Set<Node> certainEdgeLabels = new HashSet<>();
+        final Set<Node> certainNodeLabels = new HashSet<>();
+        final Set<Node> certainPropertyNames = new HashSet<>();
+        final Set<Node> certainPropertyValues = new HashSet<>();
+        for (final TriplePattern tp : bgp.getTriplePatterns()) {
+            final Node s = tp.asJenaTriple().getSubject();
+            final Node p = tp.asJenaTriple().getPredicate();
+            final Node o = tp.asJenaTriple().getObject();
+            if (s.isVariable()) {
+                if (conf.isLabelIRI(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
+                    certainNodes.add(s);
+                }
+            }
+            if (o.isVariable()) {
+                if (conf.mapsToEdgeLabel(p)){
+                    certainNodes.add(o);
+                }
+                if (conf.isLabelIRI(p)) {
+                    certainNodeLabels.add(o);
+                }
+                if (conf.mapsToProperty(p) || s.isNodeTriple()) {
+                    certainPropertyValues.add(o);
+                }
+            }
+            if (p.isVariable()) {
+                if (conf.mapsToNode(o)) {
+                    certainEdgeLabels.add(p);
+                }
+                if (o.isLiteral() || s.isNodeTriple()) {
+                    certainPropertyNames.add(p);
+                }
+            }
+        }
+
+        CypherQuery result = null;
+        final CypherVarGenerator gen = new CypherVarGenerator();
+        for (final TriplePattern tp : bgp.getTriplePatterns()) {
+            CypherQuery tpTranslation = translateTriplePattern(tp, conf, gen, certainNodes,
+                    certainEdgeLabels, certainNodeLabels, certainPropertyNames, certainPropertyValues).object1;
+            if (result == null){
+                result = tpTranslation;
+            } else {
+                result = CypherQueryCombinator.combine(result, tpTranslation);
+            }
+        }
+        return new Pair<>(result, gen.getReverseMap());
+    }
+
+    @Override
     public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(TriplePattern tp, LPG2RDFConfiguration conf) {
-        return translateTriplePattern(tp, conf, new HashSet<>(), new HashSet<>(), new HashSet<>(),
+        return translateTriplePattern(tp, conf, new CypherVarGenerator(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
                 new HashSet<>(), new HashSet<>());
     }
 
     @Override
     public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
                                                                           final LPG2RDFConfiguration conf,
+                                                                          final CypherVarGenerator generator,
                                                                           final Set<Node> certainNodes,
                                                                           final Set<Node> certainEdgeLabels,
                                                                           final Set<Node> certainNodeLabels,
                                                                           final Set<Node> certainPropertyNames,
                                                                           final Set<Node> certainPropertyValues) {
-        final CypherVarGenerator generator = new CypherVarGenerator();
         return new Pair<>(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }

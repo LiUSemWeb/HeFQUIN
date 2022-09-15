@@ -2,13 +2,14 @@
 HeFQUIN is a query federation engine for heterogeneous federations of graph data sources (e.g, federated knowledge graphs) that is currently under development by [the Semantic Web research group at Linköping University](https://www.ida.liu.se/research/semanticweb/).
 
 ### Features of HeFQUIN
+* Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)
 * So far, support for SPARQL endpoints, TPF, and brTPF
   * [work on openCypher Property Graphs ongoing](https://github.com/LiUSemWeb/HeFQUIN/tree/main/src/main/java/se/liu/ida/hefquin/engine/wrappers/graphqlwrapper)
   * [work on GraphQL APIs ongoing](https://github.com/LiUSemWeb/HeFQUIN/tree/main/src/main/java/se/liu/ida/hefquin/engine/wrappers/graphqlwrapper)
 * Initial support for vocabulary mappings
 * [Heuristics-based logical query optimizer](https://github.com/LiUSemWeb/HeFQUIN/wiki/Heuristics-Based-Logical-Query-Optimizer)
 * Several different [cost-based physical optimizers](https://github.com/LiUSemWeb/HeFQUIN/wiki/Cost-Based-Physical-Query-Optimizers) (greedy, dynamic programming, simulated annealing, randomized iterative improvement)
-* Relevant physical operators; e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ), several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
+* Relevant [physical operators](https://github.com/LiUSemWeb/HeFQUIN/wiki/Physical-Operators); e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ), several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
 * Two execution models (push-based and pull-based)
 * Features for getting an understanding of the internals of the engine
   * printing of logical and physical plans

@@ -44,8 +44,7 @@ public class EdgeMatchClause implements MatchClause {
         builder.append("MATCH (")
                 .append(sourceNode.getName())
                 .append(")-[");
-        if (edge != null)
-            builder.append(edge.getName());
+        builder.append(edge.getName());
         builder.append("]->(")
                 .append(targetNode.getName())
                 .append(")");
@@ -68,7 +67,12 @@ public class EdgeMatchClause implements MatchClause {
 
     @Override
     public boolean isRedundantWith(final MatchClause match) {
-        return this.equals(match);
+        if (match instanceof EdgeMatchClause)
+            return this.equals(match);
+        else if (match instanceof NodeMatchClause)
+            return ((NodeMatchClause) match).getNode().equals(sourceNode) ||
+                    ((NodeMatchClause) match).getNode().equals(targetNode);
+        else return false;
     }
 
     @Override

@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.utils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
@@ -55,13 +56,13 @@ public class CypherQueryUtils {
         }
         final Set<CypherVar> matchVars = matches.stream().map(MatchClause::getVars)
                 .flatMap(Set::stream).collect(Collectors.toSet());
-        final List<WhereCondition> conditions = new ArrayList<>();
-        for ( final WhereCondition c : q1.getConditions() ){
+        final List<BooleanCypherExpression> conditions = new ArrayList<>();
+        for ( final BooleanCypherExpression c : q1.getConditions() ){
             if (!conditions.contains(c) && compatibleVars(c.getVars(), matchVars)) {
                 conditions.add(c);
             }
         }
-        for ( final WhereCondition c : q2.getConditions() ){
+        for ( final BooleanCypherExpression c : q2.getConditions() ){
             if (!conditions.contains(c) && compatibleVars(c.getVars(), matchVars)) {
                 conditions.add(c);
             }
@@ -82,7 +83,7 @@ public class CypherQueryUtils {
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherMatchQuery q2) {
         final List<CypherMatchQuery> union = new ArrayList<>();
-        for (final CypherMatchQuery q : q1.getUnion()) {
+        for (final CypherMatchQuery q : q1.getSubqueries()) {
             final CypherMatchQuery combination = combine(q, q2);
             if (!union.contains(combination)) {
                 union.add(combination);
@@ -97,8 +98,8 @@ public class CypherQueryUtils {
 
     public static CypherUnionQuery combine(final CypherUnionQuery q1, final CypherUnionQuery q2) {
         final List<CypherMatchQuery> union = new ArrayList<>();
-        for (final CypherMatchQuery q3 : q1.getUnion()) {
-            for (final CypherMatchQuery q4 : q2.getUnion()){
+        for (final CypherMatchQuery q3 : q1.getSubqueries()) {
+            for (final CypherMatchQuery q4 : q2.getSubqueries()){
                 final CypherMatchQuery combination = combine(q3, q4);
                 if (!union.contains(combination)) {
                     union.add(combination);

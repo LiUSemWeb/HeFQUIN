@@ -26,7 +26,7 @@ public class CypherUnionQueryImpl implements CypherUnionQuery {
     }
 
     @Override
-    public List<CypherMatchQuery> getUnion() {
+    public List<CypherMatchQuery> getSubqueries() {
         return union;
     }
 

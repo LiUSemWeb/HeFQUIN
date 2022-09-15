@@ -66,7 +66,7 @@ public class CypherUtils {
             return isPropertyColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isPropertyColumn(q, colName)) {
                     return true;
                 }
@@ -94,7 +94,7 @@ public class CypherUtils {
             return isLabelColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isLabelColumn(q, colName)) {
                     return true;
                 }
@@ -121,7 +121,7 @@ public class CypherUtils {
             return isRelationshipTypeColumn( (CypherMatchQuery) query, colName );
         }
         else if (query instanceof CypherUnionQuery) {
-            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getUnion()) {
+            for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
                 if (isRelationshipTypeColumn(q, colName)) {
                     return true;
                 }
