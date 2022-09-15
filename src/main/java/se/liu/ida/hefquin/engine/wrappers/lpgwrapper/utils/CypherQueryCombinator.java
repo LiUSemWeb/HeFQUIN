@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.JoinCondition;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.EqualityExpression;
