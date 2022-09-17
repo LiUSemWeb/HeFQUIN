@@ -21,57 +21,77 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
 		final ExecutionContext execCtxt = createExecContext();
-		final LinkedList<ExecPlanTask> tasks = new LinkedList<>();
-		createTasks(qep, tasks, 1, execCtxt);
+		final LinkedList<ExecPlanTask> tasks = createTasks(qep, execCtxt);
 		return new TaskBasedExecutablePlanImpl(tasks, execCtxt);
 	}
 
-	protected void createTasks( final PhysicalPlan qep,
-	                            final LinkedList<ExecPlanTask> tasks,
-	                            final int preferredOutputBlockSize,
-	                            final ExecutionContext execCxt ) {
-		final ExecPlanTask newTask;
-		if ( qep.numberOfSubPlans() == 0 )
-		{
-			final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true);
-			newTask = createTaskForNullaryExecOp(execOp, execCxt, preferredOutputBlockSize);
-		}
-		else if ( qep.numberOfSubPlans() == 1 )
-		{
-			final PhysicalPlan subPlan = qep.getSubPlan(0);
-
-			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
-
-			createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
-			final ExecPlanTask childTask = tasks.getFirst();
-
-			newTask = createTaskForUnaryExecOp(execOp, childTask, execCxt, preferredOutputBlockSize);
-		}
-		else if ( qep.numberOfSubPlans() == 2 )
-		{
-			final PhysicalPlan subPlan1 = qep.getSubPlan(0);
-			final PhysicalPlan subPlan2 = qep.getSubPlan(1);
-
-			final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
-					true,
-					subPlan1.getExpectedVariables(),
-					subPlan2.getExpectedVariables() );
-
-			createTasks( subPlan1, tasks, execOp.preferredInputBlockSizeFromChild1(), execCxt );
-			final ExecPlanTask childTask1 = tasks.getFirst();
-
-			createTasks( subPlan2, tasks, execOp.preferredInputBlockSizeFromChild2(), execCxt );
-			final ExecPlanTask childTask2 = tasks.getFirst();
-
-			newTask = createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt, preferredOutputBlockSize);
-		}
-		else
-		{
-			throw new IllegalArgumentException();
-		}
-
-		tasks.addFirst(newTask);
+	protected LinkedList<ExecPlanTask> createTasks( final PhysicalPlan qep,
+	                                                final ExecutionContext execCxt ) {
+		final int preferredOutputBlockSize = 1;
+		final LinkedList<ExecPlanTask> tasks = new LinkedList<>();
+		createWorker().createTasks(qep, tasks, preferredOutputBlockSize, execCxt);
+		return tasks;
 	}
+
+	protected Worker createWorker() {
+		return new Worker();
+	}
+
+	protected class Worker
+	{
+		public void createTasks( final PhysicalPlan qep,
+		                         final LinkedList<ExecPlanTask> tasks,
+		                         final int preferredOutputBlockSize,
+		                         final ExecutionContext execCxt ) {
+			final ExecPlanTask newTask = _createTasks(qep, tasks, preferredOutputBlockSize, execCxt);
+			tasks.addFirst(newTask);
+		}
+
+		protected ExecPlanTask _createTasks( final PhysicalPlan qep,
+		                                     final LinkedList<ExecPlanTask> tasks,
+		                                     final int preferredOutputBlockSize,
+		                                     final ExecutionContext execCxt ) {
+			if ( qep.numberOfSubPlans() == 0 )
+			{
+				final NullaryExecutableOp execOp = (NullaryExecutableOp) qep.getRootOperator().createExecOp(true);
+				return createTaskForNullaryExecOp(execOp, execCxt, preferredOutputBlockSize);
+			}
+			else if ( qep.numberOfSubPlans() == 1 )
+			{
+				final PhysicalPlan subPlan = qep.getSubPlan(0);
+
+				final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
+
+				createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
+				final ExecPlanTask childTask = tasks.getFirst();
+
+				return createTaskForUnaryExecOp(execOp, childTask, execCxt, preferredOutputBlockSize);
+			}
+			else if ( qep.numberOfSubPlans() == 2 )
+			{
+				final PhysicalPlan subPlan1 = qep.getSubPlan(0);
+				final PhysicalPlan subPlan2 = qep.getSubPlan(1);
+
+				final BinaryExecutableOp execOp = (BinaryExecutableOp) qep.getRootOperator().createExecOp(
+						true,
+						subPlan1.getExpectedVariables(),
+						subPlan2.getExpectedVariables() );
+
+				createTasks( subPlan1, tasks, execOp.preferredInputBlockSizeFromChild1(), execCxt );
+				final ExecPlanTask childTask1 = tasks.getFirst();
+
+				createTasks( subPlan2, tasks, execOp.preferredInputBlockSizeFromChild2(), execCxt );
+				final ExecPlanTask childTask2 = tasks.getFirst();
+
+				return createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+			}
+			else
+			{
+				throw new IllegalArgumentException();
+			}
+		}
+
+	} // end of helper class Worker
 
 	protected abstract ExecPlanTask createTaskForNullaryExecOp( NullaryExecutableOp op,
 	                                                            ExecutionContext execCxt,
