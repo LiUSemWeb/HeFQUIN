@@ -20,7 +20,6 @@ public interface UnwindIterator extends CypherExpression{
 
     /**
      * Returns the expression that evaluates to a list, whose values are iterated through.
-     * TODO: this should return a CypherExpression Object
      */
     ListCypherExpression getListExpression();
 
