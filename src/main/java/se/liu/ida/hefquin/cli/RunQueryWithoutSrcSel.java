@@ -110,7 +110,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		if ( statsAndExceptions != null && ! statsAndExceptions.object2.isEmpty() ) {
 			final int numberOfExceptions = statsAndExceptions.object2.size();
-			System.err.println("Attention: The query result may be incomplete because the following " + numberOfExceptions + " exceptions were caught when executing the query plan.");
+			if ( numberOfExceptions > 1 )
+				System.err.println("Attention: The query result may be incomplete because the following " + numberOfExceptions + " exceptions were caught when executing the query plan.");
+			else
+				System.err.println("Attention: The query result may be incomplete because the following exception was caught when executing the query plan.");
+
 			System.err.println();
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
 				final Exception ex = statsAndExceptions.object2.get(i);

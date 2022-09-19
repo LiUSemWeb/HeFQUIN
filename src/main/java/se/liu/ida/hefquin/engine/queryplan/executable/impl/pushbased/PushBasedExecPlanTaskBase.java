@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -19,12 +22,15 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  *   task (by calling {@link #getNextIntermediateResultBlock()}).
  */
 public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
+                                                implements PushBasedExecPlanTask, IntermediateResultElementSink
 {
 	protected static final int DEFAULT_OUTPUT_BLOCK_SIZE = 50;
 
 	protected final int outputBlockSize;
 
 	private final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
+
+	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
 
 
 	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt, final int preferredMinimumBlockSize ) {
@@ -37,10 +43,27 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 	}
 
 	@Override
+	public ExecPlanTask addConnectorForAdditionalConsumer( final int preferredMinimumBlockSize ) {
+		if ( extraConnectors == null ) {
+			extraConnectors = new ArrayList<>();
+		}
+
+		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt, preferredMinimumBlockSize);
+		extraConnectors.add(c);
+		return c;
+	}
+
+	@Override
 	public final void run() {
 		setStatus(Status.RUNNING);
 
-		final IntermediateResultElementSink sink = new MyIntermediateResultElementSink();
+		if ( extraConnectors != null ) {
+			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+				c.setStatus(Status.RUNNING);
+			}
+		}
+
+		final IntermediateResultElementSink sink = this;
 
 		boolean failed       = false;
 		boolean interrupted  = false;
@@ -56,6 +79,42 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 			interrupted = true;
 		}
 
+		wrapUp(failed, interrupted);
+
+		if ( extraConnectors != null ) {
+			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+				c.wrapUp(failed, interrupted);
+			}
+		}
+	}
+
+	protected abstract void produceOutput( final IntermediateResultElementSink sink )
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException;
+
+
+	@Override
+	public void send( final SolutionMapping element ) {
+		blockBuilder.add(element);
+		// If we have collected enough solution mappings, produce the next
+		// output result block with these solution mappings and inform the
+		// consuming thread in case it is already waiting for the next block
+		if ( blockBuilder.sizeOfCurrentBlock() >= outputBlockSize ) {
+			final IntermediateResultBlock nextBlock = blockBuilder.finishCurrentBlock();
+			synchronized (availableResultBlocks) {
+				availableResultBlocks.add(nextBlock);
+				availableResultBlocks.notify();
+			}
+		}
+
+		if ( extraConnectors != null ) {
+			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+				c.send(element);
+			}
+		}
+	}
+
+	protected void wrapUp( final boolean failed, final boolean interrupted )
+	{
 		synchronized (availableResultBlocks) {
 			if ( failed ) {
 				setStatus(Status.FAILED);
@@ -87,9 +146,6 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 			}
 		}
 	}
-
-	protected abstract void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException;
 
 
 	@Override
@@ -139,24 +195,6 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 			}
 
 			return nextBlock;
-		}
-	}
-
-
-	protected class MyIntermediateResultElementSink implements IntermediateResultElementSink {
-		@Override
-		public void send( final SolutionMapping element ) {
-			blockBuilder.add(element);
-			// If we have collected enough solution mappings, produce the next
-			// output result block with these solution mappings and inform the
-			// consuming thread in case it is already waiting for the next block
-			if ( blockBuilder.sizeOfCurrentBlock() >= outputBlockSize ) {
-				final IntermediateResultBlock nextBlock = blockBuilder.finishCurrentBlock();
-				synchronized (availableResultBlocks) {
-					availableResultBlocks.add(nextBlock);
-					availableResultBlocks.notify();
-				}
-			}
 		}
 	}
 
