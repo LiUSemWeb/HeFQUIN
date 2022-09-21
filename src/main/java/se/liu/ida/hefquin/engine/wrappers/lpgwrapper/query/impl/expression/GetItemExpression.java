@@ -10,7 +10,7 @@ public class GetItemExpression implements CypherExpression {
     protected final CypherExpression expression;
     protected final int index;
 
-    public GetItemExpression(CypherExpression expression, int index) {
+    public GetItemExpression(final CypherExpression expression, final int index) {
         assert expression != null;
 
         this.expression = expression;
