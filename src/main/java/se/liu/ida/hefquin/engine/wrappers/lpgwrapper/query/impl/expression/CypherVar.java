@@ -1,8 +1,11 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 
 import java.util.Objects;
+import java.util.Set;
 
-public class CypherVar {
+public class CypherVar implements CypherExpression {
     private final String name;
 
     public CypherVar(final String name) {
@@ -30,5 +33,10 @@ public class CypherVar {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public Set<CypherVar> getVars() {
+        return Set.of(this);
     }
 }

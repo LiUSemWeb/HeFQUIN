@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 
 import java.util.HashSet;

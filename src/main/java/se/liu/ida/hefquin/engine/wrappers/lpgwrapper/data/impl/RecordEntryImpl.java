@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 public class RecordEntryImpl implements RecordEntry {
 

@@ -2,7 +2,9 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.JoinCondition;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.EqualityExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 
@@ -58,21 +60,21 @@ public class CypherQueryCombinator {
                 builder.add(m);
             }
         }
-        for (final WhereCondition c : q1.getConditions())
+        for (final BooleanCypherExpression c : q1.getConditions())
             builder.add(c);
-        for (final WhereCondition c : q2.getConditions())
+        for (final BooleanCypherExpression c : q2.getConditions())
             builder.add(c);
         for (final UnwindIterator i : q1.getIterators())
             builder.add(i);
         for (final UnwindIterator i : q2.getIterators())
             builder.add(i);
-        for (final ReturnStatement r : q1.getReturnStatements())
+        for (final AliasedExpression r : q1.getReturnExprs())
             builder.add(r);
-        for (final ReturnStatement r : q2.getReturnStatements()) {
-            if (q1.getReturnStatements().contains(r)) continue;
+        for (final AliasedExpression r : q2.getReturnExprs()) {
+            if (q1.getReturnExprs().contains(r)) continue;
             if (q1.getAliases().contains(r.getAlias())) {
-                builder.add(new JoinCondition(r.getExpression(),
-                        q1.getReturnStatements().stream().filter(x -> x.getAlias().equals(r.getAlias()))
+                builder.add(new EqualityExpression(r.getExpression(),
+                        q1.getReturnExprs().stream().filter(x -> x.getAlias().equals(r.getAlias()))
                                 .findFirst().get().getExpression()));
             } else {
                 builder.add(r);

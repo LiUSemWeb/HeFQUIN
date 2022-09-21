@@ -1,6 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -8,10 +11,10 @@ import java.util.stream.Collectors;
 public class CypherMatchQueryImpl implements CypherMatchQuery {
 
     final protected List<MatchClause> matches;
-    final protected List<WhereCondition> conditions;
+    final protected List<BooleanCypherExpression> conditions;
 
     final protected List<UnwindIterator> iterators;
-    final protected List<ReturnStatement> returnExprs;
+    final protected List<AliasedExpression> returnExprs;
 
     public CypherMatchQueryImpl() {
         matches = new ArrayList<>();
@@ -20,8 +23,8 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
         iterators = new ArrayList<>();
     }
 
-    public CypherMatchQueryImpl(final List<MatchClause> matches, final List<WhereCondition> conditions,
-                                final List<UnwindIterator> iterators, final List<ReturnStatement> returnExprs) {
+    public CypherMatchQueryImpl(final List<MatchClause> matches, final List<BooleanCypherExpression> conditions,
+                                final List<UnwindIterator> iterators, final List<AliasedExpression> returnExprs) {
         assert matches != null;
         assert  returnExprs != null;
 
@@ -37,7 +40,7 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     @Override
-    public List<WhereCondition> getConditions() {
+    public List<BooleanCypherExpression> getConditions() {
         return conditions;
     }
 
@@ -47,13 +50,13 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     @Override
-    public List<ReturnStatement> getReturnStatements() {
+    public List<AliasedExpression> getReturnExprs() {
         return returnExprs;
     }
 
     @Override
     public List<CypherVar> getAliases() {
-        return returnExprs.stream().map(ReturnStatement::getAlias).collect(Collectors.toList());
+        return returnExprs.stream().map(AliasedExpression::getAlias).collect(Collectors.toList());
     }
 
     @Override

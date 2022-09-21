@@ -1,25 +1,25 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.WhereCondition;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UnwindIteratorImpl implements UnwindIterator {
 
     protected final CypherVar innerVar;
-    //TODO: this below should be a CypherExpression
-    protected final String listExpression;
-    protected final List<WhereCondition> filters;
-    protected final List<String> returnExpressions;
+    protected final ListCypherExpression listExpression;
+    protected final List<BooleanCypherExpression> filters;
+    protected final List<CypherExpression> returnExpressions;
     protected final CypherVar alias;
 
-    public UnwindIteratorImpl(final CypherVar innerVar, final String listExpression,
-                              final List<WhereCondition> filters, final List<String> returnExpressions,
-                              final CypherVar alias) {
+    public UnwindIteratorImpl(final CypherVar innerVar, final ListCypherExpression listExpression,
+                              final List<BooleanCypherExpression> filters,
+                              final List<CypherExpression> returnExpressions, final CypherVar alias) {
         assert innerVar != null;
         assert listExpression != null;
         assert alias != null;
@@ -37,17 +37,17 @@ public class UnwindIteratorImpl implements UnwindIterator {
     }
 
     @Override
-    public String getListExpression() {
+    public ListCypherExpression getListExpression() {
         return listExpression;
     }
 
     @Override
-    public List<WhereCondition> getFilters() {
+    public List<BooleanCypherExpression> getFilters() {
         return filters;
     }
 
     @Override
-    public List<String> getReturnExpressions() {
+    public List<CypherExpression> getReturnExpressions() {
         return returnExpressions;
     }
 
@@ -84,10 +84,20 @@ public class UnwindIteratorImpl implements UnwindIterator {
             builder.append(filters.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
         }
         builder.append(" | [")
-                .append(String.join(", ", returnExpressions))
+                .append(returnExpressions.stream().map(Objects::toString).collect(Collectors.joining(", ")))
                 .append("]] AS ")
                 .append(alias);
         return builder.toString();
     }
 
+    @Override
+    public Set<CypherVar> getVars() {
+        final Set<CypherVar> res = new HashSet<>(listExpression.getVars());
+        for (final CypherExpression c : filters)
+            res.addAll(c.getVars());
+        for (final CypherExpression c : returnExpressions)
+            res.addAll(c.getVars());
+        res.add(alias);
+        return res;
+    }
 }

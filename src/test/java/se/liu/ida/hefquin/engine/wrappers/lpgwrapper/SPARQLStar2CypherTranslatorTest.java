@@ -14,13 +14,11 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.UnwindIteratorImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.condition.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.UnwindIteratorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.returns.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
@@ -63,6 +61,9 @@ public class SPARQLStar2CypherTranslatorTest {
 
     final Set<Node> emptySet = Collections.emptySet();
 
+    final LiteralExpression id22 = new LiteralExpression("22");
+    final LiteralExpression id23 = new LiteralExpression("23");
+
     @Before
     public void resetVarGenerator() {
         gen = new CypherVarGenerator();
@@ -77,9 +78,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new NodeLabelCondition(a1, "Person"))
-                        .add(new CountLargerThanZeroReturnStatement(a2))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new VariableLabelExpression(a1, "Person"))
+                        .add(new AliasedExpression(new CountLargerThanZeroExpression(), a2))
                         .build(),
                 translation
         );
@@ -95,9 +96,10 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new PropertyValueCondition(a1, "name", "Uma Thurman"))
-                        .add(new CountLargerThanZeroReturnStatement(a2))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a1, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new AliasedExpression(new CountLargerThanZeroExpression(), a2))
                         .build(),
                 translation);
     }
@@ -111,10 +113,10 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, a3))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new EdgeLabelCondition(a2, "directed"))
-                        .add(new NodeIDCondition(a3, "23"))
-                        .add(new CountLargerThanZeroReturnStatement(a4))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new VariableLabelExpression(a2, "directed"))
+                        .add(new EqualityExpression(new VariableIDExpression(a3), id23))
+                        .add(new AliasedExpression(new CountLargerThanZeroExpression(), a4))
                         .build(),
                 translation);
     }
@@ -130,13 +132,15 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(v1))
-                                .add(new PropertyValueCondition(v1, "name", "Quentin Tarantino"))
-                                .add(new VariableReturnStatement(v1, ret1))
+                                .add(new EqualityExpression(new PropertyAccessExpression(v1, "name"),
+                                        new LiteralExpression("Quentin Tarantino")))
+                                .add(new AliasedExpression(v1, ret1))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(src1, edge1, tgt1))
-                                .add(new PropertyValueCondition(edge1, "name", "Quentin Tarantino"))
-                                .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
+                                .add(new EqualityExpression(new PropertyAccessExpression(edge1, "name"),
+                                        new LiteralExpression("Quentin Tarantino")))
+                                .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
                                 .build())
                 , translation);
     }
@@ -150,8 +154,8 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new NodeLabelCondition(v1, "Person"))
-                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new VariableLabelExpression(v1, "Person"))
+                        .add(new AliasedExpression(v1, ret1))
                         .build(),
                 translation);
     }
@@ -165,9 +169,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, a2))
-                        .add(new NodeIDCondition(a2, "22"))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a2), id22))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new AliasedExpression(v1, ret1))
                         .build(),
                 translation);
     }
@@ -181,8 +185,8 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new NodeIDCondition(v1, "22"))
-                        .add(new LabelsReturnStatement(v1, ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(v1), id22))
+                        .add(new AliasedExpression(new LabelsExpression(v1), ret1))
                         .build(),
                 translation);
     }
@@ -196,9 +200,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new PropertyEXISTSCondition(a1, "name"))
-                        .add(new PropertyValueReturnStatement(a1, "name", ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a1, "name")))
+                        .add(new AliasedExpression(new PropertyAccessExpression(a1, "name"), ret1))
                         .build(),
                 translation);
     }
@@ -212,9 +216,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, v1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new EdgeLabelCondition(a2, "DIRECTED"))
-                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new VariableLabelExpression(a2, "DIRECTED"))
+                        .add(new AliasedExpression(v1, ret1))
                         .build(),
                 translation);
     }
@@ -228,9 +232,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, v1, a2))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new NodeIDCondition(a2, "23"))
-                        .add(new RelationshipTypeReturnStatement(v1, ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new EqualityExpression(new VariableIDExpression(a2), id23))
+                        .add(new AliasedExpression(new TypeExpression(v1), ret1))
                         .build(),
                 translation);
     }
@@ -245,11 +249,13 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a1 + ")",
-                                List.of(new PropertyValueConditionWithVar(a1, vark, "Quentin Tarantino")),
-                                List.of("k"), a2))
-                        .add(new VariableGetItemReturnStatement(a2, 0, ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1),
+                                List.of(new EqualityExpression(
+                                        new PropertyAccessWithVarExpression(a1, vark),
+                                        new LiteralExpression("Quentin Tarantino"))),
+                                List.of(vark), a2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret1))
                         .build(),
                 translation);
     }
@@ -263,9 +269,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, node22.getId()))
-                        .add(new NodeLabelCondition(a1, "Person"))
-                        .add(new LiteralValueReturnStatement("label", ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new VariableLabelExpression(a1, "Person"))
+                        .add(new AliasedExpression(new LiteralExpression("label"), ret1))
                         .build(),
                 translation);
     }
@@ -279,8 +285,8 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new LabelsReturnStatement(v1, ret2))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(new LabelsExpression(v1), ret2))
                         .build(),
                 translation);
     }
@@ -294,9 +300,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, v2))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableReturnStatement(v2, ret2))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(v2, ret2))
                         .build(),
                 translation);
     }
@@ -311,15 +317,15 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(src1, edge1, tgt1))
-                                .add(new PropertyEXISTSCondition(edge1, "name"))
-                                .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
-                                .add(new PropertyValueReturnStatement(edge1, "name", ret2))
+                                .add(new EXISTSExpression(new PropertyAccessExpression(edge1, "name")))
+                                .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
+                                .add(new AliasedExpression(new PropertyAccessExpression(edge1, "name"), ret2))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(v1))
-                                .add(new PropertyEXISTSCondition(v1, "name"))
-                                .add(new VariableReturnStatement(v1, ret1))
-                                .add(new PropertyValueReturnStatement(v1, "name", ret2)).build()),
+                                .add(new EXISTSExpression(new PropertyAccessExpression(v1, "name")))
+                                .add(new AliasedExpression(v1, ret1))
+                                .add(new AliasedExpression(new PropertyAccessExpression(v1, "name"), ret2)).build()),
                 translation);
     }
 
@@ -332,9 +338,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new NodeLabelCondition(v1, "Person"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new LiteralValueReturnStatement("label", ret2))
+                        .add(new VariableLabelExpression(v1, "Person"))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(new LiteralExpression("label"), ret2))
                         .build(),
                 translation);
     }
@@ -348,9 +354,9 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, v2, a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new RelationshipTypeReturnStatement(v2, ret2))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(new TypeExpression(v2), ret2))
                         .build(),
                 translation);
     }
@@ -365,19 +371,23 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(src1, edge1, tgt1))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + edge1 + ")",
-                                        List.of(new PropertyValueConditionWithVar(edge1, vark, "The Matrix")),
-                                        List.of("k"), a2))
-                                .add(new TripleMapReturnStatement(src1, edge1, tgt1, ret1))
-                                .add(new VariableGetItemReturnStatement(a2, 0, ret2))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(edge1),
+                                        List.of(new EqualityExpression(
+                                                new PropertyAccessWithVarExpression(edge1, vark),
+                                                new LiteralExpression("The Matrix"))),
+                                        List.of(vark), a2))
+                                .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a2, 0), ret2))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(v1))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + v1 + ")",
-                                        List.of(new PropertyValueConditionWithVar(v1, vark, "The Matrix")),
-                                        List.of("k"), a1))
-                                .add(new VariableReturnStatement(v1, ret1))
-                                .add(new VariableGetItemReturnStatement(a1, 0, ret2))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(v1),
+                                        List.of(new EqualityExpression(
+                                                new PropertyAccessWithVarExpression(v1, vark),
+                                                new LiteralExpression("The Matrix"))),
+                                        List.of(vark), a1))
+                                .add(new AliasedExpression(v1, ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a1, 0), ret2))
                                 .build()),
                 translation);
     }
@@ -392,23 +402,23 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a1))
-                                .add(new NodeIDCondition(a1, "22"))
-                                .add(new LiteralValueReturnStatement("label", ret1))
-                                .add(new LabelsReturnStatement(a1, ret2))
+                                .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                                .add(new AliasedExpression(new LiteralExpression("label"), ret1))
+                                .add(new AliasedExpression(new LabelsExpression(a1), ret2))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a2))
-                                .add(new NodeIDCondition(a2, "22"))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
-                                        List.of("k", a2 + "[k]"), a3))
-                                .add(new VariableGetItemReturnStatement(a3, 0, ret1))
-                                .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                                .add(new EqualityExpression(new VariableIDExpression(a2), id22))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a2), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a2, vark)), a3))
+                                .add(new AliasedExpression(new GetItemExpression(a3, 0), ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a3, 1), ret2))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a4, a5, a6))
-                                .add(new NodeIDCondition(a4, "22"))
-                                .add(new RelationshipTypeReturnStatement(a5, ret1))
-                                .add(new VariableReturnStatement(a6, ret2))
+                                .add(new EqualityExpression(new VariableIDExpression(a4), id22))
+                                .add(new AliasedExpression(new TypeExpression(a5), ret1))
+                                .add(new AliasedExpression(a6, ret2))
                                 .build()),
                 translation);
     }
@@ -423,31 +433,31 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a1, a2, a3))
-                                .add(new VariableReturnStatement(a1, ret1))
-                                .add(new RelationshipTypeReturnStatement(a2, ret2))
-                                .add(new VariableReturnStatement(a3, ret3))
+                                .add(new AliasedExpression(a1, ret1))
+                                .add(new AliasedExpression(new TypeExpression(a2), ret2))
+                                .add(new AliasedExpression(a3, ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .addMatch(new NodeMatchClause(a4))
-                                .add(new VariableReturnStatement(a4, ret1))
-                                .add(new LiteralValueReturnStatement("label", ret2))
-                                .add(new LabelsReturnStatement(a4, ret3))
+                                .add(new AliasedExpression(a4, ret1))
+                                .add(new AliasedExpression(new LiteralExpression("label"), ret2))
+                                .add(new AliasedExpression(new LabelsExpression(a4), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
-                                        null, List.of("k", a5 + "[k]"), a6))
-                                .add(new VariableReturnStatement(a5, ret1))
-                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a5), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a5, vark)), a6))
+                                .add(new AliasedExpression(a5, ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 1), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
-                                        null, List.of("k", a8 + "[k]"), a10))
-                                .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
-                                .add(new VariableGetItemReturnStatement(a10, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a10, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a8), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a8, vark)), a10))
+                                .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 1), ret3))
                                 .build()),
                 translation);
     }
@@ -464,8 +474,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new PropertyValueCondition(v1, "name", "Quentin Tarantino"))
-                        .add(new VariableReturnStatement(v1, ret1))
+                        .add(new EqualityExpression(new PropertyAccessExpression(v1, "name"),
+                                new LiteralExpression("Quentin Tarantino")))
+                        .add(new AliasedExpression(v1, ret1))
                         .build()
                 , translation);
     }
@@ -480,11 +491,13 @@ public class SPARQLStar2CypherTranslatorTest {
                         emptySet, emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(v1))
-                        .add(new UnwindIteratorImpl(vark, "KEYS(" + v1 + ")",
-                                List.of(new PropertyValueConditionWithVar(v1, vark, "The Matrix")),
-                                List.of("k"), a1))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableGetItemReturnStatement(a1, 0, ret2))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(v1),
+                                List.of(new EqualityExpression(
+                                        new PropertyAccessWithVarExpression(v1, vark),
+                                        new LiteralExpression("The Matrix"))),
+                                List.of(vark), a1))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a1, 0), ret2))
                         .build(),
                 translation);
     }
@@ -499,9 +512,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         emptySet, emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, v1, v2))
-                .add(new NodeIDCondition(a1, "22"))
-                .add(new RelationshipTypeReturnStatement(v1, ret1))
-                .add(new VariableReturnStatement(v2, ret2))
+                .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                .add(new AliasedExpression(new TypeExpression(v1), ret1))
+                .add(new AliasedExpression(v2, ret2))
                 .build(), translation);
     }
 
@@ -517,23 +530,23 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a1, a2, a3))
-                                .add(new VariableReturnStatement(a1, ret1))
-                                .add(new RelationshipTypeReturnStatement(a2, ret2))
-                                .add(new VariableReturnStatement(a3, ret3))
+                                .add(new AliasedExpression(a1, ret1))
+                                .add(new AliasedExpression(new TypeExpression(a2), ret2))
+                                .add(new AliasedExpression(a3, ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .addMatch(new NodeMatchClause(a4))
-                                .add(new VariableReturnStatement(a4, ret1))
-                                .add(new LiteralValueReturnStatement("label", ret2))
-                                .add(new LabelsReturnStatement(a4, ret3))
+                                .add(new AliasedExpression(a4, ret1))
+                                .add(new AliasedExpression(new LiteralExpression("label"), ret2))
+                                .add(new AliasedExpression(new LabelsExpression(a4), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
-                                        null, List.of("k", a5 + "[k]"), a6))
-                                .add(new VariableReturnStatement(a5, ret1))
-                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a5), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a5, vark)), a6))
+                                .add(new AliasedExpression(a5, ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 1), ret3))
                                 .build()),
                 translation);
     }
@@ -549,9 +562,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         emptySet, emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, a3))
-                        .add(new VariableReturnStatement(a1, ret1))
-                        .add(new RelationshipTypeReturnStatement(a2, ret2))
-                        .add(new VariableReturnStatement(a3, ret3))
+                        .add(new AliasedExpression(a1, ret1))
+                        .add(new AliasedExpression(new TypeExpression(a2), ret2))
+                        .add(new AliasedExpression(a3, ret3))
                         .build(),
                 translation);
     }
@@ -566,9 +579,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         Collections.singleton(o), emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
-                        .add(new NodeIDCondition(a1, "22"))
-                        .add(new LiteralValueReturnStatement("label", ret1))
-                        .add(new LabelsReturnStatement(a1, ret2))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id22))
+                        .add(new AliasedExpression(new LiteralExpression("label"), ret1))
+                        .add(new AliasedExpression(new LabelsExpression(a1), ret2))
                         .build(),
                 translation);
     }
@@ -583,9 +596,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         Collections.singleton(o), emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .addMatch(new NodeMatchClause(a4))
-                        .add(new VariableReturnStatement(a4, ret1))
-                        .add(new LiteralValueReturnStatement("label", ret2))
-                        .add(new LabelsReturnStatement(a4, ret3))
+                        .add(new AliasedExpression(a4, ret1))
+                        .add(new AliasedExpression(new LiteralExpression("label"), ret2))
+                        .add(new AliasedExpression(new LabelsExpression(a4), ret3))
                         .build(),
                 translation);
     }
@@ -600,11 +613,11 @@ public class SPARQLStar2CypherTranslatorTest {
                         Collections.singleton(p), emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
-                        .add(new NodeIDCondition(a2, "22"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
-                                List.of("k", a2 + "[k]"), a3))
-                        .add(new VariableGetItemReturnStatement(a3, 0, ret1))
-                        .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                        .add(new EqualityExpression(new VariableIDExpression(a2), id22))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a2), null,
+                                List.of(vark, new PropertyAccessWithVarExpression(a2, vark)), a3))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 0), ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 1), ret2))
                         .build(),
                 translation);
     }
@@ -619,11 +632,11 @@ public class SPARQLStar2CypherTranslatorTest {
                         emptySet, Collections.singleton(o)).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
-                        .add(new NodeIDCondition(a2, "22"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS(" + a2 + ")", null,
-                                List.of("k", a2 + "[k]"), a3))
-                        .add(new VariableGetItemReturnStatement(a3, 0, ret1))
-                        .add(new VariableGetItemReturnStatement(a3, 1, ret2))
+                        .add(new EqualityExpression(new VariableIDExpression(a2), id22))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a2), null,
+                                List.of(vark, new PropertyAccessWithVarExpression(a2, vark)), a3))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 0), ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 1), ret2))
                         .build(),
                 translation);
     }
@@ -640,19 +653,19 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
-                                        null, List.of("k", a5 + "[k]"), a6))
-                                .add(new VariableReturnStatement(a5, ret1))
-                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a5), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a5, vark)), a6))
+                                .add(new AliasedExpression(a5, ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 1), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
-                                        null, List.of("k", a8 + "[k]"), a10))
-                                .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
-                                .add(new VariableGetItemReturnStatement(a10, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a10, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a8), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a8, vark)), a10))
+                                .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 1), ret3))
                                 .build()),
                 translation);
     }
@@ -669,19 +682,19 @@ public class SPARQLStar2CypherTranslatorTest {
                 new CypherUnionQueryImpl(
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a5 + ")",
-                                        null, List.of("k", a5 + "[k]"), a6))
-                                .add(new VariableReturnStatement(a5, ret1))
-                                .add(new VariableGetItemReturnStatement(a6, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a6, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a5), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a5, vark)), a6))
+                                .add(new AliasedExpression(a5, ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a6, 1), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new EdgeMatchClause(a7, a8, a9))
-                                .add(new UnwindIteratorImpl(vark, "KEYS(" + a8 + ")",
-                                        null, List.of("k", a8 + "[k]"), a10))
-                                .add(new TripleMapReturnStatement(a7, a8, a9, ret1))
-                                .add(new VariableGetItemReturnStatement(a10, 0, ret2))
-                                .add(new VariableGetItemReturnStatement(a10, 1, ret3))
+                                .add(new UnwindIteratorImpl(vark, new KeysExpression(a8), null,
+                                        List.of(vark, new PropertyAccessWithVarExpression(a8, vark)), a10))
+                                .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), ret1))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 0), ret2))
+                                .add(new AliasedExpression(new GetItemExpression(a10, 1), ret3))
                                 .build()),
                 translation);
     }
@@ -696,9 +709,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         Collections.singleton(p), emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a4, a5, a6))
-                        .add(new NodeIDCondition(a4, "22"))
-                        .add(new RelationshipTypeReturnStatement(a5, ret1))
-                        .add(new VariableReturnStatement(a6, ret2))
+                        .add(new EqualityExpression(new VariableIDExpression(a4), id22))
+                        .add(new AliasedExpression(new TypeExpression(a5), ret1))
+                        .add(new AliasedExpression(a6, ret2))
                         .build(),
                 translation);
     }
@@ -713,9 +726,9 @@ public class SPARQLStar2CypherTranslatorTest {
                         Collections.singleton(p), emptySet, emptySet, emptySet).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, a3))
-                        .add(new VariableReturnStatement(a1, ret1))
-                        .add(new RelationshipTypeReturnStatement(a2, ret2))
-                        .add(new VariableReturnStatement(a3, ret3))
+                        .add(new AliasedExpression(a1, ret1))
+                        .add(new AliasedExpression(new TypeExpression(a2), ret2))
+                        .add(new AliasedExpression(a3, ret3))
                         .build(),
                 translation);
     }
@@ -730,10 +743,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, v2))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new PropertyValueCondition(a1, "certainty", "0.8"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableReturnStatement(v2, ret2))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a1, "certainty"),
+                                new LiteralExpression("0.8")))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(v2, ret2))
                 .build(),
                 translation);
     }
@@ -747,11 +761,11 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, v2))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new PropertyEXISTSCondition(a1, "certainty"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableReturnStatement(v2, ret2))
-                        .add(new PropertyValueReturnStatement(a1, "certainty", ret3))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a1, "certainty")))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(v2, ret2))
+                        .add(new AliasedExpression(new PropertyAccessExpression(a1, "certainty"), ret3))
                         .build(),
                 translation);
     }
@@ -765,13 +779,14 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, v2))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS("+a1+")",
-                                List.of(new PropertyValueConditionWithVar(a1, vark, "0.8")),
-                                List.of("k"), a2))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableReturnStatement(v2, ret2))
-                        .add(new VariableGetItemReturnStatement(a2, 0, ret3))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1),
+                                List.of(new EqualityExpression(new PropertyAccessWithVarExpression(a1, vark),
+                                        new LiteralExpression("0.8"))),
+                                List.of(vark), a2))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(v2, ret2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret3))
                         .build(),
                 translation);
     }
@@ -785,13 +800,13 @@ public class SPARQLStar2CypherTranslatorTest {
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v1, a1, v2))
-                        .add(new EdgeLabelCondition(a1, "DIRECTED"))
-                        .add(new UnwindIteratorImpl(vark, "KEYS("+a1+")", null,
-                                List.of("k", a1+"[k]"), a2))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new VariableReturnStatement(v2, ret2))
-                        .add(new VariableGetItemReturnStatement(a2, 0, ret3))
-                        .add(new VariableGetItemReturnStatement(a2, 1, new CypherVar("ret4")))
+                        .add(new VariableLabelExpression(a1, "DIRECTED"))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1), null,
+                                List.of(vark, new PropertyAccessWithVarExpression(a1, vark)), a2))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(v2, ret2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret3))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 1), new CypherVar("ret4")))
                         .build(),
                 translation);
     }
@@ -812,15 +827,17 @@ public class SPARQLStar2CypherTranslatorTest {
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new EdgeMatchClause(v2, a1, v1))
-                        .add(new PropertyEXISTSCondition(v1, "released"))
-                        .add(new EdgeLabelCondition(a1, "ACTED_IN"))
-                        .add(new PropertyValueCondition(a1, "source", "IMDB"))
-                        .add(new NodeLabelCondition(v2, "Person"))
-                        .add(new PropertyValueCondition(v2, "name", "Uma Thurman"))
-                        .add(new NodeLabelCondition(v1, "Movie"))
-                        .add(new VariableReturnStatement(v1, ret1))
-                        .add(new PropertyValueReturnStatement(v1, "released", ret2))
-                        .add(new VariableReturnStatement(v2, ret3))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(v1, "released")))
+                        .add(new VariableLabelExpression(a1, "ACTED_IN"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a1, "source"),
+                                new LiteralExpression("IMDB")))
+                        .add(new VariableLabelExpression(v2, "Person"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(v2, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new VariableLabelExpression(v1, "Movie"))
+                        .add(new AliasedExpression(v1, ret1))
+                        .add(new AliasedExpression(new PropertyAccessExpression(v1, "released"), ret2))
+                        .add(new AliasedExpression(v2, ret3))
                         .build(),
                 translation);
     }
@@ -837,12 +854,13 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeMatchClause(a2))
-                        .add(new NodeIDCondition(a1, "23"))
-                        .add(new PropertyEXISTSCondition(a1, "name"))
-                        .add(new NodeIDCondition(a2, "22"))
-                        .add(new PropertyEXISTSCondition(a2, "name"))
-                        .add(new JoinCondition(a2+".name", a1+".name"))
-                        .add(new PropertyValueReturnStatement(a1, "name", ret1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id23))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a1, "name")))
+                        .add(new EqualityExpression(new VariableIDExpression(a2), id22))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a2, "name")))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a2, "name"),
+                                new PropertyAccessExpression(a1, "name")))
+                        .add(new AliasedExpression(new PropertyAccessExpression(a1, "name"), ret1))
                         .build(),
                 translation);
     }
