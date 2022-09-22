@@ -72,7 +72,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             if (result == null){
                 result = tpTranslation;
             } else {
-                result = CypherQueryCombinator.combine(result, tpTranslation);
+                result = CypherQueryCombinator.combine(result, tpTranslation, gen);
             }
         }
         return new Pair<>(result, gen.getReverseMap());
