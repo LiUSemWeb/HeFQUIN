@@ -75,8 +75,10 @@ public class CypherQueryCombinator {
                     && x.getVars().contains(i.getAlias()))) {
                 builder.add(i);
             } else {
+                final List<UnwindIterator> list = new ArrayList<>();
+                list.add(i);
                 iteratorJoin.put(q1.getReturnExprs().stream().filter(x -> x.getVars().contains(i.getAlias()))
-                        .findFirst().get().getAlias(), List.of(i));
+                        .findFirst().get().getAlias(), list);
             }
         }
         for (final UnwindIterator i : q2.getIterators()) {
@@ -84,7 +86,7 @@ public class CypherQueryCombinator {
                     && x.getVars().contains(i.getAlias()))) {
                 builder.add(i);
             } else {
-                iteratorJoin.get(q1.getReturnExprs().stream().filter(x -> x.getVars().contains(i.getAlias()))
+                iteratorJoin.get(q2.getReturnExprs().stream().filter(x -> x.getVars().contains(i.getAlias()))
                         .findFirst().get().getAlias()).add(i);
             }
         }
@@ -92,51 +94,68 @@ public class CypherQueryCombinator {
         for (final Map.Entry<CypherVar,List<UnwindIterator>> e : iteratorJoin.entrySet()) {
             final UnwindIterator u1 = e.getValue().get(0);
             final UnwindIterator u2 = e.getValue().get(1);
-            final List<BooleanCypherExpression> filters = new ArrayList<>(u1.getFilters());
-            filters.addAll(u2.getFilters());
-            final List<CypherExpression> retExprs = new ArrayList<>(u1.getReturnExpressions());
-            for (final CypherExpression ex : u2.getReturnExpressions()) {
-                if (! retExprs.contains(ex))
-                    retExprs.add(ex);
-            }
             final CypherVar anonVar = gen.getAnonVar();
-            unwindVarsMap.put(e.getKey(), anonVar);
-            builder.add(new UnwindIteratorImpl(u1.getInnerVar(),
-                    combineLists(u1.getListExpression(), u2.getListExpression()),
-                    filters, retExprs, anonVar));
+            unwindVarsMap.put(u1.getAlias(), anonVar);
+            unwindVarsMap.put(u2.getAlias(), anonVar);
+            builder.add(combineLists(u1, u2, anonVar));
         }
+        List<AliasedExpression> combinedAliasedExpressions = new ArrayList<>();
         for (final AliasedExpression r : q1.getReturnExprs()) {
-            if (iteratorJoin.containsKey(r.getAlias())){
-                if (r.getExpression() instanceof GetItemExpression) {
-                    final GetItemExpression ex = (GetItemExpression) r.getExpression();
-                    builder.add(new AliasedExpression(new GetItemExpression(
-                        unwindVarsMap.get(r.getAlias()), ex.getIndex()), r.getAlias()));
-                } else {
-                    throw new IllegalArgumentException("Joins involving UNWIND variables need to return GetItem expressions");
-                }
+            if (r.getExpression() instanceof GetItemExpression) {
+                final GetItemExpression ex = (GetItemExpression) r.getExpression();
+                final CypherVar unwindVar = (CypherVar) ex.getExpression();
+                if (unwindVarsMap.containsKey(unwindVar)) {
+                    combinedAliasedExpressions.add(new AliasedExpression(new GetItemExpression(
+                            unwindVarsMap.get(unwindVar), ex.getIndex()), r.getAlias()));
+                } else combinedAliasedExpressions.add(r);
             } else {
-                builder.add(r);
+                combinedAliasedExpressions.add(r);
             }
         }
         for (final AliasedExpression r : q2.getReturnExprs()) {
-            if (q1.getReturnExprs().contains(r)) continue;
-            if (iteratorJoin.containsKey(r.getAlias())) continue;
-            if (q1.getAliases().contains(r.getAlias())) {
+            final AliasedExpression mappedR;
+            if (r.getExpression() instanceof GetItemExpression) {
+                final GetItemExpression ex = (GetItemExpression) r.getExpression();
+                final CypherVar unwindVar = (CypherVar) ex.getExpression();
+                if (unwindVarsMap.containsKey(unwindVar)) {
+                    mappedR = new AliasedExpression(new GetItemExpression(unwindVarsMap.get(unwindVar),
+                            ex.getIndex()), r.getAlias());
+                } else {
+                    mappedR = r;
+                }
+            } else {
+                mappedR = r;
+            }
+            if (combinedAliasedExpressions.contains(mappedR)) {
+                continue;
+            }
+            if (q1.getAliases().contains(mappedR.getAlias())) {
                 final AliasedExpression r1 = q1.getReturnExprs().stream()
                         .filter(x -> x.getAlias().equals(r.getAlias())).findFirst().get();
                 if (!uvars2.containsAll(r.getVars()) && !uvars1.containsAll(r1.getVars())) {
                     builder.add(new EqualityExpression(r.getExpression(), r1.getExpression()));
                 }
             } else {
-                builder.add(r);
+                combinedAliasedExpressions.add(mappedR);
             }
+        }
+        for (final AliasedExpression ex : combinedAliasedExpressions) {
+            builder.add(ex);
         }
         return builder.build();
     }
 
-    private static ListCypherExpression combineLists(final ListCypherExpression l1,
-                                                     final ListCypherExpression l2) {
-        return null;
+    private static UnwindIterator combineLists(final UnwindIterator u1, final UnwindIterator u2,
+                                               final CypherVar anonVar) {
+        final List<BooleanCypherExpression> filters = new ArrayList<>(u1.getFilters());
+        filters.addAll(u2.getFilters());
+        filters.add(new MembershipExpression(u1.getInnerVar(), u2.getListExpression()));
+        final List<CypherExpression> retExprs = new ArrayList<>(u1.getReturnExpressions());
+        for (final CypherExpression ex : u2.getReturnExpressions()) {
+            if (! retExprs.contains(ex))
+                retExprs.add(ex);
+        }
+        return new UnwindIteratorImpl(u1.getInnerVar(), u1.getListExpression(), filters, retExprs, anonVar);
     }
 
     private static boolean hasInvalidJoins(final CypherMatchQuery q1, final CypherMatchQuery q2) {

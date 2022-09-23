@@ -43,4 +43,8 @@ public class GetItemExpression implements CypherExpression {
     public int getIndex() {
         return index;
     }
+
+    public CypherExpression getExpression() {
+        return expression;
+    }
 }

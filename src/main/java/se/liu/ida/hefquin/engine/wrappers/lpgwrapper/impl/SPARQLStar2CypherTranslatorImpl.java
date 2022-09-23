@@ -570,9 +570,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar pvar = gen.getVarFor(p);
         final CypherVar ovar = gen.getVarFor(o);
         final CypherVar a1 = gen.getAnonVar();
+        //In general, we shouldn't reuse parts of queries, because it messes with the order of anonymous variables
         if (certainNodes.contains(o) || isEdgeCompatible){
             return new CypherQueryBuilder()
-                    //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .add(new EdgeMatchClause(a1, pvar, ovar))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
                             new LiteralExpression(node.getId())))
@@ -580,48 +580,65 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(ovar, gen.getRetVar(o)))
                     .build();
         }
-
-        final CypherVar a2 = gen.getAnonVar();
-        final CypherMatchQuery qLabels = new CypherQueryBuilder()
-                .add(new NodeMatchClause(a1))
-                .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(node.getId())))
-                .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
-                .build();
         if (certainNodeLabels.contains(o)){
-            return qLabels;
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a1))
+                    .add(new EqualityExpression(new VariableIDExpression(a1),
+                            new LiteralExpression(node.getId())))
+                    .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                    .build();
         }
-
-        final CypherVar iterVar = gen.getAnonVar();
+        final CypherVar a2 = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
+        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)){
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a1))
+                    .add(new EqualityExpression(new VariableIDExpression(a1),
+                            new LiteralExpression(node.getId())))
+                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), null,
+                            List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
+                    .build();
+        }
+        final CypherVar a3 = gen.getAnonVar();
+        if (certainEdgeLabels.contains(p)){
+            return new CypherQueryBuilder()
+                    .add(new EdgeMatchClause(a1, a2, a3))
+                    .add(new EqualityExpression(new VariableIDExpression(a1),
+                            new LiteralExpression(node.getId())))
+                    .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                    .add(new AliasedExpression(a3, gen.getRetVar(o)))
+                    .build();
+        }
         final CypherVar a4 = gen.getAnonVar();
         final CypherVar a5 = gen.getAnonVar();
         final CypherVar a6 = gen.getAnonVar();
-        final CypherMatchQuery qEdges = new CypherQueryBuilder()
-                .add(new EdgeMatchClause(a4, a5, a6))
-                .add(new EqualityExpression(new VariableIDExpression(a4),
-                        new LiteralExpression(node.getId())))
-                .add(new AliasedExpression(new TypeExpression(a5), gen.getRetVar(p)))
-                .add(new AliasedExpression(a6, gen.getRetVar(o)))
-                .build();
-        if (certainEdgeLabels.contains(p)){
-            return qEdges;
-        }
-
-        final CypherVar innerVar = new CypherVar("k");
-        final CypherMatchQuery qProperties = new CypherQueryBuilder()
-                .add(new NodeMatchClause(a2))
-                .add(new EqualityExpression(new VariableIDExpression(a2),
-                        new LiteralExpression(node.getId())))
-                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a2), null,
-                        List.of(innerVar, new PropertyAccessWithVarExpression(a2, innerVar)), iterVar))
-                .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
-                .add(new AliasedExpression(new GetItemExpression(iterVar, 1), gen.getRetVar(o)))
-                .build();
-        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)){
-            return qProperties;
-        }
-        return new CypherUnionQueryImpl(qLabels, qProperties, qEdges);
+        return new CypherUnionQueryImpl(
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new EqualityExpression(new VariableIDExpression(a1),
+                                new LiteralExpression(node.getId())))
+                        .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
+                        .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a2))
+                        .add(new EqualityExpression(new VariableIDExpression(a2),
+                                new LiteralExpression(node.getId())))
+                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a2), null,
+                                List.of(innerVar, new PropertyAccessWithVarExpression(a2, innerVar)), a3))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 0), gen.getRetVar(p)))
+                        .add(new AliasedExpression(new GetItemExpression(a3, 1), gen.getRetVar(o)))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a4, a5, a6))
+                        .add(new EqualityExpression(new VariableIDExpression(a4),
+                                new LiteralExpression(node.getId())))
+                        .add(new AliasedExpression(new TypeExpression(a5), gen.getRetVar(p)))
+                        .add(new AliasedExpression(a6, gen.getRetVar(o)))
+                        .build());
     }
 
     protected static CypherQuery getVarVarVar(final Node s, final Node p, final Node o,
