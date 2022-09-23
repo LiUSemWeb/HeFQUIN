@@ -19,6 +19,16 @@ public class TableRecordImpl implements TableRecord {
     }
 
     @Override
+    public int size() {
+        return entries.size();
+    }
+
+    @Override
+    public RecordEntry getEntry(int i) {
+        return entries.get(i);
+    }
+
+    @Override
     public String toString() {
         return entries.toString();
     }
