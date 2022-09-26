@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     private List<AliasedExpression> getRelevantReturnExpressions(final CypherQuery query) {
         if (query instanceof CypherMatchQuery)
             return ((CypherMatchQuery) query).getReturnExprs();
-        return null;
+        return ((CypherUnionQuery) query).getSubqueries().get(0).getReturnExprs();
     }
 
     @Override
