@@ -10,7 +10,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
+import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.vocabulary.OWL2;
 
@@ -107,25 +107,74 @@ public class EntityMappingImpl implements EntityMapping
 
 	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		final Set<SolutionMapping> newMappings = new HashSet<SolutionMapping>();
+		final Set<Map<Var,Node>> cartesianProduct = new HashSet<>();
 		final Binding binding = sm.asJenaBinding();
 		final Iterator<Var> it = binding.vars();
+		
+		final Var firstVar = it.next(); // Create a number of single var-node combinations to populate the set with.
+		final Node firstNode = binding.get(firstVar);
+		if (firstNode.isURI()) {
+			final Set<Node> mappedNodes = g2lMap.get(firstNode);
+			if (mappedNodes == null) { // Local Node not different from global. 
+				final Map<Var,Node> newMap = new HashMap<>();
+				newMap.put(firstVar,firstNode);
+				cartesianProduct.add(newMap);
+			} else { // Local different from global exists, use that.
+				for (Node node : mappedNodes) {
+					final Map<Var,Node> newMap = new HashMap<>();
+					newMap.put(firstVar,node);
+					cartesianProduct.add(newMap);
+				}
+			}
+		} else {
+			final Map<Var,Node> newMap = new HashMap<>();
+			newMap.put(firstVar,firstNode);
+			cartesianProduct.add(newMap);
+		}
+		
 		while (it.hasNext()) {
 			final Var var = it.next();
 			final Node node = binding.get(var);
-			final Set<Node> mappedNodes = g2lMap.get(node);
-			if (mappedNodes == null) { // Local Node not different from global. 
-				final Binding newBinding = BindingFactory.binding(var,node);
-				final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
-				newMappings.add(newMapping);
-			} else { // Local different from global exists, use that.
-				for (final Node localNode : mappedNodes) {
-					final Binding newBinding = BindingFactory.binding(var,localNode);
-					final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
-					newMappings.add(newMapping);
+			if (node.isURI()) {
+				final Set<Node> mappedNodes = g2lMap.get(node);
+				if (mappedNodes == null) { // Local Node not different from global. 
+					for(Map<Var,Node> map : cartesianProduct) { // Multiply by one by adding the pair to all existing combinations.
+						map.put(var, node);
+					}
+				} else { // Local different from global exists, use that.
+					final Set<Map<Var,Node>> newCartesianProducts = new HashSet<>();
+					for(Map<Var,Node> map : cartesianProduct) {
+						final Iterator<Node> nodeIt = mappedNodes.iterator();
+						final Node newNode = nodeIt.next(); // Add the first of the combinations to each map.
+						map.put(var, newNode);
+						
+						while (nodeIt.hasNext()) { // Add the rest of the multiplications from 2 thru n, if such exists.
+							final Node anotherNewNode = it.next();
+							final Map<Var,Node> newMap = new HashMap<>();
+							newMap.putAll(map);
+							newMap.replace(var, anotherNewNode);
+							newCartesianProducts.add(newMap);
+						}
+					}
+					cartesianProduct.addAll(newCartesianProducts); // Merge the two to create the next step cartesian product.
+				}
+			} else {
+				for(Map<Var,Node> map : cartesianProduct) { // Multiply by one by adding the pair to all existing combinations.
+					map.put(var, node);
 				}
 			}
 		}
+
+		final Set<SolutionMapping> newMappings = new HashSet<SolutionMapping>();
+		
+		for (Map<Var,Node> map : cartesianProduct) { // For each entry in the product, create a builder, build the binding, and make it a solution mapping.
+			final BindingBuilder builder = BindingBuilder.create();
+			map.forEach((var,node) -> builder.add(var, node));
+			final Binding newBinding = builder.build();
+			final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
+			newMappings.add(newMapping);
+		}
+		
 		return newMappings;
 	}
 
