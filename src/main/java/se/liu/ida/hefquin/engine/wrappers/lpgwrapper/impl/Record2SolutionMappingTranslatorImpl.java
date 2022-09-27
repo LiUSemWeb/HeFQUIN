@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.Binding0;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -12,7 +11,9 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNodeValue;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.MapValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
@@ -25,12 +26,16 @@ import java.util.Map;
 
 public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMappingTranslator {
 
+    private CypherExpression currentMarker =  null;
+    List<AliasedExpression> returnExpressions = null;
+
     @Override
     public SolutionMapping translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
                                            final CypherQuery query, final Map<CypherVar, Var> varMap) {
         final BindingBuilder builder = Binding.builder();
         final int n = record.size();
-        final List<AliasedExpression> returnExpressions = getRelevantReturnExpressions(query);
+        if (returnExpressions == null)
+            returnExpressions = getRelevantReturnExpressions(0, query);
 
         for (int i = 0; i < n; i++) {
             final RecordEntry current = record.getEntry(i);
@@ -38,6 +43,17 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             final CypherVar alias = aExp.getAlias();
             final Var var = varMap.get(alias);
             final CypherExpression expression = aExp.getExpression();
+            if (aExp instanceof MarkerExpression) {
+                final CypherExpression dataMarker = new LiteralExpression(current.getValue().toString());
+                if (currentMarker == null) {
+                    currentMarker = expression;
+                }
+                if (! currentMarker.equals(dataMarker)) {
+                    currentMarker = dataMarker;
+                    returnExpressions = getRelevantReturnExpressions(extractIndex(dataMarker), query);
+                }
+                continue;
+            }
             if (expression instanceof CountLargerThanZeroExpression) {
                 if (current.getValue().toString().equals("true")) continue;
                 else return new SolutionMappingImpl(BindingFactory.binding());
@@ -73,10 +89,15 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
         return new SolutionMappingImpl(builder.build());
     }
 
-    private List<AliasedExpression> getRelevantReturnExpressions(final CypherQuery query) {
+    private int extractIndex(CypherExpression dataMarker) {
+        final String literal = dataMarker.toString();
+        return Integer.parseInt(literal.substring(2, literal.length()-1));
+    }
+
+    private List<AliasedExpression> getRelevantReturnExpressions(final int index, final CypherQuery query) {
         if (query instanceof CypherMatchQuery)
             return ((CypherMatchQuery) query).getReturnExprs();
-        return ((CypherUnionQuery) query).getSubqueries().get(0).getReturnExprs();
+        return ((CypherUnionQuery) query).getSubqueries().get(index).getReturnExprs();
     }
 
     @Override

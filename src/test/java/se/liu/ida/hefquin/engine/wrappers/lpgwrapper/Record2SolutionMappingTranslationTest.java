@@ -65,6 +65,7 @@ public class Record2SolutionMappingTranslationTest {
     final CypherVar a8 = new CypherVar("a8");
 
     final CypherVar vark = new CypherVar("k");
+    final CypherVar marker = new CypherVar("m1");
 
     @Test
     public void translateVarPropertyLiteralTest() throws JsonProcessingException, Neo4JException {
@@ -382,22 +383,24 @@ public class Record2SolutionMappingTranslationTest {
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(src1, edge1, tgt1))
                         .add(new EXISTSExpression(new PropertyAccessExpression(edge1, "name")))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
                         .add(new AliasedExpression(new PropertyAccessExpression(edge1, "name"), ret2))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(cpvar1))
                         .add(new EXISTSExpression(new PropertyAccessExpression(cpvar1, "name")))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(cpvar1, ret1))
                         .add(new AliasedExpression(new PropertyAccessExpression(cpvar1, "name"), ret2))
                         .build()
         );
-        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
-                "{\"row\":[{\"born\":1964,\"name\":\"Keanu\"},\"Keanu\"],\"meta\":[{\"id\":1,\"type\":\"node\"},null]}," +
-                "{\"row\":[{\"born\":1967,\"name\":\"Carrie-Anne\"},\"Carrie-Anne\"],\"meta\":[{\"id\":2,\"type\":\"node\"},null]}," +
-                "{\"row\":[{\"born\":1961,\"name\":\"Laurence\"},\"Laurence\"],\"meta\":[{\"id\":3,\"type\":\"node\"},null]}," +
-                "{\"row\":[{\"born\":1960,\"name\":\"Hugo\"},\"Hugo\"],\"meta\":[{\"id\":4,\"type\":\"node\"},null]}," +
-                "{\"row\":[{\"born\":1967,\"name\":\"Andy\"},\"Andy\"],\"meta\":[{\"id\":5,\"type\":\"node\"},null]}]}]" +
+        final String neo4jResponse = "{\"results\":[{\"columns\":[\"m1\",\"ret1\",\"ret2\"],\"data\":[" +
+                "{\"row\":[\"$1\",{\"born\":1964,\"name\":\"Keanu\"},\"Keanu\"],\"meta\":[null,{\"id\":1,\"type\":\"node\"},null]}," +
+                "{\"row\":[\"$1\",{\"born\":1967,\"name\":\"Carrie-Anne\"},\"Carrie-Anne\"],\"meta\":[null,{\"id\":2,\"type\":\"node\"},null]}," +
+                "{\"row\":[\"$1\",{\"born\":1961,\"name\":\"Laurence\"},\"Laurence\"],\"meta\":[null,{\"id\":3,\"type\":\"node\"},null]}," +
+                "{\"row\":[\"$1\",{\"born\":1960,\"name\":\"Hugo\"},\"Hugo\"],\"meta\":[null,{\"id\":4,\"type\":\"node\"},null]}," +
+                "{\"row\":[\"$1\",{\"born\":1967,\"name\":\"Andy\"},\"Andy\"],\"meta\":[null,{\"id\":5,\"type\":\"node\"},null]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
@@ -506,6 +509,7 @@ public class Record2SolutionMappingTranslationTest {
                                 List.of(new EqualityExpression(new PropertyAccessWithVarExpression(edge1, vark),
                                         new LiteralExpression("The Matrix"))),
                                 List.of(vark), a1))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
                         .add(new AliasedExpression(new GetItemExpression(a1, 0), ret2))
                         .build(),
@@ -515,13 +519,14 @@ public class Record2SolutionMappingTranslationTest {
                                 List.of(new EqualityExpression(new PropertyAccessWithVarExpression(cpvar1, vark),
                                         new LiteralExpression("The Matrix"))),
                                 List.of(vark), a2))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(cpvar1, ret1))
                         .add(new AliasedExpression(new GetItemExpression(cpvar1, 0), ret2))
                         .build()
         );
-        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"], \"data\":[{" +
-                "\"row\":[{\"title\":\"The Matrix\",\"released\":1999},[\"title\"]]," +
-                "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null]}]}]" +
+        final String neo4jResponse = "{\"results\":[{\"columns\":[\"m1\",\"ret1\",\"ret2\"], \"data\":[{" +
+                "\"row\":[\"$1\",{\"title\":\"The Matrix\",\"released\":1999},\"title\"]," +
+                "\"meta\":[null,{\"id\":0,\"type\":\"node\",\"deleted\":false},null]}]}]" +
                 ",\"errors\":[]}}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
@@ -542,6 +547,7 @@ public class Record2SolutionMappingTranslationTest {
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new EqualityExpression(new VariableIDExpression(a1), new LiteralExpression("22")))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret1))
                         .add(new AliasedExpression(new LabelsExpression(a1), ret2))
                         .build(),
@@ -550,21 +556,24 @@ public class Record2SolutionMappingTranslationTest {
                         .add(new EqualityExpression(new VariableIDExpression(a2), new LiteralExpression("22")))
                         .add(new UnwindIteratorImpl(vark, new KeysExpression(a2), null,
                                 List.of(vark, new PropertyAccessWithVarExpression(a2, vark)), a3))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(new GetItemExpression(a3, 0), ret1))
                         .add(new AliasedExpression(new GetItemExpression(a3, 1), ret2))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a3, a4, a5))
                         .add(new EqualityExpression(new VariableIDExpression(a3), new LiteralExpression("22")))
+                        .add(new MarkerExpression(2, marker))
                         .add(new AliasedExpression(new TypeExpression(a4), ret1))
                         .add(new AliasedExpression(a5, ret2))
                         .build()
         );
-        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
-                "{\"row\":[\"label\",\"Person\"],\"meta\":[null,null]}," +
-                "{\"row\":[[\"born\",\"name\"],[1968,\"Cuba Gooding Jr.\"]],\"meta\":[null,null,null,null]}," +
-                "{\"row\":[\"ACTED_IN\",{\"title\":\"What Dreams May Come\",\"released\":1998}]," +
-                    "\"meta\":[null,{\"id\":0,\"type\":\"node\"}]}]}]," +
+        final String neo4jResponse = "{\"results\":[{\"columns\":[\"m1\",\"ret1\",\"ret2\"],\"data\":[" +
+                "{\"row\":[\"$0\",\"label\",\"Person\"],\"meta\":[null,null, null]}," +
+                "{\"row\":[\"$1\",\"born\",\"1986\"],\"meta\":[null,null,null]}," +
+                "{\"row\":[\"$1\",\"name\",\"Cuba Gooding Jr.\"],\"meta\":[null,null,null]},"+
+                "{\"row\":[\"$2\",\"ACTED_IN\",{\"title\":\"What Dreams May Come\",\"released\":1998}]," +
+                    "\"meta\":[null,null,{\"id\":0,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
@@ -573,7 +582,7 @@ public class Record2SolutionMappingTranslationTest {
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabel(),
                 Var.alloc("o"), conf.mapNodeLabel("Person"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("born"),
-                Var.alloc("o"), NodeFactory.createLiteral("1968"))));
+                Var.alloc("o"), NodeFactory.createLiteral("1986"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("name"),
                 Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr."))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"),
@@ -593,12 +602,14 @@ public class Record2SolutionMappingTranslationTest {
         final CypherQuery query = new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a1, a2, a3))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(a1, ret1))
                         .add(new AliasedExpression(new TypeExpression(a2), ret2))
                         .add(new AliasedExpression(a3, ret3))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a4))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(a4, ret1))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret2))
                         .add(new AliasedExpression(new LabelsExpression(a4), ret3))
@@ -607,28 +618,34 @@ public class Record2SolutionMappingTranslationTest {
                         .add(new NodeMatchClause(a5))
                         .add(new UnwindIteratorImpl(vark, new KeysExpression(a5), null,
                                 List.of(vark, new PropertyAccessWithVarExpression(a5, vark)), a6))
+                        .add(new MarkerExpression(2, marker))
                         .add(new AliasedExpression(a5, ret1))
                         .add(new AliasedExpression(new GetItemExpression(a6, 0), ret2))
-                        .add(new AliasedExpression(new GetItemExpression(a6, 0), ret3))
+                        .add(new AliasedExpression(new GetItemExpression(a6, 1), ret3))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a7, a8, a9))
                         .add(new UnwindIteratorImpl(vark, new KeysExpression(a8), null,
                                 List.of(vark, new PropertyAccessWithVarExpression(a8, vark)), a10))
+                        .add(new MarkerExpression(3, marker))
                         .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), ret1))
                         .add(new AliasedExpression(new GetItemExpression(a10, 0), ret2))
-                        .add(new AliasedExpression(new GetItemExpression(a10, 0), ret3))
+                        .add(new AliasedExpression(new GetItemExpression(a10, 1), ret3))
                         .build()
         );
-        final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\",\"ret3\"],\"data\":[" +
-                "{\"row\":[{\"born\":1964,\"name\":\"Keanu Reeves\"},\"ACTED_IN\",{\"title\":\"The Replacements\",\"released\":2000}]," +
-                "\"meta\":[{\"id\":1,\"type\":\"node\"},null,{\"id\":87,\"type\":\"node\"}]}," +
-                "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},\"label\",\"Movie\"]," +
-                "\"meta\":[{\"id\":0,\"type\":\"node\",\"deleted\":false},null,null]}," +
-                "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},[\"title\",\"tagline\",\"released\"],[\"The Matrix\",\"Welcome to the Real World\",1999]]," +
-                "\"meta\":[{\"id\":0,\"type\":\"node\"},null,null,null,null,null,null]}," +
-                "{\"row\":[{\"edge\":\"ACTED_IN\",\"source\":{\"born\":1964,\"name\":\"Keanu Reeves\"},\"target\":{\"title\":\"The Replacements\",\"released\":2000}},[\"roles\"],[\"Shane Falco\"]]," +
-                "\"meta\":[null,{\"id\":1,\"type\":\"node\"},{\"id\":87,\"type\":\"node\"},null,null]}]}]," +
+        final String neo4jResponse = "{\"results\":[{\"columns\":[\"m1\",\"ret1\",\"ret2\",\"ret3\"],\"data\":[" +
+                "{\"row\":[\"$0\",{\"born\":1964,\"name\":\"Keanu Reeves\"},\"ACTED_IN\",{\"title\":\"The Replacements\",\"released\":2000}]," +
+                "\"meta\":[null,{\"id\":1,\"type\":\"node\"},null,{\"id\":87,\"type\":\"node\"}]}," +
+                "{\"row\":[\"$1\",{\"title\":\"The Matrix\",\"released\":1999},\"label\",\"Movie\"]," +
+                "\"meta\":[null,{\"id\":0,\"type\":\"node\",\"deleted\":false},null,null]}," +
+                "{\"row\":[\"$2\",{\"title\":\"The Matrix\",\"released\":1999},\"title\",\"The Matrix\"]," +
+                "\"meta\":[null,{\"id\":0,\"type\":\"node\"},null,null]}," +
+                "{\"row\":[\"$2\",{\"title\":\"The Matrix\",\"released\":1999},\"tagline\",\"Welcome to the Real World\"]," +
+                "\"meta\":[null,{\"id\":0,\"type\":\"node\"},null,null]}," +
+                "{\"row\":[\"$2\",{\"title\":\"The Matrix\",\"released\":1999},\"released\",1999]," +
+                "\"meta\":[null,{\"id\":0,\"type\":\"node\"},null,null]}," +
+                "{\"row\":[\"$3\",{\"e\":\"ACTED_IN\",\"s\":{\"born\":1964,\"name\":\"Keanu Reeves\"},\"t\":{\"title\":\"The Replacements\",\"released\":2000}},\"roles\",\"Shane Falco\"]," +
+                "\"meta\":[null,null,{\"id\":1,\"type\":\"node\"},{\"id\":87,\"type\":\"node\"},null,null]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
