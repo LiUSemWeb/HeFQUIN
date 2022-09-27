@@ -6,16 +6,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
-
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.vocabulary.OWL2;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.mappings.EntityMapping;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -107,24 +107,26 @@ public class EntityMappingImpl implements EntityMapping
 
 	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		/*final BiConsumer<Var,Node> apply = (var,node) -> {
-			
-		};*/
+		final Set<SolutionMapping> newMappings = new HashSet<SolutionMapping>();
 		final Binding binding = sm.asJenaBinding();
 		final Iterator<Var> it = binding.vars();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			final Var var = it.next();
 			final Node node = binding.get(var);
 			final Set<Node> mappedNodes = g2lMap.get(node);
-			if(mappedNodes == null) {
-				// No translation exists, use original node.
-			} else {
-				// Local different from global exists, use that.
+			if (mappedNodes == null) { // Local Node not different from global. 
+				final Binding newBinding = BindingFactory.binding(var,node);
+				final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
+				newMappings.add(newMapping);
+			} else { // Local different from global exists, use that.
+				for (final Node localNode : mappedNodes) {
+					final Binding newBinding = BindingFactory.binding(var,localNode);
+					final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
+					newMappings.add(newMapping);
+				}
 			}
 		}
-		
-		// TODO: implement this function
-		return Collections.singleton(sm);
+		return newMappings;
 	}
 
 	@Override
