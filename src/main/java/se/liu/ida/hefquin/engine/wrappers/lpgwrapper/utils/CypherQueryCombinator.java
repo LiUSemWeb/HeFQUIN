@@ -68,7 +68,7 @@ public class CypherQueryCombinator {
         for (final UnwindIterator i : q2.getIterators())
             builder.add(i);
         if (index > -1) {
-            builder.add(new MarkerExpression(0, new CypherVar("m1"))); //we have generator access on a different PR
+            builder.add(new MarkerExpression(index, new CypherVar("m1"))); //we have generator access on a different PR
         }
         for (final AliasedExpression r : q1.getReturnExprs()) {
             if (r instanceof MarkerExpression) continue;

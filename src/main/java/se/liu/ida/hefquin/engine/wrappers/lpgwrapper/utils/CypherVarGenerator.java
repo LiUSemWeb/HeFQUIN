@@ -18,12 +18,11 @@ public class CypherVarGenerator {
     private int edgeCount = 0;
     private int anonCount = 0;
     private int retVarCount = 0;
-    private int markerCount = 0;
 
     private static final String varPrefix = "cpvar";
     private static final String retPrefix = "ret";
     private static final String anonPrefix = "a";
-    private static final String marketPrefix = "m";
+    private static final String markerPrefix = "m";
 
     public CypherVar getVarFor(final Node n) {
         CypherVar var = innerVars.get(n.getName());
@@ -68,8 +67,7 @@ public class CypherVarGenerator {
     }
 
     public CypherVar getMarkerVar() {
-        markerCount++;
-        return new CypherVar(marketPrefix + markerCount);
+        return new CypherVar(markerPrefix);
     }
 
     public Map<CypherVar, Node> getReverseMap() {

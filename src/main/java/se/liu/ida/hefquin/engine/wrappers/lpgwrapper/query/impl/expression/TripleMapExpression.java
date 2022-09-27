@@ -43,8 +43,8 @@ public class TripleMapExpression implements CypherExpression {
     public String toString() {
         return "{" +
                 "s: " + source +
-                ", e: " + edge +
-                ", t: " + target +
+                " , e: TYPE(" + edge +
+                "), t: " + target +
                 '}';
     }
 }
