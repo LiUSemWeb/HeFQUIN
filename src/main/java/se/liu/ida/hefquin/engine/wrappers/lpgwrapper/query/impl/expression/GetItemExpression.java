@@ -39,4 +39,12 @@ public class GetItemExpression implements CypherExpression {
     public String toString() {
         return expression + "[" + index + "]";
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public CypherExpression getExpression() {
+        return expression;
+    }
 }

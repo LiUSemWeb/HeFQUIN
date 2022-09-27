@@ -60,6 +60,11 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     }
 
     @Override
+    public Set<CypherVar> getUvars() {
+        return iterators.stream().map(UnwindIterator::getAlias).collect(Collectors.toSet());
+    }
+
+    @Override
     public Set<CypherVar> getMatchVars() {
         final Set<CypherVar> result = new HashSet<>();
         for (final MatchClause m : matches){
