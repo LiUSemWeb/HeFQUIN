@@ -6,9 +6,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.vocabulary.OWL2;
 
@@ -104,6 +107,22 @@ public class EntityMappingImpl implements EntityMapping
 
 	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
+		/*final BiConsumer<Var,Node> apply = (var,node) -> {
+			
+		};*/
+		final Binding binding = sm.asJenaBinding();
+		final Iterator<Var> it = binding.vars();
+		while(it.hasNext()) {
+			final Var var = it.next();
+			final Node node = binding.get(var);
+			final Set<Node> mappedNodes = g2lMap.get(node);
+			if(mappedNodes == null) {
+				// No translation exists, use original node.
+			} else {
+				// Local different from global exists, use that.
+			}
+		}
+		
 		// TODO: implement this function
 		return Collections.singleton(sm);
 	}
