@@ -27,7 +27,7 @@ import java.util.Map;
 public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMappingTranslator {
 
     private CypherExpression currentMarker =  null;
-    List<AliasedExpression> returnExpressions = null;
+    private List<AliasedExpression> returnExpressions = null;
 
     @Override
     public SolutionMapping translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
@@ -83,6 +83,8 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 builder.add(var, NodeFactory.createLiteral(current.getValue().toString()));
             } else if (expression instanceof LiteralExpression) {
                 builder.add(var, conf.getLabel());
+            } else {
+                throw new IllegalArgumentException("Invalid Return Statement");
             }
         }
 

@@ -17,7 +17,7 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     protected final String LABEL = "http://www.w3.org/2000/01/rdf-schema#Label";
 
     @Override
-    public Node mapNode(LPGNode node) {
+    public Node mapNode(final LPGNode node) {
         return NodeFactory.createURI(NS + NODE + node.getId());
     }
 
