@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.EqualityExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 
@@ -15,11 +13,11 @@ import java.util.stream.Collectors;
 public class CypherQueryCombinator {
     public static CypherQuery combine(final CypherQuery q1, final CypherQuery q2) {
         if (q1 instanceof CypherMatchQuery && q2 instanceof CypherMatchQuery) {
-            return combineMatchMatch((CypherMatchQuery) q1, (CypherMatchQuery) q2);
+            return combineMatchMatch((CypherMatchQuery) q1, (CypherMatchQuery) q2, -1);
         } else if (q1 instanceof  CypherUnionQuery && q2 instanceof CypherMatchQuery) {
-            return combineUnionMatch((CypherUnionQuery) q1, (CypherMatchQuery) q2);
+            return combineUnionMatch((CypherUnionQuery) q1, (CypherMatchQuery) q2, 0);
         } else if (q1 instanceof CypherMatchQuery && q2 instanceof CypherUnionQuery) {
-            return combineUnionMatch((CypherUnionQuery) q2, (CypherMatchQuery) q1);
+            return combineUnionMatch((CypherUnionQuery) q2, (CypherMatchQuery) q1, 0);
         } else if (q1 instanceof CypherUnionQuery && q2 instanceof CypherUnionQuery) {
             return combineUnionUnion((CypherUnionQuery) q1, (CypherUnionQuery) q2);
         } else {
@@ -27,7 +25,8 @@ public class CypherQueryCombinator {
         }
     }
 
-    private static CypherMatchQuery combineMatchMatch(final CypherMatchQuery q1, final CypherMatchQuery q2) {
+    private static CypherMatchQuery combineMatchMatch(final CypherMatchQuery q1, final CypherMatchQuery q2,
+                                                      final int index) {
         final CypherQueryBuilder builder = new CypherQueryBuilder();
 
         final List<MatchClause> matches1 = q1.getMatches();
@@ -68,10 +67,15 @@ public class CypherQueryCombinator {
             builder.add(i);
         for (final UnwindIterator i : q2.getIterators())
             builder.add(i);
-        for (final AliasedExpression r : q1.getReturnExprs())
+        if (index > -1) {
+            builder.add(new MarkerExpression(0, new CypherVar("m1"))); //we have generator access on a different PR
+        }
+        for (final AliasedExpression r : q1.getReturnExprs()) {
+            if (r instanceof MarkerExpression) continue;
             builder.add(r);
+        }
         for (final AliasedExpression r : q2.getReturnExprs()) {
-            if (q1.getReturnExprs().contains(r)) continue;
+            if (r instanceof MarkerExpression || q1.getReturnExprs().contains(r)) continue;
             if (q1.getAliases().contains(r.getAlias())) {
                 builder.add(new EqualityExpression(r.getExpression(),
                         q1.getReturnExprs().stream().filter(x -> x.getAlias().equals(r.getAlias()))
@@ -83,27 +87,34 @@ public class CypherQueryCombinator {
         return builder.build();
     }
 
-    private static CypherUnionQuery combineUnionMatch(final CypherUnionQuery q1, final CypherMatchQuery q2) {
+    private static CypherUnionQuery combineUnionMatch(final CypherUnionQuery q1, final CypherMatchQuery q2,
+                                                      final int offset) {
         final List<CypherMatchQuery> subqueries = new ArrayList<>();
+        int index = offset;
         for (final CypherMatchQuery q : q1.getSubqueries()) {
-            final CypherMatchQuery combination = combineMatchMatch(q, q2);
+            final CypherMatchQuery combination = combineMatchMatch(q, q2, index);
             if (combination == null){
-                return null;
+                continue;
             }
+            index++;
             subqueries.add(combination);
         }
+        if (subqueries.isEmpty()) return null;
         return new CypherUnionQueryImpl(subqueries);
     }
 
     private static CypherUnionQuery combineUnionUnion(final CypherUnionQuery q1, final CypherUnionQuery q2) {
         final List<CypherMatchQuery> subqueries = new ArrayList<>();
+        int offset = 0;
         for (final CypherMatchQuery q : q1.getSubqueries()) {
-            final CypherUnionQuery combination = combineUnionMatch(q2, q);
+            final CypherUnionQuery combination = combineUnionMatch(q2, q, offset);
             if (combination == null) {
-                return null;
+                continue;
             }
+            offset += combination.getSubqueries().size();
             subqueries.addAll(combination.getSubqueries());
         }
+        if (subqueries.isEmpty()) return null;
         return new CypherUnionQueryImpl(subqueries);
     }
 
