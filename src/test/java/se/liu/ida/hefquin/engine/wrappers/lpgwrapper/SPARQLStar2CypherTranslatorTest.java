@@ -56,7 +56,7 @@ public class SPARQLStar2CypherTranslatorTest {
     final CypherVar a10 = new CypherVar("a10");
 
     final CypherVar vark = new CypherVar("k");
-    final CypherVar marker = new CypherVar("m1");
+    final CypherVar marker = new CypherVar("m");
 
     final LPGNode node22 = new LPGNode("22", null, null);
     final LPGNode node23 = new LPGNode("23", null, null);
