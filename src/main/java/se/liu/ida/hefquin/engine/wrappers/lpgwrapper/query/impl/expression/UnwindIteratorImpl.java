@@ -3,10 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnwindIteratorImpl implements UnwindIterator {
@@ -26,7 +23,7 @@ public class UnwindIteratorImpl implements UnwindIterator {
 
         this.innerVar = innerVar;
         this.listExpression = listExpression;
-        this.filters = filters;
+        this.filters = Objects.requireNonNullElseGet(filters, ArrayList::new);
         this.returnExpressions = returnExpressions;
         this.alias = alias;
     }

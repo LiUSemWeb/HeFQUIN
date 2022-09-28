@@ -22,10 +22,6 @@ public class GetItemExpression implements CypherExpression {
         return expression.getVars();
     }
 
-    public int getIndex() {
-        return index;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -42,5 +38,13 @@ public class GetItemExpression implements CypherExpression {
     @Override
     public String toString() {
         return expression + "[" + index + "]";
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public CypherExpression getExpression() {
+        return expression;
     }
 }

@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.Boole
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a Cypher Query with a MATCH-WHERE-RETURN structure,
@@ -47,5 +48,13 @@ public interface CypherMatchQuery extends CypherQuery {
      */
     List<AliasedExpression> getReturnExprs();
 
+    /**
+     * Returns a list with the aliases of each of the {@link AliasedExpression} objects contained by this query
+     */
     List<CypherVar> getAliases();
+
+    /**
+     * Returns a Set with all the aliases of the {@link UnwindIterator} objects contained by this query
+     */
+    Set<CypherVar> getUvars();
 }

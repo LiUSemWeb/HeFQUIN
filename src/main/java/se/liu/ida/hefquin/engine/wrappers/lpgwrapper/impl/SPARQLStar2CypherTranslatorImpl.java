@@ -72,7 +72,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             if (result == null){
                 result = tpTranslation;
             } else {
-                result = CypherQueryCombinator.combine(result, tpTranslation);
+                result = CypherQueryCombinator.combine(result, tpTranslation, gen);
             }
         }
         return new Pair<>(result, gen.getReverseMap());
@@ -596,9 +596,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar pvar = gen.getVarFor(p);
         final CypherVar ovar = gen.getVarFor(o);
         final CypherVar a1 = gen.getAnonVar();
+        //In general, we shouldn't reuse parts of queries, because it messes with the order of anonymous variables
         if (certainNodes.contains(o) || isEdgeCompatible){
             return new CypherQueryBuilder()
-                    //this rule in the paper uses pvar and ovar, not anonymous vars so this query can't be reused
                     .add(new EdgeMatchClause(a1, pvar, ovar))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
                             new LiteralExpression(node.getId())))
@@ -606,7 +606,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(ovar, gen.getRetVar(o)))
                     .build();
         }
-        final CypherVar a2 = gen.getAnonVar();
         if (certainNodeLabels.contains(o)){
             return new CypherQueryBuilder()
                     .add(new NodeMatchClause(a1))
@@ -614,6 +613,19 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                             new LiteralExpression(node.getId())))
                     .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
                     .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                    .build();
+        }
+        final CypherVar a2 = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
+        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)){
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a1))
+                    .add(new EqualityExpression(new VariableIDExpression(a1),
+                            new LiteralExpression(node.getId())))
+                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), null,
+                            List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
                     .build();
         }
         final CypherVar a3 = gen.getAnonVar();
@@ -626,16 +638,13 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
         }
-        final CypherVar innerVar = new CypherVar("k");
-        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)){
+        if (certainEdgeLabels.contains(p)){
             return new CypherQueryBuilder()
-                    .add(new NodeMatchClause(a1))
+                    .add(new EdgeMatchClause(a1, a2, a3))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
                             new LiteralExpression(node.getId())))
-                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), null,
-                            List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
-                    .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
-                    .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
+                    .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                    .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
         }
         final CypherVar a4 = gen.getAnonVar();

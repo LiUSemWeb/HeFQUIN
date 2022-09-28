@@ -997,4 +997,57 @@ public class SPARQLStar2CypherTranslatorTest {
         ), translation);
     }
 
+    @Test
+    public void joinOnPredicateTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var p = Var.alloc("p");
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(conf.mapNode(node23), p, NodeFactory.createLiteral("2005")),
+                new TriplePatternImpl(conf.mapNode(node22), p, Var.alloc("o"))
+        );
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeMatchClause(a3))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id23))
+                        .add(new EqualityExpression(new VariableIDExpression(a3), id22))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1),
+                                List.of(new EqualityExpression(
+                                        new PropertyAccessWithVarExpression(a1, vark),
+                                        new LiteralExpression("2005")),
+                                        new MembershipExpression(vark, new KeysExpression(a3))),
+                                List.of(vark, new PropertyAccessWithVarExpression(a3, vark)), a5))
+                        .add(new AliasedExpression(new GetItemExpression(a5, 0), ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a5, 1), ret2))
+                        .build(),
+                translation);
+    }
+
+    @Test
+    public void crossProductTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(conf.mapNode(node23), Var.alloc("p1"), NodeFactory.createLiteral("2005")),
+                new TriplePatternImpl(conf.mapNode(node22), Var.alloc("p2"), NodeFactory.createLiteral("2005"))
+        );
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new NodeMatchClause(a3))
+                        .add(new EqualityExpression(new VariableIDExpression(a1), id23))
+                        .add(new EqualityExpression(new VariableIDExpression(a3), id22))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1),
+                                List.of(new EqualityExpression(new PropertyAccessWithVarExpression(a1, vark),
+                                        new LiteralExpression("2005"))),
+                                List.of(vark), a2))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a3),
+                                List.of(new EqualityExpression(new PropertyAccessWithVarExpression(a3, vark),
+                                        new LiteralExpression("2005"))),
+                                List.of(vark), a4))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a4, 0), ret2))
+                        .build(),
+                translation);
+    }
+
 }
