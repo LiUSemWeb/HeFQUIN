@@ -30,34 +30,11 @@ public class CypherQueryCombinator {
             return null;
         }
         final CypherQueryBuilder builder = new CypherQueryBuilder();
-
-        final List<MatchClause> matches1 = q1.getMatches();
-        final List<MatchClause> matches2 = q2.getMatches();
-        final List<NodeMatchClause> nodes1 = matches1.stream().filter(x -> x instanceof NodeMatchClause)
-                .map(x -> (NodeMatchClause) x).collect(Collectors.toList());
-        final List<NodeMatchClause> nodes2 = matches2.stream().filter(x -> x instanceof NodeMatchClause)
-                .map(x -> (NodeMatchClause) x).collect(Collectors.toList());
-        final List<EdgeMatchClause> edges1 = matches1.stream().filter(x -> x instanceof EdgeMatchClause)
-                .map(x -> (EdgeMatchClause) x).collect(Collectors.toList());
-        final List<EdgeMatchClause> edges2 = matches2.stream().filter(x -> x instanceof EdgeMatchClause)
-                .map(x -> (EdgeMatchClause) x).collect(Collectors.toList());
-        for (final EdgeMatchClause m : edges1){
+        for (final MatchClause m : q1.getMatches()){
             builder.add(m);
         }
-        for (final EdgeMatchClause m : edges2) {
-            if (! edges1.contains(m)) {
-                builder.add(m);
-            }
-        }
-        for (final NodeMatchClause m : nodes1) {
-            if (edges1.stream().noneMatch(x->x.isRedundantWith(m)) &&
-                edges2.stream().noneMatch(x -> x.isRedundantWith(m))) {
-                builder.add(m);
-            }
-        }
-        for (final NodeMatchClause m : nodes2) {
-            if ((!nodes1.contains(m)) && edges1.stream().noneMatch(x->x.isRedundantWith(m)) &&
-                    edges2.stream().noneMatch(x -> x.isRedundantWith(m))) {
+        for (final MatchClause m : q2.getMatches()) {
+            if (! q1.getMatches().contains(m)) {
                 builder.add(m);
             }
         }
