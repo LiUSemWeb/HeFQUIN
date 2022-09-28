@@ -107,8 +107,14 @@ public class EntityMappingImpl implements EntityMapping
 
 	@Override
 	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		final Set<Map<Var,Node>> cartesianProduct = new HashSet<>();
 		final Binding binding = sm.asJenaBinding();
+
+		// If the given solution mapping is the empty mapping, simply return it unchanged.
+		if ( binding.isEmpty() ) {
+			return Collections.singleton(sm);
+		}
+
+		final Set<Map<Var,Node>> cartesianProduct = new HashSet<>();
 		final Iterator<Var> it = binding.vars();
 		
 		final Var firstVar = it.next(); // Create a number of single var-node combinations to populate the set with.
