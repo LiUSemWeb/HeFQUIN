@@ -22,6 +22,7 @@ public class CypherVarGenerator {
     private static final String varPrefix = "cpvar";
     private static final String retPrefix = "ret";
     private static final String anonPrefix = "a";
+    private static final String markerPrefix = "m";
 
     public CypherVar getVarFor(final Node n) {
         CypherVar var = innerVars.get(n.getName());
@@ -65,8 +66,8 @@ public class CypherVarGenerator {
         return var;
     }
 
-    public Node getReverseRetVar(final CypherVar var) {
-        return reverseRetVars.get(var);
+    public CypherVar getMarkerVar() {
+        return new CypherVar(markerPrefix);
     }
 
     public Map<CypherVar, Node> getReverseMap() {

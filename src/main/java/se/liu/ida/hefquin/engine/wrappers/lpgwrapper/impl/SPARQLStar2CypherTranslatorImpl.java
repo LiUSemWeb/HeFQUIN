@@ -308,22 +308,29 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final String property = configuration.unmapProperty(p);
         final String literal = o.getLiteralValue().toString();
         final CypherVar svar = gen.getVarFor(s);
-        final CypherMatchQuery q = new CypherQueryBuilder()
-                                    .add(new NodeMatchClause(svar))
-                                    .add(new EqualityExpression(new PropertyAccessExpression(svar, property),
-                                            new LiteralExpression(literal)))
-                                    .add(new AliasedExpression(svar, gen.getRetVar(s)))
-                                    .build();
         if (certainNodes.contains(s)) {
-            return q;
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(svar))
+                    .add(new EqualityExpression(new PropertyAccessExpression(svar, property),
+                            new LiteralExpression(literal)))
+                    .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                    .build();
         }
         final List<CypherVar> sedge = gen.getEdgeVars(s);
+        final CypherVar marker = gen.getMarkerVar();
         return new CypherUnionQueryImpl(
-                q,
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(svar))
+                        .add(new EqualityExpression(new PropertyAccessExpression(svar, property),
+                                new LiteralExpression(literal)))
+                        .add(new MarkerExpression(0, marker))
+                        .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                        .build(),
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
                         .add(new EqualityExpression(new PropertyAccessExpression(sedge.get(1), property),
                                 new LiteralExpression(literal)))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(new TripleMapExpression(sedge.get(0), sedge.get(1), sedge.get(2)),
                                 gen.getRetVar(s)))
                         .build());
@@ -474,25 +481,33 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                 final Set<Node> certainNodes) {
         final String property = configuration.unmapProperty(p);
         final CypherVar svar = gen.getVarFor(s);
-        final CypherMatchQuery q = new CypherQueryBuilder()
-                                        .add(new NodeMatchClause(svar))
-                                        .add(new EXISTSExpression(new PropertyAccessExpression(svar, property)))
-                                        .add(new AliasedExpression(svar, gen.getRetVar(s)))
-                                        .add(new AliasedExpression(new PropertyAccessExpression(svar, property),
-                                                gen.getRetVar(o)))
-                                        .build();
         if (certainNodes.contains(s)) {
-            return q;
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(svar))
+                    .add(new EXISTSExpression(new PropertyAccessExpression(svar, property)))
+                    .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new PropertyAccessExpression(svar, property),
+                            gen.getRetVar(o)))
+                    .build();
         }
         final List<CypherVar> sedge = gen.getEdgeVars(s);
+        final CypherVar marker = gen.getMarkerVar();
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
                         .add(new EXISTSExpression(new PropertyAccessExpression(sedge.get(1), property)))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new TripleMapExpression(sedge.get(0), sedge.get(1), sedge.get(2)), gen.getRetVar(s)))
                         .add(new AliasedExpression(new PropertyAccessExpression(sedge.get(1), property), gen.getRetVar(o)))
                         .build(),
-                q
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(svar))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(svar, property)))
+                        .add(new MarkerExpression(1, marker))
+                        .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                        .add(new AliasedExpression(new PropertyAccessExpression(svar, property),
+                                gen.getRetVar(o)))
+                        .build()
         );
     }
 
@@ -529,20 +544,20 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar iterVar = gen.getAnonVar();
         final CypherVar iterVar2 = gen.getAnonVar();
         final String literal = o.getLiteralValue().toString();
-        final CypherMatchQuery q = new CypherQueryBuilder()
-                                        .add(new NodeMatchClause(svar))
-                                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(svar),
-                                                List.of(new EqualityExpression(
-                                                        new PropertyAccessWithVarExpression(svar, innerVar),
-                                                        new LiteralExpression(literal))),
-                                                List.of(innerVar), iterVar))
-                                        .add(new AliasedExpression(svar, gen.getRetVar(s)))
-                                        .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
-                                        .build();
         if (certainNodes.contains(s)) {
-            return q;
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(svar))
+                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(svar),
+                            List.of(new EqualityExpression(
+                                    new PropertyAccessWithVarExpression(svar, innerVar),
+                                    new LiteralExpression(literal))),
+                            List.of(innerVar), iterVar))
+                    .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
+                    .build();
         }
         final List<CypherVar> sedge = gen.getEdgeVars(s);
+        final CypherVar marker = gen.getMarkerVar();
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(sedge.get(0), sedge.get(1), sedge.get(2)))
@@ -550,11 +565,22 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                 List.of(new EqualityExpression(
                                         new PropertyAccessWithVarExpression(sedge.get(1), innerVar),
                                         new LiteralExpression(literal))), List.of(innerVar), iterVar2))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new TripleMapExpression(sedge.get(0), sedge.get(1), sedge.get(2)),
                                 gen.getRetVar(s)))
                         .add(new AliasedExpression(new GetItemExpression(iterVar2 , 0), gen.getRetVar(p)))
                         .build(),
-                q
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(svar))
+                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(svar),
+                                List.of(new EqualityExpression(
+                                        new PropertyAccessWithVarExpression(svar, innerVar),
+                                        new LiteralExpression(literal))),
+                                List.of(innerVar), iterVar))
+                        .add(new MarkerExpression(1, marker))
+                        .add(new AliasedExpression(svar, gen.getRetVar(s)))
+                        .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
+                        .build()
         );
     }
 
@@ -612,14 +638,25 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
         }
+        if (certainEdgeLabels.contains(p)){
+            return new CypherQueryBuilder()
+                    .add(new EdgeMatchClause(a1, a2, a3))
+                    .add(new EqualityExpression(new VariableIDExpression(a1),
+                            new LiteralExpression(node.getId())))
+                    .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                    .add(new AliasedExpression(a3, gen.getRetVar(o)))
+                    .build();
+        }
         final CypherVar a4 = gen.getAnonVar();
         final CypherVar a5 = gen.getAnonVar();
         final CypherVar a6 = gen.getAnonVar();
+        final CypherVar marker = gen.getMarkerVar();
         return new CypherUnionQueryImpl(
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new EqualityExpression(new VariableIDExpression(a1),
                                 new LiteralExpression(node.getId())))
+                        .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
                         .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
                         .build(),
@@ -629,6 +666,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                 new LiteralExpression(node.getId())))
                         .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a2), null,
                                 List.of(innerVar, new PropertyAccessWithVarExpression(a2, innerVar)), a3))
+                        .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(new GetItemExpression(a3, 0), gen.getRetVar(p)))
                         .add(new AliasedExpression(new GetItemExpression(a3, 1), gen.getRetVar(o)))
                         .build(),
@@ -636,6 +674,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                         .add(new EdgeMatchClause(a4, a5, a6))
                         .add(new EqualityExpression(new VariableIDExpression(a4),
                                 new LiteralExpression(node.getId())))
+                        .add(new MarkerExpression(2, marker))
                         .add(new AliasedExpression(new TypeExpression(a5), gen.getRetVar(p)))
                         .add(new AliasedExpression(a6, gen.getRetVar(o)))
                         .build());
@@ -653,57 +692,114 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final CypherVar a1 = gen.getAnonVar();
         final CypherVar a2 = gen.getAnonVar();
         final CypherVar a3 = gen.getAnonVar();
-        final CypherMatchQuery qEdges = new CypherQueryBuilder()
-                .add(new EdgeMatchClause(a1, a2, a3))
-                .add(new AliasedExpression(a1, gen.getRetVar(s)))
-                .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
-                .add(new AliasedExpression(a3, gen.getRetVar(o)))
-                .build();
         if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)
         || isEdgeCompatible) {
-            return qEdges;
+            return new CypherQueryBuilder()
+                    .add(new EdgeMatchClause(a1, a2, a3))
+                    .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                    .add(new AliasedExpression(a3, gen.getRetVar(o)))
+                    .build();
         }
 
         final CypherVar a4 = gen.getAnonVar();
-        final CypherMatchQuery qNodeLabels = new CypherQueryBuilder()
-                .add(new NodeMatchClause(a4))
-                .add(new AliasedExpression(a4, gen.getRetVar(s)))
-                .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
-                .build();
         if (certainNodeLabels.contains(o)) {
-            return qNodeLabels;
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a4))
+                    .add(new AliasedExpression(a4, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                    .build();
         }
 
         final CypherVar a5 = gen.getAnonVar();
-        final CypherVar iterVar = gen.getAnonVar();
+        final CypherVar a6 = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
+        final CypherVar marker = gen.getMarkerVar();
+        if (certainNodes.contains(s)){
+            return new CypherUnionQueryImpl(
+                    new CypherQueryBuilder()
+                            .add(new EdgeMatchClause(a1, a2, a3))
+                            .add(new MarkerExpression(0, marker))
+                            .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                            .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                            .add(new AliasedExpression(a3, gen.getRetVar(o)))
+                            .build(),
+                    new CypherQueryBuilder()
+                            .add(new NodeMatchClause(a4))
+                            .add(new MarkerExpression(1, marker))
+                            .add(new AliasedExpression(a4, gen.getRetVar(s)))
+                            .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
+                            .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                            .build(),
+                    new CypherQueryBuilder()
+                            .add(new NodeMatchClause(a5))
+                            .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a5), null,
+                                    List.of(innerVar, new PropertyAccessWithVarExpression(a5, innerVar)), a6))
+                            .add(new MarkerExpression(2, marker))
+                            .add(new AliasedExpression(a5, gen.getRetVar(s)))
+                            .add(new AliasedExpression(new GetItemExpression(a6, 0), gen.getRetVar(p)))
+                            .add(new AliasedExpression(new GetItemExpression(a6, 1), gen.getRetVar(o)))
+                            .build());
+        }
+        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)) {
+            return new CypherUnionQueryImpl(
+                    new CypherQueryBuilder()
+                            .add(new NodeMatchClause(a1))
+                            .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), null,
+                                    List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
+                            .add(new MarkerExpression(0, marker))
+                            .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                            .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
+                            .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
+                            .build(),
+                    new CypherQueryBuilder()
+                            .add(new EdgeMatchClause(a3, a4, a5))
+                            .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a4), null,
+                                    List.of(innerVar, new PropertyAccessWithVarExpression(a4, innerVar)), a6))
+                            .add(new MarkerExpression(1, marker))
+                            .add(new AliasedExpression(new TripleMapExpression(a3, a4, a5), gen.getRetVar(s)))
+                            .add(new AliasedExpression(new GetItemExpression(a6, 0), gen.getRetVar(p)))
+                            .add(new AliasedExpression(new GetItemExpression(a6, 1), gen.getRetVar(o)))
+                            .build());
+        }
+
         final CypherVar a7 = gen.getAnonVar();
         final CypherVar a8 = gen.getAnonVar();
         final CypherVar a9 = gen.getAnonVar();
-        final CypherVar iterVar2 = gen.getAnonVar();
-        final CypherVar innerVar = new CypherVar("k");
-        final CypherMatchQuery qNodeProperties = new CypherQueryBuilder()
-                .add(new NodeMatchClause(a5))
-                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a5), null,
-                        List.of(innerVar, new PropertyAccessWithVarExpression(a5, innerVar)), iterVar))
-                .add(new AliasedExpression(a5, gen.getRetVar(s)))
-                .add(new AliasedExpression(new GetItemExpression(iterVar, 0), gen.getRetVar(p)))
-                .add(new AliasedExpression(new GetItemExpression(iterVar, 1), gen.getRetVar(o)))
-                .build();
-        final CypherMatchQuery qEdgeProperties = new CypherQueryBuilder()
-                .add(new EdgeMatchClause(a7, a8, a9))
-                .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a8), null,
-                        List.of(innerVar, new PropertyAccessWithVarExpression(a8, innerVar)), iterVar2))
-                .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), gen.getRetVar(s)))
-                .add(new AliasedExpression(new GetItemExpression(iterVar2, 0), gen.getRetVar(p)))
-                .add(new AliasedExpression(new GetItemExpression(iterVar2, 1), gen.getRetVar(o)))
-                .build();
-        if (certainNodes.contains(s)){
-            return new CypherUnionQueryImpl(qEdges, qNodeLabels, qNodeProperties);
-        }
-        if (certainPropertyNames.contains(p) || certainPropertyValues.contains(o)) {
-            return new CypherUnionQueryImpl(qNodeProperties, qEdgeProperties);
-        }
-        return new CypherUnionQueryImpl(qEdges, qNodeLabels, qNodeProperties, qEdgeProperties);
+        final CypherVar a10 = gen.getAnonVar();
+        return new CypherUnionQueryImpl(
+                new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a1, a2, a3))
+                        .add(new MarkerExpression(0, marker))
+                        .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                        .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
+                        .add(new AliasedExpression(a3, gen.getRetVar(o)))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a4))
+                        .add(new MarkerExpression(1, marker))
+                        .add(new AliasedExpression(a4, gen.getRetVar(s)))
+                        .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
+                        .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a5))
+                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a5), null,
+                                List.of(innerVar, new PropertyAccessWithVarExpression(a5, innerVar)), a6))
+                        .add(new MarkerExpression(2, marker))
+                        .add(new AliasedExpression(a5, gen.getRetVar(s)))
+                        .add(new AliasedExpression(new GetItemExpression(a6, 0), gen.getRetVar(p)))
+                        .add(new AliasedExpression(new GetItemExpression(a6, 1), gen.getRetVar(o)))
+                        .build(),
+                new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a7, a8, a9))
+                        .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a8), null,
+                                List.of(innerVar, new PropertyAccessWithVarExpression(a8, innerVar)), a10))
+                        .add(new MarkerExpression(3, marker))
+                        .add(new AliasedExpression(new TripleMapExpression(a7, a8, a9), gen.getRetVar(s)))
+                        .add(new AliasedExpression(new GetItemExpression(a10, 0), gen.getRetVar(p)))
+                        .add(new AliasedExpression(new GetItemExpression(a10, 1), gen.getRetVar(o)))
+                        .build());
     }
 }

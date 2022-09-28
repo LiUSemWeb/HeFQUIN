@@ -71,7 +71,7 @@ public class CypherUtilsTest extends EngineTestBase {
     @Test
     public void parseLiteralsMapsAndArraysTest() throws FederationAccessException {
         if (!skipLocalNeo4jTests) {
-            final String cypherQuery = "RETURN 2 AS a, [1, 2, 3] AS b, {x:1, y:2} AS c";
+            final String cypherQuery = "RETURN 2 AS a, {x:1, y:2} AS c";
             final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
 
             final Neo4jServer fm = new Neo4jServerImpl4Test();
@@ -87,10 +87,6 @@ public class CypherUtilsTest extends EngineTestBase {
                 final RecordEntry a = iterator.next();
                 assertEquals(new CypherVar("a"), a.getName());
                 assertTrue(a.getValue() instanceof LiteralValue);
-                assertTrue(iterator.hasNext());
-                final RecordEntry b = iterator.next();
-                assertEquals(new CypherVar("b"), b.getName());
-                assertTrue(b.getValue() instanceof ListValue);
                 assertTrue(iterator.hasNext());
                 final RecordEntry c = iterator.next();
                 assertEquals(new CypherVar("c"), c.getName());
