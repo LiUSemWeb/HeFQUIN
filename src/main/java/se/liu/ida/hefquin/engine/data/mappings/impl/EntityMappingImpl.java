@@ -28,6 +28,11 @@ public class EntityMappingImpl implements EntityMapping
 	public EntityMappingImpl( final Graph mappingDescription ) {
 		parseMappingDescription(mappingDescription);
 	}
+	
+	public EntityMappingImpl ( final Map<Node, Set<Node>> g2l, final Map<Node, Set<Node>> l2g) {
+		g2lMap.putAll(g2l);
+		l2gMap.putAll(l2g);
+	}
 
 	protected void parseMappingDescription( final Graph mappingDescription ) {
 		// populate both g2lMap and l2gMap based on the owl:sameAs
@@ -105,10 +110,10 @@ public class EntityMappingImpl implements EntityMapping
 		}
 	}
 
-	@Override
-	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		final Binding binding = sm.asJenaBinding();
+	private Set<SolutionMapping> applyMapToSolutionMapping(final SolutionMapping sm, final Map<Node, Set<Node>> translationMap ) {
 
+		final Binding binding = sm.asJenaBinding();
+		
 		// If the given solution mapping is the empty mapping, simply return it unchanged.
 		if ( binding.isEmpty() ) {
 			return Collections.singleton(sm);
@@ -122,12 +127,12 @@ public class EntityMappingImpl implements EntityMapping
 			final Var var = it.next();
 			final Node node = binding.get(var);
 			if (node.isURI()) {
-				final Set<Node> mappedNodes = g2lMap.get(node);
-				if (mappedNodes == null) { // Local Node not different from global. 
+				final Set<Node> mappedNodes = translationMap.get(node);
+				if (mappedNodes == null) { // Local/global Node not different from global/local. 
 					for(Map<Var,Node> map : cartesianProduct) { // Multiply by one by adding the pair to all existing combinations.
 						map.put(var, node);
 					}
-				} else { // Local different from global exists, use that.
+				} else { // Local/global different from global/local exists, use that.
 					final Set<Map<Var,Node>> newCartesianProducts = new HashSet<>();
 					for(Map<Var,Node> map : cartesianProduct) {
 						final Iterator<Node> nodeIt = mappedNodes.iterator();
@@ -162,63 +167,15 @@ public class EntityMappingImpl implements EntityMapping
 		
 		return newMappings;
 	}
+	
+	@Override
+	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
+		return applyMapToSolutionMapping(sm,g2lMap);
+	}
 
 	@Override
 	public Set<SolutionMapping> applyInverseToSolutionMapping( final SolutionMapping sm ) {
-		final Binding binding = sm.asJenaBinding();
-
-		// If the given solution mapping is the empty mapping, simply return it unchanged.
-		if ( binding.isEmpty() ) {
-			return Collections.singleton(sm);
-		}
-
-		final Set<Map<Var,Node>> cartesianProduct = new HashSet<>();
-		cartesianProduct.add(new HashMap<Var,Node>());
-		final Iterator<Var> it = binding.vars();
-		
-		while (it.hasNext()) {
-			final Var var = it.next();
-			final Node node = binding.get(var);
-			if (node.isURI()) {
-				final Set<Node> mappedNodes = l2gMap.get(node);
-				if (mappedNodes == null) { // Global node not different from local.
-					for(Map<Var,Node> map : cartesianProduct) { // Multiply by one by adding the pair to all existing combinations.
-						map.put(var, node);
-					}
-				} else { // Global different from local exists, use that.
-					final Set<Map<Var,Node>> newCartesianProducts = new HashSet<>();
-					for(Map<Var,Node> map : cartesianProduct) {
-						final Iterator<Node> nodeIt = mappedNodes.iterator();
-						final Node newNode = nodeIt.next(); // Add the first of the combinations to each map.
-						map.put(var, newNode);
-						
-						while (nodeIt.hasNext()) { // Add the rest of the multiplications from 2 thru n, if such exists.
-							final Node anotherNewNode = it.next();
-							final Map<Var,Node> newMap = new HashMap<>(map);
-							newMap.replace(var, anotherNewNode);
-							newCartesianProducts.add(newMap);
-						}
-					}
-					cartesianProduct.addAll(newCartesianProducts); // Merge the two to create the next step cartesian product.
-				}
-			} else {
-				for(Map<Var,Node> map : cartesianProduct) { // Multiply by one by adding the pair to all existing combinations.
-					map.put(var, node);
-				}
-			}
-		}
-
-		final Set<SolutionMapping> newMappings = new HashSet<SolutionMapping>();
-		
-		for (Map<Var,Node> map : cartesianProduct) { // For each entry in the product, create a builder, build the binding, and make it a solution mapping.
-			final BindingBuilder builder = BindingBuilder.create();
-			map.forEach((var,node) -> builder.add(var, node));
-			final Binding newBinding = builder.build();
-			final SolutionMapping newMapping = new SolutionMappingImpl(newBinding);
-			newMappings.add(newMapping);
-		}
-		
-		return newMappings;
+		return applyMapToSolutionMapping(sm,l2gMap);
 	}
 
 }
