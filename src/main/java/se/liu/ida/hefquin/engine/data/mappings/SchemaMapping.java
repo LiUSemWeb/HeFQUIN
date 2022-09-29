@@ -26,7 +26,7 @@ public interface SchemaMapping
 	 * is assumed to use the global schema for the vocabulary terms that
 	 * it binds to its query variables. If this schema mapping is not
 	 * relevant for anything mentioned in the given solution mapping
-	 * (i.e., applying this entity mapping to the solution mapping does
+	 * (i.e., applying this schema mapping to the solution mapping does
 	 * not have any effect), then the result of this function is simply
 	 * a singleton set that contains the given solution mapping without
 	 * any changes.
@@ -38,7 +38,7 @@ public interface SchemaMapping
 	 * mapping, which is assumed to use the global schema for the vocabulary
 	 * terms that it binds to its query variables. If this schema mapping is
 	 * not relevant for anything mentioned in the given solution mapping (i.e.,
-	 * applying this entity mapping to the solution mapping does not have any
+	 * applying this schema mapping to the solution mapping does not have any
 	 * effect), then the result of this function is simply a singleton set that
 	 * contains the given solution mapping without any changes.
 	 */
