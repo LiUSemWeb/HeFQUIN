@@ -43,6 +43,11 @@ public class EntityMappingImplTest {
 	}
 	
 	@Test
+	public void parseMappingDescriptionTest() {
+		
+	}
+	
+	@Test
 	public void applyToSolutionMappingTest() {
 		
 		// Create solution mappings.
