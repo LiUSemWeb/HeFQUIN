@@ -68,7 +68,7 @@ public class EntityMappingImplTest {
 		final SolutionMapping bobbyKarl = SolutionMappingUtils.createSolutionMapping(x, bobby, y, alibaba, z, karl);
 	
 		// See to it that the result set contains the cartesian product and only the cartesian product.
-		assertEquals(resultSet.size(),6);
+		assertEquals( 6, resultSet.size() );
 		assertTrue(resultSet.contains(robertCharlie));
 		assertTrue(resultSet.contains(robertCarolus));
 		assertTrue(resultSet.contains(robertKarl));
