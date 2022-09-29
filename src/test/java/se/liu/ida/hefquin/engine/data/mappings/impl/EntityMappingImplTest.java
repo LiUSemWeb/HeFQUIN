@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
@@ -17,7 +18,30 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.mappings.EntityMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 
+
+
 public class EntityMappingImplTest {
+
+	protected class EntityMappingImplForTests extends EntityMappingImpl {
+
+		public EntityMappingImplForTests(final Graph mappingDescription) {
+			super(mappingDescription);
+		}
+		
+		public EntityMappingImplForTests( final Map<Node, Set<Node>> g2l, final Map<Node, Set<Node>> l2g) {
+			super(g2l,l2g);
+		}
+		
+		public Map<Node, Set<Node>> getG2lMap() {
+			return g2lMap;
+		}
+		
+		public Map<Node, Set<Node>> getL2gMap() {
+			return l2gMap;
+		}
+		
+	}
+	
 	@Test
 	public void applyToSolutionMappingTest() {
 		
