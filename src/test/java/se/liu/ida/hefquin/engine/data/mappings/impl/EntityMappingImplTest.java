@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 
 public class EntityMappingImplTest {
 	@Test
-	public void TranslateCartesianProduct() {
+	public void applyToSolutionMappingTest() {
 		
 		// Create solution mappings.
 		final Node bob = NodeFactory.createURI("ex:Bob");
