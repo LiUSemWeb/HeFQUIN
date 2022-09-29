@@ -140,7 +140,7 @@ public class EntityMappingImpl implements EntityMapping
 						map.put(var, newNode);
 						
 						while (nodeIt.hasNext()) { // Add the rest of the multiplications from 2 thru n, if such exists.
-							final Node anotherNewNode = it.next();
+							final Node anotherNewNode = nodeIt.next();
 							final Map<Var,Node> newMap = new HashMap<>(map);
 							newMap.replace(var, anotherNewNode);
 							newCartesianProducts.add(newMap);
