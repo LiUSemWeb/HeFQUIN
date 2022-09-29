@@ -1,12 +1,14 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+
 import java.util.Set;
 
 /**
  * Represents path matching statements of Cypher queries
  * For example, MATCH (x), MATCH (x)-[e]->(y)
  */
-public interface MatchClause {
+public interface MatchClause extends CypherExpression{
     /**
      * Checks if two match statements are redundant. This can happen if they are exactly the same pattern,
      * or if one is a node pattern and the other a path pattern that contains it. For instance, MATCH (x)

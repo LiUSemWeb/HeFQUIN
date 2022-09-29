@@ -13,4 +13,14 @@ public interface TableRecord {
      * Gets the collection of entries of the row/record.
      */
     Iterable<RecordEntry> getRecordEntries();
+
+    /**
+     * Returns the number of columns of the Record
+     */
+    int size();
+
+    /**
+     * Returns the {@link RecordEntry} in the i-th position
+     */
+    RecordEntry getEntry(int i);
 }

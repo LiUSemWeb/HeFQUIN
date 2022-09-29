@@ -4,19 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.*;
 
 public class RecordEntryFactory {
     public static RecordEntry create(final JsonNode col, final Iterator<JsonNode> metaRow, final CypherVar name) {
         final Value val;
-        if (col.isArray()) {
-            val = new ListValue(parseAsList(col));
-            for (int i = 0; i < col.size(); i++) {
-                metaRow.next();
-            }
-        } else if (col.get("source") != null) {
+        if (col.get("s") != null && col.get("e") != null && col.get("t") != null) {
             val = new MapValue(parseAsMap(col, metaRow));
         } else {
             final JsonNode metaCol = metaRow.next();
@@ -49,15 +44,6 @@ public class RecordEntryFactory {
                 mapObject = val.asText();
             }
             values.put(name, mapObject);
-        }
-        return values;
-    }
-
-    private static List<Object> parseAsList(final JsonNode col) {
-        List<Object> values = new LinkedList<>();
-        for (final Iterator<JsonNode> it = col.elements(); it.hasNext(); ) {
-            final JsonNode item = it.next();
-            values.add(item.asText());
         }
         return values;
     }
