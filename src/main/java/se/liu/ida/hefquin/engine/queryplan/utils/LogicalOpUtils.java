@@ -53,9 +53,19 @@ public class LogicalOpUtils
 	public static LogicalPlan rewriteLogPlan( final LogicalPlan input) {
 		if (input.getRootOperator() instanceof LogicalOpRequest) {
 			final LogicalOpRequest request = (LogicalOpRequest) input.getRootOperator();
+			
 			if(request.getFederationMember().getVocabularyMapping() != null) { // If fm has a vocabulary mapping vm
 				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(request.getFederationMember().getVocabularyMapping());
-				final LogicalPlan rw = rewriteToUseLocalVocabulary(request);
+				/*
+				if (request.getRequest() instanceof SPARQLRequest) {
+					final SPARQLRequest requestRequest = (SPARQLRequest) request.getRequest();
+					final LogicalPlan rw = rewriteReqOf(requestRequest.getQueryPattern(), request.getFederationMember());
+					return new LogicalPlanWithUnaryRootImpl(l2g,rw);
+				} else {
+					throw new IllegalArgumentException( "The given plan is a non-SPARQL request." );
+				}
+				*/
+				final LogicalPlan rw = rewriteReqOf(request);
 				return new LogicalPlanWithUnaryRootImpl(l2g,rw);
 			} else {
 				return new LogicalPlanWithNullaryRootImpl(request);
