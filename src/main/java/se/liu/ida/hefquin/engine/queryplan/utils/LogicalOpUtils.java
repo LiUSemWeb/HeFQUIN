@@ -23,11 +23,9 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -35,72 +33,24 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 public class LogicalOpUtils
 {
-	/**
-	 * Rewrites an initial logical plan into a second plan which incorporates translations of local to global vocabulary and request-operator rewriting.
-	 */
-	public static LogicalPlan rewriteLogPlan( final LogicalPlan input) {
-		if (input.getRootOperator() instanceof LogicalOpRequest) {
-			final LogicalOpRequest request = (LogicalOpRequest) input.getRootOperator();
-			
-			if(request.getFederationMember().getVocabularyMapping() != null) { // If fm has a vocabulary mapping vm
-				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(request.getFederationMember().getVocabularyMapping());
-				/*
-				if (request.getRequest() instanceof SPARQLRequest) {
-					final SPARQLRequest requestRequest = (SPARQLRequest) request.getRequest();
-					final LogicalPlan rw = rewriteReqOf(requestRequest.getQueryPattern(), request.getFederationMember());
-					return new LogicalPlanWithUnaryRootImpl(l2g,rw);
-				} else {
-					throw new IllegalArgumentException( "The given plan is a non-SPARQL request." );
-				}
-				*/
-				final LogicalPlan rw = rewriteReqOf(request);
-				return new LogicalPlanWithUnaryRootImpl(l2g,rw);
-			} else {
-				return new LogicalPlanWithNullaryRootImpl(request);
-			}
-		} else if (input.getRootOperator() instanceof LogicalOpMultiwayJoin) {
-			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
-			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) input).getSubPlans();
-			while(it.hasNext()) {
-				final LogicalPlan rewrittenSubplan = rewriteLogPlan(it.next());
-				rewrittenSubplans.add(rewrittenSubplan);
-			}
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl(newRoot,rewrittenSubplans);
-			return newPlan;
-		} else if (input.getRootOperator() instanceof LogicalOpMultiwayUnion) {
-			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
-			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) input).getSubPlans();
-			while(it.hasNext()) {
-				final LogicalPlan rewrittenSubplan = rewriteLogPlan(it.next());
-				rewrittenSubplans.add(rewrittenSubplan);
-			}
-			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
-			final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl(newRoot,rewrittenSubplans);
-			return newPlan;
-		} else {
-			return input;
-		}
-	}
 	
 	/**
 	 * Rewrites the given request operator (with a triple pattern request) into
 	 * a logical plan that uses the local vocabulary of the federation member of
 	 * the request.
 	 */
-	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalOpRequest<TriplePatternRequest, ?> reqOp ) {
+	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalOpRequest<TriplePatternRequest, ?> reqOp ) { // TODO: Make working for all SPARQL requests, as per the thesis.
+		// Augment with [FUNCTIONALITY LIFTED FROM ExecOpRequestSPARQLWithTranslation]
 		final TriplePatternRequest tpReq = reqOp.getRequest();
 		final TriplePattern tp = tpReq.getQueryPattern();
 
