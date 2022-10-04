@@ -41,7 +41,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				//return new LogicalPlanWithUnaryRootImpl(l2g,rw);
 				return inputPlan; // Temporary return for error suppression.s
 			} else {
-				return new LogicalPlanWithNullaryRootImpl(request);
+				return inputPlan;
 			}
 		} else if (inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) {
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
