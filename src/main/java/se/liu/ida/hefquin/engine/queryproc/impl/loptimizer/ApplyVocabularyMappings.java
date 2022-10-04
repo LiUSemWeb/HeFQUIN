@@ -38,7 +38,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			} else {
 				return inputPlan;
 			}
-		} else if (inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) {
+		} else if ((inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) || (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion)) {
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
 			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) inputPlan).getSubPlans();
 			boolean rewritten = false;
@@ -56,16 +56,6 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			} else {
 				return inputPlan;
 			}
-		} else if (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion) {
-			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
-			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) inputPlan).getSubPlans();
-			while(it.hasNext()) {
-				final LogicalPlan rewrittenSubplan = apply(it.next());
-				rewrittenSubplans.add(rewrittenSubplan);
-			}
-			final LogicalOpMultiwayUnion newRoot = LogicalOpMultiwayUnion.getInstance();
-			final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl(newRoot,rewrittenSubplans);
-			return newPlan;
 		} else {
 			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
 		}
