@@ -24,7 +24,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	@Override
 	public LogicalPlan apply(LogicalPlan inputPlan) {
 		if (inputPlan.getRootOperator() instanceof LogicalOpRequest) {
-			final LogicalOpRequest request = (LogicalOpRequest) inputPlan.getRootOperator();
+			final LogicalOpRequest<?,?> request = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
 			
 			if(request.getFederationMember().getVocabularyMapping() != null) { // If fm has a vocabulary mapping vm
 				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(request.getFederationMember().getVocabularyMapping());
