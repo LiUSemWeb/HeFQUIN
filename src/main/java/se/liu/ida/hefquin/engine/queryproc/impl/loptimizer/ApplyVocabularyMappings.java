@@ -22,7 +22,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	 * This method implements the rewriteLogPlan pseudocode of Helgesson's B.Sc thesis.
 	 */
 	@Override
-	public LogicalPlan apply(LogicalPlan inputPlan) {
+	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		if (inputPlan.getRootOperator() instanceof LogicalOpRequest) {
 			final LogicalOpRequest<?,?> request = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
 			
