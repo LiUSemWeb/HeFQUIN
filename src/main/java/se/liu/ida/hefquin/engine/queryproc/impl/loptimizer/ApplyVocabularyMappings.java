@@ -50,8 +50,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final LogicalPlan rewrittenSubplan = apply(it.next());
 				rewrittenSubplans.add(rewrittenSubplan);
 			}
-			final LogicalOpMultiwayJoin newRoot = LogicalOpMultiwayJoin.getInstance();
-			final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl(newRoot,rewrittenSubplans);
+			final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) inputPlan.getRootOperator(), rewrittenSubplans);
 			return newPlan;
 		} else if (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion) {
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
