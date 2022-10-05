@@ -56,7 +56,7 @@ public class LogicalOpUtils
 		if (fm.getVocabularyMapping() == null) { // If no vocabulary mapping, nothing to translate.
 			return new LogicalPlanWithNullaryRootImpl(reqOp);
 		}
-		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest(); // Unsure if this is a correct cast. In C++, I would want to preserve the derived class. I assume Java does this, but I'm not 100% on it.
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
 		final SPARQLGraphPattern p = req.getQueryPattern();
 
 
