@@ -11,6 +11,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 
+import se.liu.ida.hefquin.engine.data.mappings.VocabularyMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -28,8 +29,6 @@ import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -60,108 +59,14 @@ public class LogicalOpUtils
 		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest(); // Unsure if this is a correct cast. In C++, I would want to preserve the derived class. I assume Java does this, but I'm not 100% on it.
 		final SPARQLGraphPattern p = req.getQueryPattern();
 
-		if(req instanceof TriplePattern) {
-			final SPARQLGraphPattern newP = handleTriplePattern((TriplePattern) p, fm);
-			if ( newP.equals(p) ) {
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-			else {
-				return rewriteReqOf(newP, fm);
-			}
-		}
-		if(req instanceof BGP) {
-			final SPARQLGraphPattern newP = handleBGP((BGP) p, fm);
-			if ( newP.equals(p) ) {
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-			else {
-				return rewriteReqOf(newP, fm);
-			}
-		}
-		if(req instanceof SPARQLUnionPattern) {
-			final SPARQLGraphPattern newP = handleUnion((SPARQLUnionPattern) p, fm);
-			if ( newP.equals(p) ) {
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-			else {
-				return rewriteReqOf(newP, fm);
-			}
-		}
-		if(req instanceof SPARQLGroupPattern) {
-			final SPARQLGraphPattern newP = handleGroup((SPARQLGroupPattern) p, fm);
-			if ( newP.equals(p) ) {
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-			else {
-				return rewriteReqOf(newP, fm);
-			}
-		}
-		return null;
-	}
-	
-	public static SPARQLGraphPattern handleTriplePattern( final TriplePattern tp, final FederationMember fm ) {
-		return fm.getVocabularyMapping().translateTriplePattern((TriplePattern) tp);
-	}
-	
-	public static SPARQLGraphPattern handleBGP( final BGP bgp, final FederationMember fm ) {
-		final List<SPARQLGraphPattern> allSubPatterns = new ArrayList<>();
-		final Set<TriplePattern> tpSubPatterns = new HashSet<>();
-		boolean allSubPatternsAreTriplePatterns = true; // assume yes
 
-		for( final TriplePattern i : bgp.getTriplePatterns() ) {
-			final SPARQLGraphPattern iTranslation = fm.getVocabularyMapping().translateTriplePattern(i); 
-			allSubPatterns.add(iTranslation);
-
-			if ( allSubPatternsAreTriplePatterns && iTranslation instanceof TriplePattern ) {
-				tpSubPatterns.add( (TriplePattern) iTranslation );
-			}
-			else {
-				allSubPatternsAreTriplePatterns = false;
-			}
-		}
-
-		if ( allSubPatternsAreTriplePatterns ) {
-			return new BGPImpl(tpSubPatterns);
+		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
+		if ( newP.equals(p) ) {
+			return new LogicalPlanWithNullaryRootImpl(reqOp);
 		}
 		else {
-			return new SPARQLGroupPatternImpl(allSubPatterns);
+			return rewriteReqOf(newP, fm);
 		}
-	}
-	
-	public static SPARQLGraphPattern handleUnion( final SPARQLUnionPattern up, final FederationMember fm ) {
-		final SPARQLUnionPatternImpl unionTranslation = new SPARQLUnionPatternImpl();
-		for (final SPARQLGraphPattern i : up.getSubPatterns()) {
-			if (i instanceof TriplePattern) {
-				unionTranslation.addSubPattern(handleTriplePattern((TriplePattern) i, fm));
-			} else if (i instanceof BGP) {
-				unionTranslation.addSubPattern(handleBGP((BGP) i, fm));
-			} else if (i instanceof SPARQLUnionPattern) {
-				unionTranslation.addSubPattern(handleUnion((SPARQLUnionPattern) i, fm));
-			} else if (i instanceof SPARQLGroupPattern) {
-				unionTranslation.addSubPattern(handleGroup((SPARQLGroupPattern) i, fm));
-			} else {
-				throw new IllegalArgumentException("Unsupported type of pattern: " + i.getClass().getName() );
-			}
-		}
-		return unionTranslation;
-	}
-	
-	public static SPARQLGraphPattern handleGroup( final SPARQLGroupPattern gp, final FederationMember fm ) {
-		final List<SPARQLGraphPattern> subPatterns = new ArrayList<>();
-		for (final SPARQLGraphPattern i : gp.getSubPatterns()) {
-			if (i instanceof TriplePattern) {
-				subPatterns.add(handleTriplePattern((TriplePattern) i, fm));
-			} else if (i instanceof BGP) {
-				subPatterns.add(handleBGP((BGP) i, fm));
-			} else if (i instanceof SPARQLUnionPattern) {
-				subPatterns.add(handleUnion((SPARQLUnionPattern) i, fm));
-			} else if (i instanceof SPARQLGroupPattern) {
-				subPatterns.add(handleGroup((SPARQLGroupPattern) i, fm));
-			} else {
-				throw new IllegalArgumentException("Unsupported type of pattern: " + i.getClass().getName() );
-			}
-		}
-		return new SPARQLGroupPatternImpl(subPatterns);
 	}
 	
 
