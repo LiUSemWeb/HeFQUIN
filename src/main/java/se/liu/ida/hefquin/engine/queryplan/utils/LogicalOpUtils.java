@@ -11,7 +11,6 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 
-import se.liu.ida.hefquin.engine.data.mappings.VocabularyMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -46,30 +45,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 
 public class LogicalOpUtils
 {
-	/**
-	 * Rewrites the given request operator (with a triple pattern request) into
-	 * a logical plan that uses the local vocabulary of the federation member of
-	 * the request.
-	 */
-	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalOpRequest<?, ?> reqOp ) {
-		final FederationMember fm = reqOp.getFederationMember();
-		if (fm.getVocabularyMapping() == null) { // If no vocabulary mapping, nothing to translate.
-			return new LogicalPlanWithNullaryRootImpl(reqOp);
-		}
-		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-		final SPARQLGraphPattern p = req.getQueryPattern();
-
-
-		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
-		if ( newP.equals(p) ) {
-			return new LogicalPlanWithNullaryRootImpl(reqOp);
-		}
-		else {
-			return rewriteReqOf(newP, fm);
-		}
-	}
-	
-
 	/**
 	 * Creates a logical plan where all requests are TriplePatternRequests
 	 * for use when a federation member's interface is a TPF-server.
