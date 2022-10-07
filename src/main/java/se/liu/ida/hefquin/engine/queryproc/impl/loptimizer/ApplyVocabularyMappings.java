@@ -44,12 +44,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		final SPARQLGraphPattern p = req.getQueryPattern();
 
 		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
-		if ( newP.equals(p) ) {
-			return inputPlan;
-		}
-		else {
-			return LogicalOpUtils.rewriteReqOf(newP, fm);
-		}
+		return ( newP.equals(p) ) ? inputPlan : LogicalOpUtils.rewriteReqOf(newP, fm);
 	}
 	
 	
@@ -63,12 +58,8 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			final LogicalOpRequest<?,?> requestOp = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
 			if(requestOp.getFederationMember().getVocabularyMapping() != null) { // If fm has a vocabulary mapping vm
 				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(requestOp.getFederationMember().getVocabularyMapping());
-				if (requestOp.getRequest() instanceof SPARQLRequest) {
-					final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan);
-					return new LogicalPlanWithUnaryRootImpl(l2g,rw);
-				} else {
-					throw new IllegalArgumentException( "The given plan is a non-SPARQL request." );
-				}
+				final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan);
+				return new LogicalPlanWithUnaryRootImpl(l2g,rw);
 			} else {
 				return inputPlan;
 			}
@@ -85,8 +76,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				}
 			}
 			if (rewritten) {
-				final LogicalPlanWithNaryRootImpl newPlan = new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) inputPlan.getRootOperator(), rewrittenSubplans);
-				return newPlan;
+				return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) inputPlan.getRootOperator(), rewrittenSubplans);
 			} else {
 				return inputPlan;
 			}
