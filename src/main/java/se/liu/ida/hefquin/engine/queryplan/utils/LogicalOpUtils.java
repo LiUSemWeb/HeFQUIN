@@ -1,9 +1,16 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.syntax.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
+
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -36,35 +43,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 public class LogicalOpUtils
 {
-	/**
-	 * Rewrites the given request operator (with a triple pattern request) into
-	 * a logical plan that uses the local vocabulary of the federation member of
-	 * the request.
-	 */
-	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalOpRequest<TriplePatternRequest, ?> reqOp ) {
-		final TriplePatternRequest tpReq = reqOp.getRequest();
-		final TriplePattern tp = tpReq.getQueryPattern();
-
-		final FederationMember fm = reqOp.getFederationMember();
-		final VocabularyMapping vm = fm.getVocabularyMapping();
-
-		final SPARQLGraphPattern newP = vm.translateTriplePattern(tp);
-
-		if ( newP.equals(tp) ) {
-			return new LogicalPlanWithNullaryRootImpl(reqOp);
-		}
-		else {
-			return rewriteReqOf(newP, fm);
-		}
-	}
-
 	/**
 	 * Creates a logical plan where all requests are TriplePatternRequests
 	 * for use when a federation member's interface is a TPF-server.
