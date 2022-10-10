@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Triple;
@@ -14,9 +15,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.UnwindIteratorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -56,8 +55,8 @@ public class SPARQLStar2CypherTranslatorTest {
 
     final Set<Node> emptySet = Collections.emptySet();
 
-    final LiteralExpression id22 = new LiteralExpression("22");
-    final LiteralExpression id23 = new LiteralExpression("23");
+    final LiteralExpression id22 = new LiteralExpression("22", XSDDatatype.XSDinteger);
+    final LiteralExpression id23 = new LiteralExpression("23", XSDDatatype.XSDinteger);
 
     @Before
     public void resetVarGenerator() {
@@ -874,6 +873,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(conf.mapNode(node22), conf.mapProperty("name"), l)
         );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        System.out.println(translation);
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeMatchClause(a2))

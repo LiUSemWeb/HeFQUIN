@@ -1,0 +1,6 @@
+PREFIX r:<https://example.org/relationship/>
+
+SELECT * WHERE {
+?c r:DIRECTED ?p .
+?a r:ACTED_IN ?p .
+}
