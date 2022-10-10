@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
@@ -28,7 +29,7 @@ import java.util.Set;
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf) {
+    public Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf) {
         final Set<Node> certainNodes = new HashSet<>();
         final Set<Node> certainEdgeLabels = new HashSet<>();
         final Set<Node> certainNodeLabels = new HashSet<>();
@@ -79,13 +80,13 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
     }
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(TriplePattern tp, LPG2RDFConfiguration conf) {
+    public Pair<CypherQuery, Map<CypherVar, Var>> translateTriplePattern(TriplePattern tp, LPG2RDFConfiguration conf) {
         return translateTriplePattern(tp, conf, new CypherVarGenerator(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
                 new HashSet<>(), new HashSet<>());
     }
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Node>> translateTriplePattern(final TriplePattern tp,
+    public Pair<CypherQuery, Map<CypherVar, Var>> translateTriplePattern(final TriplePattern tp,
                                                                           final LPG2RDFConfiguration conf,
                                                                           final CypherVarGenerator generator,
                                                                           final Set<Node> certainNodes,
