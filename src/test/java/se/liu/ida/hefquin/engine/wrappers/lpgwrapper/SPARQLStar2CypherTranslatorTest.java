@@ -850,13 +850,13 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new EqualityExpression(new PropertyAccessExpression(a3, "source"),
                                 new LiteralExpression("IMDB")))
                         .add(new EqualityExpression(a4, a1))
-                        .add(new VariableLabelExpression(a5, "Person"))
-                        .add(new EqualityExpression(a5, a2))
+                        .add(new VariableLabelExpression(a5, "Movie"))
+                        .add(new EqualityExpression(a5, a1))
                         .add(new EqualityExpression(new PropertyAccessExpression(a6, "name"),
                                 new LiteralExpression("Uma Thurman")))
                         .add(new EqualityExpression(a6, a2))
-                        .add(new VariableLabelExpression(a7, "Movie"))
-                        .add(new EqualityExpression(a7, a1))
+                        .add(new VariableLabelExpression(a7, "Person"))
+                        .add(new EqualityExpression(a7, a2))
                         .add(new AliasedExpression(a1, ret1))
                         .add(new AliasedExpression(new PropertyAccessExpression(a1, "released"), ret2))
                         .add(new AliasedExpression(a2, ret3))
