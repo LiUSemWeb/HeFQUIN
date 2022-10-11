@@ -104,8 +104,10 @@ public class RunBGPOverNeo4j extends CmdARQ {
         final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf);
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
-            System.err.println("Query Translation Time: " + modTime.timeStr(time) + " sec");
+            System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");
         }
+
+        System.out.println(translation.object1);
 
         //Query Execution
         modTime.startTimer();
@@ -123,7 +125,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
         }
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
-            System.err.println("Query Execution Time: " + modTime.timeStr(time) + " sec");
+            System.out.println("Query Execution Time: " + modTime.timeStr(time) + " sec");
         }
 
         //Result parsing
@@ -131,7 +133,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
         List<SolutionMapping> mappingList = new Record2SolutionMappingTranslatorImpl().translateRecords(response.getResponse(), conf, translation.object1, translation.object2);
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
-            System.err.println("Result Translation Time: " + modTime.timeStr(time) + " sec");
+            System.out.println("Result Translation Time: " + modTime.timeStr(time) + " sec");
         }
         System.out.println("Results:" + mappingList.size());
     }
