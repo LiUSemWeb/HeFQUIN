@@ -60,7 +60,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
     @Override
     protected String getSummary() {
-        return getCommandName()+"--query=<query> --considerNeo4jEndpoint=<endpoint URI>\"";
+        return getCommandName()+"--query=<query> --neo4juri=<Neo4j endpoint URI>\"";
     }
 
     @Override
@@ -133,6 +133,6 @@ public class RunBGPOverNeo4j extends CmdARQ {
             final long time = modTime.endTimer();
             System.err.println("Result Translation Time: " + modTime.timeStr(time) + " sec");
         }
-        System.out.println(mappingList.get(0));
+        System.out.println("Results:" + mappingList.size());
     }
 }
