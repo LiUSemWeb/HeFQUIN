@@ -6,7 +6,6 @@ import arq.cmdline.ModTime;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
