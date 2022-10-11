@@ -107,8 +107,6 @@ public class RunBGPOverNeo4j extends CmdARQ {
             System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");
         }
 
-        System.out.println(translation.object1);
-
         //Query Execution
         modTime.startTimer();
         final Neo4jRequest request = new Neo4jRequestImpl(translation.object1.toString());
