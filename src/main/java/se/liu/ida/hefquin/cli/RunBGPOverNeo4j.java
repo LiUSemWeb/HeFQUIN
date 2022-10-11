@@ -41,6 +41,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
     protected final ModResultsOut modResults =       new ModResultsOut();
 
     protected final ArgDecl argNeo4jUri   = new ArgDecl(ArgDecl.HasValue, "neo4juri");
+    protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
 
     protected RunBGPOverNeo4j(String[] argv) {
         super(argv);
@@ -49,6 +50,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
         addModule(modResults);
 
         add(argNeo4jUri, "--neo4juri", "The URI of the Neo4j endpoint");
+        add(argNaive, "--naive", "If you want naive translation");
 
         addModule(modQuery);
     }
@@ -59,7 +61,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
     @Override
     protected String getSummary() {
-        return getCommandName()+"--query=<query> --neo4juri=<Neo4j endpoint URI>\"";
+        return getCommandName()+"--query=<query> --neo4juri=<Neo4j endpoint URI> --time? --naive?\"";
     }
 
     @Override
@@ -100,7 +102,8 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //Query translation
         modTime.startTimer();
-        final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf);
+        final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateBGP(bgp, conf, argNaive.takesValue());
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
             System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");

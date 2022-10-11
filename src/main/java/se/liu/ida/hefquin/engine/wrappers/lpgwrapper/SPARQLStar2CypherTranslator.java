@@ -21,7 +21,7 @@ public interface SPARQLStar2CypherTranslator {
      * LPG is guaranteed to obtain no matching triples, this method returns null.
      */
     Pair<CypherQuery, Map<CypherVar, Var>> translateTriplePattern(final TriplePattern tp,
-                                                                   final LPG2RDFConfiguration conf);
+                                                                  final LPG2RDFConfiguration conf);
 
     /**
      * Translates a triple pattern to a Cypher query, using restricted rules based on the different
@@ -41,7 +41,9 @@ public interface SPARQLStar2CypherTranslator {
      * translations into one Cypher query that represents the whole BGP.
      * This method statically analyzes the BGP to obtain insight on the boundedness properties
      * of the variables in the BGP to prune unuseful subqueries.
+     * @param naive if naive translation is required.
      */
-    Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf);
+    Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf,
+                                                        final boolean naive);
 
 }

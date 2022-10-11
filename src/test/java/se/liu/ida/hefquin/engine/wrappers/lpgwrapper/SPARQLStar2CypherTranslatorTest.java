@@ -838,7 +838,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
                         conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")
         ));
-        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new EdgeMatchClause(a2, a3, a4))
@@ -872,7 +872,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(conf.mapNode(node23), conf.mapProperty("name"), l),
                 new TriplePatternImpl(conf.mapNode(node22), conf.mapProperty("name"), l)
         );
-        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
         System.out.println(translation);
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
@@ -896,7 +896,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(s, conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")),
                 new TriplePatternImpl(s, Var.alloc("p"), Var.alloc("o"))
         );
-        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
         final CypherVar a11 = new CypherVar("a11");
         final CypherVar a12 = new CypherVar("a12");
         final CypherVar a13 = new CypherVar("a13");
@@ -1010,7 +1010,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(conf.mapNode(node23), p, NodeFactory.createLiteral("2005")),
                 new TriplePatternImpl(conf.mapNode(node22), p, Var.alloc("o"))
         );
-        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeMatchClause(a3))
@@ -1035,7 +1035,7 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(conf.mapNode(node23), Var.alloc("p1"), NodeFactory.createLiteral("2005")),
                 new TriplePatternImpl(conf.mapNode(node22), Var.alloc("p2"), NodeFactory.createLiteral("2005"))
         );
-        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf).object1;
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeMatchClause(a3))

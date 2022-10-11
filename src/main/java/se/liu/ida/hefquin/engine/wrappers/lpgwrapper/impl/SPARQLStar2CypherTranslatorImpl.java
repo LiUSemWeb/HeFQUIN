@@ -30,42 +30,44 @@ import java.util.Set;
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf) {
+    public Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf,
+                                                               final boolean naive) {
         final Set<Node> certainNodes = new HashSet<>();
         final Set<Node> certainEdgeLabels = new HashSet<>();
         final Set<Node> certainNodeLabels = new HashSet<>();
         final Set<Node> certainPropertyNames = new HashSet<>();
         final Set<Node> certainPropertyValues = new HashSet<>();
-        for (final TriplePattern tp : bgp.getTriplePatterns()) {
-            final Node s = tp.asJenaTriple().getSubject();
-            final Node p = tp.asJenaTriple().getPredicate();
-            final Node o = tp.asJenaTriple().getObject();
-            if (s.isVariable()) {
-                if (conf.isLabelIRI(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
-                    certainNodes.add(s);
+        if (!naive) {
+            for (final TriplePattern tp : bgp.getTriplePatterns()) {
+                final Node s = tp.asJenaTriple().getSubject();
+                final Node p = tp.asJenaTriple().getPredicate();
+                final Node o = tp.asJenaTriple().getObject();
+                if (s.isVariable()) {
+                    if (conf.isLabelIRI(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
+                        certainNodes.add(s);
+                    }
                 }
-            }
-            if (o.isVariable()) {
-                if (conf.mapsToEdgeLabel(p)){
-                    certainNodes.add(o);
+                if (o.isVariable()) {
+                    if (conf.mapsToEdgeLabel(p)) {
+                        certainNodes.add(o);
+                    }
+                    if (conf.isLabelIRI(p)) {
+                        certainNodeLabels.add(o);
+                    }
+                    if (conf.mapsToProperty(p) || s.isNodeTriple()) {
+                        certainPropertyValues.add(o);
+                    }
                 }
-                if (conf.isLabelIRI(p)) {
-                    certainNodeLabels.add(o);
-                }
-                if (conf.mapsToProperty(p) || s.isNodeTriple()) {
-                    certainPropertyValues.add(o);
-                }
-            }
-            if (p.isVariable()) {
-                if (conf.mapsToNode(o)) {
-                    certainEdgeLabels.add(p);
-                }
-                if (o.isLiteral() || s.isNodeTriple()) {
-                    certainPropertyNames.add(p);
+                if (p.isVariable()) {
+                    if (conf.mapsToNode(o)) {
+                        certainEdgeLabels.add(p);
+                    }
+                    if (o.isLiteral() || s.isNodeTriple()) {
+                        certainPropertyNames.add(p);
+                    }
                 }
             }
         }
-
         CypherQuery result = null;
         final CypherVarGenerator gen = new CypherVarGenerator();
         for (final TriplePattern tp : bgp.getTriplePatterns()) {
