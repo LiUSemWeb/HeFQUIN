@@ -8,7 +8,7 @@ import arq.cmdline.ModQueryIn;
 public class ModQuery extends ModQueryIn
 {
     public ModQuery() {
-        super( Syntax.syntaxSPARQL_11 );
+        super( Syntax.syntaxARQ );
     }
 
 	@Override
