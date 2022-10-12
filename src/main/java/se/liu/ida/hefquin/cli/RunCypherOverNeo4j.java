@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.cli;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModTime;
+import org.apache.jena.base.Sys;
 import org.apache.jena.cmd.ArgDecl;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
@@ -34,7 +35,7 @@ public class RunCypherOverNeo4j extends CmdARQ {
     }
 
     public static void main(String[] args) {
-        new RunBGPOverNeo4j(args).mainRun();
+        new RunCypherOverNeo4j(args).mainRun();
     }
 
     @Override
