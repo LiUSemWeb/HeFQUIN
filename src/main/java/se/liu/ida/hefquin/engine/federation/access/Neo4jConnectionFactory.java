@@ -40,7 +40,6 @@ public class Neo4jConnectionFactory {
                     "    \"statement\" : \""+ cypher +"\"" +
                     "  , \"parameters\" : {} } ]" +
                     "}";
-
             final var request = HttpRequest.newBuilder(
                     URI.create(this.URL))
                     .header("Accept", "application/json;charset=UTF-8")

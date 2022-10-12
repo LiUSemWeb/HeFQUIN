@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.cli;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import org.apache.jena.base.Sys;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
@@ -103,7 +104,9 @@ public class RunBGPOverNeo4j extends CmdARQ {
         //Query translation
         modTime.startTimer();
         final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateBGP(bgp, conf, argNaive.takesValue());
+                .translateBGP(bgp, conf, hasArg(argNaive));
+        //System.out.println(translation.object1);
+        System.exit(0);
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
             System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");
