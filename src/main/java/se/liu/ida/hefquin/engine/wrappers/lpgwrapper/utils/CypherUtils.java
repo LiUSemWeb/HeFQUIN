@@ -25,10 +25,11 @@ public class CypherUtils {
     public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4JException {
         final ObjectMapper mapper = new ObjectMapper();
         final List<TableRecord> records = new LinkedList<>();
+        System.out.println(body);
         final JsonNode root = mapper.readTree(body);
         final JsonNode errors = root.get("errors");
         if (errors.isArray() && !errors.isEmpty()) {
-            throw new Neo4JException(errors.textValue());
+            throw new Neo4JException(errors.get(0).textValue());
         }
         final JsonNode results = root.get("results");
         for (final JsonNode r : results) {
