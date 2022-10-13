@@ -699,6 +699,17 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
         }
+        final CypherVar innerVar = new CypherVar("k");
+        if (certainNodes.contains(s) && certainPropertyNames.contains(p)) {
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a1))
+                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), List.of(),
+                            List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
+                    .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
+                    .build();
+        }
 
         final CypherVar a4 = gen.getAnonVar();
         if (certainNodeLabels.contains(o)) {
@@ -712,7 +723,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
 
         final CypherVar a5 = gen.getAnonVar();
         final CypherVar a6 = gen.getAnonVar();
-        final CypherVar innerVar = new CypherVar("k");
         final CypherVar marker = gen.getMarkerVar();
         if (certainNodes.contains(s)){
             return new CypherUnionQueryImpl(
