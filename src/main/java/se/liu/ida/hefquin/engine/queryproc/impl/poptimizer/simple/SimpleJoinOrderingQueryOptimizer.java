@@ -53,13 +53,14 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalOptimizer
     }
 
     public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalOptimizationException {
+        if ( plan.numberOfSubPlans() == 0 ) {
+            return plan;
+        }
+
         final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan);
 
         if ( hasMultiwayJoinAsRoot(plan) ){
             return joinPlanOptimizer.determineJoinPlan(optSubPlans);
-        }
-        else if ( plan.numberOfSubPlans() == 0){
-            return plan;
         }
         else {
             return PhysicalPlanFactory.createPlan( plan.getRootOperator(), optSubPlans );

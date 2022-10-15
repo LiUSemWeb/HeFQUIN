@@ -26,7 +26,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpParallelMultiLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 
@@ -167,8 +166,9 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 				return PhysicalPlanFactory.createPlan(pop, children);
 			}
 
-//			Multiway joins are converted to left-deep plan of joins:
-//			For join operators, use tpAdd and bgpAdd when possible; otherwise, binary joins are used by default.
+			// Multiway joins are converted to a left-deep plan of joins, where
+			// tpAdd and bgpAdd are used when possible; otherwise, binary joins
+			// are used by default.
 			PhysicalPlan currentSubPlan = children.get(0);
 			for ( int i = 1; i < children.size(); ++i ) {
 				final PhysicalPlan nextChild = children.get(i);
@@ -216,16 +216,9 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 
 			// Now comes the generic option that works for all cases.
 
-			if ( keepMultiwayJoins ) {
-				final NaryPhysicalOp pop = new BasePhysicalOpMultiwayLeftJoin(lop) {
-					@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
-					@Override public NaryExecutableOp createExecOp(boolean collectExceptions, ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
-				};
-				return PhysicalPlanFactory.createPlan(pop, children);
-			}
-
-//			Multiway left joins are converted to right-deep plan of right outer joins:
-//			For join operators, use tpOptAdd and bgpOptAdd when possible; otherwise, binary joins are used by default.
+			// Multiway left joins are converted to right-deep plans of right
+			// outer joins, where tpOptAdd and bgpOptAdd are used when possible;
+			// otherwise, binary outer joins are used by default.
 
 			// The first child of the multiway left join is the non-optional part
 			// and, thus, is used as the right input to the first right outer join
