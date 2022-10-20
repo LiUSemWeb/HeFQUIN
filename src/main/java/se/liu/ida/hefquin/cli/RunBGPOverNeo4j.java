@@ -105,8 +105,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
         modTime.startTimer();
         final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateBGP(bgp, conf, hasArg(argNaive));
-        //System.out.println(translation.object1);
-        //System.exit(0);
+
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
             System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");

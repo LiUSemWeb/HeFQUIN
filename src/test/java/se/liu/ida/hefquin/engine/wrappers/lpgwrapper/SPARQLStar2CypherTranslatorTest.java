@@ -873,7 +873,6 @@ public class SPARQLStar2CypherTranslatorTest {
                 new TriplePatternImpl(conf.mapNode(node22), conf.mapProperty("name"), l)
         );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).object1;
-        System.out.println(translation);
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new NodeMatchClause(a2))
