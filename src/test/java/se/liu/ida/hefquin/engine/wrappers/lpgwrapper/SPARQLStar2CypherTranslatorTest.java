@@ -749,6 +749,26 @@ public class SPARQLStar2CypherTranslatorTest {
     }
 
     @Test
+    public void certainNodeAndPropertyVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var s = Var.alloc("s");
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(s, p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, gen, Collections.singleton(s),
+                        emptySet, emptySet, Collections.singleton(p), emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1), List.of(),
+                                List.of(vark, new PropertyAccessWithVarExpression(a1, vark)), a2))
+                        .add(new AliasedExpression(a1, ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 1), ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
     public void translateTriplePropertyLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
