@@ -34,6 +34,6 @@ public class LabelsExpression implements CypherExpression {
 
     @Override
     public String toString() {
-        return "HEAD(LABELS(" + var + ')';
+        return "HEAD(LABELS(" + var + "))";
     }
 }
