@@ -12,7 +12,7 @@ public class DefaultConfiguration implements LPG2RDFConfiguration {
     protected final String NODELABEL = "label/";
     protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
-    protected final String LABEL = "http://www.w3.org/2000/01/rdf-schema#Label";
+    protected final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
     @Override
     public Node mapNode(final LPGNode node) {
