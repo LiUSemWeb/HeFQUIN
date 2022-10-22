@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Triple;
@@ -14,9 +15,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.UnwindIteratorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -56,8 +55,8 @@ public class SPARQLStar2CypherTranslatorTest {
 
     final Set<Node> emptySet = Collections.emptySet();
 
-    final LiteralExpression id22 = new LiteralExpression("22");
-    final LiteralExpression id23 = new LiteralExpression("23");
+    final LiteralExpression id22 = new LiteralExpression("22", XSDDatatype.XSDinteger);
+    final LiteralExpression id23 = new LiteralExpression("23", XSDDatatype.XSDinteger);
 
     @Before
     public void resetVarGenerator() {
@@ -749,6 +748,26 @@ public class SPARQLStar2CypherTranslatorTest {
     }
 
     @Test
+    public void certainNodeAndPropertyVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var s = Var.alloc("s");
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(s, p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, gen, Collections.singleton(s),
+                        emptySet, emptySet, Collections.singleton(p), emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1), List.of(),
+                                List.of(vark, new PropertyAccessWithVarExpression(a1, vark)), a2))
+                        .add(new AliasedExpression(a1, ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 1), ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
     public void translateTriplePropertyLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
@@ -851,13 +870,13 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new EqualityExpression(new PropertyAccessExpression(a3, "source"),
                                 new LiteralExpression("IMDB")))
                         .add(new EqualityExpression(a4, a1))
-                        .add(new VariableLabelExpression(a5, "Person"))
-                        .add(new EqualityExpression(a5, a2))
+                        .add(new VariableLabelExpression(a5, "Movie"))
+                        .add(new EqualityExpression(a5, a1))
                         .add(new EqualityExpression(new PropertyAccessExpression(a6, "name"),
                                 new LiteralExpression("Uma Thurman")))
                         .add(new EqualityExpression(a6, a2))
-                        .add(new VariableLabelExpression(a7, "Movie"))
-                        .add(new EqualityExpression(a7, a1))
+                        .add(new VariableLabelExpression(a7, "Person"))
+                        .add(new EqualityExpression(a7, a2))
                         .add(new AliasedExpression(a1, ret1))
                         .add(new AliasedExpression(new PropertyAccessExpression(a1, "released"), ret2))
                         .add(new AliasedExpression(a2, ret3))
