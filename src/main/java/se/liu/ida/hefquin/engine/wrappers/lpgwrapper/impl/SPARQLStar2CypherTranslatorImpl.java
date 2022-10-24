@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -264,7 +265,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(nodeVar))
                 .add(new EqualityExpression(new VariableIDExpression(nodeVar),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new VariableLabelExpression(nodeVar, configuration.unmapNodeLabel(o)))
                 .add(new AliasedExpression(new CountLargerThanZeroExpression(), gen.getAnonVar()))
                 .build();
@@ -277,7 +278,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(nodeVar))
                 .add(new EqualityExpression(new VariableIDExpression(nodeVar),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new EqualityExpression(new PropertyAccessExpression(nodeVar, configuration.unmapProperty(p)),
                         new LiteralExpression(o.getLiteralValue().toString())))
                 .add(new AliasedExpression(new CountLargerThanZeroExpression(), gen.getAnonVar()))
@@ -293,10 +294,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new EdgeMatchClause(srcVar, edgeVar, tgtVar))
                 .add(new EqualityExpression(new VariableIDExpression(srcVar),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new VariableLabelExpression(edgeVar, configuration.unmapEdgeLabel(p)))
                 .add(new EqualityExpression(new VariableIDExpression(tgtVar),
-                        new LiteralExpression(configuration.unmapNode(o).getId())))
+                        new LiteralExpression(configuration.unmapNode(o).getId(), XSDDatatype.XSDinteger)))
                 .add(new AliasedExpression(new CountLargerThanZeroExpression(), gen.getAnonVar()))
                 .build();
     }
@@ -360,7 +361,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new EqualityExpression(new VariableIDExpression(a3),
-                        new LiteralExpression(node.getId())))
+                        new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                 .add(new VariableLabelExpression(a2, relationship))
                 .add(new AliasedExpression(a1, gen.getRetVar(s)))
                 .build();
@@ -372,7 +373,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(a1))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
                 .build();
     }
@@ -385,7 +386,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(var))
                 .add(new EqualityExpression(new VariableIDExpression(var),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new EXISTSExpression(new PropertyAccessExpression(var, property)))
                 .add(new AliasedExpression(new PropertyAccessExpression(var, property), gen.getRetVar(o)))
                 .build();
@@ -400,7 +401,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new VariableLabelExpression(a2, configuration.unmapEdgeLabel(p)))
                 .add(new AliasedExpression(a3, gen.getRetVar(o)))
                 .build();
@@ -414,9 +415,9 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new EqualityExpression(new VariableIDExpression(a3),
-                        new LiteralExpression(configuration.unmapNode(o).getId())))
+                        new LiteralExpression(configuration.unmapNode(o).getId(), XSDDatatype.XSDinteger)))
                 .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
                 .build();
     }
@@ -431,7 +432,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(a1))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1),
                         List.of(new EqualityExpression(
                                 new PropertyAccessWithVarExpression(a1, innerVar),
@@ -447,7 +448,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(a1))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
-                        new LiteralExpression(configuration.unmapNode(s).getId())))
+                        new LiteralExpression(configuration.unmapNode(s).getId(), XSDDatatype.XSDinteger)))
                 .add(new VariableLabelExpression(a1, configuration.unmapNodeLabel(o)))
                 .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
                 .build();
@@ -534,7 +535,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new EdgeMatchClause(a1, a2, a3))
                 .add(new EqualityExpression(new VariableIDExpression(a3),
-                        new LiteralExpression(configuration.unmapNode(o).getId())))
+                        new LiteralExpression(configuration.unmapNode(o).getId(), XSDDatatype.XSDinteger)))
                 .add(new AliasedExpression(a1, gen.getRetVar(s)))
                 .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
                 .build();
@@ -603,7 +604,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             return new CypherQueryBuilder()
                     .add(new NodeMatchClause(a1))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
-                            new LiteralExpression(node.getId())))
+                            new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                     .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
                     .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
                     .build();
@@ -614,7 +615,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             return new CypherQueryBuilder()
                     .add(new NodeMatchClause(a1))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
-                            new LiteralExpression(node.getId())))
+                            new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                     .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), null,
                             List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
                     .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
@@ -627,7 +628,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             return new CypherQueryBuilder()
                     .add(new EdgeMatchClause(a1, a2, a3))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
-                            new LiteralExpression(node.getId())))
+                            new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                     .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
@@ -636,7 +637,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             return new CypherQueryBuilder()
                     .add(new EdgeMatchClause(a1, a2, a3))
                     .add(new EqualityExpression(new VariableIDExpression(a1),
-                            new LiteralExpression(node.getId())))
+                            new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                     .add(new AliasedExpression(new TypeExpression(a2), gen.getRetVar(p)))
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
@@ -649,7 +650,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new EqualityExpression(new VariableIDExpression(a1),
-                                new LiteralExpression(node.getId())))
+                                new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                         .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
                         .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
@@ -657,7 +658,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
                         .add(new EqualityExpression(new VariableIDExpression(a2),
-                                new LiteralExpression(node.getId())))
+                                new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                         .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a2), null,
                                 List.of(innerVar, new PropertyAccessWithVarExpression(a2, innerVar)), a3))
                         .add(new MarkerExpression(1, marker))
@@ -667,7 +668,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 new CypherQueryBuilder()
                         .add(new EdgeMatchClause(a4, a5, a6))
                         .add(new EqualityExpression(new VariableIDExpression(a4),
-                                new LiteralExpression(node.getId())))
+                                new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                         .add(new MarkerExpression(2, marker))
                         .add(new AliasedExpression(new TypeExpression(a5), gen.getRetVar(p)))
                         .add(new AliasedExpression(a6, gen.getRetVar(o)))
@@ -685,6 +686,17 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                               final boolean isEdgeCompatible) {
         final CypherVar a1 = gen.getAnonVar();
         final CypherVar a2 = gen.getAnonVar();
+        final CypherVar innerVar = new CypherVar("k");
+        if (certainNodes.contains(s) && (certainPropertyNames.contains(p) || certainPropertyValues.contains(o))) {
+            return new CypherQueryBuilder()
+                    .add(new NodeMatchClause(a1))
+                    .add(new UnwindIteratorImpl(innerVar, new KeysExpression(a1), List.of(),
+                            List.of(innerVar, new PropertyAccessWithVarExpression(a1, innerVar)), a2))
+                    .add(new AliasedExpression(a1, gen.getRetVar(s)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 0), gen.getRetVar(p)))
+                    .add(new AliasedExpression(new GetItemExpression(a2, 1), gen.getRetVar(o)))
+                    .build();
+        }
         final CypherVar a3 = gen.getAnonVar();
         if ((certainNodes.contains(s) && certainNodes.contains(o)) || certainEdgeLabels.contains(p)
         || isEdgeCompatible) {
@@ -695,7 +707,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new AliasedExpression(a3, gen.getRetVar(o)))
                     .build();
         }
-
         final CypherVar a4 = gen.getAnonVar();
         if (certainNodeLabels.contains(o)) {
             return new CypherQueryBuilder()
@@ -708,7 +719,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
 
         final CypherVar a5 = gen.getAnonVar();
         final CypherVar a6 = gen.getAnonVar();
-        final CypherVar innerVar = new CypherVar("k");
         final CypherVar marker = gen.getMarkerVar();
         if (certainNodes.contains(s)){
             return new CypherUnionQueryImpl(

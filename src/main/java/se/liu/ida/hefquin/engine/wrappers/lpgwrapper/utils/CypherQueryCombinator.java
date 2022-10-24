@@ -141,19 +141,16 @@ public class CypherQueryCombinator {
     private static boolean hasInvalidJoins(final CypherMatchQuery q1, final CypherMatchQuery q2) {
         final List<AliasedExpression> ret1 = q1.getReturnExprs();
         final List<AliasedExpression> ret2 = q2.getReturnExprs();
-        final List<CypherVar> aliases1 = q1.getAliases();
         final List<CypherVar> aliases2 = q2.getAliases();
         final Set<CypherVar> uvars1 = q1.getUvars();
-        final Set<CypherVar> uvars2 = q1.getUvars();
+        final Set<CypherVar> uvars2 = q2.getUvars();
 
         for (final AliasedExpression e : ret1) {
-            if (aliases2.contains(e.getAlias()) && uvars1.contains(e.getAlias()))
-                return true;
-        }
-
-        for (final AliasedExpression e : ret2){
-            if (aliases1.contains(e.getAlias()) && uvars2.contains(e.getAlias()))
-                return true;
+            if (aliases2.contains(e.getAlias())) {
+                final CypherExpression exp = ret2.stream().filter(x -> x.getAlias().equals(e.getAlias())).findFirst().get();
+                if (!Collections.disjoint(exp.getVars(), uvars2)^!Collections.disjoint(e.getVars(), uvars1))
+                    return true;
+            }
         }
         return false;
     }
