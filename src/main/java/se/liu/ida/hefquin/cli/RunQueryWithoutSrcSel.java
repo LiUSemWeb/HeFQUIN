@@ -157,7 +157,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace();
 		}
 
-		if ( statsAndExceptions != null && contains(argQueryProcStats) ) {
+		if (    statsAndExceptions != null
+		     && statsAndExceptions.object1 != null
+		     && contains(argQueryProcStats) ) {
 			StatsPrinter.print(statsAndExceptions.object1, System.err, true);
 		}
 
