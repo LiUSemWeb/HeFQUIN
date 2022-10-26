@@ -11,14 +11,12 @@ import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
 import se.liu.ida.hefquin.engine.federation.*;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.*;
@@ -105,7 +103,12 @@ public class ModFederation extends ModBase
 				throw new IllegalArgumentException();
 			}
 
-			addSPARQLEndpoint(addrStr);
+			if( fd.contains(iface, FD.vocabularyMappings) ){
+				final RDFNode path = fd.getRequiredProperty(iface, FD.vocabularyMappings).getObject();
+				addSPARQLEndpoint(addrStr, path.toString());
+			}
+			else
+				addSPARQLEndpoint(addrStr);
 		}
 
 		final ResIterator itTPF = fd.listResourcesWithProperty(RDF.type, FD.TPFInterface);
@@ -198,6 +201,19 @@ public class ModFederation extends ModBase
 	protected void addBRTPFServers( final List<String> uris ) {
 		for ( final String uri : uris )
 			addBRTPFServer(uri);
+	}
+
+	protected void addSPARQLEndpoint( final String sparqlEndpointValue, final String pathToVocabularyMappings ) {
+		verifyExpectedURI(sparqlEndpointValue);
+
+		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl(sparqlEndpointValue);
+		final VocabularyMapping vocabMap = new VocabularyMappingImpl( pathToVocabularyMappings );
+		final SPARQLEndpoint fm = new SPARQLEndpoint() {
+			@Override public SPARQLEndpointInterface getInterface() { return iface; }
+			@Override public VocabularyMapping getVocabularyMapping() { return vocabMap; }
+		};
+
+		membersByURI.put(sparqlEndpointValue, fm);
 	}
 
 	protected void addSPARQLEndpoint( final String sparqlEndpointValue ) {
