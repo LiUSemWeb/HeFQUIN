@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.cli.modules;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -87,165 +88,151 @@ public class ModFederation extends ModBase
 	protected void parseFedDescr( final String filename ) {
 		final Model fd = RDFDataMgr.loadModel(filename);
 
-		final ResIterator itSPARQL = fd.listResourcesWithProperty(RDF.type, FD.SPARQLEndpointInterface);
-		while ( itSPARQL.hasNext() ) {
-			final Resource iface = itSPARQL.next();
-			final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+		final ResIterator isFedMember = fd.listResourcesWithProperty(RDF.type, FD.FederationMember);
+		// Iterate over all federation members
+		while ( isFedMember.hasNext() ) {
+			final Resource fedMember = isFedMember.next();
+			VocabularyMapping vocabMap = null;
+			if( fd.contains(fedMember, FD.vocabularyMappingsFile) ){
+				final RDFNode pathToMappingFile = fd.getRequiredProperty(fedMember, FD.vocabularyMappingsFile).getObject();
 
-			final String addrStr;
-			if ( addr.isLiteral() ) {
-				addrStr = addr.asLiteral().getLexicalForm();
-			}
-			else if ( addr.isURIResource() ) {
-				addrStr = addr.asResource().getURI();
-			}
-			else {
-				throw new IllegalArgumentException();
+				final String path = pathToMappingFile.toString();
+				if ( verifyValidVocabMappingFile( path ) ) {
+					vocabMap = new VocabularyMappingImpl(path);
+				}
 			}
 
-			if( fd.contains(iface, FD.vocabularyMappings) ){
-				final RDFNode path = fd.getRequiredProperty(iface, FD.vocabularyMappings).getObject();
-				addSPARQLEndpoint(addrStr, path.toString());
-			}
-			else
-				addSPARQLEndpoint(addrStr);
-		}
+			final Resource iface = fedMember.getProperty(FD.interface_).getResource();
+			// Check the type of interface
+			if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.SPARQLEndpointInterface) ){
+				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
-		final ResIterator itTPF = fd.listResourcesWithProperty(RDF.type, FD.TPFInterface);
-		while ( itTPF.hasNext() ) {
-			final Resource iface = itTPF.next();
-			final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+				final String addrStr;
+				if ( addr.isLiteral() ) {
+					addrStr = addr.asLiteral().getLexicalForm();
+				}
+				else if ( addr.isURIResource() ) {
+					addrStr = addr.asResource().getURI();
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+				addSPARQLEndpoint(addrStr, vocabMap);
+			}
+			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.TPFInterface) ){
+				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
 
-			final String addrStr;
-			if ( addr.isLiteral() ) {
-				addrStr = addr.asLiteral().getLexicalForm();
+				final String addrStr;
+				if ( addr.isLiteral() ) {
+					addrStr = addr.asLiteral().getLexicalForm();
+				}
+				else if ( addr.isURIResource() ) {
+					addrStr = addr.asResource().getURI();
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+
+				addTPFServer(addrStr, vocabMap);
 			}
-			else if ( addr.isURIResource() ) {
-				addrStr = addr.asResource().getURI();
+			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.brTPFInterface) ){
+				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+
+				final String addrStr;
+				if ( addr.isLiteral() ) {
+					addrStr = addr.asLiteral().getLexicalForm();
+				}
+				else if ( addr.isURIResource() ) {
+					addrStr = addr.asResource().getURI();
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+
+				addBRTPFServer(addrStr, vocabMap);
 			}
-			else {
-				throw new IllegalArgumentException();
+			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.BoltInterface) ){
+				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+
+				final String addrStr;
+				if ( addr.isLiteral() ) {
+					addrStr = addr.asLiteral().getLexicalForm();
+				}
+				else if ( addr.isURIResource() ) {
+					addrStr = addr.asResource().getURI();
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+
+				addNeo4jServer(addrStr, vocabMap);
+			}
+			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.GraphQLEndpointInterface) ){
+				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+
+				final String addrStr;
+				if ( addr.isLiteral() ) {
+					addrStr = addr.asLiteral().getLexicalForm();
+				}
+				else if ( addr.isURIResource() ) {
+					addrStr = addr.asResource().getURI();
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+
+				addGraphQLServer(addrStr);
 			}
 
-			addTPFServer(addrStr);
-		}
-
-		final ResIterator itBRTPF = fd.listResourcesWithProperty(RDF.type, FD.brTPFInterface);
-		while ( itBRTPF.hasNext() ) {
-			final Resource iface = itBRTPF.next();
-			final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
-
-			final String addrStr;
-			if ( addr.isLiteral() ) {
-				addrStr = addr.asLiteral().getLexicalForm();
-			}
-			else if ( addr.isURIResource() ) {
-				addrStr = addr.asResource().getURI();
-			}
-			else {
-				throw new IllegalArgumentException();
-			}
-
-			addBRTPFServer(addrStr);
-		}
-
-		final ResIterator itNeo4j = fd.listResourcesWithProperty(RDF.type, FD.BoltInterface);
-		while ( itNeo4j.hasNext() ) {
-			final Resource iface = itNeo4j.next();
-			final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
-
-			final String addrStr;
-			if ( addr.isLiteral() ) {
-				addrStr = addr.asLiteral().getLexicalForm();
-			}
-			else if ( addr.isURIResource() ) {
-				addrStr = addr.asResource().getURI();
-			}
-			else {
-				throw new IllegalArgumentException();
-			}
-
-			addNeo4jServer(addrStr);
-		}
-
-		final ResIterator itGraphQL = fd.listResourcesWithProperty(RDF.type, FD.GraphQLEndpointInterface);
-		while ( itGraphQL.hasNext() ) {
-			final Resource iface = itGraphQL.next();
-			final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
-
-			final String addrStr;
-			if ( addr.isLiteral() ) {
-				addrStr = addr.asLiteral().getLexicalForm();
-			}
-			else if ( addr.isURIResource() ) {
-				addrStr = addr.asResource().getURI();
-			}
-			else {
-				throw new IllegalArgumentException();
-			}
-
-			addGraphQLServer(addrStr);
 		}
 	}
 
 	protected void addSPARQLEndpoints( final List<String> sparqlEndpointValues ) {
 		for ( final String v : sparqlEndpointValues )
-			addSPARQLEndpoint(v);
+			// TODO: extend command line to support connect the endpoint to a file that describe the vocabulary mappings
+			addSPARQLEndpoint(v, null);
 	}
 
 	protected void addTPFServers( final List<String> uris ) {
 		for ( final String uri : uris )
-			addTPFServer(uri);
+			addTPFServer(uri, null);
 	}
 
 	protected void addBRTPFServers( final List<String> uris ) {
 		for ( final String uri : uris )
-			addBRTPFServer(uri);
+			addBRTPFServer(uri, null);
 	}
 
-	protected void addSPARQLEndpoint( final String sparqlEndpointValue, final String pathToVocabularyMappings ) {
-		verifyExpectedURI(sparqlEndpointValue);
-
-		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl(sparqlEndpointValue);
-		final VocabularyMapping vocabMap = new VocabularyMappingImpl( pathToVocabularyMappings );
-		final SPARQLEndpoint fm = new SPARQLEndpoint() {
-			@Override public SPARQLEndpointInterface getInterface() { return iface; }
-			@Override public VocabularyMapping getVocabularyMapping() { return vocabMap; }
-		};
-
-		membersByURI.put(sparqlEndpointValue, fm);
-	}
-
-	protected void addSPARQLEndpoint( final String sparqlEndpointValue ) {
+	protected void addSPARQLEndpoint( final String sparqlEndpointValue, final VocabularyMapping vocabMappings ) {
 		verifyExpectedURI(sparqlEndpointValue);
 
 		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl(sparqlEndpointValue);
 		final SPARQLEndpoint fm = new SPARQLEndpoint() {
 			@Override public SPARQLEndpointInterface getInterface() { return iface; }
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
+			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 		};
 
 		membersByURI.put(sparqlEndpointValue, fm);
 	}
 
-	protected void addTPFServer( final String uri ) {
+	protected void addTPFServer( final String uri, final VocabularyMapping vocabMappings ) {
 		verifyExpectedURI(uri);
 
 		final TPFInterface iface = TPFInterfaceUtils.createTPFInterface(uri);
 		final TPFServer fm = new TPFServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
+			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public TPFInterface getInterface() { return iface; }
 		};
 
 		membersByURI.put(uri, fm);
 	}
 
-	protected void addBRTPFServer( final String uri ) {
+	protected void addBRTPFServer( final String uri, final VocabularyMapping vocabMappings ) {
 		verifyExpectedURI(uri);
 
 		final BRTPFInterface iface = BRTPFInterfaceUtils.createBRTPFInterface(uri);
 		final BRTPFServer fm = new BRTPFServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
+			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public BRTPFInterface getInterface() { return iface; }
 		};
 
@@ -275,12 +262,12 @@ public class ModFederation extends ModBase
 		}
 	}
 
-	protected void addNeo4jServer( final String uri ) {
+	protected void addNeo4jServer( final String uri, final VocabularyMapping vocabMappings ) {
 		verifyExpectedURI(uri);
 
 		final Neo4jInterface iface = new Neo4jInterfaceImpl(uri);
 		final Neo4jServer fm = new Neo4jServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
+			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public Neo4jInterface getInterface() { return iface; }
 		};
 
@@ -301,6 +288,16 @@ public class ModFederation extends ModBase
 		}
 
 		return uri;
+	}
+
+	protected boolean verifyValidVocabMappingFile(final String pathString ) {
+		File f = new File(pathString);
+		if ( f.exists() ){
+			// TODO: .nt file?
+			return f.isFile();
+		}
+		else
+			throw new IllegalArgumentException( "The following path to vocab.mapping does not exist:" + pathString );
 	}
 
 }
