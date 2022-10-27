@@ -31,6 +31,6 @@ public class FD
 	public static final Property endpointAddress          = property("endpointAddress");
 	public static final Property exampleFragmentAddress   = property("exampleFragmentAddress");
 
-	public static final Property vocabularyMappings     = property("vocabularyMappings");
+	public static final Property vocabularyMappingsFile     = property("vocabularyMappingsFile");
 
 }
