@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
@@ -882,6 +883,38 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new AliasedExpression(a2, ret3))
                         .build(),
                 translation);
+    }
+
+    @Test
+    public void translateBGPwithJoinRewriteTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var m = Var.alloc("m");
+        final Var p = Var.alloc("p");
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(m, conf.getLabel(), conf.mapNodeLabel("Movie")),
+                new TriplePatternImpl(p, conf.getLabel(), conf.mapNodeLabel("Person")),
+                new TriplePatternImpl(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman")),
+                new TriplePatternImpl(m, conf.mapProperty("released"), Var.alloc("y")),
+                new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
+                        conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")
+                ));
+        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
+        final CypherQuery procTranslation = translator.rewriteJoins((CypherMatchQuery) translator.translateBGP(bgp, conf).object1);
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a2, a3, a4))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a4, "released")))
+                        .add(new VariableLabelExpression(a3, "ACTED_IN"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a3, "source"),
+                                new LiteralExpression("IMDB")))
+                        .add(new VariableLabelExpression(a4, "Movie"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a2, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new VariableLabelExpression(a2, "Person"))
+                        .add(new AliasedExpression(a4, ret1))
+                        .add(new AliasedExpression(new PropertyAccessExpression(a4, "released"), ret2))
+                        .add(new AliasedExpression(a2, ret3))
+                        .build(),
+                procTranslation);
     }
 
     @Test

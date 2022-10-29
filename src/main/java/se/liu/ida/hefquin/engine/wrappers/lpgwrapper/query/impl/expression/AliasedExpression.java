@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +26,13 @@ public class AliasedExpression implements CypherExpression {
         final Set<CypherVar> res = new HashSet<>(expression.getVars());
         res.add(alias);
         return res;
+    }
+
+    @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        expression.acceptVisitor(visitor);
+        alias.acceptVisitor(visitor);
+        visitor.visitAliasedExpression(this);
     }
 
     public CypherVar getAlias() {

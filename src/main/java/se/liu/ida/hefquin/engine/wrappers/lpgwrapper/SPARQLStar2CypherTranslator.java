@@ -4,10 +4,15 @@ import org.apache.jena.graph.Node;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.utils.Pair;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,4 +48,14 @@ public interface SPARQLStar2CypherTranslator {
      */
     Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf);
 
+
+    CypherMatchQuery rewriteJoins(CypherMatchQuery query);
+
+    default CypherUnionQuery rewriteJoins(CypherUnionQuery query) {
+        List<CypherMatchQuery> union = new ArrayList<>();
+        for (final CypherMatchQuery q : query.getSubqueries()) {
+            union.add(rewriteJoins(q));
+        }
+        return new CypherUnionQueryImpl(union);
+    }
 }

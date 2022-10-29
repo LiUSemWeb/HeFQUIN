@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -24,6 +25,21 @@ public class EqualityExpression implements BooleanCypherExpression{
         final Set<CypherVar> res = new HashSet<>(leftExpression.getVars());
         res.addAll(rightExpression.getVars());
         return res;
+    }
+
+    @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        leftExpression.acceptVisitor(visitor);
+        rightExpression.acceptVisitor(visitor);
+        visitor.visitEquality(this);
+    }
+
+    public CypherExpression getLeftExpression() {
+        return leftExpression;
+    }
+
+    public CypherExpression getRightExpression() {
+        return rightExpression;
     }
 
     @Override

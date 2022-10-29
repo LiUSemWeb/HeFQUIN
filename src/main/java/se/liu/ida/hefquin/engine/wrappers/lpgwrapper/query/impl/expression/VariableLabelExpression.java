@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
+
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,6 +24,12 @@ public class VariableLabelExpression implements BooleanCypherExpression {
     }
 
     @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        variable.acceptVisitor(visitor);
+        visitor.visitVariableLabel(this);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -37,5 +45,9 @@ public class VariableLabelExpression implements BooleanCypherExpression {
     @Override
     public String toString() {
         return variable + ":" + label;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

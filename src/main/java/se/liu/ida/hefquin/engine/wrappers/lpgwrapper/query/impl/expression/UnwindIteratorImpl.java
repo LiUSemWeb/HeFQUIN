@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -96,5 +97,17 @@ public class UnwindIteratorImpl implements UnwindIterator {
             res.addAll(c.getVars());
         res.add(alias);
         return res;
+    }
+
+    @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        innerVar.acceptVisitor(visitor);
+        listExpression.acceptVisitor(visitor);
+        for (final CypherExpression e : filters)
+            e.acceptVisitor(visitor);
+        for (final CypherExpression e : returnExpressions)
+            e.acceptVisitor(visitor);
+        alias.acceptVisitor(visitor);
+        visitor.visitUnwind(this);
     }
 }

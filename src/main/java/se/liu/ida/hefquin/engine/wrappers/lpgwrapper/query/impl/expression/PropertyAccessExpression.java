@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +25,12 @@ public class PropertyAccessExpression implements CypherExpression {
     }
 
     @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        var.acceptVisitor(visitor);
+        visitor.visitPropertyAccess(this);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -39,5 +46,9 @@ public class PropertyAccessExpression implements CypherExpression {
     @Override
     public String toString() {
         return var + "." + property;
+    }
+
+    public String getProperty() {
+        return property;
     }
 }

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +21,12 @@ public class GetItemExpression implements CypherExpression {
     @Override
     public Set<CypherVar> getVars() {
         return expression.getVars();
+    }
+
+    @Override
+    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+        expression.acceptVisitor(visitor);
+        visitor.visitGetItem(this);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.VariableReplacementVisitor;
 
 import java.util.Set;
 
@@ -16,4 +18,8 @@ public interface CypherExpression {
      */
     Set<CypherVar> getVars();
 
+    /**
+     * accepts a {@link CypherExpressionVisitor} and propagates the visit recursively when required.
+     */
+    void acceptVisitor(CypherExpressionVisitor visitor);
 }
