@@ -49,9 +49,9 @@ public interface SPARQLStar2CypherTranslator {
     Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf);
 
 
-    CypherMatchQuery rewriteJoins(CypherMatchQuery query);
+    CypherMatchQuery rewriteJoins(final CypherMatchQuery query);
 
-    default CypherUnionQuery rewriteJoins(CypherUnionQuery query) {
+    default CypherUnionQuery rewriteJoins(final CypherUnionQuery query) {
         List<CypherMatchQuery> union = new ArrayList<>();
         for (final CypherMatchQuery q : query.getSubqueries()) {
             union.add(rewriteJoins(q));
