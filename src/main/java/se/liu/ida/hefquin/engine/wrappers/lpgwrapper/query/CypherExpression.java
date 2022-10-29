@@ -21,5 +21,5 @@ public interface CypherExpression {
     /**
      * accepts a {@link CypherExpressionVisitor} and propagates the visit recursively when required.
      */
-    void acceptVisitor(CypherExpressionVisitor visitor);
+    void acceptVisitor(final CypherExpressionVisitor visitor);
 }

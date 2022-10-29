@@ -52,7 +52,7 @@ public class CypherUtils {
         return records;
     }
 
-    public static Object replaceVariable(Map<CypherVar, CypherVar> equivalences, final CypherExpression ex) {
+    public static Object replaceVariable(final Map<CypherVar, CypherVar> equivalences, final CypherExpression ex) {
         if (Collections.disjoint(equivalences.keySet(), ex.getVars())) return ex;
         final VariableReplacementVisitor visitor = new VariableReplacementVisitor(equivalences);
         visitor.visit(ex);

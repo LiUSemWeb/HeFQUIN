@@ -809,7 +809,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
     }
 
     @Override
-    public CypherMatchQuery rewriteJoins(CypherMatchQuery query) {
+    public CypherMatchQuery rewriteJoins(final CypherMatchQuery query) {
         final CypherQueryBuilder builder = new CypherQueryBuilder();
         final List<BooleanCypherExpression> variableJoins = query.getConditions().stream()
                 .filter(x -> x instanceof EqualityExpression

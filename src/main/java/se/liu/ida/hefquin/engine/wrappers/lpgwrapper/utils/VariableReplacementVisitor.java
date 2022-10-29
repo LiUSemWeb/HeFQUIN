@@ -21,12 +21,12 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
 
 
     @Override
-    public void visit(CypherExpression ex) {
+    public void visit(final CypherExpression ex) {
         ex.acceptVisitor(this);
     }
 
     @Override
-    public void visitAliasedExpression(AliasedExpression ex) {
+    public void visitAliasedExpression(final AliasedExpression ex) {
         //we need to get the elements from the stack in reverse order
         assert stack.peek() instanceof CypherVar;
         final CypherVar alias = (CypherVar) stack.pop();
@@ -35,51 +35,51 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitCountLargerThanZero(CountLargerThanZeroExpression ex) {
+    public void visitCountLargerThanZero(final CountLargerThanZeroExpression ex) {
         stack.push(ex);
     }
 
     @Override
-    public void visitVar(CypherVar var) {
+    public void visitVar(final CypherVar var) {
         stack.push(equivalences.getOrDefault(var, var));
     }
 
     @Override
-    public void visitEquality(EqualityExpression ex) {
+    public void visitEquality(final EqualityExpression ex) {
         final CypherExpression rhs = stack.pop();
         final CypherExpression lhs = stack.pop();
         stack.push(new EqualityExpression(lhs, rhs));
     }
 
     @Override
-    public void visitEXISTS(EXISTSExpression ex) {
+    public void visitEXISTS(final EXISTSExpression ex) {
         stack.push(new EXISTSExpression(stack.pop()));
     }
 
     @Override
-    public void visitGetItem(GetItemExpression ex) {
+    public void visitGetItem(final GetItemExpression ex) {
         stack.push(new GetItemExpression(stack.pop(), ex.getIndex()));
     }
 
     @Override
-    public void visitKeys(KeysExpression ex) {
+    public void visitKeys(final KeysExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new KeysExpression((CypherVar) stack.pop()));
     }
 
     @Override
-    public void visitLabels(LabelsExpression ex) {
+    public void visitLabels(final LabelsExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new LabelsExpression((CypherVar) stack.pop()));
     }
 
     @Override
-    public void visitLiteral(LiteralExpression ex) {
+    public void visitLiteral(final LiteralExpression ex) {
         stack.push(ex);
     }
 
     @Override
-    public void visitMembership(MembershipExpression ex) {
+    public void visitMembership(final MembershipExpression ex) {
         assert stack.peek() instanceof ListCypherExpression;
         final ListCypherExpression list = (ListCypherExpression) stack.pop();
         assert stack.peek() instanceof CypherVar;
@@ -88,13 +88,13 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitPropertyAccess(PropertyAccessExpression ex) {
+    public void visitPropertyAccess(final PropertyAccessExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new PropertyAccessExpression((CypherVar) stack.pop(), ex.getProperty()));
     }
 
     @Override
-    public void visitPropertyAccessWithVar(PropertyAccessWithVarExpression ex) {
+    public void visitPropertyAccessWithVar(final PropertyAccessWithVarExpression ex) {
         assert stack.peek() instanceof CypherVar;
         final CypherVar innerVar = (CypherVar) stack.pop();
         assert stack.peek() instanceof CypherVar;
@@ -103,7 +103,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitTripleMap(TripleMapExpression ex) {
+    public void visitTripleMap(final TripleMapExpression ex) {
         assert stack.peek() instanceof CypherVar;
         final CypherVar target = (CypherVar) stack.pop();
         assert stack.peek() instanceof CypherVar;
@@ -114,13 +114,13 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitType(TypeExpression ex) {
+    public void visitType(final TypeExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new TypeExpression((CypherVar) stack.pop()));
     }
 
     @Override
-    public void visitUnwind(UnwindIteratorImpl iterator) {
+    public void visitUnwind(final UnwindIteratorImpl iterator) {
         assert stack.peek() instanceof CypherVar;
         final CypherVar alias = (CypherVar) stack.pop();
         final List<CypherExpression> returnExps = new ArrayList<>();
@@ -140,19 +140,19 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitID(VariableIDExpression ex) {
+    public void visitID(final VariableIDExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new VariableIDExpression((CypherVar) stack.pop()));
     }
 
     @Override
-    public void visitVariableLabel(VariableLabelExpression ex) {
+    public void visitVariableLabel(final VariableLabelExpression ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new VariableLabelExpression((CypherVar) stack.pop(), ex.getLabel()));
     }
 
     @Override
-    public void visitEdgeMatch(EdgeMatchClause ex) {
+    public void visitEdgeMatch(final EdgeMatchClause ex) {
         assert stack.peek() instanceof CypherVar;
         final CypherVar target = (CypherVar) stack.pop();
         assert stack.peek() instanceof CypherVar;
@@ -163,7 +163,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
-    public void visitNodeMatch(NodeMatchClause ex) {
+    public void visitNodeMatch(final NodeMatchClause ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new NodeMatchClause((CypherVar) stack.pop()));
     }
