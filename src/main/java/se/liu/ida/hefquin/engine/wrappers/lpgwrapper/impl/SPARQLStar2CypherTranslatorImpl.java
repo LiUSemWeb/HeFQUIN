@@ -818,13 +818,35 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                         && query.getMatchVars().contains((CypherVar) ((EqualityExpression) x).getLeftExpression())
                         && query.getMatchVars().contains((CypherVar) ((EqualityExpression) x).getRightExpression()))
                 .collect(Collectors.toList());
+        if (variableJoins.isEmpty()) return query;
         final Map<CypherVar, CypherVar> equivalences = getEquivalenceMap(variableJoins);
+
+        //first rewrite the MATCH clauses by replacing the equivalent variables
         final List<MatchClause> matches = new ArrayList<>();
         for (final MatchClause m : query.getMatches()){
             final MatchClause newM = (MatchClause) CypherUtils.replaceVariable(equivalences, m);
             if (!matches.contains(newM))
                 matches.add(newM);
         }
+        final List<NodeMatchClause> nodes = matches.stream().filter(x->x instanceof NodeMatchClause)
+                .map(x->(NodeMatchClause)x).collect(Collectors.toList());
+        //then remove any redundant node patterns
+        if (!nodes.isEmpty()) {
+            final List<MatchClause> toRemove = new ArrayList<>();
+            for (final MatchClause m : matches) {
+                if (m instanceof EdgeMatchClause) {
+                    for (final NodeMatchClause node : nodes) {
+                        if (m.isRedundantWith(node))
+                            toRemove.add(node);
+                    }
+                }
+            }
+            matches.removeAll(toRemove);
+        }
+        for (final MatchClause m : matches)
+            builder.add(m);
+
+        //now replace the variables in the rest of the elements of the query
         for (final BooleanCypherExpression c : query.getConditions()) {
             if (variableJoins.contains(c)) continue;
             builder.add(CypherUtils.replaceVariable(equivalences, c));
@@ -835,20 +857,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         for (final AliasedExpression r : query.getReturnExprs()) {
             builder.add(CypherUtils.replaceVariable(equivalences, r));
         }
-        final List<NodeMatchClause> nodes = matches.stream().filter(x->x instanceof NodeMatchClause)
-                .map(x->(NodeMatchClause)x).collect(Collectors.toList());
-        final List<MatchClause> toRemove = new ArrayList<>();
-        for (final MatchClause m : matches) {
-            if (m instanceof EdgeMatchClause) {
-                for (final NodeMatchClause node : nodes) {
-                    if (m.isRedundantWith(node))
-                        toRemove.add(node);
-                }
-            }
-        }
-        matches.removeAll(toRemove);
-        for (final MatchClause m : matches)
-            builder.add(m);
         return builder.build();
     }
 
