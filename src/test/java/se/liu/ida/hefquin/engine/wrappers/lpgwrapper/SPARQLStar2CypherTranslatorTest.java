@@ -918,6 +918,45 @@ public class SPARQLStar2CypherTranslatorTest {
     }
 
     @Test
+    public void rewriteJoinsTest() {
+        final CypherVar a11 = new CypherVar("a11");
+        final CypherVar a12 = new CypherVar("a12");
+        final CypherVar a13 = new CypherVar("a13");
+        final CypherVar a14 = new CypherVar("a14");
+        final CypherMatchQuery query = new CypherQueryBuilder()
+                .add(new EdgeMatchClause(a1, a2, a3))
+                .add(new EdgeMatchClause(a4, a5, a6))
+                .add(new EdgeMatchClause(a7, a8, a9))
+                .add(new EdgeMatchClause(a10, a11, a12))
+                .add(new NodeMatchClause(a13))
+                .add(new NodeMatchClause(a14))
+                .add(new EqualityExpression(a1, a6))
+                .add(new EqualityExpression(a14, a1))
+                .add(new EqualityExpression(a4, a13))
+                .add(new EqualityExpression(a7, a4))
+                .add(new EqualityExpression(a13, a10))
+                .add(new EqualityExpression(new PropertyAccessExpression(a13, "name"),
+                        new LiteralExpression("Uma Thurman")))
+                .add(new AliasedExpression(a13, ret1))
+                .add(new AliasedExpression(a14, ret2))
+                .add(new AliasedExpression(new TypeExpression(a5), ret3))
+                .build();
+        final CypherMatchQuery rewrittenQuery = new SPARQLStar2CypherTranslatorImpl().rewriteJoins(query);
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a14, a2, a3))
+                        .add(new EdgeMatchClause(a4, a5, a14))
+                        .add(new EdgeMatchClause(a4, a8, a9))
+                        .add(new EdgeMatchClause(a4, a11, a12))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a4, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new AliasedExpression(a4, ret1))
+                        .add(new AliasedExpression(a14, ret2))
+                        .add(new AliasedExpression(new TypeExpression(a5), ret3))
+                        .build(),
+                rewrittenQuery);
+    }
+
+    @Test
     public void joinOnLiteralsTest() {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Var l = Var.alloc("l");
