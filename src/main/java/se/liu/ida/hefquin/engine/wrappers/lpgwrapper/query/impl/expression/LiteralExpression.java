@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -27,6 +28,11 @@ public class LiteralExpression implements CypherExpression {
     @Override
     public Set<CypherVar> getVars() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        visitor.visitLiteral(this);
     }
 
     @Override

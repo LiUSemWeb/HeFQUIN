@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +22,13 @@ public class PropertyAccessWithVarExpression implements CypherExpression {
     @Override
     public Set<CypherVar> getVars() {
         return Set.of(var, innerVar);
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        var.visit(visitor);
+        innerVar.visit(visitor);
+        visitor.visitPropertyAccessWithVar(this);
     }
 
     @Override

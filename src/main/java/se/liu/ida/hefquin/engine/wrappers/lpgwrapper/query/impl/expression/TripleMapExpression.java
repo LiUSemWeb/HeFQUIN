@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +25,14 @@ public class TripleMapExpression implements CypherExpression {
     @Override
     public Set<CypherVar> getVars() {
         return Set.of(source, edge, target);
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        source.visit(visitor);
+        edge.visit(visitor);
+        target.visit(visitor);
+        visitor.visitTripleMap(this);
     }
 
     @Override

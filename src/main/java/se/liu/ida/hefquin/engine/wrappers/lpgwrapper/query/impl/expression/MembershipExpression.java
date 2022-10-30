@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,6 +24,13 @@ public class MembershipExpression implements BooleanCypherExpression {
         final Set<CypherVar> res = new HashSet<>(listExpression.getVars());
         res.add(var);
         return res;
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        var.visit(visitor);
+        listExpression.visit(visitor);
+        visitor.visitMembership(this);
     }
 
     @Override

@@ -13,18 +13,19 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryCombinator;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
@@ -806,4 +807,93 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                         .add(new AliasedExpression(new GetItemExpression(a10, 1), gen.getRetVar(o)))
                         .build());
     }
+
+    @Override
+    public CypherMatchQuery rewriteJoins(final CypherMatchQuery query) {
+        final CypherQueryBuilder builder = new CypherQueryBuilder();
+        final List<BooleanCypherExpression> variableJoins = query.getConditions().stream()
+                .filter(x -> x instanceof EqualityExpression
+                        && ((EqualityExpression) x).getLeftExpression() instanceof CypherVar
+                        && ((EqualityExpression) x).getRightExpression() instanceof CypherVar
+                        && query.getMatchVars().contains((CypherVar) ((EqualityExpression) x).getLeftExpression())
+                        && query.getMatchVars().contains((CypherVar) ((EqualityExpression) x).getRightExpression()))
+                .collect(Collectors.toList());
+        if (variableJoins.isEmpty()) return query;
+        final Map<CypherVar, CypherVar> equivalences = getEquivalenceMap(variableJoins);
+
+        //first rewrite the MATCH clauses by replacing the equivalent variables
+        final List<MatchClause> matches = new ArrayList<>();
+        for (final MatchClause m : query.getMatches()){
+            final MatchClause newM = (MatchClause) CypherUtils.replaceVariable(equivalences, m);
+            if (!matches.contains(newM))
+                matches.add(newM);
+        }
+        final List<NodeMatchClause> nodes = matches.stream().filter(x->x instanceof NodeMatchClause)
+                .map(x->(NodeMatchClause)x).collect(Collectors.toList());
+        //then remove any redundant node patterns
+        if (!nodes.isEmpty()) {
+            final List<MatchClause> toRemove = new ArrayList<>();
+            for (final MatchClause m : matches) {
+                if (m instanceof EdgeMatchClause) {
+                    for (final NodeMatchClause node : nodes) {
+                        if (m.isRedundantWith(node))
+                            toRemove.add(node);
+                    }
+                }
+            }
+            matches.removeAll(toRemove);
+        }
+        for (final MatchClause m : matches)
+            builder.add(m);
+
+        //now replace the variables in the rest of the elements of the query
+        for (final BooleanCypherExpression c : query.getConditions()) {
+            if (variableJoins.contains(c)) continue;
+            builder.add(CypherUtils.replaceVariable(equivalences, c));
+        }
+        for (final UnwindIterator i : query.getIterators()) {
+            builder.add(CypherUtils.replaceVariable(equivalences, i));
+        }
+        for (final AliasedExpression r : query.getReturnExprs()) {
+            builder.add(CypherUtils.replaceVariable(equivalences, r));
+        }
+        return builder.build();
+    }
+
+    private Map<CypherVar, CypherVar> getEquivalenceMap(final List<BooleanCypherExpression> variableJoins) {
+        final Set<Set<CypherVar>> equivalenceClasses = new HashSet<>();
+        for (final BooleanCypherExpression join : variableJoins) {
+            final EqualityExpression eq = (EqualityExpression) join;
+            final CypherVar v1 = (CypherVar) eq.getLeftExpression();
+            final CypherVar v2 = (CypherVar) eq.getRightExpression();
+            boolean found = false;
+            for (final Set<CypherVar> eqClass : equivalenceClasses) {
+                if (eqClass.contains(v1) || eqClass.contains(v2)) {
+                    eqClass.add(v1); eqClass.add(v2);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                final Set<CypherVar> eqClass = new HashSet<>();
+                eqClass.add(v1); eqClass.add(v2);
+                equivalenceClasses.add(eqClass);
+            }
+        }
+        final Map<CypherVar, CypherVar> equivalenceMap = new HashMap<>();
+        for (final Set<CypherVar> eqClass : equivalenceClasses) {
+            CypherVar id = null;
+            boolean first = true;
+            for (final CypherVar v : eqClass) {
+                if (first) {
+                    id = v;
+                    first = false;
+                    continue;
+                }
+                equivalenceMap.put(v, id);
+            }
+        }
+        return equivalenceMap;
+    }
+
 }
