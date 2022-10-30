@@ -49,8 +49,16 @@ public interface SPARQLStar2CypherTranslator {
     Pair<CypherQuery, Map<CypherVar, Node>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf);
 
 
+    /**
+     * Receives a {@link CypherMatchQuery} and rewrites explicit variable joins in the WHERE clause
+     * as implicit joins in the MATCH clauses. Then, it removes redundant MATCH clauses.
+     * e.g. query MATCH (a)-[b]->(c) MATCH (x) WHERE a=x RETURN x is rewritten as MATCH (a)-[b]->(c) RETURN a
+     */
     CypherMatchQuery rewriteJoins(final CypherMatchQuery query);
 
+    /**
+     * Applies the join rewriting method to each subquery of a {@link CypherUnionQuery}
+     */
     default CypherUnionQuery rewriteJoins(final CypherUnionQuery query) {
         List<CypherMatchQuery> union = new ArrayList<>();
         for (final CypherMatchQuery q : query.getSubqueries()) {
