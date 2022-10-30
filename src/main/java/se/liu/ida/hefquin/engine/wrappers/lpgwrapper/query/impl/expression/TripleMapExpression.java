@@ -28,10 +28,10 @@ public class TripleMapExpression implements CypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        source.acceptVisitor(visitor);
-        edge.acceptVisitor(visitor);
-        target.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        source.visit(visitor);
+        edge.visit(visitor);
+        target.visit(visitor);
         visitor.visitTripleMap(this);
     }
 

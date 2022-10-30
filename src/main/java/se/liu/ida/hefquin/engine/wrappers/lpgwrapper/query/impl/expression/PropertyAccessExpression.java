@@ -25,8 +25,8 @@ public class PropertyAccessExpression implements CypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        var.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        var.visit(visitor);
         visitor.visitPropertyAccess(this);
     }
 

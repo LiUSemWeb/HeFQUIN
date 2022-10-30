@@ -27,9 +27,9 @@ public class MembershipExpression implements BooleanCypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        var.acceptVisitor(visitor);
-        listExpression.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        var.visit(visitor);
+        listExpression.visit(visitor);
         visitor.visitMembership(this);
     }
 

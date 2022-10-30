@@ -100,14 +100,14 @@ public class UnwindIteratorImpl implements UnwindIterator {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        innerVar.acceptVisitor(visitor);
-        listExpression.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        innerVar.visit(visitor);
+        listExpression.visit(visitor);
         for (final CypherExpression e : filters)
-            e.acceptVisitor(visitor);
+            e.visit(visitor);
         for (final CypherExpression e : returnExpressions)
-            e.acceptVisitor(visitor);
-        alias.acceptVisitor(visitor);
+            e.visit(visitor);
+        alias.visit(visitor);
         visitor.visitUnwind(this);
     }
 }

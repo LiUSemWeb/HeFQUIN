@@ -24,8 +24,8 @@ public class VariableLabelExpression implements BooleanCypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        variable.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        variable.visit(visitor);
         visitor.visitVariableLabel(this);
     }
 

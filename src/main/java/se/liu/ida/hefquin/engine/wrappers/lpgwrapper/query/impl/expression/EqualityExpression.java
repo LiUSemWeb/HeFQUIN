@@ -28,9 +28,9 @@ public class EqualityExpression implements BooleanCypherExpression{
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        leftExpression.acceptVisitor(visitor);
-        rightExpression.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        leftExpression.visit(visitor);
+        rightExpression.visit(visitor);
         visitor.visitEquality(this);
     }
 

@@ -31,7 +31,7 @@ public class LiteralExpression implements CypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+    public void visit(final CypherExpressionVisitor visitor) {
         visitor.visitLiteral(this);
     }
 

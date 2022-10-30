@@ -22,7 +22,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
 
     @Override
     public void visit(final CypherExpression ex) {
-        ex.acceptVisitor(this);
+        ex.visit(this);
     }
 
     @Override

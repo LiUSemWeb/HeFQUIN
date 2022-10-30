@@ -41,8 +41,8 @@ public class NodeMatchClause implements MatchClause {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        node.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        node.visit(visitor);
         visitor.visitNodeMatch(this);
     }
 

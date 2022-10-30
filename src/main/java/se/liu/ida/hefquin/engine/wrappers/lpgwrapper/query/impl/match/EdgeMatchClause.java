@@ -86,10 +86,10 @@ public class EdgeMatchClause implements MatchClause {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        sourceNode.acceptVisitor(visitor);
-        edge.acceptVisitor(visitor);
-        targetNode.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        sourceNode.visit(visitor);
+        edge.visit(visitor);
+        targetNode.visit(visitor);
         visitor.visitEdgeMatch(this);
     }
 }

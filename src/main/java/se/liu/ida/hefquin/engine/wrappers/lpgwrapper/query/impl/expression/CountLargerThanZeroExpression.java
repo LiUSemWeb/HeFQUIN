@@ -12,7 +12,7 @@ public class CountLargerThanZeroExpression implements BooleanCypherExpression{
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+    public void visit(final CypherExpressionVisitor visitor) {
         visitor.visitCountLargerThanZero(this);
     }
 

@@ -24,8 +24,8 @@ public class GetItemExpression implements CypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        expression.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        expression.visit(visitor);
         visitor.visitGetItem(this);
     }
 

@@ -42,7 +42,7 @@ public class CypherVar implements CypherExpression {
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
+    public void visit(final CypherExpressionVisitor visitor) {
         visitor.visitVar(this);
     }
 }

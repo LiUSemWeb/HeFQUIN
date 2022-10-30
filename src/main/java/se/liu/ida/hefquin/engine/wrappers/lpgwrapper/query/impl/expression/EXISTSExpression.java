@@ -21,8 +21,8 @@ public class EXISTSExpression implements BooleanCypherExpression{
     }
 
     @Override
-    public void acceptVisitor(final CypherExpressionVisitor visitor) {
-        expression.acceptVisitor(visitor);
+    public void visit(final CypherExpressionVisitor visitor) {
+        expression.visit(visitor);
         visitor.visitEXISTS(this);
     }
 
