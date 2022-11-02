@@ -190,7 +190,6 @@ public class ModFederation extends ModBase
 
 	protected void addSPARQLEndpoints( final List<String> sparqlEndpointValues ) {
 		for ( final String v : sparqlEndpointValues )
-			// TODO: extend command line to support connect the endpoint to a file that describe the vocabulary mappings
 			addSPARQLEndpoint(v, null);
 	}
 
@@ -292,7 +291,7 @@ public class ModFederation extends ModBase
 	}
 
 	protected boolean verifyValidVocabMappingFile(final String pathString ) {
-		File f = new File(pathString);
+		final File f = new File(pathString);
 		if ( f.exists() && f.isFile() ){
 			return true;
 		}
