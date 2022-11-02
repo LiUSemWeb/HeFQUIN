@@ -291,7 +291,7 @@ public class ModFederation extends ModBase
 	}
 
 	protected boolean verifyValidVocabMappingFile(final String pathString ) {
-		File f = new File(pathString);
+		final File f = new File(pathString);
 		if ( f.exists() ){
 			// TODO: .nt file?
 			return f.isFile();
