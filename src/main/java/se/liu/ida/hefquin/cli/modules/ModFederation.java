@@ -88,10 +88,10 @@ public class ModFederation extends ModBase
 	protected void parseFedDescr( final String filename ) {
 		final Model fd = RDFDataMgr.loadModel(filename);
 
-		final ResIterator isFedMember = fd.listResourcesWithProperty(RDF.type, FD.FederationMember);
+		final ResIterator fedMembers = fd.listResourcesWithProperty(RDF.type, FD.FederationMember);
 		// Iterate over all federation members
-		while ( isFedMember.hasNext() ) {
-			final Resource fedMember = isFedMember.next();
+		while ( fedMembers.hasNext() ) {
+			final Resource fedMember = fedMembers.next();
 			VocabularyMapping vocabMap = null;
 			if( fd.contains(fedMember, FD.vocabularyMappingsFile) ){
 				final RDFNode pathToMappingFile = fd.getRequiredProperty(fedMember, FD.vocabularyMappingsFile).getObject();
@@ -103,8 +103,9 @@ public class ModFederation extends ModBase
 			}
 
 			final Resource iface = fedMember.getProperty(FD.interface_).getResource();
+			final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 			// Check the type of interface
-			if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.SPARQLEndpointInterface) ){
+			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ){
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
@@ -119,7 +120,7 @@ public class ModFederation extends ModBase
 				}
 				addSPARQLEndpoint(addrStr, vocabMap);
 			}
-			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.TPFInterface) ){
+			else if ( ifaceType.equals(FD.TPFInterface) ){
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
 
 				final String addrStr;
@@ -135,7 +136,7 @@ public class ModFederation extends ModBase
 
 				addTPFServer(addrStr, vocabMap);
 			}
-			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.brTPFInterface) ){
+			else if ( ifaceType.equals(FD.brTPFInterface) ){
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
 
 				final String addrStr;
@@ -151,7 +152,7 @@ public class ModFederation extends ModBase
 
 				addBRTPFServer(addrStr, vocabMap);
 			}
-			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.BoltInterface) ){
+			else if ( ifaceType.equals(FD.BoltInterface) ){
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
@@ -167,7 +168,7 @@ public class ModFederation extends ModBase
 
 				addNeo4jServer(addrStr, vocabMap);
 			}
-			else if ( fd.getRequiredProperty(iface, RDF.type).getObject().equals(FD.GraphQLEndpointInterface) ){
+			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ){
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
@@ -292,9 +293,8 @@ public class ModFederation extends ModBase
 
 	protected boolean verifyValidVocabMappingFile(final String pathString ) {
 		File f = new File(pathString);
-		if ( f.exists() ){
-			// TODO: .nt file?
-			return f.isFile();
+		if ( f.exists() && f.isFile() ){
+			return true;
 		}
 		else
 			throw new IllegalArgumentException( "The following path to vocab.mapping does not exist:" + pathString );
