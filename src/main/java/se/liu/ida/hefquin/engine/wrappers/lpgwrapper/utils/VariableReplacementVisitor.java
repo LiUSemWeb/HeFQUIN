@@ -4,16 +4,14 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class VariableReplacementVisitor implements CypherExpressionVisitor {
     protected final Map<CypherVar, CypherVar> equivalences;
 
-    protected final Stack<CypherExpression> stack = new Stack<>();
+    protected final Deque<CypherExpression> stack = new ArrayDeque<>();
 
     public VariableReplacementVisitor(final Map<CypherVar, CypherVar> equivalences) {
         this.equivalences = equivalences;
@@ -123,20 +121,21 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     public void visitUnwind(final UnwindIteratorImpl iterator) {
         assert stack.peek() instanceof CypherVar;
         final CypherVar alias = (CypherVar) stack.pop();
-        final List<CypherExpression> returnExps = new ArrayList<>();
+        final Deque<CypherExpression> returnExps = new ArrayDeque<>();
         for (int i = iterator.getReturnExpressions().size(); i > 0; i--) {
-            returnExps.add(stack.pop());
+            returnExps.push(stack.pop());
         }
-        final List<BooleanCypherExpression> filters = new ArrayList<>();
+        final Deque<BooleanCypherExpression> filters = new ArrayDeque<>();
         for (int i = iterator.getFilters().size(); i > 0; i--) {
             assert stack.peek() instanceof BooleanCypherExpression;
-            filters.add((BooleanCypherExpression) stack.pop());
+            filters.push((BooleanCypherExpression) stack.pop());
         }
         assert stack.peek() instanceof ListCypherExpression;
         final ListCypherExpression list = (ListCypherExpression) stack.pop();
         assert stack.peek() instanceof CypherVar;
         final CypherVar innerVar = (CypherVar) stack.pop();
-        stack.push(new UnwindIteratorImpl(innerVar, list, filters, returnExps, alias));
+        stack.push(new UnwindIteratorImpl(innerVar, list, new ArrayList<>(filters),
+                new ArrayList<>(returnExps), alias));
     }
 
     @Override
@@ -166,6 +165,21 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     public void visitNodeMatch(final NodeMatchClause ex) {
         assert stack.peek() instanceof CypherVar;
         stack.push(new NodeMatchClause((CypherVar) stack.pop()));
+    }
+
+    @Override
+    public void visitPathMatch(PathMatchClause ex) {
+        final Deque<PathMatchClause.Edge> edges = new ArrayDeque<>();
+        for (int i = ex.getEdges().size(); i > 0; i--) {
+            assert stack.peek() instanceof CypherVar;
+            final CypherVar right = (CypherVar) stack.pop();
+            assert stack.peek() instanceof CypherVar;
+            final CypherVar edge = (CypherVar) stack.pop();
+            assert stack.peek() instanceof CypherVar;
+            final CypherVar left = (CypherVar) stack.pop();
+            edges.push(new PathMatchClause.Edge(left, edge, right, ex.getEdges().get(i).getDirection()));
+        }
+        stack.push(new PathMatchClause(new ArrayList<>(edges)));
     }
 
     public CypherExpression getResult() {

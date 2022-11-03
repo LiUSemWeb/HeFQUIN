@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
 
 /**
  * This class is made to provide generic visitor functionalities to traverse expression trees.
@@ -37,4 +38,5 @@ public interface CypherExpressionVisitor {
     void visitVariableLabel (final VariableLabelExpression ex);
     void visitEdgeMatch(final EdgeMatchClause ex);
     void visitNodeMatch(final NodeMatchClause ex);
+    void visitPathMatch(final PathMatchClause ex);
 }

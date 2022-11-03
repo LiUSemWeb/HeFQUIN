@@ -41,15 +41,13 @@ public class EdgeMatchClause implements MatchClause {
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("MATCH (")
-                .append(sourceNode.getName())
-                .append(")-[");
-        builder.append(edge.getName());
-        builder.append("]->(")
-                .append(targetNode.getName())
-                .append(")");
-        return builder.toString();
+        return "MATCH (" +
+                sourceNode.getName() +
+                ")-[" +
+                edge.getName() +
+                "]->(" +
+                targetNode.getName() +
+                ")";
     }
 
     @Override
