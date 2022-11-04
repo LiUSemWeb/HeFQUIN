@@ -875,7 +875,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final List<MatchClause> mergedPatterns = new ArrayList<>();
         while (!graph.isEmpty()) {
             final LabeledGraph.Path longest = graph.getLongestPath();
-            mergedPatterns.add(new PathMatchClause(longest));
+            if (longest.size()==0)
+                mergedPatterns.add(new NodeMatchClause(longest.getStart()));
+            else
+                mergedPatterns.add(new PathMatchClause(longest));
             graph.removePath(longest);
         }
         return mergedPatterns;

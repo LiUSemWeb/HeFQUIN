@@ -62,6 +62,10 @@ public class LabeledGraph {
      * removes the edges contained in path
      */
     public void removePath(final Path path) {
+        if (adjacencyLists.get(path.start).isEmpty()) {
+            adjacencyLists.remove(path.start);
+            return;
+        }
         CypherVar current = path.start;
         for (final Edge e : path.path) {
             //removes LEFT2RIGHT
@@ -88,16 +92,16 @@ public class LabeledGraph {
     public Path getLongestPath() {
         Path longest = null;
         for (final CypherVar start : adjacencyLists.keySet()) {
-           final Path candidate = longestStartingFrom(start);
-           if (longest == null || candidate.size() > longest.size()) {
-               longest = candidate;
-           }
+            final Path candidate = longestStartingFrom(start);
+            if (longest == null || candidate.size() > longest.size()) {
+                longest = candidate;
+            }
         }
         return longest;
     }
 
     private Path longestStartingFrom(final CypherVar start) {
-        //System.out.println("start: "+start);
+        if (adjacencyLists.get(start).isEmpty()) return new Path(start, new ArrayList<>());
         final Set<Integer> visitedEdges = new HashSet<>();
         final Deque<Edge> toVisit = new ArrayDeque<>();
         for (final Edge e : adjacencyLists.get(start)) {
@@ -107,7 +111,6 @@ public class LabeledGraph {
         Path longest = null;
         while (!toVisit.isEmpty()) {
             final Edge currentEdge = toVisit.pop();
-            //System.out.println("current edge: " + currentEdge);
             if (candidate == null) {
                 candidate = new Path(start, currentEdge);
             }
@@ -115,11 +118,7 @@ public class LabeledGraph {
                 candidate.addEdge(currentEdge);
             }
             visitedEdges.add(currentEdge.id);
-            //System.out.println("current path: " + candidate);
             if (!allVisited(adjacencyLists.get(currentEdge.target), visitedEdges)) {
-                //System.out.println("going through: " + currentEdge.target);
-                //System.out.println(visitedEdges);
-                //System.out.println(adjacencyLists.get(currentEdge.target));
                 for (final Edge e : adjacencyLists.get(currentEdge.target)) {
                     if (!visitedEdges.contains(e.id)) {
                         toVisit.push(e);
@@ -129,7 +128,6 @@ public class LabeledGraph {
                 if ( longest == null || candidate.size() > longest.size() ) {
                     longest = candidate.copy();
                 }
-                //System.out.println("end of path");
                 candidate.removeLast();
             }
         }

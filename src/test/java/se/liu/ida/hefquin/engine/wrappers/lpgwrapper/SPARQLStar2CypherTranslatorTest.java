@@ -1170,4 +1170,51 @@ public class SPARQLStar2CypherTranslatorTest {
                 merged.get(1));
     }
 
+    @Test
+    public void mergeStarPatternTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a1, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a1, a6, a7));
+        matchClauses.add(new EdgeMatchClause(a1, a8, a9));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(2, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a1, a8, a9, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a5, a4, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a1, a6, a7, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(1));
+    }
+
+    @Test
+    public void mergeCyclePatternTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a5, a6, a7));
+        matchClauses.add(new EdgeMatchClause(a7, a8, a1));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(1, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a4, a5, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a5, a6, a7, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a7, a8, a1, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a1, a2, a3, LabeledGraph.Direction.LEFT2RIGHT))),
+                merged.get(0));
+    }
+
+    @Test
+    public void mergeWithNodePatternsTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a3, a6, a7));
+        matchClauses.add(new NodeMatchClause(a8));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(3, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a3, a6, a7, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(1));
+        assertEquals(new NodeMatchClause(a8), merged.get(2));
+    }
+
 }
