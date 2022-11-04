@@ -5,10 +5,21 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.Cyphe
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class models graphs with labeled edges. Nodes and edge labels are modeled as {@link CypherVar} objects.
+ * Edges can be directed or not. A pair of nodes can have an arbitrary number of edges between them. Nodes can
+ * have edges that start and end on themselves.
+ */
 public class LabeledGraph {
 
+    /**
+     * Enum for the possible edge directions
+     */
     public enum Direction {LEFT2RIGHT, RIGHT2LEFT, UNDIRECTED}
 
+    /**
+     * An edge of a labeled graph has an id, an edge label, a target node and a direction
+     */
     public static class Edge {
         protected final int id;
         protected final CypherVar edge;
@@ -24,11 +35,7 @@ public class LabeledGraph {
 
         @Override
         public String toString() {
-            return "(" + id +
-                    ", " + edge +
-                    ", " + target +
-                    ", " + direction +
-                    ')';
+            return "(" + id + ", " + edge + ", " + target + ", " + direction + ')';
         }
     }
 
@@ -62,6 +69,10 @@ public class LabeledGraph {
         }
     }
 
+    /**
+     * Enumerates all possible paths and returns the longest found. In case of ties, it returns the first
+     * longest path found.
+     */
     public Path getLongestPath() {
         Path longest = null;
         for (final CypherVar start : adjacencyLists.keySet()) {
@@ -135,6 +146,9 @@ public class LabeledGraph {
         return Objects.hash(adjacencyLists);
     }
 
+    /**
+     * Represents a path in a graph, starting from a given node and following a sequence of edges.
+     */
     public static class Path {
         protected CypherVar start;
         protected List<Edge> path;
