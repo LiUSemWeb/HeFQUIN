@@ -19,10 +19,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQuery
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryCombinator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -858,6 +856,29 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             builder.add(CypherUtils.replaceVariable(equivalences, r));
         }
         return builder.build();
+    }
+
+    @Override
+    public List<MatchClause> mergePaths(final List<MatchClause> matchClauses) {
+        final LabeledGraph.LabeledGraphBuilder builder = LabeledGraph.builder();
+        for (final MatchClause m : matchClauses) {
+            if (m instanceof NodeMatchClause)
+                builder.addNode(((NodeMatchClause) m).getNode());
+            else if (m instanceof  EdgeMatchClause) {
+                final EdgeMatchClause e = (EdgeMatchClause) m;
+                builder.addEdge(e.getSourceNode(), e.getEdge(), e.getTargetNode());
+            } else {
+                throw new IllegalArgumentException("Only Node and Edge Match clauses are supported in pattern merging");
+            }
+        }
+        final LabeledGraph graph = builder.build();
+        final List<MatchClause> mergedPatterns = new ArrayList<>();
+        while (!graph.isEmpty()) {
+            final LabeledGraph.Path longest = graph.getLongestPath();
+            mergedPatterns.add(new PathMatchClause(longest));
+            graph.removePath(longest);
+        }
+        return mergedPatterns;
     }
 
     private Map<CypherVar, CypherVar> getEquivalenceMap(final List<BooleanCypherExpression> variableJoins) {

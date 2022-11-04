@@ -37,6 +37,18 @@ public class LabeledGraph {
         public String toString() {
             return "(" + id + ", " + edge + ", " + target + ", " + direction + ')';
         }
+
+        public CypherVar getEdge() {
+            return edge;
+        }
+
+        public CypherVar getTarget() {
+            return target;
+        }
+
+        public Direction getDirection() {
+            return direction;
+        }
     }
 
     protected final Map<CypherVar, List<Edge>> adjacencyLists;
@@ -85,7 +97,7 @@ public class LabeledGraph {
     }
 
     private Path longestStartingFrom(final CypherVar start) {
-        System.out.println("start: "+start);
+        //System.out.println("start: "+start);
         final Set<Integer> visitedEdges = new HashSet<>();
         final Deque<Edge> toVisit = new ArrayDeque<>();
         for (final Edge e : adjacencyLists.get(start)) {
@@ -95,7 +107,7 @@ public class LabeledGraph {
         Path longest = null;
         while (!toVisit.isEmpty()) {
             final Edge currentEdge = toVisit.pop();
-            System.out.println("current edge: " + currentEdge);
+            //System.out.println("current edge: " + currentEdge);
             if (candidate == null) {
                 candidate = new Path(start, currentEdge);
             }
@@ -103,11 +115,11 @@ public class LabeledGraph {
                 candidate.addEdge(currentEdge);
             }
             visitedEdges.add(currentEdge.id);
-            System.out.println("current path: " + candidate);
+            //System.out.println("current path: " + candidate);
             if (!allVisited(adjacencyLists.get(currentEdge.target), visitedEdges)) {
-                System.out.println("going through: " + currentEdge.target);
-                System.out.println(visitedEdges);
-                System.out.println(adjacencyLists.get(currentEdge.target));
+                //System.out.println("going through: " + currentEdge.target);
+                //System.out.println(visitedEdges);
+                //System.out.println(adjacencyLists.get(currentEdge.target));
                 for (final Edge e : adjacencyLists.get(currentEdge.target)) {
                     if (!visitedEdges.contains(e.id)) {
                         toVisit.push(e);
@@ -117,7 +129,7 @@ public class LabeledGraph {
                 if ( longest == null || candidate.size() > longest.size() ) {
                     longest = candidate.copy();
                 }
-                System.out.println("end of path");
+                //System.out.println("end of path");
                 candidate.removeLast();
             }
         }
@@ -126,6 +138,15 @@ public class LabeledGraph {
 
     private boolean allVisited(final List<Edge> edges, Set<Integer> visitedEdges) {
         return edges == null || visitedEdges.containsAll(edges.stream().map(x->x.id).collect(Collectors.toSet()));
+    }
+
+    public static LabeledGraphBuilder builder() {
+        return new LabeledGraphBuilder();
+    }
+
+    //checks if there's any nodes or edges in the graph
+    public boolean isEmpty() {
+        return adjacencyLists.isEmpty();
     }
 
     @Override
@@ -209,6 +230,51 @@ public class LabeledGraph {
         public int hashCode() {
             return Objects.hash(start, path);
         }
+
+        public CypherVar getStart() {
+            return start;
+        }
+
+        public List<Edge> getEdges() {
+            return path;
+        }
     }
 
+    public static class LabeledGraphBuilder {
+        protected final Map<CypherVar, List<Edge>> adjacencyList;
+        protected int currentId = 0;
+
+        private LabeledGraphBuilder() {
+            adjacencyList = new HashMap<>();
+        }
+
+        public void addEdge(final CypherVar src, final CypherVar edge, final CypherVar tgt) {
+            ++currentId;
+            List<Edge> list = adjacencyList.get(src);
+            if (list == null) {
+                list = new LinkedList<>();
+                list.add(new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT));
+                adjacencyList.put(src, list);
+            } else {
+                list.add(new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT));
+            }
+            list = adjacencyList.get(tgt);
+            if (list == null) {
+                list = new LinkedList<>();
+                list.add(new Edge(currentId, edge, src, Direction.RIGHT2LEFT));
+                adjacencyList.put(tgt, list);
+            } else {
+                list.add(new Edge(currentId, edge, src, Direction.RIGHT2LEFT));
+            }
+        }
+
+        public void addNode(final CypherVar node) {
+            if (!adjacencyList.containsKey(node))
+                adjacencyList.put(node, new ArrayList<>());
+        }
+
+        public LabeledGraph build() {
+            return new LabeledGraph(adjacencyList);
+        }
+    }
 }

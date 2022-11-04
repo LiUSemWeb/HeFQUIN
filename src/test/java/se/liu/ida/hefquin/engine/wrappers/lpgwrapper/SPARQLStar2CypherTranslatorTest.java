@@ -16,13 +16,17 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.LabeledGraph;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -1144,6 +1148,26 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new AliasedExpression(new GetItemExpression(a4, 0), ret2))
                         .build(),
                 translation);
+    }
+
+    @Test
+    public void mergePatternsTest() {
+        final CypherVar a11 = new CypherVar("a11");
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a7, a6, a5));
+        matchClauses.add(new EdgeMatchClause(a7, a8, a9));
+        matchClauses.add(new EdgeMatchClause(a7, a10, a11));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(2, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a11, a10, a7, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a7, a6, a5, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a7, a8, a9, LabeledGraph.Direction.LEFT2RIGHT))),
+                merged.get(1));
     }
 
 }

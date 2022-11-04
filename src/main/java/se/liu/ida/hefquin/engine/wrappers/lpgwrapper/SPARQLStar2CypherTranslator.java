@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
@@ -66,4 +67,11 @@ public interface SPARQLStar2CypherTranslator {
         }
         return new CypherUnionQueryImpl(union);
     }
+
+    /**
+     * Receives a list of {@link MatchClause} and merges compatible clauses into longer paths.
+     * e.g., if receives (x)-[a]->(y) and (z)-[b]->(y) returns (z)-[b]->(y)<-[a]-(x).
+     */
+    List<MatchClause> mergePaths(final List<MatchClause> matchClauses);
+
 }

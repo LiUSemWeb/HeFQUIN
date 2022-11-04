@@ -169,7 +169,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
 
     @Override
     public void visitPathMatch(PathMatchClause ex) {
-        final Deque<PathMatchClause.Edge> edges = new ArrayDeque<>();
+        final Deque<PathMatchClause.EdgePattern> edges = new ArrayDeque<>();
         for (int i = ex.getEdges().size(); i > 0; i--) {
             assert stack.peek() instanceof CypherVar;
             final CypherVar right = (CypherVar) stack.pop();
@@ -177,7 +177,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
             final CypherVar edge = (CypherVar) stack.pop();
             assert stack.peek() instanceof CypherVar;
             final CypherVar left = (CypherVar) stack.pop();
-            edges.push(new PathMatchClause.Edge(left, edge, right, ex.getEdges().get(i).getDirection()));
+            edges.push(new PathMatchClause.EdgePattern(left, edge, right, ex.getEdges().get(i).getDirection()));
         }
         stack.push(new PathMatchClause(new ArrayList<>(edges)));
     }
