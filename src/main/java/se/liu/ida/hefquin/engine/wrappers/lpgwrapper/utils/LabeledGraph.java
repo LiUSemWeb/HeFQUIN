@@ -256,11 +256,9 @@ public class LabeledGraph {
             list = adjacencyList.get(tgt);
             if (list == null) {
                 list = new LinkedList<>();
-                list.add(new Edge(currentId, edge, src, Direction.RIGHT2LEFT));
                 adjacencyList.put(tgt, list);
-            } else {
-                list.add(new Edge(currentId, edge, src, Direction.RIGHT2LEFT));
             }
+            list.add( new Edge(currentId, edge, src, Direction.RIGHT2LEFT) );
         }
 
         public void addNode(final CypherVar node) {
