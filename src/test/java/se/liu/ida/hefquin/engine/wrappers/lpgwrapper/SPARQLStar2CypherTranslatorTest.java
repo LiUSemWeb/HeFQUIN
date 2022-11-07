@@ -1194,10 +1194,10 @@ public class SPARQLStar2CypherTranslatorTest {
         matchClauses.add(new EdgeMatchClause(a7, a8, a1));
         final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
         assertEquals(1, merged.size());
-        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a4, a5, LabeledGraph.Direction.LEFT2RIGHT),
-                        new PathMatchClause.EdgePattern(a5, a6, a7, LabeledGraph.Direction.LEFT2RIGHT),
-                        new PathMatchClause.EdgePattern(a7, a8, a1, LabeledGraph.Direction.LEFT2RIGHT),
-                        new PathMatchClause.EdgePattern(a1, a2, a3, LabeledGraph.Direction.LEFT2RIGHT))),
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a1, a8, a7, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a7, a6, a5, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT))),
                 merged.get(0));
     }
 
