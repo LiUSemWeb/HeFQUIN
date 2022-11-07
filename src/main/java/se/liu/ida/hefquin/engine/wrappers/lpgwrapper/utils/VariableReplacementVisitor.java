@@ -177,7 +177,7 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
             final CypherVar edge = (CypherVar) stack.pop();
             assert stack.peek() instanceof CypherVar;
             final CypherVar left = (CypherVar) stack.pop();
-            edges.push(new PathMatchClause.EdgePattern(left, edge, right, ex.getEdges().get(i).getDirection()));
+            edges.push( new PathMatchClause.EdgePattern(left, edge, right, ex.getEdges().get(i).direction) );
         }
         stack.push(new PathMatchClause(new ArrayList<>(edges)));
     }
