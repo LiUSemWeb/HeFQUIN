@@ -169,8 +169,8 @@ public class LabeledGraph {
      * Represents a path in a graph, starting from a given node and following a sequence of edges.
      */
     public static class Path {
-        protected CypherVar start;
-        protected List<Edge> path;
+        protected final CypherVar start;
+        protected final List<Edge> path;
 
         public Path(final CypherVar start, final Edge e) {
             this.start = start;
