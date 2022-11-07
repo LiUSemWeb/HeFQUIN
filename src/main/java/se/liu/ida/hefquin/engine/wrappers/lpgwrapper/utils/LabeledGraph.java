@@ -51,6 +51,79 @@ public class LabeledGraph {
         }
     }
 
+    /**
+     * Represents a path in a graph, starting from a given node and following a sequence of edges.
+     */
+    public static class Path {
+        protected final CypherVar start;
+        protected final List<Edge> path;
+
+        public Path(final CypherVar start, final Edge e) {
+            this.start = start;
+            this.path = new LinkedList<>();
+            this.path.add(e);
+        }
+
+        public Path(final CypherVar start, final List<Edge> path) {
+            this.start = start;
+            this.path = path;
+        }
+
+        public void addEdge(final Edge e) {
+            this.path.add(e);
+        }
+
+        public int size() {
+            return path.size();
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("(").append(start).append(")");
+            for (final LabeledGraph.Edge e : path) {
+                if (e.direction.equals(LabeledGraph.Direction.RIGHT2LEFT)) {
+                    builder.append("<");
+                }
+                builder.append("-").append("[").append(e.edge).append("]").append("-");
+                if (e.direction.equals(LabeledGraph.Direction.LEFT2RIGHT)) {
+                    builder.append(">");
+                }
+                builder.append("(").append(e.target).append(")");
+            }
+            return builder.toString();
+        }
+
+        public void removeLast() {
+            this.path.remove(size()-1);
+        }
+
+        public Path copy() {
+            return new Path(start, new LinkedList<>(path));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Path path1 = (Path) o;
+            return start.equals(path1.start) && path.equals(path1.path);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(start, path);
+        }
+
+        public CypherVar getStart() {
+            return start;
+        }
+
+        public List<Edge> getEdges() {
+            return path;
+        }
+    }
+
     protected final Map<CypherVar, List<Edge>> adjacencyLists;
 
     public LabeledGraph(final Map<CypherVar, List<Edge>> adjacencyLists) {
@@ -138,10 +211,6 @@ public class LabeledGraph {
         return edges == null || visitedEdges.containsAll(edges.stream().map(x->x.id).collect(Collectors.toSet()));
     }
 
-    public static LabeledGraphBuilder builder() {
-        return new LabeledGraphBuilder();
-    }
-
     //checks if there's any nodes or edges in the graph
     public boolean isEmpty() {
         return adjacencyLists.isEmpty();
@@ -163,111 +232,5 @@ public class LabeledGraph {
     @Override
     public int hashCode() {
         return Objects.hash(adjacencyLists);
-    }
-
-    /**
-     * Represents a path in a graph, starting from a given node and following a sequence of edges.
-     */
-    public static class Path {
-        protected final CypherVar start;
-        protected final List<Edge> path;
-
-        public Path(final CypherVar start, final Edge e) {
-            this.start = start;
-            this.path = new LinkedList<>();
-            this.path.add(e);
-        }
-
-        public Path(final CypherVar start, final List<Edge> path) {
-            this.start = start;
-            this.path = path;
-        }
-
-        public void addEdge(final Edge e) {
-            this.path.add(e);
-        }
-
-        public int size() {
-            return path.size();
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("(").append(start).append(")");
-            for (final LabeledGraph.Edge e : path) {
-                if (e.direction.equals(LabeledGraph.Direction.RIGHT2LEFT)) {
-                    builder.append("<");
-                }
-                builder.append("-").append("[").append(e.edge).append("]").append("-");
-                if (e.direction.equals(LabeledGraph.Direction.LEFT2RIGHT)) {
-                    builder.append(">");
-                }
-                builder.append("(").append(e.target).append(")");
-            }
-            return builder.toString();
-        }
-
-        public void removeLast() {
-            this.path.remove(size()-1);
-        }
-
-        public Path copy() {
-            return new Path(start, new LinkedList<>(path));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Path path1 = (Path) o;
-            return start.equals(path1.start) && path.equals(path1.path);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(start, path);
-        }
-
-        public CypherVar getStart() {
-            return start;
-        }
-
-        public List<Edge> getEdges() {
-            return path;
-        }
-    }
-
-    public static class LabeledGraphBuilder {
-        protected final Map<CypherVar, List<Edge>> adjacencyList = new HashMap<>();
-        protected int currentId = 0;
-
-        private LabeledGraphBuilder() {
-        }
-
-        public void addEdge(final CypherVar src, final CypherVar edge, final CypherVar tgt) {
-            ++currentId;
-            List<Edge> list = adjacencyList.get(src);
-            if (list == null) {
-                list = new LinkedList<>();
-                adjacencyList.put(src, list);
-            }
-            list.add( new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT) );
-            list = adjacencyList.get(tgt);
-            if (list == null) {
-                list = new LinkedList<>();
-                adjacencyList.put(tgt, list);
-            }
-            list.add( new Edge(currentId, edge, src, Direction.RIGHT2LEFT) );
-        }
-
-        public void addNode(final CypherVar node) {
-            if (!adjacencyList.containsKey(node))
-                adjacencyList.put(node, new ArrayList<>());
-        }
-
-        public LabeledGraph build() {
-            return new LabeledGraph(adjacencyList);
-        }
     }
 }

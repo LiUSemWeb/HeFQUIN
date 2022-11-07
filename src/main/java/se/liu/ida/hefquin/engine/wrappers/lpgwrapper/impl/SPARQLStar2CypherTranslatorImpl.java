@@ -860,7 +860,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
 
     @Override
     public List<MatchClause> mergePaths(final List<MatchClause> matchClauses) {
-        final LabeledGraph.LabeledGraphBuilder builder = LabeledGraph.builder();
+        final LabeledGraphBuilder builder = new LabeledGraphBuilder();
         for (final MatchClause m : matchClauses) {
             if (m instanceof NodeMatchClause)
                 builder.addNode(((NodeMatchClause) m).getNode());

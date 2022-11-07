@@ -105,10 +105,6 @@ public class PathMatchClause implements MatchClause {
             this.direction = direction;
         }
 
-        public LabeledGraph.Direction getDirection() {
-            return direction;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
