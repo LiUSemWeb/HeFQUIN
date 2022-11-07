@@ -48,16 +48,16 @@ public class LabeledGraphTest {
     @Test
     public void longestPathWithCyclesTest() {
         final Map<CypherVar, List<LabeledGraph.Edge>> adjacencyList = new HashMap<>();
-        final LabeledGraph.Edge wczr2l = new LabeledGraph.Edge(4, c, z, LabeledGraph.Direction.RIGHT2LEFT);
-        final LabeledGraph.Edge zdyl2r = new LabeledGraph.Edge(3, d, y, LabeledGraph.Direction.LEFT2RIGHT);
-        final LabeledGraph.Edge ybxl2r = new LabeledGraph.Edge(2, b, x, LabeledGraph.Direction.LEFT2RIGHT);
-        final LabeledGraph.Edge xawr2l = new LabeledGraph.Edge(1, a, w, LabeledGraph.Direction.RIGHT2LEFT);
-        adjacencyList.put(x, List.of(xawr2l, new LabeledGraph.Edge(2, b, y, LabeledGraph.Direction.RIGHT2LEFT)));
-        adjacencyList.put(y, List.of(ybxl2r, new LabeledGraph.Edge(3, d, z, LabeledGraph.Direction.RIGHT2LEFT)));
-        adjacencyList.put(z, List.of(zdyl2r, new LabeledGraph.Edge(4, c, w, LabeledGraph.Direction.LEFT2RIGHT)));
-        adjacencyList.put(w, List.of(new LabeledGraph.Edge(1, a, x, LabeledGraph.Direction.LEFT2RIGHT), wczr2l));
+        final LabeledGraph.Edge waxl2r = new LabeledGraph.Edge(1, a, x, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge xbdr2l = new LabeledGraph.Edge(2, b, y, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge ydzr2l = new LabeledGraph.Edge(3, d, z, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge zcwl2r = new LabeledGraph.Edge(4, c, w, LabeledGraph.Direction.LEFT2RIGHT);
+        adjacencyList.put(x, List.of(new LabeledGraph.Edge(1, a, w, LabeledGraph.Direction.RIGHT2LEFT), xbdr2l));
+        adjacencyList.put(y, List.of(new LabeledGraph.Edge(2, b, x, LabeledGraph.Direction.LEFT2RIGHT), ydzr2l));
+        adjacencyList.put(z, List.of(new LabeledGraph.Edge(3, d, y, LabeledGraph.Direction.LEFT2RIGHT), zcwl2r));
+        adjacencyList.put(w, List.of(waxl2r, new LabeledGraph.Edge(4, c, z, LabeledGraph.Direction.RIGHT2LEFT)));
         final LabeledGraph graph = new LabeledGraph(adjacencyList);
-        assertEquals(new LabeledGraph.Path(w, List.of(wczr2l, zdyl2r, ybxl2r, xawr2l)), graph.getLongestPath());
+        assertEquals(new LabeledGraph.Path(w, List.of(waxl2r, xbdr2l, ydzr2l, zcwl2r)), graph.getLongestPath());
     }
 
     @Test

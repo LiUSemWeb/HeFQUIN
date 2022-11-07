@@ -176,10 +176,7 @@ public class LabeledGraph {
     private Path longestStartingFrom(final CypherVar start) {
         if (adjacencyLists.get(start).isEmpty()) return new Path(start, new ArrayList<>());
         final Set<Integer> visitedEdges = new HashSet<>();
-        final Deque<Edge> toVisit = new ArrayDeque<>();
-        for (final Edge e : adjacencyLists.get(start)) {
-            toVisit.push(e);
-        }
+        final Deque<Edge> toVisit = new ArrayDeque<>( adjacencyLists.get(start) );
         Path candidate = null;
         Path longest = null;
         while (!toVisit.isEmpty()) {
