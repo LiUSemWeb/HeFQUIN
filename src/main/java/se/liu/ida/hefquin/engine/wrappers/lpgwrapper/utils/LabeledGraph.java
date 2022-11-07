@@ -239,11 +239,10 @@ public class LabeledGraph {
     }
 
     public static class LabeledGraphBuilder {
-        protected final Map<CypherVar, List<Edge>> adjacencyList;
+        protected final Map<CypherVar, List<Edge>> adjacencyList = new HashMap<>();
         protected int currentId = 0;
 
         private LabeledGraphBuilder() {
-            adjacencyList = new HashMap<>();
         }
 
         public void addEdge(final CypherVar src, final CypherVar edge, final CypherVar tgt) {
