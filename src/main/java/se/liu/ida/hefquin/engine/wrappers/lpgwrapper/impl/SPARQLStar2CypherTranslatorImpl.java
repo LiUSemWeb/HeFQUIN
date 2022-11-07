@@ -868,7 +868,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 final EdgeMatchClause e = (EdgeMatchClause) m;
                 builder.addEdge(e.getSourceNode(), e.getEdge(), e.getTargetNode());
             } else {
-                throw new IllegalArgumentException("Only Node and Edge Match clauses are supported in pattern merging");
+                throw new IllegalArgumentException("Unsupported type of Match clause given to pattern merging: " + m.getClass().getName() );
             }
         }
         final LabeledGraph graph = builder.build();
