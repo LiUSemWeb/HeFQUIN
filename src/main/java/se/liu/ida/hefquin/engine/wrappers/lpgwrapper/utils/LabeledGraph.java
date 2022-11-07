@@ -250,11 +250,9 @@ public class LabeledGraph {
             List<Edge> list = adjacencyList.get(src);
             if (list == null) {
                 list = new LinkedList<>();
-                list.add(new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT));
                 adjacencyList.put(src, list);
-            } else {
-                list.add(new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT));
             }
+            list.add( new Edge(currentId, edge, tgt, Direction.LEFT2RIGHT) );
             list = adjacencyList.get(tgt);
             if (list == null) {
                 list = new LinkedList<>();
