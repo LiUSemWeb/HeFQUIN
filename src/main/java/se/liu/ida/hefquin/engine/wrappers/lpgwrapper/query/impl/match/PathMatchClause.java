@@ -88,10 +88,10 @@ public class PathMatchClause implements MatchClause {
     }
 
     public static class EdgePattern {
-        protected final CypherVar left;
-        protected final CypherVar edge;
-        protected final CypherVar right;
-        protected final LabeledGraph.Direction direction;
+        public final CypherVar left;
+        public final CypherVar edge;
+        public final CypherVar right;
+        public final LabeledGraph.Direction direction;
 
         public EdgePattern(final CypherVar left, final CypherVar edge, final CypherVar right, final LabeledGraph.Direction direction) {
             assert left != null;
