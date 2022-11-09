@@ -56,6 +56,8 @@ public class LogicalToPhysicalOpConverter
 		else if ( lop instanceof LogicalOpBGPAdd )    return convert( (LogicalOpBGPAdd) lop );
 		else if ( lop instanceof LogicalOpBGPOptAdd ) return convert( (LogicalOpBGPOptAdd) lop );
 		else if ( lop instanceof LogicalOpFilter )    return convert( (LogicalOpFilter) lop );
+		else if ( lop instanceof LogicalOpLocalToGlobal ) return convert ( (LogicalOpLocalToGlobal) lop);
+		else if ( lop instanceof LogicalOpGlobalToLocal ) return convert ( (LogicalOpGlobalToLocal) lop);
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
@@ -155,6 +157,14 @@ public class LogicalToPhysicalOpConverter
 
 	public static UnaryPhysicalOp convert( final LogicalOpFilter lop ) {
 		return new PhysicalOpFilter(lop);
+	}
+
+	public static UnaryPhysicalOp convert( final LogicalOpLocalToGlobal lop ) {
+		return new PhysicalOpLocalToGlobal(lop);
+	}
+
+	public static UnaryPhysicalOp convert( final LogicalOpGlobalToLocal lop ) {
+		return new PhysicalOpGlobalToLocal(lop);
 	}
 
 	// --------- binary operators -----------
