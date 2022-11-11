@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -80,8 +81,12 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			} else {
 				return inputPlan;
 			}
-		} else {
-			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
-		}
+		} else if (inputPlan.getRootOperator() instanceof LogicalOpFilter){
+            final LogicalOpFilter filterOp = (LogicalOpFilter) inputPlan.getRootOperator();
+            final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan.getSubPlan(0));
+            return new LogicalPlanWithUnaryRootImpl(filterOp,rw);
+        } else {
+            throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
+        }
 	}
 }
