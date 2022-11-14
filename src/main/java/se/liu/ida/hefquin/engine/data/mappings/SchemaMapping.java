@@ -35,12 +35,12 @@ public interface SchemaMapping
 
 	/**
 	 * Applies the inverse of this schema mapping to the given solution
-	 * mapping, which is assumed to use the global schema for the vocabulary
+	 * mapping, which is assumed to use the local schema for the vocabulary
 	 * terms that it binds to its query variables. If this schema mapping is
 	 * not relevant for anything mentioned in the given solution mapping (i.e.,
-	 * applying this schema mapping to the solution mapping does not have any
-	 * effect), then the result of this function is simply a singleton set that
-	 * contains the given solution mapping without any changes.
+	 * applying the inverse of this schema mapping to the solution mapping does
+	 * not have any effect), then the result of this function is simply a singleton
+	 * set that contains the given solution mapping without any changes.
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
 }

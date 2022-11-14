@@ -57,9 +57,9 @@ public class HeFQUINEngineConfig
 		return new PhysicalOptimizerFactory() {
 			@Override
 			public PhysicalOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
-				return createQueryOptimizerWithoutOptimization(ctxt);
+//				return createQueryOptimizerWithoutOptimization(ctxt);
 //				return createGreedyJoinPlanOptimizer(ctxt);
-//				return createDPBasedJoinPlanOptimizer(ctxt);
+				return createDPBasedJoinPlanOptimizer(ctxt);
 //				return createEvolutionaryAlgorithmQueryOptimizer(ctxt);
 			}
 		};

@@ -23,22 +23,26 @@ public class CypherQueryBuilder {
     }
 
     public CypherQueryBuilder addMatch(final MatchClause match) {
-        this.matches.add(match);
+        if (!matches.contains(match))
+            matches.add(match);
         return this;
     }
 
     public CypherQueryBuilder addCondition(final BooleanCypherExpression condition) {
-        this.conditions.add(condition);
+        if (!conditions.contains(condition))
+            conditions.add(condition);
         return this;
     }
 
     public CypherQueryBuilder addIterator(final UnwindIterator iterator) {
-        this.iterators.add(iterator);
+        if (!iterators.contains(iterator))
+            iterators.add(iterator);
         return this;
     }
 
     public CypherQueryBuilder addReturn(final AliasedExpression ret) {
-        this.returns.add(ret);
+        if (!returns.contains(ret))
+            returns.add(ret);
         return this;
     }
 
@@ -52,7 +56,7 @@ public class CypherQueryBuilder {
         } else if (clause instanceof AliasedExpression) {
             this.addReturn((AliasedExpression) clause);
         } else {
-            throw new IllegalArgumentException("Provided object is not a CypherQuery Clause");
+            throw new IllegalArgumentException("Provided object is not a CypherQuery Clause: " + clause.getClass());
         }
         return this;
     }
@@ -74,6 +78,12 @@ public class CypherQueryBuilder {
         for (final AliasedExpression r : q.getReturnExprs()) {
             this.addReturn(r);
         }
+        return this;
+    }
+
+    public CypherQueryBuilder addAll(final List<? extends Object> objects) {
+        for (final Object o : objects)
+            this.add(o);
         return this;
     }
 }

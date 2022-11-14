@@ -22,6 +22,13 @@ public class StatsPrinter
 	 * printed as well if the 'recursive' flag is 'true'.
 	 */
 	public static void print( final Stats s, final PrintStream out, final boolean recursive, final int indentLevel ) {
+		if ( s == null ) {
+			addTabs(out, indentLevel);
+			out.append( "null" );
+			out.append( System.lineSeparator() );
+			return;
+		}
+
 		for ( final String entryName : s.getEntryNames() ) {
 			final Object entry = s.getEntry(entryName);
 

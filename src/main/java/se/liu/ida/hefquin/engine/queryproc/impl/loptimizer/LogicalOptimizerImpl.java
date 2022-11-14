@@ -14,6 +14,13 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 
 	public LogicalOptimizerImpl() {
 		heuristics.add( new UnionPullUp() );
+
+/*
+  Uncomment the following line to apply vocabulary mappings of federation members during query planning.
+  Note that applying vocabulary mappings is only supported by the naive algorithm currently
+  since the cost model needs to be extended to consider operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal
+ */
+//		heuristics.add( new ApplyVocabularyMappings());
 	}
 
 	@Override

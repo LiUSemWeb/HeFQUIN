@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Objects;
 import java.util.Set;
@@ -17,6 +18,12 @@ public class EXISTSExpression implements BooleanCypherExpression{
     @Override
     public Set<CypherVar> getVars() {
         return expression.getVars();
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        expression.visit(visitor);
+        visitor.visitEXISTS(this);
     }
 
     @Override

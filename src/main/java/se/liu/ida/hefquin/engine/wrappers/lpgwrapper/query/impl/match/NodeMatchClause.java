@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -37,6 +38,12 @@ public class NodeMatchClause implements MatchClause {
     @Override
     public Set<CypherVar> getVars() {
         return Collections.singleton(node);
+    }
+
+    @Override
+    public void visit(final CypherExpressionVisitor visitor) {
+        node.visit(visitor);
+        visitor.visitNodeMatch(this);
     }
 
     @Override

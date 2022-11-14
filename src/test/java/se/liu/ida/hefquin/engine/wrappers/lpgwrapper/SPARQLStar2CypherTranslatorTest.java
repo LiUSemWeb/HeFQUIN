@@ -14,14 +14,19 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherVarGenerator;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.LabeledGraph;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -748,6 +753,26 @@ public class SPARQLStar2CypherTranslatorTest {
     }
 
     @Test
+    public void certainNodeAndPropertyVarVarVarTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var s = Var.alloc("s");
+        final Var p = Var.alloc("p");
+        final Triple t = new Triple(s, p, Var.alloc("o"));
+        final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
+                .translateTriplePattern(new TriplePatternImpl(t), conf, gen, Collections.singleton(s),
+                        emptySet, emptySet, Collections.singleton(p), emptySet).object1;
+        assertEquals(new CypherQueryBuilder()
+                        .add(new NodeMatchClause(a1))
+                        .add(new UnwindIteratorImpl(vark, new KeysExpression(a1), List.of(),
+                                List.of(vark, new PropertyAccessWithVarExpression(a1, vark)), a2))
+                        .add(new AliasedExpression(a1, ret1))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 0), ret2))
+                        .add(new AliasedExpression(new GetItemExpression(a2, 1), ret3))
+                        .build(),
+                translation);
+    }
+
+    @Test
     public void translateTriplePropertyLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultConfiguration();
         final Triple inner = new Triple(Var.alloc("s"), conf.mapEdgeLabel("DIRECTED"), Var.alloc("o"));
@@ -862,6 +887,77 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new AliasedExpression(a2, ret3))
                         .build(),
                 translation);
+    }
+
+    @Test
+    public void translateBGPwithJoinRewriteTest() {
+        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final Var m = Var.alloc("m");
+        final Var p = Var.alloc("p");
+        final BGP bgp = new BGPImpl(
+                new TriplePatternImpl(m, conf.getLabel(), conf.mapNodeLabel("Movie")),
+                new TriplePatternImpl(p, conf.getLabel(), conf.mapNodeLabel("Person")),
+                new TriplePatternImpl(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman")),
+                new TriplePatternImpl(m, conf.mapProperty("released"), Var.alloc("y")),
+                new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
+                        conf.mapProperty("source"), NodeFactory.createLiteral("IMDB")
+                ));
+        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
+        final CypherQuery procTranslation = translator.rewriteJoins((CypherMatchQuery) translator.translateBGP(bgp, conf, false).object1);
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a2, a3, a4))
+                        .add(new EXISTSExpression(new PropertyAccessExpression(a4, "released")))
+                        .add(new VariableLabelExpression(a3, "ACTED_IN"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a3, "source"),
+                                new LiteralExpression("IMDB")))
+                        .add(new VariableLabelExpression(a4, "Movie"))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a2, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new VariableLabelExpression(a2, "Person"))
+                        .add(new AliasedExpression(a4, ret1))
+                        .add(new AliasedExpression(new PropertyAccessExpression(a4, "released"), ret2))
+                        .add(new AliasedExpression(a2, ret3))
+                        .build(),
+                procTranslation);
+    }
+
+    @Test
+    public void rewriteJoinsTest() {
+        final CypherVar a11 = new CypherVar("a11");
+        final CypherVar a12 = new CypherVar("a12");
+        final CypherVar a13 = new CypherVar("a13");
+        final CypherVar a14 = new CypherVar("a14");
+        final CypherMatchQuery query = new CypherQueryBuilder()
+                .add(new EdgeMatchClause(a1, a2, a3))
+                .add(new EdgeMatchClause(a4, a5, a6))
+                .add(new EdgeMatchClause(a7, a8, a9))
+                .add(new EdgeMatchClause(a10, a11, a12))
+                .add(new NodeMatchClause(a13))
+                .add(new NodeMatchClause(a14))
+                .add(new EqualityExpression(a1, a6))
+                .add(new EqualityExpression(a14, a1))
+                .add(new EqualityExpression(a4, a13))
+                .add(new EqualityExpression(a7, a4))
+                .add(new EqualityExpression(a13, a10))
+                .add(new EqualityExpression(new PropertyAccessExpression(a13, "name"),
+                        new LiteralExpression("Uma Thurman")))
+                .add(new AliasedExpression(a13, ret1))
+                .add(new AliasedExpression(a14, ret2))
+                .add(new AliasedExpression(new TypeExpression(a5), ret3))
+                .build();
+        final CypherMatchQuery rewrittenQuery = new SPARQLStar2CypherTranslatorImpl().rewriteJoins(query);
+        assertEquals(new CypherQueryBuilder()
+                        .add(new EdgeMatchClause(a14, a2, a3))
+                        .add(new EdgeMatchClause(a4, a5, a14))
+                        .add(new EdgeMatchClause(a4, a8, a9))
+                        .add(new EdgeMatchClause(a4, a11, a12))
+                        .add(new EqualityExpression(new PropertyAccessExpression(a4, "name"),
+                                new LiteralExpression("Uma Thurman")))
+                        .add(new AliasedExpression(a4, ret1))
+                        .add(new AliasedExpression(a14, ret2))
+                        .add(new AliasedExpression(new TypeExpression(a5), ret3))
+                        .build(),
+                rewrittenQuery);
     }
 
     @Test
@@ -1052,6 +1148,73 @@ public class SPARQLStar2CypherTranslatorTest {
                         .add(new AliasedExpression(new GetItemExpression(a4, 0), ret2))
                         .build(),
                 translation);
+    }
+
+    @Test
+    public void mergePatternsTest() {
+        final CypherVar a11 = new CypherVar("a11");
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a7, a6, a5));
+        matchClauses.add(new EdgeMatchClause(a7, a8, a9));
+        matchClauses.add(new EdgeMatchClause(a7, a10, a11));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(2, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a11, a10, a7, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a7, a6, a5, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a7, a8, a9, LabeledGraph.Direction.LEFT2RIGHT))),
+                merged.get(1));
+    }
+
+    @Test
+    public void mergeStarPatternTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a1, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a1, a6, a7));
+        matchClauses.add(new EdgeMatchClause(a1, a8, a9));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(2, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a1, a8, a9, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a5, a4, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a1, a6, a7, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(1));
+    }
+
+    @Test
+    public void mergeCyclePatternTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a5, a6, a7));
+        matchClauses.add(new EdgeMatchClause(a7, a8, a1));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(1, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a1, a8, a7, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a7, a6, a5, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(0));
+    }
+
+    @Test
+    public void mergeWithNodePatternsTest() {
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a3, a6, a7));
+        matchClauses.add(new NodeMatchClause(a8));
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(3, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a3, a6, a7, LabeledGraph.Direction.LEFT2RIGHT))), merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(1));
+        assertEquals(new NodeMatchClause(a8), merged.get(2));
     }
 
 }

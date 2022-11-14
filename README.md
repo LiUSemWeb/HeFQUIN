@@ -4,7 +4,7 @@ HeFQUIN is a query federation engine for heterogeneous federations of graph data
 ### Features of HeFQUIN
 * Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)
 * So far, support for SPARQL endpoints, TPF, and brTPF
-  * [work on openCypher Property Graphs ongoing](https://github.com/LiUSemWeb/HeFQUIN/tree/main/src/main/java/se/liu/ida/hefquin/engine/wrappers/graphqlwrapper)
+  * [work on openCypher Property Graphs ongoing](https://github.com/LiUSemWeb/HeFQUIN/tree/main/src/main/java/se/liu/ida/hefquin/engine/wrappers/lpgwrapper)
   * [work on GraphQL APIs ongoing](https://github.com/LiUSemWeb/HeFQUIN/tree/main/src/main/java/se/liu/ida/hefquin/engine/wrappers/graphqlwrapper)
 * Initial support for vocabulary mappings
 * [Heuristics-based logical query optimizer](https://github.com/LiUSemWeb/HeFQUIN/wiki/Heuristics-Based-Logical-Query-Optimizer)
@@ -14,7 +14,7 @@ HeFQUIN is a query federation engine for heterogeneous federations of graph data
 * Features for getting an understanding of the internals of the engine
   * printing of logical and physical plans
   * programmatic access to execution statistics on the level of individual operators and data structures, as well as printing of these statistics from the CLI
-* 350+ unit tests
+* 380+ unit tests
 
 ### Current Limitations
 * HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN need to be wrapped in SERVICE clauses.

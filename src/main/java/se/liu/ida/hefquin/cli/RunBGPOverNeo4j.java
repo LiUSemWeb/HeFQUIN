@@ -27,11 +27,17 @@ import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 
 import java.util.*;
 
@@ -43,6 +49,8 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
     protected final ArgDecl argNeo4jUri   = new ArgDecl(ArgDecl.HasValue, "neo4juri");
     protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
+    protected final ArgDecl argVarRep   = new ArgDecl(ArgDecl.NoValue, "varrep");
+    protected final ArgDecl argMerge   = new ArgDecl(ArgDecl.NoValue, "merge");
 
     protected RunBGPOverNeo4j(String[] argv) {
         super(argv);
@@ -52,6 +60,8 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         add(argNeo4jUri, "--neo4juri", "The URI of the Neo4j endpoint");
         add(argNaive, "--naive", "If you want naive translation");
+        add(argVarRep, "--varrep", "If you want variable replacement");
+        add(argMerge, "--merge", "If you want path merging");
 
         addModule(modQuery);
     }
@@ -103,8 +113,46 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //Query translation
         modTime.startTimer();
-        final Pair<CypherQuery, Map<CypherVar, Var>> translation = new SPARQLStar2CypherTranslatorImpl()
-                .translateBGP(bgp, conf, hasArg(argNaive));
+        final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
+        final Pair<CypherQuery, Map<CypherVar, Var>> translation = translator.translateBGP(bgp, conf, hasArg(argNaive));
+        CypherQuery query;
+
+        //optional optimizations
+        if (hasArg(argVarRep)) {
+            if (translation.object1 instanceof CypherMatchQuery)
+                query = translator.rewriteJoins((CypherMatchQuery)translation.object1);
+            else if (translation.object1 instanceof CypherUnionQuery) {
+                query = translator.rewriteJoins((CypherUnionQuery) translation.object1);
+            } else {
+                throw new IllegalStateException();
+            }
+        } else {
+            query = translation.object1;
+        }
+
+        if (hasArg(argMerge)) {
+            if (query instanceof CypherMatchQuery) {
+                List<MatchClause> merged = translator.mergePaths(((CypherMatchQuery) query).getMatches());
+                query = new CypherQueryBuilder().addAll(merged)
+                        .addAll(((CypherMatchQuery) query).getConditions())
+                        .addAll(((CypherMatchQuery) query).getIterators())
+                        .addAll(((CypherMatchQuery) query).getReturnExprs())
+                        .build();
+            } else if (query instanceof CypherUnionQuery) {
+                List<CypherMatchQuery> subqueries = new ArrayList<>();
+                for (final CypherMatchQuery q : ((CypherUnionQuery) query).getSubqueries()) {
+                    List<MatchClause> merged = translator.mergePaths(q.getMatches());
+                    subqueries.add(new CypherQueryBuilder().addAll(merged)
+                            .addAll(q.getConditions())
+                            .addAll(q.getIterators())
+                            .addAll(q.getReturnExprs())
+                            .build());
+                }
+                query = new CypherUnionQueryImpl(subqueries);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
 
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
@@ -114,7 +162,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //Query Execution
         modTime.startTimer();
-        final Neo4jRequest request = new Neo4jRequestImpl(translation.object1.toString());
+        final Neo4jRequest request = new Neo4jRequestImpl(query.toString());
 
         final RecordsResponse response;
         try {

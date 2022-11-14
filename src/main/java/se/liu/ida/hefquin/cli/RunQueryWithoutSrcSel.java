@@ -108,7 +108,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace( System.err );
 		}
 
-		if ( statsAndExceptions != null && ! statsAndExceptions.object2.isEmpty() ) {
+		if (    statsAndExceptions != null
+		     && statsAndExceptions.object2 != null
+		     && ! statsAndExceptions.object2.isEmpty() ) {
 			final int numberOfExceptions = statsAndExceptions.object2.size();
 			if ( numberOfExceptions > 1 )
 				System.err.println("Attention: The query result may be incomplete because the following " + numberOfExceptions + " exceptions were caught when executing the query plan.");
@@ -155,7 +157,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace();
 		}
 
-		if ( statsAndExceptions != null && contains(argQueryProcStats) ) {
+		if (    statsAndExceptions != null
+		     && statsAndExceptions.object1 != null
+		     && contains(argQueryProcStats) ) {
 			StatsPrinter.print(statsAndExceptions.object1, System.err, true);
 		}
 
