@@ -119,7 +119,6 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //optional optimizations
         if (hasArg(argVarRep)) {
-            System.err.println("varrep");
             if (translation.object1 instanceof CypherMatchQuery)
                 query = translator.rewriteJoins((CypherMatchQuery)translation.object1);
             else if (translation.object1 instanceof CypherUnionQuery) {

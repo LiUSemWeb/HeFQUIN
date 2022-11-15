@@ -821,7 +821,6 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .collect(Collectors.toList());
         if (variableJoins.isEmpty()) return query;
         final Map<CypherVar, CypherVar> equivalences = getEquivalenceMap(variableJoins);
-
         //first rewrite the MATCH clauses by replacing the equivalent variables
         final List<MatchClause> matches = new ArrayList<>();
         for (final MatchClause m : query.getMatches()){
