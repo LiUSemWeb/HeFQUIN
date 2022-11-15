@@ -72,7 +72,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
     @Override
     protected String getSummary() {
-        return getCommandName()+"--query=<query> --neo4juri=<Neo4j endpoint URI> --time? --naive?\"";
+        return getCommandName()+"--query=<query> --neo4juri=<Neo4j endpoint URI> --time? --naive? --varrep? --merge?\"";
     }
 
     @Override
@@ -131,6 +131,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
         }
 
         if (hasArg(argMerge)) {
+            System.err.println("hi");
             if (query instanceof CypherMatchQuery) {
                 List<MatchClause> merged = translator.mergePaths(((CypherMatchQuery) query).getMatches());
                 query = new CypherQueryBuilder().addAll(merged)
@@ -181,7 +182,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //Result parsing
         modTime.startTimer();
-        List<SolutionMapping> mappingList = new Record2SolutionMappingTranslatorImpl().translateRecords(response.getResponse(), conf, translation.object1, translation.object2);
+        List<SolutionMapping> mappingList = new Record2SolutionMappingTranslatorImpl().translateRecords(response.getResponse(), conf, query, translation.object2);
         if ( modTime.timingEnabled() ) {
             final long time = modTime.endTimer();
             System.out.println("Result Translation Time: " + modTime.timeStr(time) + " sec");
