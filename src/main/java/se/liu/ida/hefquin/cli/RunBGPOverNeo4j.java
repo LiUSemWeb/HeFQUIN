@@ -119,6 +119,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
 
         //optional optimizations
         if (hasArg(argVarRep)) {
+            System.err.println("varrep");
             if (translation.object1 instanceof CypherMatchQuery)
                 query = translator.rewriteJoins((CypherMatchQuery)translation.object1);
             else if (translation.object1 instanceof CypherUnionQuery) {
@@ -131,7 +132,6 @@ public class RunBGPOverNeo4j extends CmdARQ {
         }
 
         if (hasArg(argMerge)) {
-            System.err.println("hi");
             if (query instanceof CypherMatchQuery) {
                 List<MatchClause> merged = translator.mergePaths(((CypherMatchQuery) query).getMatches());
                 query = new CypherQueryBuilder().addAll(merged)
