@@ -347,36 +347,37 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		while(i.hasNext()) {
 			final Var v = i.next();
 			final Node n = sm.asJenaBinding().get(v);
-			
+
 			if(!n.isURI()) {
 				for (final BindingBuilder j : bbs) {
 					j.add(v, n);
 				}
 			}
-			
-			final Set<Node> bindingTranslation = translateBinding(n);
-			if (bindingTranslation.size() > 1) {
-				final Set<BindingBuilder> bbsCopy = new HashSet<>();
-				
-				for(final Node j : bindingTranslation) {
-					for (final BindingBuilder k : bbs) {
-						BindingBuilder translationCopy = BindingBuilder.create();
-						if(!k.isEmpty()) {
-							translationCopy.addAll(k.snapshot());
+			else {
+				final Set<Node> bindingTranslation = translateBinding(n);
+				if (bindingTranslation.size() > 1) {
+					final Set<BindingBuilder> bbsCopy = new HashSet<>();
+
+					for (final Node j : bindingTranslation) {
+						for (final BindingBuilder k : bbs) {
+							BindingBuilder translationCopy = BindingBuilder.create();
+							if (!k.isEmpty()) {
+								translationCopy.addAll(k.snapshot());
+							}
+							translationCopy.add(v, j);
+							bbsCopy.add(translationCopy);
 						}
-						translationCopy.add(v, j);
-						bbsCopy.add(translationCopy);
 					}
-				}
-				
-				bbs = bbsCopy;
-			} else if (bindingTranslation.size() == 0) {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, n);
-				}
-			} else {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, bindingTranslation.iterator().next());
+
+					bbs = bbsCopy;
+				} else if (bindingTranslation.size() == 0) {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, n);
+					}
+				} else {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, bindingTranslation.iterator().next());
+					}
 				}
 			}
 		}
