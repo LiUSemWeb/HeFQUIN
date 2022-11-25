@@ -1217,4 +1217,29 @@ public class SPARQLStar2CypherTranslatorTest {
         assertEquals(new NodeMatchClause(a8), merged.get(2));
     }
 
+    @Test
+    public void mergeBranchPatternTest() {
+        final CypherVar a11 = new CypherVar("a11");
+        final CypherVar a12 = new CypherVar("a12");
+        final CypherVar a13 = new CypherVar("a13");
+        final List<MatchClause> matchClauses = new ArrayList<>();
+        matchClauses.add(new EdgeMatchClause(a1, a2, a3));
+        matchClauses.add(new EdgeMatchClause(a3, a4, a5));
+        matchClauses.add(new EdgeMatchClause(a5, a6, a7));
+        matchClauses.add(new EdgeMatchClause(a7, a8, a9));
+        matchClauses.add(new EdgeMatchClause(a5, a10, a11));
+        matchClauses.add(new EdgeMatchClause(a11, a12, a13));
+
+        final List<MatchClause> merged = new SPARQLStar2CypherTranslatorImpl().mergePaths(matchClauses);
+        assertEquals(2, merged.size());
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a13, a12, a11, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a11, a10, a5, LabeledGraph.Direction.RIGHT2LEFT),
+                        new PathMatchClause.EdgePattern(a5, a6, a7, LabeledGraph.Direction.LEFT2RIGHT),
+                        new PathMatchClause.EdgePattern(a7, a8, a9, LabeledGraph.Direction.LEFT2RIGHT))),
+            merged.get(0));
+        assertEquals(new PathMatchClause(List.of(new PathMatchClause.EdgePattern(a5, a4, a3, LabeledGraph.Direction.RIGHT2LEFT),
+                new PathMatchClause.EdgePattern(a3, a2, a1, LabeledGraph.Direction.RIGHT2LEFT))),
+                merged.get(1));
+    }
+
 }
