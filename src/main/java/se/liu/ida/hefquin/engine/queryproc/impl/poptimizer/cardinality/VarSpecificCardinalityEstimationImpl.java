@@ -110,12 +110,12 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			// both f1 and f2 have completed and, then, will combine
 			// the results of f1 and f2 (i.e., c1 and c2) using the
 			// min function.
-			return f1.thenCombine(f2, (c1,c2) -> min(c1, c2) );
+			return f1.thenCombine(f2, (c1,c2) -> min( (c1 < 0 ? Integer.MAX_VALUE : c1) , (c2 < 0 ? Integer.MAX_VALUE : c2) ) );
 		}
 		else {
 			// ... combine the results of f1 and f2 (i.e., c1 and c2)
 			// by multiplication.
-			return f1.thenCombine(f2, (c1,c2) -> c1 * c2 );
+			return f1.thenCombine(f2, (c1,c2) -> ( c1 < 0 ? Integer.MAX_VALUE : c1 ) * ( c2 < 0 ? Integer.MAX_VALUE : c2 ) );
 		}
 	}
 
@@ -131,7 +131,7 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 		// both f1 and f2 have completed and, then, will combine
 		// the results of f1 and f2 (i.e., c1 and c2) by adding
 		// them.
-		return f1.thenCombine(f2, (c1,c2) -> c1 + c2 );
+		return f1.thenCombine(f2, (c1,c2) -> ( c1 < 0 ? Integer.MAX_VALUE : c1 ) + ( c2 < 0 ? Integer.MAX_VALUE : c2 ) );
 	}
 
 
