@@ -80,7 +80,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		// result size, which needs to be fetched first
 		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
 		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
-			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms - numberOfJoinVars) );
+			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfTerms + numberOfJoinVars) );
 		}
 		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
 		          || pop instanceof PhysicalOpBindJoinWithVALUES
