@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputExce
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 /**
  * Push-based implementation of {@link ExecPlanTask}.
@@ -55,36 +56,47 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 
 	@Override
 	public final void run() {
-		setStatus(Status.RUNNING);
-
-		if ( extraConnectors != null ) {
-			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
-				c.setStatus(Status.RUNNING);
-			}
-		}
-
-		final IntermediateResultElementSink sink = this;
-
-		boolean failed       = false;
-		boolean interrupted  = false;
 		try {
-			produceOutput(sink);
-		}
-		catch ( final ExecOpExecutionException | ExecPlanTaskInputException e ) {
-			setCauseOfFailure(e);
-			failed = true;
-		}
-		catch ( final ExecPlanTaskInterruptionException  e ) {
-			setCauseOfFailure(e);
-			interrupted = true;
-		}
+			setStatus(Status.RUNNING);
 
-		wrapUp(failed, interrupted);
-
-		if ( extraConnectors != null ) {
-			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
-				c.wrapUp(failed, interrupted);
+			if ( extraConnectors != null ) {
+				for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+					c.setStatus(Status.RUNNING);
+				}
 			}
+
+			final IntermediateResultElementSink sink = this;
+
+			boolean failed       = false;
+			boolean interrupted  = false;
+			try {
+				produceOutput(sink);
+			}
+			catch ( final ExecOpExecutionException | ExecPlanTaskInputException e ) {
+				setCauseOfFailure(e);
+				failed = true;
+			}
+			catch ( final ExecPlanTaskInterruptionException  e ) {
+				setCauseOfFailure(e);
+				interrupted = true;
+			}
+
+			wrapUp(failed, interrupted);
+
+			if ( extraConnectors != null ) {
+				for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+					c.wrapUp(failed, interrupted);
+				}
+			}
+		}
+		catch ( final Throwable th ) {
+			System.err.println("Unexpected exception in one of the ExecPlanTasks.");
+			System.err.println( "--> The class of the executable operator of this ExecPlanTask is:" + getExecOp().getClass().getName() );
+			System.err.println( "--> The current runtime statistics of this ExecPlanTask are:");
+			StatsPrinter.print( getStats(), System.err, true ); // true=recursive
+			System.err.println( "--> The stack trace of the exception that was caught is:");
+			th.printStackTrace( System.err );
+			System.err.println();
 		}
 	}
 
