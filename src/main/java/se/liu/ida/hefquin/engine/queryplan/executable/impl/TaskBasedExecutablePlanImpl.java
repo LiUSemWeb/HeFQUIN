@@ -126,8 +126,14 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 
 	@Override
 	public ExecutablePlanStats getStats() {
-		// TODO Auto-generated method stub
-		return null;
+		final ExecPlanTaskStats[] statsOfTasks = new ExecPlanTaskStats[ tasks.size() ];
+		int i = 0;
+		for ( final ExecPlanTask t : tasks ) {
+			statsOfTasks[i] = t.getStats();
+			i++;
+		}
+
+		return new ExecutablePlanStatsOfTaskBasedPlan(statsOfTasks);
 	}
 
 	@Override
