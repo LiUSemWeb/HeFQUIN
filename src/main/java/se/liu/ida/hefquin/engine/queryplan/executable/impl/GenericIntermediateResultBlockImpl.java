@@ -49,7 +49,11 @@ public class GenericIntermediateResultBlockImpl
 		return elements;
 	}
 
-	public void add( SolutionMapping element ) {
+	public void add( final SolutionMapping element ) {
+		if ( element == null ) {
+			throw new IllegalArgumentException("The given solution mapping must not be null.");
+		}
+
 		elements.add(element);
 	}
 }
