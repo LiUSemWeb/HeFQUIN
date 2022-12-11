@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.BasicPattern;
@@ -12,111 +10,29 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
-import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 
 public class LogicalOpUtils
 {
 	/**
-	 * Creates a logical plan where all requests are TriplePatternRequests
-	 * for use when a federation member's interface is a TPF-server.
-	 */
-	public static LogicalPlan rewriteReqOf( final SPARQLGraphPattern pattern, final FederationMember fm ) {
-		// Right now there are just TPF-servers and SPARQL endpoints, but there may be more in the future.
-		// For now, we will not assume that third types of interfaces will necessarily support all patterns.
-
-		// For SPARQL endpoints, the whole graph pattern can be sent in a single request.
-		if ( fm instanceof SPARQLEndpoint ) {
-			final SPARQLRequest reqP = new SPARQLRequestImpl(pattern);
-			final LogicalOpRequest<SPARQLRequest, SPARQLEndpoint> req = new LogicalOpRequest<>( (SPARQLEndpoint) fm, reqP );
-			return new LogicalPlanWithNullaryRootImpl(req);
-		}
-		else if( pattern instanceof TriplePattern ) {
-			if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The given federation member has the following interface type which does not support triple pattern requests: " + fm.getInterface().getClass().getName() );
-			}
-
-			final TriplePatternRequest req = new TriplePatternRequestImpl( (TriplePattern) pattern );
-			final LogicalOpRequest<TriplePatternRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
-			return new LogicalPlanWithNullaryRootImpl(reqOp);
-		}
-		else if( pattern instanceof BGP ) {
-			final BGP bgp = (BGP) pattern;
-
-			if ( fm.getInterface().supportsBGPRequests() ) {
-				final BGPRequest req = new BGPRequestImpl(bgp);
-				final LogicalOpRequest<BGPRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-
-			if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
-				throw new IllegalArgumentException( "The given federation member has the following interface type which does not support triple pattern requests: " + fm.getInterface().getClass().getName() );
-			}
-
-			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
-				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
-				final LogicalOpRequest<TriplePatternRequest, FederationMember> reqOp = new LogicalOpRequest<>(fm,req);
-				return new LogicalPlanWithNullaryRootImpl(reqOp);
-			}
-
-			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
-			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
-		}
-		else if( pattern instanceof SPARQLUnionPattern ) {
-			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final SPARQLGraphPattern subP : ((SPARQLUnionPattern) pattern).getSubPatterns() ) {
-				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
-				subPlans.add(subPlan);
-			}
-
-			final LogicalOpMultiwayUnion muRootOp = LogicalOpMultiwayUnion.getInstance();
-			return new LogicalPlanWithNaryRootImpl(muRootOp, subPlans);
-		}
-		else if( pattern instanceof SPARQLGroupPattern ) {
-			final List<LogicalPlan> subPlans = new ArrayList<>();
-			for ( final SPARQLGraphPattern subP : ((SPARQLGroupPattern) pattern).getSubPatterns() ) {
-				final LogicalPlan subPlan = rewriteReqOf(subP,fm);
-				subPlans.add(subPlan);
-			}
-
-			final LogicalOpMultiwayJoin mjRootOp = LogicalOpMultiwayJoin.getInstance();
-			return new LogicalPlanWithNaryRootImpl(mjRootOp, subPlans);
-		}
-		else {
-			throw new IllegalArgumentException( pattern.getClass().getName() );
-		}
-	}
-
-    /**
      * Creates a BGP by merging two sets of triple patterns,
      * which are extracted from two given Requests.
      */
