@@ -113,11 +113,9 @@ public class SPARQL2GraphQLHelper
                 }
 
             }
-            else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
+            else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)
+                    && sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
                 // If the current TP predicate is a URI, add the GraphQL field it corresponds to
-                if(!sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
-                    continue;
-                }
                 finishedFieldPaths.addAll(addObjectField(connectedSP,currentPath,sgpType,predicate.getURI()));
             }
         }
@@ -141,11 +139,9 @@ public class SPARQL2GraphQLHelper
             // If no variable predicate exists, only the necessary fields from the star pattern have to be added.
             for ( final TriplePattern tp : sp.getTriplePatterns() ) {
                 final Node predicate = tp.asJenaTriple().getPredicate();
-                if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)){
+                if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint) 
+                        && sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
                     final String fieldName = config.mapPropertyToField(predicate.getURI());
-                    if(!sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
-                        continue;
-                    }
                     if(endpoint.getGraphQLFieldType(sgpType,fieldName) == GraphQLFieldType.OBJECT){
                         finishedFieldPaths.add( addEmptyObjectField(currentPath,sgpType,predicate.getURI()) );
                     }
