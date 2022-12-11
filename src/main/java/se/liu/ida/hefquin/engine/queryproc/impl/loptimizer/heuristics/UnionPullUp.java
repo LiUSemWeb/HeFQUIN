@@ -146,7 +146,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithUnionRoot);
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithNonUnionRoot);
 
-			return recreatePlanWithRewrittenSubPlans(rootOp, rewrittenSubPlans);
+			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, rewrittenSubPlans);
 		}
 		else
 			return inputPlan;
@@ -246,26 +246,6 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		}
 
 		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), newSubPlans ); 
-	}
-
-	/**
-	 * Creates a plan with the given operator as root operator and the plans
-	 * given in the list as subplans.
-	 */
-	public LogicalPlan recreatePlanWithRewrittenSubPlans( final LogicalOperator rootOp,
-	                                                      final List<LogicalPlan> subPlans ) {
-		if ( rootOp instanceof UnaryLogicalOp ) {
-			return new LogicalPlanWithUnaryRootImpl( (UnaryLogicalOp) rootOp, subPlans.get(0) );
-		}
-		else if ( rootOp instanceof BinaryLogicalOp ) {
-			return new LogicalPlanWithBinaryRootImpl( (BinaryLogicalOp) rootOp, subPlans.get(0), subPlans.get(1) );
-		}
-		else if ( rootOp instanceof NaryLogicalOp ) {
-			return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) rootOp, subPlans );
-		}
-		else {
-			throw new IllegalArgumentException( rootOp.getClass().getName() );
-		}
 	}
 
 }
