@@ -106,13 +106,14 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 
 	@Override
 	public void send( final SolutionMapping element ) {
-		blockBuilder.add(element);
-		// If we have collected enough solution mappings, produce the next
-		// output result block with these solution mappings and inform the
-		// consuming thread in case it is already waiting for the next block
-		if ( blockBuilder.sizeOfCurrentBlock() >= outputBlockSize ) {
-			final IntermediateResultBlock nextBlock = blockBuilder.finishCurrentBlock();
-			synchronized (availableResultBlocks) {
+		synchronized (availableResultBlocks) {
+			blockBuilder.add(element);
+
+			// If we have collected enough solution mappings, produce the next
+			// output result block with these solution mappings and inform the
+			// consuming thread in case it is already waiting for the next block
+			if ( blockBuilder.sizeOfCurrentBlock() >= outputBlockSize ) {
+				final IntermediateResultBlock nextBlock = blockBuilder.finishCurrentBlock();
 				availableResultBlocks.add(nextBlock);
 				availableResultBlocks.notify();
 			}
