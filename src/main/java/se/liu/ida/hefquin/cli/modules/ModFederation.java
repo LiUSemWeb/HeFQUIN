@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
@@ -30,9 +29,6 @@ import se.liu.ida.hefquin.vocabulary.FD;
 public class ModFederation extends ModBase
 {
 	protected final ArgDecl fedDescrDecl   = new ArgDecl(ArgDecl.HasValue, "federationDescription", "fd");
-	protected final ArgDecl sparqlEndpointDecl   = new ArgDecl(ArgDecl.HasValue, "considerSPARQLEndpoint");
-	protected final ArgDecl tpfServerDecl        = new ArgDecl(ArgDecl.HasValue, "considerTPFServer");
-	protected final ArgDecl brtpfServerDecl      = new ArgDecl(ArgDecl.HasValue, "considerBRTPFServer");
 
 	protected final Map<String, FederationMember> membersByURI = new HashMap<>();
 
@@ -40,9 +36,6 @@ public class ModFederation extends ModBase
 	public void registerWith( final CmdGeneral cmdLine ) {
 		cmdLine.getUsage().startCategory("Federation");
 		cmdLine.add(fedDescrDecl,  "--federationDescription",  "file with an RDF description of the federation");
-		cmdLine.add(sparqlEndpointDecl,  "--considerSPARQLEndpoint",  "URI of a SPARQL endpoint that is part of the federation (this argument can be used multiple times for multiple endpoints)");
-		cmdLine.add(tpfServerDecl,       "--considerTPFServer",  "URI of a fragment provided by a TPF server that is part of the federation (this argument can be used multiple times for multiple TPF servers)");
-		cmdLine.add(brtpfServerDecl,     "--considerBRTPFServer",  "URI of a fragment provided by a brTPF server that is part of the federation (this argument can be used multiple times for multiple brTPF servers)");
 	}
 
 	@Override
@@ -50,33 +43,6 @@ public class ModFederation extends ModBase
 		if ( cmdLine.contains(fedDescrDecl) ) {
 			final String fedDescrFilename = cmdLine.getValue(fedDescrDecl);
 			parseFedDescr(fedDescrFilename);
-		}
-
-		if ( cmdLine.contains(sparqlEndpointDecl) ) {
-			try {
-				addSPARQLEndpoints( cmdLine.getValues(sparqlEndpointDecl) );
-			}
-			catch ( final IllegalArgumentException ex ) {
-				cmdLine.cmdError( ex.getMessage() );
-			}
-		}
-
-		if ( cmdLine.contains(tpfServerDecl) ) {
-			try {
-				addTPFServers( cmdLine.getValues(tpfServerDecl) );
-			}
-			catch ( final IllegalArgumentException ex ) {
-				cmdLine.cmdError( ex.getMessage() );
-			}
-		}
-
-		if ( cmdLine.contains(brtpfServerDecl) ) {
-			try {
-				addBRTPFServers( cmdLine.getValues(brtpfServerDecl) );
-			}
-			catch ( final IllegalArgumentException ex ) {
-				cmdLine.cmdError( ex.getMessage() );
-			}
 		}
 	}
 
@@ -186,21 +152,6 @@ public class ModFederation extends ModBase
 			}
 
 		}
-	}
-
-	protected void addSPARQLEndpoints( final List<String> sparqlEndpointValues ) {
-		for ( final String v : sparqlEndpointValues )
-			addSPARQLEndpoint(v, null);
-	}
-
-	protected void addTPFServers( final List<String> uris ) {
-		for ( final String uri : uris )
-			addTPFServer(uri, null);
-	}
-
-	protected void addBRTPFServers( final List<String> uris ) {
-		for ( final String uri : uris )
-			addBRTPFServer(uri, null);
 	}
 
 	protected void addSPARQLEndpoint( final String sparqlEndpointValue, final VocabularyMapping vocabMappings ) {
