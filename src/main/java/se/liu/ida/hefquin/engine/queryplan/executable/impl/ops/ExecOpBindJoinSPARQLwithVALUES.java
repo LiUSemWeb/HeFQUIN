@@ -66,6 +66,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		if (noJoinVars) {
 			return new ExecOpRequestSPARQL( new SPARQLRequestImpl(query), fm, false );
 		}
+
 		if ( bindings.isEmpty() ) {
 			return null;
 		}
