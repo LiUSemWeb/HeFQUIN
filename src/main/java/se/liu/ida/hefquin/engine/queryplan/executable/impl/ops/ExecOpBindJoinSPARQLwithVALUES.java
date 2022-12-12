@@ -43,8 +43,18 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Set<Binding> bindings = new HashSet<>();
 		final Set<Var> joinVars = new HashSet<>();
+
+		boolean noJoinVars = false;
 		for ( final SolutionMapping s : solMaps ) {
 			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );
+
+			// If there exists a solution mapping that does not have any variables in common with the triple pattern of this operator
+			// retrieve all matching triples of the given query
+			if ( b.isEmpty() ) {
+				noJoinVars = true;
+				break;
+			}
+
 			if ( ! SolutionMappingUtils.containsBlankNodes(b) ) {
 				bindings.add(b);
 
@@ -53,6 +63,10 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 					joinVars.add( it.next() );
 				}
 			}
+		}
+
+		if (noJoinVars) {
+			return new ExecOpRequestSPARQL( new SPARQLRequestImpl(query), fm, false );
 		}
 
 		if ( bindings.isEmpty() ) {
