@@ -6,6 +6,7 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.UnionPullUp;
 
 public class LogicalOptimizerImpl implements LogicalOptimizer
@@ -14,6 +15,7 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 
 	public LogicalOptimizerImpl() {
 		heuristics.add( new UnionPullUp() );
+		heuristics.add( new MergeRequests() );
 
 /*
   Uncomment the following line to apply vocabulary mappings of federation members during query planning.
