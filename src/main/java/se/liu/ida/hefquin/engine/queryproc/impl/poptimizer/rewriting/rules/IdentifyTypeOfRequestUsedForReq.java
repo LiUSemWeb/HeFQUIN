@@ -86,13 +86,13 @@ public class IdentifyTypeOfRequestUsedForReq {
         return false;
     }
 
-    public static boolean twoGraphPatternReqWithSameFm( final PhysicalOperator subPlanOp1, final PhysicalOperator subPlanOp2 ) {
+    public static boolean twoGraphPatternReqWithSameSPARQLEndpoint( final PhysicalOperator subPlanOp1, final PhysicalOperator subPlanOp2 ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator)subPlanOp1).getLogicalOperator();
 
         if ( IdentifyTypeOfRequestUsedForReq.isGraphPatternRequest( lop ) ) {
             final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
-            return IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
+            return (fm instanceof SPARQLEndpoint) && IdentifyTypeOfRequestUsedForReq.isGraphPatternReqWithFm( subPlanOp2, fm );
         }
         return false;
     }
