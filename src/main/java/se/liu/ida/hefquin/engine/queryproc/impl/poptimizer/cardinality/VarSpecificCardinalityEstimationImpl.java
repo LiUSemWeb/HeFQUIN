@@ -100,10 +100,13 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan plan2,
 			final Var v )
 	{
-		final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(plan1, v);
-		final CompletableFuture<Integer> f2 = initiateCardinalityEstimation(plan2, v);
+//		Estimate cardinality of sub-queries
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
 
-		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1.getExpectedVariables(), plan2.getExpectedVariables() );
+		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1, plan2 );
+		final Set<Var> vars1 = ExpectedVariablesUtils.unionOfAllVariables( plan1.getExpectedVariables() );
+		final Set<Var> vars2 = ExpectedVariablesUtils.unionOfAllVariables( plan2.getExpectedVariables() );
 
 		if ( allJoinVars.contains(v) ) {
 			// Create a CompletableFuture that will complete once
@@ -112,11 +115,21 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			// min function.
 			return f1.thenCombine(f2, (c1,c2) -> min( (c1 < 0 ? Integer.MAX_VALUE : c1) , (c2 < 0 ? Integer.MAX_VALUE : c2) ) );
 		}
+		else if ( !allJoinVars.isEmpty() && vars1.contains(v) ) {
+			return f1.thenApply( c -> (c < 0? Integer.MAX_VALUE : c ));
+		}
+		else if ( !allJoinVars.isEmpty() && vars2.contains(v) ) {
+			return f2.thenApply( c -> (c < 0 ? Integer.MAX_VALUE : c ));
+		}
 		else {
 			// ... combine the results of f1 and f2 (i.e., c1 and c2)
 			// by multiplication.
-			return f1.thenCombine(f2, (c1,c2) -> ( c1 < 0 ? Integer.MAX_VALUE : c1 ) * ( c2 < 0 ? Integer.MAX_VALUE : c2 ) );
+			return f1.thenCombine(f2, (c1,c2) -> {
+				int value = ( c1 < 0 ? Integer.MAX_VALUE : c1 ) * ( c2 < 0 ? Integer.MAX_VALUE : c2 );
+				return value < 0 ? Integer.MAX_VALUE : value ;
+			} );
 		}
+
 	}
 
 	protected CompletableFuture<Integer> _initiateUnionCardinalityEstimation(
@@ -124,14 +137,35 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan plan2,
 			final Var v )
 	{
-		final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(plan1, v);
-		final CompletableFuture<Integer> f2 = initiateCardinalityEstimation(plan2, v);
+		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1, plan2 );
+		final Set<Var> vars1 = ExpectedVariablesUtils.unionOfAllVariables( plan1.getExpectedVariables() );
+		final Set<Var> vars2 = ExpectedVariablesUtils.unionOfAllVariables( plan2.getExpectedVariables() );
 
-		// Create a CompletableFuture that will complete once
-		// both f1 and f2 have completed and, then, will combine
-		// the results of f1 and f2 (i.e., c1 and c2) by adding
-		// them.
-		return f1.thenCombine(f2, (c1,c2) -> ( c1 < 0 ? Integer.MAX_VALUE : c1 ) + ( c2 < 0 ? Integer.MAX_VALUE : c2 ) );
+		if ( allJoinVars.contains(v) ) {
+			final CompletableFuture<Integer> fv1 = initiateCardinalityEstimation(plan1, v);
+			final CompletableFuture<Integer> fv2 = initiateCardinalityEstimation(plan2, v);
+			// Create a CompletableFuture that will complete once
+			// both f1 and f2 have completed and, then, will combine
+			// the results of f1 and f2 (i.e., c1 and c2) by adding
+			// them.
+			return fv1.thenCombine(fv2, (c1, c2) -> {
+				int value = (c1 < 0 ? Integer.MAX_VALUE : c1) + (c2 < 0 ? Integer.MAX_VALUE : c2);
+				return value < 0 ? Integer.MAX_VALUE : value;
+			});
+		}
+		else if (vars1.contains(v) ){
+			return cardEstimator.initiateCardinalityEstimation(plan1);
+		}
+		else if ( vars2.contains(v) )
+			return cardEstimator.initiateCardinalityEstimation(plan2);
+		else {
+			final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
+			final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
+			return f1.thenCombine(f2, (c1, c2) -> {
+				int value = (c1 < 0 ? Integer.MAX_VALUE : c1) + (c2 < 0 ? Integer.MAX_VALUE : c2);
+				return value < 0 ? Integer.MAX_VALUE : value;
+			});
+		}
 	}
 
 

@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 import org.apache.jena.sparql.core.Var;
 
@@ -24,8 +23,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
@@ -97,34 +94,19 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan ) {
         final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
 
-        if ( rootOp instanceof LogicalOpUnion ) {
-            final CompletableFuture<Integer> future1 = initiateCardinalityEstimation( plan.getSubPlan(0) );
-            final CompletableFuture<Integer> future2 = initiateCardinalityEstimation( plan.getSubPlan(1) );
-            return future1.thenCombine( future2, (c1,c2) -> ((c1 < 0? Integer.MAX_VALUE:c1) + (c2 < 0? Integer.MAX_VALUE:c2)) < 0? Integer.MAX_VALUE:(c1 < 0? Integer.MAX_VALUE:c1) + (c2 < 0? Integer.MAX_VALUE:c2) );
-        }
-
         final Supplier<Integer> worker;
         if ( rootOp instanceof LogicalOpRequest ) {
             worker = new WorkerForRequestOps( (LogicalOpRequest<?, ?>) rootOp);
         }
-        else if ( rootOp instanceof LogicalOpJoin ) {
-            worker = new WorkerForJoins( plan.getSubPlan(0), plan.getSubPlan(1) );
-        }
-        else if ( rootOp instanceof LogicalOpTPAdd ) {
-            final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpTPAdd) rootOp );
-            worker = new WorkerForJoins( plan.getSubPlan(0), reqTP );
-        }
-        else if ( rootOp instanceof LogicalOpBGPAdd ) {
-            final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
-            worker = new WorkerForJoins( plan.getSubPlan(0), reqBGP );
-        }
+        else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpTPAdd || rootOp instanceof LogicalOpBGPAdd) {
+			worker = new WorkerForSubquery(plan);
+		}
         else {
             throw new IllegalArgumentException("The type of the root operator of the given plan is currently not supported (" + rootOp.getClass().getName() + ").");
         }
 
         return CompletableFuture.supplyAsync(worker);
     }
-
 
 	protected class WorkerForRequestOps implements Supplier<Integer>
 	{
@@ -180,103 +162,30 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 	}
 
-
-	protected class WorkerForJoins implements Supplier<Integer>
+	protected class WorkerForSubquery implements Supplier<Integer>
 	{
-		protected final PhysicalPlan plan1;
-		protected final PhysicalPlan plan2;
+		protected final PhysicalPlan plan;
 
-		public WorkerForJoins( final PhysicalPlan plan1,
-		                       final PhysicalPlan plan2 ) {
-			this.plan1 = plan1;
-			this.plan2 = plan2;
+		public WorkerForSubquery( final PhysicalPlan plan) {
+			this.plan = plan;
 		}
 
 		@Override
 		public Integer get() {
-			final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables( plan1.getExpectedVariables(), plan2.getExpectedVariables() );
-			if ( ! certainJoinVars.isEmpty() ) {
-				return getEstimateBasedOnJoinVars( new ArrayList<>(certainJoinVars) );
-			}
+//			The cardinality of a subquery is the maximum cardinality
+//			of VarSpecificCardinalityEstimation for all (certain) variables
+			final Set<Var> allCertainVars = plan.getExpectedVariables().getCertainVariables();
 
-			final Set<Var> possibleJoinVars = ExpectedVariablesUtils.unionOfAllVariables( plan1.getExpectedVariables(), plan2.getExpectedVariables() );
-			possibleJoinVars.removeAll(certainJoinVars);
-			if ( ! possibleJoinVars.isEmpty() ) {
-				return getEstimateBasedOnJoinVars( new ArrayList<>(possibleJoinVars) );
-			}
-
-			final Set<Var> allCertainVars = ExpectedVariablesUtils.unionOfCertainVariables( plan1.getExpectedVariables(), plan2.getExpectedVariables() );
 			return getEstimateBasedOnAllCertainVars( new ArrayList<>(allCertainVars) );
 		}
 
-		protected Integer getEstimateBasedOnJoinVars( final List<Var> joinVars ) {
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<Integer>[] futures1 = new CompletableFuture[joinVars.size()];
-			@SuppressWarnings("unchecked")
-			final CompletableFuture<Integer>[] futures2 = new CompletableFuture[joinVars.size()];
-
-			for ( int i = 0; i < joinVars.size(); ++i ) {
-				futures1[i] = vsCardEstimator.initiateCardinalityEstimation(plan1, joinVars.get(i));
-				futures2[i] = vsCardEstimator.initiateCardinalityEstimation(plan2, joinVars.get(i));
-			}
-
-			final Integer[] cardinalities1;
-			try {
-				cardinalities1 = CompletableFutureUtils.getAll(futures1, Integer.class);
-			}
-			catch ( final CompletableFutureUtils.GetAllException ex ) {
-				for ( int i = 0; i < joinVars.size(); ++i ) {
-					futures2[i].cancel(true);
-				}
-				if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-					throw new RuntimeException("Unexpected interruption when getting a variable-specific cardinality estimate.", ex.getCause() );
-				}
-				else {
-					throw new RuntimeException("Getting a variable-specific cardinality estimate caused an exception.", ex.getCause() );
-				}
-			}
-
-			final Integer[] cardinalities2;
-			try {
-				cardinalities2 = CompletableFutureUtils.getAll(futures2, Integer.class);
-			}
-			catch ( final CompletableFutureUtils.GetAllException ex ) {
-				if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-					throw new RuntimeException("Unexpected interruption when getting a variable-specific cardinality estimate.", ex.getCause() );
-				}
-				else {
-					throw new RuntimeException("Getting a variable-specific cardinality estimate caused an exception.", ex.getCause() );
-				}
-			}
-
-			int cardinality = 0;
-			for ( int i = 0; i < joinVars.size(); ++i ) {
-				int intValue1 = cardinalities1[i].intValue();
-				int intValue2 = cardinalities2[i].intValue();
-				if( intValue1 < 0 ) intValue1 = Integer.MAX_VALUE;
-				if( intValue2 < 0 ) intValue2 = Integer.MAX_VALUE;
-
-				final int c = min( intValue1, intValue2 );
-				cardinality = max(c, cardinality);
-			}
-
-			return Integer.valueOf(cardinality);
-		}
-
 		protected Integer getEstimateBasedOnAllCertainVars( final List<Var> vars ) {
-			// Note that this method is used only if the sets
-			// of all variables in the two plans are disjoint.
 			@SuppressWarnings("unchecked")
 			final CompletableFuture<Integer>[] futures = new CompletableFuture[vars.size()];
 
 			for ( int i = 0; i < vars.size(); ++i ) {
 				final Var v = vars.get(i);
-				if ( plan1.getExpectedVariables().getCertainVariables().contains(v) ) {
-					futures[i] = vsCardEstimator.initiateCardinalityEstimation(plan1, v);
-				}
-				else {
-					futures[i] = vsCardEstimator.initiateCardinalityEstimation(plan2, v);
-				}
+				futures[i] = vsCardEstimator.initiateCardinalityEstimation(plan, v);
 			}
 
 			final Integer[] cardinalities;
@@ -295,8 +204,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 			int cardinality = 0;
 			for ( int i = 0; i < vars.size(); ++i ) {
 				int intValue = cardinalities[i].intValue();
-				if( intValue < 0 ) intValue = Integer.MAX_VALUE;
-				cardinality = max( intValue, cardinality );
+				cardinality = max( intValue < 0? Integer.MAX_VALUE: intValue, cardinality );
 			}
 
 			return Integer.valueOf(cardinality);
