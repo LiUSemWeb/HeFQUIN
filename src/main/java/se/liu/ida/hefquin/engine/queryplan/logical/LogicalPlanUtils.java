@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
+import java.util.Arrays;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -26,6 +27,49 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRoot
 
 public class LogicalPlanUtils
 {
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpJoin} as root
+	 * operator and the given plans as its two subplans.
+	 */
+	public static LogicalPlan createPlanWithBinaryJoin( final LogicalPlan subPlan1,
+	                                                    final LogicalPlan subPlan2 ) {
+		return createPlanWithSubPlans( LogicalOpJoin.getInstance(), subPlan1, subPlan2 );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayJoin} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayJoin( final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpUnion} as root
+	 * operator and the given plans as its two subplans.
+	 */
+	public static LogicalPlan createPlanWithBinaryUnion( final LogicalPlan subPlan1,
+	                                                     final LogicalPlan subPlan2 ) {
+		return createPlanWithSubPlans( LogicalOpUnion.getInstance(), subPlan1, subPlan2 );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayUnion} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayUnion( final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with the given operator as root operator
+	 * and the given plans as subplans.
+	 */
+	public static LogicalPlan createPlanWithSubPlans( final LogicalOperator rootOp,
+	                                                  final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( rootOp, Arrays.asList(subPlans) );
+	}
+
 	/**
 	 * Creates a {@link LogicalPlan} with the given operator as root operator
 	 * and the plans given in the list as subplans. If the given operator is
