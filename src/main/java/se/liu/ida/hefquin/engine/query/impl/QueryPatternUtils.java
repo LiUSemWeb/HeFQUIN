@@ -23,9 +23,13 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -36,6 +40,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 public class QueryPatternUtils
 {
@@ -99,14 +104,14 @@ public class QueryPatternUtils
 		if ( p instanceof TriplePattern ) {
 			final TriplePattern tp = (TriplePattern) p;
 
-			final ElementPathBlock e = new ElementPathBlock();
+			final ElementTriplesBlock e = new ElementTriplesBlock();
 			e.addTriple( tp.asJenaTriple() );
 			return e;
 		}
 		else if ( p instanceof BGP ) {
 			final BGP bgp = (BGP) p;
 
-			final ElementPathBlock e = new ElementPathBlock();
+			final ElementTriplesBlock e = new ElementTriplesBlock();
 			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 				e.addTriple( tp.asJenaTriple() );
 			}
@@ -139,7 +144,7 @@ public class QueryPatternUtils
 			return jenaElement;
 		}
 		else {
-			throw new UnsupportedOperationException( p.getClass().getName() );
+			throw new IllegalArgumentException( "unexpected type of graph pattern: " + p.getClass().getName() );
 		}
 	}
 
@@ -422,6 +427,38 @@ public class QueryPatternUtils
 				}
 			};
 		}
+		else if ( pattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern gp = (SPARQLGroupPattern) pattern;
+			final ExpectedVariables[] evs = new ExpectedVariables[gp.getNumberOfSubPatterns()];
+			for ( int i = 0; i < gp.getNumberOfSubPatterns(); i++ ) {
+				evs[i] = getExpectedVariablesInPattern( gp.getSubPatterns(i) );
+			}
+
+			final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(evs);
+			final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(evs);
+			possibleVars.removeAll(certainVars);
+
+			return new ExpectedVariables() {
+				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+				@Override public Set<Var> getCertainVariables() { return certainVars; }
+			};
+		}
+		else if ( pattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) pattern;
+			final ExpectedVariables[] evs = new ExpectedVariables[up.getNumberOfSubPatterns()];
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				evs[i] = getExpectedVariablesInPattern( up.getSubPatterns(i) );
+			}
+
+			final Set<Var> certainVars = ExpectedVariablesUtils.intersectionOfCertainVariables(evs);
+			final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(evs);
+			possibleVars.removeAll(certainVars);
+
+			return new ExpectedVariables() {
+				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+				@Override public Set<Var> getCertainVariables() { return certainVars; }
+			};
+		}
 		else {
 			final Op jenaOp;
 			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
@@ -543,7 +580,6 @@ public class QueryPatternUtils
 			return new TriplePatternImpl(s,p,o);
 		}
 	}
-
 
 	public static class VariableByBlankNodeSubstitutionException extends Exception
 	{
