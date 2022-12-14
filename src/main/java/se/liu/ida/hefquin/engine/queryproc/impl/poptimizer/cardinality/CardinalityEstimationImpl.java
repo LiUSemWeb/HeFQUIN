@@ -137,9 +137,10 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				throw new RuntimeException("Issuing a cardinality request caused an exception.", e);
 			}
 
-			int intValue = Integer.valueOf( resps[0].getCardinality() );
-			if( intValue < 0 ) intValue = Integer.MAX_VALUE;
-			return intValue;
+			int intValue = resps[0].getCardinality();
+//			This value might end up with a negative value
+//			when the cardinality exceed the maximum possible Integer number that can be represented
+			return ( intValue < 0 ? Integer.MAX_VALUE : intValue ) ;
 		}
 
 		protected TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
@@ -207,7 +208,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				cardinality = max( intValue < 0? Integer.MAX_VALUE: intValue, cardinality );
 			}
 
-			return Integer.valueOf(cardinality);
+			return cardinality;
 		}
 	}
 
