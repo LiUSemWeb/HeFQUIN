@@ -586,4 +586,330 @@ public class QueryPatternUtils
 		private static final long serialVersionUID = 3285677866147999456L;
 	}
 
+	/**
+	 * Merges the given filter expressions into the given graph pattern.
+	 */
+	public static SPARQLGraphPattern merge( final ExprList exprs, final SPARQLGraphPattern p ) {
+		// Create a new ElementGroup object, add into it the Element represented
+		// by the given graph pattern, add into it the filters, and create a new
+		// graph pattern from it.
+		final ElementGroup group = new ElementGroup();
+
+		// - convert the given graph pattern into an Element and add it to the group
+		final Element elmt = convertToJenaElement(p);
+		if ( elmt instanceof ElementGroup ) {
+			// If the given graph pattern was converted to an ElementGroup, instead
+			// of simply adding it into the new group, copy its sub-elements over
+			// to the new group, which avoids unnecessary nesting of groups.
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
+				group.addElement(subElmt);
+			}
+		}
+		else {
+			// If the given graph pattern was converted to something other
+			// than an ElementGroup, simply add it into the new group.
+			group.addElement(elmt);
+		}
+
+		// - now add the filters to the group
+		for ( final Expr expr : exprs ) {
+			final ElementFilter f = new ElementFilter(expr);
+			group.addElementFilter(f);
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(group);
+	}
+
+	/**
+	 * Merges the given triple pattern into the given graph pattern. If the
+	 * given graph pattern is also a triple pattern or a BGP, then the resulting
+	 * graph pattern is a BGP to which the triple pattern was added. Otherwise,
+	 * the resulting graph pattern is the given graph pattern with the triple
+	 * pattern joined into it.
+	 */
+	public static SPARQLGraphPattern merge( final TriplePattern tp, final SPARQLGraphPattern p ) {
+		// If the given graph pattern is a triple pattern, produce and return a BGP.
+		if ( p instanceof TriplePattern ) {
+			return new BGPImpl( (TriplePattern) p, tp );
+		}
+
+		// If the given graph pattern is a BGP, produce and return a BGP.
+		if ( p instanceof BGP ) {
+			final BGPImpl resultBGP = new BGPImpl(tp);
+
+			Set<? extends TriplePattern> bgp = ( (BGP) p ).getTriplePatterns();
+			for ( final TriplePattern tpOfBGP : bgp ) {
+				resultBGP.addTriplePattern(tpOfBGP);
+			}
+
+			return resultBGP;
+		}
+
+		// Convert the given graph pattern into a Jena Element object and continue with that.
+		final Element elmt = convertToJenaElement(p);
+
+		// If we can still create a BGP, then we do that.
+		if ( elmt instanceof ElementTriplesBlock ) {
+			// create the BGP and add the given triple pattern into it
+			final BGPImpl resultBGP = new BGPImpl(tp);
+
+			// add the triple patterns from the given graph pattern into the BGP as well
+			final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+			while ( it.hasNext() ) {
+				resultBGP.addTriplePattern( new TriplePatternImpl(it.next()) );
+			}
+
+			return resultBGP;
+		}
+
+		// At this point it is clear that we will return a GenericSPARQLGraphPatternImpl1,
+		// for which we need to create an Element object first. The type of Element that
+		// we create depends on the type of the Element that the given graph pattern was
+		// converted to.
+		final Element resultElmt;
+
+		if ( elmt instanceof ElementPathBlock ) {
+			// If the given graph pattern was converted to an ElementPathBlock,
+			// create a copy of that ElementPathBlock and add the given triple
+			// pattern into that copy.
+			final ElementPathBlock copy = new ElementPathBlock();
+
+			final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+			while ( it.hasNext() ) {
+				copy.addTriple( it.next() );
+			}
+
+			copy.addTriple( tp.asJenaTriple() );
+
+			resultElmt = copy;
+		}
+		else if ( elmt instanceof ElementGroup ) {
+			// If the given graph pattern was converted to an ElementGroup,
+			// create a copy of that ElementGroup with the same sub-elements.
+			// When creating the copy, try to add the given triple pattern
+			// into a copy of one of the sub-elements. If that's not possible
+			// (i.e., none of the sub-elements is of a suitable type), then
+			// add the triple pattern as an additional sub-element to the copy
+			// in the end.
+			final ElementGroup newGroup = new ElementGroup();
+			boolean tpAdded = false;
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() )
+			{
+				if ( ! tpAdded && subElmt instanceof ElementTriplesBlock ) {
+					final ElementTriplesBlock copy = new ElementTriplesBlock();
+
+					final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+					while ( it.hasNext() ) {
+						copy.addTriple( it.next() );
+					}
+
+					copy.addTriple( tp.asJenaTriple() );
+					tpAdded = true;
+
+					newGroup.addElement(copy);
+				}
+				else if ( ! tpAdded && subElmt instanceof ElementPathBlock ) {
+					final ElementPathBlock copy = new ElementPathBlock();
+
+					final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+					while ( it.hasNext() ) {
+						copy.addTriplePath( it.next() );
+					}
+
+					copy.addTriple( tp.asJenaTriple() );
+					tpAdded = true;
+
+					newGroup.addElement(copy);
+				}
+				else {
+					newGroup.addElement(subElmt);
+				}
+			}
+
+			if ( ! tpAdded ) {
+				final ElementTriplesBlock bgp = new ElementTriplesBlock();
+				bgp.addTriple( tp.asJenaTriple() );
+				newGroup.addElement(bgp);
+			}
+
+			resultElmt = newGroup;
+		}
+		else {
+			// In all other cases, create an ElementGroup, ...
+			final ElementGroup newGroup = new ElementGroup();
+
+			// ... add the Element obtained for the given graph
+			// pattern as one sub-element of the group, and ...
+			newGroup.addElement(elmt);
+
+			// ... add the given triple pattern as another sub-element.
+			final ElementTriplesBlock bgp = new ElementTriplesBlock();
+			bgp.addTriple( tp.asJenaTriple() );
+			newGroup.addElement(bgp);
+
+			resultElmt = newGroup;
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(resultElmt);
+	}
+
+	/**
+	 * Merges the given BGP into the given graph pattern. If the given graph
+	 * pattern is also a BGP, then the resulting graph pattern is a BGP that
+	 * is the union of the two given BGPs. Otherwise, the resulting graph
+	 * pattern is the given graph pattern with the BGP joined into it.
+	 */
+	public static SPARQLGraphPattern merge( final BGP bgp, final SPARQLGraphPattern p ) {
+		// If the given graph pattern is a triple pattern, produce and return a BGP.
+		if ( p instanceof TriplePattern ) {
+			final BGPImpl resultBGP = new BGPImpl( (TriplePattern) p );
+
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				resultBGP.addTriplePattern(tp);
+			}
+
+			return resultBGP;
+		}
+
+		// If the given graph pattern is a BGP, produce and return a BGP.
+		if ( p instanceof BGP ) {
+			final BGPImpl resultBGP = new BGPImpl();
+
+			Set<? extends TriplePattern> otherBGP = ( (BGP) p ).getTriplePatterns();
+			for ( final TriplePattern tp : otherBGP ) {
+				resultBGP.addTriplePattern(tp);
+			}
+
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				resultBGP.addTriplePattern(tp);
+			}
+
+			return resultBGP;
+		}
+
+		// Convert the given graph pattern into a Jena Element object and continue with that.
+		final Element elmt = convertToJenaElement(p);
+
+		// If we can still create a BGP, then we do that.
+		if ( elmt instanceof ElementTriplesBlock ) {
+			// create the BGP
+			final BGPImpl resultBGP = new BGPImpl();
+
+			// add the triple patterns from the given graph pattern to the BGP
+			final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+			while ( it.hasNext() ) {
+				resultBGP.addTriplePattern( new TriplePatternImpl(it.next()) );
+			}
+
+			// add the triple patterns of the given BGP as well
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				resultBGP.addTriplePattern(tp);
+			}
+
+			return resultBGP;
+		}
+
+		// At this point it is clear that we will return a GenericSPARQLGraphPatternImpl1,
+		// for which we need to create an Element object first. The type of Element that
+		// we create depends on the type of the Element that the given graph pattern was
+		// converted to.
+		final Element resultElmt;
+
+		if ( elmt instanceof ElementPathBlock ) {
+			// If the given graph pattern was converted to an ElementPathBlock,
+			// create a copy of that ElementPathBlock, and add the triple patterns
+			// of the given BGP into that copy.
+			final ElementPathBlock copy = new ElementPathBlock();
+
+			final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+			while ( it.hasNext() ) {
+				copy.addTriple( it.next() );
+			}
+
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				copy.addTriple( tp.asJenaTriple() );
+			}
+
+			resultElmt = copy;
+		}
+		else if ( elmt instanceof ElementGroup ) {
+			// If the given graph pattern was converted to an ElementGroup,
+			// create a copy of that ElementGroup with the same sub-elements.
+			// When creating the copy, try to add the triple patterns of the
+			// given BGP into a copy of one of the sub-elements. If that's not
+			// possible (i.e., none of the sub-elements is of a suitable type),
+			// then add the BGP as an additional sub-element to the copy in the
+			// end.
+			final ElementGroup newGroup = new ElementGroup();
+			boolean bgpAdded = false;
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() )
+			{
+				if ( ! bgpAdded && subElmt instanceof ElementTriplesBlock ) {
+					final ElementTriplesBlock copy = new ElementTriplesBlock();
+
+					final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+					while ( it.hasNext() ) {
+						copy.addTriple( it.next() );
+					}
+
+					for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+						copy.addTriple( tp.asJenaTriple() );
+					}
+					bgpAdded = true;
+
+					newGroup.addElement(copy);
+				}
+				else if ( ! bgpAdded && subElmt instanceof ElementPathBlock ) {
+					final ElementPathBlock copy = new ElementPathBlock();
+
+					final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+					while ( it.hasNext() ) {
+						copy.addTriplePath( it.next() );
+					}
+
+					for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+						copy.addTriple( tp.asJenaTriple() );
+					}
+					bgpAdded = true;
+
+					newGroup.addElement(copy);
+				}
+				else {
+					newGroup.addElement(subElmt);
+				}
+			}
+
+			if ( ! bgpAdded ) {
+				final ElementTriplesBlock bgpToAdd = new ElementTriplesBlock();
+
+				for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+					bgpToAdd.addTriple( tp.asJenaTriple() );
+				}
+
+				newGroup.addElement(bgpToAdd);
+			}
+
+			resultElmt = newGroup;
+		}
+		else {
+			// In all other cases, create an ElementGroup, ...
+			final ElementGroup newGroup = new ElementGroup();
+
+			// ... add the Element obtained for the given graph
+			// pattern as one sub-element of the group, and ...
+			newGroup.addElement(elmt);
+
+			// ... add the given BGP as another sub-element.
+			final ElementTriplesBlock bgpToAdd = new ElementTriplesBlock();
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				bgpToAdd.addTriple( tp.asJenaTriple() );
+			}
+			newGroup.addElement(bgpToAdd);
+
+			resultElmt = newGroup;
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(resultElmt);
+	}
+
 }
