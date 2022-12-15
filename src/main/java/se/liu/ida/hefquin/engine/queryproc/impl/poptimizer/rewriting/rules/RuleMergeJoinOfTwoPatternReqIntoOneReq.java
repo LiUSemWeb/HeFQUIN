@@ -24,7 +24,7 @@ public class RuleMergeJoinOfTwoPatternReqIntoOneReq extends AbstractRewritingRul
             final PhysicalOperator subPlanOp1 = plan.getSubPlan(0).getRootOperator();
             final PhysicalOperator subPlanOp2 = plan.getSubPlan(1).getRootOperator();
 
-            return IdentifyTypeOfRequestUsedForReq.twoGraphPatternReqWithSameFm(subPlanOp1, subPlanOp2);
+            return IdentifyTypeOfRequestUsedForReq.twoGraphPatternReqWithSameSPARQLEndpoint(subPlanOp1, subPlanOp2);
         }
         return false;
     }
