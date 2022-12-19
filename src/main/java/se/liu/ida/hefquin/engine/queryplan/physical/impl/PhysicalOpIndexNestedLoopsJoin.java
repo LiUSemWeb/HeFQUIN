@@ -11,6 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNested
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -30,6 +32,14 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 	}
 
 	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpBGPOptAdd lop ) {
+		super(lop);
+	}
+
+	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
+		super(lop);
+	}
+
+	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -88,6 +98,26 @@ public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoi
 
 			if ( fm instanceof SPARQLEndpoint )
 				return new ExecOpIndexNestedLoopsJoinSPARQL( bgpAdd.getBGP(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			else
+				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			final FederationMember fm = gpAdd.getFederationMember();
+			final boolean useOuterJoinSemantics = false;
+
+			if ( fm instanceof SPARQLEndpoint )
+				return new ExecOpIndexNestedLoopsJoinSPARQL( gpAdd.getPattern(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			else
+				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+		}
+		else if ( lop instanceof LogicalOpGPOptAdd ) {
+			final LogicalOpGPOptAdd gpAdd = (LogicalOpGPOptAdd) lop;
+			final FederationMember fm = gpAdd.getFederationMember();
+			final boolean useOuterJoinSemantics = true;
+
+			if ( fm instanceof SPARQLEndpoint )
+				return new ExecOpIndexNestedLoopsJoinSPARQL( gpAdd.getPattern(), (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
