@@ -88,6 +88,30 @@ public class QueryPatternUtils
 			}
 			return new OpBGP(bgp);
 		}
+		else if ( pattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) pattern;
+
+			final Iterator<SPARQLGraphPattern> it = up.getSubPatterns().iterator();
+			Op unionOp = convertToJenaOp( it.next() );
+			while ( it.hasNext() ) {
+				final Op nextOp = convertToJenaOp( it.next() );
+				unionOp = OpUnion.create( unionOp, nextOp );
+			}
+
+			return unionOp;
+		}
+		else if ( pattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern gp = (SPARQLGroupPattern) pattern;
+
+			final Iterator<SPARQLGraphPattern> it = gp.getSubPatterns().iterator();
+			Op joinOp = convertToJenaOp( it.next() );
+			while ( it.hasNext() ) {
+				final Op nextOp = convertToJenaOp( it.next() );
+				joinOp = OpJoin.create( joinOp, nextOp );
+			}
+
+			return joinOp;
+		}
 		else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
 			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) pattern ).asJenaOp();
