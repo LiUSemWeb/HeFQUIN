@@ -9,6 +9,8 @@ import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
@@ -129,10 +131,16 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpBGPAdd op )        { subplanCount++; }
 
 		@Override
+		public void visit( final LogicalOpGPAdd op )         { subplanCount++; }
+
+		@Override
 		public void visit( final LogicalOpTPOptAdd op )      { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpBGPOptAdd op )     { subplanCount++; }
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op )      { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpJoin op )          { subplanCount++; }
@@ -186,12 +194,22 @@ public class LogicalPlanUtils
 		}
 
 		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			isSourceAssignment = false;
+		}
+
+		@Override
 		public void visit( final LogicalOpTPOptAdd op ) {
 			isSourceAssignment = false;
 		}
 
 		@Override
 		public void visit( final LogicalOpBGPOptAdd op ) {
+			isSourceAssignment = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
 			isSourceAssignment = false;
 		}
 
