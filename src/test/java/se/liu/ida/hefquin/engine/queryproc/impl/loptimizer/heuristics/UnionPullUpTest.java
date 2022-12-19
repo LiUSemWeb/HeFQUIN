@@ -537,6 +537,7 @@ public class UnionPullUpTest
 	protected static class DummyDataRetrievalInterface implements DataRetrievalInterface {
 		@Override public boolean supportsTriplePatternRequests() { return true; }
 		@Override public boolean supportsBGPRequests() { throw new UnsupportedOperationException(); }
+		@Override public boolean supportsSPARQLPatternRequests() { throw new UnsupportedOperationException(); }
 		@Override public boolean supportsRequest(DataRetrievalRequest req) { throw new UnsupportedOperationException(); }
 	}
 

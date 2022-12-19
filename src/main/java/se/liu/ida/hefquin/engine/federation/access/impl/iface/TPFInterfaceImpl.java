@@ -53,6 +53,11 @@ public class TPFInterfaceImpl implements TPFInterface
 	}
 
 	@Override
+	public boolean supportsSPARQLPatternRequests() {
+		return false;
+	}
+
+	@Override
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
 		return req instanceof TriplePatternRequest;
 	}

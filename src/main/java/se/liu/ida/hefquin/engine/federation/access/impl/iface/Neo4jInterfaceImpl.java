@@ -28,6 +28,11 @@ public class Neo4jInterfaceImpl implements Neo4jInterface
         return false;
     }
 
+	@Override
+	public boolean supportsSPARQLPatternRequests() {
+		return false;
+	}
+
     @Override
     public boolean supportsRequest( final DataRetrievalRequest req ) {
         return req instanceof Neo4jRequest;

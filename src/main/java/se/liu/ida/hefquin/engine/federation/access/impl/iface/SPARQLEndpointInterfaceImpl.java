@@ -26,6 +26,11 @@ public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
 	}
 
 	@Override
+	public boolean supportsSPARQLPatternRequests() {
+		return true;
+	}
+
+	@Override
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
 		return req instanceof SPARQLRequest;
 	}
