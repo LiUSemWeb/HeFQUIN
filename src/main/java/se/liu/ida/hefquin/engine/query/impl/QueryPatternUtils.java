@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -25,12 +27,20 @@ import org.apache.jena.sparql.core.Vars;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprTransformSubstitute;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.graph.NodeTransform;
+import org.apache.jena.sparql.graph.NodeTransformLib;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
+import org.apache.jena.sparql.syntax.syntaxtransform.NodeTransformSubst;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -576,15 +586,74 @@ public class QueryPatternUtils
 			final SPARQLGraphPattern pattern )
 					throws VariableByBlankNodeSubstitutionException
 	{
-		// TODO
 		if ( pattern instanceof TriplePattern )
+		{
 			return applySolMapToTriplePattern( sm, (TriplePattern) pattern );
+		}
 		else if ( pattern instanceof BGP )
+		{
 			return applySolMapToBGP( sm, (BGP) pattern );
+		}
+		else if ( pattern instanceof SPARQLUnionPattern )
+		{
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) pattern;
+			final SPARQLUnionPatternImpl upNew = new SPARQLUnionPatternImpl();
+			boolean unchanged = true;
+			for ( final SPARQLGraphPattern p : up.getSubPatterns() ) {
+				final SPARQLGraphPattern pNew = applySolMapToGraphPattern(sm, p);
+				upNew.addSubPattern(pNew);
+				if ( ! pNew.equals(p) ) {
+					unchanged = false;
+				}
+			}
+
+			return ( unchanged ) ? pattern : upNew;
+		}
+		else if ( pattern instanceof SPARQLGroupPattern )
+		{
+			final SPARQLGroupPattern gp = (SPARQLGroupPattern) pattern;
+			final SPARQLGroupPatternImpl gpNew = new SPARQLGroupPatternImpl();
+			boolean unchanged = true;
+			for ( final SPARQLGraphPattern p : gp.getSubPatterns() ) {
+				final SPARQLGraphPattern pNew = applySolMapToGraphPattern(sm, p);
+				gpNew.addSubPattern(pNew);
+				if ( ! pNew.equals(p) ) {
+					unchanged = false;
+				}
+			}
+
+			return ( unchanged ) ? pattern : gpNew;
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 )
+		{
+			final Map<Var, Node> map1 = new HashMap<>();
+			final Map<String, Expr> map2 = new HashMap<>();
+			sm.asJenaBinding().forEach( (v,n) -> { map1.put(v,n); map2.put(v.getVarName(),NodeValue.makeNode(n)); } );
+			final ElementTransform t1 = new ElementTransformSubst(map1);
+			final ExprTransformSubstitute t2 = new ExprTransformSubstitute(map2);
+
+			final Element e = ( (GenericSPARQLGraphPatternImpl1) pattern ).asJenaElement();
+			final Element eNew = ElementTransformer.transform(e, t1, t2);
+			return ( e == eNew ) ? pattern : new GenericSPARQLGraphPatternImpl1(eNew);
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 )
+		{
+			final Map<Var, Node> map = new HashMap<>();
+			sm.asJenaBinding().forEach( (v,n) -> map.put(v,n) );
+			final NodeTransform t = new NodeTransformSubst(map);
+
+			final Op op = ( (GenericSPARQLGraphPatternImpl2) pattern ).asJenaOp();
+			final Op opNew = NodeTransformLib.transform(t, op);
+			return ( op == opNew ) ? pattern : new GenericSPARQLGraphPatternImpl2(opNew);
+		}
 		else
 			throw new UnsupportedOperationException("TODO");
 	}
 
+	/**
+	 * Attention, this function throws an exception in all cases in which
+	 * one of the variables of the BGP would be replaced by a blank node.
+	 */
 	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp )
 			throws VariableByBlankNodeSubstitutionException
 	{
