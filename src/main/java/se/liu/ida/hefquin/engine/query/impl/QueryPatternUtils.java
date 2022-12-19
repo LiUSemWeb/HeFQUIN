@@ -163,6 +163,24 @@ public class QueryPatternUtils
 		else if ( queryPattern instanceof BGP ) {
 			return getVariablesInPattern( (BGP) queryPattern );
 		}
+		else if ( queryPattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern up = (SPARQLGroupPattern) queryPattern;
+			Set<Var> vars = new HashSet<>();
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				vars.addAll( getVariablesInPattern( up.getSubPatterns(i) ) );
+			}
+
+			return vars;
+		}
+		else if ( queryPattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) queryPattern;
+			Set<Var> vars = new HashSet<>();
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				vars.addAll( getVariablesInPattern( up.getSubPatterns(i) ) );
+			}
+
+			return vars;
+		}
 		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
 			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaOp();
@@ -359,6 +377,24 @@ public class QueryPatternUtils
 		else if ( queryPattern instanceof BGP ) {
 			return getNumberOfVarOccurrences( (BGP) queryPattern );
 		}
+		else if ( queryPattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern up = (SPARQLGroupPattern) queryPattern;
+			int sum = 0;
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				sum += getNumberOfVarOccurrences( up.getSubPatterns(i) );
+			}
+
+			return sum;
+		}
+		else if ( queryPattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) queryPattern;
+			int sum = 0;
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				sum += getNumberOfVarOccurrences( up.getSubPatterns(i) );
+			}
+
+			return sum;
+		}
 		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
 			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaOp();
@@ -389,6 +425,24 @@ public class QueryPatternUtils
 		}
 		else if ( queryPattern instanceof BGP ) {
 			return getNumberOfTermOccurrences( (BGP) queryPattern  );
+		}
+		else if ( queryPattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern up = (SPARQLGroupPattern) queryPattern;
+			int sum = 0;
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				sum += getNumberOfTermOccurrences( up.getSubPatterns(i) );
+			}
+
+			return sum;
+		}
+		else if ( queryPattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) queryPattern;
+			int sum = 0;
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				sum += getNumberOfTermOccurrences( up.getSubPatterns(i) );
+			}
+
+			return sum;
 		}
 		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
 			@SuppressWarnings("deprecation")
