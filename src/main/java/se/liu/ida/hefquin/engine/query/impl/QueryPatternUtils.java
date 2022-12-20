@@ -768,6 +768,26 @@ public class QueryPatternUtils
 	}
 
 	/**
+	 * Merges the two graph patterns into a single one, using join semantics.
+	 * Returns a {@link BGP} if possible (for instance, if both of the given
+	 * patterns are BGPs or one of them is a BGP and the other one a triple
+	 * pattern).
+	 */
+	public static SPARQLGraphPattern merge( final SPARQLGraphPattern p1,
+	                                        final SPARQLGraphPattern p2 )
+	{
+		if ( p1 instanceof TriplePattern ) return merge( (TriplePattern) p1, p2 );
+
+		if ( p2 instanceof TriplePattern ) return merge( (TriplePattern) p2, p1 );
+
+		if ( p1 instanceof BGP ) return merge( (BGP) p1, p2 );
+
+		if ( p2 instanceof BGP ) return merge( (BGP) p2, p1 );
+
+		return new SPARQLGroupPatternImpl(p1, p2);
+	}
+
+	/**
 	 * Merges the given triple pattern into the given graph pattern. If the
 	 * given graph pattern is also a triple pattern or a BGP, then the resulting
 	 * graph pattern is a BGP to which the triple pattern was added. Otherwise,
