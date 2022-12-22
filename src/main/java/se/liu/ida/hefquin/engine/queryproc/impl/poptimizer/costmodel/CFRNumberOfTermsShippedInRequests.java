@@ -51,6 +51,16 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
 		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences( gpAdd.getPattern() );
+
+			final PhysicalPlan subplan = plan.getSubPlan(0);
+			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
+			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqGP).size();
+
+			futureIntResSize = initiateCardinalityEstimation(subplan);
+		}
 		else if ( lop instanceof LogicalOpRequest ) {
 			final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
 			if ( req instanceof TriplePatternRequest ) {

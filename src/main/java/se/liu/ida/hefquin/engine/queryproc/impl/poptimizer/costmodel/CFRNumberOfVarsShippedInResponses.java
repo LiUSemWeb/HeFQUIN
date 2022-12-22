@@ -55,6 +55,19 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 				throw createIllegalArgumentException(fm);
 			}
 		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			final FederationMember fm = gpAdd.getFederationMember();
+
+			if ( fm instanceof SPARQLEndpoint ) {
+				final int numberOfVars = QueryPatternUtils.getVariablesInPattern( gpAdd.getPattern() ).size();
+				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
+				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
+			}
+			else {
+				throw createIllegalArgumentException(fm);
+			}
+		}
 		else if ( lop instanceof LogicalOpRequest ) {
 			final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
 
