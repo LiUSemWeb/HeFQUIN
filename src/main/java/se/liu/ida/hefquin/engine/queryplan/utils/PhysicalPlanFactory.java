@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -498,6 +499,20 @@ public class PhysicalPlanFactory
 		final DataRetrievalRequest req;
 		if ( fm.getInterface().supportsBGPRequests() ) {
 			req = new BGPRequestImpl( lop.getBGP() );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		}
+
+		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
+	}
+
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+
+		final DataRetrievalRequest req;
+		if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
+			req = new SPARQLRequestImpl( lop.getPattern() );
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");

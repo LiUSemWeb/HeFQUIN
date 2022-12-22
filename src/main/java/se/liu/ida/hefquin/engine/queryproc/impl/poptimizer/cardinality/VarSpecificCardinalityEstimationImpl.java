@@ -11,6 +11,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
@@ -83,6 +84,10 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 		else if ( rootOp instanceof LogicalOpBGPAdd ) {
 			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqBGP, v );
+		}
+		else if ( rootOp instanceof LogicalOpGPAdd ) {
+			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpGPAdd) rootOp );
+			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v );
 		}
 		else if ( rootOp instanceof LogicalOpJoin ) {
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
