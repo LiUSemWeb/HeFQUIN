@@ -473,16 +473,23 @@ public class UnionPullUpTest
 		final LogicalPlan resultPlan = new UnionPullUp().apply(l2gPlan);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
-		assertEquals( l2g, rootOfResultPlan );
-		assertEquals( 1, resultPlan.numberOfSubPlans() );
+		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
+		assertEquals( 2, resultPlan.numberOfSubPlans() );
 
-		final LogicalPlan childOfResultPlan = resultPlan.getSubPlan(0);
-		final LogicalOperator rootOfChild = childOfResultPlan.getRootOperator();
-		assertTrue( rootOfChild instanceof LogicalOpMultiwayUnion || rootOfChild instanceof LogicalOpUnion );
-		assertEquals( 2, childOfResultPlan.numberOfSubPlans() );
+		final LogicalPlan child1 = resultPlan.getSubPlan(0);
+		final LogicalPlan child2 = resultPlan.getSubPlan(1);
 
-		final LogicalPlan grandchild1 = childOfResultPlan.getSubPlan(0);
-		final LogicalPlan grandchild2 = childOfResultPlan.getSubPlan(1);
+		assertEquals( 1, child1.numberOfSubPlans() );
+		assertEquals( 1, child2.numberOfSubPlans() );
+
+		final LogicalOperator rootOfChild1 = child1.getRootOperator();
+		final LogicalOperator rootOfChild2 = child2.getRootOperator();
+
+		assertEquals( l2g, rootOfChild1 );
+		assertEquals( l2g, rootOfChild2 );
+
+		final LogicalPlan grandchild1 = child1.getSubPlan(0);
+		final LogicalPlan grandchild2 = child2.getSubPlan(0);
 
 		assertEquals( 1, grandchild1.numberOfSubPlans() );
 		assertEquals( 1, grandchild2.numberOfSubPlans() );
@@ -537,6 +544,7 @@ public class UnionPullUpTest
 	protected static class DummyDataRetrievalInterface implements DataRetrievalInterface {
 		@Override public boolean supportsTriplePatternRequests() { return true; }
 		@Override public boolean supportsBGPRequests() { throw new UnsupportedOperationException(); }
+		@Override public boolean supportsSPARQLPatternRequests() { throw new UnsupportedOperationException(); }
 		@Override public boolean supportsRequest(DataRetrievalRequest req) { throw new UnsupportedOperationException(); }
 	}
 

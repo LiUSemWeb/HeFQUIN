@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -31,6 +32,14 @@ public class CFRNumberOfRequests extends CFRBase
 			LogicalOperator lop = (((PhysicalOpIndexNestedLoopsJoin) rootOp).getLogicalOperator());
 			if ( lop instanceof LogicalOpBGPAdd) {
 				FederationMember fm = ((LogicalOpBGPAdd)((PhysicalOpIndexNestedLoopsJoin) rootOp).getLogicalOperator()).getFederationMember();
+				if (fm instanceof SPARQLEndpoint) {
+					return initiateCardinalityEstimation(plan.getSubPlan(0));
+				}
+				else
+					throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+			}
+			else if ( lop instanceof LogicalOpGPAdd) {
+				FederationMember fm = ((LogicalOpGPAdd)((PhysicalOpIndexNestedLoopsJoin) rootOp).getLogicalOperator()).getFederationMember();
 				if (fm instanceof SPARQLEndpoint) {
 					return initiateCardinalityEstimation(plan.getSubPlan(0));
 				}

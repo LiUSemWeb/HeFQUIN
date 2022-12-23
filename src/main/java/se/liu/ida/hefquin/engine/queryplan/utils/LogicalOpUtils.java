@@ -24,6 +24,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
@@ -209,6 +211,9 @@ public class LogicalOpUtils
         else if( req instanceof TriplePatternRequest ) {
             return createTPAddLopFromRequest( (TriplePatternRequest) req, fm );
         }
+        else if( req instanceof SPARQLRequest ) {
+            return createGPAddLopFromRequest( (SPARQLRequest) req, fm );
+        }
         else {
             throw new IllegalArgumentException( "unsupported type of request: " + req.getClass().getName() );
         }
@@ -231,6 +236,9 @@ public class LogicalOpUtils
         else if( req instanceof TriplePatternRequest ) {
             return createTPOptAddLopFromRequest( (TriplePatternRequest) req, fm );
         }
+        else if( req instanceof SPARQLRequest ) {
+            return createGPOptAddLopFromRequest( (SPARQLRequest) req, fm );
+        }
         else {
             throw new IllegalArgumentException( "unsupported type of request: " + req.getClass().getName() );
         }
@@ -247,7 +255,7 @@ public class LogicalOpUtils
     }
 
     /**
-     * Creates a logical bgpAdd operator that uses the BGP of the
+     * Creates a logical bgpOptAdd operator that uses the BGP of the
      * given request, together with the given federation member.
      */
     public static LogicalOpBGPOptAdd createBGPOptAddLopFromRequest( final BGPRequest req,
@@ -267,13 +275,33 @@ public class LogicalOpUtils
     }
 
     /**
-     * Creates a logical tpAdd operator that uses the triple pattern of
-     * the given request, together with the given federation member.
+     * Creates a logical tpOptAdd operator that uses the triple pattern
+     * of the given request, together with the given federation member.
      */
     public static LogicalOpTPOptAdd createTPOptAddLopFromRequest( final TriplePatternRequest req,
                                                                   final FederationMember fm ) {
         final TriplePattern tp = req.getQueryPattern();
         return new LogicalOpTPOptAdd( fm, tp );
+    }
+
+    /**
+     * Creates a logical gpAdd operator that uses the graph pattern of
+     * the given request, together with the given federation member.
+     */
+    public static LogicalOpGPAdd createGPAddLopFromRequest( final SPARQLRequest req,
+                                                            final FederationMember fm ) {
+        final SPARQLGraphPattern pattern = req.getQueryPattern();
+        return new LogicalOpGPAdd( fm, pattern );
+    }
+
+    /**
+     * Creates a logical gpOptAdd operator that uses the graph pattern
+     * of the given request, together with the given federation member.
+     */
+    public static LogicalOpGPOptAdd createGPOptAddLopFromRequest( final SPARQLRequest req,
+                                                                  final FederationMember fm ) {
+        final SPARQLGraphPattern pattern = req.getQueryPattern();
+        return new LogicalOpGPOptAdd( fm, pattern );
     }
 
 }

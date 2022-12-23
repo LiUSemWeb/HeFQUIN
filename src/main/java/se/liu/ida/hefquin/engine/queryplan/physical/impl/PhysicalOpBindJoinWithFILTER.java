@@ -8,6 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -33,6 +35,18 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	}
 
 	public PhysicalOpBindJoinWithFILTER( final LogicalOpBGPOptAdd lop ) {
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+	}
+
+	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+	}
+
+	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
@@ -69,6 +83,16 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 		else if ( lop instanceof LogicalOpBGPOptAdd ) {
 			pt = ( (LogicalOpBGPOptAdd) lop ).getBGP();
 			fm = ( (LogicalOpBGPOptAdd) lop ).getFederationMember();
+			useOuterJoinSemantics = true;
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			pt = ( (LogicalOpGPAdd) lop ).getPattern();
+			fm = ( (LogicalOpGPAdd) lop ).getFederationMember();
+			useOuterJoinSemantics = false;
+		}
+		else if ( lop instanceof LogicalOpGPOptAdd ) {
+			pt = ( (LogicalOpGPOptAdd) lop ).getPattern();
+			fm = ( (LogicalOpGPOptAdd) lop ).getFederationMember();
 			useOuterJoinSemantics = true;
 		}
 		else {

@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
@@ -27,10 +29,16 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpBGPAdd op )            {}
 
 	@Override
+	public void visit( final LogicalOpGPAdd op )             {}
+
+	@Override
 	public void visit( final LogicalOpTPOptAdd op )          {}
 
 	@Override
 	public void visit( final LogicalOpBGPOptAdd op )         {}
+
+	@Override
+	public void visit( final LogicalOpGPOptAdd op )          {}
 
 	@Override
 	public void visit( final LogicalOpJoin op )              {}

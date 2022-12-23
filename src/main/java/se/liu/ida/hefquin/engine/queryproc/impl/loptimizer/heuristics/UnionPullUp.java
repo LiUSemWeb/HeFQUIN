@@ -90,7 +90,11 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		     || rootOp instanceof LogicalOpTPOptAdd
 		     || rootOp instanceof LogicalOpBGPAdd
 		     || rootOp instanceof LogicalOpBGPOptAdd
-		     || rootOp instanceof LogicalOpFilter )
+		     || rootOp instanceof LogicalOpGPAdd
+		     || rootOp instanceof LogicalOpGPOptAdd
+		     || rootOp instanceof LogicalOpFilter
+		     || rootOp instanceof LogicalOpLocalToGlobal
+		     || rootOp instanceof LogicalOpGlobalToLocal )
 		{
 			// The listed operators are unary operators; i.e., have exactly one
 			// subplan as child. If that subplan has a union operator as root,
@@ -99,14 +103,6 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			if ( ! rewrittenSubPlansWithUnionRoot.isEmpty() )
 				return rewritePlanWithUnaryRootAndUnionChild( (UnaryLogicalOp) rootOp,
 				                                              rewrittenSubPlansWithUnionRoot.get(0) );
-		}
-		else if (    rootOp instanceof LogicalOpLocalToGlobal
-		          || rootOp instanceof LogicalOpGlobalToLocal )
-		{
-			// nothing to do here (if we have a vocabulary translation as root
-			// operator, we do not attempt to pull a potential union out of it)
-
-			// TODO: think about these cases again
 		}
 		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion )
 		{

@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
@@ -21,10 +22,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.rules.IdentifyTypeOfRequestUsedForReq;
 
 public class PhysicalPlanFactory
 {
@@ -213,6 +214,62 @@ public class PhysicalPlanFactory
 	 * Creates a plan with a bind join as root operator.
 	 */
 	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpBGPAdd lop,
+	                                                         final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithVALUES(lop);
+
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with an index nested loops join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpGPAdd lop,
+	                                                   final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpIndexNestedLoopsJoin(lop);
+
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a FILTER-based bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpGPAdd lop,
+	                                                         final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			pop = new PhysicalOpBindJoinWithFILTERandTranslation(lop);
+		else
+			pop = new PhysicalOpBindJoinWithFILTER(lop);
+
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a UNION-based bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpGPAdd lop,
+	                                                        final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop;
+		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
+			throw new UnsupportedOperationException("There is no such bind join operator that takes care of vocab.mappings.");
+		else
+			pop = new PhysicalOpBindJoinWithUNION(lop);
+
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a VALUES-based bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpGPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
 		final UnaryPhysicalOp pop;
 		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
@@ -450,6 +507,20 @@ public class PhysicalPlanFactory
 		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
 	}
 
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+
+		final DataRetrievalRequest req;
+		if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
+			req = new SPARQLRequestImpl( lop.getPattern() );
+		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		}
+
+		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
+	}
+
 	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoin pop ) {
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
@@ -470,12 +541,15 @@ public class PhysicalPlanFactory
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	protected static PhysicalPlan extractRequestAsPlan( final LogicalOperator lop ) {
+	public static PhysicalPlan extractRequestAsPlan(final UnaryLogicalOp lop) {
 		if ( lop instanceof LogicalOpTPAdd ) {
 			return extractRequestAsPlan( (LogicalOpTPAdd) lop );
 		}
 		else if ( lop instanceof LogicalOpBGPAdd ) {
 			return extractRequestAsPlan( (LogicalOpBGPAdd) lop );
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			return extractRequestAsPlan( (LogicalOpGPAdd) lop );
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
@@ -485,52 +559,101 @@ public class PhysicalPlanFactory
 	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest<?, ?> req,
 	                                                                   final PhysicalPlan subplan,
 	                                                                   final List<PhysicalPlan> plans ) {
-		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
-			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
+		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
+		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
 
-			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+		if ( newRoot instanceof LogicalOpTPAdd ) {
+			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) newRoot;
 
-		}
-		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
-			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
-			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+			plans.add( createPlanWithIndexNLJ( tpAdd, subplan) );
 
-			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();
-			if (fm instanceof SPARQLEndpoint) {
-				plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
-				plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
+				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
+				plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
+			}
+
+			if ( tpAdd.getFederationMember() instanceof BRTPFServer ) {
+				plans.add( createPlanWithBindJoin(tpAdd, subplan) );
 			}
 		}
+		else if ( newRoot instanceof LogicalOpBGPAdd ) {
+			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) newRoot;
+
+			plans.add( createPlanWithIndexNLJ( bgpAdd, subplan) );
+
+			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
+				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
+				plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
+			}
+		}
+		else if ( newRoot instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) newRoot;
+
+			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
+			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
+			plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
+			plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+		}
+		else {
+			throw new UnsupportedOperationException("unsupported operator: " + newRoot.getClass().getName() );
+		}
+
 		return plans;
 	}
 
 	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequestWithTranslation<?, ?> req,
 	                                                                   final PhysicalPlan subplan,
 	                                                                   final List<PhysicalPlan> plans ) {
-		if (IdentifyTypeOfRequestUsedForReq.isBGPRequestOverSPARQLEndpoint(req)) {
-			final LogicalOpBGPAdd newRoot = (LogicalOpBGPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
+		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
+		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
 
-			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
-			plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+		// The options that are commented out in the following if-else blocks
+		// are options for which we don't have an explicit physical operator
+		// with vocabulary-related translation built in. Notice also that
+		// using such operators is not the default way of dealing with
+		// vocabulary mappings in HeFQUIN.
 
-		}
-		else if (IdentifyTypeOfRequestUsedForReq.isTriplePatternRequest(req)) {
-			final LogicalOpTPAdd newRoot = (LogicalOpTPAdd) LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(req);
-			plans.add( createPlanWithIndexNLJ(newRoot, subplan) );
+		if ( newRoot instanceof LogicalOpTPAdd ) {
+			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) newRoot;
 
-			final FederationMember fm = ((LogicalOpRequest<?, ?>) req.getLogicalOperator()).getFederationMember();
-			if (fm instanceof SPARQLEndpoint) {
-				plans.add( createPlanWithBindJoinFILTER(newRoot, subplan) );
-				plans.add( createPlanWithBindJoinUNION(newRoot, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(newRoot, subplan) );
+			//plans.add( createPlanWithIndexNLJ( tpAdd, subplan) );
+
+			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
+				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
+			}
+
+			if ( tpAdd.getFederationMember() instanceof BRTPFServer ) {
+				//plans.add( createPlanWithBindJoin(tpAdd, subplan) );
 			}
 		}
+		else if ( newRoot instanceof LogicalOpBGPAdd ) {
+			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) newRoot;
+
+			//plans.add( createPlanWithIndexNLJ( bgpAdd, subplan) );
+
+			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
+				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
+			}
+		}
+		else if ( newRoot instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) newRoot;
+
+			//plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
+
+			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
+			//plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
+			//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+		}
+		else {
+			throw new UnsupportedOperationException("unsupported operator: " + newRoot.getClass().getName() );
+		}
+
 		return plans;
 	}
 
