@@ -541,12 +541,15 @@ public class PhysicalPlanFactory
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	protected static PhysicalPlan extractRequestAsPlan( final LogicalOperator lop ) {
+	public static PhysicalPlan extractRequestAsPlan(final UnaryLogicalOp lop) {
 		if ( lop instanceof LogicalOpTPAdd ) {
 			return extractRequestAsPlan( (LogicalOpTPAdd) lop );
 		}
 		else if ( lop instanceof LogicalOpBGPAdd ) {
 			return extractRequestAsPlan( (LogicalOpBGPAdd) lop );
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			return extractRequestAsPlan( (LogicalOpGPAdd) lop );
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of logical operator (type: " + lop.getClass().getName() + ").");
