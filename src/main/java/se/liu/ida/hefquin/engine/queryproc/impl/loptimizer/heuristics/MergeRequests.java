@@ -372,9 +372,9 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		}
 	}
 
-	protected LogicalPlan mergeFilterIntoSPARQLEndpointRequest( final LogicalOpFilter filterOp,
-	                                                            final SPARQLEndpoint ep,
-	                                                            final SPARQLRequest req ) {
+	public static LogicalPlan mergeFilterIntoSPARQLEndpointRequest( final LogicalOpFilter filterOp,
+	                                                                final SPARQLEndpoint ep,
+	                                                                final SPARQLRequest req ) {
 		final SPARQLGraphPattern mergedPattern = QueryPatternUtils.merge( filterOp.getFilterExpressions(),
 		                                                                  req.getQueryPattern() );
 		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
