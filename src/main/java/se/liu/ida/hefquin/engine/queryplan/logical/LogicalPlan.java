@@ -2,12 +2,20 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+
 public interface LogicalPlan
 {
 	/**
 	 * Returns the root operator of this plan.
 	 */
 	LogicalOperator getRootOperator();
+
+	/**
+	 * Returns the variables that can be expected in the
+	 * solution mappings produced by this plan.
+	 */
+	ExpectedVariables getExpectedVariables();
 
 	/**
 	 * Returns the number of sub-plans that this plan has

@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -41,6 +42,11 @@ public class LogicalPlanWithUnaryRootImpl implements LogicalPlanWithUnaryRoot
 	@Override
 	public UnaryLogicalOp getRootOperator() {
 		return rootOp;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		return rootOp.getExpectedVariables( getSubPlan().getExpectedVariables() );
 	}
 
 	@Override
