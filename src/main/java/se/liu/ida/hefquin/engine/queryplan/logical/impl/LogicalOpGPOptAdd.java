@@ -1,7 +1,14 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
@@ -25,6 +32,27 @@ public class LogicalOpGPOptAdd implements UnaryLogicalOp
 
 	public SPARQLGraphPattern getPattern() {
 		return pattern;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 1;
+
+		final ExpectedVariables expVarsPattern = QueryPatternUtils.getExpectedVariablesInPattern(pattern);
+		final ExpectedVariables expVarsInput = inputVars[0];
+
+		final Set<Var> certainVars = expVarsInput.getCertainVariables();
+
+		final Set<Var> possibleVars = new HashSet<>();
+		possibleVars.addAll( expVarsPattern.getCertainVariables() );
+		possibleVars.addAll( expVarsPattern.getPossibleVariables() );
+		possibleVars.addAll( expVarsInput.getPossibleVariables() );
+		possibleVars.removeAll(certainVars);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
 	}
 
 	@Override

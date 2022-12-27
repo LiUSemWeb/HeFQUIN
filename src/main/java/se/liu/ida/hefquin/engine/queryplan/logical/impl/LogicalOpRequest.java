@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
@@ -42,6 +43,13 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 
 	public ReqType getRequest() {
 		return req;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 0;
+
+		return req.getExpectedVariables();
 	}
 
 	@Override

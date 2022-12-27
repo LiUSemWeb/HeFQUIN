@@ -1,9 +1,14 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import java.util.Objects;
+import java.util.Set;
 
+import org.apache.jena.sparql.core.Var;
+
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 /**
  * A multiway left join corresponds to a sequence of SPARQL OPTIONAL clauses.
@@ -17,6 +22,18 @@ public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
 	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
 
 	protected LogicalOpMultiwayLeftJoin() {}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		final Set<Var> certainVars = inputVars[0].getCertainVariables();
+		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(inputVars);
+		possibleVars.removeAll(certainVars);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
+	}
 
 	@Override
 	public boolean equals( final Object o ) {
