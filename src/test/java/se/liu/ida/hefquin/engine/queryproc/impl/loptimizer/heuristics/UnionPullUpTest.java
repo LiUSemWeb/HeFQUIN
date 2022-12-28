@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.jena.graph.Triple;
@@ -529,8 +528,9 @@ public class UnionPullUpTest
 	protected static class DummyLogicalPlan implements LogicalPlan {
 		final protected LogicalOperator rootOp = new DummyLogicalOp();
 		@Override public LogicalOperator getRootOperator() { return rootOp; }
+		@Override public ExpectedVariables getExpectedVariables() { throw new UnsupportedOperationException(); }
 		@Override public int numberOfSubPlans() { return 0; }
-		@Override public LogicalPlan getSubPlan(int i) throws NoSuchElementException { throw new UnsupportedOperationException(); }
+		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
