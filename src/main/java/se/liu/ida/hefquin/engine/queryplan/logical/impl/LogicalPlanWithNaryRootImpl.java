@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +22,15 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 
 		this.rootOp = rootOp;
 		this.subPlans = subPlans;
+	}
+
+	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final LogicalPlan ... subPlans ) {
+		assert rootOp != null;
+		assert subPlans != null;
+
+		this.rootOp = rootOp;
+		this.subPlans = Arrays.asList(subPlans);
 	}
 
 	@Override

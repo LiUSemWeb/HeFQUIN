@@ -6,6 +6,7 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.UnionPullUp;
 
@@ -14,8 +15,12 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 	protected final List<HeuristicForLogicalOptimization> heuristics = new ArrayList<>();
 
 	public LogicalOptimizerImpl() {
+		final HeuristicForLogicalOptimization mergeRequests = new MergeRequests();
+
 		heuristics.add( new UnionPullUp() );
-		heuristics.add( new MergeRequests() );
+		heuristics.add( mergeRequests );
+		heuristics.add( new FilterPushDown() );
+		heuristics.add( mergeRequests );
 
 /*
   Uncomment the following line to apply vocabulary mappings of federation members during query planning.
