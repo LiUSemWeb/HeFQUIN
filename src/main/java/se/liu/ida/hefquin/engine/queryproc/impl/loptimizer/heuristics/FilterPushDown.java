@@ -297,7 +297,9 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 
 		// If there is only one subplan under the join, then remove the join altogether.
 		if ( numberOfSubPlansUnderJoin == 1 ) {
-			return new LogicalPlanWithUnaryRootImpl( filterOp, subPlanUnderFilter.getSubPlan(0) );
+			final LogicalPlan subPlan = subPlanUnderFilter.getSubPlan(0);
+			final LogicalPlan subPlanAfterFilterPushDown = apply(subPlan);
+			return new LogicalPlanWithUnaryRootImpl(filterOp, subPlanAfterFilterPushDown);
 		}
 
 		// Determine the sets of certain variables in each of the subplans
