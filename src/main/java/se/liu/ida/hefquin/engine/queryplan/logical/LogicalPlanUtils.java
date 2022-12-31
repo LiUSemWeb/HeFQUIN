@@ -47,6 +47,14 @@ public class LogicalPlanUtils
 	}
 
 	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayJoin} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayJoin( final List<LogicalPlan> subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), subPlans );
+	}
+
+	/**
 	 * Creates a {@link LogicalPlan} with a {@link LogicalOpUnion} as root
 	 * operator and the given plans as its two subplans.
 	 */
@@ -60,6 +68,14 @@ public class LogicalPlanUtils
 	 * root operator and the given plans as its subplans.
 	 */
 	public static LogicalPlan createPlanWithMultiwayUnion( final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayUnion} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayUnion( final List<LogicalPlan> subPlans ) {
 		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), subPlans );
 	}
 
