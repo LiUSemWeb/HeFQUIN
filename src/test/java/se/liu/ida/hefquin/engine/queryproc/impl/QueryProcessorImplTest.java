@@ -51,7 +51,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 
 public class QueryProcessorImplTest extends EngineTestBase
 {
@@ -378,7 +378,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 			@Override public CostModel getCostModel() { return costModel; }
 		};
 
-		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
+		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, false, false, false);

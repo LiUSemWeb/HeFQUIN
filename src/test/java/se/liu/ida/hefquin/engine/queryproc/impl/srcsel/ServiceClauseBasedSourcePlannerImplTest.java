@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
-public class SourcePlannerImplTest extends EngineTestBase
+public class ServiceClauseBasedSourcePlannerImplTest extends EngineTestBase
 {
 	@Test
 	public void oneTPFoneTriplePattern() throws SourcePlanningException {
@@ -370,7 +370,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 			@Override public boolean isExperimentRun() { return false; }
 		};
 
-		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
+		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
 		return sourcePlanner.createSourceAssignment(query).object1;
 	}

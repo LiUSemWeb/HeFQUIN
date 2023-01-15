@@ -42,7 +42,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.SourcePlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
@@ -78,7 +78,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 		};
 
-		final SourcePlanner srcPlanner = new SourcePlannerImpl(ctxt);
+		final SourcePlanner srcPlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
 

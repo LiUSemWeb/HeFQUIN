@@ -46,11 +46,11 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
-public class SourcePlannerImpl implements SourcePlanner
+public class ServiceClauseBasedSourcePlannerImpl implements SourcePlanner
 {
 	protected final QueryProcContext ctxt;
 
-	public SourcePlannerImpl( final QueryProcContext ctxt ) {
+	public ServiceClauseBasedSourcePlannerImpl( final QueryProcContext ctxt ) {
 		assert ctxt != null;
 		this.ctxt = ctxt;
 	}
