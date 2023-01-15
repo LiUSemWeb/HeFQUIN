@@ -32,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlannerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
@@ -42,7 +43,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
@@ -78,7 +78,8 @@ public class OpExecutorHeFQUIN extends OpExecutor
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 		};
 
-		final SourcePlanner srcPlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
+		final SourcePlannerFactory srcPlannerFactory = execCxt.getContext().get(HeFQUINConstants.sysSourcePlannerFactory);
+		final SourcePlanner srcPlanner = srcPlannerFactory.createSourcePlanner(ctxt);
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
 
@@ -101,6 +102,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	@Override
 	protected QueryIterator exec(Op op, QueryIterator input) {
 		return super.exec(op, input);
+	}
+
+	@Override
+	protected QueryIterator execute( final OpBGP opBGP, final QueryIterator input ) {
+		if ( isSupportedOp(opBGP) ) {
+			return executeSupportedOp( opBGP, input );
+		}
+		else {
+			return super.execute(opBGP, input);
+		}
 	}
 
 	@Override
@@ -177,7 +188,8 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	protected boolean isSupportedOp( final Op op ) {
 		final UnsupportedOpFinder f = new UnsupportedOpFinder();
 		new WalkerVisitorSkipService(f, null, null, null).walk(op);
-		return ! f.unsupportedOpFound();
+		final boolean unsupportedOpFound = f.unsupportedOpFound();
+		return ! unsupportedOpFound;
 	}
 
 	protected QueryIterator executeSupportedOp( final Op op, final QueryIterator input ) {
@@ -254,7 +266,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		public boolean unsupportedOpFound() { return unsupportedOpFound; }
 
-		@Override public void visit(OpBGP opBGP)                  { unsupportedOpFound = true; }
+		@Override public void visit(OpBGP opBGP)                  {}
 
 		@Override public void visit(OpQuadPattern quadPattern)    { unsupportedOpFound = true; }
 

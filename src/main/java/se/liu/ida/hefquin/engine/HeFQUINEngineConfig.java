@@ -9,6 +9,9 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlannerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
@@ -18,6 +21,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedJoinPla
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.GreedyJoinPlanOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.JoinPlanOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class HeFQUINEngineConfig
@@ -33,6 +37,7 @@ public class HeFQUINEngineConfig
 	}
 
 	public void initializeContext( final Context ctxt ) {
+		ctxt.set( HeFQUINConstants.sysSourcePlannerFactory, createSourcePlannerFactory() );
 		ctxt.set( HeFQUINConstants.sysQueryOptimizerFactory, createQueryOptimizerFactory() );
 	}
 
@@ -49,6 +54,17 @@ public class HeFQUINEngineConfig
 	public ExecutorService createExecutorServiceForFedAccess() {
 		//return Executors.newCachedThreadPool();
 		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+	}
+
+	protected SourcePlannerFactory createSourcePlannerFactory() {
+		// TODO: Instead of hard-coding the following, the source planner (and
+		// similar things) should be created based on a config file.
+		return new SourcePlannerFactory() {
+			@Override
+			public SourcePlanner createSourcePlanner( final QueryProcContext ctxt ) {
+				return new ServiceClauseBasedSourcePlannerImpl(ctxt);
+			}
+		};
 	}
 
 	protected PhysicalOptimizerFactory createQueryOptimizerFactory() {

@@ -59,7 +59,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	@Override
-	public Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp )
+	protected Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp )
 			throws SourcePlanningException
 	{
 		final LogicalPlan sa = createPlan(jenaOp);
