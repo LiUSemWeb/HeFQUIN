@@ -7,6 +7,11 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 public interface FederationCatalog
 {
 	/**
+	 * Returns an {@link Iterable} over all federation members in this catalog.
+	 */
+	Iterable<FederationMember> getAllFederationMembers();
+
+	/**
 	 * Returns the federation member identified by the given URI.
 	 *
 	 * Throws a {@link NoSuchElementException} if there is no federation

@@ -405,9 +405,6 @@ public abstract class EngineTestBase
 
 	public static class FederationCatalogForTest extends FederationCatalogImpl
 	{
-		public void addMember( final String uri, final FederationMember fm ) {
-			membersByURI.put(uri, fm);
-		}
 	} // end of FederationCatalogForTest
 
 
