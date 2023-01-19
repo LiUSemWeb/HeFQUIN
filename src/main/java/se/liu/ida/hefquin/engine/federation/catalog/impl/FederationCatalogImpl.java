@@ -24,7 +24,7 @@ public class FederationCatalogImpl implements FederationCatalog
 	}
 
 	@Override
-	public Iterable<FederationMember> getAllFederationMembers() {
+	public Set<FederationMember> getAllFederationMembers() {
 		if ( members == null ) {
 			members = new HashSet<>( membersByURI.values() );
 		}

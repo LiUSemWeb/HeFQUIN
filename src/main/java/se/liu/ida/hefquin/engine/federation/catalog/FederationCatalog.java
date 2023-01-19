@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 
@@ -9,7 +10,7 @@ public interface FederationCatalog
 	/**
 	 * Returns an {@link Iterable} over all federation members in this catalog.
 	 */
-	Iterable<FederationMember> getAllFederationMembers();
+	Set<FederationMember> getAllFederationMembers();
 
 	/**
 	 * Returns the federation member identified by the given URI.
