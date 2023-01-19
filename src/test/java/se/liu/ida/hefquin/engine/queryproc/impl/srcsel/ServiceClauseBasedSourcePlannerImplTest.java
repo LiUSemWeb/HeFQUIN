@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -30,7 +31,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -54,7 +55,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p1> ?y; <http://example.org/p2> ?z }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new BRTPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -106,7 +107,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "SERVICE <http://example.org/tpf2> { ?x <http://example.org/p2> ?z }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest() );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest() );
 
@@ -148,7 +149,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "  { SERVICE <http://example.org> { ?z <http://example.org/q> ?y } }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -187,7 +188,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -226,7 +227,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new SPARQLEndpointForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -256,7 +257,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "  { SERVICE <http://example.org> { ?v <http://example.org/r> ?y } }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -309,7 +310,7 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);

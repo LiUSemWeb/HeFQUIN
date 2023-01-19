@@ -34,7 +34,6 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProc
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
@@ -401,11 +400,6 @@ public abstract class EngineTestBase
 		@Override
 		public Boolean isLastPage() { return true; }
 	}
-
-
-	public static class FederationCatalogForTest extends FederationCatalogImpl
-	{
-	} // end of FederationCatalogForTest
 
 
 	protected static class FederationAccessManagerForTest implements FederationAccessManager

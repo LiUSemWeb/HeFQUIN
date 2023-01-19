@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.BlockingFederationAccessManagerImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -68,7 +69,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o")) );
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
@@ -107,7 +108,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p2"),
 				NodeFactory.createURI("http://example.org/o2")) );
 
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new BRTPFServerForTest(dataForMember) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
@@ -152,7 +153,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p2"),
 				NodeFactory.createURI("http://example.org/o2")) );
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
 
@@ -199,7 +200,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p1"),
 				NodeFactory.createURI("http://example.org/o2")) );
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest(dataForMember1) );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest(dataForMember2) );
 
@@ -250,7 +251,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o2")) );
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
@@ -290,7 +291,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 				NodeFactory.createURI("http://example.org/p"),
 				NodeFactory.createURI("http://example.org/o2")) );
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest(dataForMember) );
 
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
@@ -321,7 +322,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 					+ "SERVICE <" + dbpediaURL + "> { <http://dbpedia.org/resource/Berlin> <http://xmlns.com/foaf/0.1/name> ?o }"
 					+ "}";
 
-			final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+			final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 			fedCat.addMember( dbpediaURL, new SPARQLEndpointForTest(dbpediaURL) );
 
 			final SPARQLRequestProcessor reqProcSPARQL = new SPARQLRequestProcessorImpl();
