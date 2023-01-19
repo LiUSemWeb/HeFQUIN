@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 
-public class BroadcastingSourcePlannerImplTest extends SourcePlannerImplTestBase
+public class ExhaustiveSourcePlannerImplTest extends SourcePlannerImplTestBase
 {
 	@Test
 	public void oneFedMemberOneTriplePattern() throws SourcePlanningException {
@@ -202,7 +202,7 @@ public class BroadcastingSourcePlannerImplTest extends SourcePlannerImplTestBase
 	@Override
 	protected SourcePlanner createSourcePlanner( final QueryProcContext ctxt )
 	{
-		return new BroadcastingSourcePlannerImpl(ctxt);
+		return new ExhaustiveSourcePlannerImpl(ctxt);
 	}
 
 }

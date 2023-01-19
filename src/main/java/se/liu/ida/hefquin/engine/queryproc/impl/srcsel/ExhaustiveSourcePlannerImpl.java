@@ -19,10 +19,21 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 
-public class BroadcastingSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
+/**
+ * This implementation of {@link SourcePlanner} assigns every triple
+ * pattern of the given query to every federation member known in the
+ * federation catalog. In other words, this source planner creates what
+ * we call an 'exhaustive source assignment' in the FedQPL paper (see
+ * Definition 9 in Section 5.2 of the paper).
+ *
+ * This source planner assumes that the given queries do not contain
+ * any SERVICE clauses.
+ */
+public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
 {
-	public BroadcastingSourcePlannerImpl( final QueryProcContext ctxt ) {
+	public ExhaustiveSourcePlannerImpl( final QueryProcContext ctxt ) {
 		super(ctxt);
 	}
 

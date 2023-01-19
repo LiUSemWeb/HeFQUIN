@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedJoinPla
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.GreedyJoinPlanOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.JoinPlanOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.BroadcastingSourcePlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
@@ -64,7 +64,7 @@ public class HeFQUINEngineConfig
 			@Override
 			public SourcePlanner createSourcePlanner( final QueryProcContext ctxt ) {
 				return new ServiceClauseBasedSourcePlannerImpl(ctxt);
-//				return new BroadcastingSourcePlannerImpl(ctxt);
+//				return new ExhaustiveSourcePlannerImpl(ctxt);
 			}
 		};
 	}
