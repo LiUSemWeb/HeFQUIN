@@ -10,6 +10,7 @@ public class HeFQUINConstants {
 
     public static final Symbol sysExecServiceForPlanTasks = Symbol.create(systemVarNS+"execServiceForPlanTasks");
 
+    public static final Symbol sysSourcePlannerFactory            = Symbol.create(systemVarNS+"sourcePlannerFactory");
     public static final Symbol sysLogicalToPhysicalPlanConverter  = Symbol.create(systemVarNS+"logicalToPhysicalPlanConverter");
     public static final Symbol sysQueryOptimizerFactory           = Symbol.create(systemVarNS+"optimizerFactory");
 
