@@ -169,7 +169,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 				final long planningTime = statsAndExceptions.object1.getPlanningTime();
 				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
 				final long executionTime = statsAndExceptions.object1.getExecutionTime();
-				final String queryProcStats = "Overall Query Processing Time, " + overallQueryProcessingTime + ", Query Planning Time, " + planningTime +", Compile Time, " + compilationTime + ", Execution time, " + executionTime + "\n";
+				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime +", " + compilationTime + ", " + executionTime + "\n";
 				System.out.println(queryProcStats);
 			}
 		}
