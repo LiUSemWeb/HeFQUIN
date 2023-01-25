@@ -42,6 +42,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ArgDecl argPrintLogicalPlan   = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
 	protected final ArgDecl argPrintPhysicalPlan  = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
 	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
+	protected final ArgDecl argOnelineTimeStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcTime");
 	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
 
 	public static void main( final String... argv ) {
@@ -60,6 +61,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan produced by the logical query optimization");
 		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan produced by the physical query optimization and used for the query execution");
 		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
+		add(argOnelineTimeStats, "--printQueryProcTime", "Print out statistics about the query processing time in one line");
 		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
 
 		addModule(modQuery);
@@ -158,9 +160,18 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 
 		if (    statsAndExceptions != null
-		     && statsAndExceptions.object1 != null
-		     && contains(argQueryProcStats) ) {
-			StatsPrinter.print(statsAndExceptions.object1, System.err, true);
+		     && statsAndExceptions.object1 != null) {
+			if ( contains(argQueryProcStats) ) {
+				StatsPrinter.print(statsAndExceptions.object1, System.err, true);
+			}
+			if ( contains(argOnelineTimeStats) ) {
+				final long overallQueryProcessingTime = statsAndExceptions.object1.getOverallQueryProcessingTime();
+				final long planningTime = statsAndExceptions.object1.getPlanningTime();
+				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
+				final long executionTime = statsAndExceptions.object1.getExecutionTime();
+				final String queryProcStats = "Overall Query Processing Time: " + overallQueryProcessingTime + " - Query Planning Time: " + planningTime +" - Compile Time: " + compilationTime + " - Execution time: " + executionTime;
+				System.out.println(queryProcStats);
+			}
 		}
 
 		if ( contains(argFedAccessStats) ) {
