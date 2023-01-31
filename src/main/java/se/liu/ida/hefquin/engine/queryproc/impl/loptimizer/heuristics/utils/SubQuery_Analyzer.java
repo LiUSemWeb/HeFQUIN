@@ -1,10 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 
 import org.apache.jena.graph.Node;
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
@@ -23,19 +22,31 @@ public class SubQuery_Analyzer {
     }
 
     public void analyze( final LogicalPlan lop) {
-        Set<TriplePattern> triples = new HashSet<>();
+        Set<TriplePattern> triples;
+
         if( lop.getRootOperator() instanceof LogicalOpRequest) {
-            DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop.getRootOperator()).getRequest();
-            if ( req instanceof BGPRequest ) {
-                triples = (Set<TriplePattern>) ((BGPRequest) req).getQueryPattern().getTriplePatterns();
-            }
-            else if ( req instanceof TriplePatternRequest) {
-                triples.add(((TriplePatternRequest) req).getQueryPattern());
-            }
+            triples = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop.getRootOperator());
         }
-        else if ( lop.getRootOperator() instanceof LogicalOpUnion ) {
-//            TODO
+        else if ( lop.getRootOperator() instanceof LogicalOpMultiwayUnion || lop.getRootOperator() instanceof LogicalOpUnion ) {
+            final int numOfSubPlans = lop.numberOfSubPlans();
+            Set<TriplePattern> previousTriples = new HashSet<>();
+
+            for ( int i = 0; i < numOfSubPlans; i++ ) {
+                final LogicalPlan subPlan = lop.getSubPlan(i);
+                if ( subPlan.getRootOperator() instanceof LogicalOpRequest ) {
+                    final Set<TriplePattern> currentTriples = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) subPlan.getRootOperator());
+                    if( !currentTriples.isEmpty() && !previousTriples.isEmpty() && !currentTriples.equals( previousTriples) ) {
+                        throw new IllegalArgumentException("UNION is not added s a result of source selection");
+                    }
+                    previousTriples = new HashSet<>(currentTriples);
+                }
+                else
+                    throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + subPlan.getRootOperator().getClass().getName() + ")");
+            }
+            triples = previousTriples;
         }
+        else
+            throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getRootOperator().getClass().getName() + ")");
 
         // analyze triples for variables
         for ( TriplePattern tp: triples ) {
@@ -52,14 +63,10 @@ public class SubQuery_Analyzer {
         }
     }
 
-    public List<Node> getSubs() {
-        return subs;
-    }
+    public List<Node> getSubs() { return subs; }
 
     public List<Node> getPreds() { return preds; }
 
-    public List<Node> getObjs() {
-        return objs;
-    }
+    public List<Node> getObjs() { return objs; }
 
 }
