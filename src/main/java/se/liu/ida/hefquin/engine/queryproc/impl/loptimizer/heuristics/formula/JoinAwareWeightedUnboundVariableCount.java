@@ -30,6 +30,7 @@ public class JoinAwareWeightedUnboundVariableCount {
         return calculateCost( bindings, new SubQuery_Analyzer(lop) );
     }
 
+//  Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
     private static double calculateCost( final Set<Node> bindings, final SubQuery_Analyzer subQuery ) {
         final double unboundVarsCost = getUnboundVarsCost(
                 subQuery.getSubs(),
@@ -43,6 +44,7 @@ public class JoinAwareWeightedUnboundVariableCount {
         return unboundVarsCost / joinCost;
     }
 
+//    Calculate the number of (unique) unbound subjects, predicates and objects
     private static double getUnboundVarsCost( final List<Node> vars_s, final List<Node> vars_p,
                                               final List<Node> vars_o, final Set<Node> bindings) {
         final Set<Node> varsTotal = new HashSet<>();

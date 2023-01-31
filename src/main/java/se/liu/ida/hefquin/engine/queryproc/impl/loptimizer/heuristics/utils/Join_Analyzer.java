@@ -9,18 +9,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Join_Analyzer {
 
-    public static double getStarJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Ts){
+    public static double getStarJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Ts ){
         final int jsubs = countDuplicates(vars_s);
         final int jobjs = countDuplicates(vars_o);
         return ( jsubs + jobjs ) * J_Ts;
     }
 
-    public static double getChainJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Tc) {
+    public static double getChainJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Tc ) {
         final int chainjoins = countDuplicates(vars_s,vars_o);
         return chainjoins * J_Tc;
     }
 
-    public static double getUnusualJoins(final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o, final double J_Tu) {
+    public static double getUnusualJoins( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o, final double J_Tu ) {
         final int unusualjoins = countDuplicates(vars_s,vars_p) + countDuplicates(vars_p,vars_o)+ countDuplicates(vars_p);
         return unusualjoins * J_Tu;
     }

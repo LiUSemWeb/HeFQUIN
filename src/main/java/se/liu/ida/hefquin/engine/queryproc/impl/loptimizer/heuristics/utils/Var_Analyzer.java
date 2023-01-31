@@ -8,16 +8,18 @@ import java.util.Set;
 
 public class Var_Analyzer {
 
-    public static int calculateVars( final List<Node> vars, final Set<Node> varsTotal, final Set<Node> bindings) {
+//    varsTotal: a set of all variables that have been calculated
+//    Add all bound variables to bindings
+    public static int calculateVars( final List<Node> vars, final Set<Node> varsTotal, final Set<Node> bindings ) {
         varsTotal.addAll( getUniqueNodes(vars) );
         varsTotal.removeAll( bindings );
+
         bindings.addAll( varsTotal );
         return varsTotal.size();
     }
 
-    public static Set<Node> getUniqueNodes( final List<Node> vars) {
-        Set<Node> uvars = new HashSet<Node>(vars);
-        return uvars;
+    public static Set<Node> getUniqueNodes( final List<Node> vars ) {
+        return new HashSet<>(vars);
     }
 
     public static Set<Node> addBinds( final List<Node> vars_s,
