@@ -22,7 +22,7 @@ public class SubQuery_Analyzer {
     }
 
     public void analyze( final LogicalPlan lop) {
-        Set<TriplePattern> triples;
+        final Set<TriplePattern> triples;
 
         if( lop.getRootOperator() instanceof LogicalOpRequest) {
             triples = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop.getRootOperator());
