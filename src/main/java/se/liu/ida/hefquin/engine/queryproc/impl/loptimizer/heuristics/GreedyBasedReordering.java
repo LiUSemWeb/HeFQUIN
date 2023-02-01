@@ -46,7 +46,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
 
     }
 
-    protected LogicalPlan reorderSubPlans( LogicalPlan inputPlan ) {
+    protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
         final List<LogicalPlan> candidatePlans = new ArrayList<>();
         final List<LogicalPlan> selectedSubPlans = new ArrayList<>();
 
