@@ -66,7 +66,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         selectedSubPlans.add(plan);
         candidatePlans.remove(plan);
 
-//        Find the next subQuery from the remaining subPlans
+        // Find the next subQuery from the remaining subPlans
         while ( !candidatePlans.isEmpty() ) {
             findNextPlan(selectedSubPlans, candidatePlans);
         }
