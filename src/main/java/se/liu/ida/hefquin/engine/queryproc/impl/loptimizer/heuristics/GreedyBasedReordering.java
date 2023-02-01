@@ -56,7 +56,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         for ( int i = 0; i < inputPlan.numberOfSubPlans(); i ++ ) {
             LogicalPlan lop = inputPlan.getSubPlan(i);
             candidatePlans.add(lop);
-            double selectivity = estimateSelectivity( selectedSubPlans, lop);
+            final double selectivity = estimateSelectivity( selectedSubPlans, lop);
 
             if ( cost < 0 || selectivity < cost ) {
                 cost = selectivity;
