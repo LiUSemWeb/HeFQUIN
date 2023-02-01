@@ -89,7 +89,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         candidatePlans.remove(plan);
     }
 
-    protected LogicalPlan constructBinaryPlan( List<LogicalPlan> selectedSubPlans ) {
+    protected LogicalPlan constructBinaryPlan( final List<LogicalPlan> selectedSubPlans ) {
         if( selectedSubPlans.size() == 0 ) {
             return null;
         }
