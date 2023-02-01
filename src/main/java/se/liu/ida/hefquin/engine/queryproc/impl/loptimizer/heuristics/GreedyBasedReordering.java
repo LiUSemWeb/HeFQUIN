@@ -50,7 +50,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         final List<LogicalPlan> candidatePlans = new ArrayList<>();
         final List<LogicalPlan> selectedSubPlans = new ArrayList<>();
 
-//      Find the first subQuery and put it into selectedSubPlans
+        // Find the first subQuery and put it into selectedSubPlans
         double cost = -1;
         LogicalPlan plan = null;
         for ( int i = 0; i < inputPlan.numberOfSubPlans(); i ++ ) {
