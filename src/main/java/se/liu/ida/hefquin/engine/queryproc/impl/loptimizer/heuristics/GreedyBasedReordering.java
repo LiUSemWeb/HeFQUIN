@@ -74,7 +74,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         return constructBinaryPlan(selectedSubPlans);
     }
 
-    protected void findNextPlan( List<LogicalPlan> selectedSubPlans, List<LogicalPlan> candidatePlans ) {
+    protected void findNextPlan( final List<LogicalPlan> selectedSubPlans, final List<LogicalPlan> candidatePlans ) {
         double cost = -1;
         LogicalPlan plan = null;
         for (LogicalPlan lop : candidatePlans) {
