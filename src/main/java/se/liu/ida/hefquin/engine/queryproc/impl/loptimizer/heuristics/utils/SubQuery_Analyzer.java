@@ -49,7 +49,7 @@ public class SubQuery_Analyzer {
             throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getRootOperator().getClass().getName() + ")");
 
         // analyze triples for variables
-        for ( TriplePattern tp: triples ) {
+        for ( final TriplePattern tp: triples ) {
             Node node;
             if ((node = tp.asJenaTriple().getSubject()).isVariable()) {
                 subs.add(node);
