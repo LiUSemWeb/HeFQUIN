@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import java.util.*;
 
 public class SubQuery_Analyzer {
-    private List<Node> subs, preds, objs;
+    protected final List<Node> subs, preds, objs;
 
     public SubQuery_Analyzer( final LogicalPlan lop ) {
         subs = new ArrayList<>();
