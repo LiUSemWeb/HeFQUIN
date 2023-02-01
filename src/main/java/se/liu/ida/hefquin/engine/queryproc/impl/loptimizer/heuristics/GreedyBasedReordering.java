@@ -98,7 +98,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         }
 
         final Iterator<LogicalPlan> i = selectedSubPlans.iterator();
-        LogicalPlan output = new LogicalPlanWithBinaryRootImpl(LogicalOpJoin.getInstance(), i.next(), i.next());
+        LogicalPlan output = LogicalPlanUtils.createPlanWithBinaryJoin( i.next(), i.next() );
         while ( i.hasNext() ) {
             output = LogicalPlanUtils.createPlanWithBinaryJoin( output, i.next() );
         }
