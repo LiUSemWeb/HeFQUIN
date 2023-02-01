@@ -78,7 +78,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         double cost = -1;
         LogicalPlan plan = null;
         for (LogicalPlan lop : candidatePlans) {
-            double selectivity = estimateSelectivity(selectedSubPlans, lop);
+            final double selectivity = estimateSelectivity(selectedSubPlans, lop);
             if (cost < 0 || selectivity < cost) {
                 cost = selectivity;
                 plan = lop;
