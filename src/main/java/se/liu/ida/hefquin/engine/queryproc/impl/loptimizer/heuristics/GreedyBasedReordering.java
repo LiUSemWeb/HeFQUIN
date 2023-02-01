@@ -105,8 +105,8 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         return output;
     }
 
-    protected double estimateSelectivity( final List<LogicalPlan> selectedPlans, final LogicalPlan lop ) {
-        return JoinAwareWeightedUnboundVariableCount.estimate( selectedPlans, lop);
+    protected double estimateSelectivity( final List<LogicalPlan> selectedPlans, final LogicalPlan nextPossiblePlan ) {
+        return JoinAwareWeightedUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
     }
 
 }
