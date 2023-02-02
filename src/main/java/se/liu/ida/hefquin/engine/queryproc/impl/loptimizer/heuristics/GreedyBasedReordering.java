@@ -43,7 +43,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
             }
         }
 
-        LogicalPlan newPlan;
+        final LogicalPlan newPlan;
         if ( noChanges )
             newPlan = inputPlan;
         else {
@@ -112,6 +112,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     }
 
     protected double estimateSelectivity( final List<Query_Analyzer> selectedPlans, final Query_Analyzer nextPossiblePlan ) {
+        // Any of the defined formulas can be used for calculating the cost value here
         return JoinAwareWeightedUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
     }
 

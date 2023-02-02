@@ -11,13 +11,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import java.util.*;
 
 public class Query_Analyzer {
-    protected LogicalPlan plan;
+    protected final LogicalPlan plan;
 
     protected final List<Node> subs = new ArrayList<>();
     protected final List<Node> preds = new ArrayList<>();
     protected final List<Node> objs = new ArrayList<>();
 
-    public Query_Analyzer( LogicalPlan plan ) {
+    public Query_Analyzer( final LogicalPlan plan ) {
         this.plan = plan;
         final Set<TriplePattern> tps = extractTriplePatterns();
 
