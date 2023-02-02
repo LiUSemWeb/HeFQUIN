@@ -31,15 +31,15 @@ public class JoinAwareWeightedUnboundVariableCount {
 
     public static double estimate( final List<Query_Analyzer> selectedPlans, final Query_Analyzer subPlan ) {
         // Add bound variables of all selected plans to a set
-        Set<Node> boundVars = new HashSet<>();
+        Set<Node> boundVariables = new HashSet<>();
 
         // This part can be optimized if all formulas need to consider bound variables:
         // adding to this set directly when adding a new subPlan to 'selectedPlans'
         for ( Query_Analyzer plan : selectedPlans ) {
-            boundVars = addBinds( plan.getSubs(), plan.getPreds(), plan.getObjs() );
+            boundVariables = addBinds( plan.getSubs(), plan.getPreds(), plan.getObjs() );
         }
 
-        return calculateCost( boundVars, subPlan );
+        return calculateCost( boundVariables, subPlan );
     }
 
     // Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
@@ -57,12 +57,12 @@ public class JoinAwareWeightedUnboundVariableCount {
     }
 
     private static double getUnboundVarsCost( final List<Node> vars_s, final List<Node> vars_p,
-                                              final List<Node> vars_o, final Set<Node> boundVars) {
+                                              final List<Node> vars_o, final Set<Node> boundVariables) {
         final Set<Node> varsTotal = new HashSet<>();
         // Calculate the number of (unique) unbound subjects, predicates and objects
-        final int totalSubs = calculateVars(vars_s, varsTotal, boundVars);
-        final int totalObjs = calculateVars(vars_o, varsTotal, boundVars);
-        final int totalPreds = calculateVars(vars_p, varsTotal, boundVars);
+        final int totalSubs = calculateVars(vars_s, varsTotal, boundVariables);
+        final int totalObjs = calculateVars(vars_o, varsTotal, boundVariables);
+        final int totalPreds = calculateVars(vars_p, varsTotal, boundVariables);
 
         return calculateTripleWeights(totalSubs, totalPreds, totalObjs);
     }
@@ -72,25 +72,25 @@ public class JoinAwareWeightedUnboundVariableCount {
      * and adds the bound variables to bindings
      * @param vars A list of variables, can be subs, preds or objects
      * @param varsTotal A list of all variables that have been currently calculated in this subquery
-     * @param boundVars All bound variables (including variables in selected plans and calculated part of this subquery)
+     * @param boundVariables All bound variables (including variables in selected plans and calculated part of this subquery)
      * @return The number of unbounded variables
      */
-    private static int calculateVars( final List<Node> vars, final Set<Node> varsTotal, final Set<Node> boundVars ) {
+    private static int calculateVars( final List<Node> vars, final Set<Node> varsTotal, final Set<Node> boundVariables ) {
         varsTotal.addAll( vars );
-        varsTotal.removeAll( boundVars );
+        varsTotal.removeAll( boundVariables );
 
-        boundVars.addAll( varsTotal );
+        boundVariables.addAll( varsTotal );
         return varsTotal.size();
     }
 
     private static Set<Node> addBinds( final List<Node> vars_s,
                                       final List<Node> vars_p,
                                       final List<Node> vars_o) {
-        final Set<Node> tempBinds = new HashSet<>();
-        tempBinds.addAll(vars_s);
-        tempBinds.addAll(vars_o);
-        tempBinds.addAll(vars_p);
-        return tempBinds;
+        final Set<Node> tempBoundVars = new HashSet<>();
+        tempBoundVars.addAll(vars_s);
+        tempBoundVars.addAll(vars_o);
+        tempBoundVars.addAll(vars_p);
+        return tempBoundVars;
     }
 
     /**
