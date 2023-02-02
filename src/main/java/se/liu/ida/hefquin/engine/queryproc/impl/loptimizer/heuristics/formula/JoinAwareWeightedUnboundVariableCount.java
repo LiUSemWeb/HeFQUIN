@@ -1,68 +1,110 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula;
 
 import org.apache.jena.graph.Node;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Join_Analyzer;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.SubQuery_Analyzer;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Var_Analyzer;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Query_Analyzer;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Estimate selectivity of a subplan by considering
+ * - the number of new unbound variables
+ * - the position of new unbound variables (sub, pred, or obj)
+ * - number of joins contained in this subplan
+ * - types of joins contained in this subplan (star join, chain join, unusal join)
+ * To get unbound variables, the set of bindings in selectedPlans needs to be considered.
+ *
+ * This implementation is based on the formula (7) that is proposed in paper
+ * "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
+ */
+
 public class JoinAwareWeightedUnboundVariableCount {
-    public static final double W_S = 1; // weight for subject variables
-    public static final double W_P = 0.1; // weight for predicate variables
-    public static final double W_O = 0.8; // weight for object variables
+    protected static final double W_S = 1; // weight for subject variables
+    protected static final double W_P = 0.1; // weight for predicate variables
+    protected static final double W_O = 0.8; // weight for object variables
 
-    public static final double J_Tc=0.6; // weight for chain join
-    public static final double J_Ts=0.5; // weight for star join
-    public static final double J_Tu=1; // weight for unusual join
-    public static final double J_Tn=0; // no join
+    protected static final double J_Tc = 0.6; // weight for chain join
+    protected static final double J_Ts = 0.5; // weight for star join
+    protected static final double J_Tu = 1; // weight for unusual join
 
-    public static double estimate( final List<LogicalPlan> selectedPlans, LogicalPlan lop ) {
+    public static double estimate(final List<Query_Analyzer> selectedPlans, Query_Analyzer subPlan ) {
+        // Add bound bindings of all selected plans to a set
         Set<Node> bindings = new HashSet<>();
-        for ( LogicalPlan plan : selectedPlans ) {
-            final SubQuery_Analyzer analyzer = new SubQuery_Analyzer( plan );
-            bindings = Var_Analyzer.addBinds( analyzer.getSubs(), analyzer.getPreds(), analyzer.getObjs() );
+        for ( Query_Analyzer plan : selectedPlans ) {
+            bindings = addBinds( plan.getSubs(), plan.getPreds(), plan.getObjs() );
         }
 
-        return calculateCost( bindings, new SubQuery_Analyzer(lop) );
+        return calculateCost( bindings, subPlan );
     }
 
-//  Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
-    private static double calculateCost( final Set<Node> bindings, final SubQuery_Analyzer subQuery ) {
+    // Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
+    private static double calculateCost( final Set<Node> bindings, final Query_Analyzer subPlan ) {
         final double unboundVarsCost = getUnboundVarsCost(
-                subQuery.getSubs(),
-                subQuery.getPreds(),
-                subQuery.getObjs(),
+                subPlan.getSubs(),
+                subPlan.getPreds(),
+                subPlan.getObjs(),
                 bindings);
-        final double joinCost = JoinsWeight(
-                subQuery.getSubs(),
-                subQuery.getPreds(),
-                subQuery.getObjs());
+        final double joinCost = joinsWeight(
+                subPlan.getSubs(),
+                subPlan.getPreds(),
+                subPlan.getObjs());
         return unboundVarsCost / joinCost;
     }
 
-//    Calculate the number of (unique) unbound subjects, predicates and objects
     private static double getUnboundVarsCost( final List<Node> vars_s, final List<Node> vars_p,
                                               final List<Node> vars_o, final Set<Node> bindings) {
         final Set<Node> varsTotal = new HashSet<>();
-        final int totalSubs = Var_Analyzer.calculateVars(vars_s, varsTotal, bindings);
-        final int totalObjs = Var_Analyzer.calculateVars(vars_o, varsTotal, bindings);
-        final int totalPreds = Var_Analyzer.calculateVars(vars_p, varsTotal, bindings);
+        // Calculate the number of (unique) unbound subjects, predicates and objects
+        final int totalSubs = calculateVars(vars_s, varsTotal, bindings);
+        final int totalObjs = calculateVars(vars_o, varsTotal, bindings);
+        final int totalPreds = calculateVars(vars_p, varsTotal, bindings);
+
         return calculateTripleWeights(totalSubs, totalPreds, totalObjs);
     }
 
-    public static double calculateTripleWeights( final int totalSubs, final int totalPreds, final int totalObjs) {
+    /**
+     * Creates a collection with all variables that have been currently calculated
+     * and adds the bound variables to bindings
+     * @param vars A list of variables, can be subs, preds or objects
+     * @param varsTotal A list of all variables that have been currently calculated in this subquery
+     * @param bindings All bound variables (including variables in selected plans and calculated part of this subquery)
+     * @return The number of unbounded variables
+     */
+    private static int calculateVars( final List<Node> vars, Set<Node> varsTotal, final Set<Node> bindings ) {
+        varsTotal.addAll( vars );
+        varsTotal.removeAll( bindings );
+
+        bindings.addAll( varsTotal );
+        return varsTotal.size();
+    }
+
+    private static Set<Node> addBinds( final List<Node> vars_s,
+                                      final List<Node> vars_p,
+                                      final List<Node> vars_o) {
+        final Set<Node> tempBinds = new HashSet<>();
+        tempBinds.addAll(vars_s);
+        tempBinds.addAll(vars_o);
+        tempBinds.addAll(vars_p);
+        return tempBinds;
+    }
+
+    /**
+     * Calculate the weighed sum of subs, preds and objs
+     */
+    private static double calculateTripleWeights( final int totalSubs, final int totalPreds, final int totalObjs) {
         return totalSubs * W_S + totalPreds * W_P + totalObjs * W_O;
     }
 
-    public static double JoinsWeight( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o ) {
+    /**
+     * Calculate the weighed sum of different types of joins
+     */
+    private static double joinsWeight( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o ) {
         return 1
-                + Join_Analyzer.getStarJoins(vars_s, vars_o, J_Ts)
-                + Join_Analyzer.getChainJoins(vars_s, vars_o, J_Tc)
-                + Join_Analyzer.getUnusualJoins(vars_s, vars_p, vars_o, J_Tu);
+                + Join_Analyzer.getNumOfStarJoins(vars_s, vars_o) * J_Ts
+                + Join_Analyzer.getNumOfChainJoins(vars_s, vars_o) * J_Tc
+                + Join_Analyzer.getNumOfUnusualJoins(vars_s, vars_p, vars_o)* J_Tu;
     }
 
 }
