@@ -5,49 +5,71 @@ import org.apache.jena.graph.Node;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Join_Analyzer {
 
-    public static double getStarJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Ts ){
+    // Consider the subject-subject and object-object joins as star joins
+    public static double getNumOfStarJoins( final List<Node> vars_s, final List<Node> vars_o ){
         final int jsubs = countDuplicates(vars_s);
         final int jobjs = countDuplicates(vars_o);
-        return ( jsubs + jobjs ) * J_Ts;
+        return ( jsubs + jobjs );
     }
 
-    public static double getChainJoins( final List<Node> vars_s, final List<Node> vars_o, final double J_Tc ) {
-        final int chainjoins = countDuplicates(vars_s,vars_o);
-        return chainjoins * J_Tc;
+    // Consider the object-subject and subject-object joins as chain joins
+    public static double getNumOfChainJoins( final List<Node> vars_s, final List<Node> vars_o ) {
+        return countDuplicates(vars_s,vars_o);
     }
 
-    public static double getUnusualJoins( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o, final double J_Tu ) {
-        final int unusualjoins = countDuplicates(vars_s,vars_p) + countDuplicates(vars_p,vars_o)+ countDuplicates(vars_p);
-        return unusualjoins * J_Tu;
+    // Consider subject-predicate, predicate-object, predicate-predicate joins as unusual joins
+    public static double getNumOfUnusualJoins( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o ) {
+        return countDuplicates(vars_s,vars_p) + countDuplicates(vars_p,vars_o)+ countDuplicates(vars_p);
     }
 
+    /**
+     * Sum the number of duplicates for each variable
+     * e.g., if the input contains three ?s variable, the number of duplicates is 2
+     */
     private static int countDuplicates( final List<Node> vars ) {
-        final Map<Node,Integer> histogram= new HashMap<>();
-        vars.forEach(s-> histogram.put(s, (histogram.containsKey(s) ? histogram.get(s) : -1) +1)
-        );
-        final AtomicInteger dups= new AtomicInteger(0);
-        histogram.keySet().forEach(s -> {
-            if(histogram.get(s) > 0)  dups.set(dups.get() + histogram.get(s));
-        });
-        return dups.get();
+        final Map<Node,Integer> map= new HashMap<>();
+
+        int count = 0;
+        for ( final Node s: vars ) {
+            if ( map.containsKey(s) ) {
+                count = map.get(s) + 1;
+            }
+            map.put( s, count );
+        }
+
+        int sum = 0;
+        for ( final Node s: map.keySet() ) {
+            if( map.get(s) > 0 ) {
+                sum += map.get(s);
+            }
+        }
+
+        return sum;
     }
 
+    /**
+     * Count the number of matched pairs between two lists of variables
+     */
     private static int countDuplicates( final List<Node> vars_a, final List<Node> vars_b ) {
-        final Map<Node,Integer> histogram= new HashMap<>();
-        vars_a.forEach(s-> histogram.put(s, (histogram.containsKey(s) ? histogram.get(s) : 0) +1)
-        );
-        final AtomicInteger dups= new AtomicInteger(0);
-        vars_b.forEach(b -> {
-            if(histogram.containsKey(b) && histogram.get(b)>0) {
-                dups.incrementAndGet();
-                histogram.put(b, histogram.get(b)-1);
+        final Map<Node,Integer> map= new HashMap<>();
+
+        for ( final Node a: vars_a ) {
+            final int count_a = map.containsKey(a)? (map.get(a) + 1) : 1;
+            map.put( a, count_a );
+        }
+
+        int sum = 0;
+        for ( final Node b: vars_b ) {
+            if ( map.containsKey(b) && map.get(b) > 0 ) {
+                sum += 1;
+                map.put( b, map.get(b)-1 );
             }
-        });
-        return dups.get();
+        }
+
+        return sum;
     }
 
 }
