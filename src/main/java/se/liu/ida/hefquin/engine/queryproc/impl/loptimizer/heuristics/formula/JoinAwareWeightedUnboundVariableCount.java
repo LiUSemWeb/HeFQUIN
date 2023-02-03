@@ -13,7 +13,7 @@ import java.util.Set;
  * - the number of new unbound variables
  * - the position of new unbound variables (sub, pred, or obj)
  * - number of joins contained in this subplan
- * - types of joins contained in this subplan (star join, chain join, unusal join)
+ * - types of joins contained in this subplan (star join, chain join, unusual join)
  * To get unbound variables, the set of bindings in selectedPlans needs to be considered.
  *
  * This implementation is based on the formula (7) that is proposed in paper
