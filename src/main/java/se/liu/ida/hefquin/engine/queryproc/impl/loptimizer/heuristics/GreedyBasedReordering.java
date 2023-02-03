@@ -56,7 +56,6 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         else {
             return newPlan;
         }
-
     }
 
     protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
