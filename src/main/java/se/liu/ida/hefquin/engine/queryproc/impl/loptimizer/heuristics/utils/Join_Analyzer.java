@@ -71,6 +71,14 @@ public class Join_Analyzer {
      * Count the number of pairs that have the same variable between two lists of variables
      */
     public static int countDuplicates( final List<Node> vars_a, final List<Node> vars_b ) {
+        final List<Node> intersection = new ArrayList<>(vars_a);
+        intersection.retainAll(vars_b);
+
+        if( intersection.isEmpty() ) {
+            // The given two lists have no intersection
+            return 0;
+        }
+
         final Map<Node,Integer> map= new HashMap<>();
 
         for ( final Node a: vars_a ) {
