@@ -35,7 +35,7 @@ public class JoinAwareWeightedUnboundVariableCount {
 
         // This part can be optimized if all formulas need to consider bound variables:
         // adding to this set directly when adding a new subPlan to 'selectedPlans'
-        for ( Query_Analyzer plan : selectedPlans ) {
+        for ( final Query_Analyzer plan : selectedPlans ) {
             boundVariables = addBinds( plan.getSubs(), plan.getPreds(), plan.getObjs() );
         }
 
