@@ -31,7 +31,6 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
             return inputPlan;
         }
 
-        final LogicalOperator rootOp = inputPlan.getRootOperator();
         // Apply this heuristic recursively to all sub-plans.
         final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
         boolean noChanges = true; // set to false if the heuristic changes any of the subplans
@@ -44,6 +43,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         }
 
         final LogicalPlan newPlan;
+        final LogicalOperator rootOp = inputPlan.getRootOperator();
         if ( noChanges )
             newPlan = inputPlan;
         else {

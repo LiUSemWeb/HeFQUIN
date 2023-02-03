@@ -31,24 +31,26 @@ public class JoinAwareWeightedUnboundVariableCount {
 
     public static double estimate( final List<Query_Analyzer> selectedPlans, final Query_Analyzer subPlan ) {
         // Add bound variables of all selected plans to a set
-        Set<Node> boundVariables = new HashSet<>();
+        final Set<Node> boundVariables = new HashSet<>();
 
         // This part can be optimized if all formulas need to consider bound variables:
         // adding to this set directly when adding a new subPlan to 'selectedPlans'
         for ( final Query_Analyzer plan : selectedPlans ) {
-            boundVariables = addBinds( plan.getSubs(), plan.getPreds(), plan.getObjs() );
+            boundVariables.addAll( plan.getSubs() );
+            boundVariables.addAll( plan.getPreds() );
+            boundVariables.addAll( plan.getObjs() );
         }
 
         return calculateCost( boundVariables, subPlan );
     }
 
     // Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
-    private static double calculateCost( final Set<Node> bindings, final Query_Analyzer subPlan ) {
+    private static double calculateCost( final Set<Node> boundVariables, final Query_Analyzer subPlan ) {
         final double unboundVarsCost = getUnboundVarsCost(
                 subPlan.getSubs(),
                 subPlan.getPreds(),
                 subPlan.getObjs(),
-                bindings);
+                boundVariables);
         final double joinCost = joinsWeight(
                 subPlan.getSubs(),
                 subPlan.getPreds(),
@@ -58,39 +60,26 @@ public class JoinAwareWeightedUnboundVariableCount {
 
     private static double getUnboundVarsCost( final List<Node> vars_s, final List<Node> vars_p,
                                               final List<Node> vars_o, final Set<Node> boundVariables) {
-        final Set<Node> varsTotal = new HashSet<>();
         // Calculate the number of (unique) unbound subjects, predicates and objects
-        final int totalSubs = calculateVars(vars_s, varsTotal, boundVariables);
-        final int totalObjs = calculateVars(vars_o, varsTotal, boundVariables);
-        final int totalPreds = calculateVars(vars_p, varsTotal, boundVariables);
+        final int totalSubs = calculateVars(vars_s, boundVariables);
+        final int totalObjs = calculateVars(vars_o, boundVariables);
+        final int totalPreds = calculateVars(vars_p, boundVariables);
 
         return calculateTripleWeights(totalSubs, totalPreds, totalObjs);
     }
 
     /**
-     * Creates a collection with all variables that have been currently calculated
-     * and adds the bound variables to bindings
+     * For a given list of variables, count the number of unbound variables
      * @param vars A list of variables, can be subs, preds or objects
-     * @param varsTotal A list of all variables that have been currently calculated in this subquery
-     * @param boundVariables All bound variables (including variables in selected plans and calculated part of this subquery)
+     * @param boundVariables All bound variables (including variables in selected plans and counted part of this subquery)
      * @return The number of unbounded variables
      */
-    private static int calculateVars( final List<Node> vars, final Set<Node> varsTotal, final Set<Node> boundVariables ) {
-        varsTotal.addAll( vars );
-        varsTotal.removeAll( boundVariables );
+    private static int calculateVars( final List<Node> vars, final Set<Node> boundVariables ) {
+        final Set<Node> uniqueVars = new HashSet<>(vars);
+        uniqueVars.removeAll(boundVariables);
 
-        boundVariables.addAll( varsTotal );
-        return varsTotal.size();
-    }
-
-    private static Set<Node> addBinds( final List<Node> vars_s,
-                                      final List<Node> vars_p,
-                                      final List<Node> vars_o) {
-        final Set<Node> tempBoundVars = new HashSet<>();
-        tempBoundVars.addAll(vars_s);
-        tempBoundVars.addAll(vars_o);
-        tempBoundVars.addAll(vars_p);
-        return tempBoundVars;
+        boundVariables.addAll( uniqueVars );
+        return uniqueVars.size();
     }
 
     /**
