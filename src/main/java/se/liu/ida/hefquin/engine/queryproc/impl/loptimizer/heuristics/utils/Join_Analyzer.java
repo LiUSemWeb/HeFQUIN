@@ -6,28 +6,53 @@ import java.util.*;
 
 public class Join_Analyzer {
 
-    // Count number of star joins ( i.e., subject-subject and object-object joins )
-    public static double getNumOfStarJoins( final List<Node> vars_s, final List<Node> vars_o ){
-        final int jsubs = countDuplicates(vars_s);
-        final int jobjs = countDuplicates(vars_o);
-        return ( jsubs + jobjs );
+    /**
+     * Count number of different types of joins for a given plan;
+     * - star joins: subject-subject and object-object joins
+     * - chain joins: object-subject and subject-object joins
+     * - unusual joins: subject-predicate, predicate-object, predicate-predicate joins
+     */
+    public static double countNumOfStarJoins( final Query_Analyzer plan ){
+        return countDuplicates( plan.getSubs() )
+                + countDuplicates( plan.getObjs() );
     }
 
-    // Count number of chain joins (i.e., object-subject and subject-object joins )
-    public static double getNumOfChainJoins( final List<Node> vars_s, final List<Node> vars_o ) {
-        return countDuplicates(vars_s,vars_o);
+    public static double countNumOfChainJoins( final Query_Analyzer plan ) {
+        return countDuplicates( plan.getSubs(), plan.getObjs() );
     }
 
-    // Count number of unusual joins (i.e., subject-predicate, predicate-object, predicate-predicate joins )
-    public static double getNumOfUnusualJoins( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o ) {
-        return countDuplicates(vars_s,vars_p) + countDuplicates(vars_p,vars_o)+ countDuplicates(vars_p);
+    public static double countNumOfUnusualJoins(final Query_Analyzer plan ) {
+        return countDuplicates( plan.getSubs(), plan.getPreds() )
+                + countDuplicates( plan.getPreds(), plan.getObjs() )
+                + countDuplicates( plan.getPreds() );
+    }
+
+    /**
+     * Count number of different types of joins between two given sub-plans
+     */
+    public static double countNumOfStarJoins( final Query_Analyzer plan_l, final Query_Analyzer plan_r ){
+        return countDuplicates( plan_l.getSubs(), plan_r.getSubs() )
+                + countDuplicates( plan_l.getObjs(), plan_r.getObjs() );
+    }
+
+    public static double countNumOfChainJoins( final Query_Analyzer plan_l, final Query_Analyzer plan_r ) {
+        return countDuplicates( plan_l.getSubs(), plan_r.getObjs() )
+                + countDuplicates( plan_l.getObjs(), plan_r.getSubs() );
+    }
+
+    public static double countNumOfUnusualJoins( final Query_Analyzer plan_l, final Query_Analyzer plan_r ) {
+        return countDuplicates( plan_l.getSubs(), plan_r.getPreds() )
+                + countDuplicates( plan_r.getSubs(), plan_l.getPreds() )
+                + countDuplicates( plan_l.getPreds(), plan_r.getObjs() )
+                + countDuplicates( plan_r.getPreds(), plan_l.getObjs() )
+                + countDuplicates( plan_l.getPreds(), plan_r.getPreds() );
     }
 
     /**
      * Sum the number of duplicates for each variable
      * e.g., if the input contains three ?s variable, the number of duplicates is 2
      */
-    private static int countDuplicates( final List<Node> vars ) {
+    public static int countDuplicates( final List<Node> vars ) {
         final Set<Node> uniqueVars = new HashSet<>();
 
         int sum = 0;
@@ -45,7 +70,7 @@ public class Join_Analyzer {
     /**
      * Count the number of pairs that have the same variable between two lists of variables
      */
-    private static int countDuplicates( final List<Node> vars_a, final List<Node> vars_b ) {
+    public static int countDuplicates( final List<Node> vars_a, final List<Node> vars_b ) {
         final Map<Node,Integer> map= new HashMap<>();
 
         for ( final Node a: vars_a ) {
