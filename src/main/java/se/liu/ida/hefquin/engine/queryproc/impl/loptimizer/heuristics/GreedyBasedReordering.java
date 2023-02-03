@@ -27,7 +27,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     @Override
     public LogicalPlan apply( final LogicalPlan inputPlan ) {
         final int numberOfSubPlans = inputPlan.numberOfSubPlans();
-        if ( numberOfSubPlans == 0 || numberOfSubPlans == 1 ) {
+        if ( numberOfSubPlans < 2 ) {
             return inputPlan;
         }
 
