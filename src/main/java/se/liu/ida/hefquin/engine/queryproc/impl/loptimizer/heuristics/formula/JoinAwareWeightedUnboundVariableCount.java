@@ -46,26 +46,20 @@ public class JoinAwareWeightedUnboundVariableCount {
 
     // Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
     private static double calculateCost( final Set<Node> boundVariables, final Query_Analyzer subPlan ) {
-        final double unboundVarsCost = getUnboundVarsCost(
-                subPlan.getSubs(),
-                subPlan.getPreds(),
-                subPlan.getObjs(),
-                boundVariables);
-        final double joinCost = joinsWeight(
-                subPlan.getSubs(),
-                subPlan.getPreds(),
-                subPlan.getObjs());
-        return unboundVarsCost / joinCost;
+        return weightedUnboundVarsCount(boundVariables, subPlan)
+                / weightedJoinsCount( subPlan );
     }
 
-    private static double getUnboundVarsCost( final List<Node> vars_s, final List<Node> vars_p,
-                                              final List<Node> vars_o, final Set<Node> boundVariables) {
+    /**
+     * Calculate the weighed sum of subs, preds and objs
+     */
+    protected static double weightedUnboundVarsCount( final Set<Node> boundVariables, final Query_Analyzer plan ) {
         // Calculate the number of (unique) unbound subjects, predicates and objects
-        final int totalSubs = calculateVars(vars_s, boundVariables);
-        final int totalObjs = calculateVars(vars_o, boundVariables);
-        final int totalPreds = calculateVars(vars_p, boundVariables);
+        final int totalSubs = countUnboundVars( plan.getSubs(), boundVariables);
+        final int totalObjs = countUnboundVars( plan.getObjs(), boundVariables);
+        final int totalPreds = countUnboundVars( plan.getPreds(), boundVariables);
 
-        return calculateTripleWeights(totalSubs, totalPreds, totalObjs);
+        return totalSubs * W_S + totalPreds * W_P + totalObjs * W_O;
     }
 
     /**
@@ -74,7 +68,7 @@ public class JoinAwareWeightedUnboundVariableCount {
      * @param boundVariables All bound variables (including variables in selected plans and counted part of this subquery)
      * @return The number of unbounded variables
      */
-    private static int calculateVars( final List<Node> vars, final Set<Node> boundVariables ) {
+    private static int countUnboundVars( final List<Node> vars, final Set<Node> boundVariables ) {
         final Set<Node> uniqueVars = new HashSet<>(vars);
         uniqueVars.removeAll(boundVariables);
 
@@ -83,20 +77,13 @@ public class JoinAwareWeightedUnboundVariableCount {
     }
 
     /**
-     * Calculate the weighed sum of subs, preds and objs
-     */
-    private static double calculateTripleWeights( final int totalSubs, final int totalPreds, final int totalObjs) {
-        return totalSubs * W_S + totalPreds * W_P + totalObjs * W_O;
-    }
-
-    /**
      * Calculate the weighed sum of different types of joins
      */
-    private static double joinsWeight( final List<Node> vars_s, final List<Node> vars_p, final List<Node> vars_o ) {
+    protected static double weightedJoinsCount( final Query_Analyzer plan ) {
         return 1
-                + Join_Analyzer.getNumOfStarJoins(vars_s, vars_o) * J_Ts
-                + Join_Analyzer.getNumOfChainJoins(vars_s, vars_o) * J_Tc
-                + Join_Analyzer.getNumOfUnusualJoins(vars_s, vars_p, vars_o)* J_Tu;
+                + Join_Analyzer.countNumOfStarJoins(plan) * J_Ts
+                + Join_Analyzer.countNumOfChainJoins(plan) * J_Tc
+                + Join_Analyzer.countNumOfUnusualJoins(plan) * J_Tu;
     }
 
 }
