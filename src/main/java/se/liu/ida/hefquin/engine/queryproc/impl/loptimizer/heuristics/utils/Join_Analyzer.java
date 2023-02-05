@@ -88,9 +88,10 @@ public class Join_Analyzer {
 
         int sum = 0;
         for ( final Node b: vars_b ) {
-            if ( map.containsKey(b) && map.get(b) > 0 ) {
-                sum += 1;
-                map.put( b, map.get(b)-1 );
+            final Integer bCounter = map.get(b);
+            if ( bCounter != null && bCounter > 0 ) {
+                sum++;
+                map.put( b, bCounter-1 );
             }
         }
 
