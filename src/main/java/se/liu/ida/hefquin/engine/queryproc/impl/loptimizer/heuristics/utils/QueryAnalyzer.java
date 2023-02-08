@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 
 import org.apache.jena.graph.Node;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -10,15 +11,19 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 import java.util.*;
 
-public class Query_Analyzer {
+public class QueryAnalyzer {
     protected final LogicalPlan plan;
 
-    protected final List<Node> subs = new ArrayList<>();
-    protected final List<Node> preds = new ArrayList<>();
-    protected final List<Node> objs = new ArrayList<>();
+    protected List<Node> subs = new ArrayList<>();
+    protected List<Node> preds = new ArrayList<>();
+    protected List<Node> objs = new ArrayList<>();
 
-    public Query_Analyzer( final LogicalPlan plan ) {
+    public QueryAnalyzer( final LogicalPlan plan ) {
         this.plan = plan;
+
+        if( plan == null ) {
+            return;
+        }
         final Set<TriplePattern> tps = extractTriplePatterns();
 
         for ( final TriplePattern tp: tps ) {
@@ -36,30 +41,32 @@ public class Query_Analyzer {
     }
 
     protected Set<TriplePattern> extractTriplePatterns() {
+        final LogicalOperator lop = plan.getRootOperator();
 
-        if( plan.getRootOperator() instanceof LogicalOpRequest) {
-            return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) plan.getRootOperator());
+        if( lop instanceof LogicalOpRequest) {
+            return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop);
         }
-        else if ( plan.getRootOperator() instanceof LogicalOpMultiwayUnion || plan.getRootOperator() instanceof LogicalOpUnion ) {
+        else if ( lop instanceof LogicalOpMultiwayUnion || plan.getRootOperator() instanceof LogicalOpUnion ) {
             final int numOfSubPlans = plan.numberOfSubPlans();
             Set<TriplePattern> previousTPs = null;
 
             for ( int i = 0; i < numOfSubPlans; i++ ) {
-                final LogicalPlan subPlan = plan.getSubPlan(i);
-                if ( subPlan.getRootOperator() instanceof LogicalOpRequest ) {
-                    final Set<TriplePattern> currentTPs = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) subPlan.getRootOperator());
+                final LogicalOperator subLop = plan.getSubPlan(i).getRootOperator();
+
+                if ( subLop instanceof LogicalOpRequest ) {
+                    final Set<TriplePattern> currentTPs = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) subLop);
                     if( !currentTPs.isEmpty() && previousTPs != null && !currentTPs.equals( previousTPs) ) {
                         throw new IllegalArgumentException("UNION is not added as a result of source selection");
                     }
                     previousTPs = currentTPs;
                 }
                 else
-                    throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + subPlan.getRootOperator().getClass().getName() + ")");
+                    throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + subLop.getClass().getName() + ")");
             }
             return previousTPs;
         }
         else
-            throw new IllegalArgumentException("Unsupported type of root operator (" + plan.getRootOperator().getClass().getName() + ")");
+            throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ")");
     }
 
     public LogicalPlan getPlan() { return plan; }
@@ -69,5 +76,17 @@ public class Query_Analyzer {
     public List<Node> getPreds() { return preds; }
 
     public List<Node> getObjs() { return objs; }
+
+    public void setSubs( final List<Node> subs ) {
+        this.subs = subs;
+    }
+
+    public void setObjs( final List<Node> objs ) {
+        this.objs = objs;
+    }
+
+    public void setPreds( final List<Node> preds ) {
+        this.preds = preds;
+    }
 
 }
