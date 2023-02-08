@@ -158,6 +158,7 @@ public class RunBGPOverNeo4j extends CmdARQ {
             final long time = modTime.endTimer();
             System.out.println("Query Translation Time: " + modTime.timeStr(time) + " sec");
             System.out.println(query);
+            System.exit(1);
         }
 
         //Query Execution
