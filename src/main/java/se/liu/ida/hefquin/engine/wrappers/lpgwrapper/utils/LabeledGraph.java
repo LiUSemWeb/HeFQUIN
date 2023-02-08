@@ -124,7 +124,7 @@ public class LabeledGraph {
         }
 
         public CypherVar lastTarget() {
-            return path.size()>0 ? path.get(path.size()-1).target : start;
+            return path.get(path.size()-1).target;
         }
     }
 
@@ -185,10 +185,17 @@ public class LabeledGraph {
         Path longest = null;
         while (!toVisit.isEmpty()) {
             final Edge currentEdge = toVisit.pop();
-            if (candidate == null) {
+            if (candidate == null || candidate.size()==0) {
                 candidate = new Path(start, currentEdge);
             }
             else if (! visitedEdges.contains(currentEdge.id)) {
+                /*if (adjacencyLists.get(candidate.path.get(candidate.path.size()-1).target).stream().noneMatch(
+                        e -> e.edge.equals(currentEdge.edge) && e.target.equals(currentEdge.target)
+                )) {
+                    System.out.println("ERROR: " + currentEdge);
+                    System.out.println("node:" + candidate.path.get(candidate.path.size()-1).target);
+                    System.out.println("doesnt connect with: " + currentEdge.target);
+                }*/
                 candidate.addEdge(currentEdge);
             }
             visitedEdges.add(currentEdge.id);
@@ -202,9 +209,9 @@ public class LabeledGraph {
                 if ( longest == null || candidate.size() > longest.size() ) {
                     longest = candidate.copy();
                 }
-                while (candidate.size()>0) {
+                while (true) {
                     candidate.removeLast();
-                    if (visitedEdges.containsAll(adjacencyLists.get(candidate.lastTarget()).stream().map(e->e.id).collect(Collectors.toList()))) {
+                    if (candidate.size()==0 || !visitedEdges.containsAll(adjacencyLists.get(candidate.lastTarget()).stream().map(e->e.id).collect(Collectors.toList()))) {
                         break;
                     }
                 }
