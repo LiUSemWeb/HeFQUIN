@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Query_Analyzer;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,14 +59,14 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     }
 
     protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
-        final List<Query_Analyzer> candidatePlans = new ArrayList<>();
-        final List<Query_Analyzer> selectedSubPlans = new ArrayList<>();
+        final List<QueryAnalyzer> candidatePlans = new ArrayList<>();
+        final List<QueryAnalyzer> selectedSubPlans = new ArrayList<>();
 
         // Find the first subQuery and put it into selectedSubPlans
         double costOfBestSubPlan = Double.MAX_VALUE;
-        Query_Analyzer bestSubPlan = null;
+        QueryAnalyzer bestSubPlan = null;
         for ( int i = 0; i < inputPlan.numberOfSubPlans(); i ++ ) {
-            final Query_Analyzer subPlan = new Query_Analyzer( inputPlan.getSubPlan(i) );
+            final QueryAnalyzer subPlan = new QueryAnalyzer( inputPlan.getSubPlan(i) );
             candidatePlans.add( subPlan );
             final double selectivity = estimateSelectivity( selectedSubPlans, subPlan);
 
@@ -86,10 +86,10 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         return constructBinaryPlan(selectedSubPlans);
     }
 
-    protected void findNextPlan( final List<Query_Analyzer> selectedSubPlans, final List<Query_Analyzer> candidatePlans ) {
+    protected void findNextPlan(final List<QueryAnalyzer> selectedSubPlans, final List<QueryAnalyzer> candidatePlans ) {
         double costOfBestSubPlan = Double.MAX_VALUE;
-        Query_Analyzer bestSubPlan = null;
-        for ( final Query_Analyzer subPlan : candidatePlans) {
+        QueryAnalyzer bestSubPlan = null;
+        for ( final QueryAnalyzer subPlan : candidatePlans) {
             final double selectivity = estimateSelectivity(selectedSubPlans, subPlan);
             if ( selectivity < costOfBestSubPlan ) {
                 costOfBestSubPlan = selectivity;
@@ -101,8 +101,8 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         candidatePlans.remove(bestSubPlan);
     }
 
-    protected LogicalPlan constructBinaryPlan( final List<Query_Analyzer> selectedSubPlans ) {
-        final Iterator<Query_Analyzer> it = selectedSubPlans.iterator();
+    protected LogicalPlan constructBinaryPlan( final List<QueryAnalyzer> selectedSubPlans ) {
+        final Iterator<QueryAnalyzer> it = selectedSubPlans.iterator();
         LogicalPlan output = LogicalPlanUtils.createPlanWithBinaryJoin( it.next().getPlan(), it.next().getPlan() );
         while ( it.hasNext() ) {
             output = LogicalPlanUtils.createPlanWithBinaryJoin( output, it.next().getPlan() );
@@ -110,7 +110,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         return output;
     }
 
-    protected double estimateSelectivity( final List<Query_Analyzer> selectedPlans, final Query_Analyzer nextPossiblePlan ) {
+    protected double estimateSelectivity(final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPossiblePlan ) {
         // Any of the defined formulas can be used for calculating the cost value here
         return JoinAwareWeightedUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
     }
