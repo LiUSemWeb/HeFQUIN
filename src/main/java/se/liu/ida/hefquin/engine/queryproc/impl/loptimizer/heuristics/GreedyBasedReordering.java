@@ -59,34 +59,25 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     }
 
     protected LogicalPlan reorderSubPlans( final LogicalPlan inputPlan ) {
+        // Initialize candidatePlans
         final List<QueryAnalyzer> candidatePlans = new ArrayList<>();
-        final List<QueryAnalyzer> selectedSubPlans = new ArrayList<>();
-
-        // Find the first subQuery and put it into selectedSubPlans
-        double costOfBestSubPlan = Double.MAX_VALUE;
-        QueryAnalyzer bestSubPlan = null;
         for ( int i = 0; i < inputPlan.numberOfSubPlans(); i ++ ) {
             final QueryAnalyzer subPlan = new QueryAnalyzer( inputPlan.getSubPlan(i) );
             candidatePlans.add( subPlan );
-            final double selectivity = estimateSelectivity( selectedSubPlans, subPlan);
-
-            if ( selectivity < costOfBestSubPlan ) {
-                costOfBestSubPlan = selectivity;
-                bestSubPlan = subPlan;
-            }
         }
-        selectedSubPlans.add(bestSubPlan);
-        candidatePlans.remove(bestSubPlan);
 
-        // Find the next subQuery from the remaining subPlans
+        // Find the next subPlan with the lowest cost and put it into selectedSubPlans
+        final List<QueryAnalyzer> selectedSubPlans = new ArrayList<>();
         while ( !candidatePlans.isEmpty() ) {
-            findNextPlan(selectedSubPlans, candidatePlans);
+            final QueryAnalyzer bestSubPlan = findNextPlan(selectedSubPlans, candidatePlans);
+            selectedSubPlans.add(bestSubPlan);
+            candidatePlans.remove(bestSubPlan);
         }
 
         return constructBinaryPlan(selectedSubPlans);
     }
 
-    protected void findNextPlan(final List<QueryAnalyzer> selectedSubPlans, final List<QueryAnalyzer> candidatePlans ) {
+    protected QueryAnalyzer findNextPlan( final List<QueryAnalyzer> selectedSubPlans, final List<QueryAnalyzer> candidatePlans ) {
         double costOfBestSubPlan = Double.MAX_VALUE;
         QueryAnalyzer bestSubPlan = null;
         for ( final QueryAnalyzer subPlan : candidatePlans) {
@@ -96,9 +87,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
                 bestSubPlan = subPlan;
             }
         }
-
-        selectedSubPlans.add(bestSubPlan);
-        candidatePlans.remove(bestSubPlan);
+        return bestSubPlan;
     }
 
     protected LogicalPlan constructBinaryPlan( final List<QueryAnalyzer> selectedSubPlans ) {
