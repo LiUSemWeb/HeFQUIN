@@ -189,13 +189,6 @@ public class LabeledGraph {
                 candidate = new Path(start, currentEdge);
             }
             else if (! visitedEdges.contains(currentEdge.id)) {
-                /*if (adjacencyLists.get(candidate.path.get(candidate.path.size()-1).target).stream().noneMatch(
-                        e -> e.edge.equals(currentEdge.edge) && e.target.equals(currentEdge.target)
-                )) {
-                    System.out.println("ERROR: " + currentEdge);
-                    System.out.println("node:" + candidate.path.get(candidate.path.size()-1).target);
-                    System.out.println("doesnt connect with: " + currentEdge.target);
-                }*/
                 candidate.addEdge(currentEdge);
             }
             visitedEdges.add(currentEdge.id);
