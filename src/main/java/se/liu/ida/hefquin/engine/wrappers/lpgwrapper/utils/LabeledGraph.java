@@ -124,7 +124,7 @@ public class LabeledGraph {
         }
 
         public CypherVar lastTarget() {
-            return path.get(path.size()-1).target;
+            return path.size()>0 ? path.get(path.size()-1).target : start;
         }
     }
 
@@ -202,11 +202,9 @@ public class LabeledGraph {
                 if ( longest == null || candidate.size() > longest.size() ) {
                     longest = candidate.copy();
                 }
-                while (true) {
+                while (candidate.size()>0) {
                     candidate.removeLast();
-                    if (candidate.size()==0 ||
-                            !visitedEdges.containsAll(adjacencyLists.get(candidate.lastTarget()).stream().map(e->e.id)
-                                    .collect(Collectors.toList()))) {
+                    if (visitedEdges.containsAll(adjacencyLists.get(candidate.lastTarget()).stream().map(e->e.id).collect(Collectors.toList()))) {
                         break;
                     }
                 }

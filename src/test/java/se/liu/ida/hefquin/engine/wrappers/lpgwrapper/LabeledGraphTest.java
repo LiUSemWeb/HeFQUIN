@@ -32,16 +32,19 @@ public class LabeledGraphTest {
         final LabeledGraph.Edge wczl2r = new LabeledGraph.Edge(3, c, z, LabeledGraph.Direction.LEFT2RIGHT);
         final LabeledGraph.Edge zbyr2l = new LabeledGraph.Edge(2, b, y, LabeledGraph.Direction.RIGHT2LEFT);
         final LabeledGraph.Edge yaxr2l = new LabeledGraph.Edge(1, a, x, LabeledGraph.Direction.RIGHT2LEFT);
-
-        adjacencyList.put(x, List.of(new LabeledGraph.Edge(1, a, y, LabeledGraph.Direction.LEFT2RIGHT)));
-        adjacencyList.put(y, List.of(yaxr2l, new LabeledGraph.Edge(2, b, z, LabeledGraph.Direction.LEFT2RIGHT)));
-        adjacencyList.put(z, List.of(zbyr2l, new LabeledGraph.Edge(3, c, w, LabeledGraph.Direction.RIGHT2LEFT)));
-        adjacencyList.put(w, List.of(wczl2r, new LabeledGraph.Edge(4, d, u, LabeledGraph.Direction.LEFT2RIGHT),
-                new LabeledGraph.Edge(5, e, t, LabeledGraph.Direction.LEFT2RIGHT)));
+        final LabeledGraph.Edge xayl2r = new LabeledGraph.Edge(1, a, y, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge ybzl2r = new LabeledGraph.Edge(2, b, z, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge zcwr2l = new LabeledGraph.Edge(3, c, w, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge wdul2r = new LabeledGraph.Edge(4, d, u, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge wetl2r = new LabeledGraph.Edge(5, e, t, LabeledGraph.Direction.LEFT2RIGHT);
+        adjacencyList.put(x, List.of(xayl2r));
+        adjacencyList.put(y, List.of(yaxr2l, ybzl2r));
+        adjacencyList.put(z, List.of(zbyr2l, zcwr2l));
+        adjacencyList.put(w, List.of(wczl2r, wdul2r, wetl2r));
         adjacencyList.put(u, List.of(new LabeledGraph.Edge(4, d, w, LabeledGraph.Direction.RIGHT2LEFT)));
         adjacencyList.put(t, List.of(tewr2l));
         final LabeledGraph graph = new LabeledGraph(adjacencyList);
-        assertEquals(new LabeledGraph.Path(t, List.of(tewr2l, wczl2r, zbyr2l, yaxr2l)),
+        assertEquals(new LabeledGraph.Path(x, List.of(xayl2r, ybzl2r, zcwr2l, wetl2r)),
                 graph.getLongestPath());
     }
 
@@ -84,6 +87,29 @@ public class LabeledGraphTest {
         updatedAdjacencyList.put(z, List.of(zcxr2l));
 
         assertEquals(new LabeledGraph(updatedAdjacencyList), graph);
+    }
+
+    @Test
+    public void goBack2Test() {
+        final Map<CypherVar, List<LabeledGraph.Edge>> adjacencyList = new HashMap<>();
+        final LabeledGraph.Edge xayl2r = new LabeledGraph.Edge(1, a, y, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge ybzl2r = new LabeledGraph.Edge(2, b, z, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge zcul2r = new LabeledGraph.Edge(3, c, u, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge ydwl2r = new LabeledGraph.Edge(4, d, w, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge wetl2r = new LabeledGraph.Edge(5, e, t, LabeledGraph.Direction.LEFT2RIGHT);
+        final LabeledGraph.Edge yaxr2l = new LabeledGraph.Edge(1, a, x, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge zbyr2l = new LabeledGraph.Edge(2, b, y, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge uczr2l = new LabeledGraph.Edge(3, c, z, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge wdyr2l = new LabeledGraph.Edge(4, d, y, LabeledGraph.Direction.RIGHT2LEFT);
+        final LabeledGraph.Edge tewr2l = new LabeledGraph.Edge(5, e, w, LabeledGraph.Direction.RIGHT2LEFT);
+        adjacencyList.put(x, List.of(xayl2r));
+        adjacencyList.put(y, List.of(ybzl2r, ydwl2r, yaxr2l));
+        adjacencyList.put(z, List.of(zcul2r, zbyr2l));
+        adjacencyList.put(w, List.of(wetl2r, wdyr2l));
+        adjacencyList.put(u, List.of(uczr2l));
+        adjacencyList.put(t, List.of(tewr2l));
+        final LabeledGraph graph = new LabeledGraph(adjacencyList);
+        System.out.println(graph.getLongestPath());
     }
 
 }
