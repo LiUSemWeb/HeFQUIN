@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FmAwareWeightedJoinAndUnboundVariableCount;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     @Override
     public LogicalPlan apply( final LogicalPlan inputPlan ) {
         final int numberOfSubPlans = inputPlan.numberOfSubPlans();
-        if ( numberOfSubPlans < 2 ) {
+        if ( numberOfSubPlans == 0 ) {
             return inputPlan;
         }
 
@@ -102,6 +103,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     protected double estimateSelectivity(final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPossiblePlan ) {
         // Any of the defined formulas can be used for calculating the cost value here
         return JoinAwareWeightedUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
+//        return FmAwareWeightedJoinAndUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
     }
 
 }
