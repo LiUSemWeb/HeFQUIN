@@ -1,13 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.*;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
@@ -20,6 +17,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -185,6 +183,27 @@ public class LogicalOpUtils
             else {
                 return new HashSet<>( bgp.getTriplePatterns() );
             }
+        }
+        else if( req instanceof SPARQLRequest ) {
+            final SPARQLQuery graphPattern = ((SPARQLRequest) req).getQuery();
+            final ElementGroup queryPattern = (ElementGroup) graphPattern.asJenaQuery().getQueryPattern();
+
+            final Set<TriplePattern> tps = new HashSet<>();
+            for ( final Element e: queryPattern.getElements() ) {
+                if ( e instanceof ElementTriplesBlock ) {
+                    final List<Triple> triples = ((ElementTriplesBlock) e).getPattern().getList();
+
+                    for ( Triple t: triples ) {
+                        tps.add( new TriplePatternImpl(t) );
+                    }
+                }
+                else if ( e instanceof ElementFilter ) {
+//                    Do nothing
+                }
+                else
+                    throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
+            }
+            return tps;
         }
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );
