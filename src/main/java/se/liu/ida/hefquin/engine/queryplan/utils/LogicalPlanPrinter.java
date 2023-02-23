@@ -53,7 +53,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
 		}
 
 		@Override
@@ -61,7 +61,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
 		}
 
 		@Override
@@ -77,7 +77,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
 		}
 
 		@Override
@@ -85,7 +85,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
 		}
 
 		@Override
