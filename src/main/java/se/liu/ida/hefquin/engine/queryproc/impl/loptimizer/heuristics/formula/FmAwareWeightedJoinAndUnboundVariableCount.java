@@ -5,7 +5,6 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.JoinAnalyzer;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,20 +25,12 @@ import java.util.Set;
 
 public class FmAwareWeightedJoinAndUnboundVariableCount extends JoinAwareWeightedUnboundVariableCount {
 
-    public static double estimate( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPlan ) {
-        // Add bound variables of all selected plans to a set
-        final Set<Node> boundVariables = new HashSet<>();
-
-        for ( final QueryAnalyzer plan : selectedPlans ) {
-            boundVariables.addAll( plan.getSubs() );
-            boundVariables.addAll( plan.getPreds() );
-            boundVariables.addAll( plan.getObjs() );
-        }
-
-        return weightedUnboundVarsCount(boundVariables, nextPlan)
+    @Override
+    protected double calculateCost( final List<QueryAnalyzer> selectedPlans, final Set<Node> boundVariables, final QueryAnalyzer subPlan ) {
+        return weightedUnboundVarsCount(boundVariables, subPlan)
                 /
-                ( weightedJoinsCountInNextPlan( nextPlan )
-                        * weightedJoinsCountAcrossPlans( selectedPlans, nextPlan )
+                ( weightedJoinsCountInNextPlan( subPlan )
+                        * weightedJoinsCountAcrossPlans( selectedPlans, subPlan )
                 );
     }
 

@@ -20,7 +20,7 @@ import java.util.Set;
  * "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
  */
 
-public class JoinAwareWeightedUnboundVariableCount {
+public class JoinAwareWeightedUnboundVariableCount implements Formula {
     protected static final double W_S = 1; // weight for subject variables
     protected static final double W_P = 0.1; // weight for predicate variables
     protected static final double W_O = 0.8; // weight for object variables
@@ -29,7 +29,8 @@ public class JoinAwareWeightedUnboundVariableCount {
     protected static final double J_Ts = 0.5; // weight for star join
     protected static final double J_Tu = 1; // weight for unusual join
 
-    public static double estimate( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer subPlan ) {
+    @Override
+    public double estimate( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer subPlan ) {
         // Add bound variables of all selected plans to a set
         final Set<Node> boundVariables = new HashSet<>();
 
@@ -41,11 +42,11 @@ public class JoinAwareWeightedUnboundVariableCount {
             boundVariables.addAll( plan.getObjs() );
         }
 
-        return calculateCost( boundVariables, subPlan );
+        return calculateCost( selectedPlans, boundVariables, subPlan );
     }
 
     // Formula (7) in paper "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
-    private static double calculateCost( final Set<Node> boundVariables, final QueryAnalyzer subPlan ) {
+    protected double calculateCost( final List<QueryAnalyzer> selectedPlans, final Set<Node> boundVariables, final QueryAnalyzer subPlan) {
         return weightedUnboundVarsCount(boundVariables, subPlan)
                 / weightedJoinsCountInNextPlan( subPlan );
     }
