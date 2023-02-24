@@ -11,13 +11,8 @@ import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.query.*;
+import se.liu.ida.hefquin.engine.query.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -185,23 +180,37 @@ public class LogicalOpUtils
             }
         }
         else if( req instanceof SPARQLRequest ) {
-            final SPARQLQuery graphPattern = ((SPARQLRequest) req).getQuery();
-            final ElementGroup queryPattern = (ElementGroup) graphPattern.asJenaQuery().getQueryPattern();
+            final SPARQLGraphPattern graphPattern = ((SPARQLRequest) req).getQueryPattern();
 
             final Set<TriplePattern> tps = new HashSet<>();
-            for ( final Element e: queryPattern.getElements() ) {
-                if ( e instanceof ElementTriplesBlock ) {
-                    final List<Triple> triples = ((ElementTriplesBlock) e).getPattern().getList();
+            for ( final SPARQLGraphPattern pattern: ( (SPARQLGroupPatternImpl) graphPattern).getSubPatterns() ) {
 
-                    for ( Triple t: triples ) {
-                        tps.add( new TriplePatternImpl(t) );
+                if ( pattern instanceof BGP ) {
+                    tps.addAll( ((BGP) pattern).getTriplePatterns() );
+                }
+                else if ( pattern instanceof TriplePattern ) {
+                    tps.add( (TriplePattern) pattern );
+                }
+                else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+                    Element e = ((GenericSPARQLGraphPatternImpl1) pattern).asJenaElement();
+
+                    if ( e instanceof ElementTriplesBlock ) {
+                        final List<Triple> triples = ((ElementTriplesBlock) e).getPattern().getList();
+
+                        for ( Triple t: triples ) {
+                            tps.add( new TriplePatternImpl(t) );
+                        }
                     }
+                    else if ( e instanceof ElementFilter ) {
+                        // Do nothing
+                    }
+                    else
+                        throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
                 }
-                else if ( e instanceof ElementFilter ) {
-//                    Do nothing
-                }
+//                else if ( pattern instanceof SPARQLUnionPattern || pattern instanceof SPARQLGraphPattern ) {
+//                }
                 else
-                    throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
+                    throw new IllegalArgumentException( "Cannot get triple patterns of the pattern (type: " + pattern.getClass().getName() + ")." );
             }
             return tps;
         }
