@@ -24,7 +24,7 @@ public class QueryAnalyzer {
         if( plan == null ) {
             return;
         }
-        final Set<TriplePattern> tps = extractTriplePatterns( plan );
+        final Set<TriplePattern> tps = extractTPsAndRecordFms( plan );
         if( tps == null || tps.isEmpty() ) {
             return;
         }
@@ -43,7 +43,7 @@ public class QueryAnalyzer {
         }
     }
 
-    protected Set<TriplePattern> extractTriplePatterns( final LogicalPlan plan ) {
+    protected Set<TriplePattern> extractTPsAndRecordFms( final LogicalPlan plan ) {
         final LogicalOperator lop = plan.getRootOperator();
 
         if( lop instanceof LogicalOpRequest) {
@@ -71,7 +71,7 @@ public class QueryAnalyzer {
             return previousTPs;
         }
         else if( lop instanceof LogicalOpFilter ) {
-            return extractTriplePatterns( plan.getSubPlan(0) );
+            return extractTPsAndRecordFms( plan.getSubPlan(0) );
         }
         else
             throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ")");
