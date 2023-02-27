@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.*;
 
-import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.syntax.*;
 
@@ -181,38 +180,7 @@ public class LogicalOpUtils
         }
         else if( req instanceof SPARQLRequest ) {
             final SPARQLGraphPattern graphPattern = ((SPARQLRequest) req).getQueryPattern();
-
-            final Set<TriplePattern> tps = new HashSet<>();
-            for ( final SPARQLGraphPattern pattern: ( (SPARQLGroupPatternImpl) graphPattern).getSubPatterns() ) {
-
-                if ( pattern instanceof BGP ) {
-                    tps.addAll( ((BGP) pattern).getTriplePatterns() );
-                }
-                else if ( pattern instanceof TriplePattern ) {
-                    tps.add( (TriplePattern) pattern );
-                }
-                else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
-                    Element e = ((GenericSPARQLGraphPatternImpl1) pattern).asJenaElement();
-
-                    if ( e instanceof ElementTriplesBlock ) {
-                        final List<Triple> triples = ((ElementTriplesBlock) e).getPattern().getList();
-
-                        for ( Triple t: triples ) {
-                            tps.add( new TriplePatternImpl(t) );
-                        }
-                    }
-                    else if ( e instanceof ElementFilter ) {
-                        // Do nothing
-                    }
-                    else
-                        throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
-                }
-//                else if ( pattern instanceof SPARQLUnionPattern || pattern instanceof SPARQLGraphPattern ) {
-//                }
-                else
-                    throw new IllegalArgumentException( "Cannot get triple patterns of the pattern (type: " + pattern.getClass().getName() + ")." );
-            }
-            return tps;
+            return QueryPatternUtils.getTPsInPattern(graphPattern);
         }
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );
