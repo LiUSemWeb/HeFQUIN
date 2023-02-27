@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FmAwareWeightedJoinAndUnboundVariableCount;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.Formula;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
 
 public class LogicalOptimizerImpl implements LogicalOptimizer
@@ -23,7 +23,7 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		heuristics.add( new FilterPushDown() );
 		heuristics.add( mergeRequests );
 
-//		final Formula formula = new JoinAwareWeightedUnboundVariableCount();
+//		final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
 //		heuristics.add( new GreedyBasedReordering( formula ) );
 
 //		heuristics.add( new PushJoinUnderUnionWithRequests() );

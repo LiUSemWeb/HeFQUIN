@@ -23,7 +23,7 @@ import java.util.List;
  * Any of the defined formulas can be used for calculating the cost value to find the optimal order.
  * One example of such formulas is {@link JoinAwareWeightedUnboundVariableCount}.
  */
-public abstract class GreedyBasedReordering implements HeuristicForLogicalOptimization {
+public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     final FormulaForComputingSelectivity formula;
 
     public GreedyBasedReordering( final FormulaForComputingSelectivity formula ) {
