@@ -24,7 +24,7 @@ import java.util.List;
  * One example of such formulas is {@link JoinAwareWeightedUnboundVariableCount}.
  */
 public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
-    final FormulaForComputingSelectivity formula;
+    protected final FormulaForComputingSelectivity formula;
 
     public GreedyBasedReordering( final FormulaForComputingSelectivity formula ) {
         this.formula = formula;
