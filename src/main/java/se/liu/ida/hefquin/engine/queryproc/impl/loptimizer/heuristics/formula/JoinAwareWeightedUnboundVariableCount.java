@@ -20,7 +20,7 @@ import java.util.Set;
  * "Heuristics-based Query Reordering for Federated Queries in SPARQL 1.1 and SPARQL-LD"
  */
 
-public class JoinAwareWeightedUnboundVariableCount implements Formula {
+public class JoinAwareWeightedUnboundVariableCount implements FormulaForComputingSelectivity {
     protected static final double W_S = 1; // weight for subject variables
     protected static final double W_P = 0.1; // weight for predicate variables
     protected static final double W_O = 0.8; // weight for object variables

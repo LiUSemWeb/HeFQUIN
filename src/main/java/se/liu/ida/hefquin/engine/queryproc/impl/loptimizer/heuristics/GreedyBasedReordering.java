@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.Formula;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
@@ -23,10 +23,10 @@ import java.util.List;
  * Any of the defined formulas can be used for calculating the cost value to find the optimal order.
  * One example of such formulas is {@link JoinAwareWeightedUnboundVariableCount}.
  */
-public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
-    final Formula formula;
+public abstract class GreedyBasedReordering implements HeuristicForLogicalOptimization {
+    final FormulaForComputingSelectivity formula;
 
-    public GreedyBasedReordering( final Formula formula ) {
+    public GreedyBasedReordering( final FormulaForComputingSelectivity formula ) {
         this.formula = formula;
     }
 
