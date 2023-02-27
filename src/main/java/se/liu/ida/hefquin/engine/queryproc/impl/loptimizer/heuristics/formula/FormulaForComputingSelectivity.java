@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.Quer
 
 import java.util.List;
 
-public interface Formula {
+public interface FormulaForComputingSelectivity {
 
     double estimate( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer subPlan );
 
