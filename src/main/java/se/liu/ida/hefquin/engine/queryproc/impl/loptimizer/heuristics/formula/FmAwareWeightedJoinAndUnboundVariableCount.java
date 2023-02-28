@@ -34,7 +34,7 @@ public class FmAwareWeightedJoinAndUnboundVariableCount extends JoinAwareWeighte
                 );
     }
 
-    protected static double weightedJoinsCountAcrossPlans( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPlan ) {
+    protected double weightedJoinsCountAcrossPlans( final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPlan ) {
         double fmAwareStarJoinsCount = 0;
         double fmAwareChainJoinsCount = 0;
         double fmAwareUnusualJoinsCount = 0;
