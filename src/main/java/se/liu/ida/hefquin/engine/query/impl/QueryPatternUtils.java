@@ -181,6 +181,15 @@ public class QueryPatternUtils
 	 * Returns the set of all triple patterns that occur in the given graph pattern.
 	 */
 	public static Set<TriplePattern> getTPsInPattern( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			final Element element = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaElement();
+			return getTPsInPattern(element);
+		}
+		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
+			return getTPsInPattern(jenaOp);
+		}
+
 		final Set<TriplePattern> tps = new HashSet<>();
 		if ( queryPattern instanceof TriplePattern ) {
 			tps.add( (TriplePattern) queryPattern );
@@ -200,14 +209,6 @@ public class QueryPatternUtils
 				tps.addAll( getTPsInPattern( up.getSubPatterns(i) ) );
 			}
 		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
-			final Element element = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaElement();
-			return getTPsInPattern(element);
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
-			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
-			return getTPsInPattern(jenaOp);
-		}
 		else {
 			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
 		}
@@ -215,6 +216,13 @@ public class QueryPatternUtils
 	}
 
 	public static Set<TriplePattern> getTPsInPattern( final Op op ) {
+		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
+			return getTPsInPattern( (Op2) op );
+		}
+		if ( op instanceof OpService ){
+			return getTPsInPattern( ((Op1) op).getSubOp());
+		}
+
 		final Set<TriplePattern> tps = new HashSet<>();
 		if ( op instanceof OpBGP ) {
 			final List<Triple> triples = ((OpBGP) op).getPattern().getList();
@@ -222,12 +230,6 @@ public class QueryPatternUtils
 				tps.add( new TriplePatternImpl(t) );
 			}
 			return tps;
-		}
-		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
-			return getTPsInPattern( (Op2) op );
-		}
-		else if ( op instanceof OpService ){
-			return getTPsInPattern( ((Op1) op).getSubOp());
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
