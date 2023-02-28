@@ -27,6 +27,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     protected final FormulaForComputingSelectivity formula;
 
     public GreedyBasedReordering( final FormulaForComputingSelectivity formula ) {
+        assert formula != null;
         this.formula = formula;
     }
 
