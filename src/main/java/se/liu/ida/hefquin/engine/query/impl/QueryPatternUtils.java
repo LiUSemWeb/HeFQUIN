@@ -218,7 +218,7 @@ public class QueryPatternUtils
 		final Set<TriplePattern> tps = new HashSet<>();
 		if ( op instanceof OpBGP ) {
 			final List<Triple> triples = ((OpBGP) op).getPattern().getList();
-			for ( Triple t: triples ) {
+			for ( final Triple t: triples ) {
 				tps.add( new TriplePatternImpl(t) );
 			}
 			return tps;
