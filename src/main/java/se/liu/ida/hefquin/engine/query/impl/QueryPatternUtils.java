@@ -1,11 +1,6 @@
 package se.liu.ida.hefquin.engine.query.impl;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -180,6 +175,90 @@ public class QueryPatternUtils
 		else {
 			throw new IllegalArgumentException( "unexpected type of graph pattern: " + p.getClass().getName() );
 		}
+	}
+
+	/**
+	 * Returns the set of all triple patterns that occur in the given graph pattern.
+	 */
+	public static Set<TriplePattern> getTPsInPattern( final SPARQLGraphPattern queryPattern ) {
+		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 ) {
+			final Element element = ( (GenericSPARQLGraphPatternImpl1) queryPattern ).asJenaElement();
+			return getTPsInPattern(element);
+		}
+		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 ) {
+			final Op jenaOp = ( (GenericSPARQLGraphPatternImpl2) queryPattern ).asJenaOp();
+			return getTPsInPattern(jenaOp);
+		}
+
+		final Set<TriplePattern> tps = new HashSet<>();
+		if ( queryPattern instanceof TriplePattern ) {
+			tps.add( (TriplePattern) queryPattern );
+		}
+		else if ( queryPattern instanceof BGP ) {
+			tps.addAll( ((BGP) queryPattern).getTriplePatterns() );
+		}
+		else if ( queryPattern instanceof SPARQLGroupPattern ) {
+			final SPARQLGroupPattern gp = (SPARQLGroupPattern) queryPattern;
+			for ( int i = 0; i < gp.getNumberOfSubPatterns(); i++ ) {
+				tps.addAll( getTPsInPattern(gp.getSubPatterns(i)) );
+			}
+		}
+		else if ( queryPattern instanceof SPARQLUnionPattern ) {
+			final SPARQLUnionPattern up = (SPARQLUnionPattern) queryPattern;
+			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
+				tps.addAll( getTPsInPattern( up.getSubPatterns(i) ) );
+			}
+		}
+		else {
+			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
+		}
+		return tps;
+	}
+
+	public static Set<TriplePattern> getTPsInPattern( final Op op ) {
+		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
+			return getTPsInPattern( (Op2) op );
+		}
+		if ( op instanceof OpService ){
+			return getTPsInPattern( ((Op1) op).getSubOp());
+		}
+
+		final Set<TriplePattern> tps = new HashSet<>();
+		if ( op instanceof OpBGP ) {
+			final List<Triple> triples = ((OpBGP) op).getPattern().getList();
+			for ( final Triple t: triples ) {
+				tps.add( new TriplePatternImpl(t) );
+			}
+			return tps;
+		}
+		else {
+			throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
+		}
+	}
+
+	public static Set<TriplePattern> getTPsInPattern( final Op2 op ) {
+		final Set<TriplePattern> varLeft = getTPsInPattern( op.getLeft() );
+		final Set<TriplePattern> varRight = getTPsInPattern( op.getRight() );
+		varLeft.addAll(varRight);
+		return varLeft;
+	}
+
+	public static Set<TriplePattern> getTPsInPattern ( final Element e ) {
+		final Set<TriplePattern> tps = new HashSet<>();
+		if ( e instanceof ElementTriplesBlock ) {
+			final List<Triple> triples = ((ElementTriplesBlock) e).getPattern().getList();
+
+			for ( Triple t: triples ) {
+				tps.add( new TriplePatternImpl(t) );
+			}
+			return tps;
+		}
+		else if ( e instanceof ElementFilter ) {
+			// Do nothing
+			return tps;
+		}
+		else
+			throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
 	}
 
 	/**

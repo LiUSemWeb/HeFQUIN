@@ -1,25 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.*;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.query.*;
+import se.liu.ida.hefquin.engine.query.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -185,6 +177,10 @@ public class LogicalOpUtils
             else {
                 return new HashSet<>( bgp.getTriplePatterns() );
             }
+        }
+        else if( req instanceof SPARQLRequest ) {
+            final SPARQLGraphPattern graphPattern = ((SPARQLRequest) req).getQueryPattern();
+            return QueryPatternUtils.getTPsInPattern(graphPattern);
         }
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );

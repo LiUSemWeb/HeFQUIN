@@ -1,13 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 
 import org.apache.jena.graph.Node;
+import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 import java.util.*;
 
@@ -17,6 +16,7 @@ public class QueryAnalyzer {
     protected List<Node> subs = new ArrayList<>();
     protected List<Node> preds = new ArrayList<>();
     protected List<Node> objs = new ArrayList<>();
+    protected List<FederationMember> fms = new ArrayList<>();
 
     public QueryAnalyzer( final LogicalPlan plan ) {
         this.plan = plan;
@@ -24,7 +24,10 @@ public class QueryAnalyzer {
         if( plan == null ) {
             return;
         }
-        final Set<TriplePattern> tps = extractTriplePatterns();
+        final Set<TriplePattern> tps = extractTPsAndRecordFms( plan );
+        if( tps == null || tps.isEmpty() ) {
+            return;
+        }
 
         for ( final TriplePattern tp: tps ) {
             Node node;
@@ -40,13 +43,14 @@ public class QueryAnalyzer {
         }
     }
 
-    protected Set<TriplePattern> extractTriplePatterns() {
+    protected Set<TriplePattern> extractTPsAndRecordFms( final LogicalPlan plan ) {
         final LogicalOperator lop = plan.getRootOperator();
 
         if( lop instanceof LogicalOpRequest) {
+            fms.add( ((LogicalOpRequest<?, ?>) lop).getFederationMember() );
             return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop);
         }
-        else if ( lop instanceof LogicalOpMultiwayUnion || plan.getRootOperator() instanceof LogicalOpUnion ) {
+        else if ( lop instanceof LogicalOpMultiwayUnion || lop instanceof LogicalOpUnion ) {
             final int numOfSubPlans = plan.numberOfSubPlans();
             Set<TriplePattern> previousTPs = null;
 
@@ -54,6 +58,7 @@ public class QueryAnalyzer {
                 final LogicalOperator subLop = plan.getSubPlan(i).getRootOperator();
 
                 if ( subLop instanceof LogicalOpRequest ) {
+                    fms.add( ((LogicalOpRequest<?, ?>) subLop).getFederationMember() );
                     final Set<TriplePattern> currentTPs = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) subLop);
                     if( !currentTPs.isEmpty() && previousTPs != null && !currentTPs.equals( previousTPs) ) {
                         throw new IllegalArgumentException("UNION is not added as a result of source selection");
@@ -64,6 +69,9 @@ public class QueryAnalyzer {
                     throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + subLop.getClass().getName() + ")");
             }
             return previousTPs;
+        }
+        else if( lop instanceof LogicalOpFilter ) {
+            return extractTPsAndRecordFms( plan.getSubPlan(0) );
         }
         else
             throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ")");
@@ -76,6 +84,18 @@ public class QueryAnalyzer {
     public List<Node> getPreds() { return preds; }
 
     public List<Node> getObjs() { return objs; }
+
+    public List<FederationMember> getFms() { return fms; }
+
+    public Set<Node> getUniqueVars() {
+        final Set<Node> uniqueVars = new HashSet<>();
+
+        uniqueVars.addAll(subs);
+        uniqueVars.addAll(preds);
+        uniqueVars.addAll(objs);
+
+        return uniqueVars;
+    }
 
     public void setSubs( final List<Node> subs ) {
         this.subs = subs;

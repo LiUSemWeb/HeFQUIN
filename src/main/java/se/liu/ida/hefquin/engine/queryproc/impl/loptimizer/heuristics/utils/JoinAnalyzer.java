@@ -35,13 +35,11 @@ public class JoinAnalyzer {
      * Count number of different types of joins between two given sub-plans
      */
     public static int countNumOfJoinsWithSameSub( final QueryAnalyzer plan_l, final QueryAnalyzer plan_r ){
-        return countNumOfJoinPairs( plan_l.getSubs(), plan_r.getSubs() )
-                + countNumOfJoinPairs( plan_l.getObjs(), plan_r.getObjs() );
+        return countNumOfJoinPairs( plan_l.getSubs(), plan_r.getSubs() );
     }
 
     public static int countNumOfJoinsWithSameObj( final QueryAnalyzer plan_l, final QueryAnalyzer plan_r ){
-        return countNumOfJoinPairs( plan_l.getSubs(), plan_r.getSubs() )
-                + countNumOfJoinPairs( plan_l.getObjs(), plan_r.getObjs() );
+        return countNumOfJoinPairs( plan_l.getObjs(), plan_r.getObjs() );
     }
 
     public static int countNumOfChainJoins( final QueryAnalyzer plan_l, final QueryAnalyzer plan_r ) {

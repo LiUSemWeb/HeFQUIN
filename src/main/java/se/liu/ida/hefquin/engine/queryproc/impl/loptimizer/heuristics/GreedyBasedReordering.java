@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
@@ -23,11 +24,17 @@ import java.util.List;
  * One example of such formulas is {@link JoinAwareWeightedUnboundVariableCount}.
  */
 public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
+    protected final FormulaForComputingSelectivity formula;
+
+    public GreedyBasedReordering( final FormulaForComputingSelectivity formula ) {
+        assert formula != null;
+        this.formula = formula;
+    }
 
     @Override
     public LogicalPlan apply( final LogicalPlan inputPlan ) {
         final int numberOfSubPlans = inputPlan.numberOfSubPlans();
-        if ( numberOfSubPlans < 2 ) {
+        if ( numberOfSubPlans == 0 ) {
             return inputPlan;
         }
 
@@ -81,7 +88,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
         double costOfBestSubPlan = Double.MAX_VALUE;
         QueryAnalyzer bestSubPlan = null;
         for ( final QueryAnalyzer subPlan : candidatePlans) {
-            final double selectivity = estimateSelectivity(selectedSubPlans, subPlan);
+            final double selectivity = formula.estimate( selectedSubPlans, subPlan );
             if ( selectivity < costOfBestSubPlan ) {
                 costOfBestSubPlan = selectivity;
                 bestSubPlan = subPlan;
@@ -97,11 +104,6 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
             output = LogicalPlanUtils.createPlanWithBinaryJoin( output, it.next().getPlan() );
         }
         return output;
-    }
-
-    protected double estimateSelectivity(final List<QueryAnalyzer> selectedPlans, final QueryAnalyzer nextPossiblePlan ) {
-        // Any of the defined formulas can be used for calculating the cost value here
-        return JoinAwareWeightedUnboundVariableCount.estimate(selectedPlans, nextPossiblePlan);
     }
 
 }

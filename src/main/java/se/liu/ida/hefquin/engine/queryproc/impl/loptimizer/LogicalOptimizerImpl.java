@@ -7,6 +7,9 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.*;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FmAwareWeightedJoinAndUnboundVariableCount;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount;
 
 public class LogicalOptimizerImpl implements LogicalOptimizer
 {
@@ -19,7 +22,11 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		heuristics.add( mergeRequests );
 		heuristics.add( new FilterPushDown() );
 		heuristics.add( mergeRequests );
-//		heuristics.add( new GreedyBasedReordering() );
+
+//		final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
+//		heuristics.add( new GreedyBasedReordering( formula ) );
+
+//		heuristics.add( new PushJoinUnderUnionWithRequests() );
 
 /*
   Uncomment the following line to apply vocabulary mappings of federation members during query planning.
