@@ -57,7 +57,7 @@ public class FmAwareWeightedJoinAndUnboundVariableCount extends JoinAwareWeighte
         return 1 + fmAwareStarJoinsCount * J_Ts + fmAwareChainJoinsCount * J_Tc + fmAwareUnusualJoinsCount * J_Tu;
     }
 
-    public static double weightedFmCount( final List<FederationMember> fms_l, final List<FederationMember> fms_r ){
+    protected double weightedFmCount( final List<FederationMember> fms_l, final List<FederationMember> fms_r ){
         double count = 0;
         for ( final FederationMember fm_l: fms_l ) {
             for ( final FederationMember fm_r: fms_r ) {
