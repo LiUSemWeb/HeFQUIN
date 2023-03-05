@@ -238,7 +238,7 @@ public class LogicalToPhysicalOpConverter
 	}
 
 	public static NaryPhysicalOp convert( final LogicalOpMultiwayUnion lop ) {
-		throw new UnsupportedOperationException();
+		return new PhysicalOpMultiwayUnion();
 	}
 
 }

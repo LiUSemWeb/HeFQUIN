@@ -128,6 +128,14 @@ public class PhysicalPlanPrinter extends PlanPrinter{
         }
 
         @Override
+        public void visit( final PhysicalOpMultiwayUnion op ) {
+            addTabs();
+            builder.append( op.toString() );
+            builder.append( System.lineSeparator() );
+            indentLevel++;
+        }
+
+        @Override
         public void visit( final PhysicalOpFilter op ) {
             addTabs();
             builder.append( op.toString() );
@@ -221,6 +229,11 @@ public class PhysicalPlanPrinter extends PlanPrinter{
 
         @Override
         public void visit(final PhysicalOpBinaryUnion op) {
+            indentLevel--;
+        }
+
+        @Override
+        public void visit(final PhysicalOpMultiwayUnion op) {
             indentLevel--;
         }
 

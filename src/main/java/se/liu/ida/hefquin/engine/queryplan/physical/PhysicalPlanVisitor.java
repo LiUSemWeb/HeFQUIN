@@ -23,6 +23,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpHashRJoin op );
 
 	void visit( PhysicalOpBinaryUnion op );
+	void visit( PhysicalOpMultiwayUnion op );
 
 	void visit( PhysicalOpFilter op );
 	void visit( PhysicalOpLocalToGlobal op );
