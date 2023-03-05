@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
@@ -38,6 +39,14 @@ public class PullBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 	                                                  final ExecutionContext execCxt,
 	                                                  final int preferredOutputBlockSize ) {
 		return new PullBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+	}
+
+	@Override
+	protected ExecPlanTask createTaskForNaryExecOp( final NaryExecutableOp op,
+	                                                final ExecPlanTask[] childTasks,
+	                                                final ExecutionContext execCxt,
+	                                                final int preferredOutputBlockSize ) {
+		throw new UnsupportedOperationException();
 	}
 
 }
