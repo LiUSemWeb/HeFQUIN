@@ -42,4 +42,9 @@ public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
 		return LogicalOpMultiwayUnion.getInstance().hashCode();
 	}
 
+	@Override
+	public String toString(){
+		return "> multiwayUnion ";
+	}
+
 }

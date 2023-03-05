@@ -5,12 +5,14 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.ConnectorForAdditionalConsumer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTask;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForBinaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForNaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForNullaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForUnaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -45,6 +47,14 @@ public class PushBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 	                                                  final ExecutionContext execCxt,
 	                                                  final int preferredOutputBlockSize ) {
 		return new PushBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+	}
+
+	@Override
+	protected ExecPlanTask createTaskForNaryExecOp( final NaryExecutableOp op,
+	                                                final ExecPlanTask[] childTasks,
+	                                                final ExecutionContext execCxt,
+	                                                final int preferredOutputBlockSize ) {
+		return new PushBasedExecPlanTaskForNaryOperator(op, childTasks, execCxt, preferredOutputBlockSize);
 	}
 
 	@Override

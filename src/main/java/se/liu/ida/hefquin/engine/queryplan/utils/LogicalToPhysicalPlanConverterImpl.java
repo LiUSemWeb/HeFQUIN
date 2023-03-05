@@ -140,11 +140,6 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			else if ( lop instanceof LogicalOpMultiwayLeftJoin ) {
 				return createPhysicalPlanForMultiwayLeftJoin( (LogicalOpMultiwayLeftJoin) lop, children, keepMultiwayJoins );
 			}
-			else if ( lop instanceof LogicalOpMultiwayUnion ) {
-				// TODO: remove this else-if branch, including the method that it
-				// calls, once we have a physical operator for multiway union 
-				return createPhysicalPlanForMultiwayUnion( (LogicalOpMultiwayUnion) lop, children );
-			}
 			else {
 				return PhysicalPlanFactory.createPlan(lop, children);
 			}
