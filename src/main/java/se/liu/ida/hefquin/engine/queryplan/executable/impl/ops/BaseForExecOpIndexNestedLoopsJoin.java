@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -31,6 +32,13 @@ public abstract class BaseForExecOpIndexNestedLoopsJoin<QueryType extends Query,
 			final ExecutionContext execCxt )
 	{
 		// nothing to be done here
+	}
+
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "queryAsString",      query.toString() );
+		s.put( "fedMemberAsString",  fm.toString() );
+		return s;
 	}
 
 }
