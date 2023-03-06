@@ -161,6 +161,7 @@ public class ModFederation extends ModBase
 		final SPARQLEndpoint fm = new SPARQLEndpoint() {
 			@Override public SPARQLEndpointInterface getInterface() { return iface; }
 			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
+			@Override public String toString( ) { return "SPARQL endpoint (" + iface.toString() + ")"; }
 		};
 
 		membersByURI.put(sparqlEndpointValue, fm);
@@ -173,6 +174,7 @@ public class ModFederation extends ModBase
 		final TPFServer fm = new TPFServer() {
 			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public TPFInterface getInterface() { return iface; }
+			@Override public String toString( ) { return "TPF server (" + iface.toString() + ")"; }
 		};
 
 		membersByURI.put(uri, fm);
@@ -185,6 +187,7 @@ public class ModFederation extends ModBase
 		final BRTPFServer fm = new BRTPFServer() {
 			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public BRTPFInterface getInterface() { return iface; }
+			@Override public String toString( ) { return "brTPF server (" + iface.toString() + ")"; }
 		};
 
 		membersByURI.put(uri, fm);
@@ -220,6 +223,7 @@ public class ModFederation extends ModBase
 		final Neo4jServer fm = new Neo4jServer() {
 			@Override public VocabularyMapping getVocabularyMapping() { return vocabMappings; }
 			@Override public Neo4jInterface getInterface() { return iface; }
+			@Override public String toString( ) { return "Neo4j server (" + iface.toString() + ")"; }
 		};
 
 		membersByURI.put(uri, fm);

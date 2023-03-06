@@ -91,4 +91,10 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
         }
         return null;
     }
+
+    @Override
+    public String toString( ) {
+        return "GraphQL endpoint (" + graphqlInterface.toString() + ")";
+    }
+
 }
