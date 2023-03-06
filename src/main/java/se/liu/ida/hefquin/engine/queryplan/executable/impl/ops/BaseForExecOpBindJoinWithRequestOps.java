@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -52,6 +53,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 */
 	protected static final int minimumRequestBlockSize = 5;
 
+	// statistics
+	private long numberOfOutputMappingsProduced = 0L;
 
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
@@ -73,6 +76,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 		if ( useOuterJoinSemantics ) {
 			for ( final SolutionMapping sm : unjoinableInputSMs ) {
+				numberOfOutputMappingsProduced++;
 				sink.send(sm);
 			}
 		}
@@ -195,9 +199,23 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		return s;
+	}
+
+
 	// ------- helper classes ------
 
-	protected static class MyIntermediateResultElementSink implements IntermediateResultElementSink
+	protected class MyIntermediateResultElementSink implements IntermediateResultElementSink
 	{
 		protected final IntermediateResultElementSink outputSink;
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
@@ -222,6 +240,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
+					numberOfOutputMappingsProduced++;
 					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 				}
 			}
@@ -234,7 +253,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	} // end of helper class MyIntermediateResultElementSink
 
 
-	protected static class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
+	protected class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
 	{
 		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
 
@@ -251,6 +270,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
+					numberOfOutputMappingsProduced++;
 					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 					inputSolutionMappingsWithJoinPartners.add(smFromInput);
 				}
@@ -265,6 +285,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		public void flush() {
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( ! inputSolutionMappingsWithJoinPartners.contains(smFromInput) ) {
+					numberOfOutputMappingsProduced++;
 					outputSink.send(smFromInput);
 				}
 			}

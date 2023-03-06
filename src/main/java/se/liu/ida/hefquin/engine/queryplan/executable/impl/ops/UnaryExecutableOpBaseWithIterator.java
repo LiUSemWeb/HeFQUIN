@@ -6,10 +6,13 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class UnaryExecutableOpBaseWithIterator extends UnaryExecutableOpBase
 {
+	private long numberOfOutputMappingsProduced = 0L;
+
 	public UnaryExecutableOpBaseWithIterator( final boolean collectExceptions ) {
 		super(collectExceptions);
 	}
@@ -40,8 +43,22 @@ public abstract class UnaryExecutableOpBaseWithIterator extends UnaryExecutableO
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
 		while ( output.hasNext() ) {
+			numberOfOutputMappingsProduced++;
 			sink.send( output.next() );
 		}
+	}
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		return s;
 	}
 
 }

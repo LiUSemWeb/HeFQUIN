@@ -16,6 +16,8 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private long timeAfterResponse = 0L;
+	private long solMapsRetrieved = 0L;
+	private long numberOfOutputMappingsProduced = 0L;
 
 	public BaseForExecOpSolMapsRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
 		super( req, fm, collectExceptions );
@@ -34,6 +36,7 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 		}
 
 		timeAfterResponse = System.currentTimeMillis();
+		solMapsRetrieved = response.getSize();
 
 		process(response, sink);
 	}
@@ -41,6 +44,7 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
 	{
 		for ( SolutionMapping sm : response.getSolutionMappings() ) {
+			numberOfOutputMappingsProduced++;
 			sink.send( sm );
 		}
 	}
@@ -51,12 +55,16 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 	public void resetStats() {
 		super.resetStats();
 		timeAfterResponse = 0L;
+		solMapsRetrieved = 0L;
+		numberOfOutputMappingsProduced = 0L;
 	}
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "requestExecTime",  Long.valueOf(timeAtExecEnd-timeAfterResponse) );
 		s.put( "responseProcTime", Long.valueOf(timeAfterResponse-timeAtExecStart) );
+		s.put( "solMapsRetrieved", Long.valueOf(solMapsRetrieved) );
+		s.put( "numberOfOutputMappingsProduced", Long.valueOf(numberOfOutputMappingsProduced) );
 		return s;
 	}
 }
