@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
@@ -25,7 +26,7 @@ public class CFRNumberOfRequests extends CFRBase
 		final PhysicalOperator rootOp = plan.getRootOperator();
 
 		final double pageSize = 100.0;
-		final double blockSize = 30.0;
+		final double blockSize = BaseForExecOpBindJoin.defaultPreferredInputBlockSize;
 		final CompletableFuture<Integer> numReq;
 
 		if ( rootOp instanceof PhysicalOpIndexNestedLoopsJoin ) {
