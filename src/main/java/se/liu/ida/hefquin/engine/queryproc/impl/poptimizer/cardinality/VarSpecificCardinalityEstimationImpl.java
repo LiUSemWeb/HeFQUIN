@@ -85,15 +85,8 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 		else if ( rootOp instanceof LogicalOpJoin ) {
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
 		}
-		else if ( rootOp instanceof LogicalOpUnion ) {
-			return _initiateUnionCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
-		}
-		else if ( rootOp instanceof LogicalOpMultiwayUnion ) {
-			final List<PhysicalPlan> subPlans = new ArrayList<>();
-			for( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				subPlans.add( plan.getSubPlan(i) );
-			}
-			return _initiateMultiwayUnionCardinalityEstimation( subPlans, v);
+		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion ) {
+			return _initiateMultiwayUnionCardinalityEstimation( plan, v);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ").");
@@ -133,66 +126,27 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 
 	}
 
-	protected CompletableFuture<Integer> _initiateUnionCardinalityEstimation(
-			final PhysicalPlan plan1,
-			final PhysicalPlan plan2,
-			final Var v )
-	{
-		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1, plan2 );
-
-		if ( allJoinVars.contains(v) ) {
-			final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(plan1, v);
-			final CompletableFuture<Integer> f2 = initiateCardinalityEstimation(plan2, v);
-			// Create a CompletableFuture that will complete once
-			// both f1 and f2 have completed and, then, will combine
-			// the results of f1 and f2 (i.e., c1 and c2) by adding them.
-			return f1.thenCombine( f2, (c1, c2) -> ( c1 + c2 ) < 0 ? Integer.MAX_VALUE :( c1 + c2 ) );
-		}
-
-		final Set<Var> vars1 = ExpectedVariablesUtils.unionOfAllVariables( plan1.getExpectedVariables() );
-		if (vars1.contains(v) ){
-			return cardEstimator.initiateCardinalityEstimation(plan1);
-		}
-
-		final Set<Var> vars2 = ExpectedVariablesUtils.unionOfAllVariables( plan2.getExpectedVariables() );
-		if ( vars2.contains(v) ) {
-			return cardEstimator.initiateCardinalityEstimation(plan2);
-		}
-
-		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
-		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
-		return f1.thenCombine( f2, (c1, c2) -> ( c1 + c2 ) < 0 ? Integer.MAX_VALUE : ( c1 + c2 ) );
-
-	}
-
 	protected CompletableFuture<Integer> _initiateMultiwayUnionCardinalityEstimation(
-			final List<PhysicalPlan> subPlans,
+			final PhysicalPlan plan,
 			final Var v )
 	{
-		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( subPlans.toArray(new PhysicalPlan[0]) );
-
-		if ( allJoinVars.contains(v) ) {
-			CompletableFuture<Integer> f = CompletableFuture.completedFuture(0);
-			for ( final PhysicalPlan subPlan : subPlans) {
-				final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(subPlan, v);
-				f = f.thenCombine(f1, (c, c1) -> (c + c1) < 0 ? Integer.MAX_VALUE : (c + c1));
-			}
-			return f;
-		}
-
-		for ( final PhysicalPlan subPlan: subPlans ) {
-			final Set<Var> vars1 = ExpectedVariablesUtils.unionOfAllVariables( subPlan.getExpectedVariables() );
-			if (vars1.contains(v)) {
-				return cardEstimator.initiateCardinalityEstimation(subPlan);
-			}
-		}
-
 		CompletableFuture<Integer> f = CompletableFuture.completedFuture(0);
-		for ( final PhysicalPlan subPlan: subPlans ) {
-			final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(subPlan);
-			f = f.thenCombine( f1, (c, c1) -> ( c + c1 ) < 0 ? Integer.MAX_VALUE : ( c + c1 ) );
+		boolean containVar = false;
+		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
+			final Set<Var> vars = ExpectedVariablesUtils.unionOfAllVariables( plan.getSubPlan(i) );
+			if ( vars.contains(v) ) {
+				final CompletableFuture<Integer> f1 = initiateCardinalityEstimation( plan.getSubPlan(i), v );
+				f = f.thenCombine(f1, (c, c1) -> (c + c1) < 0 ? Integer.MAX_VALUE : (c + c1));
+
+				containVar = true;
+			}
 		}
-		return f;
+
+		if ( containVar )
+			return f;
+		else
+			throw new IllegalArgumentException("The given variable is not included in the Union plan");
+
 	}
 
 	protected static class MyCache
