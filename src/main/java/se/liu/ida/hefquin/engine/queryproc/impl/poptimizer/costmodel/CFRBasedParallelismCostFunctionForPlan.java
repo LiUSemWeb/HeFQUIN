@@ -19,40 +19,26 @@ import java.util.concurrent.CompletableFuture;
  * and to determine the operator-specific cost values the implementation
  * uses a {@link CostFunctionForRootOp}.
  */
-public class CFRBasedParallelismCostFunctionForPlan implements CostFunctionForPlan
+public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunctionForPlan
 {
-	protected final CostFunctionForRootOp costFctForRoot;
-
 	protected CFRBasedParallelismCostFunctionForPlan(final CostFunctionForRootOp costFctForRoot ) {
-		assert costFctForRoot != null;
-		this.costFctForRoot = costFctForRoot;
+		super(costFctForRoot);
 	}
 
 	@Override
-	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
-		final CompletableFuture<Integer> futureForRoot = costFctForRoot.initiateCostEstimation(plan);
-		if ( plan.numberOfSubPlans() == 0 ) {
-			return futureForRoot;
-		}
-
-		CompletableFuture<Integer> f = futureForRoot;
+	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final CompletableFuture<Integer> futureForRoot, final PhysicalPlan plan ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		if ( pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion || pop instanceof PhysicalOpSymmetricHashJoin ){
-			CompletableFuture<Integer> max = CompletableFuture.completedFuture( 0 );
+			CompletableFuture<Integer> cardForSubPlan = CompletableFuture.completedFuture( 0 );
+			CompletableFuture<Integer> f = futureForRoot;
 			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 				final PhysicalPlan subPlan = plan.getSubPlan(i);
-				max = max.thenCombine( initiateCostEstimation(subPlan), (m, v) -> Math.max(m, v));
+				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation(subPlan), (m, v) -> Math.max(m, v));
 			}
-			return f.thenCombine(max, ( total, valueForSubPlan) -> (total < 0 ? Integer.MAX_VALUE : total) + (valueForSubPlan < 0 ? Integer.MAX_VALUE: valueForSubPlan) );
+			return f.thenCombine(cardForSubPlan, ( total, valueForSubPlan) -> (total + valueForSubPlan) < 0 ? Integer.MAX_VALUE : (total + valueForSubPlan) );
 		}
-		else {
-			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-				final PhysicalPlan subPlan = plan.getSubPlan(i);
-				f = f.thenCombine( initiateCostEstimation(subPlan),
-						(total,valueForSubPlan) -> (total < 0 ? Integer.MAX_VALUE : total) + (valueForSubPlan < 0 ? Integer.MAX_VALUE: valueForSubPlan) );
-			}
-			return f;
-		}
+		else
+			return super.aggregateValueForAllSubPlans(futureForRoot, plan);
 	}
 
 }
