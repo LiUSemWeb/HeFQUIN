@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.Jo
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils.QueryAnalyzer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -98,12 +97,11 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     }
 
     protected LogicalPlan constructBinaryPlan( final List<QueryAnalyzer> selectedSubPlans ) {
-        final Iterator<QueryAnalyzer> it = selectedSubPlans.iterator();
-        LogicalPlan output = LogicalPlanUtils.createPlanWithBinaryJoin( it.next().getPlan(), it.next().getPlan() );
-        while ( it.hasNext() ) {
-            output = LogicalPlanUtils.createPlanWithBinaryJoin( output, it.next().getPlan() );
+        final List<LogicalPlan> subPlans = new ArrayList<>();
+        for ( final QueryAnalyzer query: selectedSubPlans  ) {
+            subPlans.add( query.getPlan() );
         }
-        return output;
+        return LogicalPlanUtils.createPlanWithMultiwayJoin( subPlans );
     }
 
 }
