@@ -102,7 +102,7 @@ public class CFRNumberOfRequests extends CFRBase
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}
-		else if ( rootOp instanceof BasePhysicalOpBinaryJoin || rootOp instanceof PhysicalOpBinaryUnion ) {
+		else if ( rootOp instanceof BasePhysicalOpBinaryJoin || rootOp instanceof PhysicalOpBinaryUnion || rootOp instanceof PhysicalOpMultiwayUnion ) {
 			return CompletableFuture.completedFuture(0);
 		}
 		else {

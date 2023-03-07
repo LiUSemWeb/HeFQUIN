@@ -27,12 +27,15 @@ public class CFRBasedCostFunctionForPlan implements CostFunctionForPlan
 		if ( plan.numberOfSubPlans() == 0 ) {
 			return futureForRoot;
 		}
+		return aggregateValueForAllSubPlans(futureForRoot, plan);
+	}
 
+	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final CompletableFuture<Integer> futureForRoot, final PhysicalPlan plan ) {
 		CompletableFuture<Integer> f = futureForRoot;
 		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = plan.getSubPlan(i);
 			f = f.thenCombine( initiateCostEstimation(subPlan),
-			                   (total,valueForSubPlan) -> (total < 0 ? Integer.MAX_VALUE : total) + (valueForSubPlan < 0 ? Integer.MAX_VALUE: valueForSubPlan) );
+					(total,valueForSubPlan) -> (total + valueForSubPlan) < 0 ? Integer.MAX_VALUE : (total + valueForSubPlan) );
 		}
 
 		return f;
