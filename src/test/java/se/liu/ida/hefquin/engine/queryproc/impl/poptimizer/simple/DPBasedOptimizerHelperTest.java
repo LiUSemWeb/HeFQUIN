@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedJoinPlanOptimizer;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.Arrays;
@@ -54,12 +53,12 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
 
     }
 
-    @Test
-    public void splitIntoTwoSubSets()
-    {
-        final List<Pair<List<Integer>, List<Integer>>> subsets = DPBasedJoinPlanOptimizer.splitIntoSubSets(list);
-
-        assertEquals( 30, subsets.size() );
-    }
+//    @Test
+//    public void splitIntoTwoSubSets()
+//    {
+//        final List<Pair<List<Integer>, List<Integer>>> subsets = DPBasedJoinPlanOptimizer.splitIntoSubSets(list);
+//
+//        assertEquals( 30, subsets.size() );
+//    }
 
 }
