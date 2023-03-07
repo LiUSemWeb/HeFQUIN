@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.access.utils.RequestMemberPair;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
@@ -100,7 +101,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
         if ( rootOp instanceof LogicalOpRequest ) {
             worker = new WorkerForRequestOps( (LogicalOpRequest<?, ?>) rootOp);
         }
-		else if ( rootOp instanceof BinaryLogicalOp || rootOp instanceof UnaryLogicalOp ) {
+		else if ( rootOp instanceof NaryLogicalOp || rootOp instanceof BinaryLogicalOp || rootOp instanceof UnaryLogicalOp ) {
 			worker = new WorkerForSubquery(plan);
 		}
         else {
