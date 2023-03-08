@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.*;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
