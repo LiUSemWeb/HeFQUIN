@@ -97,7 +97,7 @@ public class GreedyBasedReordering implements HeuristicForLogicalOptimization {
     }
 
     protected LogicalPlan constructBinaryPlan( final List<QueryAnalyzer> selectedSubPlans ) {
-        final List<LogicalPlan> subPlans = new ArrayList<>();
+        final List<LogicalPlan> subPlans = new ArrayList<>( selectedSubPlans.size() );
         for ( final QueryAnalyzer query: selectedSubPlans  ) {
             subPlans.add( query.getPlan() );
         }
