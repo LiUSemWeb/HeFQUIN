@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
@@ -557,8 +558,8 @@ public class PhysicalPlanFactory
 	}
 
 	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequest<?, ?> req,
-	                                                                   final PhysicalPlan subplan,
-	                                                                   final List<PhysicalPlan> plans ) {
+	                                                                   final PhysicalPlan subplan ) {
+		final List<PhysicalPlan> plans = new ArrayList<>();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
 		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
 
@@ -604,8 +605,8 @@ public class PhysicalPlanFactory
 	}
 
 	public static List<PhysicalPlan> enumeratePlansWithUnaryOpFromReq( final PhysicalOpRequestWithTranslation<?, ?> req,
-	                                                                   final PhysicalPlan subplan,
-	                                                                   final List<PhysicalPlan> plans ) {
+	                                                                   final PhysicalPlan subplan ) {
+		final List<PhysicalPlan> plans = new ArrayList<>();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
 		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
 

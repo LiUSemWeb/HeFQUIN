@@ -1,8 +1,11 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
@@ -12,7 +15,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.*;
 
-public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
+public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
     protected final QueryOptimizationContext ctxt;
 
@@ -47,12 +50,10 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
             for ( int num = 2; num < subplans.size()+1; num ++ ){
                 // Get all subsets with size num.
                 final List<List<PhysicalPlan>> subsets = getSubSet(subplans, num);
-
                 for( final List<PhysicalPlan> plans : subsets ){
-                    final List<PhysicalPlan> candidatePlans = new ArrayList<>();
-
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
+                    final List<PhysicalPlan> candidatePlans = new ArrayList<>();
                     for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> p: candidatePairs ) {
                         final PhysicalPlan plan_left = optPlan.get( p.object1 );
                         final PhysicalPlan plan_right = optPlan.get( p.object2 );
@@ -62,11 +63,33 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         }
 
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
-                        if ( plan_left.getRootOperator() instanceof PhysicalOpRequest ) {
-                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) plan_left.getRootOperator(), plan_right, candidatePlans );
+                        final PhysicalOperator rightRootOp = plan_right.getRootOperator();
+                        if ( rightRootOp instanceof PhysicalOpRequest ) {
+                            candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq((PhysicalOpRequest<?, ?>) rightRootOp, plan_left ) );
                         }
-                        else if ( plan_left.getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
-                            PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) plan_left.getRootOperator(), plan_right, candidatePlans );
+                        if ( rightRootOp instanceof PhysicalOpRequestWithTranslation ) {
+                            candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) rightRootOp, plan_left ) );
+                        }
+                        if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
+                            boolean applicable = true;
+                            for ( int i = 0; i < plan_right.numberOfSubPlans(); i++ ) {
+                                final PhysicalPlan subPlan = plan_right.getSubPlan(i);
+                                final PhysicalOperator subRootOp = subPlan.getRootOperator();
+                                if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
+                                    applicable = false;
+                                    break;
+                                }
+
+                                if ( subRootOp instanceof PhysicalOpFilter ){
+                                    if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
+                                        applicable = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if ( applicable ) {
+                                candidatePlans.add(createPlanWithUnaryOpForUnionPlan(plan_left, plan_right));
+                            }
                         }
                     }
 
@@ -82,8 +105,49 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
     }
 
-    // This method returns all subsets (with the given size) of the given superset.
-    public static <T> List<List<T>> getSubSet( final List<T> superset, final int n ){
+    public abstract <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset );
+
+    /**
+     * In cases in which there is a union with requests under right input,
+     * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
+     **/
+    protected PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
+        final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
+        final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
+
+        for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
+            final PhysicalPlan oldSubPlan = unionPlan.getSubPlan(i);
+            final PhysicalPlan newSubPlan;
+
+            final PhysicalOperator oldSubPlanRootOp = oldSubPlan.getRootOperator();
+            if ( oldSubPlanRootOp instanceof PhysicalOpRequest ) {
+                final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlanRootOp;
+                final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+                newSubPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
+            }
+            else if ( oldSubPlanRootOp instanceof PhysicalOpFilter
+                    && oldSubPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ) {
+                final PhysicalOpFilter filterOp = (PhysicalOpFilter) oldSubPlanRootOp;
+                final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlan.getSubPlan(0).getRootOperator();
+
+                final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+                final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
+
+                newSubPlan = PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
+            }
+            else
+                throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + oldSubPlanRootOp.getClass().getName() + ")");
+
+            newUnionSubPlans[i] = newSubPlan;
+        }
+
+        return PhysicalPlanFactory.createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
+    }
+
+    /**
+     * This method returns all subsets (with the given size) of the given superset.
+     */
+    protected static <T> List<List<T>> getSubSet( final List<T> superset, final int n ){
         final List<List<T>> result = new ArrayList<>();
         if ( n < 1 || n > superset.size() ) {
             throw new IllegalArgumentException("Does not support to get subsets with less than one element or containing more than the total number of elements in the superset (length of subset: " + n + ").");
@@ -116,38 +180,6 @@ public class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
             }
         }
 
-        return result;
-    }
-
-    // Split a superset into two subsets. This method returns all possible combinations of subsets.
-    public static <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset ){
-        if ( superset.size() < 2 ){
-            throw new IllegalArgumentException("Cannot divide a set of length less than two into two non-empty subsets. (length: " + superset.size() + ").");
-        }
-
-        final List<List<T>> left = new ArrayList<>();
-        final List<List<T>> right = new ArrayList<>();
-        final List< Pair<List<T>, List<T>> > result = new ArrayList<>();
-
-        left.add( new ArrayList<>() );
-        right.add( new ArrayList<>(superset) );
-
-        for ( T element : superset ) {
-            final int leftSize = left.size();
-            for ( int j = 0; j < leftSize; j++ ){
-                final List<T> leftClone = new ArrayList<>( left.get(j) );
-                leftClone.add( element );
-                left.add( leftClone );
-
-                final List<T> rightClone = new ArrayList<>( right.get(j) );
-                rightClone.remove( element );
-                right.add( rightClone );
-
-                if ( leftClone.size() != 0 && rightClone.size() != 0 )
-                    result.add( new Pair<>( leftClone, rightClone ) );
-
-            }
-        }
         return result;
     }
 
