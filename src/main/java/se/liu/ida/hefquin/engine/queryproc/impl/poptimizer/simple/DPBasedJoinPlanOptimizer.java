@@ -71,7 +71,17 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                             candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) rightRootOp, plan_left ) );
                         }
                         if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
-                            candidatePlans.add( createPlansWithUnaryOpForUnionPlan( plan_left, plan_right ) );
+                            boolean applicable = true;
+                            for ( int i = 0; i < plan_right.numberOfSubPlans(); i++ ) {
+                                final PhysicalOperator subLop = plan_right.getSubPlan(i).getRootOperator();
+                                if ( !(subLop instanceof PhysicalOpRequest || subLop instanceof PhysicalOpFilter) ) {
+                                    applicable = false;
+                                    break;
+                                }
+                            }
+                            if ( applicable ) {
+                                candidatePlans.add(createPlanWithUnaryOpForUnionPlan(plan_left, plan_right));
+                            }
                         }
                     }
 
@@ -93,7 +103,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
      * In cases in which there is a union with requests under right input,
      * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
      **/
-    protected PhysicalPlan createPlansWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
+    protected PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
         final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
         final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
 
@@ -117,9 +127,8 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
                 newSubPlan = PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
             }
-            else {
-                newSubPlan = PhysicalPlanFactory.createPlanWithJoin( inputPlan, oldSubPlan);
-            }
+            else
+                throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + oldSubPlanRootOp.getClass().getName() + ")");
 
             newUnionSubPlans[i] = newSubPlan;
         }
