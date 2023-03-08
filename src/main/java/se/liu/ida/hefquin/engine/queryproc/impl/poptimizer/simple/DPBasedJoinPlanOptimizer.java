@@ -73,10 +73,18 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
                             boolean applicable = true;
                             for ( int i = 0; i < plan_right.numberOfSubPlans(); i++ ) {
-                                final PhysicalOperator subLop = plan_right.getSubPlan(i).getRootOperator();
-                                if ( !(subLop instanceof PhysicalOpRequest || subLop instanceof PhysicalOpFilter) ) {
+                                final PhysicalPlan subPlan = plan_right.getSubPlan(i);
+                                final PhysicalOperator subRootOp = subPlan.getRootOperator();
+                                if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
                                     applicable = false;
                                     break;
+                                }
+
+                                if ( subRootOp instanceof PhysicalOpFilter ){
+                                    if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
+                                        applicable = false;
+                                        break;
+                                    }
                                 }
                             }
                             if ( applicable ) {
