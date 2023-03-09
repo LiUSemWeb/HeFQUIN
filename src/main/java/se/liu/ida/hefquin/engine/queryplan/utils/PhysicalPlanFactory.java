@@ -658,4 +658,81 @@ public class PhysicalPlanFactory
 		return plans;
 	}
 
+	/**
+	 * In cases in which there is a union with requests under right input,
+	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
+	 **/
+	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
+		final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
+		final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
+
+		for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
+			final PhysicalPlan oldSubPlan = unionPlan.getSubPlan(i);
+			final PhysicalPlan newSubPlan = createPlanWithDefaultUnaryOpIfPossible( inputPlan, oldSubPlan );
+			newUnionSubPlans[i] = newSubPlan;
+		}
+
+		return PhysicalPlanFactory.createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
+	}
+
+	/**
+	 * In cases in which there is a request, filter with request, or union with requests on the right input,
+	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
+	 **/
+	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan, final PhysicalPlan nextPlan ) {
+		final PhysicalOperator oldSubPlanRootOp = nextPlan.getRootOperator();
+		if ( oldSubPlanRootOp instanceof PhysicalOpRequest ) {
+			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlanRootOp;
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+			return PhysicalPlanFactory.createPlan( addOp, inputPlan);
+		}
+		else if ( oldSubPlanRootOp instanceof PhysicalOpFilter
+				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ) {
+			final PhysicalOpFilter filterOp = (PhysicalOpFilter) oldSubPlanRootOp;
+			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) nextPlan.getSubPlan(0).getRootOperator();
+
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
+
+			return PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
+		}
+		else if (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion){
+			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan) ) {
+				return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan( inputPlan, nextPlan );
+			}
+			else
+				throw new IllegalArgumentException("Unsupported type of subquery under UNION");
+		}
+		else
+			return PhysicalPlanFactory.createPlanWithJoin(inputPlan, nextPlan);
+	}
+
+	/**
+	 * Check whether subplans under the UNION are all requests or filters with request
+	 */
+	public static boolean checkUnaryOpApplicableToUnionPlan( final PhysicalPlan unionPlan ){
+		final PhysicalOperator rootOp = unionPlan.getRootOperator();
+		if ( !(rootOp instanceof PhysicalOpBinaryUnion || rootOp instanceof PhysicalOpMultiwayUnion) ){
+			return false;
+		}
+
+		boolean applicable = true;
+		for ( int i = 0; i < unionPlan.numberOfSubPlans(); i++ ) {
+			final PhysicalPlan subPlan = unionPlan.getSubPlan(i);
+			final PhysicalOperator subRootOp = subPlan.getRootOperator();
+			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
+				applicable = false;
+				break;
+			}
+
+			if ( subRootOp instanceof PhysicalOpFilter){
+				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
+					applicable = false;
+					break;
+				}
+			}
+		}
+		return applicable;
+	}
+
 }
