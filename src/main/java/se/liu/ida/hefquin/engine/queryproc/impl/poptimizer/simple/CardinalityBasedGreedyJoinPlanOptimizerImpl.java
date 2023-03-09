@@ -240,10 +240,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          * The block size (number of bindings can be attached) depends on the type of interface
          */
         protected double setBlockSize( final FederationMember fm ) {
-            if ( fm instanceof SPARQLEndpoint ){
-                return 50;
-            }
-            else if ( fm instanceof BRTPFServer ){
+            if ( (fm instanceof SPARQLEndpoint) || (fm instanceof BRTPFServer) ){
                 return 30;
             }
             else if ( fm instanceof TPFServer ){
