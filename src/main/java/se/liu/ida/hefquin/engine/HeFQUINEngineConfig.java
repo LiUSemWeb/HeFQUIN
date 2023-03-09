@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.*;
-import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
@@ -74,6 +73,7 @@ public class HeFQUINEngineConfig
 			public PhysicalOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
 //				return createQueryOptimizerWithoutOptimization(ctxt);
 //				return createGreedyJoinPlanOptimizer(ctxt);
+//				return createGreedyBasedTwoPhaseJoinPlanOptimizerImpl(ctxt);
 				return createDPBasedBushyJoinPlanOptimizer(ctxt);
 //				return createDPBasedLinearJoinPlanOptimizer(ctxt);
 //				return createEvolutionaryAlgorithmQueryOptimizer(ctxt);
@@ -86,7 +86,12 @@ public class HeFQUINEngineConfig
 	}
 
 	protected PhysicalOptimizer createGreedyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new GreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
+		final JoinPlanOptimizer joinOpt = new CostModelBasedGreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createGreedyBasedTwoPhaseJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 
