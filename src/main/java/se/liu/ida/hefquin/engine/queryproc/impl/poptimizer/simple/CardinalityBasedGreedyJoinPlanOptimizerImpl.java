@@ -140,22 +140,26 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
 
                     final FederationMember fm = flattenRequestMemPairs.get(index).getMember();
                     planWithStatistics.addNumOfAccess( accessNumForReq( resps[index].getCardinality(), fm ) );
+                    planWithStatistics.addFederationMembers( new ArrayList<>( Arrays.asList(fm) ) );
 
                     index++;
                 }
                 else if (pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion) {
                     int sumCard = 0, sumAccess = 0;
+                    final List<FederationMember> fms = new ArrayList<>();
                     for ( int count = 0; count < plan.numberOfSubPlans(); count++ ) {
                         sumCard += resps[index].getCardinality();
 
                         final FederationMember fm = flattenRequestMemPairs.get(index).getMember();
                         sumAccess += accessNumForReq( resps[index].getCardinality(), fm );
+                        fms.add( fm );
 
                         index++;
                     }
 
                     planWithStatistics.addCandidate( sumCard );
                     planWithStatistics.addNumOfAccess( sumAccess );
+                    planWithStatistics.addFederationMembers( fms );
                 }
                 else
                     throw new IllegalArgumentException("Unsupported type of subquery in source assignment (" + pop.getClass().getName() + ")");
@@ -192,13 +196,16 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          * For the comparison, only keeping the second element is enough.
          */
         protected PhysicalPlanWithStatistics decidePhysicalAlgorithm( final PhysicalPlanWithStatistics currentPlan, final PhysicalPlanWithStatistics nextPlan ) {
-            final double blockSize = 30;
-            final double accNumSHJ = // currentPlan.getNumOfAccess() +
-                                        nextPlan.getNumOfAccess();
-            final double accNumBJ = // currentPlan.getNumOfAccess() +
-                                       currentPlan.getCandidate() / blockSize;
+            final double accNumSHJ = nextPlan.getNumOfAccess();
 
-            PhysicalPlan newPlan = null;
+            final List<FederationMember> fms = nextPlan.getFederationMembers();
+            double accNumBJ = 0;
+            for ( final FederationMember fm: fms ) {
+                double blockSize = setBlockSize(fm);
+                accNumBJ += currentPlan.getCandidate() / blockSize;
+            }
+
+            PhysicalPlan newPlan;
             if ( accNumSHJ <= accNumBJ ) {
                 newPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.plan, nextPlan.plan);
             }
@@ -228,6 +235,24 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             else
                 throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
         }
+
+        /**
+         * The block size (number of bindings can be attached) depends on the type of interface
+         */
+        protected double setBlockSize( final FederationMember fm ) {
+            if ( fm instanceof SPARQLEndpoint ){
+                return 50;
+            }
+            else if ( fm instanceof BRTPFServer ){
+                return 30;
+            }
+            else if ( fm instanceof TPFServer ){
+                return 1;
+            }
+            else
+                throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+        }
+
     }
         
 }
@@ -236,6 +261,7 @@ class PhysicalPlanWithStatistics {
     public final PhysicalPlan plan;
     protected int candidate;
     protected int numOfAccess;
+    protected List<FederationMember> fms;
 
     public PhysicalPlanWithStatistics( final PhysicalPlan plan ){
         this.plan = plan;
@@ -243,6 +269,10 @@ class PhysicalPlanWithStatistics {
 
     public void addCandidate( final int candidate ){
         this.candidate = candidate;
+    }
+
+    public void addFederationMembers( final List<FederationMember> fms ){
+        this.fms = fms;
     }
 
     public void addNumOfAccess( final int numOfAccess ){
@@ -255,6 +285,10 @@ class PhysicalPlanWithStatistics {
 
     public int getNumOfAccess( ){
         return numOfAccess;
+    }
+
+    public List<FederationMember> getFederationMembers( ){
+        return fms;
     }
 
 }
