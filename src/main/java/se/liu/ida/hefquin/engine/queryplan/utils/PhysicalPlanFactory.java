@@ -704,7 +704,7 @@ public class PhysicalPlanFactory
 				throw new IllegalArgumentException("Unsupported type of subquery under UNION");
 		}
 		else
-			return PhysicalPlanFactory.createPlanWithJoin(inputPlan, nextPlan);
+			return createPlanWithJoin(inputPlan, nextPlan);
 	}
 
 	/**
