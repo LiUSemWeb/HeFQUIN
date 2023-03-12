@@ -672,7 +672,7 @@ public class PhysicalPlanFactory
 			newUnionSubPlans[i] = newSubPlan;
 		}
 
-		return PhysicalPlanFactory.createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
+		return createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
 	}
 
 	/**
