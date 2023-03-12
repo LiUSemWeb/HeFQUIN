@@ -198,9 +198,8 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
         protected PhysicalPlanWithStatistics decidePhysicalAlgorithm( final PhysicalPlanWithStatistics currentPlan, final PhysicalPlanWithStatistics nextPlan ) {
             final double accNumSHJ = nextPlan.getNumOfAccess();
 
-            final List<FederationMember> fms = nextPlan.getFederationMembers();
             double accNumBJ = 0;
-            for ( final FederationMember fm: fms ) {
+            for ( final FederationMember fm: nextPlan.getFederationMembers() ) {
                 double blockSize = setBlockSize(fm);
                 accNumBJ += currentPlan.getCandidate() / blockSize;
             }
