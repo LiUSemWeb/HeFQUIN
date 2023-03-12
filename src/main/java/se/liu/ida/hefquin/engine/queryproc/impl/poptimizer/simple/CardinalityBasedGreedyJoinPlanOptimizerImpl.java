@@ -204,7 +204,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                 accNumBJ += currentPlan.getCandidate() / blockSize;
             }
 
-            PhysicalPlan newPlan;
+            final PhysicalPlan newPlan;
             if ( accNumSHJ <= accNumBJ ) {
                 newPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.plan, nextPlan.plan);
             }
