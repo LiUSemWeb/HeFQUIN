@@ -716,23 +716,20 @@ public class PhysicalPlanFactory
 			return false;
 		}
 
-		boolean applicable = true;
 		for ( int i = 0; i < unionPlan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = unionPlan.getSubPlan(i);
 			final PhysicalOperator subRootOp = subPlan.getRootOperator();
 			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
-				applicable = false;
-				break;
+				return false;
 			}
 
 			if ( subRootOp instanceof PhysicalOpFilter){
 				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
-					applicable = false;
-					break;
+					return false;
 				}
 			}
 		}
-		return applicable;
+		return true;
 	}
 
 }
