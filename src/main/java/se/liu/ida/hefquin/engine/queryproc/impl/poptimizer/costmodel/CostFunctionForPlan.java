@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -10,5 +11,5 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface CostFunctionForPlan
 {
-	CompletableFuture<Integer> initiateCostEstimation( PhysicalPlan plan );
+	CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlans, final PhysicalPlan plan );
 }
