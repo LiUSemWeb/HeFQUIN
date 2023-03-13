@@ -659,7 +659,7 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * In cases in which there is a union with requests under right input,
+	 * If the right input of a join is a union with requests,
 	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
 	 **/
 	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
@@ -676,8 +676,10 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * In cases in which there is a request, filter with request, or union with requests on the right input,
+	 * If the right input of a join operator is a request, filter with request, or union with requests,
 	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
+	 *
+	 * Otherwise, create a plan with a binary join as root operator (using the default physical operator).
 	 **/
 	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan, final PhysicalPlan nextPlan ) {
 		final PhysicalOperator oldSubPlanRootOp = nextPlan.getRootOperator();
@@ -696,12 +698,10 @@ public class PhysicalPlanFactory
 
 			return PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
 		}
-		else if (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion){
-			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan) ) {
-				return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan( inputPlan, nextPlan );
-			}
-			else
-				throw new IllegalArgumentException("Unsupported type of subquery under UNION");
+		else if ( (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion)
+				&& PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan)){
+			
+			return PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan( inputPlan, nextPlan );
 		}
 		else
 			return createPlanWithJoin(inputPlan, nextPlan);
