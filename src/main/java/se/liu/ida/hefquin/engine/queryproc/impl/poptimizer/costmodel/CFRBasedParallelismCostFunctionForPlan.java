@@ -35,7 +35,9 @@ public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunction
 			CompletableFuture<Integer> f = futureForRoot;
 			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 				final PhysicalPlan subPlan = plan.getSubPlan(i);
-				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation( visitedPlans, subPlan), (m, v) -> Math.max(m, v));
+
+				// To get a fair maximum value, the visited subPlans should not be skipped.
+				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation( new HashSet<>(), subPlan), (m, v) -> Math.max(m, v));
 			}
 			return f.thenCombine(cardForSubPlan, ( total, valueForSubPlan) -> (total + valueForSubPlan) < 0 ? Integer.MAX_VALUE : (total + valueForSubPlan) );
 		}
