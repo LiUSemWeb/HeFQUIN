@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
+import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -9,14 +10,17 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.access.utils.RequestMemberPair;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
 import java.util.*;
 
@@ -70,20 +74,33 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // ( including cardinality, number of access, and a list of relevant federation members )
             final List<PhysicalPlanWithStatistics> subPlansWithStatistics = associateCardWithSubPlans( flattenRequestMemPairs, resps);
 
-            // To build a left-deep query plan, first sort subPlans based on their cardinality estimation (starting with the lowest cardinality)
-            Collections.sort(subPlansWithStatistics, new Comparator<PhysicalPlanWithStatistics>() {
+            // To build a left-deep query plan, first select the subplan with the lowest estimated cardinality
+            PhysicalPlanWithStatistics nextSelectedSubPlan = chooseFirstSubPlan(subPlansWithStatistics);
+            subPlansWithStatistics.remove(nextSelectedSubPlan);
+
+            PhysicalPlanWithStatistics currentJoinPlan = nextSelectedSubPlan;
+
+            // The nextSubPlan is selected from subplans that have join variables with selected subplans.
+            // To achieve this, we implement a custom comparator and create a PriorityQueue to store candidate subPlans in cardinality order.
+            final Comparator<PhysicalPlanWithStatistics> orderBasedOnCard = new Comparator<PhysicalPlanWithStatistics>() {
                 @Override
                 public int compare( PhysicalPlanWithStatistics o1, PhysicalPlanWithStatistics o2 ) {
                     return Integer.compare( o1.getCardinality(), o2.getCardinality() );
                 }
-            });
+            };
+            final PriorityQueue<PhysicalPlanWithStatistics> orderedCandidateSubPlans = new PriorityQueue<>(orderBasedOnCard);
 
-            final Iterator<PhysicalPlanWithStatistics> it = subPlansWithStatistics.iterator();
-            PhysicalPlanWithStatistics currentJoinPlan = it.next();
-            while ( it.hasNext() ){
-                final PhysicalPlanWithStatistics nextSubPlan = it.next();
+            for ( int i = 1; i < subplans.size(); i ++ ){
+                // Identify subplans that have join variables with the selected subplan as new candidateSubPlans.
+                // These candidateSubPlans are then added to the ordered list 'orderedCandidateSubPlans' and removed from the remaining subPlansWithStatistics
+                final List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansContainVars(nextSelectedSubPlan.plan.getExpectedVariables(), subPlansWithStatistics);
+                orderedCandidateSubPlans.addAll(candidateSubPlans);
+                subPlansWithStatistics.removeAll(candidateSubPlans);
+
+                // select the first element (with the lowest cardinality) from orderedCandidateSubPlans as the nextSelectedSubPlan
+                nextSelectedSubPlan = orderedCandidateSubPlans.poll();
                 // Decide the physical algorithm depending on the estimated number of requests
-                currentJoinPlan = decidePhysicalAlgorithm( currentJoinPlan, nextSubPlan );
+                currentJoinPlan = decidePhysicalAlgorithm( currentJoinPlan, nextSelectedSubPlan );
             }
 
             return currentJoinPlan.plan;
@@ -201,6 +218,44 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             }
 
             return subPlansWithStatistics;
+        }
+
+        /**
+         * Compares all available subplans (see {@link #subplans}) in terms of
+         * their respective cardinality returns the one with the lowest cardinality.
+         */
+        protected PhysicalPlanWithStatistics chooseFirstSubPlan( final List<PhysicalPlanWithStatistics> subPlansWithStatistics ) {
+            PhysicalPlanWithStatistics bestPlanWithCandidate = subPlansWithStatistics.get(0);
+            int lowestCost = bestPlanWithCandidate.getCardinality();
+
+            for ( int i = 1; i < subPlansWithStatistics.size(); i++ ) {
+                PhysicalPlanWithStatistics current = subPlansWithStatistics.get(i);
+                if ( current.getCardinality() < lowestCost ) {
+                    lowestCost = current.getCardinality();
+                    bestPlanWithCandidate = current;
+                }
+            }
+
+            return bestPlanWithCandidate;
+        }
+
+        /**
+         * Iterate through the remaining subplans and selected those that contain any of the variables in the given set of variables.
+         */
+        protected List<PhysicalPlanWithStatistics> getSubPlansContainVars( final ExpectedVariables vars, final List<PhysicalPlanWithStatistics> subPlansWithStatistics ) {
+            final List<PhysicalPlanWithStatistics> subPlansContainsVars = new ArrayList<>();
+            for ( final PhysicalPlanWithStatistics subplan: subPlansWithStatistics ) {
+                if ( ! ExpectedVariablesUtils.intersectionOfAllVariables( vars, subplan.plan.getExpectedVariables() ).isEmpty() ){
+                    subPlansContainsVars.add(subplan);
+                }
+            }
+
+            if ( !subPlansWithStatistics.isEmpty() && subPlansContainsVars.isEmpty() ){
+                // Independent subplans exist. In this case, choose the subplan with the lowest candidate (from remaining subPlans) as candidate plan
+                return Arrays.asList( chooseFirstSubPlan(subPlansWithStatistics) );
+            }
+            else
+                return subPlansContainsVars;
         }
 
         /**
