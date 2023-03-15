@@ -54,8 +54,8 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // where the list of these objects is ordered in the order in which
             // the request operators can be found by a depth-first traversal of the subplans.
             final List<RequestMemberPair> flattenRequestMemPairs = new ArrayList<>();
-            for ( final PhysicalPlan plan : subplans ) {
-                flattenRequestMemPairs.addAll( createRequestMemPairsFromSourceAssignment(plan) );
+            for ( final PhysicalPlan subplan : subplans ) {
+                flattenRequestMemPairs.addAll( createRequestMemPairsFromSourceAssignment(subplan) );
             }
 
             // Next, get a list of cardinalities by performing cardinality requests with above list of RequestMemberPair objects.
@@ -66,7 +66,8 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                 throw new PhysicalOptimizationException("Issuing a cardinality request caused an exception.", e);
             }
 
-            // Then, annotate each subQuery with its cardinality
+            // Then, annotate each subplan (in the 'subplans') with all statistics relevant for the join planning
+            // ( including cardinality, number of access, and a list of relevant federation members )
             final List<PhysicalPlanWithStatistics> subPlansWithStatistics = associateCardWithSubPlans( flattenRequestMemPairs, resps);
 
             // To build a left-deep query plan, first sort subPlans based on their cardinality estimation (starting with the lowest cardinality)
@@ -78,14 +79,14 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             });
 
             final Iterator<PhysicalPlanWithStatistics> it = subPlansWithStatistics.iterator();
-            PhysicalPlanWithStatistics currentPlan = it.next();
-            // Decide the physical algorithm depending on the estimated number of requests
+            PhysicalPlanWithStatistics currentJoinPlan = it.next();
             while ( it.hasNext() ){
-                final PhysicalPlanWithStatistics nextPlan = it.next();
-                currentPlan = decidePhysicalAlgorithm( currentPlan, nextPlan );
+                final PhysicalPlanWithStatistics nextSubPlan = it.next();
+                // Decide the physical algorithm depending on the estimated number of requests
+                currentJoinPlan = decidePhysicalAlgorithm( currentJoinPlan, nextSubPlan );
             }
 
-            return currentPlan.plan;
+            return currentJoinPlan.plan;
         }
 
         /**
@@ -152,33 +153,36 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          *
          * @param flattenRequestMemPairs A list of RequestMemberPair objects, which is ordered in the order in which the request operators can be found by a depth-first traversal of the subplans.
          * @param resps A list of cardinality in the same order of 'flattenRequestMemPairs'
-         * @return A list of PhysicalPlanWithStatistics, which contains a physical plan with associated cardinality, a list of relevant federations members, and estimated number of access to fm
+         * @return A list of PhysicalPlanWithStatistics, with each object corresponding to a subplan in the 'subplans' list.
+         * Each PhysicalPlanWithStatistics object contains the physical plan for the subplan, along with its cardinality,
+         * a list of relevant federations members, and estimated number of access to federation members.
          *
-         * Depth-first traversal of the subplans, increase the index by 1 when visiting a request operator:
-         * for the subPlan with Request as root operator, get the corresponding cardinality from resps with the same index;
-         * for the subPlan with a Union of requests, calculate the total cardinality by summing up the cardinality of individual requests (see page 1052 in the paper[1])
+         * During a depth-first traversal of the subplans, increase the index by 1 when visiting a request operator:
+         * If the root operator of the subplan is a Request operator, get the corresponding cardinality from resps with the same index;
+         * If the subPlan with a Union of requests, calculate the total cardinality by summing up the cardinality of individual requests.
+         * (See page 1052 in the paper[1])
          */
         protected List<PhysicalPlanWithStatistics> associateCardWithSubPlans( final List<RequestMemberPair> flattenRequestMemPairs, final CardinalityResponse[] resps ){
             final List<PhysicalPlanWithStatistics> subPlansWithStatistics = new ArrayList<>();
 
             int index = 0;
-            for ( final PhysicalPlan plan : subplans ) {
-                final PhysicalOperator pop = plan.getRootOperator();
+            for ( final PhysicalPlan subplan : subplans ) {
+                final PhysicalOperator pop = subplan.getRootOperator();
 
                 final PhysicalPlanWithStatistics planWithStatistics;
                 if ( pop instanceof PhysicalOpRequest ||
-                        (pop instanceof PhysicalOpFilter && plan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest)) {
+                        (pop instanceof PhysicalOpFilter && subplan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest)) {
                     final int cardinality = resps[index].getCardinality();
                     final FederationMember fm = flattenRequestMemPairs.get(index).getMember();
                     final int numOfAccess = accessNumForReq( resps[index].getCardinality(), fm );
 
-                    planWithStatistics = new PhysicalPlanWithStatistics( plan, Arrays.asList(fm), cardinality, numOfAccess );
+                    planWithStatistics = new PhysicalPlanWithStatistics( subplan, Arrays.asList(fm), cardinality, numOfAccess );
                     index++;
                 }
                 else if (pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion) {
                     int cardinality = 0, numOfAccess = 0;
                     final List<FederationMember> fms = new ArrayList<>();
-                    for ( int count = 0; count < plan.numberOfSubPlans(); count++ ) {
+                    for ( int count = 0; count < subplan.numberOfSubPlans(); count++ ) {
                         cardinality += resps[index].getCardinality();
 
                         final FederationMember fm = flattenRequestMemPairs.get(index).getMember();
@@ -188,7 +192,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                         index++;
                     }
 
-                    planWithStatistics = new PhysicalPlanWithStatistics(plan, fms, cardinality, numOfAccess );
+                    planWithStatistics = new PhysicalPlanWithStatistics(subplan, fms, cardinality, numOfAccess );
                 }
                 else
                     throw new IllegalArgumentException("Unsupported type of subquery in source assignment (" + pop.getClass().getName() + ")");
