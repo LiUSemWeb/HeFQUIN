@@ -11,7 +11,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
-import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityEstimationUtils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -26,11 +28,11 @@ import java.util.function.Supplier;
 
 public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl {
 
-    public MinBasedCardinalityEstimationImpl(final FederationAccessManager fedAccessMgr ) {
+    public MinBasedCardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
         super( fedAccessMgr );
     }
 
-    public MinBasedCardinalityEstimationImpl(final QueryProcContext ctxt ) {
+    public MinBasedCardinalityEstimationImpl( final QueryProcContext ctxt ) {
         super( ctxt );
     }
 
@@ -44,14 +46,14 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
         }
         else if (  rootOp instanceof LogicalOpJoin  ){
             // The join cardinality is the minimum cardinality of subPlans
-            worker = new WorkerForJoin( plan.getSubPlan(0), plan.getSubPlan(1) );
+            worker = new WorkerForJoin( this, plan.getSubPlan(0), plan.getSubPlan(1) );
         }
         else if ( rootOp instanceof UnaryLogicalOp ) {
-            worker = new WorkerForJoin( plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan((UnaryLogicalOp) rootOp));
+            worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan((UnaryLogicalOp) rootOp));
         }
         else if ( rootOp instanceof LogicalOpMultiwayUnion || rootOp instanceof LogicalOpUnion ) {
             // The estimated cardinality is the sum up cardinality of subPlans
-            worker = new WorkerForUnion( plan );
+            worker = new WorkerForUnion( this, plan );
         }
         else {
             throw new IllegalArgumentException("The type of the root operator of the given plan is currently not supported (" + rootOp.getClass().getName() + ").");
@@ -62,31 +64,23 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
 
     protected class WorkerForJoin implements Supplier<Integer>
     {
+        protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan1;
         protected final PhysicalPlan plan2;
 
-        public WorkerForJoin( final PhysicalPlan plan1, final PhysicalPlan plan2 ) {
+        public WorkerForJoin( final CardinalityEstimation cardEstimate, final PhysicalPlan plan1, final PhysicalPlan plan2 ) {
+            this.cardEstimate = cardEstimate;
             this.plan1 = plan1;
             this.plan2 = plan2;
         }
 
         @Override
         public Integer get() {
-            final CompletableFuture<Integer>[] futures = new CompletableFuture[2];
-            futures[0] = initiateCardinalityEstimation( plan1 );
-            futures[1] = initiateCardinalityEstimation( plan2 );
-
-            Integer[] cardinalities;
+            Integer[] cardinalities = new Integer[0];
             try {
-                cardinalities = CompletableFutureUtils.getAll(futures, Integer.class);
-            }
-            catch ( final CompletableFutureUtils.GetAllException ex ) {
-                if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-                    throw new RuntimeException("Unexpected interruption when getting a variable-specific cardinality estimate.", ex.getCause() );
-                }
-                else {
-                    throw new RuntimeException("Getting a variable-specific cardinality estimate caused an exception.", ex.getCause() );
-                }
+                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, plan1, plan2);
+            } catch ( CardinalityEstimationException e ) {
+                e.printStackTrace();
             }
 
             return Math.min( cardinalities[0], cardinalities[1] );
@@ -96,15 +90,29 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
 
     protected class WorkerForUnion implements Supplier<Integer>
     {
+        protected final CardinalityEstimation cardEstimate;
         protected final PhysicalPlan plan;
 
-        public WorkerForUnion(final PhysicalPlan plan) {
+        public WorkerForUnion( final CardinalityEstimation cardEstimate, final PhysicalPlan plan) {
+            this.cardEstimate = cardEstimate;
             this.plan = plan;
         }
 
         @Override
         public Integer get() {
-            final Integer[] cardinalities = getEstimatedCardsOfSubPlans( plan );
+            final int numOfSubPlans = plan.numberOfSubPlans();
+            final PhysicalPlan[] subPlans = new PhysicalPlan[numOfSubPlans];
+            for ( int i = 0; i < numOfSubPlans; i++ ) {
+                subPlans[i] = plan.getSubPlan(i);
+            }
+
+            Integer[] cardinalities = new Integer[0];
+            try {
+                cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, subPlans );
+            } catch ( CardinalityEstimationException e ) {
+                e.printStackTrace();
+            }
+
             int cardinality = 0;
             for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
                 int intValue = cardinalities[i];
@@ -115,29 +123,6 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
             return cardinality;
         }
 
-        protected Integer[] getEstimatedCardsOfSubPlans( final PhysicalPlan plan ) {
-            final int numOfSubPlans = plan.numberOfSubPlans();
-            final CompletableFuture<Integer>[] futures = new CompletableFuture[numOfSubPlans];
-
-            for ( int i = 0; i < numOfSubPlans; i++ ) {
-                final PhysicalPlan p = plan.getSubPlan(i);
-                futures[i] = initiateCardinalityEstimation( p );
-            }
-
-            final Integer[] cardinalities;
-            try {
-                cardinalities = CompletableFutureUtils.getAll(futures, Integer.class);
-            }
-            catch ( final CompletableFutureUtils.GetAllException ex ) {
-                if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-                    throw new RuntimeException("Unexpected interruption when getting a variable-specific cardinality estimate.", ex.getCause() );
-                }
-                else {
-                    throw new RuntimeException("Getting a variable-specific cardinality estimate caused an exception.", ex.getCause() );
-                }
-            }
-            return cardinalities;
-        }
     }
 
 }
