@@ -659,9 +659,11 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * If the right input of a join is a union with requests,
-	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
-	 **/
+	 * This function take a inputPlan and unionPlan as input,
+	 * where the unionPlan is required to be a plan with union as root operator, and all subPlans under the UNION are all requests or filters with request.
+	 *
+	 * In such cases, this function turns the requests under UNION into xxAdd operators with the inputPlan as subplans.
+	 */
 	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
 		final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
 		final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
@@ -676,10 +678,10 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * If the right input of a join operator is a request, filter with request, or union with requests,
-	 * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
+	 * If the nextPlan is in the form of a request, filter with request, or union with requests,
+	 * this function turns the requests into xxAdd operators with the inputPlan as subplans.
 	 *
-	 * Otherwise, create a plan with a binary join as root operator (using the default physical operator).
+	 * Otherwise, it constructs a plan with a binary join between inputPlan and nextPlan (using the default physical operator)
 	 **/
 	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan, final PhysicalPlan nextPlan ) {
 		final PhysicalOperator oldSubPlanRootOp = nextPlan.getRootOperator();
