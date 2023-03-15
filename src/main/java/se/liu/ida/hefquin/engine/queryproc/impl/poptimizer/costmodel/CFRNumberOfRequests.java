@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation
 
 public class CFRNumberOfRequests extends CFRBase
 {
-	public static final int defaultPageSize = 30;
+	public static final int defaultPageSize = 100;
 	public CFRNumberOfRequests( final CardinalityEstimation cardEstimate ) {
 		super(cardEstimate);
 	}
