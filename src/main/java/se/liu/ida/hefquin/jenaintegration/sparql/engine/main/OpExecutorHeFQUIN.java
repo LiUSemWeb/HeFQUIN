@@ -42,6 +42,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.MinBasedCardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
@@ -343,6 +344,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 		public QueryOptimizationContextBase() {
 			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
+//			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
 		}
 
 		@Override public CostModel getCostModel() { return costModel; }
