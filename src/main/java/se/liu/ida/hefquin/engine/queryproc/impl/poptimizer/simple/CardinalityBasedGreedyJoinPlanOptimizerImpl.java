@@ -90,12 +90,21 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             };
             final PriorityQueue<PhysicalPlanWithStatistics> orderedCandidateSubPlans = new PriorityQueue<>(orderBasedOnCard);
 
-            for ( int i = 1; i < subplans.size(); i ++ ){
-                // Identify subplans that have join variables with the selected subplan as new candidateSubPlans.
-                // These candidateSubPlans are then added to the ordered list 'orderedCandidateSubPlans' and removed from the remaining subPlansWithStatistics
-                final List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansContainVars(nextSelectedSubPlan.plan.getExpectedVariables(), subPlansWithStatistics);
-                orderedCandidateSubPlans.addAll(candidateSubPlans);
-                subPlansWithStatistics.removeAll(candidateSubPlans);
+            while ( !orderedCandidateSubPlans.isEmpty() || !subPlansWithStatistics.isEmpty() ){
+
+                if ( !subPlansWithStatistics.isEmpty() ) {
+                    // Identify subplans that have join variables with the selected subplan as new candidateSubPlans.
+                    List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansContainVars(nextSelectedSubPlan.plan.getExpectedVariables(), subPlansWithStatistics);
+                    if ( candidateSubPlans.isEmpty() && orderedCandidateSubPlans.isEmpty() ) {
+                        // Independent subplans exist, and there are no more candidate subplans to be consumed in orderedCandidateSubPlans
+                        // In this case, choose the subplan with the lowest candidate from subPlansWithStatistics as candidate plan
+                        candidateSubPlans = Arrays.asList( chooseFirstSubPlan(subPlansWithStatistics) );
+                    }
+
+                    // The candidateSubPlans are added to the ordered list 'orderedCandidateSubPlans' and removed from the remaining subPlansWithStatistics
+                    orderedCandidateSubPlans.addAll(candidateSubPlans);
+                    subPlansWithStatistics.removeAll(candidateSubPlans);
+                }
 
                 // select the first element (with the lowest cardinality) from orderedCandidateSubPlans as the nextSelectedSubPlan
                 nextSelectedSubPlan = orderedCandidateSubPlans.poll();
@@ -250,12 +259,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                 }
             }
 
-            if ( !subPlansWithStatistics.isEmpty() && subPlansContainsVars.isEmpty() ){
-                // Independent subplans exist. In this case, choose the subplan with the lowest candidate (from remaining subPlans) as candidate plan
-                return Arrays.asList( chooseFirstSubPlan(subPlansWithStatistics) );
-            }
-            else
-                return subPlansContainsVars;
+            return subPlansContainsVars;
         }
 
         /**
