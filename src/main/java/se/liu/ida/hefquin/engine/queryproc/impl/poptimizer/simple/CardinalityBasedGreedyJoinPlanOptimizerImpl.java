@@ -229,10 +229,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             final int joinCardinality = Math.min( currentPlan.getCardinality(), nextPlan.getCardinality() );
 
             // The list of fed.members and numOfAccess will not be accessed anymore for this new PhysicalPlanWithStatistics object
-            final PhysicalPlanWithStatistics newPlanWithStatistics = new PhysicalPlanWithStatistics( newPlan );
-            newPlanWithStatistics.setCardinality( joinCardinality );
-
-            return newPlanWithStatistics;
+            return new PhysicalPlanWithStatistics( newPlan, null, joinCardinality, -1 );
         }
 
         /**
