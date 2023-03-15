@@ -264,23 +264,15 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
 
     class PhysicalPlanWithStatistics {
         public final PhysicalPlan plan;
-        protected int cardinality;
-        protected int numOfAccess;
-        protected List<FederationMember> fms;
-
-        public PhysicalPlanWithStatistics( final PhysicalPlan plan ){
-            this.plan = plan;
-        }
+        protected final int cardinality;
+        protected final int numOfAccess;
+        protected final List<FederationMember> fms;
 
         public PhysicalPlanWithStatistics( final PhysicalPlan plan, final List<FederationMember> fms, final int cardinality, final int numOfAccess ){
             this.plan = plan;
             this.fms = fms;
             this.cardinality = cardinality;
             this.numOfAccess = numOfAccess;
-        }
-
-        public void setCardinality( final int cardinality ){
-            this.cardinality = cardinality;
         }
 
         public int getCardinality( ){
