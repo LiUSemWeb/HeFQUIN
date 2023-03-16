@@ -91,6 +91,25 @@ public class TPFResponseBuilder
 		if ( requestStartTime == null )
 			throw new IllegalStateException("requestStartTime not specified");
 
+		if ( metadataTriples.isEmpty() ) {
+			// Attention. This case may occur if the requested triple
+			// pattern has only variables, (?s,?p,?o), and the response
+			// of the TPF/brTPF server arrived in a serialization format
+			// that is only for a single RDF graph (i.e., not some format
+			// for RDF datasets with multiple graphs). In this case, the
+			// 'parseRetrievedTriples' method of 'TPFRequestProcessorBase'
+			// thinks that all triples contained in the response are
+			// payload.
+			// In this case, let's go over all the matching triples to
+			// find at least the relevant metadata.
+
+			for ( final Triple t : matchingTriples ) {
+				final boolean foundCountOrNextPageURL = tryExtractCountMetadataOrNextPageURL(t);
+				if ( foundCountOrNextPageURL && tripleCount >= 0 && nextPageURL != null ) {
+					break;
+				}
+			}
+		}
 		if ( tripleCount < 0 )
 			return new TPFResponseImpl(matchingTriples, metadataTriples, nextPageURL, fm, request, requestStartTime);
 		else
