@@ -175,6 +175,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static class FunctionToObtainCardinalityResponseFromTPFResponse implements Function<TPFResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
+			if ( tpfResp == null ) throw new IllegalArgumentException("The given TPFResponse is null");
+
 			final int cardinality = tpfResp.getCardinalityEstimate();
 			return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), cardinality);
 		}

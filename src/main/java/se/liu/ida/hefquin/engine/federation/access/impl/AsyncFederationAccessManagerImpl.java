@@ -113,6 +113,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+
+				if ( resp == null ) {
+					throw new RuntimeException("reqProcSPARQL returned null");
+				}
+
 				completedSPARQLRequests.incrementAndGet();
 				return resp;
 			}
@@ -130,6 +135,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+
+				if ( resp == null ) {
+					throw new RuntimeException("reqProcTPF returned null");
+				}
+
 				completedTPFRequests.incrementAndGet();
 				return resp;
 			}
@@ -147,6 +157,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+
+				if ( resp == null ) {
+					throw new RuntimeException("reqProcTPF returned null");
+				}
+
 				completedTPFRequests.incrementAndGet();
 				return resp;
 			}
@@ -164,6 +179,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+
+				if ( resp == null ) {
+					throw new RuntimeException("reqProcBRTPF returned null");
+				}
+
 				completedBRTPFRequests.incrementAndGet();
 				return resp;
 			}
@@ -181,6 +201,11 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 				} catch ( final FederationAccessException e ) {
 					throw new RuntimeException("Performing a request caused an exception.", e);
 				}
+
+				if ( resp == null ) {
+					throw new RuntimeException("reqProcNeo4j returned null");
+				}
+
 				completedNeo4jRequests.incrementAndGet();
 				return resp;
 			}

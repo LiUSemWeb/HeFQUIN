@@ -61,8 +61,12 @@ public class CompletableFutureUtils
 
 		@Override
 		public String getMessage() {
-			if ( getCause() != null )
-				return getCause().getMessage();
+			if ( getCause() != null ) {
+				if ( getCause().getCause() != null )
+					return getCause().getMessage() + " (cause:" + getCause().getCause().getMessage() + ")";
+				else
+					return getCause().getMessage();
+			}
 			else
 				return null;
 		}
