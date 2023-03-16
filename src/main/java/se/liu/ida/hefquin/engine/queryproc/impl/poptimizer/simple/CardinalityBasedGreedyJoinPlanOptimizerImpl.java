@@ -170,25 +170,28 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                         (pop instanceof PhysicalOpFilter && subplan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest)) {
                     final int cardinality = resps[index].getCardinality();
                     final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
-                    final int numOfAccess = accessNumForReq( resps[index].getCardinality(), fm );
+                    final int numOfAccess = accessNumForReq(cardinality, fm);
 
                     planWithStatistics = new PhysicalPlanWithStatistics( subplan, Arrays.asList(fm), cardinality, numOfAccess );
                     index++;
                 }
                 else if (pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion) {
-                    int cardinality = 0, numOfAccess = 0;
+                    int aggregatedCardinality = 0;
+                    int numOfAccess = 0;
                     final List<FederationMember> fms = new ArrayList<>();
                     for ( int count = 0; count < subplan.numberOfSubPlans(); count++ ) {
-                        cardinality += resps[index].getCardinality();
+                        final int cardinality = resps[index].getCardinality();
+                        aggregatedCardinality += (cardinality == Integer.MAX_VALUE) ? Integer.MAX_VALUE : cardinality;
+                        if ( aggregatedCardinality < 0 ) aggregatedCardinality = Integer.MAX_VALUE;
 
                         final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
-                        numOfAccess += accessNumForReq( resps[index].getCardinality(), fm );
+                        numOfAccess += accessNumForReq(cardinality, fm);
                         fms.add( fm );
 
                         index++;
                     }
 
-                    planWithStatistics = new PhysicalPlanWithStatistics(subplan, fms, cardinality, numOfAccess );
+                    planWithStatistics = new PhysicalPlanWithStatistics(subplan, fms, aggregatedCardinality, numOfAccess );
                 }
                 else
                     throw new IllegalArgumentException("Unsupported type of subquery in source assignment (" + pop.getClass().getName() + ")");
