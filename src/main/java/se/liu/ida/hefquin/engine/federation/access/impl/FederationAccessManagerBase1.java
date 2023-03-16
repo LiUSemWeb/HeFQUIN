@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImplWithoutCardinality;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
@@ -177,8 +178,14 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
 			if ( tpfResp == null ) throw new IllegalArgumentException("The given TPFResponse is null");
 
-			final int cardinality = tpfResp.getCardinalityEstimate();
-			return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), cardinality);
+			final Integer cardinality = tpfResp.getCardinalityEstimate();
+			if ( cardinality != null ) {
+				final int c = cardinality;
+				return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), c);
+			}
+			else {
+				return new CardinalityResponseImplWithoutCardinality( tpfResp, tpfResp.getRequest() );
+			}
 		}
 	}
 
