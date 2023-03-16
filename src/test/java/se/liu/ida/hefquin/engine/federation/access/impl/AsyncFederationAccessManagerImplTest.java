@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +26,8 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProc
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
@@ -78,8 +81,10 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInSequence \t milliseconds passed: " + (endTime - startTime) );
 
-		assertEquals( r1, null );
-		assertEquals( r2, null );
+		assertEquals( req1, r1.getRequest() );
+		assertEquals( req2, r2.getRequest() );
+		assertEquals( fm1, r1.getFederationMember() );
+		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -107,8 +112,10 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
 
-		assertEquals( r1, null );
-		assertEquals( r2, null );
+		assertEquals( req1, r1.getRequest() );
+		assertEquals( req2, r2.getRequest() );
+		assertEquals( fm1, r1.getFederationMember() );
+		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -189,7 +196,7 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 		@Override
 		public SolMapsResponse performRequest(SPARQLRequest req, SPARQLEndpoint fm) {
 			sleep();
-			return null;
+			return new SolMapsResponseImpl( new ArrayList<>(), fm, req, new Date() );
 		}
 	}
 
@@ -200,12 +207,14 @@ public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 
 		@Override
 		public TPFResponse performRequest(TPFRequest req, TPFServer fm) {
-			sleep(); return null;
+			sleep();
+			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
 		}
 
 		@Override
 		public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) {
-			sleep(); return null;
+			sleep();
+			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
 		}
 	}
 
