@@ -71,24 +71,8 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                             candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) rightRootOp, plan_left ) );
                         }
                         if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
-                            boolean applicable = true;
-                            for ( int i = 0; i < plan_right.numberOfSubPlans(); i++ ) {
-                                final PhysicalPlan subPlan = plan_right.getSubPlan(i);
-                                final PhysicalOperator subRootOp = subPlan.getRootOperator();
-                                if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
-                                    applicable = false;
-                                    break;
-                                }
-
-                                if ( subRootOp instanceof PhysicalOpFilter ){
-                                    if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
-                                        applicable = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if ( applicable ) {
-                                candidatePlans.add(createPlanWithUnaryOpForUnionPlan(plan_left, plan_right));
+                            if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(plan_right) ) {
+                                candidatePlans.add( PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(plan_left, plan_right) );
                             }
                         }
                     }
@@ -106,43 +90,6 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
     }
 
     public abstract <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset );
-
-    /**
-     * In cases in which there is a union with requests under right input,
-     * this function turns the requests into xxAdd operators with the previous join arguments as subplans.
-     **/
-    protected PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan, final PhysicalPlan unionPlan ) {
-        final int numberOfSubPlansUnderUnion = unionPlan.numberOfSubPlans();
-        final PhysicalPlan[] newUnionSubPlans = new PhysicalPlan[numberOfSubPlansUnderUnion];
-
-        for ( int i = 0; i < numberOfSubPlansUnderUnion; i++ ) {
-            final PhysicalPlan oldSubPlan = unionPlan.getSubPlan(i);
-            final PhysicalPlan newSubPlan;
-
-            final PhysicalOperator oldSubPlanRootOp = oldSubPlan.getRootOperator();
-            if ( oldSubPlanRootOp instanceof PhysicalOpRequest ) {
-                final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlanRootOp;
-                final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
-                newSubPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
-            }
-            else if ( oldSubPlanRootOp instanceof PhysicalOpFilter
-                    && oldSubPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ) {
-                final PhysicalOpFilter filterOp = (PhysicalOpFilter) oldSubPlanRootOp;
-                final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) oldSubPlan.getSubPlan(0).getRootOperator();
-
-                final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
-                final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, inputPlan);
-
-                newSubPlan = PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
-            }
-            else
-                throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + oldSubPlanRootOp.getClass().getName() + ")");
-
-            newUnionSubPlans[i] = newSubPlan;
-        }
-
-        return PhysicalPlanFactory.createPlan( LogicalOpMultiwayUnion.getInstance(), newUnionSubPlans );
-    }
 
     /**
      * This method returns all subsets (with the given size) of the given superset.

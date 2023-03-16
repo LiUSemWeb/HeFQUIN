@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation
 
 public class CFRNumberOfRequests extends CFRBase
 {
+	public static final int defaultPageSize = 100;
 	public CFRNumberOfRequests( final CardinalityEstimation cardEstimate ) {
 		super(cardEstimate);
 	}
@@ -25,7 +26,7 @@ public class CFRNumberOfRequests extends CFRBase
 	public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
 		final PhysicalOperator rootOp = plan.getRootOperator();
 
-		final double pageSize = 100.0;
+		final double pageSize = defaultPageSize;
 		final double blockSize = BaseForExecOpBindJoin.defaultPreferredInputBlockSize;
 		final CompletableFuture<Integer> numReq;
 

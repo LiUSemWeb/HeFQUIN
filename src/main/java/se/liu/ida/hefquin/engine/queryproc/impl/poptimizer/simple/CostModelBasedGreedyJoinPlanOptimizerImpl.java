@@ -14,11 +14,11 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
-public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
+public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 {
 	protected final CostModel costModel;
 
-	public GreedyJoinPlanOptimizerImpl( final CostModel costModel ) {
+	public CostModelBasedGreedyJoinPlanOptimizerImpl(final CostModel costModel ) {
 		assert costModel != null;
 		this.costModel= costModel;
 	}
