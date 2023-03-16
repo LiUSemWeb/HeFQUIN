@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.utils;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -12,6 +14,8 @@ import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
@@ -20,6 +24,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestPro
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessorImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 public class FederationAccessUtils
@@ -36,28 +41,31 @@ public class FederationAccessUtils
 	}
 
 	public static DataRetrievalResponse[] performRequest( final FederationAccessManager fedAccessMgr,
-	                                                      final RequestMemberPair... pairs )
+	                                                      final LogicalOpRequest<?,?>... reqOps )
 			  throws FederationAccessException
 	{
 		@SuppressWarnings("unchecked")
-		final CompletableFuture<? extends DataRetrievalResponse>[] futures = new CompletableFuture[pairs.length];
+		final CompletableFuture<? extends DataRetrievalResponse>[] futures = new CompletableFuture[reqOps.length];
 
-		for ( int i = 0; i < pairs.length; ++i ) {
-			final DataRetrievalRequest req = pairs[i].getRequest();
-			final FederationMember fm = pairs[i].getMember();
-			if ( req instanceof SPARQLRequest && fm instanceof SPARQLEndpoint ) {
+		for ( int i = 0; i < reqOps.length; ++i ) {
+			final DataRetrievalRequest req = reqOps[i].getRequest();
+			final FederationMember fm = reqOps[i].getFederationMember();
+			if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
 				futures[i] = fedAccessMgr.issueRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
 			}
-			else if ( req instanceof TPFRequest && fm instanceof TPFServer ) {
-				futures[i] = fedAccessMgr.issueRequest( (TPFRequest) req, (TPFServer) fm );
+			else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
+				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueRequest( reqTPF, (TPFServer) fm );
 			}
-			else if ( req instanceof TPFRequest && fm instanceof BRTPFServer ) {
-				futures[i] = fedAccessMgr.issueRequest( (TPFRequest) req, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueRequest( reqTPF, (BRTPFServer) fm );
 			}
-			else if ( req instanceof BRTPFRequest && fm instanceof BRTPFServer ) {
-				futures[i] = fedAccessMgr.issueRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
+				final BRTPFRequest reqBRTPF = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueRequest( reqBRTPF, (BRTPFServer) fm );
 			}
-			else if ( req instanceof Neo4jRequest && fm instanceof Neo4jServer ) {
+			else if ( fm instanceof Neo4jServer && req instanceof Neo4jRequest ) {
 				futures[i] = fedAccessMgr.issueRequest( (Neo4jRequest) req, (Neo4jServer) fm );
 			}
 			else {
@@ -70,36 +78,46 @@ public class FederationAccessUtils
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+				throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", ex.getCause(), reqOps[ex.i].getRequest(), reqOps[ex.i].getFederationMember() );
 			}
 			else {
-				throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+				throw new FederationAccessException("Getting the response to a data retrieval request caused an exception: " + ex.getMessage(), ex.getCause(), reqOps[ex.i].getRequest(), reqOps[ex.i].getFederationMember() );
 			}
 		}
 	}
 
-	public static CardinalityResponse[] performCardinalityRequests(
-			final FederationAccessManager fedAccessMgr,
-			final RequestMemberPair... pairs )
+	public static CardinalityResponse[] performCardinalityRequests( final FederationAccessManager fedAccessMgr,
+	                                                                final LogicalOpRequest<?,?>... reqOps )
+					throws FederationAccessException
+	{
+		return performCardinalityRequests( fedAccessMgr, Arrays.asList(reqOps) );
+	}
+
+	public static CardinalityResponse[] performCardinalityRequests( final FederationAccessManager fedAccessMgr,
+	                                                                final List<LogicalOpRequest<?,?>> reqOps )
 					throws FederationAccessException
 	{
 		@SuppressWarnings("unchecked")
-		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[pairs.length];
+		final CompletableFuture<CardinalityResponse>[] futures = new CompletableFuture[reqOps.size()];
 
-		for ( int i = 0; i < pairs.length; ++i ) {
-			final DataRetrievalRequest req = pairs[i].getRequest();
-			final FederationMember fm = pairs[i].getMember();
-			if ( req instanceof SPARQLRequest && fm instanceof SPARQLEndpoint ) {
+		for ( int i = 0; i < reqOps.size(); ++i ) {
+			final LogicalOpRequest<?,?> reqOp = reqOps.get(i);
+			final DataRetrievalRequest req = reqOp.getRequest();
+			final FederationMember fm = reqOp.getFederationMember();
+			if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
 				futures[i] = fedAccessMgr.issueCardinalityRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
 			}
-			else if ( req instanceof TPFRequest && fm instanceof TPFServer ) {
-				futures[i] = fedAccessMgr.issueCardinalityRequest( (TPFRequest) req, (TPFServer) fm );
+			else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
+				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (TPFServer) fm );
 			}
-			else if ( req instanceof TPFRequest && fm instanceof BRTPFServer ) {
-				futures[i] = fedAccessMgr.issueCardinalityRequest( (TPFRequest) req, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
+				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueCardinalityRequest( reqTPF, (BRTPFServer) fm );
 			}
-			else if ( req instanceof BRTPFRequest && fm instanceof BRTPFServer ) {
-				futures[i] = fedAccessMgr.issueCardinalityRequest( (BRTPFRequest) req, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
+				final BRTPFRequest reqBRTPF = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
+				futures[i] = fedAccessMgr.issueCardinalityRequest( reqBRTPF, (BRTPFServer) fm );
 			}
 			else {
 				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
@@ -115,10 +133,10 @@ public class FederationAccessUtils
 		}
 		catch ( final CompletableFutureUtils.GetAllException ex ) {
 			if ( ex.getCause() != null && ex.getCause() instanceof InterruptedException ) {
-				throw new FederationAccessException("Unexpected interruption when getting the response to a cardinality retrieval request.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+				throw new FederationAccessException("Unexpected interruption when getting the response to a cardinality retrieval request.", ex.getCause(), reqOps.get(ex.i).getRequest(), reqOps.get(ex.i).getFederationMember() );
 			}
 			else {
-				throw new FederationAccessException("Getting the response to a cardinality retrieval request caused an exception.", ex.getCause(), pairs[ex.i].getRequest(), pairs[ex.i].getMember() );
+				throw new FederationAccessException("Getting the response to a cardinality retrieval request caused an exception: " + ex.getMessage(), ex.getCause(), reqOps.get(ex.i).getRequest(), reqOps.get(ex.i).getFederationMember() );
 			}
 		}
 	}
@@ -210,5 +228,23 @@ public class FederationAccessUtils
 			throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", e, req, fm);
 		}
 	}
+
+    public static TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
+        if ( req instanceof TPFRequest ) {
+            return (TPFRequest) req;
+        }
+        else {
+            return new TPFRequestImpl( req.getQueryPattern() );
+        }
+    }
+
+    public static BRTPFRequest ensureBRTPFRequest( final BindingsRestrictedTriplePatternRequest req ) {
+        if ( req instanceof BRTPFRequest ) {
+            return (BRTPFRequest) req;
+        }
+        else {
+            return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings() );
+        }
+    }
 
 }

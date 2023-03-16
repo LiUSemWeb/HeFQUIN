@@ -4,21 +4,10 @@ import static java.lang.Math.max;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.federation.access.utils.RequestMemberPair;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -119,22 +108,9 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 
 		@Override
 		public Integer get() {
-			final FederationMember fm = reqOp.getFederationMember();
-			DataRetrievalRequest req = reqOp.getRequest();
-			if ( fm instanceof TPFServer ) {
-				req = ensureTPFRequest( (TriplePatternRequest) req );
-			}
-			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-				req = ensureTPFRequest( (TriplePatternRequest) req );
-			}
-			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
-				req = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
-			}
-
-			final RequestMemberPair rm = new RequestMemberPair(req, fm);
 			final CardinalityResponse[] resps;
 			try {
-				resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, rm);
+				resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, reqOp);
 			}
 			catch ( final FederationAccessException e ) {
 				throw new RuntimeException("Issuing a cardinality request caused an exception.", e);
@@ -145,25 +121,6 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 //			when the cardinality exceed the maximum possible Integer number that can be represented
 			return ( intValue < 0 ? Integer.MAX_VALUE : intValue ) ;
 		}
-
-		protected TPFRequest ensureTPFRequest( final TriplePatternRequest req ) {
-			if ( req instanceof TPFRequest ) {
-				return (TPFRequest) req;
-			}
-			else {
-				return new TPFRequestImpl( req.getQueryPattern() );
-			}
-		}
-
-		protected BRTPFRequest ensureBRTPFRequest( final BindingsRestrictedTriplePatternRequest req ) {
-			if ( req instanceof BRTPFRequest ) {
-				return (BRTPFRequest) req;
-			}
-			else {
-				return new BRTPFRequestImpl( req.getTriplePattern(), req.getSolutionMappings() );
-			}
-		}
-
 	}
 
 	protected class WorkerForSubquery implements Supplier<Integer>
