@@ -162,14 +162,28 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
 			final int cardinality = extractCardinality(smResp);
-			return new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
+			if ( cardinality < 0 )
+				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
+			else
+				return new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
 		}
 
 		protected int extractCardinality( final SolMapsResponse smResp ) {
 			final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
 			final SolutionMapping sm = it.next();
-			final Node countValue = sm.asJenaBinding().get(countVar);
-			return ( (Integer) countValue.getLiteralValue() ).intValue();
+			final Node countValueNode = sm.asJenaBinding().get(countVar);
+			final Object countValueObj = countValueNode.getLiteralValue();
+
+			if ( countValueObj instanceof Integer ) {
+				return ( (Integer) countValueObj ).intValue();
+			}
+			else if ( countValueObj instanceof Long ) {
+				final long l = ( (Long) countValueObj ).longValue();
+				return ( Integer.MAX_VALUE < l ) ? Integer.MAX_VALUE : (int) l;
+			}
+			else {
+				return -1;
+			}
 		}
 	}
 
