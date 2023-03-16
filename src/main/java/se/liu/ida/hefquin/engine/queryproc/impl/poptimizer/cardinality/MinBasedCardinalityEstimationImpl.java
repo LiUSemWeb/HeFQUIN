@@ -106,11 +106,12 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
                 subPlans[i] = plan.getSubPlan(i);
             }
 
-            Integer[] cardinalities = new Integer[0];
+            final Integer[] cardinalities;
             try {
                 cardinalities = CardinalityEstimationUtils.getEstimates( cardEstimate, subPlans );
-            } catch ( CardinalityEstimationException e ) {
-                e.printStackTrace();
+            }
+            catch ( final CardinalityEstimationException e ) {
+                throw new RuntimeException("Getting cardinality estimates caused an exception.", e);
             }
 
             int cardinality = 0;
