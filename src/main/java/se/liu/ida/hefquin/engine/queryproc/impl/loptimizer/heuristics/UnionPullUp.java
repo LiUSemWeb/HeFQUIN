@@ -50,6 +50,18 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * 
  * Now, the two joins can be turned into bind joins, and it is even possible
  * to pick two different join strategies for them.
+ * 
+ * Attention: It has turned out that UnionPullUp typically does more harm
+ * than good, because it has the tendency to turn a join-over-union source
+ * assignment into a (multiway) union with many join subplans (in particular
+ * for cases in which there are several unions in the join-over-union source
+ * assignment, because in these cases every combination of requests under
+ * the different unions ends up as a separate join). If, thereafter, these
+ * many join subplans are predominantly implemented as symmetric hash joins,
+ * then the execution plan will do many more requests than what would be
+ * necessary for the joins of the original join-over-union source assignment.
+ * An alternative heuristic that does not have this problem is
+ * {@link PushJoinUnderUnionWithRequests}.
  */
 public class UnionPullUp implements HeuristicForLogicalOptimization
 {

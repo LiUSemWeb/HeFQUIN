@@ -26,6 +26,11 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * be pushed, and into which child plan(s) it is pushed depends on the
  * variables that it mentions.
  *
+ * For cases in which a filter operator has a request operator as its
+ * child plan and this request operator is for a federation member that
+ * is capable of handling requests that contain filter conditions, such
+ * as a SPARQL endpoint, the filter is merged into the request.
+ *
  * Conjunctive filter conditions (i.e., conditions that consist of multiple
  * sub-conditions that are connected via a logical AND) are split up into
  * separate conditions for each of the conjuncts, which may make it possible

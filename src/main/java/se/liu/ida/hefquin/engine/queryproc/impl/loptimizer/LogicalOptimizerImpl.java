@@ -18,22 +18,26 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 	public LogicalOptimizerImpl() {
 		final HeuristicForLogicalOptimization mergeRequests = new MergeRequests();
 
-		heuristics.add( new UnionPullUp() );
+		//// It has turned out that UnionPullUp typically does more
+		//// harm than good. For more details, see the end of the
+		//// JavaDoc comment for UnionPullUp.
+		//heuristics.add( new UnionPullUp() );
+
 		heuristics.add( mergeRequests );
 		heuristics.add( new FilterPushDown() );
 		heuristics.add( mergeRequests );
 
-//		final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
-//		heuristics.add( new GreedyBasedReordering( formula ) );
+		// final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
+		// heuristics.add( new GreedyBasedReordering(formula) );
 
-//		heuristics.add( new PushJoinUnderUnionWithRequests() );
+		// heuristics.add( new PushJoinUnderUnionWithReuests() );
 
-/*
-  Uncomment the following line to apply vocabulary mappings of federation members during query planning.
-  Note that applying vocabulary mappings is only supported by the naive algorithm currently
-  since the cost model needs to be extended to consider operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal
- */
-//		heuristics.add( new ApplyVocabularyMappings());
+		//// Uncomment the following line to apply vocabulary mappings of
+		//// federation members during query planning. Note that applying
+		//// vocabulary mappings is only supported by the naive algorithm
+		//// currently since the cost model needs to be extended to consider
+		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
+		//heuristics.add( new ApplyVocabularyMappings());
 	}
 
 	@Override
