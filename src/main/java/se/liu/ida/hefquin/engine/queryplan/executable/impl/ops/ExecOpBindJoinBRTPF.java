@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTr
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
@@ -41,12 +42,33 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP);
 
 		if ( restrictedSMs == null ) {
-			final TriplePatternRequest req = new TriplePatternRequestImpl( (TriplePattern) query );
+			final TriplePatternRequest req = new TriplePatternRequestImpl(query);
 			return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
 		}
 
 		if ( restrictedSMs.isEmpty() ) {
 			return null;
+		}
+
+		// If there is only a single solution mapping, we
+		// do a TPF request instead of a brTPF request.
+		if ( restrictedSMs.size() == 1 ) {
+			final SolutionMapping sm = restrictedSMs.iterator().next();
+			final TriplePattern restrictedTP;
+			try {
+				restrictedTP = QueryPatternUtils.applySolMapToTriplePattern(sm, query);
+			}
+			catch ( final VariableByBlankNodeSubstitutionException e ) {
+				// This exception should not happen because the set of solution
+				// mappings given to this function should not have blank nodes
+				// for the join variables.
+				e.printStackTrace();
+
+				return null;
+			}
+
+			final TriplePatternRequest req = new TriplePatternRequestImpl(restrictedTP);
+			return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
 		}
 
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSMs );
