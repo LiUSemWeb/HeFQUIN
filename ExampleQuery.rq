@@ -1,0 +1,14 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:    <http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    <http://dbpedia.org/ontology/>
+
+SELECT * WHERE {
+	SERVICE <http://dbpedia.org/sparql> {
+		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
+		?c owl:sameAs ?cc
+	}
+	SERVICE <https://query.wikidata.org/sparql> {
+		?cc rdfs:label ?o
+	}
+}
