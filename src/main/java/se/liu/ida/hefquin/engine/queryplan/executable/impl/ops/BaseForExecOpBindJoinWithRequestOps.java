@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
@@ -55,6 +56,10 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	// statistics
 	private long numberOfOutputMappingsProduced = 0L;
+	protected boolean requestBlockSizeWasReduced = false;
+	protected int numberOfRequestOpsUsed = 0;
+	protected ExecutableOperatorStats statsOfFirstReqOp = null;
+	protected ExecutableOperatorStats statsOfLastReqOp = null;
 
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
@@ -110,6 +115,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(joinableInputSMs);
 
 		if ( reqOp != null ) {
+			numberOfRequestOpsUsed++;
+
 			final MyIntermediateResultElementSink mySink;
 			if ( useOuterJoinSemantics )
 				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, joinableInputSMs);
@@ -134,6 +141,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			}
 
 			mySink.flush();
+
+			statsOfLastReqOp = reqOp.getStats();
+			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 		}
 	}
 
@@ -151,6 +161,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 		else {
 			requestBlockSize = newRequestBlockSize;
+			requestBlockSizeWasReduced = true;
 			return true;
 		}
 	}
@@ -203,12 +214,21 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	public void resetStats() {
 		super.resetStats();
 		numberOfOutputMappingsProduced = 0L;
+		requestBlockSizeWasReduced = false;
+		numberOfRequestOpsUsed = 0;
+		statsOfFirstReqOp = null;
+		statsOfLastReqOp = null;
 	}
 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "requestBlockSizeWasReduced",      Boolean.valueOf(requestBlockSizeWasReduced) );
+		s.put( "requestBlockSize",                Integer.valueOf(requestBlockSize) );
+		s.put( "numberOfRequestOpsUsed",          Integer.valueOf(numberOfRequestOpsUsed) );
+		s.put( "statsOfFirstReqOp",  statsOfFirstReqOp );
+		s.put( "statsOfLastReqOp",   statsOfLastReqOp );
 		return s;
 	}
 

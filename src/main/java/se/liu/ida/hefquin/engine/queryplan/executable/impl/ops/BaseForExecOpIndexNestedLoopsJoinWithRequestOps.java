@@ -10,9 +10,11 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -31,6 +33,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
               extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
 	protected final boolean useOuterJoinSemantics;
+
+	// statistics
+	protected long numberOfOutputMappingsProduced = 0L;
+	protected int numberOfRequestOpsUsed = 0;
+	protected ExecutableOperatorStats statsOfLastReqOp = null; // no statsOfFirstReqOp because the req.ops are running in separate threads
 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
@@ -115,11 +122,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 			// that is used when creating the request
 
 			if ( useOuterJoinSemantics ) {
+				numberOfOutputMappingsProduced++;
 				sink.send(sm);
 			}
 
 			return null;
 		}
+
+		numberOfRequestOpsUsed++;
 
 		final Runnable processor = createProcessor(reqOp, sm, sink, execCxt);
 		final ExecutorService execService = execCxt.getExecutorServiceForPlanTasks();
@@ -154,14 +164,34 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 				}
 
 				mySink.flush();
+
+				statsOfLastReqOp = reqOp.getStats();
 			}
 		};
 	}
 
 
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+		numberOfRequestOpsUsed = 0;
+		statsOfLastReqOp = null;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfRequestOpsUsed",          Integer.valueOf(numberOfRequestOpsUsed) );
+		s.put( "statsOfLastReqOp",   statsOfLastReqOp );
+		return s;
+	}
+
+
 	// ------- helper classes ------
 
-	protected static class MyIntermediateResultElementSink implements IntermediateResultElementSink
+	protected class MyIntermediateResultElementSink implements IntermediateResultElementSink
 	{
 		protected final IntermediateResultElementSink outputSink;
 		protected final SolutionMapping smFromInput;
@@ -174,13 +204,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 		@Override
 		public void send( final SolutionMapping smFromRequest ) {
+			numberOfOutputMappingsProduced++;
 			outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 		}
 
 		public void flush() { }
 	}
 
-	protected static class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
+	protected class MyIntermediateResultElementSinkOuterJoin extends MyIntermediateResultElementSink
 	{
 		protected boolean hasJoinPartner = false;
 
@@ -197,6 +228,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 		public void flush() {
 			if ( ! hasJoinPartner ) {
+				numberOfOutputMappingsProduced++;
 				outputSink.send(smFromInput);
 			}
 		}
