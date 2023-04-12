@@ -3,6 +3,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import java.util.List;
 
@@ -84,6 +88,10 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 			Pair<Integer, Integer> indexOfBestPlan = new Pair<>(0, 0);
 			double leastCost = Double.MAX_VALUE;
 			for ( int indexOfSubPlan = 0; indexOfSubPlan < subplans.size(); indexOfSubPlan ++ ){
+				final List<PhysicalPlan> candidatePlansForSubPlan = nextPossiblePlans.get(indexOfSubPlan);
+				if ( candidatePlansForSubPlan == null || candidatePlansForSubPlan.isEmpty() ){
+					continue;
+				}
 				final Double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans.get(indexOfSubPlan));
 
 				for ( int i = 0; i < costs.length; i ++ ){
@@ -106,26 +114,45 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 		 */
 		protected Map<Integer, List<PhysicalPlan>> createNextPossiblePlans( final PhysicalPlan currentPlan ) {
 			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = new HashMap<>();
+			boolean existsSubplansWithJoinVars = true;
+			while ( true ) {
+				for (int i = 0; i < subplans.size(); i++ ) {
+					final List<PhysicalPlan> plans = new ArrayList<>();
 
-			for ( int i = 0; i < subplans.size(); ++i ) {
-				final List<PhysicalPlan> plans = new ArrayList<>();
-				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
+					final PhysicalPlan subplan = subplans.get(i);
+					if ( existsSubplansWithJoinVars ){
+						// Only consider subplans that have join variables with currentPlan
+						if ( ExpectedVariablesUtils.intersectionOfAllVariables(currentPlan, subplan).isEmpty() ) {
+							continue;
+						}
+					}
+					else {
+						// Set "existsSubplansWithJoinVars" back to the initial value, to be able to check join variables in the next loop
+						existsSubplansWithJoinVars = true;
+					}
 
-				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
-				}
-				else if ( currentPlan.getRootOperator() instanceof PhysicalOpRequestWithTranslation ){
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
+					plans.add(PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplan));
+					if (subplan.getRootOperator() instanceof PhysicalOpRequest) {
+						plans.addAll(PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq((PhysicalOpRequest<?, ?>) subplans.get(i).getRootOperator(), currentPlan));
+					} else if (subplan.getRootOperator() instanceof PhysicalOpRequestWithTranslation) {
+						plans.addAll(PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq((PhysicalOpRequestWithTranslation<?, ?>) subplans.get(i).getRootOperator(), currentPlan));
+					} else if (subplan.getRootOperator() instanceof PhysicalOpBinaryUnion || subplan.getRootOperator() instanceof PhysicalOpMultiwayUnion) {
+						if (PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(subplan)) {
+							plans.add(PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(currentPlan, subplan));
+						}
+					}
+
+					nextPossiblePlans.put(i, plans);
 				}
 
-				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan ) );
+				if ( subplans.size() != 0 && nextPossiblePlans.isEmpty() ){
+					// Not find any subplan with join variables.
+					// For a complete query plan, pick up the next plan without considering join variables
+					existsSubplansWithJoinVars = false;
 				}
-				else if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) subplans.get(i).getRootOperator(), currentPlan ));
-				}
-
-				nextPossiblePlans.put(i, plans);
+				else
+					// Terminate while loop until finding the next possible plan, or all subplans have been consumed
+					break;
 			}
 
 			return nextPossiblePlans;
