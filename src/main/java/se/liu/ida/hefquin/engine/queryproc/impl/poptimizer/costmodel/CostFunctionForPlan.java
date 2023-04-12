@@ -11,5 +11,11 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
  */
 public interface CostFunctionForPlan
 {
+	/**
+	 * A function for estimating the cost of a plan.
+	 * @param visitedPlans: 
+	 * Record a set of sub-plans (of plan) that have been visited during the cost estimation.
+	 * This set can be used for checking if a subplan has been visited or not.
+	 */
 	CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlans, final PhysicalPlan plan );
 }
