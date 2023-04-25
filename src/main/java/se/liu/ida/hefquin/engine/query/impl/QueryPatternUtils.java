@@ -1093,7 +1093,7 @@ public class QueryPatternUtils
 				if ( ! bgpAdded && subElmt instanceof ElementTriplesBlock ) {
 					final ElementTriplesBlock copy = new ElementTriplesBlock();
 
-					final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+					final Iterator<Triple> it = ((ElementTriplesBlock) subElmt).patternElts();
 					while ( it.hasNext() ) {
 						copy.addTriple( it.next() );
 					}
@@ -1108,7 +1108,7 @@ public class QueryPatternUtils
 				else if ( ! bgpAdded && subElmt instanceof ElementPathBlock ) {
 					final ElementPathBlock copy = new ElementPathBlock();
 
-					final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+					final Iterator<TriplePath> it = ((ElementPathBlock) subElmt).patternElts();
 					while ( it.hasNext() ) {
 						copy.addTriplePath( it.next() );
 					}
