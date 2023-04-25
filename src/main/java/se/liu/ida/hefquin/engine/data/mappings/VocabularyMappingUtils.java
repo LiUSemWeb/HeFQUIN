@@ -8,9 +8,11 @@ import java.util.Set;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.expr.ExprList;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.query.BGP;
@@ -21,6 +23,7 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -113,11 +116,9 @@ public class VocabularyMappingUtils
 		else if ( op instanceof OpUnion ) {
 			return translateGraphPattern( (OpUnion) op, vm );
 		}
-/* TODO
 		else if ( op instanceof OpFilter ) {
 			return translateGraphPattern( (OpFilter) op, vm );
 		}
-*/
 		else if ( op instanceof OpBGP ) {
 			return translateGraphPattern( (OpBGP) op, vm );
 		}
@@ -189,6 +190,21 @@ public class VocabularyMappingUtils
 		}
 
 		return new SPARQLGroupPatternImpl(subPatterns);
+	}
+
+	public static SPARQLGraphPattern translateGraphPattern( final OpFilter op,
+	                                                        final VocabularyMapping vm ) {
+		final Op subOp = op.getSubOp();
+		final SPARQLGraphPattern translatedSubPlan = translateGraphPattern(subOp, vm);
+		final ExprList translatedExprs = translateExpressions( op.getExprs(), vm );
+		return QueryPatternUtils.merge(translatedExprs, translatedSubPlan);
+	}
+
+	public static ExprList translateExpressions( final ExprList exprs,
+	                                             final VocabularyMapping vm ) {
+		// TODO: translate the filter expressions
+
+		return exprs;
 	}
 
 }

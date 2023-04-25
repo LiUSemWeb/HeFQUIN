@@ -339,7 +339,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 	}
 
 	@Override
-	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm) {		
+	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping sm ) {
 		Set<BindingBuilder> bbs = new HashSet<>();
 		bbs.add( BindingBuilder.create() );
 		
@@ -384,7 +384,8 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		
 		final Set<SolutionMapping> results = new HashSet<>();
 		for (final BindingBuilder b : bbs) {
-			results.add(new SolutionMappingImpl(b.build()));
+			final SolutionMapping translatedSM = new SolutionMappingImpl( b.build() );
+			results.add(translatedSM);
 		}
 		return results;
 	}
