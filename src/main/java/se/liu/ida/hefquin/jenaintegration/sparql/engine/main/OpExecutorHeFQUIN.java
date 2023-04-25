@@ -166,6 +166,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	}
 
 	@Override
+	protected QueryIterator execute( final OpExtend opExtend, final QueryIterator input ) {
+		if ( isSupportedOp(opExtend) ) {
+			return executeSupportedOp( opExtend, input );
+		}
+		else {
+			return super.execute(opExtend, input);
+		}
+	}
+
+	@Override
 	protected QueryIterator execute( final OpFilter opFilter, final QueryIterator input ) {
 		if ( isSupportedOp(opFilter) ) {
 			return executeSupportedOp( opFilter, input );
@@ -289,7 +299,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpDisjunction opDisjunction)  { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
+		@Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
 
 	    @Override public void visit(OpConditional opCond)         {} // supported
 
@@ -317,7 +327,8 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpAssign opAssign)            { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpExtend opExtend)            { unsupportedOpFound = true; }
+//	    @Override public void visit(OpExtend opExtend)            { unsupportedOpFound = true; }
+	    @Override public void visit(OpExtend opExtend)            {} // supported
 
 	    //@Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
 
