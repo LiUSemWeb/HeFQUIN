@@ -14,11 +14,7 @@ import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.op.Op2;
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.PathBlock;
-import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.Vars;
+import org.apache.jena.sparql.core.*;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -26,12 +22,7 @@ import org.apache.jena.sparql.expr.ExprTransformSubstitute;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.graph.NodeTransformLib;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.*;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
@@ -841,6 +832,40 @@ public class QueryPatternUtils
 		for ( final Expr expr : exprs ) {
 			final ElementFilter f = new ElementFilter(expr);
 			group.addElementFilter(f);
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(group);
+	}
+
+	/**
+	 * Merges the given BIND clause into the given graph pattern.
+	 */
+	public static SPARQLGraphPattern merge(final VarExprList exprs, final SPARQLGraphPattern p ) {
+		// Create a new ElementGroup object, add into it the Element represented
+		// by the given graph pattern, add into it the filters, and create a new
+		// graph pattern from it.
+		final ElementGroup group = new ElementGroup();
+
+		// - convert the given graph pattern into an Element and add it to the group
+		final Element elmt = convertToJenaElement(p);
+		if ( elmt instanceof ElementGroup ) {
+			// If the given graph pattern was converted to an ElementGroup, instead
+			// of simply adding it into the new group, copy its sub-elements over
+			// to the new group, which avoids unnecessary nesting of groups.
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
+				group.addElement(subElmt);
+			}
+		}
+		else {
+			// If the given graph pattern was converted to something other
+			// than an ElementGroup, simply add it into the new group.
+			group.addElement(elmt);
+		}
+
+		// - now add the BIND clause to the group
+		for ( final Var v : exprs.getVars() ) {
+			final ElementBind f = new ElementBind(v, exprs.getExpr(v) );
+			group.addElement(f);
 		}
 
 		return new GenericSPARQLGraphPatternImpl1(group);
