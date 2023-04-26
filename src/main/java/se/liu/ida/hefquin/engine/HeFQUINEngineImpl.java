@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.query.Query;
@@ -39,8 +40,11 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 		final QueryProcStats stats = (QueryProcStats) qe.getContext().get(HeFQUINConstants.sysQueryProcStats);
 
 		@SuppressWarnings("unchecked")
-		final List<Exception> exceptions = (List<Exception>) qe.getContext().get(HeFQUINConstants.sysQueryProcExceptions);
+		List<Exception> exceptions = (List<Exception>) qe.getContext().get(HeFQUINConstants.sysQueryProcExceptions);
 		if ( ex != null ) {
+			if ( exceptions == null ) {
+				exceptions = new ArrayList<>();
+			}
 			exceptions.add(ex);
 		}
 
