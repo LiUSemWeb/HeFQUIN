@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.query.impl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
@@ -44,10 +45,15 @@ public class TriplePatternImpl implements TriplePattern
 
 		return n;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "(triple " + this.asJenaTriple().toString() + ") ";
+		// wrapping the triple pattern into an ElementTriplesBlock
+		// because the toString() function of that one uses pretty
+		// printing via FormatterElement
+		final ElementTriplesBlock e = new ElementTriplesBlock();
+		e.addTriple( this.asJenaTriple() );
+		return e.toString();
 	}
 
 	@Override
