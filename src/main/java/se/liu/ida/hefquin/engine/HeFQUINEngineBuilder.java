@@ -1,26 +1,15 @@
 package se.liu.ida.hefquin.engine;
 
-import java.io.PrintStream;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.ARQ;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.engine.main.QC;
-import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.Context;
-import org.apache.jena.sparql.util.QueryExecUtils;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
-import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
@@ -152,26 +141,12 @@ public class HeFQUINEngineBuilder
 		ctxt.set( HeFQUINConstants.sysPrintLogicalPlans, printLogicalPlan );
 		ctxt.set( HeFQUINConstants.sysPrintPhysicalPlans, printPhysicalPlan );
 		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );
-		return new MyEngine();
+		return new HeFQUINEngineImpl();
 	}
 
 
 	protected void setDefaultFederationAccessManager() {
 		this.fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager(execServiceForFedAccess);
-	}
-
-	protected static class MyEngine implements HeFQUINEngine {
-		@SuppressWarnings("unchecked")
-		@Override
-		public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query, final ResultsFormat outputFormat, final PrintStream output ) {
-			final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
-			final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
-			QueryExecUtils.executeQuery(query, qe, outputFormat, output);
-
-			return new Pair<>( (QueryProcStats) qe.getContext().get(HeFQUINConstants.sysQueryProcStats),
-			                   (List<Exception>) qe.getContext().get(HeFQUINConstants.sysQueryProcExceptions) );
-		}
-		
 	}
 
 }
