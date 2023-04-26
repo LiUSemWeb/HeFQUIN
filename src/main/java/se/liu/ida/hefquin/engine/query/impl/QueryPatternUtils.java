@@ -7,6 +7,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
@@ -262,7 +263,8 @@ public class QueryPatternUtils
 	}
 
 	/**
-	 * Returns the set of all variables that occur in the given graph pattern.
+	 * Returns the set of all variables that occur in the given graph pattern,
+	 * but ignoring variables in FILTER expressions.
 	 *
 	 * If the given pattern is a {@link TriplePattern}, this function returns
 	 * the result of {@link #getVariablesInPattern(TriplePattern)}. Similarly,
@@ -341,6 +343,9 @@ public class QueryPatternUtils
 		return varLeft;
 	}
 
+	/**
+	 * Ignores variables in FILTER expressions.
+	 */
 	public static Set<Var> getVariablesInPattern( final Op op ) {
 		if ( op instanceof OpBGP ) {
 			return getVariablesInPattern( (OpBGP) op);
@@ -349,7 +354,10 @@ public class QueryPatternUtils
 			return getVariablesInPattern( (Op2) op );
 		}
 		else if ( op instanceof OpService ){
-			return getVariablesInPattern( ((Op1) op).getSubOp());
+			return getVariablesInPattern( ((OpService) op).getSubOp());
+		}
+		else if ( op instanceof OpFilter ){
+			return getVariablesInPattern( ((OpFilter) op).getSubOp());
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
