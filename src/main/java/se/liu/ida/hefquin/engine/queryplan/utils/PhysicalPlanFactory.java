@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -700,6 +701,18 @@ public class PhysicalPlanFactory
 
 			return PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
 		}
+		else if ( oldSubPlanRootOp instanceof PhysicalOpLocalToGlobal
+				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ){
+			final VocabularyMapping vm = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) oldSubPlanRootOp).getLogicalOperator()).getVocabularyMapping();
+
+			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
+			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan( new PhysicalOpGlobalToLocal(g2l), inputPlan );
+
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(nextPlan.getSubPlan(0).getRootOperator());
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, newInputPlan);
+
+			return PhysicalPlanFactory.createPlan( oldSubPlanRootOp, addOpPlan );
+		}
 		else if ( (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion)
 				&& PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan)){
 			
@@ -721,11 +734,17 @@ public class PhysicalPlanFactory
 		for ( int i = 0; i < unionPlan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = unionPlan.getSubPlan(i);
 			final PhysicalOperator subRootOp = subPlan.getRootOperator();
-			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
+			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter || subRootOp instanceof PhysicalOpLocalToGlobal ) ) {
 				return false;
 			}
 
-			if ( subRootOp instanceof PhysicalOpFilter){
+			if ( subRootOp instanceof PhysicalOpLocalToGlobal ){
+				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest || subPlan.getSubPlan(0) instanceof PhysicalOpFilter) ){
+					return false;
+				}
+			}
+
+			if ( subRootOp instanceof PhysicalOpFilter ){
 				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
 					return false;
 				}
