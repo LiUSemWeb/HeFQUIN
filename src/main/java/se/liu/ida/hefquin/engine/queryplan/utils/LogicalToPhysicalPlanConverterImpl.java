@@ -13,21 +13,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.BasePhysicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpParallelMultiLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -167,16 +159,8 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			PhysicalPlan currentSubPlan = children.get(0);
 			for ( int i = 1; i < children.size(); ++i ) {
 				final PhysicalPlan nextChild = children.get(i);
-				final PhysicalOperator rootOpOfNextChild = nextChild.getRootOperator();
-				if( ! ignorePhysicalOpsForLogicalAddOps && rootOpOfNextChild instanceof PhysicalOpRequest ){
-					currentSubPlan = createPhysicalPlanWithUnaryRoot(
-							LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(rootOpOfNextChild),
-							currentSubPlan );
-				}
-				else if ( ! ignorePhysicalOpsForLogicalAddOps && currentSubPlan.getRootOperator() instanceof PhysicalOpRequest ){
-					currentSubPlan = createPhysicalPlanWithUnaryRoot(
-							LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(currentSubPlan.getRootOperator()),
-							nextChild );
+				if( ! ignorePhysicalOpsForLogicalAddOps ) {
+					currentSubPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentSubPlan, nextChild);
 				}
 				else {
 					currentSubPlan = createPhysicalPlanWithBinaryRoot(
