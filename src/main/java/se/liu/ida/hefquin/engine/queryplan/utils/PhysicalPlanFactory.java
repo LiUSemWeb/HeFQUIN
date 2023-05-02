@@ -727,7 +727,10 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * Check whether subplans under the UNION are all requests or filters with request
+	 * Check whether all operators under the UNION operator belong to any of the following:
+	 * 	 - The operator is a request
+	 * 	 - If the operator is a filter, then under that filter there must be a request,
+	 * 	 - If the operator is a L2G operator, under the L2G operator, there must be a request or a filter operator with requests.
 	 */
 	public static boolean checkUnaryOpApplicableToUnionPlan( final PhysicalPlan unionPlan ){
 		final PhysicalOperator rootOp = unionPlan.getRootOperator();
@@ -745,6 +748,11 @@ public class PhysicalPlanFactory
 			if ( subRootOp instanceof PhysicalOpLocalToGlobal ){
 				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest || subPlan.getSubPlan(0) instanceof PhysicalOpFilter) ){
 					return false;
+				}
+				if ( subPlan.getSubPlan(0) instanceof PhysicalOpFilter ){
+					if ( !( subPlan.getSubPlan(0).getSubPlan(0) instanceof PhysicalOpRequest) ){
+						return false;
+					}
 				}
 			}
 
