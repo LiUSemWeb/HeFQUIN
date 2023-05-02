@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -700,6 +701,22 @@ public class PhysicalPlanFactory
 
 			return PhysicalPlanFactory.createPlan( filterOp, addOpPlan);
 		}
+		else if ( oldSubPlanRootOp instanceof PhysicalOpLocalToGlobal
+				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ){
+			final PhysicalOpLocalToGlobal l2gPOP = (PhysicalOpLocalToGlobal) oldSubPlanRootOp;
+			final LogicalOpLocalToGlobal l2gLOP = (LogicalOpLocalToGlobal) l2gPOP.getLogicalOperator();
+			final VocabularyMapping vm = l2gLOP.getVocabularyMapping();
+
+			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
+			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan( new PhysicalOpGlobalToLocal(g2l), inputPlan );
+
+			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) nextPlan.getSubPlan(0).getRootOperator();
+
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
+			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, newInputPlan);
+
+			return PhysicalPlanFactory.createPlan( l2gPOP, addOpPlan );
+		}
 		else if ( (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion)
 				&& PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan)){
 			
@@ -710,7 +727,10 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * Check whether subplans under the UNION are all requests or filters with request
+	 * Check whether all operators under the UNION operator belong to any of the following:
+	 * 	 - The operator is a request
+	 * 	 - If the operator is a filter, then under that filter there must be a request,
+	 * 	 - If the operator is a L2G operator, under the L2G operator, there must be a request or a filter operator with requests.
 	 */
 	public static boolean checkUnaryOpApplicableToUnionPlan( final PhysicalPlan unionPlan ){
 		final PhysicalOperator rootOp = unionPlan.getRootOperator();
@@ -721,11 +741,22 @@ public class PhysicalPlanFactory
 		for ( int i = 0; i < unionPlan.numberOfSubPlans(); i++ ) {
 			final PhysicalPlan subPlan = unionPlan.getSubPlan(i);
 			final PhysicalOperator subRootOp = subPlan.getRootOperator();
-			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter) ) {
+			if ( !(subRootOp instanceof PhysicalOpRequest || subRootOp instanceof PhysicalOpFilter || subRootOp instanceof PhysicalOpLocalToGlobal ) ) {
 				return false;
 			}
 
-			if ( subRootOp instanceof PhysicalOpFilter){
+			if ( subRootOp instanceof PhysicalOpLocalToGlobal ){
+				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest || subPlan.getSubPlan(0) instanceof PhysicalOpFilter) ){
+					return false;
+				}
+				if ( subPlan.getSubPlan(0) instanceof PhysicalOpFilter ){
+					if ( !( subPlan.getSubPlan(0).getSubPlan(0) instanceof PhysicalOpRequest) ){
+						return false;
+					}
+				}
+			}
+
+			if ( subRootOp instanceof PhysicalOpFilter ){
 				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
 					return false;
 				}
