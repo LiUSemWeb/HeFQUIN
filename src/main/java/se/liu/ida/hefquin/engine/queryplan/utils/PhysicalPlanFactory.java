@@ -746,18 +746,20 @@ public class PhysicalPlanFactory
 			}
 
 			if ( subRootOp instanceof PhysicalOpLocalToGlobal ){
-				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest || subPlan.getSubPlan(0) instanceof PhysicalOpFilter) ){
+				final PhysicalPlan subSubPlan = subPlan.getSubPlan(0);
+				final PhysicalOperator subSubRootOp = subSubPlan.getRootOperator();
+				if ( !( subSubRootOp instanceof PhysicalOpRequest || subSubRootOp instanceof PhysicalOpFilter) ){
 					return false;
 				}
-				if ( subPlan.getSubPlan(0) instanceof PhysicalOpFilter ){
-					if ( !( subPlan.getSubPlan(0).getSubPlan(0) instanceof PhysicalOpRequest) ){
+				if ( subSubRootOp instanceof PhysicalOpFilter ){
+					if ( !( subSubPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest) ){
 						return false;
 					}
 				}
 			}
 
 			if ( subRootOp instanceof PhysicalOpFilter ){
-				if ( !( subPlan.getSubPlan(0) instanceof PhysicalOpRequest) ){
+				if ( !( subPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest) ){
 					return false;
 				}
 			}
