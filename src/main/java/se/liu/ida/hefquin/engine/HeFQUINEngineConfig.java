@@ -75,6 +75,7 @@ public class HeFQUINEngineConfig
 //				return createQueryOptimizerWithoutOptimization(ctxt);
 //				return createCostModelBasedGreedyJoinPlanOptimizerImpl(ctxt);
 //				return createCardinalityBasedGreedyJoinPlanOptimizerImpl(ctxt);
+//				return createReduceVocabularyRewritingJoinPlanOptimizerImpl(ctxt);
 				return createDPBasedBushyJoinPlanOptimizer(ctxt);
 //				return createDPBasedLinearJoinPlanOptimizer(ctxt);
 //				return createEvolutionaryAlgorithmQueryOptimizer(ctxt);
@@ -93,6 +94,11 @@ public class HeFQUINEngineConfig
 
 	protected PhysicalOptimizer createCardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
 		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createReduceVocabularyRewritingJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new ReduceVocRewritingJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 
