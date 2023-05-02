@@ -703,7 +703,9 @@ public class PhysicalPlanFactory
 		}
 		else if ( oldSubPlanRootOp instanceof PhysicalOpLocalToGlobal
 				&& nextPlan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest ){
-			final VocabularyMapping vm = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) oldSubPlanRootOp).getLogicalOperator()).getVocabularyMapping();
+			final PhysicalOpLocalToGlobal l2gPOP = (PhysicalOpLocalToGlobal) oldSubPlanRootOp;
+			final LogicalOpLocalToGlobal l2gLOP = (LogicalOpLocalToGlobal) l2gPOP.getLogicalOperator();
+			final VocabularyMapping vm = l2gLOP.getVocabularyMapping();
 
 			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
 			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan( new PhysicalOpGlobalToLocal(g2l), inputPlan );
