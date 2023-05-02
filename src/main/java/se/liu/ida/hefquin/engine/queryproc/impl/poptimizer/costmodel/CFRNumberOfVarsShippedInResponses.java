@@ -84,7 +84,11 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 				throw createIllegalArgumentException(fm);
 			}
 		}
-		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion || lop instanceof LogicalOpMultiwayUnion ) {
+		else if ( lop instanceof LogicalOpJoin
+				|| lop instanceof LogicalOpUnion
+				|| lop instanceof LogicalOpMultiwayUnion
+				|| lop instanceof LogicalOpLocalToGlobal
+				|| lop instanceof LogicalOpGlobalToLocal) {
 			return CompletableFuture.completedFuture(0);
 		}
 		else {
