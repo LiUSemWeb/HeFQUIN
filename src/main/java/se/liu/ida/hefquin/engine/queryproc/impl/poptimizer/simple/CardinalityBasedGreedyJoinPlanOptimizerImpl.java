@@ -6,16 +6,17 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityBasedJoinPlanOptimizerUtils;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithStatistics;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithStatisticsUtils;
 
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             // the operators can be found by a depth-first traversal of the subplans.
             final List<LogicalOpRequest<?,?>> reqOpsOfAllSubPlans = new ArrayList<>();
             for ( final PhysicalPlan subplan : subplans ) {
-            	reqOpsOfAllSubPlans.addAll( extractAllRequestOpsFromSourceAssignment(subplan) );
+            	reqOpsOfAllSubPlans.addAll( CardinalityBasedJoinPlanOptimizerUtils.extractAllRequestOpsFromSourceAssignment(subplan) );
             }
 
             // Next, get a list of cardinality estimates by performing cardinality
@@ -71,7 +72,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             final List<PhysicalPlanWithStatistics> subPlansWithStatistics = associateCardWithSubPlans(reqOpsOfAllSubPlans, resps);
 
             // To build a left-deep query plan, first select the subplan with the lowest estimated cardinality
-            PhysicalPlanWithStatistics nextSelectedSubPlan = chooseFirstSubPlan(subPlansWithStatistics);
+            PhysicalPlanWithStatistics nextSelectedSubPlan = PhysicalPlanWithStatisticsUtils.chooseFirstSubPlan(subPlansWithStatistics);
             subPlansWithStatistics.remove(nextSelectedSubPlan);
 
             PhysicalPlanWithStatistics currentJoinPlan = nextSelectedSubPlan;
@@ -90,11 +91,11 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
 
                 if ( !subPlansWithStatistics.isEmpty() ) {
                     // Identify subplans that have join variables with the selected subplan as new candidateSubPlans.
-                    List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansContainVars(nextSelectedSubPlan.plan.getExpectedVariables(), subPlansWithStatistics);
+                    List<PhysicalPlanWithStatistics> candidateSubPlans = PhysicalPlanWithStatisticsUtils.getSubPlansContainVars( nextSelectedSubPlan.plan.getExpectedVariables(), subPlansWithStatistics );
                     if ( candidateSubPlans.isEmpty() && orderedCandidateSubPlans.isEmpty() ) {
                         // Independent subplans exist, and there are no more candidate subplans to be consumed in orderedCandidateSubPlans
                         // In this case, choose the subplan with the lowest candidate from subPlansWithStatistics as candidate plan
-                        candidateSubPlans = Arrays.asList( chooseFirstSubPlan(subPlansWithStatistics) );
+                        candidateSubPlans = Arrays.asList( PhysicalPlanWithStatisticsUtils.chooseFirstSubPlan(subPlansWithStatistics) );
                     }
 
                     // The candidateSubPlans are added to the ordered list 'orderedCandidateSubPlans' and removed from the remaining subPlansWithStatistics
@@ -109,38 +110,6 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             }
 
             return currentJoinPlan.plan;
-        }
-
-        /**
-         * Extracts all request operators from the given plan, assuming
-         * that this plan is a sub-plan of a source assignment (hence,
-         * assuming that this plan can only be either a single request,
-         * a filter over a request, or a union with requests).
-         * 
-         * The extracted request operators will be order in the order in
-         * which they are discovered by a depth-first traversal of the
-         * given plan.   
-         */
-        protected List<LogicalOpRequest<?,?>> extractAllRequestOpsFromSourceAssignment( final PhysicalPlan plan ) {
-            final PhysicalOperator pop = plan.getRootOperator();
-
-            if (pop instanceof PhysicalOpRequest) {
-                return Arrays.asList( ((PhysicalOpRequest<?,?>) pop).getLogicalOperator() );
-            }
-            else if (pop instanceof PhysicalOpFilter
-                    && plan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest) {
-                return Arrays.asList( ((PhysicalOpRequest<?,?>) plan.getSubPlan(0)).getLogicalOperator() );
-            }
-            else if (pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion) {
-                final List<LogicalOpRequest<?,?>> reqOps = new ArrayList<>();
-                final int numOfSubPlans = plan.numberOfSubPlans();
-                for (int i = 0; i < numOfSubPlans; i++) {
-                    reqOps.addAll( extractAllRequestOpsFromSourceAssignment(plan.getSubPlan(i)) );
-                }
-                return reqOps;
-            }
-            else
-                throw new IllegalArgumentException("Unsupported type of subquery in source assignment (" + pop.getClass().getName() + ")");
         }
 
         /**
@@ -166,13 +135,15 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                 final PhysicalOperator pop = subplan.getRootOperator();
 
                 final PhysicalPlanWithStatistics planWithStatistics;
-                if ( pop instanceof PhysicalOpRequest ||
-                        (pop instanceof PhysicalOpFilter && subplan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest)) {
+                if ( pop instanceof PhysicalOpRequest
+                        || (pop instanceof PhysicalOpFilter && subplan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest)
+                        || (pop instanceof PhysicalOpLocalToGlobal && subplan.getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest)
+                        || (pop instanceof PhysicalOpLocalToGlobal && subplan.getSubPlan(0).getRootOperator() instanceof PhysicalOpFilter && subplan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof PhysicalOpRequest)) {
                     final int cardinality = resps[index].getCardinality();
                     final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
                     final int numOfAccess = accessNumForReq(cardinality, fm);
 
-                    planWithStatistics = new PhysicalPlanWithStatistics( subplan, Arrays.asList(fm), cardinality, numOfAccess );
+                    planWithStatistics = new PhysicalPlanWithStatistics( subplan, Arrays.asList(fm), null, cardinality, numOfAccess );
                     index++;
                 }
                 else if (pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion) {
@@ -181,7 +152,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                     final List<FederationMember> fms = new ArrayList<>();
                     for ( int count = 0; count < subplan.numberOfSubPlans(); count++ ) {
                         final int cardinality = resps[index].getCardinality();
-                        aggregatedCardinality += (cardinality == Integer.MAX_VALUE) ? Integer.MAX_VALUE : cardinality;
+                        aggregatedCardinality += (cardinality < 0 ) ? Integer.MAX_VALUE : cardinality;
                         if ( aggregatedCardinality < 0 ) aggregatedCardinality = Integer.MAX_VALUE;
 
                         final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
@@ -191,7 +162,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                         index++;
                     }
 
-                    planWithStatistics = new PhysicalPlanWithStatistics(subplan, fms, aggregatedCardinality, numOfAccess );
+                    planWithStatistics = new PhysicalPlanWithStatistics(subplan, fms, null, aggregatedCardinality, numOfAccess );
                 }
                 else
                     throw new IllegalArgumentException("Unsupported type of subquery in source assignment (" + pop.getClass().getName() + ")");
@@ -200,39 +171,6 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             }
 
             return subPlansWithStatistics;
-        }
-
-        /**
-         * Compares all available subplans (see {@link #subplans}) in terms of
-         * their respective cardinality returns the one with the lowest cardinality.
-         */
-        protected PhysicalPlanWithStatistics chooseFirstSubPlan( final List<PhysicalPlanWithStatistics> subPlansWithStatistics ) {
-            PhysicalPlanWithStatistics bestPlanWithCandidate = subPlansWithStatistics.get(0);
-            int lowestCost = bestPlanWithCandidate.getCardinality();
-
-            for ( int i = 1; i < subPlansWithStatistics.size(); i++ ) {
-                PhysicalPlanWithStatistics current = subPlansWithStatistics.get(i);
-                if ( current.getCardinality() < lowestCost ) {
-                    lowestCost = current.getCardinality();
-                    bestPlanWithCandidate = current;
-                }
-            }
-
-            return bestPlanWithCandidate;
-        }
-
-        /**
-         * Iterate through the remaining subplans and selected those that contain any of the variables in the given set of variables.
-         */
-        protected List<PhysicalPlanWithStatistics> getSubPlansContainVars( final ExpectedVariables vars, final List<PhysicalPlanWithStatistics> subPlansWithStatistics ) {
-            final List<PhysicalPlanWithStatistics> subPlansContainsVars = new ArrayList<>();
-            for ( final PhysicalPlanWithStatistics subplan: subPlansWithStatistics ) {
-                if ( ! ExpectedVariablesUtils.intersectionOfAllVariables( vars, subplan.plan.getExpectedVariables() ).isEmpty() ){
-                    subPlansContainsVars.add(subplan);
-                }
-            }
-
-            return subPlansContainsVars;
         }
 
         /**
@@ -265,7 +203,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             final int joinCardinality = Math.min( currentPlan.getCardinality(), nextPlan.getCardinality() );
 
             // The list of fed.members and numOfAccess will not be accessed anymore for this new PhysicalPlanWithStatistics object
-            return new PhysicalPlanWithStatistics( newPlan, null, joinCardinality, -1 );
+            return new PhysicalPlanWithStatistics( newPlan, null, null, joinCardinality, -1 );
         }
 
         /**
@@ -295,32 +233,6 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
             }
             else
                 throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
-        }
-    }
-
-    class PhysicalPlanWithStatistics {
-        public final PhysicalPlan plan;
-        protected final int cardinality;
-        protected final int numOfAccess;
-        protected final List<FederationMember> fms;
-
-        public PhysicalPlanWithStatistics( final PhysicalPlan plan, final List<FederationMember> fms, final int cardinality, final int numOfAccess ){
-            this.plan = plan;
-            this.fms = fms;
-            this.cardinality = cardinality;
-            this.numOfAccess = numOfAccess;
-        }
-
-        public int getCardinality( ){
-            return cardinality;
-        }
-
-        public int getNumOfAccess( ){
-            return numOfAccess;
-        }
-
-        public List<FederationMember> getFederationMembers( ){
-            return fms;
         }
     }
 
