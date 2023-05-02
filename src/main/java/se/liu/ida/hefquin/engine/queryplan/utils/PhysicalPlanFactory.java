@@ -713,7 +713,7 @@ public class PhysicalPlanFactory
 			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(nextPlan.getSubPlan(0).getRootOperator());
 			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, newInputPlan);
 
-			return PhysicalPlanFactory.createPlan( oldSubPlanRootOp, addOpPlan );
+			return PhysicalPlanFactory.createPlan( l2gPOP, addOpPlan );
 		}
 		else if ( (oldSubPlanRootOp instanceof PhysicalOpBinaryUnion || oldSubPlanRootOp instanceof PhysicalOpMultiwayUnion)
 				&& PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(nextPlan)){
