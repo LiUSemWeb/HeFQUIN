@@ -710,7 +710,9 @@ public class PhysicalPlanFactory
 			final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal(vm);
 			final PhysicalPlan newInputPlan = PhysicalPlanFactory.createPlan( new PhysicalOpGlobalToLocal(g2l), inputPlan );
 
-			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(nextPlan.getSubPlan(0).getRootOperator());
+			final PhysicalOpRequest<?,?> reqOp = (PhysicalOpRequest<?,?>) nextPlan.getSubPlan(0).getRootOperator();
+
+			final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromPhysicalReqOp(reqOp);
 			final PhysicalPlan addOpPlan = PhysicalPlanFactory.createPlan( addOp, newInputPlan);
 
 			return PhysicalPlanFactory.createPlan( l2gPOP, addOpPlan );
