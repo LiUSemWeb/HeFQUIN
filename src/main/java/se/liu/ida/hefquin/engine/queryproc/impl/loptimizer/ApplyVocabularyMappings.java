@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.vocabulary.RDF;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.mappings.VocabularyMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -49,35 +50,12 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		if (inputPlan.getRootOperator() instanceof LogicalOpRequest) {
 			final LogicalOpRequest<?,?> requestOp = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
 
-			// For a compressed version of query plan, check if it is necessary to add the l2g operator over a request based on the form of the graph pattern.
-			// The current implementation assumes that only concepts and roles are being considered in vocabulary mapping
-			// and that the data of the federation members is only instance data (i.e., properties
-			// appear only in the predicate position of triples and classes appear only in the
-			// object position of rdf:type triples).
-			boolean rewriteNeeded = false;
-			if ( compressVocabularyRewriting ) {
-				final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq(requestOp);
-				if ( !tps.isEmpty() ) {
-					for ( final TriplePattern tp : tps ) {
-						// If any triple pattern is in the form of (-, ?p, -) or (-, rdf:type, ?o),
-
-						// the intermediate results might need to be rewritten. This requires adding a L2G operator over the request.
-						if ( tp.asJenaTriple().getPredicate().isVariable()
-								|| (tp.asJenaTriple().getPredicate().hasURI("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>")
-								&& tp.asJenaTriple().getObject().isVariable() )
-						) {
-							rewriteNeeded = true;
-							break;
-						}
-					}
-				}
-			}
-
 			final VocabularyMapping vm = requestOp.getFederationMember().getVocabularyMapping();
 			if ( vm != null) { // If fm has a vocabulary mapping vm
 				final LogicalPlan newInputPlan = rewriteToUseLocalVocabulary(inputPlan);
 
-				if ( !compressVocabularyRewriting || rewriteNeeded ){
+				// For a compressed version of query plan, check if it is necessary to add the l2g operator over a request based on the form of the graph pattern.
+				if ( !compressVocabularyRewriting || checkIfLocalToGlobalNeeded(requestOp) ) {
 					final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm);
 					return new LogicalPlanWithUnaryRootImpl(l2g, newInputPlan);
 				}
@@ -211,6 +189,32 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		else {
 			throw new IllegalArgumentException( pattern.getClass().getName() );
 		}
+	}
+
+	/**
+	 * This function is used to check if it is necessary to add a l2g operator over a request based on the form of the graph pattern.
+	 * The current implementation assumes that only concepts and roles are being considered in vocabulary mapping
+	 * and that the data of the federation members is only instance data (i.e., properties
+	 * appear only in the predicate position of triples and classes appear only in the
+	 * object position of rdf:type triples).
+	 */
+	protected boolean checkIfLocalToGlobalNeeded( final LogicalOpRequest<?,?> requestOp ){
+		final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq(requestOp);
+		if ( !tps.isEmpty() ) {
+			for ( final TriplePattern tp : tps ) {
+				// If any triple pattern is in the form of (-, ?p, -) or (-, rdf:type, ?o),
+
+				// the intermediate results might need to be rewritten. This requires adding a L2G operator over the request.
+				if ( tp.asJenaTriple().getPredicate().isVariable()
+						|| (tp.asJenaTriple().getPredicate().equals( RDF.Nodes.type )
+						&& tp.asJenaTriple().getObject().isVariable() )
+				) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
 	}
 
 }
