@@ -82,6 +82,9 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpGPAdd) rootOp );
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v );
 		}
+		else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ){
+			return _initiateCardinalityEstimation( plan.getSubPlan(0), v );
+		}
 		else if ( rootOp instanceof LogicalOpJoin ) {
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
 		}

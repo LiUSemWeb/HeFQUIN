@@ -34,8 +34,8 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 
 		//// Uncomment the following line to apply vocabulary mappings of
 		//// federation members during query planning. Note that applying
-		//// vocabulary mappings is only supported by the naive algorithm
-		//// currently since the cost model needs to be extended to consider
+		//// vocabulary mappings is not supported by the evolutionary algorithm
+		//// currently since the rewriting rules need to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
 		// heuristics.add( new ApplyVocabularyMappings(false) );
 	}

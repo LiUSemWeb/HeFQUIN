@@ -33,7 +33,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		final int numberOfJoinVars;
 		final CompletableFuture<Integer> futureIntResSize;
 
-		if ( lop instanceof UnaryLogicalOp ) {
+		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd || lop instanceof LogicalOpGPAdd  ) {
 			SPARQLGraphPattern pattern;
 			if (lop instanceof LogicalOpTPAdd) {
 				pattern = ((LogicalOpTPAdd) lop).getTP();
@@ -72,7 +72,11 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			numberOfJoinVars = 0;    // irrelevant for request operators
 			futureIntResSize = null; // irrelevant for request operators
 		}
-		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion || lop instanceof LogicalOpMultiwayUnion ) {
+		else if ( lop instanceof LogicalOpJoin
+				|| lop instanceof LogicalOpUnion
+				|| lop instanceof LogicalOpMultiwayUnion
+				|| lop instanceof LogicalOpLocalToGlobal
+				|| lop instanceof LogicalOpGlobalToLocal ) {
 			numberOfTerms = 0;       // irrelevant for join operators
 			numberOfJoinVars = 0;    // irrelevant for join operators
 			futureIntResSize = null; // irrelevant for join operators
@@ -98,7 +102,11 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfTerms;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin || pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion ) {
+		else if ( pop instanceof BasePhysicalOpBinaryJoin
+				|| pop instanceof PhysicalOpBinaryUnion
+				|| pop instanceof PhysicalOpMultiwayUnion
+				|| pop instanceof PhysicalOpLocalToGlobal
+				|| pop instanceof PhysicalOpGlobalToLocal ) {
 			costValue = 0;
 		}
 		else {
