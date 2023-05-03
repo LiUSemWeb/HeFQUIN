@@ -41,8 +41,11 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 			} else if (lop instanceof LogicalOpBGPAdd) {
 				pattern = ((LogicalOpBGPAdd) lop).getBGP();
 
-			} else {
+			} else if (lop instanceof LogicalOpGPAdd) {
 				pattern = ((LogicalOpGPAdd) lop).getPattern();
+			}
+			else {
+				throw createIllegalArgumentException(lop);
 			}
 
 			numberOfTerms = QueryPatternUtils.getNumberOfTermOccurrences( pattern );
