@@ -56,7 +56,8 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 				final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq(requestOp);
 				if ( !tps.isEmpty() ) {
 					for ( final TriplePattern tp : tps ) {
-						// If any triple pattern is in the form of (-, ?p, -) or (-, rdfs:type, ?o),
+						// If any triple pattern is in the form of (-, ?p, -) or (-, rdf:type, ?o),
+
 						// the intermediate results might need to be rewritten. This requires adding a L2G operator over the request.
 						if ( tp.asJenaTriple().getPredicate().isVariable()
 								|| (tp.asJenaTriple().getPredicate().hasURI("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>")
