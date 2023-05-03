@@ -200,19 +200,17 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	 */
 	protected boolean checkIfLocalToGlobalNeeded( final LogicalOpRequest<?,?> requestOp ){
 		final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq(requestOp);
-		if ( !tps.isEmpty() ) {
-			for ( final TriplePattern tp : tps ) {
-				// If any triple pattern is in the form of (-, ?p, -) or (-, rdf:type, ?o),
-
-				// the intermediate results might need to be rewritten. This requires adding a L2G operator over the request.
-				if ( tp.asJenaTriple().getPredicate().isVariable()
-						|| (tp.asJenaTriple().getPredicate().equals( RDF.Nodes.type )
-						&& tp.asJenaTriple().getObject().isVariable() )
-				) {
-					return true;
-				}
+		for ( final TriplePattern tp : tps ) {
+			// If any triple pattern is in the form of (-, ?p, -) or (-, rdf:type, ?o),
+			// the intermediate results might need to be rewritten, which
+			// requires adding a L2G operator over the request.
+			if ( tp.asJenaTriple().getPredicate().isVariable() ) {
+				return true;
 			}
-			return false;
+			if ( tp.asJenaTriple().getPredicate().equals(RDF.Nodes.type)
+			     && tp.asJenaTriple().getObject().isVariable() ) {
+				return true;
+			}
 		}
 		return false;
 	}
