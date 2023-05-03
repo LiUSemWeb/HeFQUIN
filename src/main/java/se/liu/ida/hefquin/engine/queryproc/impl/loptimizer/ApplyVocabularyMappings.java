@@ -50,7 +50,10 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			final LogicalOpRequest<?,?> requestOp = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
 
 			// For a compressed version of query plan, check if it is necessary to add the l2g operator over a request based on the form of the graph pattern.
-			// The current implementation assumes that only concepts and roles are being considered in vocabulary mapping.
+			// The current implementation assumes that only concepts and roles are being considered in vocabulary mapping
+			// and that the data of the federation members is only instance data (i.e., properties
+			// appear only in the predicate position of triples and classes appear only in the
+			// object position of rdf:type triples).
 			boolean rewriteNeeded = false;
 			if ( compressVocabularyRewriting ) {
 				final Set<TriplePattern> tps = LogicalOpUtils.getTriplePatternsOfReq(requestOp);
