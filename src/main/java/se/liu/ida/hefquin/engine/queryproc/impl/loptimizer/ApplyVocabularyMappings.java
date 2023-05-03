@@ -34,7 +34,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRoot
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 
 public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization {
-	boolean compressVocabularyRewriting;
+	protected final boolean compressVocabularyRewriting;
+
 
 	ApplyVocabularyMappings( final boolean compressVocabularyRewriting ){
 		this.compressVocabularyRewriting = compressVocabularyRewriting;
