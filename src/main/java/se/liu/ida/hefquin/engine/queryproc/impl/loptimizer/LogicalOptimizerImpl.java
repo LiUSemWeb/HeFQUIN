@@ -37,7 +37,7 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		//// vocabulary mappings is only supported by the naive algorithm
 		//// currently since the cost model needs to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
-		//heuristics.add( new ApplyVocabularyMappings());
+		// heuristics.add( new ApplyVocabularyMappings(false) );
 	}
 
 	@Override
