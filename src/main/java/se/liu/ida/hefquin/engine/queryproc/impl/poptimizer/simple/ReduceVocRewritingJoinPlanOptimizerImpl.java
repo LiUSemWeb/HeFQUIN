@@ -34,8 +34,8 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
             @Override
             protected PhysicalPlan determineJoinOrderAndConstructPlan( final PhysicalPlanWithStatistics firstSubPlan, final List<PhysicalPlanWithStatistics> subPlansWithStatistics, final Comparator<PhysicalPlanWithStatistics> orderBasedOnCard) {
                 final PriorityQueue<PhysicalPlanWithStatistics> orderedCandidateSubPlans = new PriorityQueue<>(orderBasedOnCard);
-                PhysicalPlanWithStatistics nextSelectedSubPlan = firstSubPlan;
-                PhysicalPlan currentJoinPlan = nextSelectedSubPlan.plan;
+                PhysicalPlanWithStatistics previousSelectedSubPlan = firstSubPlan;
+                PhysicalPlan currentJoinPlan = previousSelectedSubPlan.plan;
 
                 while ( !subPlansWithStatistics.isEmpty() ){
                     // Identify subplans that have join variables with the selected subplan as new candidateSubPlans.
@@ -46,7 +46,7 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
 
                     // Keep candidate SubPlans that use the same vocabulary mapping with the previous selected SubPlan.
                     // If 'candidateSubPlans' is empty, use all subplans in 'tmpCandidateSubPlans' as candidate subplans.
-                    List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansWithSameVoc( nextSelectedSubPlan.getVocabularyMappings(), tmpCandidateSubPlans);
+                    List<PhysicalPlanWithStatistics> candidateSubPlans = getSubPlansWithSameVoc( previousSelectedSubPlan.getVocabularyMappings(), tmpCandidateSubPlans);
                     if( candidateSubPlans.isEmpty() ){
                         candidateSubPlans = tmpCandidateSubPlans;
                     }
@@ -56,12 +56,13 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
 
                     // select the first element (with the lowest cardinality) from orderedCandidateSubPlans as the nextSelectedSubPlan
                     // Remove the selected subPlan from subPlansWithStatistics and clear orderedCandidateSubPlans for the next loop
-                    nextSelectedSubPlan = orderedCandidateSubPlans.poll();
+                    final PhysicalPlanWithStatistics nextSelectedSubPlan = orderedCandidateSubPlans.poll();
                     subPlansWithStatistics.remove(nextSelectedSubPlan);
                     orderedCandidateSubPlans.clear();
 
                     // Construct a physical plan using bind join
                     currentJoinPlan = constructPlanWithBJ( currentJoinPlan, nextSelectedSubPlan.plan );
+                    previousSelectedSubPlan = nextSelectedSubPlan;
                 }
 
                 return currentJoinPlan;
@@ -76,8 +77,8 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
         final List<PhysicalPlanWithStatistics> subPlansWithSameVoc = new ArrayList<>();
         for ( final PhysicalPlanWithStatistics subplan: subPlansWithStatistics ) {
             final List<VocabularyMapping> vmsNext = subplan.getVocabularyMappings();
-            vms.retainAll(vmsNext);
-            if ( !vms.isEmpty() ){
+            vmsNext.retainAll(vms);
+            if ( !vmsNext.isEmpty() ){
                 subPlansWithSameVoc.add(subplan);
             }
         }
@@ -89,7 +90,7 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
      * Construct a physical plan using bind join when it is possible:
      * If both currentPlan and nextPlan have PhysicalOpLocalToGlobal as root operator, and use the same vocabulary mapping,
      * the physical plan can be simplified as when unary operator can be applied:
-     * tpAdd^{tp}_{fm}(g2l^{vm}(l2g^{vm}(p))) --> tpAdd^{tp}_{fm}(p)
+     * tpAdd^{tp}_{fm}(g2l^{vm}(l2g^{vm}(p))) --> tpAdd^{tp}_{fm}(p) (see Equation 2 of Proposition 2)
      */
     protected PhysicalPlan constructPlanWithBJ( final PhysicalPlan currentPlan, final PhysicalPlan nextPlan ) {
         final PhysicalOperator currentPop = currentPlan.getRootOperator();
@@ -98,6 +99,7 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
                 && nextPop instanceof PhysicalOpLocalToGlobal ) {
             final VocabularyMapping vm1 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) currentPop).getLogicalOperator()).getVocabularyMapping();
             final VocabularyMapping vm2 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) nextPop).getLogicalOperator()).getVocabularyMapping();
+            // TODO: check if every rule is either an equivalence on concepts or an equivalence on roles.
             if( vm1.equals(vm2) ){
                 final PhysicalPlan temPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan.getSubPlan(0), nextPlan.getSubPlan(0));
                 final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm1);
@@ -119,6 +121,7 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
                 if ( oldSubPlan.getRootOperator() instanceof PhysicalOpLocalToGlobal ){
                     final VocabularyMapping vm1 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) currentPop).getLogicalOperator()).getVocabularyMapping();
                     final VocabularyMapping vm2 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) oldSubPlan.getRootOperator()).getLogicalOperator()).getVocabularyMapping();
+                    // TODO: check if every rule is either an equivalence on concepts or an equivalence on roles.
                     if( vm1.equals(vm2) ){
                         final PhysicalPlan temPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan.getSubPlan(0), oldSubPlan.getSubPlan(0));
                         final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm1);
@@ -138,6 +141,35 @@ public class ReduceVocRewritingJoinPlanOptimizerImpl extends CardinalityBasedJoi
         }
         else {
             return PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentPlan, nextPlan);
+        }
+    }
+
+    /**
+     * Construct a physical plan using symmetric hash join:
+     * If both currentPlan and nextPlan have PhysicalOpLocalToGlobal as root operator,
+     * and every rule is either an equivalence on concepts or an equivalence on roles,
+     * the physical plan can be simplified as:
+     * join( l2g^{vm}(p1), l2g^{vm}(p2) ) --> l2g^{vm}( join (p1, p2) ), (see Equation 1 of Proposition 2)
+     */
+    protected PhysicalPlan constructPlanWithSHJ( final PhysicalPlan currentPlan, final PhysicalPlan nextPlan ) {
+        final PhysicalOperator currentPop = currentPlan.getRootOperator();
+        final PhysicalOperator nextPop = nextPlan.getRootOperator();
+        if ( currentPop instanceof PhysicalOpLocalToGlobal
+                && nextPop instanceof PhysicalOpLocalToGlobal ) {
+            final VocabularyMapping vm1 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) currentPop).getLogicalOperator()).getVocabularyMapping();
+            final VocabularyMapping vm2 = ((LogicalOpLocalToGlobal)((PhysicalOpLocalToGlobal) nextPop).getLogicalOperator()).getVocabularyMapping();
+            //TODO: check if every rule is either an equivalence on concepts or an equivalence on roles.
+            if( vm1.equals(vm2) ){
+                final PhysicalPlan temPlan = PhysicalPlanFactory.createPlanWithJoin(currentPlan.getSubPlan(0), nextPlan.getSubPlan(0));
+                final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm1);
+                return PhysicalPlanFactory.createPlan( new PhysicalOpLocalToGlobal(l2g), temPlan );
+            }
+            else {
+                return PhysicalPlanFactory.createPlanWithJoin(currentPlan, nextPlan);
+            }
+        }
+        else {
+            return PhysicalPlanFactory.createPlanWithJoin(currentPlan, nextPlan);
         }
     }
 
