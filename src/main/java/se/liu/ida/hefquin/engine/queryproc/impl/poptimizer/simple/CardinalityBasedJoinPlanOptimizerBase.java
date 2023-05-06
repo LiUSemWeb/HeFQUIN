@@ -161,8 +161,14 @@ public abstract class CardinalityBasedJoinPlanOptimizerBase extends JoinPlanOpti
                     final int cardinality = resps[index].getCardinality();
                     final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
                     final int numOfAccess = accessNumForReq(cardinality, fm);
+                    final VocabularyMapping vm = fm.getVocabularyMapping();
 
-                    planWithStatistics = new PhysicalPlanWithStatistics( subplan, Arrays.asList(fm), null, cardinality, numOfAccess );
+                    if ( vm != null ) {
+                        planWithStatistics = new PhysicalPlanWithStatistics(subplan, Arrays.asList(fm), Arrays.asList(vm), cardinality, numOfAccess);
+                    }
+                    else {
+                        planWithStatistics = new PhysicalPlanWithStatistics(subplan, Arrays.asList(fm), null, cardinality, numOfAccess);
+                    }
                     index++;
                 }
                 else if ( pop instanceof PhysicalOpLocalToGlobal ){
