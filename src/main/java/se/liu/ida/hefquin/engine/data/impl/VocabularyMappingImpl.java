@@ -431,30 +431,31 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					j.add(v, n);
 				}
 			}
-			
-			final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
-			if (bindingTranslation.size() > 1) {
-				final Set<BindingBuilder> bbsCopy = new HashSet<>();
-				
-				for(final Node j : bindingTranslation) {
-					for (final BindingBuilder k : bbs) {
-						BindingBuilder translationCopy = BindingBuilder.create();
-						if(!k.isEmpty()) {
-							translationCopy.addAll(k.snapshot());
+			else {
+				final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
+				if (bindingTranslation.size() > 1) {
+					final Set<BindingBuilder> bbsCopy = new HashSet<>();
+
+					for (final Node j : bindingTranslation) {
+						for (final BindingBuilder k : bbs) {
+							BindingBuilder translationCopy = BindingBuilder.create();
+							if (!k.isEmpty()) {
+								translationCopy.addAll(k.snapshot());
+							}
+							translationCopy.add(v, j);
+							bbsCopy.add(translationCopy);
 						}
-						translationCopy.add(v, j);
-						bbsCopy.add(translationCopy);
 					}
-				}
-				
-				bbs = bbsCopy;
-			} else if (bindingTranslation.size() == 0) {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, n);
-				}
-			} else {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, bindingTranslation.iterator().next());
+
+					bbs = bbsCopy;
+				} else if (bindingTranslation.size() == 0) {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, n);
+					}
+				} else {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, bindingTranslation.iterator().next());
+					}
 				}
 			}
 		}
@@ -465,7 +466,24 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		}
 		return results;
 	}
-	
+
+	@Override
+	public boolean isEquivalenceOnly() {
+		for (final Triple m : getMappings(Node.ANY, Node.ANY, Node.ANY)){
+			final Node predicate = m.getPredicate();
+			if ( predicate.equals( RDFS.subClassOf.asNode() )
+					|| predicate.equals( RDFS.subPropertyOf.asNode() )
+					|| predicate.equals( OWL.unionOf.asNode() )
+					|| predicate.equals( OWL.inverseOf.asNode() )
+					|| predicate.equals( OWL.intersectionOf.asNode() )
+			){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	protected Set<Node> translateBindingFromGlobal( final Node n ) {
 		final Set<Node> results = new HashSet<>();
 		for (final Triple m : getMappings(n, Node.ANY, Node.ANY)){
@@ -482,7 +500,14 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					}
 					mapping = getComplexMapping(mapping.object2);
 				}
-			} else {
+			}
+			else if ( predicate.equals(RDFS.subClassOf.asNode()) ) {
+				results.add(m.getSubject());
+			}
+			else if ( predicate.equals(RDFS.subPropertyOf.asNode()) ) {
+				results.add(m.getSubject());
+			}
+			else {
 				throw new IllegalArgumentException(predicate.toString());
 			}
 		}
