@@ -438,7 +438,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 					for (final Node j : bindingTranslation) {
 						for (final BindingBuilder k : bbs) {
-							BindingBuilder translationCopy = BindingBuilder.create();
+							final BindingBuilder translationCopy = BindingBuilder.create();
 							if (!k.isEmpty()) {
 								translationCopy.addAll(k.snapshot());
 							}
