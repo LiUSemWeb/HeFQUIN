@@ -47,6 +47,7 @@ public class FederationDescriptionReader
 	}
 
 	public static FederationDescriptionReader instance = new FederationDescriptionReader();
+	final Map<String, VocabularyMapping> vocabMappingByPath = new HashMap<>();
 
 	protected FederationDescriptionReader() {}
 
@@ -174,7 +175,12 @@ public class FederationDescriptionReader
 
 			final String path = pathToMappingFile.toString();
 			if ( verifyValidVocabMappingFile(path) ) {
-				return new VocabularyMappingImpl(path);
+				VocabularyMapping vm = vocabMappingByPath.get( path );
+				if ( vm == null ) {
+					vm = new VocabularyMappingImpl(path);
+					vocabMappingByPath.put( path, vm );
+				}
+				return vm;
 			}
 		}
 
