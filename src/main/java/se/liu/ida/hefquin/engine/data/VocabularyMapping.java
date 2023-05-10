@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.data;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public interface VocabularyMapping
@@ -40,5 +41,8 @@ public interface VocabularyMapping
 	 * given solution mapping.
 	 */
 	Set<SolutionMapping> translateSolutionMappingFromGlobal( SolutionMapping sm );
+
+
+	boolean isEquivalenceOnly();
 
 }
