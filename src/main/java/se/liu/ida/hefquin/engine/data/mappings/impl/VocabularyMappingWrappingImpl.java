@@ -72,4 +72,10 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		}
 		return result;
 	}
+
+	@Override
+	public boolean isEquivalenceOnly() {
+		throw new UnsupportedOperationException();
+	}
+
 }

@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.data;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public interface VocabularyMapping
@@ -40,5 +41,12 @@ public interface VocabularyMapping
 	 * given solution mapping.
 	 */
 	Set<SolutionMapping> translateSolutionMappingFromGlobal( SolutionMapping sm );
+
+
+	/**
+	 * Checks whether the vocabulary mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty, owl:sameAs
+	 * Return true if the vocabulary mapping consists solely of equivalence rules, false otherwise.
+	 */
+	boolean isEquivalenceOnly();
 
 }

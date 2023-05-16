@@ -431,30 +431,31 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					j.add(v, n);
 				}
 			}
-			
-			final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
-			if (bindingTranslation.size() > 1) {
-				final Set<BindingBuilder> bbsCopy = new HashSet<>();
-				
-				for(final Node j : bindingTranslation) {
-					for (final BindingBuilder k : bbs) {
-						BindingBuilder translationCopy = BindingBuilder.create();
-						if(!k.isEmpty()) {
-							translationCopy.addAll(k.snapshot());
+			else {
+				final Set<Node> bindingTranslation = translateBindingFromGlobal(n);
+				if (bindingTranslation.size() > 1) {
+					final Set<BindingBuilder> bbsCopy = new HashSet<>();
+
+					for (final Node j : bindingTranslation) {
+						for (final BindingBuilder k : bbs) {
+							final BindingBuilder translationCopy = BindingBuilder.create();
+							if (!k.isEmpty()) {
+								translationCopy.addAll(k.snapshot());
+							}
+							translationCopy.add(v, j);
+							bbsCopy.add(translationCopy);
 						}
-						translationCopy.add(v, j);
-						bbsCopy.add(translationCopy);
 					}
-				}
-				
-				bbs = bbsCopy;
-			} else if (bindingTranslation.size() == 0) {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, n);
-				}
-			} else {
-				for (final BindingBuilder j : bbs) {
-					j.add(v, bindingTranslation.iterator().next());
+
+					bbs = bbsCopy;
+				} else if (bindingTranslation.size() == 0) {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, n);
+					}
+				} else {
+					for (final BindingBuilder j : bbs) {
+						j.add(v, bindingTranslation.iterator().next());
+					}
 				}
 			}
 		}
@@ -465,7 +466,25 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		}
 		return results;
 	}
-	
+
+	@Override
+	public boolean isEquivalenceOnly() {
+		final Iterator<Triple> i = vocabularyMapping.find(Node.ANY, Node.ANY, Node.ANY);
+		while ( i.hasNext() ){
+			final Node predicate = i.next().getPredicate();
+			if ( predicate.equals( RDFS.subClassOf.asNode() )
+					|| predicate.equals( RDFS.subPropertyOf.asNode() )
+					|| predicate.equals( OWL.unionOf.asNode() )
+					|| predicate.equals( OWL.inverseOf.asNode() )
+					|| predicate.equals( OWL.intersectionOf.asNode() )
+			){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	protected Set<Node> translateBindingFromGlobal( final Node n ) {
 		final Set<Node> results = new HashSet<>();
 		for (final Triple m : getMappings(n, Node.ANY, Node.ANY)){

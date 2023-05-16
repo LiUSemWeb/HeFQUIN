@@ -86,7 +86,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 		} else if (inputPlan.getRootOperator() instanceof LogicalOpFilter){
             final LogicalOpFilter filterOp = (LogicalOpFilter) inputPlan.getRootOperator();
-            final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan.getSubPlan(0));
+			final LogicalPlan rw = apply( inputPlan.getSubPlan(0) );
             // TODO: the expressions of 'filterOp' should be rewritten too
             return new LogicalPlanWithUnaryRootImpl(filterOp,rw);
         } else {
