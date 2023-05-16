@@ -45,7 +45,7 @@ public interface VocabularyMapping
 
 	/**
 	 * Checks whether the vocabulary mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty, owl:sameAs
-	 * Return ture if the vocabulary mapping consists solely of equivalence rules, false otherwise.
+	 * Return true if the vocabulary mapping consists solely of equivalence rules, false otherwise.
 	 */
 	boolean isEquivalenceOnly();
 
