@@ -469,8 +469,9 @@ public class VocabularyMappingImpl implements VocabularyMapping
 
 	@Override
 	public boolean isEquivalenceOnly() {
-		for (final Triple m : getMappings(Node.ANY, Node.ANY, Node.ANY)){
-			final Node predicate = m.getPredicate();
+		final Iterator<Triple> i = vocabularyMapping.find(Node.ANY, Node.ANY, Node.ANY);
+		while ( i.hasNext() ){
+			final Node predicate = i.next().getPredicate();
 			if ( predicate.equals( RDFS.subClassOf.asNode() )
 					|| predicate.equals( RDFS.subPropertyOf.asNode() )
 					|| predicate.equals( OWL.unionOf.asNode() )
@@ -500,14 +501,7 @@ public class VocabularyMappingImpl implements VocabularyMapping
 					}
 					mapping = getComplexMapping(mapping.object2);
 				}
-			}
-			else if ( predicate.equals(RDFS.subClassOf.asNode()) ) {
-				results.add(m.getSubject());
-			}
-			else if ( predicate.equals(RDFS.subPropertyOf.asNode()) ) {
-				results.add(m.getSubject());
-			}
-			else {
+			} else {
 				throw new IllegalArgumentException(predicate.toString());
 			}
 		}
