@@ -75,7 +75,7 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 
 	@Override
 	public boolean isEquivalenceOnly() {
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 }
