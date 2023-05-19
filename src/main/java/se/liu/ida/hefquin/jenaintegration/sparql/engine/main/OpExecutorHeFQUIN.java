@@ -82,7 +82,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final SourcePlannerFactory srcPlannerFactory = execCxt.getContext().get(HeFQUINConstants.sysSourcePlannerFactory);
 		final SourcePlanner srcPlanner = srcPlannerFactory.createSourcePlanner(ctxt);
 
-		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
+		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
 
 		final PhysicalOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
 		final PhysicalOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);

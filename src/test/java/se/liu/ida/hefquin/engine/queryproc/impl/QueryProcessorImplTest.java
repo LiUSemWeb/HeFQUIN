@@ -380,7 +380,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
-		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
+		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(ctxt);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, false, false, false);
 		final QueryPlanCompiler planCompiler = new
