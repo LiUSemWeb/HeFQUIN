@@ -14,13 +14,34 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
+/**
+ * Base class for heuristics that use cardinality estimates to decide on
+ * a join order for the subplans of a multiway join or a binary join. The
+ * heuristic is applied recursively to all joins within the given plan.
+ *
+ * The actual join ordering algorithm implemented in this class is a greedy
+ * one. It first determines cardinality estimates for all the subplans of
+ * the corresponding join. Given these estimates, the algorithm picks the
+ * subplan with the lowest cardinality estimate to become the first plan
+ * in the join order. Thereafter, the algorithm performs an iteration where
+ * each step picks the next subplan for the join. This decision is based on
+ * estimated join cardinalities. However, as candidates to be picked as the
+ * next subplan, the algorithm considers only the subplans that have a join
+ * variable with the subplans that have already been selected so far, which
+ * is done to avoid cross products (unless a cross product is unavoidable).
+ *
+ * The actual cardinality estimation approach, both for the cardinalities
+ * of the subplans and for the join cardinalities, may be different for each
+ * subclass.
+ */
 public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLogicalOptimization
 {
 	@Override
-    public LogicalPlan apply( final LogicalPlan inputPlan ) {
+    public LogicalPlan apply( final LogicalPlan inputPlan ) throws LogicalOptimizationException {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
 		if ( numberOfSubPlans == 0 ) {
 			return inputPlan;
@@ -50,10 +71,17 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
 	}
 
-	protected void reorder( final LogicalPlan[] plans ) {
+	/**
+	 * Changes the order of the subplans in the given array by using the
+	 * greedy algorithm described above for this class.
+	 */
+	protected void reorder( final LogicalPlan[] plans ) throws LogicalOptimizationException {
 		if ( plans.length < 2 ) return;
 
-		final int[] cardinalities = determineCardinalities(plans); 
+		// Determines cardinality estimates for all the subplans.
+		final int[] cardinalities = estimateCardinalities(plans);
+
+		// Pick the first subplan based on the cardinality estimates.
 		final int idxOfFirstPlan = determineLowestValue(cardinalities);
 		final LogicalPlan firstPlan = plans[idxOfFirstPlan];
 
@@ -68,9 +96,8 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 			return;
 		}
 
-		final AnnotatedLogicalPlan firstPlanA = new AnnotatedLogicalPlan(firstPlan,
-		                                                                 firstPlan.getExpectedVariables().getCertainVariables(),
-		                                                                 cardinalities[idxOfFirstPlan]);
+		final AnnotatedLogicalPlan firstPlanA = new AnnotatedLogicalPlan( firstPlan,
+		                                                                  cardinalities[idxOfFirstPlan] );
 
 		// Create a list for collecting the subplans that can be joined with
 		// the subplans selected so far.
@@ -86,10 +113,8 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		// Populate these two lists now.
 		for ( int i = 0; i < plans.length; i++ ) {
 			if ( i != idxOfFirstPlan ) {
-				final AnnotatedLogicalPlan ithPlan = new AnnotatedLogicalPlan(
-						plans[i],
-						plans[i].getExpectedVariables().getCertainVariables(),
-						cardinalities[i]);
+				final AnnotatedLogicalPlan ithPlan = new AnnotatedLogicalPlan( plans[i],
+				                                                               cardinalities[i] );
 
 				if ( Collections.disjoint(ithPlan.potentialJoinVars, firstPlanA.potentialJoinVars) )
 					remainingPlans.add(ithPlan);
@@ -116,7 +141,7 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 				// the subplans selected so far, resort to pick one of the
 				// remaining subplans (which will result in a cross product).
 				nextPlan = remainingPlans.pop();
-				joinCardWithNextPlan = determineJoinCardinality(selectedPlans,
+				joinCardWithNextPlan = estimateJoinCardinality(selectedPlans,
 				                                                joinCardOfSelectedPlans,
 				                                                nextPlan);
 			}
@@ -156,6 +181,10 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		}
 	}
 
+	/**
+	 * Determines the smallest of the values in the given array and,
+	 * then, returns the position of this value in the given array.
+	 */
 	protected int determineLowestValue( final int[] values ) {
 		int idxOfLowestValue = 0;
 		int lowestValue = values[0];
@@ -170,21 +199,28 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 	}
 
 	/**
-	 * Assumes that nextCandidates is nonempty.
+	 * Returns the plan from the given list of next candidates that has the
+	 * lowest join cardinality with a plan consisting of the given selected
+	 * plans, and that join cardinality will be returned as well.
+	 *
+	 * The implementation of this function assumes that the given list of
+	 * next candidates is nonempty.
 	 */
 	protected Pair<AnnotatedLogicalPlan, Integer> determineNextPlan( final List<AnnotatedLogicalPlan> selectedPlans,
 	                                                                 final int joinCardOfSelectedPlans,
-	                                                                 final List<AnnotatedLogicalPlan> nextCandidates ) {
+	                                                                 final List<AnnotatedLogicalPlan> nextCandidates ) throws LogicalOptimizationException {
 		final Iterator<AnnotatedLogicalPlan> it = nextCandidates.iterator();
 
+		// Initially, assumes that the first of the given candidates is the best one.
 		AnnotatedLogicalPlan bestCandidate = it.next();
-		int joinCardWithBestCandidate = determineJoinCardinality(selectedPlans,
+		int joinCardWithBestCandidate = estimateJoinCardinality(selectedPlans,
 		                                                         joinCardOfSelectedPlans,
 		                                                         bestCandidate);
 
+		// Iterate of the rest of the given candidates in order to find the best one.
 		while ( it.hasNext() ) {
 			final AnnotatedLogicalPlan nextCandidate = it.next();
-			final int joinCardWithNextCandidate = determineJoinCardinality(selectedPlans,
+			final int joinCardWithNextCandidate = estimateJoinCardinality(selectedPlans,
 			                                                               joinCardOfSelectedPlans,
 			                                                               nextCandidate);
 			if ( joinCardWithBestCandidate > joinCardWithNextCandidate ) {
@@ -196,21 +232,55 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		return new Pair<>(bestCandidate, joinCardWithBestCandidate);
 	}
 
-	protected abstract int[] determineCardinalities( final LogicalPlan[] plans );
+	/**
+	 * Implementations of this function determine or estimate the cardinality
+	 * of each of the given plans. That is, the returned array contains as many
+	 * entries as there are plans in the given array such that the i-th entry
+	 * in the returned array is the cardinality of the i-th plan.
+	 */
+	protected abstract int[] estimateCardinalities( final LogicalPlan[] plans ) throws LogicalOptimizationException;
 
-	protected abstract int determineJoinCardinality( List<AnnotatedLogicalPlan> selectedPlans,
-	                                                 int joinCardOfSelectedPlans,
-	                                                 AnnotatedLogicalPlan nextCandidate );
+	/**
+	 * Implementations of this function estimate the cardinality of the join
+	 * between the result of joining the given selected plans and the result
+	 * of the given next candidate. Implementations that require the individual
+	 * cardinality estimates for each of the plans can get these estimates by
+	 * accessing {@link AnnotatedLogicalPlan#cardinality}. The estimated join
+	 * cardinality of joining the given selected plans is also passed to this
+	 * function, in case it is needed by some implementation.
+	 */
+	protected abstract int estimateJoinCardinality( List<AnnotatedLogicalPlan> selectedPlans,
+	                                                int joinCardOfSelectedPlans,
+	                                                AnnotatedLogicalPlan nextCandidate ) throws LogicalOptimizationException;
 
 
+	/**
+	 * A help class that wraps a {@link LogicalPlan} together with some
+	 * information about this plan that is relevant for the algorithm of
+	 * the main class ({@link CardinalityBasedJoinOrderingBase} and that
+	 * may be relevant for implementations of the abstract functions.
+	 */
 	protected static class AnnotatedLogicalPlan {
+		/**
+		 * The wrapped {@link LogicalPlan}.
+		 */
 		public final LogicalPlan plan;
+
+		/**
+		 * The set of certain variables of {@link #plan}; shortcut for
+		 * calling {@link ExpectedVariables#getCertainVariables()}) on
+		 * {@link LogicalPlan#getExpectedVariables()}.
+		 */
 		public final Set<Var> potentialJoinVars;
+
+		/**
+		 * Result cardinality as has been estimated for {@link #plan}.
+		 */
 		public final int cardinality;
 
-		public AnnotatedLogicalPlan( final LogicalPlan plan, final Set<Var> potentialJoinVars, final int card ) {
+		public AnnotatedLogicalPlan( final LogicalPlan plan, final int card ) {
 			this.plan = plan;
-			this.potentialJoinVars = potentialJoinVars;
+			this.potentialJoinVars = plan.getExpectedVariables().getCertainVariables();
 			this.cardinality = card;
 		}
 	}

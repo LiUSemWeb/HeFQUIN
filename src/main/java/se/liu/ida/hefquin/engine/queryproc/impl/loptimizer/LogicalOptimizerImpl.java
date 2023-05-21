@@ -35,6 +35,8 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		// final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
 		// heuristics.add( new GreedyBasedReordering(formula) );
 
+		// heuristics.add( new CardinalityBasedJoinOrderingWithRequests(ctxt) );
+
 		// heuristics.add( new PushJoinUnderUnionWithReuests() );
 
 		//// Uncomment the following line to apply vocabulary mappings of
