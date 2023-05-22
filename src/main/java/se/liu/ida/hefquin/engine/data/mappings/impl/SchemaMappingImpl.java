@@ -179,7 +179,7 @@ public class SchemaMappingImpl implements SchemaMapping
 				terms = applyMapToLocalURI(binding.get(v), l2gMap);
 			}
 
-			for ( Node uri: terms ) {
+			for ( final Node uri: terms ) {
 				final BindingBuilder newBinding = BindingBuilder.create();
 				newBinding.add(v, uri);
 				final SolutionMapping sol = new SolutionMappingImpl( newBinding.build() );
