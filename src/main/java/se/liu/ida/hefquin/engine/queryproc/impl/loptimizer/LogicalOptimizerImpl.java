@@ -45,6 +45,9 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		//// currently since the rewriting rules need to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
 		// heuristics.add( new ApplyVocabularyMappings(false) );
+
+		// heuristics.add( new PullUpLtgOverUnion() );
+		// heuristics.add( new PullUpLtgOverJoin() );
 	}
 
 	@Override
