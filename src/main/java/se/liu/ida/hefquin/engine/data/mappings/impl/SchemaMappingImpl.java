@@ -78,8 +78,7 @@ public class SchemaMappingImpl implements SchemaMapping
 			g2lMap.put(global, g2ltermMappings);
 		}
 
-		final TermMappingImpl localTerms = new TermMappingImpl(mappingType);
-		localTerms.addTranslatedTerm(local);
+		final TermMappingImpl localTerms = new TermMappingImpl(mappingType, local);
 		g2ltermMappings.add(localTerms);
 
 		// Populate l2gMap
@@ -91,8 +90,7 @@ public class SchemaMappingImpl implements SchemaMapping
 				l2gMap.put(localTerm, l2gtermMappings);
 			}
 
-			TermMappingImpl globalTerms = new TermMappingImpl(mappingType);
-			globalTerms.addTranslatedTerm(global);
+			TermMappingImpl globalTerms = new TermMappingImpl(mappingType, global);
 			l2gtermMappings.add(globalTerms);
 		}
 

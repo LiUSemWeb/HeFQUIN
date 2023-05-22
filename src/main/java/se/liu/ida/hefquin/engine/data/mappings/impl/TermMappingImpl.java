@@ -10,16 +10,14 @@ public class TermMappingImpl implements TermMapping {
     protected final Node type;
     protected final Set<Node> translatedTerms = new HashSet<>();
 
-    public TermMappingImpl( final Node type ) {
+    public TermMappingImpl( final Node type, final Node term ) {
         this.type = type;
-    }
-
-    public void addTranslatedTerm( final Node term ) {
         translatedTerms.add(term);
     }
 
-    public void addTranslatedTerm( final Set<Node> term ) {
-        translatedTerms.addAll(term);
+    public TermMappingImpl( final Node type, final Set<Node> terms ) {
+        this.type = type;
+        translatedTerms.addAll(terms);
     }
 
     @Override
