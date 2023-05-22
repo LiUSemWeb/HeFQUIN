@@ -85,9 +85,9 @@ public class SchemaMappingImpl implements SchemaMapping
 
 			if (l2gtermMappings == null) {
 				l2gtermMappings = new HashSet<>();
+				l2gMap.put(localTerm, l2gtermMappings);
 			}
 
-			l2gMap.put(localTerm, l2gtermMappings);
 			TermMappingImpl globalTerms = new TermMappingImpl(mappingType);
 			globalTerms.addTranslatedTerm(global);
 			l2gtermMappings.add(globalTerms);
