@@ -75,7 +75,7 @@ public class SchemaMappingImpl implements SchemaMapping
 			g2lMap.put(global, g2ltermMappings);
 		}
 
-		TermMappingImpl localTerms = new TermMappingImpl(mappingType);
+		final TermMappingImpl localTerms = new TermMappingImpl(mappingType);
 		localTerms.addTranslatedTerm(local);
 		g2ltermMappings.add(localTerms);
 
