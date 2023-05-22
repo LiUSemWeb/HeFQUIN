@@ -171,7 +171,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		final Iterator<Var> it = binding.vars();
 		while ( it.hasNext() ) {
 			final Var v = it.next();
-			Set<Node> terms;
+			final Set<Node> terms;
 			if ( Inverse ) {
 				terms = applyMapToGlobalURI(binding.get(v), g2lMap);
 			}
