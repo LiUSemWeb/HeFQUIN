@@ -16,7 +16,6 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.mappings.SchemaMapping;
 import se.liu.ida.hefquin.engine.data.mappings.TermMapping;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
@@ -28,13 +27,14 @@ public class SchemaMappingImpl implements SchemaMapping
 	protected final Graph mappingDescription;
 	protected final Map<Node, Set<TermMapping>> g2lMap = new HashMap<>();
 	protected final Map<Node, Set<TermMapping>> l2gMap = new HashMap<>();
+	boolean isEquivalenceOnly = true;
 
 	public SchemaMappingImpl( final Graph mappingDescription ) {
 		this.mappingDescription = mappingDescription;
 		parseMappingDescription(mappingDescription);
 	}
 
-	protected void parseMappingDescription( final Graph mappingDescription ) {
+	protected boolean parseMappingDescription( final Graph mappingDescription ) {
 		// Populate both g2lMap and l2gMap based on the type of TermMapping statements in the given RDF graph
 		final Iterator<Triple> it = mappingDescription.find(Node.ANY, Node.ANY, Node.ANY);
 		while ( it.hasNext() ) {
@@ -47,8 +47,10 @@ public class SchemaMappingImpl implements SchemaMapping
 			else if ( workingTriple.getPredicate().equals(RDFS.subClassOf.asNode())
 				|| workingTriple.getPredicate().equals(RDFS.subPropertyOf.asNode()) ) {
 				populate( Collections.singleton(workingTriple.getSubject()), workingTriple.getObject(), workingTriple.getPredicate() );
+				isEquivalenceOnly = false;
 			}
 			else if ( workingTriple.getPredicate().equals(OWL.unionOf.asNode())) {
+				isEquivalenceOnly = false;
 				final Set<Node> localTerms = new HashSet<>();
 
 				// Get all local terms
@@ -64,6 +66,7 @@ public class SchemaMappingImpl implements SchemaMapping
 				populate( localTerms, workingTriple.getSubject(), OWL.unionOf.asNode() );
 			}
 		}
+		return isEquivalenceOnly;
 	}
 
 	protected void populate( final Set<Node> local, final Node global, final Node mappingType ){
@@ -156,46 +159,49 @@ public class SchemaMappingImpl implements SchemaMapping
 		return applyMapToSolutionMapping(sm, true);
 	}
 
-	protected Set<SolutionMapping> applyMapToSolutionMapping(final SolutionMapping sm, final boolean Inverse ) {
+	protected Set<SolutionMapping> applyMapToSolutionMapping(final SolutionMapping sm, final boolean useInverse ) {
 		final Binding binding = sm.asJenaBinding();
 		// If the given solution mapping is the empty mapping, simply return it unchanged.
 		if ( binding.isEmpty() ) {
 			return Collections.singleton(sm);
 		}
 
-		final Set<SolutionMapping> resultsSolMaps = new HashSet<>();
-		final Set<SolutionMapping> tmpSolMaps = new HashSet<>();
+		final Set<Binding> resultsBindings = new HashSet<>();
+		final Set<Binding> tmpBindings = new HashSet<>();
 
-		final SolutionMapping initialSol = new SolutionMappingImpl( BindingBuilder.create().build() );
-		resultsSolMaps.add(initialSol);
+		resultsBindings.add( BindingBuilder.create().build() );
 		final Iterator<Var> it = binding.vars();
 		while ( it.hasNext() ) {
 			final Var v = it.next();
 			final Set<Node> terms;
-			if ( Inverse ) {
-				terms = applyMapToGlobalURI(binding.get(v), g2lMap);
+			if ( useInverse ) {
+				terms = applyMapToGlobalURI( binding.get(v) );
 			}
 			else {
-				terms = applyMapToLocalURI(binding.get(v), l2gMap);
+				terms = applyMapToLocalURI( binding.get(v) );
 			}
 
 			for ( final Node uri: terms ) {
-				final BindingBuilder newBinding = BindingBuilder.create();
-				newBinding.add(v, uri);
-				final SolutionMapping sol = new SolutionMappingImpl( newBinding.build() );
-				for ( SolutionMapping tmpSol : resultsSolMaps ){
-					tmpSolMaps.add( SolutionMappingUtils.merge(sol, tmpSol) );
+				for ( Binding b : resultsBindings ){
+					final BindingBuilder newBinding = BindingBuilder.create(b);
+					newBinding.add(v, uri);
+					tmpBindings.add( newBinding.build() );
 				}
 			}
-			resultsSolMaps.clear();
-			resultsSolMaps.addAll( tmpSolMaps );
-			tmpSolMaps.clear();
+			resultsBindings.clear();
+			resultsBindings.addAll( tmpBindings );
+			tmpBindings.clear();
+		}
+
+		final Set<SolutionMapping> resultsSolMaps = new HashSet<>();
+		for ( Binding b: resultsBindings ){
+			resultsSolMaps.add( new SolutionMappingImpl(b) );
 		}
 		return resultsSolMaps;
 	}
 
-	public Set<Node> applyMapToLocalURI( final Node node, final Map<Node, Set<TermMapping>> vocMap ) {
-		final Set<TermMapping> termMappings = vocMap.get(node);
+	public Set<Node> applyMapToLocalURI( final Node node ) {
+		final Set<TermMapping> termMappings = l2gMap.get(node);
 		final Set<Node> results = new HashSet<>();
 		if ( termMappings != null ) {
 			for ( final TermMapping mappingTypes : termMappings ) {
@@ -212,8 +218,8 @@ public class SchemaMappingImpl implements SchemaMapping
 	/**
 	 * Only apply equivalent rules
 	 */
-	public Set<Node> applyMapToGlobalURI( final Node node, final Map<Node, Set<TermMapping>> vocMap ) {
-		final Set<TermMapping> termMappings = vocMap.get(node);
+	public Set<Node> applyMapToGlobalURI( final Node node ) {
+		final Set<TermMapping> termMappings = g2lMap.get(node);
 		final Set<Node> results = new HashSet<>();
 		if ( termMappings != null ) {
 			for ( final TermMapping mappingTypes : termMappings ) {
@@ -230,23 +236,7 @@ public class SchemaMappingImpl implements SchemaMapping
 	}
 
 	public boolean isEquivalenceOnly() {
-		return containsEquivalentMappingsOnly(l2gMap) && containsEquivalentMappingsOnly(g2lMap);
-	}
-
-	protected boolean containsEquivalentMappingsOnly( final Map<Node, Set<TermMapping>> mapping ) {
-		Set<Node> globalTerms = mapping.keySet();
-		for ( Node t: globalTerms ){
-			Set<TermMapping> termMappings = mapping.get(t);
-			for ( TermMapping mapType: termMappings ) {
-				if (mapType.getTypeOfRule().equals(RDFS.subClassOf.asNode())
-						|| mapType.getTypeOfRule().equals(RDFS.subPropertyOf.asNode() )
-						|| mapType.getTypeOfRule().equals(OWL.unionOf.asNode()) )
-				{
-					return false;
-				}
-			}
-		}
-		return true;
+		return isEquivalenceOnly;
 	}
 
 	protected Pair<Node, Node> getConnectedMapping( final Node head ){
