@@ -72,7 +72,7 @@ public class PullUpLtgOverJoin implements HeuristicForLogicalOptimization {
 			}
 
 			final VocabularyMapping vm = ((LogicalOpLocalToGlobal) lop).getVocabularyMapping();
-			if ( !( vm.isEquivalenceOnly() ) || !( vm0.equals( vm ) ) ){
+			if ( ! vm0.equals(vm) ) {
 				return false;
 			}
 		}
