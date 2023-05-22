@@ -34,8 +34,7 @@ public class PullUpLtgOverJoin implements HeuristicForLogicalOptimization {
 			newPlan = LogicalPlanUtils.createPlanWithSubPlans(rootOp, newSubPlans);
 		}
 
-		if ((inputPlan.getRootOperator() instanceof LogicalOpJoin || inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin )
-				&& checkIfLtgCanBeExtractedOverJoin(newPlan)  ) {
+		if ( checkIfLtgCanBeExtractedOverJoin(newPlan) ) {
 			return PullUpLtgOverUnion.extractLtgOverNaryOp( newPlan );
 		}
 		else {
