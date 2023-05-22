@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TermMappingImpl implements TermMapping {
-    final Node type;
-    final Set<Node> translatedTerms = new HashSet<>();
+    protected final Node type;
+    protected final Set<Node> translatedTerms = new HashSet<>();
 
     public TermMappingImpl( final Node type ) {
         this.type = type;
