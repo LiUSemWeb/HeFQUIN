@@ -163,8 +163,8 @@ public class SchemaMappingImpl implements SchemaMapping
 			return Collections.singleton(sm);
 		}
 
-		Set<SolutionMapping> resultsSolMaps = new HashSet<>();
-		Set<SolutionMapping> tmpSolMaps = new HashSet<>();
+		final Set<SolutionMapping> resultsSolMaps = new HashSet<>();
+		final Set<SolutionMapping> tmpSolMaps = new HashSet<>();
 
 		final SolutionMapping initialSol = new SolutionMappingImpl( BindingBuilder.create().build() );
 		resultsSolMaps.add(initialSol);
