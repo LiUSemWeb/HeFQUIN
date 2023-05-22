@@ -43,10 +43,11 @@ public class PullUpLtgOverJoin implements HeuristicForLogicalOptimization {
 	}
 
 	/**
-	 * Check whether all root operator under the JOIN operator use the same vocabulary mapping and contains equivalent mappings only:
-	 * 	 - The operator is a request, using vm
-	 * 	 - If the operator is a filter, then under that filter there must be a request, using vm
-	 * 	 - If the operator is a L2G operator, under the L2G operator, it must use vm.
+	 * Check if l2g operator can be pulled up over join by checking:
+	 * i) the root operator is a join (binary or multiway),
+	 * ii) every subplan under this join has an l2g operator as its root,
+	 * iii) all these l2g operators have the same vocab.mapping, and
+	 * iv) that vocab.mapping is an "equivalence-only" mapping.
 	 */
 	public static boolean checkIfLtgCanBeExtractedOverJoin( final LogicalPlan inputPlan ){
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
@@ -54,14 +55,24 @@ public class PullUpLtgOverJoin implements HeuristicForLogicalOptimization {
 			return false;
 		}
 
-		final VocabularyMapping vm0 = PullUpLtgOverUnion.getVocabularyMappingOfSubPlan( inputPlan.getSubPlan(0) );
-		if ( vm0 == null || !vm0.isEquivalenceOnly() ) {
+		final LogicalOperator firstLop = inputPlan.getSubPlan(0).getRootOperator();
+		if ( !(firstLop instanceof LogicalOpLocalToGlobal) ) {
+			return false;
+		}
+
+		final VocabularyMapping vm0 = ((LogicalOpLocalToGlobal) firstLop).getVocabularyMapping();
+		if ( !( vm0.isEquivalenceOnly() ) ) {
 			return false;
 		}
 
 		for ( int i = 1; i < inputPlan.numberOfSubPlans(); i++ ) {
-			final VocabularyMapping vm = PullUpLtgOverUnion.getVocabularyMappingOfSubPlan(inputPlan.getSubPlan(i));
-			if ( vm == null || !vm0.equals(vm) ){
+			final LogicalOperator lop = inputPlan.getSubPlan(i).getRootOperator();
+			if ( !( lop instanceof LogicalOpLocalToGlobal ) ){
+				return false;
+			}
+
+			final VocabularyMapping vm = ((LogicalOpLocalToGlobal) lop).getVocabularyMapping();
+			if ( !( vm.isEquivalenceOnly() ) || !( vm0.equals( vm ) ) ){
 				return false;
 			}
 		}
