@@ -7,13 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -239,6 +233,35 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, inputPlan);
 				final LogicalPlan filterOpPlan = new LogicalPlanWithUnaryRootImpl(filterOp, addOpPlan);
 				newSubPlan = filterOpPlan;
+			}
+			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal
+					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest){
+				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlanRootOp;
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );
+
+				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getRootOperator();
+				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, newInputPlan);
+
+				newSubPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, addOpPlan );
+			}
+			else if ( oldSubPlanRootOp instanceof LogicalOpFilter
+					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpLocalToGlobal
+					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest
+			){
+				final LogicalOpFilter filterOp = (LogicalOpFilter) oldSubPlanRootOp;
+
+				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlan.getSubPlan(0).getRootOperator();
+				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
+				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );
+
+				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?, ?>) oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator();
+				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
+				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, newInputPlan);
+
+				final LogicalPlan l2gOpPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, addOpPlan );
+				newSubPlan = new LogicalPlanWithUnaryRootImpl( filterOp, l2gOpPlan );
 			}
 			else {
 				newSubPlan = LogicalPlanUtils.createPlanWithMultiwayJoin(inputPlan, oldSubPlan);
