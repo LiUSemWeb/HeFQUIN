@@ -216,7 +216,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		final Set<TermMapping> termMappings = vocMap.get(node);
 		final Set<Node> results = new HashSet<>();
 		if ( termMappings != null ) {
-			for (TermMapping mappingTypes : termMappings) {
+			for ( final TermMapping mappingTypes : termMappings ) {
 				if ( mappingTypes.getTypeOfRule().equals(OWL.equivalentClass.asNode()) || mappingTypes.getTypeOfRule().equals(OWL.equivalentProperty.asNode()) ) {
 					results.addAll(mappingTypes.getTranslatedTerms());
 				}
