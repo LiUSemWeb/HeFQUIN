@@ -87,8 +87,8 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 
 		final LogicalPlan newNextPlan = new LogicalPlanWithNaryRootImpl((NaryLogicalOp) inputPlan.getRootOperator(), newUnionSubPlans);
 
-		final VocabularyMapping vm = getVocabularyMappingOfSubPlan(inputPlan.getSubPlan(0));
-		return new LogicalPlanWithUnaryRootImpl(new LogicalOpLocalToGlobal(vm), newNextPlan);
+		final LogicalOpLocalToGlobal l2g = (LogicalOpLocalToGlobal) inputPlan.getSubPlan(0).getRootOperator();
+		return new LogicalPlanWithUnaryRootImpl(l2g, newNextPlan);
 	}
 
 	public static VocabularyMapping getVocabularyMappingOfSubPlan( final LogicalPlan subPlan ){
