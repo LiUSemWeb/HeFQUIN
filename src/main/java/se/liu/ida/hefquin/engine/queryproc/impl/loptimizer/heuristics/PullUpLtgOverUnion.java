@@ -4,7 +4,6 @@ import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
@@ -44,10 +43,10 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 	}
 
 	/**
-	 * Check whether all root operator under the UNION operator use the same vocabulary mapping:
-	 * 	 - The operator is a request, using vm
-	 * 	 - If the operator is a filter, then under that filter there must be a request, using vm
-	 * 	 - If the operator is a L2G operator, under the L2G operator, it must use vm.
+	 * Check if l2g operator can be pulled up over union by checking:
+	 * i) the root operator is a union (binary or multiway),
+	 * ii) every subplan under this join has an l2g operator as its root, and
+	 * iii) all these l2g operators have the same vocab.mapping
 	 */
 	public static boolean checkIfLtgCanBeExtractedOverUnion( final LogicalPlan unionPlan ){
 		final LogicalOperator rootOp = unionPlan.getRootOperator();
@@ -55,63 +54,47 @@ public class PullUpLtgOverUnion implements HeuristicForLogicalOptimization {
 			return false;
 		}
 
-		final VocabularyMapping vm0 = getVocabularyMappingOfSubPlan( unionPlan.getSubPlan(0) );
-		if ( vm0 == null ) {
+		final LogicalOperator firstLop = unionPlan.getSubPlan(0).getRootOperator();
+		if ( !(firstLop instanceof LogicalOpLocalToGlobal) ) {
 			return false;
 		}
 
+		final VocabularyMapping vm0 = ((LogicalOpLocalToGlobal) firstLop).getVocabularyMapping();
 		for ( int i = 1; i < unionPlan.numberOfSubPlans(); i++ ) {
-			final VocabularyMapping vm = getVocabularyMappingOfSubPlan(unionPlan.getSubPlan(i));
-			if ( vm == null || !vm0.equals(vm) ){
+			final LogicalOperator lop = unionPlan.getSubPlan(i).getRootOperator();
+			if ( !(lop instanceof LogicalOpLocalToGlobal) ){
+				return false;
+			}
+
+			final VocabularyMapping vm = ((LogicalOpLocalToGlobal) lop).getVocabularyMapping();
+			if ( !( vm0.equals( vm ) ) ){
 				return false;
 			}
 		}
+
 		return true;
 	}
 
 	protected static LogicalPlan extractLtgOverNaryOp( final LogicalPlan inputPlan ) {
-		final int numberOfSubPlansUnderUnion = inputPlan.numberOfSubPlans();
-		final LogicalPlan[] newUnionSubPlans = new LogicalPlan[numberOfSubPlansUnderUnion];
+		final int numberOfSubPlans = inputPlan.numberOfSubPlans();
+		final LogicalPlan[] newSubPlans = new LogicalPlan[numberOfSubPlans];
 
-		for (int i = 0; i < numberOfSubPlansUnderUnion; i++) {
+		for (int i = 0; i < numberOfSubPlans; i++) {
 			final LogicalPlan oldSubPlan = inputPlan.getSubPlan(i);
 			final LogicalPlan newSubPlan;
 			if (oldSubPlan.getRootOperator() instanceof LogicalOpLocalToGlobal) {
 				newSubPlan = oldSubPlan.getSubPlan(0);
 			} else {
-				newSubPlan = oldSubPlan;
+				throw new IllegalArgumentException();
 			}
 
-			newUnionSubPlans[i] = newSubPlan;
+			newSubPlans[i] = newSubPlan;
 		}
 
-		final LogicalPlan newNextPlan = new LogicalPlanWithNaryRootImpl((NaryLogicalOp) inputPlan.getRootOperator(), newUnionSubPlans);
+		final LogicalPlan newNextPlan = LogicalPlanUtils.createPlanWithSubPlans( inputPlan.getRootOperator(), newSubPlans);
 
 		final LogicalOpLocalToGlobal l2g = (LogicalOpLocalToGlobal) inputPlan.getSubPlan(0).getRootOperator();
 		return new LogicalPlanWithUnaryRootImpl(l2g, newNextPlan);
-	}
-
-	public static VocabularyMapping getVocabularyMappingOfSubPlan( final LogicalPlan subPlan ){
-		final LogicalOperator subRootOp = subPlan.getRootOperator();
-		if ( !(subRootOp instanceof LogicalOpRequest || subRootOp instanceof LogicalOpFilter || subRootOp instanceof LogicalOpLocalToGlobal) ) {
-			return null;
-		}
-
-		if ( subRootOp instanceof LogicalOpLocalToGlobal ){
-			return ((LogicalOpLocalToGlobal) subRootOp).getVocabularyMapping();
-		}
-		if ( subRootOp instanceof LogicalOpRequest ){
-			return ((LogicalOpRequest<?, ?>) subRootOp).getFederationMember().getVocabularyMapping();
-		}
-		if ( subRootOp instanceof LogicalOpFilter ){
-			if ( !( subPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest) ){
-				return null;
-			}
-			else {
-				return ((LogicalOpRequest<?, ?>) subPlan.getSubPlan(0).getRootOperator()).getFederationMember().getVocabularyMapping();
-			}
-		}
-		return null;
 	}
 
 }
