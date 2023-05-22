@@ -107,11 +107,9 @@ public class SchemaMappingImpl implements SchemaMapping
 					localObjects.addAll( mappingType.getTranslatedTerms() );
 				}
 			}
-			else {
-				localObjects.add( tp.asJenaTriple().getObject() );
-			}
 		}
-		else {
+
+		if ( localObjects.isEmpty() ) {
 			localObjects.add( tp.asJenaTriple().getObject() );
 		}
 
@@ -124,11 +122,9 @@ public class SchemaMappingImpl implements SchemaMapping
 					localPredicate.addAll( mappingType.getTranslatedTerms() );
 				}
 			}
-			else {
-				localPredicate.add( tp.asJenaTriple().getPredicate() );
-			}
 		}
-		else {
+
+		if ( localPredicate.isEmpty() ) {
 			localPredicate.add( tp.asJenaTriple().getPredicate() );
 		}
 
@@ -226,7 +222,8 @@ public class SchemaMappingImpl implements SchemaMapping
 				}
 			}
 		}
-		else {
+
+		if ( results.isEmpty() ){
 			results.add(node);
 		}
 
