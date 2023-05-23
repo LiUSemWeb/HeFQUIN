@@ -195,14 +195,13 @@ public class SchemaMappingImpl implements SchemaMapping
 
 	public Set<Node> applyMapToLocalURI( final Node node ) {
 		final Set<TermMapping> termMappings = l2gMap.get(node);
-		final Set<Node> results = new HashSet<>();
-		if ( termMappings != null ) {
-			for ( final TermMapping mappingTypes : termMappings ) {
-				results.addAll( mappingTypes.getTranslatedTerms() );
-			}
+		if ( termMappings == null ) {
+			return Collections.singleton(node);
 		}
-		else {
-			results.add(node);
+
+		final Set<Node> results = new HashSet<>();
+		for ( final TermMapping mappingTypes : termMappings ) {
+			results.addAll( mappingTypes.getTranslatedTerms() );
 		}
 
 		return results;
@@ -213,20 +212,20 @@ public class SchemaMappingImpl implements SchemaMapping
 	 */
 	public Set<Node> applyMapToGlobalURI( final Node node ) {
 		final Set<TermMapping> termMappings = g2lMap.get(node);
-		final Set<Node> results = new HashSet<>();
-		if ( termMappings != null ) {
-			for ( final TermMapping mappingTypes : termMappings ) {
-				if ( mappingTypes.getTypeOfRule().equals(OWL.equivalentClass.asNode()) || mappingTypes.getTypeOfRule().equals(OWL.equivalentProperty.asNode()) ) {
-					results.addAll(mappingTypes.getTranslatedTerms());
-				}
-				else  {
-					throw new IllegalArgumentException();
-				}
-			}
+		if ( termMappings == null ) {
+			return Collections.singleton(node);
 		}
 
-		if ( results.isEmpty() ){
-			results.add(node);
+		final Set<Node> results = new HashSet<>();
+		for ( final TermMapping mappingTypes : termMappings ) {
+			final Node ruletype = mappingTypes.getTypeOfRule();
+			if (    ruletype.equals(OWL.equivalentClass.asNode())
+			     || ruletype.equals(OWL.equivalentProperty.asNode()) ) {
+				results.addAll( mappingTypes.getTranslatedTerms() );
+			}
+			else  {
+				throw new IllegalArgumentException();
+			}
 		}
 
 		return results;
