@@ -188,7 +188,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		}
 
 		final Set<SolutionMapping> resultsSolMaps = new HashSet<>();
-		for ( Binding b: resultsBindings ){
+		for ( final Binding b: resultsBindings ){
 			resultsSolMaps.add( new SolutionMappingImpl(b) );
 		}
 		return resultsSolMaps;
