@@ -27,11 +27,11 @@ public class SchemaMappingImpl implements SchemaMapping
 	protected final Graph mappingDescription;
 	protected final Map<Node, Set<TermMapping>> g2lMap = new HashMap<>();
 	protected final Map<Node, Set<TermMapping>> l2gMap = new HashMap<>();
-	boolean isEquivalenceOnly = true;
+	protected final boolean isEquivalenceOnly;
 
 	public SchemaMappingImpl( final Graph mappingDescription ) {
 		this.mappingDescription = mappingDescription;
-		parseMappingDescription(mappingDescription);
+		this.isEquivalenceOnly = parseMappingDescription(mappingDescription);
 	}
 
 	protected boolean parseMappingDescription( final Graph mappingDescription ) {
