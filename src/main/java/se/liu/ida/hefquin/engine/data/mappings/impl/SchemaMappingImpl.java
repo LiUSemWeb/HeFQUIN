@@ -35,6 +35,7 @@ public class SchemaMappingImpl implements SchemaMapping
 	}
 
 	protected boolean parseMappingDescription( final Graph mappingDescription ) {
+		boolean isEquivalenceOnly = true;
 		// Populate both g2lMap and l2gMap based on the type of TermMapping statements in the given RDF graph
 		final Iterator<Triple> it = mappingDescription.find(Node.ANY, Node.ANY, Node.ANY);
 		while ( it.hasNext() ) {
