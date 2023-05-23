@@ -24,13 +24,11 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class SchemaMappingImpl implements SchemaMapping
 {
-	protected final Graph mappingDescription;
 	protected final Map<Node, Set<TermMapping>> g2lMap = new HashMap<>();
 	protected final Map<Node, Set<TermMapping>> l2gMap = new HashMap<>();
 	protected final boolean isEquivalenceOnly;
 
 	public SchemaMappingImpl( final Graph mappingDescription ) {
-		this.mappingDescription = mappingDescription;
 		this.isEquivalenceOnly = parseMappingDescription(mappingDescription);
 	}
 
@@ -55,13 +53,13 @@ public class SchemaMappingImpl implements SchemaMapping
 				final Set<Node> localTerms = new HashSet<>();
 
 				// Get all local terms
-				Pair<Node, Node> linkMapping = getConnectedMapping( workingTriple.getObject() );
+				Pair<Node, Node> linkMapping = getConnectedMapping( workingTriple.getObject(), mappingDescription );
 				while(true) {
 					localTerms.add(linkMapping.object1);
 					if (linkMapping.object2.equals(RDF.nil.asNode())) {
 						break;
 					}
-					linkMapping = getConnectedMapping(linkMapping.object2);
+					linkMapping = getConnectedMapping( linkMapping.object2, mappingDescription );
 				}
 
 				populate( localTerms, workingTriple.getSubject(), OWL.unionOf.asNode() );
@@ -221,6 +219,9 @@ public class SchemaMappingImpl implements SchemaMapping
 				if ( mappingTypes.getTypeOfRule().equals(OWL.equivalentClass.asNode()) || mappingTypes.getTypeOfRule().equals(OWL.equivalentProperty.asNode()) ) {
 					results.addAll(mappingTypes.getTranslatedTerms());
 				}
+				else  {
+					throw new IllegalArgumentException();
+				}
 			}
 		}
 
@@ -235,7 +236,7 @@ public class SchemaMappingImpl implements SchemaMapping
 		return isEquivalenceOnly;
 	}
 
-	protected Pair<Node, Node> getConnectedMapping( final Node head ){
+	protected Pair<Node, Node> getConnectedMapping( final Node head, final Graph mappingDescription ){
 		Node first = RDF.nil.asNode();
 		Node rest = RDF.nil.asNode();
 		boolean hasFirst = false;

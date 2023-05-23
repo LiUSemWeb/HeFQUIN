@@ -301,6 +301,7 @@ public class SchemaMappingImplTest {
 	@Test
 	public void applyInverseToSolutionMapping() throws IOException {
 		// Create mapping rules.
+		// This translation is safe only for equivalence-only vocab.mappings
 		final String mappingAsTurtle =
 				"@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"
 						+ "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n"
@@ -310,11 +311,7 @@ public class SchemaMappingImplTest {
 						+ "ex:o owl:equivalentClass ex:p . "
 						+ "ex:m owl:equivalentProperty ex:c . "
 						+ "ex:m owl:equivalentProperty ex:d . "
-						+ "ex:m owl:equivalentProperty ex:e . "
-						+ "ex:f rdfs:subPropertyOf ex:m . "
-						+ "ex:g rdfs:subPropertyOf ex:m . "
-						+ "ex:p rdfs:subClassOf ex:n . "
-						+ "ex:n owl:unionOf (ex:p ex:q) . ";
+						+ "ex:m owl:equivalentProperty ex:e . ";
 		final Graph mapping = GraphFactory.createDefaultGraph();
 		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
 
