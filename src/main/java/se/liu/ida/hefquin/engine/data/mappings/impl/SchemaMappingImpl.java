@@ -90,7 +90,7 @@ public class SchemaMappingImpl implements SchemaMapping
 				l2gMap.put(localTerm, l2gtermMappings);
 			}
 
-			TermMappingImpl globalTerms = new TermMappingImpl(mappingType, global);
+			final TermMappingImpl globalTerms = new TermMappingImpl(mappingType, global);
 			l2gtermMappings.add(globalTerms);
 		}
 
