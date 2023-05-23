@@ -43,4 +43,10 @@ public interface SchemaMapping
 	 * set that contains the given solution mapping without any changes.
 	 */
 	Set<SolutionMapping> applyInverseToSolutionMapping( SolutionMapping solmap );
+
+	/**
+	 * Checks whether the schema mapping only contains equivalence rules, e.g., owl:equivalentClass, owl:equivalentProperty
+	 * Return true if the schema mapping consists solely of equivalence rules, false otherwise.
+	 */
+	boolean isEquivalenceOnly();
 }
