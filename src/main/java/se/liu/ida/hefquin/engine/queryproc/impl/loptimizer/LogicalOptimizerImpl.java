@@ -42,7 +42,7 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		//// vocabulary mappings is not supported by the evolutionary algorithm
 		//// currently since the rewriting rules need to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
-		// heuristics.add( new ApplyVocabularyMappings(false) );
+		// heuristics.add( new ApplyVocabularyMappings() );
 		// heuristics.add( new RemoveUnnecessaryL2gAndG2l() );
 
 		// heuristics.add( new PushJoinUnderUnionWithRequests() );
