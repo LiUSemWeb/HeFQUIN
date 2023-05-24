@@ -2,13 +2,12 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import org.apache.jena.vocabulary.RDF;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryplan.logical.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimization {
@@ -73,36 +72,23 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 	}
 
 	protected static Set<TriplePattern> extractTPs( final LogicalPlan plan ) {
-		final LogicalOperator lop = plan.getRootOperator();
+		final LogicalOperator rootOp = plan.getRootOperator();
 
-		if( lop instanceof LogicalOpRequest) {
-			return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) lop);
+		if( rootOp instanceof LogicalOpRequest) {
+			return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) rootOp);
 		}
-		else if ( lop instanceof LogicalOpMultiwayUnion || lop instanceof LogicalOpUnion) {
-			final int numOfSubPlans = plan.numberOfSubPlans();
-			Set<TriplePattern> previousTPs = null;
-
-			for ( int i = 0; i < numOfSubPlans; i++ ) {
-				final LogicalOperator subLop = plan.getSubPlan(i).getRootOperator();
-
-				if ( subLop instanceof LogicalOpRequest ) {
-					final Set<TriplePattern> currentTPs = LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) subLop);
-					if( !currentTPs.isEmpty() && previousTPs != null && !currentTPs.equals( previousTPs) ) {
-						throw new IllegalArgumentException("UNION is not added as a result of source selection");
-					}
-					previousTPs = currentTPs;
-				}
-				else {
-					throw new IllegalArgumentException("Unsupported type of subquery under UNION (" + subLop.getClass().getName() + ")");
-				}
+		else if ( rootOp instanceof BinaryLogicalOp || rootOp instanceof NaryLogicalOp) {
+			final Set<TriplePattern> triplePatterns = new HashSet<>();
+			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
+				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
 			}
-			return previousTPs;
+			return triplePatterns;
 		}
-		else if( lop instanceof LogicalOpFilter || lop instanceof LogicalOpLocalToGlobal || lop instanceof LogicalOpGlobalToLocal ) {
+		else if( rootOp instanceof UnaryLogicalOp ) {
 			return extractTPs( plan.getSubPlan(0) );
 		}
 		else {
-			throw new IllegalArgumentException("Unsupported type of root operator (" + lop.getClass().getName() + ")");
+			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ")");
 		}
 	}
 
