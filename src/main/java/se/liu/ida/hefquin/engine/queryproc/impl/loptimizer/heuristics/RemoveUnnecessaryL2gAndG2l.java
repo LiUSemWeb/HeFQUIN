@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
 import org.apache.jena.vocabulary.RDF;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
@@ -77,14 +78,49 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 		if( rootOp instanceof LogicalOpRequest) {
 			return LogicalOpUtils.getTriplePatternsOfReq( (LogicalOpRequest<?, ?>) rootOp);
 		}
-		else if ( rootOp instanceof BinaryLogicalOp || rootOp instanceof NaryLogicalOp) {
+		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion
+				|| rootOp instanceof LogicalOpJoin || rootOp instanceof LogicalOpMultiwayJoin
+				|| rootOp instanceof LogicalOpMultiwayLeftJoin
+				|| rootOp instanceof LogicalOpRightJoin ) {
 			final Set<TriplePattern> triplePatterns = new HashSet<>();
 			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 				triplePatterns.addAll( extractTPs(plan.getSubPlan(i)) );
 			}
 			return triplePatterns;
 		}
-		else if( rootOp instanceof UnaryLogicalOp ) {
+		else if ( rootOp instanceof LogicalOpTPAdd ) {
+			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
+			triplePatterns.add( ((LogicalOpTPAdd) rootOp).getTP() );
+			return triplePatterns;
+		}
+		else if ( rootOp instanceof LogicalOpBGPAdd ) {
+			final Set<TriplePattern> triplePatterns = (Set<TriplePattern>) ((LogicalOpBGPAdd) rootOp).getBGP().getTriplePatterns();
+			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
+			return triplePatterns;
+		}
+		else if ( rootOp instanceof LogicalOpGPAdd ) {
+			final Set<TriplePattern> triplePatterns = QueryPatternUtils.getTPsInPattern(((LogicalOpGPAdd) rootOp).getPattern());
+			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
+			return triplePatterns;
+		}
+		else if ( rootOp instanceof LogicalOpTPOptAdd ) {
+			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
+			triplePatterns.add( ((LogicalOpTPOptAdd) rootOp).getTP() );
+			return triplePatterns;
+		}
+		else if ( rootOp instanceof LogicalOpBGPOptAdd ) {
+			final Set<TriplePattern> triplePatterns = (Set<TriplePattern>) ((LogicalOpBGPOptAdd) rootOp).getBGP().getTriplePatterns();
+			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
+			return triplePatterns;
+		}
+		else if ( rootOp instanceof LogicalOpGPOptAdd ) {
+			final Set<TriplePattern> triplePatterns = QueryPatternUtils.getTPsInPattern(((LogicalOpGPOptAdd) rootOp).getPattern());
+			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
+			return triplePatterns;
+		}
+		else if( rootOp instanceof LogicalOpFilter
+				|| rootOp instanceof LogicalOpLocalToGlobal
+				|| rootOp instanceof LogicalOpGlobalToLocal ) {
 			return extractTPs( plan.getSubPlan(0) );
 		}
 		else {
