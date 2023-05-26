@@ -254,6 +254,12 @@ public class QueryPatternUtils
 			}
 			return tps;
 		}
+		else if ( e instanceof ElementGroup ) {
+			for ( Element el: ((ElementGroup) e).getElements() ){
+				tps.addAll( getTPsInPattern(el) );
+			}
+			return tps;
+		}
 		else if ( e instanceof ElementFilter ) {
 			// Do nothing
 			return tps;
