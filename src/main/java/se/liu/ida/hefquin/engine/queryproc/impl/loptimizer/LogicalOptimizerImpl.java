@@ -35,21 +35,22 @@ public class LogicalOptimizerImpl implements LogicalOptimizer
 		// final FormulaForComputingSelectivity formula = new JoinAwareWeightedUnboundVariableCount();
 		// heuristics.add( new GreedyBasedReordering(formula) );
 
-		// heuristics.add( new CardinalityBasedJoinOrderingWithRequests(ctxt) );
-
 		//// Uncomment the following line to apply vocabulary mappings of
 		//// federation members during query planning. Note that applying
 		//// vocabulary mappings is not supported by the evolutionary algorithm
 		//// currently since the rewriting rules need to be extended to consider
 		//// operators PhysicalOpLocalToGlobal and PhysicalOpGlobalToLocal.
 		// heuristics.add( new ApplyVocabularyMappings() );
-		// heuristics.add( new RemoveUnnecessaryL2gAndG2l() );
+		// heuristics.add( new CardinalityBasedJoinOrderingWithRequests(ctxt) );
 
-		// heuristics.add( new PushJoinUnderUnionWithRequests() );
-		// heuristics.add( new RemovePairsOfG2lAndL2g() );
+		// heuristics.add( new RemoveUnnecessaryL2gAndG2l() );
 
 		// heuristics.add( new PullUpLtgOverUnion() );
 		// heuristics.add( new PullUpLtgOverJoin() );
+
+		// heuristics.add( new PushJoinUnderUnionWithRequests() );
+		// heuristics.add( new PullUpLtgOverUnion() );
+		// heuristics.add( new RemovePairsOfG2lAndL2g() );
 	}
 
 	@Override
