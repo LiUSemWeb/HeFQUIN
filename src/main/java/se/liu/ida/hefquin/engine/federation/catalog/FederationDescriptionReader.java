@@ -16,6 +16,7 @@ import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
+import se.liu.ida.hefquin.engine.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
@@ -177,7 +178,8 @@ public class FederationDescriptionReader
 			if ( verifyValidVocabMappingFile(path) ) {
 				VocabularyMapping vm = vocabMappingByPath.get( path );
 				if ( vm == null ) {
-					vm = new VocabularyMappingImpl(path);
+//					vm = new VocabularyMappingImpl(path);
+					vm = new VocabularyMappingWrappingImpl(path);
 					vocabMappingByPath.put( path, vm );
 				}
 				return vm;
