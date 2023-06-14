@@ -13,5 +13,5 @@ preferred-citation:
     given-names: "Olaf"
     orcid: "https://orcid.org/0000-0002-1741-2090"
   title: "FedQPL: A Language for Logical Query Plans over Heterogeneous Federations of RDF Data Sources"
-  booktitle: "Proceedings of the 22nd International Conference on Information Integration and Web-based Applications & Services (iiWAS)"
+  collection-title: "Proceedings of the 22nd International Conference on Information Integration and Web-based Applications & Services (iiWAS)"
   year: 2020
