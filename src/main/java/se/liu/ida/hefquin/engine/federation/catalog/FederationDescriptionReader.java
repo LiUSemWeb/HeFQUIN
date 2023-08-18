@@ -71,6 +71,15 @@ public class FederationDescriptionReader
 
 			// Check the type of interface
 			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ) {
+
+				int numberOfEndpointAddresses = iface.listProperties(FD.endpointAddress).toList().size();
+				if (numberOfEndpointAddresses == 0){
+					throw new IllegalArgumentException("EndpointAddress is required!");
+				}
+				if (numberOfEndpointAddresses > 1){
+					throw new IllegalArgumentException("More Than One EndpointAddress!");
+				}
+
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
@@ -88,6 +97,15 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.TPFInterface) ) {
+
+				int numberOfExampleFragmentAddresses = iface.listProperties(FD.exampleFragmentAddress).toList().size();
+				if (numberOfExampleFragmentAddresses == 0){
+					throw new IllegalArgumentException("ExampleFragmentAddress is required!");
+				}
+				if (numberOfExampleFragmentAddresses > 1){
+					throw new IllegalArgumentException("More Than One ExampleFragmentAddress!");
+				}
+
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
 
 				final String addrStr;
@@ -105,6 +123,15 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.brTPFInterface) ) {
+
+				int numberOfExampleFragmentAddresses = iface.listProperties(FD.exampleFragmentAddress).toList().size();
+				if (numberOfExampleFragmentAddresses == 0){
+					throw new IllegalArgumentException("ExampleFragmentAddress is required!");
+				}
+				if (numberOfExampleFragmentAddresses > 1){
+					throw new IllegalArgumentException("More Than One ExampleFragmentAddress!");
+				}
+
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
 
 				final String addrStr;
@@ -122,6 +149,15 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.BoltInterface) ) {
+
+				int numberOfEndpointAddresses = iface.listProperties(FD.endpointAddress).toList().size();
+				if (numberOfEndpointAddresses == 0){
+					throw new IllegalArgumentException("EndpointAddress is required!");
+				}
+				if (numberOfEndpointAddresses > 1){
+					throw new IllegalArgumentException("More Than One EndpointAddress!");
+				}
+
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
@@ -139,6 +175,15 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ) {
+
+				int numberOfEndpointAddresses = iface.listProperties(FD.endpointAddress).toList().size();
+				if (numberOfEndpointAddresses == 0){
+					throw new IllegalArgumentException("EndpointAddress is required!");
+				}
+				if (numberOfEndpointAddresses > 1){
+					throw new IllegalArgumentException("More Than One EndpointAddress!");
+				}
+
 				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
 
 				final String addrStr;
