@@ -75,12 +75,12 @@ public class FederationDescriptionReaderTest
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		String expectedErrorMessage = "More Than One EndpointAddress!";
-		String actualErrorMessage = exception.getMessage();
+		final String expectedErrorMessage = "More Than One SPARQL endpointAddress!";
+		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
 
@@ -101,12 +101,12 @@ public class FederationDescriptionReaderTest
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		String expectedErrorMessage = "EndpointAddress is required!";
-		String actualErrorMessage = exception.getMessage();
+		final String expectedErrorMessage = "SPARQL endpointAddress is required!";
+		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
 
@@ -127,12 +127,12 @@ public class FederationDescriptionReaderTest
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		String expectedErrorMessage = "More Than One ExampleFragmentAddress!";
-		String actualErrorMessage = exception.getMessage();
+		final String expectedErrorMessage = "More Than One TPF exampleFragmentAddress!";
+		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
 
@@ -153,12 +153,12 @@ public class FederationDescriptionReaderTest
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
 
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel(fd);
 		});
 		// Test that the error message is correct
-		String expectedErrorMessage = "ExampleFragmentAddress is required!";
-		String actualErrorMessage = exception.getMessage();
+		final String expectedErrorMessage = "TPF exampleFragmentAddress is required!";
+		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
 
