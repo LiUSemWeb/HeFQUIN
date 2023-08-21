@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
@@ -71,7 +72,14 @@ public class FederationDescriptionReader
 
 			// Check the type of interface
 			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -88,7 +96,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.TPFInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
+
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -105,7 +120,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.brTPFInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
+
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -122,7 +144,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.BoltInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("Bolt endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -139,7 +168,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {

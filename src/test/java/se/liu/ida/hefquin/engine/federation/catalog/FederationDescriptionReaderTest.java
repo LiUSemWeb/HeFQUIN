@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.catalog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -54,6 +55,111 @@ public class FederationDescriptionReaderTest
 		assertTrue( fm2.getVocabularyMapping() == null );
 		assertTrue( fm2 instanceof TPFServer );
 		assertTrue( fm2.getInterface() instanceof TPFInterface );
+	}
+
+	@Test
+	public void sparqlFMWithTwoEndpoints() {
+		final String turtle =
+				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaSPARQL\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
+						+ "                     fd:endpointAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ];\n"
+						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
+
+		final Model fd = ModelFactory.createDefaultModel();
+
+		final RDFParserBuilder b = RDFParser.fromString(turtle);
+		b.lang( Lang.TURTLE );
+		b.parse(fd);
+
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			FederationDescriptionReader.readFromModel(fd);
+		});
+		// Test that the error message is correct
+		final String expectedErrorMessage = "More Than One SPARQL endpointAddress!";
+		final String actualErrorMessage = exception.getMessage();
+		assertEquals(expectedErrorMessage, actualErrorMessage);
+	}
+
+	@Test
+	public void sparqlFMWithoutRequiredProperty() {
+		final String turtle =
+				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaSPARQL\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
+						+ "                     fd:exampleFragmentAddress <http://dbpedia.org/sparql>, <http://localhost:7474/db/neo4j/tx> ].\n";
+
+		final Model fd = ModelFactory.createDefaultModel();
+
+		final RDFParserBuilder b = RDFParser.fromString(turtle);
+		b.lang( Lang.TURTLE );
+		b.parse(fd);
+
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			FederationDescriptionReader.readFromModel(fd);
+		});
+		// Test that the error message is correct
+		final String expectedErrorMessage = "SPARQL endpointAddress is required!";
+		final String actualErrorMessage = exception.getMessage();
+		assertEquals(expectedErrorMessage, actualErrorMessage);
+	}
+
+	@Test
+	public void tpfFMWithTwoEndpoints() {
+		final String turtle =
+				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaTPF\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
+						+ "                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
+
+		final Model fd = ModelFactory.createDefaultModel();
+
+		final RDFParserBuilder b = RDFParser.fromString(turtle);
+		b.lang( Lang.TURTLE );
+		b.parse(fd);
+
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			FederationDescriptionReader.readFromModel(fd);
+		});
+		// Test that the error message is correct
+		final String expectedErrorMessage = "More Than One TPF exampleFragmentAddress!";
+		final String actualErrorMessage = exception.getMessage();
+		assertEquals(expectedErrorMessage, actualErrorMessage);
+	}
+
+	@Test
+	public void tpfFMWithoutRequiredProperty() {
+		final String turtle =
+				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaTPF\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:TPFInterface ;\n"
+						+ "                     fd:endpointAddress <http://fragments.dbpedia.org/2016-04/en>, <http://localhost:7474/db/neo4j/tx> ].\n";
+
+		final Model fd = ModelFactory.createDefaultModel();
+
+		final RDFParserBuilder b = RDFParser.fromString(turtle);
+		b.lang( Lang.TURTLE );
+		b.parse(fd);
+
+		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			FederationDescriptionReader.readFromModel(fd);
+		});
+		// Test that the error message is correct
+		final String expectedErrorMessage = "TPF exampleFragmentAddress is required!";
+		final String actualErrorMessage = exception.getMessage();
+		assertEquals(expectedErrorMessage, actualErrorMessage);
 	}
 
 }
