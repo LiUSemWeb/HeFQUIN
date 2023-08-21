@@ -72,16 +72,14 @@ public class FederationDescriptionReader
 
 			// Check the type of interface
 			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ) {
-
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
-				if (!endpointAddressesIterator.hasNext()){
+				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
-				}
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
-				if (endpointAddressesIterator.hasNext()){
-					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
-				}
 
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -98,16 +96,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.TPFInterface) ) {
-
 				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
-				if (!exampleFragmentAddressesIterator.hasNext()){
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
-				}
-				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
-				if (exampleFragmentAddressesIterator.hasNext()){
-					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
-				}
 
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -124,16 +120,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.brTPFInterface) ) {
-
 				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
-				if (!exampleFragmentAddressesIterator.hasNext()){
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
-				}
-				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
-				if (exampleFragmentAddressesIterator.hasNext()){
-					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
-				}
 
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -150,16 +144,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.BoltInterface) ) {
-
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
-				if (!endpointAddressesIterator.hasNext()){
+				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("Bolt endpointAddress is required!");
-				}
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
-				if (endpointAddressesIterator.hasNext()){
-					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
-				}
 
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -176,16 +168,14 @@ public class FederationDescriptionReader
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ) {
-
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
-				if (!endpointAddressesIterator.hasNext()){
+				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
-				}
-				final RDFNode addr = endpointAddressesIterator.next().getObject();
-				if (endpointAddressesIterator.hasNext()){
-					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
-				}
 
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
