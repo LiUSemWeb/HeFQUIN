@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.jena.graph.Triple;
@@ -18,6 +17,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalInterface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -473,16 +473,23 @@ public class UnionPullUpTest
 		final LogicalPlan resultPlan = new UnionPullUp().apply(l2gPlan);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
-		assertEquals( l2g, rootOfResultPlan );
-		assertEquals( 1, resultPlan.numberOfSubPlans() );
+		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
+		assertEquals( 2, resultPlan.numberOfSubPlans() );
 
-		final LogicalPlan childOfResultPlan = resultPlan.getSubPlan(0);
-		final LogicalOperator rootOfChild = childOfResultPlan.getRootOperator();
-		assertTrue( rootOfChild instanceof LogicalOpMultiwayUnion || rootOfChild instanceof LogicalOpUnion );
-		assertEquals( 2, childOfResultPlan.numberOfSubPlans() );
+		final LogicalPlan child1 = resultPlan.getSubPlan(0);
+		final LogicalPlan child2 = resultPlan.getSubPlan(1);
 
-		final LogicalPlan grandchild1 = childOfResultPlan.getSubPlan(0);
-		final LogicalPlan grandchild2 = childOfResultPlan.getSubPlan(1);
+		assertEquals( 1, child1.numberOfSubPlans() );
+		assertEquals( 1, child2.numberOfSubPlans() );
+
+		final LogicalOperator rootOfChild1 = child1.getRootOperator();
+		final LogicalOperator rootOfChild2 = child2.getRootOperator();
+
+		assertEquals( l2g, rootOfChild1 );
+		assertEquals( l2g, rootOfChild2 );
+
+		final LogicalPlan grandchild1 = child1.getSubPlan(0);
+		final LogicalPlan grandchild2 = child2.getSubPlan(0);
 
 		assertEquals( 1, grandchild1.numberOfSubPlans() );
 		assertEquals( 1, grandchild2.numberOfSubPlans() );
@@ -521,12 +528,14 @@ public class UnionPullUpTest
 	protected static class DummyLogicalPlan implements LogicalPlan {
 		final protected LogicalOperator rootOp = new DummyLogicalOp();
 		@Override public LogicalOperator getRootOperator() { return rootOp; }
+		@Override public ExpectedVariables getExpectedVariables() { throw new UnsupportedOperationException(); }
 		@Override public int numberOfSubPlans() { return 0; }
-		@Override public LogicalPlan getSubPlan(int i) throws NoSuchElementException { throw new UnsupportedOperationException(); }
+		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
+		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyFederationMember implements FederationMember {
@@ -537,6 +546,7 @@ public class UnionPullUpTest
 	protected static class DummyDataRetrievalInterface implements DataRetrievalInterface {
 		@Override public boolean supportsTriplePatternRequests() { return true; }
 		@Override public boolean supportsBGPRequests() { throw new UnsupportedOperationException(); }
+		@Override public boolean supportsSPARQLPatternRequests() { throw new UnsupportedOperationException(); }
 		@Override public boolean supportsRequest(DataRetrievalRequest req) { throw new UnsupportedOperationException(); }
 	}
 

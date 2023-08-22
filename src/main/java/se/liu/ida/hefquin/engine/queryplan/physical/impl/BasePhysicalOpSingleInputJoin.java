@@ -1,16 +1,13 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import org.apache.jena.sparql.core.Var;
-
-import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
@@ -21,11 +18,16 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
 
     /**
      * The given logical operator is expected to be of one of the following
-     * two types: {@link LogicalOpTPAdd} or {@link LogicalOpBGPAdd}.
+     * six types:
+     * {@link LogicalOpTPAdd}, {@link LogicalOpTPOptAdd},
+     * {@link LogicalOpBGPAdd}, {@link LogicalOpBGPOptAdd},
+     * {@link LogicalOpGPAdd}, or {@link LogicalOpGPOptAdd}.
      */
     protected BasePhysicalOpSingleInputJoin( final UnaryLogicalOp lop ) {
         assert lop != null;
-        assert (lop instanceof LogicalOpBGPAdd) || (lop instanceof LogicalOpTPAdd);
+        assert (lop instanceof LogicalOpBGPAdd) || (lop instanceof LogicalOpBGPOptAdd) ||
+               (lop instanceof LogicalOpTPAdd) || (lop instanceof LogicalOpTPOptAdd) ||
+               (lop instanceof LogicalOpGPAdd) || (lop instanceof LogicalOpGPOptAdd);
         this.lop = lop;
     }
 
@@ -45,34 +47,7 @@ public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpFo
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		assert inputVars.length == 1;
-
-		final Set<Var> certainVars = new HashSet<>( inputVars[0].getCertainVariables() );
-		final Set<Var> possibleVars = new HashSet<>( inputVars[0].getPossibleVariables() );
-
-		if ( lop instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
-			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
-		}
-		else if ( lop instanceof LogicalOpTPOptAdd ) {
-			final LogicalOpTPOptAdd tpAdd = (LogicalOpTPOptAdd) lop;
-			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(tpAdd.getTP()) );
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
-			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
-		}
-		else if ( lop instanceof LogicalOpBGPOptAdd ) {
-			final LogicalOpBGPOptAdd bgpAdd = (LogicalOpBGPOptAdd) lop;
-			certainVars.addAll( QueryPatternUtils.getVariablesInPattern(bgpAdd.getBGP()) );
-		}
-		else
-			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
-
-		return new ExpectedVariables() {
-			@Override public Set<Var> getCertainVariables() { return certainVars; }
-			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-		};
+		return lop.getExpectedVariables(inputVars);
 	}
 
 }

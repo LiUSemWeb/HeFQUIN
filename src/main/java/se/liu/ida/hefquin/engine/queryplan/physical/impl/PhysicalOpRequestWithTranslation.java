@@ -76,9 +76,7 @@ public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalReque
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		assert inputVars.length == 0;
-
-		return lop.getRequest().getExpectedVariables();
+		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override

@@ -55,6 +55,20 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 				futureIntResSize = initiateCardinalityEstimation(subplan);
 			}
 		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			numberOfVars = QueryPatternUtils.getNumberOfVarOccurrences( gpAdd.getPattern() );
+
+			final PhysicalPlan subplan = plan.getSubPlan(0);
+			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
+			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqGP).size();
+
+			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
+				futureIntResSize = null; // irrelevant
+			} else {
+				futureIntResSize = initiateCardinalityEstimation(subplan);
+			}
+		}
 		else if ( lop instanceof LogicalOpRequest ) {
 			final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
 			if ( req instanceof TriplePatternRequest ) {
@@ -71,7 +85,12 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 			numberOfJoinVars = 0;    // irrelevant for request operators
 			futureIntResSize = null; // irrelevant for request operators
 		}
-		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion ) {
+		else if ( lop instanceof LogicalOpJoin
+				|| lop instanceof LogicalOpUnion
+				|| lop instanceof LogicalOpMultiwayUnion
+				|| lop instanceof LogicalOpLocalToGlobal
+				|| lop instanceof LogicalOpGlobalToLocal
+		) {
 			numberOfVars = 0;        // irrelevant for join operators
 			numberOfJoinVars = 0;    // irrelevant for join operators
 			futureIntResSize = null; // irrelevant for join operators
@@ -99,7 +118,11 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		else if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfVars;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin || pop instanceof PhysicalOpBinaryUnion ) {
+		else if ( pop instanceof BasePhysicalOpBinaryJoin
+				|| pop instanceof PhysicalOpBinaryUnion
+				|| pop instanceof PhysicalOpMultiwayUnion
+				|| pop instanceof PhysicalOpGlobalToLocal
+				|| pop instanceof PhysicalOpLocalToGlobal ) {
 			costValue = 0;
 		}
 		else {

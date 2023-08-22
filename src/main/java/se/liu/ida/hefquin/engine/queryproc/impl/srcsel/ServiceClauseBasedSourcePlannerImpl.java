@@ -24,10 +24,8 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -46,41 +44,25 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
-public class SourcePlannerImpl implements SourcePlanner
+/**
+ * This implementation of {@link SourcePlanner} does not actually perform
+ * query decomposition and source selection but simply assumes queries with
+ * SERVICE clauses where, for the moment, all of these SERVICE clauses are
+ * of the form "SERVICE uri {...}" (i.e., not "SERVICE var {...}"). Therefore,
+ * all that this implementation does is to convert the given query pattern
+ * into a logical plan.
+ */
+public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 {
-	protected final QueryProcContext ctxt;
-
-	public SourcePlannerImpl( final QueryProcContext ctxt ) {
-		assert ctxt != null;
-		this.ctxt = ctxt;
+	public ServiceClauseBasedSourcePlannerImpl( final QueryProcContext ctxt ) {
+		super(ctxt);
 	}
 
 	@Override
-	public Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query )
+	protected Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp )
 			throws SourcePlanningException
 	{
-		// The current implementation here does not actually perform
-		// query decomposition and source selection but simply assumes
-		// queries with SERVICE clauses where, for the moment, all of
-		// these SERVICE clauses are of the form "SERVICE uri {...}"
-		// (i.e., not "SERVICE var {...}"). Therefore, all that this
-		// implementation here does is to convert the given query
-		// pattern into a logical plan.
-		final Op jenaOp;
-		if ( query instanceof GenericSPARQLGraphPatternImpl1 ) {
-			@SuppressWarnings("deprecation")
-			final Op o = ( (GenericSPARQLGraphPatternImpl1) query ).asJenaOp();
-			jenaOp = o;
-		}
-		else if ( query instanceof GenericSPARQLGraphPatternImpl2 ) {
-			jenaOp = ( (GenericSPARQLGraphPatternImpl2) query ).asJenaOp();
-		}
-		else {
-			throw new UnsupportedOperationException( query.getClass().getName() );
-		}
-
 		final LogicalPlan sa = createPlan(jenaOp);
-
 		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
 
 		return new Pair<>(sa, myStats);

@@ -3,24 +3,16 @@ package se.liu.ida.hefquin.engine.queryproc.impl.srcsel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.ExecutorService;
-
-import org.apache.jena.graph.Triple;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
@@ -29,9 +21,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
-public class SourcePlannerImplTest extends EngineTestBase
+public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTestBase
 {
 	@Test
 	public void oneTPFoneTriplePattern() throws SourcePlanningException {
@@ -40,7 +31,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p> ?y }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -64,7 +55,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "SERVICE <http://example.org> { ?x <http://example.org/p1> ?y; <http://example.org/p2> ?z }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new BRTPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -116,7 +107,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "SERVICE <http://example.org/tpf2> { ?x <http://example.org/p2> ?z }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org/tpf1", new TPFServerForTest() );
 		fedCat.addMember( "http://example.org/tpf2", new TPFServerForTest() );
 
@@ -158,7 +149,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "  { SERVICE <http://example.org> { ?z <http://example.org/q> ?y } }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -197,7 +188,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -236,7 +227,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new SPARQLEndpointForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -266,7 +257,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "  { SERVICE <http://example.org> { ?v <http://example.org/r> ?y } }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -319,7 +310,7 @@ public class SourcePlannerImplTest extends EngineTestBase
 				+ "  }"
 				+ "}";
 		
-		final FederationCatalogForTest fedCat = new FederationCatalogForTest();
+		final FederationCatalogImpl fedCat = new FederationCatalogImpl();
 		fedCat.addMember( "http://example.org", new TPFServerForTest() );
 
 		final LogicalPlan plan = createLogicalPlan(queryString, fedCat);
@@ -358,54 +349,10 @@ public class SourcePlannerImplTest extends EngineTestBase
 
 	// --------- helper functions ---------
 
-	protected LogicalPlan createLogicalPlan( final String queryString,
-	                                         final FederationCatalog fedCat )
-				throws SourcePlanningException
+	@Override
+	protected SourcePlanner createSourcePlanner( final QueryProcContext ctxt )
 	{
-		final QueryProcContext ctxt = new QueryProcContext() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return null; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
-			@Override public CostModel getCostModel() { return null; }
-			@Override public boolean isExperimentRun() { return false; }
-		};
-
-		final SourcePlanner sourcePlanner = new SourcePlannerImpl(ctxt);
-		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
-		return sourcePlanner.createSourceAssignment(query).object1;
-	}
-
-	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,
-	                                                 final String expectedPredicateURI,
-	                                                 final String expectedObjectVarName,
-	                                                 final TriplePatternRequest actualTriplePatternRequest ) {
-		assertEquals( 2, actualTriplePatternRequest.getQueryPattern().numberOfVars() );
-		assertEqualTriplePatternsVUV( expectedSubjectVarName,
-		                              expectedPredicateURI,
-		                              expectedObjectVarName,
-		                              actualTriplePatternRequest.getQueryPattern() );
-	}
-
-	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,
-	                                                 final String expectedPredicateURI,
-	                                                 final String expectedObjectVarName,
-	                                                 final TriplePattern actualTriplePattern ) {
-		assertEqualTriplePatternsVUV( expectedSubjectVarName,
-		                              expectedPredicateURI,
-		                              expectedObjectVarName,
-		                              actualTriplePattern.asJenaTriple() );
-	}
-
-	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,
-	                                                 final String expectedPredicateURI,
-	                                                 final String expectedObjectVarName,
-	                                                 final Triple actualTriplePattern ) {
-		assertTrue( actualTriplePattern.getSubject().isVariable() );
-		assertTrue( actualTriplePattern.getPredicate().isURI() );
-		assertTrue( actualTriplePattern.getObject().isVariable() );
-		assertEquals( expectedSubjectVarName, actualTriplePattern.getSubject().getName() );
-		assertEquals( expectedPredicateURI, actualTriplePattern.getPredicate().getURI() );
-		assertEquals( expectedObjectVarName, actualTriplePattern.getObject().getName() );
+		return new ServiceClauseBasedSourcePlannerImpl(ctxt);
 	}
 
 }

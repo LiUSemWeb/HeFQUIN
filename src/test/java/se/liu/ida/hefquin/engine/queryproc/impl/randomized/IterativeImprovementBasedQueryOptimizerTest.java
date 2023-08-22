@@ -5,6 +5,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -79,7 +80,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 	// ----------- helper code for the tests ------------
 
 	protected QueryOptimizationContext createContextForTest() {
-		final FederationCatalog fedCat = new FederationCatalogForTest();
+		final FederationCatalog fedCat = new FederationCatalogImpl();
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl(true, true);
 

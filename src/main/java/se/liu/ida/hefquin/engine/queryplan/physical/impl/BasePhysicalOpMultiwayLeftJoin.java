@@ -1,14 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 public abstract class BasePhysicalOpMultiwayLeftJoin implements NaryPhysicalOpForLogicalOp
 {
@@ -32,14 +27,7 @@ public abstract class BasePhysicalOpMultiwayLeftJoin implements NaryPhysicalOpFo
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		final Set<Var> certainVars = inputVars[0].getCertainVariables();
-		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(inputVars);
-		possibleVars.removeAll(certainVars);
-
-		return new ExpectedVariables() {
-			@Override public Set<Var> getCertainVariables() { return certainVars; }
-			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-		};
+		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override

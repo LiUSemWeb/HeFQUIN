@@ -40,6 +40,23 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 	}
 
 	@Override
+	public String toString(){
+		final int size = getNumberOfSubPatterns();
+
+		final StringBuilder builder = new StringBuilder();
+		builder.append( "(SPARQLUnionPattern ");
+		for ( int i = 0; i < size; i ++ ){
+			builder.append( getSubPatterns(i).toString() );
+			if( i < size-1 ) {
+				builder.append(" UNION ");
+			}
+		}
+		builder.append( " )");
+
+		return builder.toString();
+	}
+
+	@Override
 	public boolean equals( final Object other ) {
 		if ( this == other )
 			return true;

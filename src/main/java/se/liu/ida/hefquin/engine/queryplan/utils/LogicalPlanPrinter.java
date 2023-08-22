@@ -6,6 +6,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
@@ -51,7 +53,15 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
+		}
+
+		@Override
+		public void visit(final LogicalOpGPAdd op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel++;
 		}
 
 		@Override
@@ -67,7 +77,15 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
-			indentLevel--;
+			indentLevel++;
+		}
+
+		@Override
+		public void visit(final LogicalOpGPOptAdd op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel++;
 		}
 
 		@Override
@@ -161,12 +179,22 @@ public class LogicalPlanPrinter extends PlanPrinter{
 		}
 
 		@Override
+		public void visit(final LogicalOpGPAdd op) {
+			indentLevel--;
+		}
+
+		@Override
 		public void visit(final LogicalOpTPOptAdd op) {
 			indentLevel--;
 		}
 
 		@Override
 		public void visit(final LogicalOpBGPOptAdd op) {
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpGPOptAdd op) {
 			indentLevel--;
 		}
 

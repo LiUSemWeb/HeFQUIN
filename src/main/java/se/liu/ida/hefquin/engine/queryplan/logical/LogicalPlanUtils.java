@@ -1,9 +1,16 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
-import se.liu.ida.hefquin.engine.federation.access.*;
+import java.util.Arrays;
+import java.util.List;
+
+import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
+import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
@@ -15,9 +22,99 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithBinaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 
 public class LogicalPlanUtils
 {
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpJoin} as root
+	 * operator and the given plans as its two subplans.
+	 */
+	public static LogicalPlan createPlanWithBinaryJoin( final LogicalPlan subPlan1,
+	                                                    final LogicalPlan subPlan2 ) {
+		return createPlanWithSubPlans( LogicalOpJoin.getInstance(), subPlan1, subPlan2 );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayJoin} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayJoin( final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayJoin} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayJoin( final List<LogicalPlan> subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayJoin.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpUnion} as root
+	 * operator and the given plans as its two subplans.
+	 */
+	public static LogicalPlan createPlanWithBinaryUnion( final LogicalPlan subPlan1,
+	                                                     final LogicalPlan subPlan2 ) {
+		return createPlanWithSubPlans( LogicalOpUnion.getInstance(), subPlan1, subPlan2 );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayUnion} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayUnion( final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with a {@link LogicalOpMultiwayUnion} as
+	 * root operator and the given plans as its subplans.
+	 */
+	public static LogicalPlan createPlanWithMultiwayUnion( final List<LogicalPlan> subPlans ) {
+		return createPlanWithSubPlans( LogicalOpMultiwayUnion.getInstance(), subPlans );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with the given operator as root operator
+	 * and the given plans as subplans.
+	 */
+	public static LogicalPlan createPlanWithSubPlans( final LogicalOperator rootOp,
+	                                                  final LogicalPlan ... subPlans ) {
+		return createPlanWithSubPlans( rootOp, Arrays.asList(subPlans) );
+	}
+
+	/**
+	 * Creates a {@link LogicalPlan} with the given operator as root operator
+	 * and the plans given in the list as subplans. If the given operator is
+	 * a {@link NullaryLogicalOp}, then the given list may be null.
+	 */
+	public static LogicalPlan createPlanWithSubPlans( final LogicalOperator rootOp,
+	                                                  final List<LogicalPlan> subPlans ) {
+		if ( rootOp instanceof NullaryLogicalOp ) {
+			assert subPlans == null || subPlans.isEmpty();
+			return new LogicalPlanWithNullaryRootImpl( (NullaryLogicalOp) rootOp );
+		}
+		else if ( rootOp instanceof UnaryLogicalOp ) {
+			assert subPlans.size() == 1;
+			return new LogicalPlanWithUnaryRootImpl( (UnaryLogicalOp) rootOp, subPlans.get(0) );
+		}
+		else if ( rootOp instanceof BinaryLogicalOp ) {
+			assert subPlans.size() == 2;
+			return new LogicalPlanWithBinaryRootImpl( (BinaryLogicalOp) rootOp, subPlans.get(0), subPlans.get(1) );
+		}
+		else if ( rootOp instanceof NaryLogicalOp ) {
+			return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) rootOp, subPlans );
+		}
+		else {
+			throw new IllegalArgumentException( "unexpected type of logical operator: " + rootOp.getClass().getName() );
+		}
+	}
+
 	/**
 	 * Returns true if the given logical plan is a source assignment.
 	 */
@@ -26,20 +123,20 @@ public class LogicalPlanUtils
 		LogicalPlanWalker.walk(plan, null, v);
 		return v.wasSourceAssignment();
 	}
-	
-	static public int countSubplans ( final LogicalPlan plan ) {
+
+	static public int countSubplans( final LogicalPlan plan ) {
 		final LogicalPlanCounter c = new LogicalPlanCounter();
 		LogicalPlanWalker.walk(plan, null, c);
 		return c.getSubplanCount();
 	}
-	
+
 	static public class LogicalPlanCounter implements LogicalPlanVisitor {
 		protected int subplanCount = 0;
-		
+
 		public int getSubplanCount() {
 			return subplanCount;
 		}
-		
+
 		@Override
 		public void visit( final LogicalOpRequest<?,?> op )  { subplanCount++; }
 
@@ -50,10 +147,16 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpBGPAdd op )        { subplanCount++; }
 
 		@Override
+		public void visit( final LogicalOpGPAdd op )         { subplanCount++; }
+
+		@Override
 		public void visit( final LogicalOpTPOptAdd op )      { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpBGPOptAdd op )     { subplanCount++; }
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op )      { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpJoin op )          { subplanCount++; }
@@ -81,7 +184,7 @@ public class LogicalPlanUtils
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) { subplanCount++; }
-	}
+	} // end of class LogicalPlanCounter
 
 	static public class SourceAssignmentChecker extends LogicalPlanVisitorBase {
 		protected boolean isSourceAssignment = true;
@@ -107,12 +210,22 @@ public class LogicalPlanUtils
 		}
 
 		@Override
+		public void visit( final LogicalOpGPAdd op ) {
+			isSourceAssignment = false;
+		}
+
+		@Override
 		public void visit( final LogicalOpTPOptAdd op ) {
 			isSourceAssignment = false;
 		}
 
 		@Override
 		public void visit( final LogicalOpBGPOptAdd op ) {
+			isSourceAssignment = false;
+		}
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op ) {
 			isSourceAssignment = false;
 		}
 

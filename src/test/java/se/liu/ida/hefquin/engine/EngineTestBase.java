@@ -34,7 +34,6 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProc
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
-import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
@@ -403,14 +402,6 @@ public abstract class EngineTestBase
 	}
 
 
-	public static class FederationCatalogForTest extends FederationCatalogImpl
-	{
-		public void addMember( final String uri, final FederationMember fm ) {
-			membersByURI.put(uri, fm);
-		}
-	} // end of FederationCatalogForTest
-
-
 	protected static class FederationAccessManagerForTest implements FederationAccessManager
 	{
 		protected final Iterator<List<SolutionMapping>> itSolMapsForResponse;
@@ -520,8 +511,7 @@ public abstract class EngineTestBase
 				final SPARQLRequest req,
 				final SPARQLEndpoint fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -529,8 +519,7 @@ public abstract class EngineTestBase
 				final TPFRequest req,
 				final TPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -538,8 +527,7 @@ public abstract class EngineTestBase
 				final TPFRequest req,
 				final BRTPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -547,20 +535,17 @@ public abstract class EngineTestBase
 				final BRTPFRequest req,
 				final BRTPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void resetStats() {
-			// TODO Auto-generated method stub
-			
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public FederationAccessStats getStats() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 	}
 

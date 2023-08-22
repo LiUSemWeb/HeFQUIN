@@ -50,6 +50,18 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * 
  * Now, the two joins can be turned into bind joins, and it is even possible
  * to pick two different join strategies for them.
+ * 
+ * Attention: It has turned out that UnionPullUp typically does more harm
+ * than good, because it has the tendency to turn a join-over-union source
+ * assignment into a (multiway) union with many join subplans (in particular
+ * for cases in which there are several unions in the join-over-union source
+ * assignment, because in these cases every combination of requests under
+ * the different unions ends up as a separate join). If, thereafter, these
+ * many join subplans are predominantly implemented as symmetric hash joins,
+ * then the execution plan will do many more requests than what would be
+ * necessary for the joins of the original join-over-union source assignment.
+ * An alternative heuristic that does not have this problem is
+ * {@link PushJoinUnderUnionWithRequests}.
  */
 public class UnionPullUp implements HeuristicForLogicalOptimization
 {
@@ -90,7 +102,11 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		     || rootOp instanceof LogicalOpTPOptAdd
 		     || rootOp instanceof LogicalOpBGPAdd
 		     || rootOp instanceof LogicalOpBGPOptAdd
-		     || rootOp instanceof LogicalOpFilter )
+		     || rootOp instanceof LogicalOpGPAdd
+		     || rootOp instanceof LogicalOpGPOptAdd
+		     || rootOp instanceof LogicalOpFilter
+		     || rootOp instanceof LogicalOpLocalToGlobal
+		     || rootOp instanceof LogicalOpGlobalToLocal )
 		{
 			// The listed operators are unary operators; i.e., have exactly one
 			// subplan as child. If that subplan has a union operator as root,
@@ -99,14 +115,6 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			if ( ! rewrittenSubPlansWithUnionRoot.isEmpty() )
 				return rewritePlanWithUnaryRootAndUnionChild( (UnaryLogicalOp) rootOp,
 				                                              rewrittenSubPlansWithUnionRoot.get(0) );
-		}
-		else if (    rootOp instanceof LogicalOpLocalToGlobal
-		          || rootOp instanceof LogicalOpGlobalToLocal )
-		{
-			// nothing to do here (if we have a vocabulary translation as root
-			// operator, we do not attempt to pull a potential union out of it)
-
-			// TODO: think about these cases again
 		}
 		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion )
 		{
@@ -146,7 +154,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithUnionRoot);
 			rewrittenSubPlans.addAll(rewrittenSubPlansWithNonUnionRoot);
 
-			return recreatePlanWithRewrittenSubPlans(rootOp, rewrittenSubPlans);
+			return LogicalPlanUtils.createPlanWithSubPlans(rootOp, rewrittenSubPlans);
 		}
 		else
 			return inputPlan;
@@ -246,26 +254,6 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 		}
 
 		return new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), newSubPlans ); 
-	}
-
-	/**
-	 * Creates a plan with the given operator as root operator and the plans
-	 * given in the list as subplans.
-	 */
-	public LogicalPlan recreatePlanWithRewrittenSubPlans( final LogicalOperator rootOp,
-	                                                      final List<LogicalPlan> subPlans ) {
-		if ( rootOp instanceof UnaryLogicalOp ) {
-			return new LogicalPlanWithUnaryRootImpl( (UnaryLogicalOp) rootOp, subPlans.get(0) );
-		}
-		else if ( rootOp instanceof BinaryLogicalOp ) {
-			return new LogicalPlanWithBinaryRootImpl( (BinaryLogicalOp) rootOp, subPlans.get(0), subPlans.get(1) );
-		}
-		else if ( rootOp instanceof NaryLogicalOp ) {
-			return new LogicalPlanWithNaryRootImpl( (NaryLogicalOp) rootOp, subPlans );
-		}
-		else {
-			throw new IllegalArgumentException( rootOp.getClass().getName() );
-		}
 	}
 
 }

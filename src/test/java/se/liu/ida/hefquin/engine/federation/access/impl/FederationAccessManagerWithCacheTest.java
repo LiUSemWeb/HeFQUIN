@@ -70,9 +70,10 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInSequence \t milliseconds passed: " + (endTime - startTime) );
 
-		assertEquals( r1, r2 );
-		assertEquals( r1, null );
-		assertEquals( r2, null );
+		assertEquals( req1, r1.getRequest() );
+		assertEquals( req1, r2.getRequest() );
+		assertEquals( fm1, r1.getFederationMember() );
+		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test
@@ -99,9 +100,10 @@ public class FederationAccessManagerWithCacheTest extends EngineTestBase
 		final long endTime = new Date().getTime();
 		if ( PRINT_TIME ) System.out.println( "twoRequestsInParallel \t milliseconds passed: " + (endTime - startTime) );
 
-		assertEquals( r1, r2 );
-		assertEquals( r1, null );
-		assertEquals( r2, null );
+		assertEquals( req1, r1.getRequest() );
+		assertEquals( req1, r2.getRequest() );
+		assertEquals( fm1, r1.getFederationMember() );
+		assertEquals( fm2, r2.getFederationMember() );
 	}
 
 	@Test

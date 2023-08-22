@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
@@ -21,6 +22,13 @@ public class LogicalOpFilter implements UnaryLogicalOp
 		assert filterExpression != null;
 
 		this.filterExpressions = new ExprList(filterExpression);
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 1;
+
+		return inputVars[0];
 	}
 
 	@Override

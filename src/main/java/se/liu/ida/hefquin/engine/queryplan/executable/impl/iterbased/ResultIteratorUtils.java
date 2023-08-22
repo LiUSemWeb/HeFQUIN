@@ -6,7 +6,6 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutablePlanStatsImpl;
 
 public class ResultIteratorUtils
 {
@@ -22,18 +21,18 @@ public class ResultIteratorUtils
 	public static ExecutablePlanStats tryGetStatsOfProducingSubPlan( final ResultElementIterator it ) {
 		final ExecutableOperatorStats rootOpStats = ResultIteratorUtils.tryGetStatsOfProducingOperator(it);
 		if ( it instanceof ResultElementIterWithNullaryExecOp ) {
-			return new ExecutablePlanStatsImpl( rootOpStats );
+			return new ExecutablePlanStatsOfIteratorBasedPlan( rootOpStats );
 		}
 		else if ( it instanceof ResultElementIterWithUnaryExecOp ) {
 			final ResultElementIterWithUnaryExecOp itt = (ResultElementIterWithUnaryExecOp) it;
-			return new ExecutablePlanStatsImpl( rootOpStats, itt.tryGetStatsOfInput() );
+			return new ExecutablePlanStatsOfIteratorBasedPlan( rootOpStats, itt.tryGetStatsOfInput() );
 		}
 		else if ( it instanceof ResultElementIterWithBinaryExecOp ) {
 			final ResultElementIterWithBinaryExecOp itt = (ResultElementIterWithBinaryExecOp) it;
-			return new ExecutablePlanStatsImpl( rootOpStats, itt.tryGetStatsOfInput1(), itt.tryGetStatsOfInput2() );
+			return new ExecutablePlanStatsOfIteratorBasedPlan( rootOpStats, itt.tryGetStatsOfInput1(), itt.tryGetStatsOfInput2() );
 		}
 
-		return new ExecutablePlanStatsImpl( rootOpStats );
+		return new ExecutablePlanStatsOfIteratorBasedPlan( rootOpStats );
 	}
 
 	public static ExecutableOperatorStats tryGetStatsOfProducingOperator( final ResultElementIterator it ) {

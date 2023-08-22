@@ -53,6 +53,11 @@ public class TPFInterfaceImpl implements TPFInterface
 	}
 
 	@Override
+	public boolean supportsSPARQLPatternRequests() {
+		return false;
+	}
+
+	@Override
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
 		return req instanceof TriplePatternRequest;
 	}
@@ -88,6 +93,12 @@ public class TPFInterfaceImpl implements TPFInterface
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal subject (" + s.getClass().getName() + ").");
 			}
 		}
+		else if ( s != null && s.isVariable() ) {
+			// variables need to be included in the request;
+			// otherwise brTPF servers do not know what to do
+			// with the variables in the 'values' parameter
+			httpReq.addParam( httpQueryArgumentForSubject, "?" + s.getName() );
+		}
 
 		final Node p = tp.getPredicate();
 		if ( p != null && p.isConcrete() ) {
@@ -97,6 +108,9 @@ public class TPFInterfaceImpl implements TPFInterface
 			else {
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal predicate (" + s.getClass().getName() + ").");
 			}
+		}
+		else if ( p != null && p.isVariable() ) {
+			httpReq.addParam( httpQueryArgumentForPredicate, "?" + p.getName() );
 		}
 
 		final Node o = tp.getObject();
@@ -112,6 +126,9 @@ public class TPFInterfaceImpl implements TPFInterface
 			else {
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal object (" + s.getClass().getName() + ").");
 			}
+		}
+		else if ( o != null && o.isVariable() ) {
+			httpReq.addParam( httpQueryArgumentForObject, "?" + o.getName() );
 		}
 
 		return httpReq;

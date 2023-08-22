@@ -14,11 +14,11 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
-public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
+public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 {
 	protected final CostModel costModel;
 
-	public GreedyJoinPlanOptimizerImpl( final CostModel costModel ) {
+	public CostModelBasedGreedyJoinPlanOptimizerImpl(final CostModel costModel ) {
 		assert costModel != null;
 		this.costModel= costModel;
 	}
@@ -112,17 +112,17 @@ public class GreedyJoinPlanOptimizerImpl extends JoinPlanOptimizerBase
 				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
 
 				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i), plans );
+					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
 				}
 				else if ( currentPlan.getRootOperator() instanceof PhysicalOpRequestWithTranslation ){
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) currentPlan.getRootOperator(), subplans.get(i), plans );
+					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
 				}
 
 				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan, plans );
+					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan ) );
 				}
 				else if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
-					PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) subplans.get(i).getRootOperator(), currentPlan, plans );
+					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) subplans.get(i).getRootOperator(), currentPlan ));
 				}
 
 				nextPossiblePlans.put(i, plans);

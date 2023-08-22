@@ -6,8 +6,7 @@ PREFIX ex:     <http://example.org/>
 ex:dbpediaSPARQL
       a            fd:FederationMember ;
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
-                     fd:endpointAddress <http://dbpedia.org/sparql> ] ;
-      fd:vocabularyMappingsFile "dbpedia/vocabularyMappings.nt" .
+                     fd:endpointAddress <http://dbpedia.org/sparql> ] .
 
 ex:dbpediaTPF
       a            fd:FederationMember ;
@@ -41,3 +40,9 @@ ex:europaSPARQL
 #                                                # ...
 #                                              ]
 #                   ] .
+
+#ex:dbpediaSPARQLWithVocabMappings
+#      a            fd:FederationMember ;
+#      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+#                     fd:endpointAddress <http://dbpedia.org/sparql> ] ;
+#      fd:vocabularyMappingsFile "dbpedia/vocabularyMappings.nt" .

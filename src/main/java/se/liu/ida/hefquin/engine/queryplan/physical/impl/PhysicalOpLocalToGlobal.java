@@ -10,19 +10,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
 public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp {
 
-	protected final LogicalOpLocalToGlobal logicall2g;
+	protected final LogicalOpLocalToGlobal lop;
 	
-	public PhysicalOpLocalToGlobal (final LogicalOpLocalToGlobal l2g) {
-		this.logicall2g = l2g;
+	public PhysicalOpLocalToGlobal( final LogicalOpLocalToGlobal lop ) {
+		this.lop = lop;
 	}
-	
+
 	@Override
-	public ExpectedVariables getExpectedVariables(final ExpectedVariables... inputVars) {
-		if(inputVars.length == 1) {
-			return inputVars[0];
-		} else {
-			throw new IllegalArgumentException("There is more than 1 input variable.");
-		}
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override
@@ -34,17 +30,17 @@ public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp {
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpLocalToGlobal( logicall2g.getVocabularyMapping(), collectExceptions );
+		return new ExecOpLocalToGlobal( lop.getVocabularyMapping(), collectExceptions );
 	}
 
 	@Override
 	public UnaryLogicalOp getLogicalOperator() {
-		return this.logicall2g;
+		return this.lop;
 	}
 
 	@Override
 	public String toString() {
-		return "> l2g " + "(vocab.mapping: " + logicall2g.getVocabularyMapping().hashCode() + ")";
+		return "> l2g " + "(vocab.mapping: " + lop.getVocabularyMapping().hashCode() + ")";
 	}
 
 }

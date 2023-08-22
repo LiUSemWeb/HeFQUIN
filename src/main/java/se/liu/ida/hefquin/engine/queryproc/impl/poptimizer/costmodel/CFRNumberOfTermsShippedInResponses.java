@@ -57,6 +57,20 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 				throw createIllegalArgumentException(fm);
 			}
 		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			final FederationMember fm = gpAdd.getFederationMember();
+
+			if ( fm instanceof SPARQLEndpoint ) {
+				final int numberOfVars = QueryPatternUtils.getVariablesInPattern( gpAdd.getPattern() ).size();
+				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
+			}
+			else {
+				futureIntResSize.cancel(true);
+				throw createIllegalArgumentException(fm);
+			}
+		}
 		else if ( lop instanceof LogicalOpRequest ) {
 			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 			final FederationMember fm = ((LogicalOpRequest<?, ?>) lop).getFederationMember();
@@ -74,7 +88,11 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 				throw createIllegalArgumentException(fm);
 			}
 		}
-		else if ( lop instanceof LogicalOpJoin || lop instanceof LogicalOpUnion ) {
+		else if ( lop instanceof LogicalOpJoin
+				|| lop instanceof LogicalOpUnion
+				|| lop instanceof LogicalOpMultiwayUnion
+				|| lop instanceof LogicalOpLocalToGlobal
+				|| lop instanceof LogicalOpGlobalToLocal) {
 			return CompletableFuture.completedFuture(0);
 		}
 		else {

@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -20,6 +22,15 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 
 		this.rootOp = rootOp;
 		this.subPlans = subPlans;
+	}
+
+	public LogicalPlanWithNaryRootImpl( final NaryLogicalOp rootOp,
+	                                    final LogicalPlan ... subPlans ) {
+		assert rootOp != null;
+		assert subPlans != null;
+
+		this.rootOp = rootOp;
+		this.subPlans = Arrays.asList(subPlans);
 	}
 
 	@Override
@@ -59,6 +70,15 @@ public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
 	@Override
 	public NaryLogicalOp getRootOperator() {
 		return rootOp;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		final ExpectedVariables[] e = new ExpectedVariables[ subPlans.size() ];
+		for ( int i = 0; i < subPlans.size(); ++i ) {
+			e[i] = subPlans.get(i).getExpectedVariables();
+		}
+		return rootOp.getExpectedVariables(e);
 	}
 
 	@Override

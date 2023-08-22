@@ -7,6 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTERandTranslation;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -32,6 +34,18 @@ public class PhysicalOpBindJoinWithFILTERandTranslation extends PhysicalOpBindJo
 	}
 
 	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpBGPOptAdd lop ) {
+		super(lop);
+
+		assert lop.getFederationMember().getVocabularyMapping() != null;
+	}
+
+	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpGPAdd lop ) {
+		super(lop);
+
+		assert lop.getFederationMember().getVocabularyMapping() != null;
+	}
+
+	public PhysicalOpBindJoinWithFILTERandTranslation( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 
 		assert lop.getFederationMember().getVocabularyMapping() != null;

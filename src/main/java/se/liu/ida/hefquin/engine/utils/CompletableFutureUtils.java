@@ -58,6 +58,18 @@ public class CompletableFutureUtils
 			super(cause);
 			this.i = i;
 		}
+
+		@Override
+		public String getMessage() {
+			if ( getCause() != null ) {
+				if ( getCause().getCause() != null )
+					return getCause().getMessage() + " (cause:" + getCause().getCause().getMessage() + ")";
+				else
+					return getCause().getMessage();
+			}
+			else
+				return null;
+		}
 	}
 
 }

@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import java.util.NoSuchElementException;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
@@ -46,6 +47,13 @@ public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot
 	@Override
 	public BinaryLogicalOp getRootOperator() {
 		return rootOp;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		return rootOp.getExpectedVariables(
+				getSubPlan1().getExpectedVariables(),
+				getSubPlan2().getExpectedVariables() );
 	}
 
 	@Override

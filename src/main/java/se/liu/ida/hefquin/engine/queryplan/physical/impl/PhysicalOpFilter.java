@@ -10,19 +10,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
 public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 
-	protected final LogicalOpFilter logicalFilter;
+	protected final LogicalOpFilter lop;
 	
-	public PhysicalOpFilter( final LogicalOpFilter lf ) {
-		this.logicalFilter = lf;
+	public PhysicalOpFilter( final LogicalOpFilter lop ) {
+		this.lop = lop;
 	}
-	
+
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		if(inputVars.length == 1) {
-			return inputVars[0];
-		} else {
-			throw new IllegalArgumentException("There is more than 1 input variable.");
-		}
+		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override
@@ -33,12 +29,12 @@ public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpFilter( logicalFilter.getFilterExpressions(), collectExceptions );
+		return new ExecOpFilter( lop.getFilterExpressions(), collectExceptions );
 	}
 
 	@Override
 	public UnaryLogicalOp getLogicalOperator() {
-		return logicalFilter;
+		return lop;
 	}
 
 }

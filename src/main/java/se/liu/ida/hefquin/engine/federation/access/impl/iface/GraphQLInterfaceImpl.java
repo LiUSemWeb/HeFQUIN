@@ -24,6 +24,11 @@ public class GraphQLInterfaceImpl implements GraphQLInterface
 	}
 
 	@Override
+	public boolean supportsSPARQLPatternRequests() {
+		return false;
+	}
+
+	@Override
 	public boolean supportsRequest( final DataRetrievalRequest req ) {
 		return req instanceof GraphQLRequest;
 	}

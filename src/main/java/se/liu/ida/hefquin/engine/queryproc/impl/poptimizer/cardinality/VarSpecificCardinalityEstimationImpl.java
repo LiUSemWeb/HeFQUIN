@@ -2,19 +2,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality;
 
 import static java.lang.Math.min;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
@@ -84,11 +78,18 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqBGP, v );
 		}
+		else if ( rootOp instanceof LogicalOpGPAdd ) {
+			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpGPAdd) rootOp );
+			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v );
+		}
+		else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ){
+			return _initiateCardinalityEstimation( plan.getSubPlan(0), v );
+		}
 		else if ( rootOp instanceof LogicalOpJoin ) {
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
 		}
-		else if ( rootOp instanceof LogicalOpUnion ) {
-			return _initiateUnionCardinalityEstimation( plan.getSubPlan(0), plan.getSubPlan(1), v );
+		else if ( rootOp instanceof LogicalOpUnion || rootOp instanceof LogicalOpMultiwayUnion ) {
+			return _initiateMultiwayUnionCardinalityEstimation( plan, v);
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of root operator (" + rootOp.getClass().getName() + ").");
@@ -100,40 +101,56 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 			final PhysicalPlan plan2,
 			final Var v )
 	{
-		final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(plan1, v);
-		final CompletableFuture<Integer> f2 = initiateCardinalityEstimation(plan2, v);
+//		Estimate cardinality of sub-queries
+		final CompletableFuture<Integer> f1 = cardEstimator.initiateCardinalityEstimation(plan1);
+		final CompletableFuture<Integer> f2 = cardEstimator.initiateCardinalityEstimation(plan2);
 
-		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1.getExpectedVariables(), plan2.getExpectedVariables() );
-
+		final Set<Var> allJoinVars = ExpectedVariablesUtils.intersectionOfAllVariables( plan1, plan2 );
 		if ( allJoinVars.contains(v) ) {
 			// Create a CompletableFuture that will complete once
 			// both f1 and f2 have completed and, then, will combine
 			// the results of f1 and f2 (i.e., c1 and c2) using the
 			// min function.
-			return f1.thenCombine(f2, (c1,c2) -> min(c1, c2) );
+			return f1.thenCombine( f2, (c1,c2) -> min( c1 , c2 ) );
 		}
-		else {
-			// ... combine the results of f1 and f2 (i.e., c1 and c2)
-			// by multiplication.
-			return f1.thenCombine(f2, (c1,c2) -> c1 * c2 );
+
+		final Set<Var> vars1 = ExpectedVariablesUtils.unionOfAllVariables( plan1.getExpectedVariables() );
+		if ( !allJoinVars.isEmpty() && vars1.contains(v) ) {
+			return f1;
 		}
+
+		final Set<Var> vars2 = ExpectedVariablesUtils.unionOfAllVariables( plan2.getExpectedVariables() );
+		if ( !allJoinVars.isEmpty() && vars2.contains(v) ) {
+			return f2;
+		}
+		// ... combine the results of f1 and f2 (i.e., c1 and c2)
+		// by multiplication.
+		return f1.thenCombine( f2, (c1,c2) -> ( c1 * c2 < 0 ? Integer.MAX_VALUE : c1 * c2 ) );
+
 	}
 
-	protected CompletableFuture<Integer> _initiateUnionCardinalityEstimation(
-			final PhysicalPlan plan1,
-			final PhysicalPlan plan2,
+	protected CompletableFuture<Integer> _initiateMultiwayUnionCardinalityEstimation(
+			final PhysicalPlan plan,
 			final Var v )
 	{
-		final CompletableFuture<Integer> f1 = initiateCardinalityEstimation(plan1, v);
-		final CompletableFuture<Integer> f2 = initiateCardinalityEstimation(plan2, v);
+		CompletableFuture<Integer> f = CompletableFuture.completedFuture(0);
+		boolean containVar = false;
+		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
+			final Set<Var> vars = ExpectedVariablesUtils.unionOfAllVariables( plan.getSubPlan(i) );
+			if ( vars.contains(v) ) {
+				final CompletableFuture<Integer> f1 = initiateCardinalityEstimation( plan.getSubPlan(i), v );
+				f = f.thenCombine(f1, (c, c1) -> (c + c1) < 0 ? Integer.MAX_VALUE : (c + c1));
 
-		// Create a CompletableFuture that will complete once
-		// both f1 and f2 have completed and, then, will combine
-		// the results of f1 and f2 (i.e., c1 and c2) by adding
-		// them.
-		return f1.thenCombine(f2, (c1,c2) -> c1 + c2 );
+				containVar = true;
+			}
+		}
+
+		if ( containVar )
+			return f;
+		else
+			throw new IllegalArgumentException("The given variable is not included in the Union plan");
+
 	}
-
 
 	protected static class MyCache
 	{

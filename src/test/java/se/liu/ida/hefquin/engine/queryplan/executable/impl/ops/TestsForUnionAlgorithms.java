@@ -20,7 +20,9 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
+import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -289,12 +291,23 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		
-		final BinaryExecutableOp op = createExecOpForTest();
-		op.processBlockFromChild1(input1, sink, null);
-		op.processBlockFromChild2(input2, sink, null);
+		final ExecutableOperator op = createExecOpForTest();
+
+		if ( op instanceof BinaryExecutableOp ) {
+			( (BinaryExecutableOp) op).processBlockFromChild1(input1, sink, null);
+			( (BinaryExecutableOp) op).processBlockFromChild2(input2, sink, null);
+		}
+		else if ( op instanceof NaryExecutableOp ) {
+			( (NaryExecutableOp) op).processBlockFromXthChild(0, input1, sink, null);
+			( (NaryExecutableOp) op).processBlockFromXthChild(1, input2, sink, null);
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+
 		return sink.getCollectedSolutionMappings().iterator();
 	}
 
-	protected abstract BinaryExecutableOp createExecOpForTest() ;
+	protected abstract ExecutableOperator createExecOpForTest() ;
 	
 }

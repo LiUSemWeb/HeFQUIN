@@ -3,6 +3,8 @@ package se.liu.ida.hefquin.engine.utils;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class StatsPrinter
 {
 	/**
@@ -38,7 +40,8 @@ public class StatsPrinter
 			if ( entry == null ) {
 				out.append( "null" );
 			}
-			else if ( entry instanceof Stats ) {
+			else if ( entry instanceof Stats )
+			{
 				final Stats ss = (Stats) entry;
 				if ( ss.isEmpty() ) {
 					out.append( "{ }" );
@@ -53,7 +56,8 @@ public class StatsPrinter
 					out.append( "}" );
 				}
 			}
-			else if ( entry instanceof List<?> ) {
+			else if ( entry instanceof List<?> )
+			{
 				final List<?> list = (List<?>) entry;
 				if ( list.isEmpty() ) {
 					out.append( "[ ]" );
@@ -80,6 +84,10 @@ public class StatsPrinter
 				else {
 					out.append( list.toString() );
 				}
+			}
+			else if ( entry.getClass().isArray() )
+			{
+				out.append( "[ " + ArrayUtils.toString(entry) + " ]" );
 			}
 			else {
 				out.append( entry.toString() );

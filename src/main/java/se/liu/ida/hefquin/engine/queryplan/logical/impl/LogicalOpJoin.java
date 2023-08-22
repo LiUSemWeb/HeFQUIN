@@ -1,9 +1,14 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 import java.util.Objects;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
 
 public class LogicalOpJoin implements BinaryLogicalOp
 {
@@ -12,6 +17,20 @@ public class LogicalOpJoin implements BinaryLogicalOp
 	public static LogicalOpJoin getInstance() { return singleton; }
 
 	protected LogicalOpJoin() {}
+
+	@Override
+	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 2;
+
+		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(inputVars);
+		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(inputVars);
+		possibleVars.removeAll(certainVars);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
+	}
 
 	@Override
 	public boolean equals( final Object o ) {

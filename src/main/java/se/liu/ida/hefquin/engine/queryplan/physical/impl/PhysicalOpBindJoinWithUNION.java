@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithUNION;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
@@ -18,6 +19,12 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 	}
 
 	public PhysicalOpBindJoinWithUNION( final LogicalOpBGPAdd lop) {
+		super(lop);
+
+		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+	}
+
+	public PhysicalOpBindJoinWithUNION( final LogicalOpGPAdd lop) {
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
@@ -55,6 +62,15 @@ public class PhysicalOpBindJoinWithUNION extends BasePhysicalOpSingleInputJoin
 
 			if ( fm instanceof SPARQLEndpoint )
 				return new ExecOpBindJoinSPARQLwithUNION( bgpAdd.getBGP(), (SPARQLEndpoint) fm, collectExceptions );
+			else
+				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
+			final FederationMember fm = gpAdd.getFederationMember();
+
+			if ( fm instanceof SPARQLEndpoint )
+				return new ExecOpBindJoinSPARQLwithUNION( gpAdd.getPattern(), (SPARQLEndpoint) fm, collectExceptions );
 			else
 				throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 		}

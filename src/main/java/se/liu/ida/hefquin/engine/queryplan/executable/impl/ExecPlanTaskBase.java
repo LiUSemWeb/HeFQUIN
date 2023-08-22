@@ -104,6 +104,13 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	}
 
 	@Override
+	public boolean hasNextIntermediateResultBlockAvailable() {
+		synchronized (availableResultBlocks) {
+			return ! availableResultBlocks.isEmpty();
+		}
+	}
+
+	@Override
 	public ExecPlanTaskStats getStats() {
 		return new ExecPlanTaskStatsImpl( getExecOp() );
 	}

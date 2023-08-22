@@ -1,9 +1,5 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
@@ -11,7 +7,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
 {
@@ -34,16 +29,7 @@ public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		assert inputVars.length == 2;
-
-		final Set<Var> certainVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
-		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(inputVars);
-		possibleVars.removeAll(certainVars);
-
-		return new ExpectedVariables() {
-			@Override public Set<Var> getCertainVariables() { return certainVars;}
-			@Override public Set<Var> getPossibleVariables() { return possibleVars;}
-		};
+		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override

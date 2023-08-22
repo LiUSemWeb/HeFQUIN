@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.sparql.algebra.Op;
@@ -9,6 +10,7 @@ import org.apache.jena.sparql.algebra.Table;
 import org.apache.jena.sparql.algebra.op.OpSequence;
 import org.apache.jena.sparql.algebra.op.OpTable;
 import org.apache.jena.sparql.algebra.table.TableData;
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -40,18 +42,38 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
 		final Set<Binding> bindings = new HashSet<>();
+		final Set<Var> joinVars = new HashSet<>();
+
+		boolean noJoinVars = false;
 		for ( final SolutionMapping s : solMaps ) {
 			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );
+
+			// If there exists a solution mapping that does not have any variables in common with the triple pattern of this operator
+			// retrieve all matching triples of the given query
+			if ( b.isEmpty() ) {
+				noJoinVars = true;
+				break;
+			}
+
 			if ( ! SolutionMappingUtils.containsBlankNodes(b) ) {
 				bindings.add(b);
+
+				final Iterator<Var> it = b.vars();
+				while ( it.hasNext() ) {
+					joinVars.add( it.next() );
+				}
 			}
+		}
+
+		if (noJoinVars) {
+			return new ExecOpRequestSPARQL( new SPARQLRequestImpl(query), fm, false );
 		}
 
 		if ( bindings.isEmpty() ) {
 			return null;
 		}
 
-		final Table table = new TableData( varsInSubQuery, new ArrayList<>(bindings) );
+		final Table table = new TableData( new ArrayList<>(joinVars), new ArrayList<>(bindings) );
 		final Op op = OpSequence.create( OpTable.create(table), QueryPatternUtils.convertToJenaOp(query) );
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);

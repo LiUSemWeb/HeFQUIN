@@ -9,15 +9,17 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlannerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedJoinPlanOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.GreedyJoinPlanOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.JoinPlanOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.*;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class HeFQUINEngineConfig
@@ -33,6 +35,7 @@ public class HeFQUINEngineConfig
 	}
 
 	public void initializeContext( final Context ctxt ) {
+		ctxt.set( HeFQUINConstants.sysSourcePlannerFactory, createSourcePlannerFactory() );
 		ctxt.set( HeFQUINConstants.sysQueryOptimizerFactory, createQueryOptimizerFactory() );
 	}
 
@@ -51,6 +54,18 @@ public class HeFQUINEngineConfig
 		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 	}
 
+	protected SourcePlannerFactory createSourcePlannerFactory() {
+		// TODO: Instead of hard-coding the following, the source planner (and
+		// similar things) should be created based on a config file.
+		return new SourcePlannerFactory() {
+			@Override
+			public SourcePlanner createSourcePlanner( final QueryProcContext ctxt ) {
+				return new ServiceClauseBasedSourcePlannerImpl(ctxt);
+//				return new ExhaustiveSourcePlannerImpl(ctxt);
+			}
+		};
+	}
+
 	protected PhysicalOptimizerFactory createQueryOptimizerFactory() {
 		// TODO: Instead of hard-coding the following, the optimizer (and
 		// similar things) should be created based on a config file.
@@ -58,8 +73,10 @@ public class HeFQUINEngineConfig
 			@Override
 			public PhysicalOptimizer createQueryOptimizer( final QueryOptimizationContext ctxt ) {
 //				return createQueryOptimizerWithoutOptimization(ctxt);
-//				return createGreedyJoinPlanOptimizer(ctxt);
-				return createDPBasedJoinPlanOptimizer(ctxt);
+//				return createCostModelBasedGreedyJoinPlanOptimizerImpl(ctxt);
+//				return createCardinalityBasedGreedyJoinPlanOptimizerImpl(ctxt);
+				return createDPBasedBushyJoinPlanOptimizer(ctxt);
+//				return createDPBasedLinearJoinPlanOptimizer(ctxt);
 //				return createEvolutionaryAlgorithmQueryOptimizer(ctxt);
 			}
 		};
@@ -69,13 +86,23 @@ public class HeFQUINEngineConfig
 		return new PhysicalOptimizerImpl(ctxt);
 	}
 
-	protected PhysicalOptimizer createGreedyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new GreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
+	protected PhysicalOptimizer createCostModelBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new CostModelBasedGreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 
-	protected PhysicalOptimizer createDPBasedJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new DPBasedJoinPlanOptimizer(ctxt);
+	protected PhysicalOptimizer createCardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createDPBasedBushyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new DPBasedBushyJoinPlanOptimizer(ctxt);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createDPBasedLinearJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new DPBasedLinearJoinPlanOptimizer(ctxt);
 		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
 	}
 

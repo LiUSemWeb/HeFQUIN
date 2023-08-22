@@ -55,6 +55,8 @@ public class LogicalToPhysicalOpConverter
 		else if ( lop instanceof LogicalOpTPOptAdd )  return convert( (LogicalOpTPOptAdd) lop );
 		else if ( lop instanceof LogicalOpBGPAdd )    return convert( (LogicalOpBGPAdd) lop );
 		else if ( lop instanceof LogicalOpBGPOptAdd ) return convert( (LogicalOpBGPOptAdd) lop );
+		else if ( lop instanceof LogicalOpGPAdd )    return convert( (LogicalOpGPAdd) lop );
+		else if ( lop instanceof LogicalOpGPOptAdd ) return convert( (LogicalOpGPOptAdd) lop );
 		else if ( lop instanceof LogicalOpFilter )    return convert( (LogicalOpFilter) lop );
 		else if ( lop instanceof LogicalOpLocalToGlobal ) return convert ( (LogicalOpLocalToGlobal) lop);
 		else if ( lop instanceof LogicalOpGlobalToLocal ) return convert ( (LogicalOpGlobalToLocal) lop);
@@ -125,10 +127,6 @@ public class LogicalToPhysicalOpConverter
 
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
-		else if ( fm instanceof TPFServer )      throw new IllegalArgumentException();
-
-		else if ( fm instanceof BRTPFServer )    throw new IllegalArgumentException();
-
 		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
 	}
 
@@ -148,9 +146,43 @@ public class LogicalToPhysicalOpConverter
 
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
-		else if ( fm instanceof TPFServer )      throw new IllegalArgumentException();
+		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
+	}
 
-		else if ( fm instanceof BRTPFServer )    throw new IllegalArgumentException();
+	public static UnaryPhysicalOp convert( final LogicalOpGPAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+
+		// first, consider the possibility that vocabulary mappings should be
+		// handled implicitly (i.e., within the physical operators), which is
+		// not the default behavior of the engine
+
+		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
+			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
+		}
+
+		// now, consider the default behavior in which vocabulary mappings
+		// are handled explicitly during query planning
+
+		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
+
+		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
+	}
+
+	public static UnaryPhysicalOp convert( final LogicalOpGPOptAdd lop ) {
+		final FederationMember fm = lop.getFederationMember();
+
+		// first, consider the possibility that vocabulary mappings should be
+		// handled implicitly (i.e., within the physical operators), which is
+		// not the default behavior of the engine
+
+		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
+			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
+		}
+
+		// now, consider the default behavior in which vocabulary mappings
+		// are handled explicitly during query planning
+
+		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
 		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
 	}
@@ -206,7 +238,7 @@ public class LogicalToPhysicalOpConverter
 	}
 
 	public static NaryPhysicalOp convert( final LogicalOpMultiwayUnion lop ) {
-		throw new UnsupportedOperationException();
+		return new PhysicalOpMultiwayUnion();
 	}
 
 }

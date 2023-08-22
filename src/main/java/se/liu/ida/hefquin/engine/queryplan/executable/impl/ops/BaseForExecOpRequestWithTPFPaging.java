@@ -25,6 +25,10 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
        extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private int numberOfPageRequestsIssued = 0;
+	private int totalNumberOfMatchingTriplesRetrieved = 0;
+	private int minNumberOfMatchingTriplesPerPage = Integer.MAX_VALUE;
+	private int maxNumberOfMatchingTriplesPerPage = 0;
+	private int numberOfOutputMappingsProduced = 0;
 
 	public BaseForExecOpRequestWithTPFPaging( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
 		super( req, fm, collectExceptions );
@@ -48,6 +52,12 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
 			}
+
+			// update stats
+			final int payloadSize = currentPage.getPayloadSize();
+			totalNumberOfMatchingTriplesRetrieved += payloadSize;
+			if ( minNumberOfMatchingTriplesPerPage > payloadSize ) minNumberOfMatchingTriplesPerPage = payloadSize;
+			if ( maxNumberOfMatchingTriplesPerPage < payloadSize ) maxNumberOfMatchingTriplesPerPage = payloadSize;
 
 			// consume the matching triples retrieved via the page request
 			consumeMatchingTriples( currentPage.getPayload(), sink );
@@ -84,6 +94,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	protected void consumeMatchingTriples( final Iterable<Triple> itTriples, final IntermediateResultElementSink sink ) {
 		final Iterator<SolutionMapping> itSolMaps = convert( itTriples );
 		while ( itSolMaps.hasNext() ) {
+			numberOfOutputMappingsProduced++;
 			sink.send( itSolMaps.next() );
 		}
 	}
@@ -99,11 +110,19 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	public void resetStats() {
 		super.resetStats();
 		numberOfPageRequestsIssued = 0;
+		totalNumberOfMatchingTriplesRetrieved = 0;
+		minNumberOfMatchingTriplesPerPage = 0;
+		maxNumberOfMatchingTriplesPerPage = 0;
+		numberOfOutputMappingsProduced = 0;
 	}
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "numberOfPageRequestsIssued",  Integer.valueOf(numberOfPageRequestsIssued) );
+		s.put( "numberOfPageRequestsIssued",             Integer.valueOf(numberOfPageRequestsIssued) );
+		s.put( "totalNumberOfMatchingTriplesRetrieved",  Integer.valueOf(totalNumberOfMatchingTriplesRetrieved) );
+		s.put( "minNumberOfMatchingTriplesPerPage",      Integer.valueOf(minNumberOfMatchingTriplesPerPage) );
+		s.put( "maxNumberOfMatchingTriplesPerPage",      Integer.valueOf(maxNumberOfMatchingTriplesPerPage) );
+		s.put( "numberOfOutputMappingsProduced",         Integer.valueOf(numberOfOutputMappingsProduced) );
 		return s;
 	}
 }

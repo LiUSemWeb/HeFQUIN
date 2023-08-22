@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImplWithoutCardinality;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
@@ -161,22 +162,44 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
 			final int cardinality = extractCardinality(smResp);
-			return new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
+			if ( cardinality < 0 )
+				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
+			else
+				return new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
 		}
 
 		protected int extractCardinality( final SolMapsResponse smResp ) {
 			final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
 			final SolutionMapping sm = it.next();
-			final Node countValue = sm.asJenaBinding().get(countVar);
-			return ( (Integer) countValue.getLiteralValue() ).intValue();
+			final Node countValueNode = sm.asJenaBinding().get(countVar);
+			final Object countValueObj = countValueNode.getLiteralValue();
+
+			if ( countValueObj instanceof Integer ) {
+				return ( (Integer) countValueObj ).intValue();
+			}
+			else if ( countValueObj instanceof Long ) {
+				final long l = ( (Long) countValueObj ).longValue();
+				return ( Integer.MAX_VALUE < l ) ? Integer.MAX_VALUE : (int) l;
+			}
+			else {
+				return -1;
+			}
 		}
 	}
 
 	protected static class FunctionToObtainCardinalityResponseFromTPFResponse implements Function<TPFResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
-			final int cardinality = tpfResp.getCardinalityEstimate();
-			return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), cardinality);
+			if ( tpfResp == null ) throw new IllegalArgumentException("The given TPFResponse is null");
+
+			final Integer cardinality = tpfResp.getCardinalityEstimate();
+			if ( cardinality != null ) {
+				final int c = cardinality;
+				return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), c);
+			}
+			else {
+				return new CardinalityResponseImplWithoutCardinality( tpfResp, tpfResp.getRequest() );
+			}
 		}
 	}
 

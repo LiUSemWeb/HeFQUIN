@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.datastructures.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.utils.Stats;
@@ -24,6 +25,9 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
     protected boolean child1InputComplete = false;
     protected boolean child2InputComplete = false;
+
+    // statistics
+    private long numberOfOutputMappingsProduced = 0L;
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1,
                                     final ExpectedVariables inputVars2,
@@ -88,6 +92,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
             final Iterable<SolutionMapping> matchSolMapR = indexForChild2.getJoinPartners(smL);
             for ( final SolutionMapping smR : matchSolMapR ){
+            	numberOfOutputMappingsProduced++;
                 sink.send(SolutionMappingUtils.merge(smL, smR));
             }
         }
@@ -109,6 +114,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
             final Iterable<SolutionMapping> matchSolMapL = indexForChild1.getJoinPartners(smR);
             for ( final SolutionMapping smL : matchSolMapL ){
+            	numberOfOutputMappingsProduced++;
                 sink.send(SolutionMappingUtils.merge(smL, smR));
             }
         }
@@ -132,4 +138,17 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
         indexForChild1.clear();
         indexForChild2.clear();
     }
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		return s;
+	}
+
 }

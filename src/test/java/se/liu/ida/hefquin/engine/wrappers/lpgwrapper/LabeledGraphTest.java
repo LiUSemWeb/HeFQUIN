@@ -106,7 +106,7 @@ public class LabeledGraphTest {
         adjacencyList.put(u, List.of(uczr2l));
         adjacencyList.put(t, List.of(tewr2l));
         final LabeledGraph graph = new LabeledGraph(adjacencyList);
-        System.out.println(graph.getLongestPath());
+        assertEquals(new LabeledGraph.Path(t, List.of(tewr2l, wdyr2l, ybzl2r, zcul2r)), graph.getLongestPath());
     }
 
 }

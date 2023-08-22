@@ -6,5 +6,7 @@ public interface DataRetrievalInterface
 
 	boolean supportsBGPRequests();
 
+	boolean supportsSPARQLPatternRequests();
+
 	boolean supportsRequest( final DataRetrievalRequest req );
 }
