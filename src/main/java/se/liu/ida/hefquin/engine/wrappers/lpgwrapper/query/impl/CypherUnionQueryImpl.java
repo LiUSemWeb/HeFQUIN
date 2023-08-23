@@ -37,7 +37,7 @@ public class CypherUnionQueryImpl implements CypherUnionQuery {
 
     @Override
     public String toString() {
-        return union.stream().map(CypherQuery::toString).collect(Collectors.joining("\nUNION\n"));
+        return union.stream().map(CypherQuery::toString).collect(Collectors.joining(" UNION "));
     }
 
     @Override

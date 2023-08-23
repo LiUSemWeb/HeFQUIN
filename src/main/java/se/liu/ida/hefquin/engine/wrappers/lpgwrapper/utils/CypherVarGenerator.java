@@ -1,14 +1,15 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CypherVarGenerator {
-    private final Map<Node, CypherVar> retVars = new HashMap<>();
-    private final Map<CypherVar, Node> reverseRetVars = new HashMap<>();
+    private final Map<Var, CypherVar> retVars = new HashMap<>();
+    private final Map<CypherVar, Var> reverseRetVars = new HashMap<>();
     private int anonCount = 0;
     private int retVarCount = 0;
 
@@ -22,13 +23,14 @@ public class CypherVarGenerator {
     }
 
     public CypherVar getRetVar(final Node n) {
+        if (!n.isVariable()) throw new IllegalArgumentException("Expected variable, got: " + n.getClass());
         CypherVar var = retVars.get(n);
         if (var != null)
             return var;
         retVarCount++;
         var = new CypherVar(retPrefix + retVarCount);
-        retVars.put(n, var);
-        reverseRetVars.put(var, n);
+        retVars.put((Var) n, var);
+        reverseRetVars.put(var, (Var) n);
         return var;
     }
 
@@ -36,7 +38,7 @@ public class CypherVarGenerator {
         return new CypherVar(markerPrefix);
     }
 
-    public Map<CypherVar, Node> getReverseMap() {
+    public Map<CypherVar, Var> getReverseMap() {
         return reverseRetVars;
     }
 }

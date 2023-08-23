@@ -35,20 +35,17 @@ public class Neo4jConnectionFactory {
         }
 
         protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JException {
-            final String data = "{\n" +
-                    "  \"statements\" : [ {\n" +
-                    "    \"statement\" : \""+cypher+"\",\n" +
-                    "    \"parameters\" : {}\n" +
-                    "  } ]\n" +
+            final String data = "{ " +
+                    "\"statements\" : [ {" +
+                    "    \"statement\" : \""+ cypher +"\"" +
+                    "  , \"parameters\" : {} } ]" +
                     "}";
-
             final var request = HttpRequest.newBuilder(
                     URI.create(this.URL))
                     .header("Accept", "application/json;charset=UTF-8")
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(data))
                     .build();
-
             final HttpClient client = HttpClient.newHttpClient();
             final HttpResponse<String> response;
             try {

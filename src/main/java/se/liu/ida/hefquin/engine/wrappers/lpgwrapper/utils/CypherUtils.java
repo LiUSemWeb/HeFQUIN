@@ -25,7 +25,7 @@ public class CypherUtils {
         final JsonNode root = mapper.readTree(body);
         final JsonNode errors = root.get("errors");
         if (errors.isArray() && !errors.isEmpty()) {
-            throw new Neo4JException(errors.textValue());
+            throw new Neo4JException(errors.get(0).textValue());
         }
         final JsonNode results = root.get("results");
         for (final JsonNode r : results) {
