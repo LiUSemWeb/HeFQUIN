@@ -46,10 +46,10 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ModQuery modQuery =          new ModQuery();
 	protected final ModResultsOut modResults =   new ModResultsOut();
 
-	protected final ArgDecl argNeo4jUri   = new ArgDecl(ArgDecl.HasValue, "neo4juri");
+	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
 	protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
-	protected final ArgDecl argVarRep   = new ArgDecl(ArgDecl.NoValue, "varrep");
-	protected final ArgDecl argMerge   = new ArgDecl(ArgDecl.NoValue, "merge");
+	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
+	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -60,18 +60,18 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		addModule(modTime);
 		addModule(modResults);
-
-		add(argNeo4jUri, "--neo4juri", "The URI of the Neo4j endpoint");
-		add(argNaive, "--naive", "If you want naive translation");
-		add(argVarRep, "--varrep", "If you want variable replacement");
-		add(argMerge, "--merge", "If you want path merging");
-
 		addModule(modQuery);
+
+		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
+		add(argNaive, "--naive", "If you want naive translation");
+		add(argNoVarRepl, "--disableVariableReplacement", "If you want to disable variable replacement");
+		add(argNoMerge, "--disablePathMerging", "If you want to diable path merging");
+
 	}
 
 	@Override
 	protected String getSummary() {
-		return getCommandName() + "--query=<query> --neo4juri=<Neo4j endpoint URI> --time? --naive? --varrep? --merge?\"";
+		return getCommandName() + "--query=<query file> --endpoint=<Neo4j endpoint URI> --time? --naive? --disableVariableReplacement? --disablePathMerging?";
 	}
 
 	@Override
@@ -129,7 +129,10 @@ public class RunBGPOverNeo4j extends CmdARQ
 		                                                                            hasArg(argNaive) );
 
 		final CypherQuery query;
-		if ( hasArg(argVarRep) ) {
+		if ( hasArg(argNoVarRepl) ) {
+			query = tRes.object1;
+		}
+		else {
 			if ( tRes.object1 instanceof CypherMatchQuery )
 				query = translator.rewriteJoins((CypherMatchQuery)tRes.object1);
 			else if ( tRes.object1 instanceof CypherUnionQuery )
@@ -137,11 +140,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 			else
 				throw new IllegalArgumentException( tRes.object1.getClass().getName() );
 		}
-		else {
-			query = tRes.object1;
-		}
 
-		if ( ! hasArg(argMerge) ) {
+		if ( hasArg(argNoMerge) ) {
 			if ( query == tRes.object1 )
 				return tRes;
 			else
@@ -186,7 +186,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected RecordsResponse performQueryExecution( final CypherQuery query ) {
 		final Neo4jRequest request = new Neo4jRequestImpl( query.toString() );
 
-		final String uri = getArg(argNeo4jUri).getValue();
+		final String uri = getArg(argEndpointURI).getValue();
 		final Neo4jInterface iface = new Neo4jInterfaceImpl(uri);
 		final Neo4jServer server = new Neo4jServer() {
 			@Override public Neo4jInterface getInterface() { return iface; }
