@@ -60,6 +60,15 @@ public class QueryPatternUtils
 	}
 
 	/**
+	 * Assumes that the given {@link ElementPathBlock} does not contain
+	 * property path patterns (but only triple patterns). If it does,
+	 * this methods throws an {@link IllegalArgumentException}.
+	 */
+	public static BGP createBGP( final ElementPathBlock pattern ) {
+		return createBGP( pattern.getPattern() );
+	}
+
+	/**
 	 * Assumes that the given {@link PathBlock} does not contain property path
 	 * patterns (but only triple patterns). If it does, this methods throws an
 	 * {@link IllegalArgumentException}.
