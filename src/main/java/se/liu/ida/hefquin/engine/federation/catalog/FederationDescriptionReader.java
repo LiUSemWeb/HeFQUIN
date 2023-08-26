@@ -16,7 +16,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
 import se.liu.ida.hefquin.engine.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -71,7 +70,8 @@ public class FederationDescriptionReader
 			final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 
 			// Check the type of interface
-			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ) {
+			if ( ifaceType.equals(FD.SPARQLEndpointInterface) )
+			{
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
@@ -95,7 +95,8 @@ public class FederationDescriptionReader
 				final FederationMember fm = createSPARQLEndpoint(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.TPFInterface) ) {
+			else if ( ifaceType.equals(FD.TPFInterface) )
+			{
 				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
 				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
@@ -119,7 +120,8 @@ public class FederationDescriptionReader
 				final FederationMember fm = createTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.brTPFInterface) ) {
+			else if ( ifaceType.equals(FD.brTPFInterface) )
+			{
 				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
 				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
@@ -143,7 +145,8 @@ public class FederationDescriptionReader
 				final FederationMember fm = createBRTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.BoltInterface) ) {
+			else if ( ifaceType.equals(FD.BoltInterface) )
+			{
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("Bolt endpointAddress is required!");
@@ -167,7 +170,8 @@ public class FederationDescriptionReader
 				final FederationMember fm = createNeo4jServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ) {
+			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) )
+			{
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
