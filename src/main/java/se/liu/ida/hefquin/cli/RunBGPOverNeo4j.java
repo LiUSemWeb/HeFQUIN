@@ -7,14 +7,18 @@ import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 
 import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.util.QueryExecUtils;
 
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.engine.data.utils.JenaResultSetUtils;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
@@ -50,6 +54,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
 	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
+	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -60,6 +65,9 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		addModule(modTime);
 		addModule(modResults);
+
+		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
+
 		addModule(modQuery);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
@@ -88,7 +96,9 @@ public class RunBGPOverNeo4j extends CmdARQ
 		                                                               tRes.object1,
 		                                                               tRes.object2);
 
-		System.out.println( "Result size:" + result.size() );
+		if ( contains(argSuppressResultPrintout) ) {
+			printResult(result);
+		}
 	}
 
 
@@ -232,6 +242,15 @@ public class RunBGPOverNeo4j extends CmdARQ
 		}
 
 		return result;
+	}
+
+	protected void printResult( final List<SolutionMapping> result ) {
+		final Query q = modQuery.getQuery();
+		final ResultSet rs = JenaResultSetUtils.convertToJenaResultSet( result, q.getResultVars() );
+		QueryExecUtils.outputResultSet( rs,
+		                                q.getPrologue(),
+		                                modResults.getResultsFormat(),
+		                                System.out );
 	}
 
 }
