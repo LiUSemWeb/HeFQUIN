@@ -96,7 +96,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 		                                                               tRes.object1,
 		                                                               tRes.object2);
 
-		if ( contains(argSuppressResultPrintout) ) {
+		if ( ! contains(argSuppressResultPrintout) ) {
 			printResult(result);
 		}
 	}
