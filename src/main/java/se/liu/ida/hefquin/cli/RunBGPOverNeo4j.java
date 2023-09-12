@@ -118,7 +118,10 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 	protected Pair<CypherQuery, Map<CypherVar,Var>> performQueryTranslation( final BGP bgp,
 	                                                                         final LPG2RDFConfiguration conf ) {
-		modTime.startTimer();
+		if ( modTime.timingEnabled() ) {
+			modTime.startTimer();
+		}
+
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = translateToCypher(bgp, conf);
 
 		if ( modTime.timingEnabled() ) {
@@ -205,7 +208,10 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 
-		modTime.startTimer();
+		if ( modTime.timingEnabled() ) {
+			modTime.startTimer();
+		}
+
 		final RecordsResponse response;
 		try {
 			response = processor.performRequest(request, server);
@@ -229,7 +235,9 @@ public class RunBGPOverNeo4j extends CmdARQ
 	                                                          final LPG2RDFConfiguration conf,
 	                                                          final CypherQuery query,
 	                                                          final Map<CypherVar,Var> varMap ) {
-		modTime.startTimer();
+		if ( modTime.timingEnabled() ) {
+			modTime.startTimer();
+		}
 		final Record2SolutionMappingTranslator translator = new Record2SolutionMappingTranslatorImpl();
 		final List<SolutionMapping> result = translator.translateRecords( response.getResponse(),
 		                                                                  conf,
