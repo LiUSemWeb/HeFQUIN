@@ -13,9 +13,9 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
     protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
 
-    protected Node label;
+    protected final Node label;
 
-    public LPG2RDFConfigurationImpl(Node label){
+    public LPG2RDFConfigurationImpl(final Node label){
         this.label = label;
     }
 
@@ -89,7 +89,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean isLabelIRI(final Node n) {
-        return n.isURI() && label.isURI() && n.getURI().equals(label.getURI());
+        return n.equals(label);
     }
 
     @Override

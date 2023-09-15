@@ -57,7 +57,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
 
-	protected final String LABEL = "http://www.example.org/2000/01/rdf-schema#label";
+	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
