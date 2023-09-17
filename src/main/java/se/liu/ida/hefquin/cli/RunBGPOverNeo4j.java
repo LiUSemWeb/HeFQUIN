@@ -7,6 +7,7 @@ import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 
 import org.apache.jena.cmd.ArgDecl;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.Var;
@@ -33,7 +34,7 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.LPG2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
@@ -55,6 +56,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
+
+	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -85,7 +88,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 	@Override
 	protected void exec() {
 		final BGP bgp = getBGP();
-		final LPG2RDFConfiguration conf = new DefaultConfiguration();
+
+		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL));
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
