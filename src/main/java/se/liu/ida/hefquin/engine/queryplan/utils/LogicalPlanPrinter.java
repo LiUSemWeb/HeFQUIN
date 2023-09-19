@@ -3,22 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 
 public class LogicalPlanPrinter extends PlanPrinter{
 
@@ -143,6 +128,14 @@ public class LogicalPlanPrinter extends PlanPrinter{
 			builder.append(System.lineSeparator());
 			indentLevel++;
 		}
+
+		@Override
+		public void visit(final LogicalOpExtend op) {
+			addTabs();
+			builder.append( op.toString() );
+			builder.append(System.lineSeparator());
+			indentLevel++;
+		}
 		
 		@Override
 		public void visit(final LogicalOpLocalToGlobal op) {
@@ -230,6 +223,11 @@ public class LogicalPlanPrinter extends PlanPrinter{
 
 		@Override
 		public void visit(final LogicalOpFilter op) {
+			indentLevel--;
+		}
+
+		@Override
+		public void visit(final LogicalOpExtend op) {
 			indentLevel--;
 		}
 

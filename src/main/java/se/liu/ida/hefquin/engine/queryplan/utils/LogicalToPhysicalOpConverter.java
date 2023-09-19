@@ -58,6 +58,7 @@ public class LogicalToPhysicalOpConverter
 		else if ( lop instanceof LogicalOpGPAdd )    return convert( (LogicalOpGPAdd) lop );
 		else if ( lop instanceof LogicalOpGPOptAdd ) return convert( (LogicalOpGPOptAdd) lop );
 		else if ( lop instanceof LogicalOpFilter )    return convert( (LogicalOpFilter) lop );
+//		else if ( lop instanceof LogicalOpExtend )    return convert( (LogicalOpExtend) lop );
 		else if ( lop instanceof LogicalOpLocalToGlobal ) return convert ( (LogicalOpLocalToGlobal) lop);
 		else if ( lop instanceof LogicalOpGlobalToLocal ) return convert ( (LogicalOpGlobalToLocal) lop);
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
@@ -190,6 +191,11 @@ public class LogicalToPhysicalOpConverter
 	public static UnaryPhysicalOp convert( final LogicalOpFilter lop ) {
 		return new PhysicalOpFilter(lop);
 	}
+
+//	TODO
+//	public static UnaryPhysicalOp convert( final LogicalOpExtend lop ) {
+//		return new PhysicalOpExtend(lop);
+//	}
 
 	public static UnaryPhysicalOp convert( final LogicalOpLocalToGlobal lop ) {
 		return new PhysicalOpLocalToGlobal(lop);
