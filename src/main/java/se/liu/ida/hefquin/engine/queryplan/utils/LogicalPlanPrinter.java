@@ -130,7 +130,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 		}
 
 		@Override
-		public void visit(final LogicalOpExtend op) {
+		public void visit(final LogicalOpBind op) {
 			addTabs();
 			builder.append( op.toString() );
 			builder.append(System.lineSeparator());
@@ -227,7 +227,7 @@ public class LogicalPlanPrinter extends PlanPrinter{
 		}
 
 		@Override
-		public void visit(final LogicalOpExtend op) {
+		public void visit(final LogicalOpBind op) {
 			indentLevel--;
 		}
 

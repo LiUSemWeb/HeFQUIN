@@ -9,15 +9,15 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpExtend implements UnaryLogicalOp
+public class LogicalOpBind implements UnaryLogicalOp
 {
-	protected final VarExprList extendExpressions;
+	protected final VarExprList bindExpressions;
 
-	public LogicalOpExtend( final VarExprList extendExpressions ) {
-		assert extendExpressions != null;
-		assert ! extendExpressions.isEmpty();
+	public LogicalOpBind( final VarExprList bindExpressions ) {
+		assert bindExpressions != null;
+		assert ! bindExpressions.isEmpty();
 
-		this.extendExpressions = extendExpressions;
+		this.bindExpressions = bindExpressions;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class LogicalOpExtend implements UnaryLogicalOp
 		// result in an error, in which case the BIND variable remains
 		// unbound.
 		final Set<Var> possibleVars = new HashSet<>( expVarsInput.getPossibleVariables() );
-		for ( final Var bindVar : extendExpressions.getVars() ) {
+		for ( final Var bindVar : bindExpressions.getVars() ) {
 			if ( ! certainVars.contains(bindVar) ) {
 				possibleVars.add(bindVar);
 			}
@@ -48,19 +48,19 @@ public class LogicalOpExtend implements UnaryLogicalOp
 	@Override
 	public boolean equals( final Object o ) {
 		if ( o == this ) return true;
-		if ( ! (o instanceof LogicalOpExtend) ) return false;
+		if ( ! (o instanceof LogicalOpBind) ) return false;
 
-		final LogicalOpExtend oo = (LogicalOpExtend) o;
-		return oo.extendExpressions.equals(extendExpressions);
+		final LogicalOpBind oo = (LogicalOpBind) o;
+		return oo.bindExpressions.equals(bindExpressions);
 	}
 
 	@Override
 	public int hashCode(){
-		return extendExpressions.hashCode();
+		return bindExpressions.hashCode();
 	}
 
-	public VarExprList getExtendExpressions() {
-		return extendExpressions;
+	public VarExprList getBindExpressions() {
+		return bindExpressions;
 	}
 
 	@Override
@@ -70,6 +70,6 @@ public class LogicalOpExtend implements UnaryLogicalOp
 
 	@Override
 	public String toString() {
-		return "> Extend ( " + extendExpressions.toString() + " )";
+		return "> Bind ( " + bindExpressions.toString() + " )";
 	}
 }

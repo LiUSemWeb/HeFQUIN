@@ -161,7 +161,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpFilter op )        { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpExtend op )        { subplanCount++; }
+		public void visit( final LogicalOpBind op )          { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpLocalToGlobal op ) { subplanCount++; }

@@ -132,7 +132,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 
 	protected LogicalPlan createPlanForBind( final OpExtend jenaOp ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
-		final LogicalOpExtend rootOp = new LogicalOpExtend( jenaOp.getVarExprList() );
+		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList() );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 

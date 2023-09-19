@@ -187,16 +187,16 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				}
 			}
 		}
-		else if ( rootOp instanceof LogicalOpExtend)
+		else if ( rootOp instanceof LogicalOpBind)
 		{
 			// The BIND clause can be merged into a request operator if that request is for a SPARQL endpoint.
 			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
 			if ( childOp instanceof LogicalOpRequest<?,?> ) {
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) childOp;
 				if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-					return mergeExtendIntoSPARQLEndpointRequest( (LogicalOpExtend) rootOp,
-							(SPARQLEndpoint) reqOp.getFederationMember(),
-							(SPARQLRequest) reqOp.getRequest() );
+					return mergeBindIntoSPARQLEndpointRequest( (LogicalOpBind) rootOp,
+					                                           (SPARQLEndpoint) reqOp.getFederationMember(),
+					                                           (SPARQLRequest) reqOp.getRequest() );
 				}
 			}
 		}
@@ -379,11 +379,11 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		return new LogicalPlanWithNullaryRootImpl(reqOp);
 	}
 
-	public static LogicalPlan mergeExtendIntoSPARQLEndpointRequest( final LogicalOpExtend extendOp,
-																	final SPARQLEndpoint ep,
-																	final SPARQLRequest req ) {
-		final SPARQLGraphPattern mergedPattern = QueryPatternUtils.merge( extendOp.getExtendExpressions(),
-				req.getQueryPattern() );
+	public static LogicalPlan mergeBindIntoSPARQLEndpointRequest( final LogicalOpBind bindOp,
+	                                                              final SPARQLEndpoint ep,
+	                                                              final SPARQLRequest req ) {
+		final SPARQLGraphPattern mergedPattern = QueryPatternUtils.merge( bindOp.getBindExpressions(),
+		                                                                  req.getQueryPattern() );
 		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mergedReq);
 		return new LogicalPlanWithNullaryRootImpl(reqOp);

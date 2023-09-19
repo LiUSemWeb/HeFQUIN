@@ -23,7 +23,7 @@ public interface LogicalPlanVisitor
 	void visit( final LogicalOpMultiwayUnion op );
 	
 	void visit( final LogicalOpFilter op );
-	void visit( final LogicalOpExtend op );
+	void visit( final LogicalOpBind op );
 	void visit( final LogicalOpLocalToGlobal op );
 	void visit( final LogicalOpGlobalToLocal op );
 }

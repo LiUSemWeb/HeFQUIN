@@ -47,7 +47,7 @@ public class LogicalPlanVisitorBase implements LogicalPlanVisitor
 	public void visit( final LogicalOpFilter op )            {}
 
 	@Override
-	public void visit( final LogicalOpExtend op )            {}
+	public void visit( final LogicalOpBind op )              {}
 
 	@Override
 	public void visit( final LogicalOpLocalToGlobal op )     {}
