@@ -55,10 +55,10 @@ public class LogicalToPhysicalOpConverter
 		else if ( lop instanceof LogicalOpTPOptAdd )  return convert( (LogicalOpTPOptAdd) lop );
 		else if ( lop instanceof LogicalOpBGPAdd )    return convert( (LogicalOpBGPAdd) lop );
 		else if ( lop instanceof LogicalOpBGPOptAdd ) return convert( (LogicalOpBGPOptAdd) lop );
-		else if ( lop instanceof LogicalOpGPAdd )    return convert( (LogicalOpGPAdd) lop );
-		else if ( lop instanceof LogicalOpGPOptAdd ) return convert( (LogicalOpGPOptAdd) lop );
+		else if ( lop instanceof LogicalOpGPAdd )     return convert( (LogicalOpGPAdd) lop );
+		else if ( lop instanceof LogicalOpGPOptAdd )  return convert( (LogicalOpGPOptAdd) lop );
 		else if ( lop instanceof LogicalOpFilter )    return convert( (LogicalOpFilter) lop );
-//		else if ( lop instanceof LogicalOpBind )    return convert( (LogicalOpBind) lop );
+		else if ( lop instanceof LogicalOpBind )      return convert( (LogicalOpBind) lop );
 		else if ( lop instanceof LogicalOpLocalToGlobal ) return convert ( (LogicalOpLocalToGlobal) lop);
 		else if ( lop instanceof LogicalOpGlobalToLocal ) return convert ( (LogicalOpGlobalToLocal) lop);
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
@@ -192,10 +192,11 @@ public class LogicalToPhysicalOpConverter
 		return new PhysicalOpFilter(lop);
 	}
 
-//	TODO
-//	public static UnaryPhysicalOp convert( final LogicalOpBind lop ) {
+	public static UnaryPhysicalOp convert( final LogicalOpBind lop ) {
+		// TODO: see issue #309 (https://github.com/LiUSemWeb/HeFQUIN/issues/309)
+		throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 //		return new PhysicalOpBind(lop);
-//	}
+	}
 
 	public static UnaryPhysicalOp convert( final LogicalOpLocalToGlobal lop ) {
 		return new PhysicalOpLocalToGlobal(lop);
