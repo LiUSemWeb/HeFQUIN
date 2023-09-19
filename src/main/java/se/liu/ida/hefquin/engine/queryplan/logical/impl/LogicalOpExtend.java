@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -9,7 +13,7 @@ public class LogicalOpExtend implements UnaryLogicalOp
 {
 	protected final VarExprList extendExpressions;
 
-	public LogicalOpExtend(final VarExprList extendExpressions ) {
+	public LogicalOpExtend( final VarExprList extendExpressions ) {
 		assert extendExpressions != null;
 		assert ! extendExpressions.isEmpty();
 
@@ -20,7 +24,25 @@ public class LogicalOpExtend implements UnaryLogicalOp
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		return inputVars[0];
+		final ExpectedVariables expVarsInput = inputVars[0];
+
+		final Set<Var> certainVars = expVarsInput.getCertainVariables();
+
+		// The variable in a BIND clause is only possible, not certain,
+		// because the evaluating the expression of the BIND clause may
+		// result in an error, in which case the BIND variable remains
+		// unbound.
+		final Set<Var> possibleVars = new HashSet<>( expVarsInput.getPossibleVariables() );
+		for ( final Var bindVar : extendExpressions.getVars() ) {
+			if ( ! certainVars.contains(bindVar) ) {
+				possibleVars.add(bindVar);
+			}
+		}
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
 	}
 
 	@Override
