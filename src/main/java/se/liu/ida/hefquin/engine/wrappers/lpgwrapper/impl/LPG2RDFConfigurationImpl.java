@@ -14,25 +14,21 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
     protected final String PROPERTY = "property/";
 
     protected final Node label;
+    protected final NodeMapping nodeMapping;
 
-    public LPG2RDFConfigurationImpl(final Node label){
+    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping){
         this.label = label;
+        this.nodeMapping = nodeMapping;
     }
-
 
     @Override
     public Node mapNode(final LPGNode node) {
-        return NodeFactory.createURI(NS + NODE + node.getId());
+        return this.nodeMapping.mapNode(node);
     }
 
     @Override
     public LPGNode unmapNode(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("Default configuration only accepts URI Node mappings");
-        if (!node.getURI().startsWith(NS + NODE))
-            throw new IllegalArgumentException("The provided URI is not mapping a Node");
-        final String id = node.getURI().replaceAll(NS + NODE, "");
-        return new LPGNode(id, "", null);
+        return this.unmapNode(node);
     }
 
     @Override
