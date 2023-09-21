@@ -10,14 +10,13 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToBNodesImp
 import static org.junit.Assert.*;
 
 public class NodeMappingToBNodesImplTest {
-    protected final String NS = "https://example.org/";
-    protected final String NODE = "node/";
+    protected final String NSNODE = "https://example.org/node/";
     protected final NodeMapping nodeMapping = new NodeMappingToBNodesImpl();
 
     @Test
     public void mapNode() {
         final LPGNode node = new LPGNode("0", "", null);
-        final Node resultNode = nodeMapping.mapNode(node);
+        final Node resultNode = nodeMapping.map(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
         assertEquals(resultNode.getBlankNodeId().toString(), "0");
@@ -26,7 +25,7 @@ public class NodeMappingToBNodesImplTest {
     @Test
     public void unmapNode(){
         final Node node = NodeFactory.createBlankNode("0");
-        final LPGNode resultNode = nodeMapping.unmapNode(node);
+        final LPGNode resultNode = nodeMapping.unmap(node);
         assertNotNull(resultNode);
         assertEquals(resultNode.getId(), "0");
         assertEquals(resultNode.getLabel(), "");
@@ -35,8 +34,8 @@ public class NodeMappingToBNodesImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void unmapNonBlankNode(){
-        final Node node = NodeFactory.createURI(NS + NODE + "0");
-        nodeMapping.unmapNode(node);
+        final Node node = NodeFactory.createURI(NSNODE + "0");
+        nodeMapping.unmap(node);
     }
 
 }

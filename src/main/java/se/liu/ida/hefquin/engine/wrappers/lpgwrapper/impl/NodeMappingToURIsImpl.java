@@ -6,21 +6,24 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 public class NodeMappingToURIsImpl implements NodeMapping{
 
-    protected final String NS = "https://example.org/";
-    protected final String NODE = "node/";
+    protected final String NSNODE;
 
-    @Override
-    public Node mapNode(final LPGNode node) {
-        return NodeFactory.createURI(NS + NODE + node.getId());
+    public NodeMappingToURIsImpl (final String NSNODE){
+        this.NSNODE= NSNODE;
     }
 
     @Override
-    public LPGNode unmapNode(final Node node) {
+    public Node map(final LPGNode node) {
+        return NodeFactory.createURI(NSNODE + node.getId());
+    }
+
+    @Override
+    public LPGNode unmap(final Node node) {
         if (!node.isURI())
-            throw new IllegalArgumentException("LPG2RDF configuration only accepts URI Node mappings");
-        if (!node.getURI().startsWith(NS + NODE))
-            throw new IllegalArgumentException("The provided URI is not mapping a Node");
-        final String id = node.getURI().replaceAll(NS + NODE, "");
+            throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not an URI node.");
+        if (!node.getURI().startsWith(NSNODE))
+            throw new IllegalArgumentException("The given IRI (" + node.getURI() + ") is not in the image of this node mapping.");
+        final String id = node.getURI().replaceAll(NSNODE, "");
         return new LPGNode(id, "", null);
     }
 }

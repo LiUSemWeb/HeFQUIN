@@ -23,12 +23,12 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public Node mapNode(final LPGNode node) {
-        return this.nodeMapping.mapNode(node);
+        return nodeMapping.map(node);
     }
 
     @Override
     public LPGNode unmapNode(final Node node) {
-        return this.unmapNode(node);
+        return nodeMapping.unmap(node);
     }
 
     @Override

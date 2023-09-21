@@ -61,6 +61,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
+	protected static final String NSNODE = "https://example.org/node/";
+
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
 	}
@@ -91,7 +93,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected void exec() {
 		final BGP bgp = getBGP();
 
-		final NodeMapping nodeMapping = new NodeMappingToURIsImpl();
+		final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
 		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping);
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);

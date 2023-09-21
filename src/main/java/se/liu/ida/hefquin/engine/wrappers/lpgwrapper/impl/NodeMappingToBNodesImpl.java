@@ -7,14 +7,14 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public class NodeMappingToBNodesImpl implements NodeMapping{
 
     @Override
-    public Node mapNode(final LPGNode node) {
+    public Node map(final LPGNode node) {
         return NodeFactory.createBlankNode(node.getId());
     }
 
     @Override
-    public LPGNode unmapNode(final Node node) {
+    public LPGNode unmap(final Node node) {
         if (!node.isBlank())
-            throw new IllegalArgumentException("LPG2RDF configuration accepts Blank Node");
+            throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not a blank node.");
         final String id = node.getBlankNodeId().toString();
         return new LPGNode(id, "", null);
     }
