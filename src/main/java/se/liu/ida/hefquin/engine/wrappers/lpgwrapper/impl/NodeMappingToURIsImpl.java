@@ -28,7 +28,7 @@ public class NodeMappingToURIsImpl implements NodeMapping{
     }
 
     @Override
-    public boolean isPossibleResult(Node node) {
+    public boolean isPossibleResult(final Node node) {
         return node.isURI() && node.getURI().startsWith(NSNODE);
     }
 }

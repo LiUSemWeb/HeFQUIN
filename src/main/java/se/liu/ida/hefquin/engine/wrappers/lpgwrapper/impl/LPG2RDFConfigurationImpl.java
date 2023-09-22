@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final String NS = "https://example.org/";
-    protected final String NODE = "node/";
     protected final String NODELABEL = "label/";
     protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
@@ -100,6 +99,6 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToNode(final Node n) {
-        return n.isURI() && n.getURI().startsWith(NS + NODE);
+        return nodeMapping.isPossibleResult(n);
     }
 }

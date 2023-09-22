@@ -20,7 +20,7 @@ public class NodeMappingToBNodesImpl implements NodeMapping{
     }
 
     @Override
-    public boolean isPossibleResult(Node node) {
+    public boolean isPossibleResult(final Node node) {
         return node.isBlank();
     }
 }
