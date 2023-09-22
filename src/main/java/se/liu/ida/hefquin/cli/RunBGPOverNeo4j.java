@@ -37,6 +37,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.LPG2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
@@ -58,6 +60,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
 
 	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+
+	protected static final String NSNODE = "https://example.org/node/";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -89,7 +93,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected void exec() {
 		final BGP bgp = getBGP();
 
-		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL));
+		final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
+		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping);
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
