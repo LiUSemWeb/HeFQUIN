@@ -26,4 +26,9 @@ public class NodeMappingToURIsImpl implements NodeMapping{
         final String id = node.getURI().replaceAll(NSNODE, "");
         return new LPGNode(id, "", null);
     }
+
+    @Override
+    public boolean isPossibleResult(Node node) {
+        return node.isURI() && node.getURI().startsWith(NSNODE);
+    }
 }

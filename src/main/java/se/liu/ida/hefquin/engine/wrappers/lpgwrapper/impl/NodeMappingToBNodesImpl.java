@@ -18,4 +18,9 @@ public class NodeMappingToBNodesImpl implements NodeMapping{
         final String id = node.getBlankNodeId().toString();
         return new LPGNode(id, "", null);
     }
+
+    @Override
+    public boolean isPossibleResult(Node node) {
+        return node.isBlank();
+    }
 }

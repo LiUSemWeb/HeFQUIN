@@ -25,4 +25,11 @@ public interface NodeMapping {
      * It applies the inverse of this node mapping to the given RDF term (which is assumed to be a blank node or an IRI) in order to obtain the corresponding LPG node.
      */
     LPGNode unmap(Node node);
+
+
+    /**
+     *Check if the given node is in the image of corresponding
+     * node mapping or not.
+     */
+    boolean isPossibleResult(Node node);
 }
