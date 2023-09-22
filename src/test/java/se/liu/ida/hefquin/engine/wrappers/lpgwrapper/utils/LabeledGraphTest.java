@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;

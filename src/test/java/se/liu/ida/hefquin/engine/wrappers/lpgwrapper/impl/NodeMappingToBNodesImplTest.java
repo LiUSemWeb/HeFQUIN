@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;

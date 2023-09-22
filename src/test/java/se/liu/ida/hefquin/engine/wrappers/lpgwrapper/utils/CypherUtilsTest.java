@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;

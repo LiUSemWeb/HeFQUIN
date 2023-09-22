@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.jena.graph.NodeFactory;
@@ -10,6 +10,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
