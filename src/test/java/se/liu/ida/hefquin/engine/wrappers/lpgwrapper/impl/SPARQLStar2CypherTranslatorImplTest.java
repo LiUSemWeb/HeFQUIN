@@ -14,8 +14,6 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
@@ -35,7 +33,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class SPARQLStar2CypherTranslatorTest {
+public class SPARQLStar2CypherTranslatorImplTest {
 
     CypherVarGenerator gen;
 

@@ -12,7 +12,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 
 import java.util.Iterator;
 import java.util.List;

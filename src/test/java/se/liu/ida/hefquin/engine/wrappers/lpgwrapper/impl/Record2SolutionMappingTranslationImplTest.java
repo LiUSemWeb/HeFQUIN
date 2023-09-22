@@ -13,8 +13,6 @@ import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.DefaultConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
@@ -33,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * This tests are outdated, they need to be changed to include the latest changes
  */
-public class Record2SolutionMappingTranslationTest {
+public class Record2SolutionMappingTranslationImplTest {
 
     final LPGNode node0 = new LPGNode("0", null, null);
     final LPGNode node1 = new LPGNode("1", null, null);

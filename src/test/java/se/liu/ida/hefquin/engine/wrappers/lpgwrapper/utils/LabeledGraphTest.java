@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.LabeledGraph;
 
 import java.util.ArrayList;
 import java.util.HashMap;

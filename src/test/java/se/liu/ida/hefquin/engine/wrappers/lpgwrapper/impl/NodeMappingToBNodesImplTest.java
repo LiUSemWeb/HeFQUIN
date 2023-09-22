@@ -4,8 +4,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToBNodesImpl;
 
 import static org.junit.Assert.*;
 
