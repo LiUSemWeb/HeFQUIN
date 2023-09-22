@@ -28,9 +28,9 @@ public interface NodeMapping {
 
 
     /**
-     *Check if the given RDF term is in the image of this node mapping and,
-     *thus, may be one of the RDF terms returned by the {@link #map(LPGNode)}
-     *function for some LPG node.
+     * Check if the given RDF term is in the image of this node mapping and,
+     * thus, may be one of the RDF terms returned by the {@link #map(LPGNode)}
+     * function for some LPG node.
      */
     boolean isPossibleResult(Node node);
 }
