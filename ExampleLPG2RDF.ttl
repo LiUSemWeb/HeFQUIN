@@ -31,8 +31,8 @@ PREFIX ex:     <http://example.org/>
 
 # Instances
 ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
-    lr:labelPredicate <http://www.w3.org/2000/01/rdf-schema#label> ;
+    lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
     lr:nodeMapping ex:IRINodeMapping .
 
 ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
-    lr:prefixOfIRIs <https://example.org/node/> .
+    lr:prefixOfIRIs "https://example.org/node/"^^xsd:anyURI .

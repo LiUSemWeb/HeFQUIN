@@ -8,6 +8,7 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 import static org.junit.Assert.*;
@@ -19,15 +20,16 @@ public class LPG2RDFConfigurationReaderTest {
         final String turtle =
                 "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
               + "PREFIX ex:     <http://example.org/>\n"
+              + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
               + "\n"
               + "ex:LPGtoRDFConfig\n"
               + "   a  lr:LPGtoRDFConfiguration ;\n"
-              + "   lr:labelPredicate  <http://www.w3.org/2000/01/rdf-schema#label> ;\n"
+              + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
               + "   lr:nodeMapping  ex:IRINodeMapping ."
               + "\n"
               + "ex:IRINodeMapping\n"
               + "   a  lr:IRIBasedNodeMapping ;\n"
-              + "   lr:prefixOfIRIs  <https://example.org/node/> .";
+              + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
@@ -35,8 +37,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfigurationImpl lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.nodeMapping instanceof NodeMappingToURIsImpl);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabel().isURI());
         assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -50,12 +51,13 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithBNodeBasedNodeMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                  "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                 + "PREFIX ex:     <http://example.org/>\n"
+                + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                 + "\n"
                 + "ex:LPGtoRDFConfig\n"
                 + "   a  lr:LPGtoRDFConfiguration ;\n"
-                + "   lr:labelPredicate  <http://www.w3.org/2000/01/rdf-schema#label> ;\n"
+                + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                 + "   lr:nodeMapping  ex:BNodeMapping ."
                 + "\n"
                 + "ex:BNodeMapping\n"
@@ -67,8 +69,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfigurationImpl lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.nodeMapping instanceof NodeMappingToBNodesImpl);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabel().isURI());
         final LPGNode node = new LPGNode("0", "", null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
@@ -80,17 +81,18 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidLabelLPG2RDFConfigWithIRIBasedNodeMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
                         + "ex:LPGtoRDFConfig\n"
                         + "   a  lr:LPGtoRDFConfiguration ;\n"
-                        + "   lr:labelPredicate '//example.org/node/' ;\n"
+                        + "   lr:labelPredicate 'test' ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
                         + "   a  lr:IRIBasedNodeMapping ;\n"
-                        + "   lr:prefixOfIRIs  <https://example.org/node/> .";
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
@@ -104,12 +106,13 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingWithoutPrefixOfIRIs() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
                         + "ex:LPGtoRDFConfig\n"
                         + "   a  lr:LPGtoRDFConfiguration ;\n"
-                        + "   lr:labelPredicate <http://www.w3.org/2000/01/rdf-schema#label> ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -127,7 +130,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFWrongConfig() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "\n"
                         + "ex:IRINodeMapping\n"
