@@ -40,7 +40,7 @@ public class LPG2RDFConfigurationReader {
         }
         final Resource lpg2rdfConfig = lpg2rdfConfigs.next();
         if(lpg2rdfConfigs.hasNext()){
-            throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration.");
+            throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration!");
         }
 
         final String validDataType = lpg2Rdf.getNsPrefixURI("xsd").concat("anyURI");
@@ -64,7 +64,7 @@ public class LPG2RDFConfigurationReader {
         }
         final RDFNode labelPredicateObj = labelPredicateIterator.next().getObject();
         if(labelPredicateIterator.hasNext()){
-            throw new IllegalArgumentException("More than one labelPredicate.");
+            throw new IllegalArgumentException("More than one labelPredicate!");
         }
         if (!labelPredicateObj.asLiteral().getDatatypeURI().equals(validDataType)){
             throw new IllegalArgumentException("labelPredicate is invalid!");
@@ -90,7 +90,7 @@ public class LPG2RDFConfigurationReader {
             }
             final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
             if(prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("More than one prefixOfURI");
+                throw new IllegalArgumentException("More than one prefixOfURI!");
             }
 
             final String prefixOfIRIUrl = prefixOfIRIObj.asLiteral().getString();
@@ -100,7 +100,7 @@ public class LPG2RDFConfigurationReader {
             nodeMapping = new NodeMappingToBNodesImpl();
         }
         else {
-            throw new IllegalArgumentException("Type of Resource in NodeMapping is not defined.");
+            throw new IllegalArgumentException("NodeMapping type (" + nodeMappingResourceType + ") is unexpected!");
         }
         return nodeMapping;
     }
