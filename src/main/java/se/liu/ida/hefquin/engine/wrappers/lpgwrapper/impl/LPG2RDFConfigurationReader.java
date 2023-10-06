@@ -9,8 +9,11 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.vocabulary.LPG2RDF;
+
+import java.net.URI;
 
 public class LPG2RDFConfigurationReader {
 
@@ -43,19 +46,14 @@ public class LPG2RDFConfigurationReader {
             throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration!");
         }
 
-        final String validDataType = lpg2Rdf.getNsPrefixURI("xsd").concat("anyURI");
-
-        final Node label = getLabelPredicate(lpg2rdfConfig, validDataType);
+        final Node label = getLabelPredicate(lpg2rdfConfig);
         final NodeMapping nodeMapping = getNodeMapping(lpg2Rdf, lpg2rdfConfig);
 
 
         return new LPG2RDFConfigurationImpl(label, nodeMapping);
     }
 
-    public Node getLabelPredicate(final Resource lpg2rdfConfig, final String validDataType){
-        if(!lpg2rdfConfig.hasProperty(LPG2RDF.labelPredicate)){
-            throw new IllegalArgumentException("labelPredicate is required!");
-        }
+    public Node getLabelPredicate(final Resource lpg2rdfConfig){
 
         final StmtIterator labelPredicateIterator = lpg2rdfConfig.listProperties(LPG2RDF.labelPredicate);
 
@@ -66,16 +64,23 @@ public class LPG2RDFConfigurationReader {
         if(labelPredicateIterator.hasNext()){
             throw new IllegalArgumentException("More than one labelPredicate!");
         }
-        if (!labelPredicateObj.asLiteral().getDatatypeURI().equals(validDataType)){
-            throw new IllegalArgumentException("labelPredicate is invalid!");
+
+        if (!labelPredicateObj.isLiteral() || !labelPredicateObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+            throw new IllegalArgumentException("labelPredicate is invalid, it should be a xsd:anyURI!");
         }
+
         final String label = labelPredicateObj.asLiteral().getString();
 
-        return NodeFactory.createURI(label);
+        try{
+            return NodeFactory.createURI(URI.create(label).toString());
+        }
+        catch (IllegalArgumentException exception){
+            throw new IllegalArgumentException("labelPredicate is an invalid URI!");
+        }
+
     }
 
     public NodeMapping getNodeMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
-        final NodeMapping nodeMapping;
         if(!lpg2rdfConfig.hasProperty(LPG2RDF.nodeMapping)){
             throw new IllegalArgumentException("nodeMapping is required!");
         }
@@ -83,25 +88,33 @@ public class LPG2RDFConfigurationReader {
         final Resource nodeMappingResource = lpg2rdfConfig.getProperty(LPG2RDF.nodeMapping).getResource();
         final RDFNode nodeMappingResourceType = lpg2Rdf.getRequiredProperty(nodeMappingResource, RDF.type).getObject();
 
-        if ( nodeMappingResourceType.equals(LPG2RDF.IRIBasedNodeMapping) ) {
+        if ( nodeMappingResourceType.equals(LPG2RDF.IRIBasedNodeMapping)
+                || (nodeMappingResourceType.equals(LPG2RDF.NodeMapping) && nodeMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
             final StmtIterator prefixOfIRIsIterator = nodeMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
             if(!prefixOfIRIsIterator.hasNext()){
                 throw new IllegalArgumentException("prefixOfIRIs is required!");
             }
             final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
             if(prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("More than one prefixOfURI!");
+                throw new IllegalArgumentException("An instance of IRIBasedNodeMapping has more than one prefixOfIRIs property.!");
             }
 
-            final String prefixOfIRIUrl = prefixOfIRIObj.asLiteral().getString();
-            nodeMapping = new NodeMappingToURIsImpl(prefixOfIRIUrl);
+            if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+                throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
+            }
+            final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
+            try{
+                return new NodeMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+            }
+            catch (IllegalArgumentException exception){
+                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+            }
         }
-        else if ( nodeMappingResourceType.equals(LPG2RDF.BNodeBasedNodeMapping) ) {
-            nodeMapping = new NodeMappingToBNodesImpl();
+        else if ( nodeMappingResourceType.equals(LPG2RDF.BNodeBasedNodeMapping) || (nodeMappingResourceType.equals(LPG2RDF.NodeMapping) && !nodeMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
+            return new NodeMappingToBNodesImpl();
         }
         else {
             throw new IllegalArgumentException("NodeMapping type (" + nodeMappingResourceType + ") is unexpected!");
         }
-        return nodeMapping;
     }
 }
