@@ -81,11 +81,17 @@ public class LPG2RDFConfigurationReader {
     }
 
     public NodeMapping getNodeMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
-        if(!lpg2rdfConfig.hasProperty(LPG2RDF.nodeMapping)){
+
+        final StmtIterator nodeMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.nodeMapping);
+
+        if(!nodeMappingIterator.hasNext()){
             throw new IllegalArgumentException("nodeMapping is required!");
         }
+        final Resource nodeMappingResource = nodeMappingIterator.next().getObject().asResource();
+        if(nodeMappingIterator.hasNext()){
+            throw new IllegalArgumentException("More than one instance of nodeMapping!");
+        }
 
-        final Resource nodeMappingResource = lpg2rdfConfig.getProperty(LPG2RDF.nodeMapping).getResource();
         final RDFNode nodeMappingResourceType = lpg2Rdf.getRequiredProperty(nodeMappingResource, RDF.type).getObject();
 
         if ( nodeMappingResourceType.equals(LPG2RDF.IRIBasedNodeMapping)

@@ -230,4 +230,37 @@ public class LPG2RDFConfigurationReaderTest {
 
         LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
     }
+
+    /*
+    In this test case, there are more than one instances of NodeMapping.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void LPG2RDFConfigWithMultipleNodeMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;"
+                        + "   lr:nodeMapping  ex:BNodeMapping ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:NodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:BNodeMapping\n"
+                        + "   a  lr:BNodeBasedNodeMapping .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+    }
+
 }
