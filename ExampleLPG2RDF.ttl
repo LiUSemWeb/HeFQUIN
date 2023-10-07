@@ -1,0 +1,38 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>
+PREFIX ex:     <http://example.org/>
+
+# Classes
+#ex:LPGtoRDFConfiguration a rdfs:Class ;
+
+#ex:NodeMapping a rdfs:Class ;
+
+#ex:BNodeBasedNodeMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeMapping .
+#
+#ex:IRIBasedNodeMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeMapping .
+#
+## Properties
+#ex:labelPredicate a rdf:Property ;
+#   rdfs:domain ex:LPGtoRDFConfiguration ;
+#   rdfs:range  xsd:anyURI .
+#
+#ex:nodeMapping a rdf:Property ;
+#   rdfs:domain ex:LPGtoRDFConfiguration ;
+#   rdfs:range ex:NodeMapping .
+#
+#ex:prefixOfIRIs a rdf:Property ;
+#   rdfs:domain ex:IRIBasedNodeMapping ;
+#   rdfs:range xsd:anyURI .
+
+
+# Instances
+ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
+    lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
+    lr:nodeMapping ex:IRINodeMapping .
+
+ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
+    lr:prefixOfIRIs "https://example.org/node/"^^xsd:anyURI .
