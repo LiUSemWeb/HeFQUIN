@@ -8,16 +8,18 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final String NS = "https://example.org/";
-    protected final String NODELABEL = "label/";
     protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
 
     protected final Node label;
     protected final NodeMapping nodeMapping;
 
-    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping){
+    protected final NodeLabelMapping nodeLabelMapping;
+
+    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
+        this.nodeLabelMapping = nodeLabelMapping;
     }
 
     @Override
@@ -32,16 +34,12 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public Node mapNodeLabel(final String label) {
-        return NodeFactory.createURI(NS + NODELABEL + label);
+        return nodeLabelMapping.map(label);
     }
 
     @Override
     public String unmapNodeLabel(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("Default configuration only accepts URI Node Labels");
-        if (!node.getURI().startsWith(NS + NODELABEL))
-            throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
-        return node.getURI().replaceAll(NS + NODELABEL, "");
+        return nodeLabelMapping.unmap(node);
     }
 
     @Override
@@ -89,7 +87,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToLabel(final Node n) {
-        return n.isURI() && n.getURI().startsWith(NS + NODELABEL);
+        return nodeLabelMapping.isPossibleResult(n);
     }
 
     @Override
