@@ -160,7 +160,7 @@ public class LPG2RDFConfigurationReader {
                 throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
             }
         }
-        else if ( nodeLabelMappingResourceType.equals(LPG2RDF.LiteralBasedNodeLabelMapping) || (nodeLabelMappingResourceType.equals(LPG2RDF.NodeLabelMapping) && !nodeLabelMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
+        else if ( nodeLabelMappingResourceType.equals(LPG2RDF.LiteralBasedNodeLabelMapping)) {
             return new NodeLabelMappingToLiteralsImpl();
         }
         else {

@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.vocabulary.XSD;
 
 public class NodeLabelMappingToLiteralsImpl implements NodeLabelMapping{
 
@@ -11,14 +12,14 @@ public class NodeLabelMappingToLiteralsImpl implements NodeLabelMapping{
     }
 
     @Override
-    public String unmap(Node node) {
-        if (!node.isLiteral())
+    public String unmap(final Node node) {
+        if (!node.isLiteral() || !node.getLiteral().getDatatypeURI().equals(XSD.xstring.getURI()))
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not a literal.");
-        return node.getLiteral().toString();
+        return node.getLiteralLexicalForm();
     }
 
     @Override
-    public boolean isPossibleResult(Node node) {
-        return node.isLiteral();
+    public boolean isPossibleResult(final Node node) {
+        return node.isLiteral() && node.getLiteral().getDatatypeURI().equals(XSD.xstring.getURI());
     }
 }

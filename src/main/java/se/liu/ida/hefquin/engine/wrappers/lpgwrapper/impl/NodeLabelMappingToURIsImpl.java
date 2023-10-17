@@ -18,7 +18,7 @@ public class NodeLabelMappingToURIsImpl implements NodeLabelMapping{
     }
 
     @Override
-    public String unmap(Node node) {
+    public String unmap(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not an URI node.\"");
         if (!node.getURI().startsWith(NSNODELABEL))
@@ -27,7 +27,7 @@ public class NodeLabelMappingToURIsImpl implements NodeLabelMapping{
     }
 
     @Override
-    public boolean isPossibleResult(Node node) {
+    public boolean isPossibleResult(final Node node) {
         return node.isURI() && node.getURI().startsWith(NSNODELABEL);
     }
 }
