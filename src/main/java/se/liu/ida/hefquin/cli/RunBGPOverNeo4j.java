@@ -39,6 +39,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMapping
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
@@ -62,6 +64,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
 	protected static final String NSNODE = "https://example.org/node/";
+	protected static final String NSNODELABEL = "https://example.org/label/";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -94,7 +97,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 		final BGP bgp = getBGP();
 
 		final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
-		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping);
+		final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToURIsImpl(NSNODELABEL);
+		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping);
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
@@ -126,7 +130,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	}
 
 	protected Pair<CypherQuery, Map<CypherVar,Var>> performQueryTranslation( final BGP bgp,
-	                                                                         final LPG2RDFConfiguration conf ) {
+																			 final LPG2RDFConfiguration conf ) {
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
@@ -144,17 +148,16 @@ public class RunBGPOverNeo4j extends CmdARQ
 	}
 
 	protected Pair<CypherQuery, Map<CypherVar,Var>> translateToCypher( final BGP bgp,
-	                                                                   final LPG2RDFConfiguration conf ) {
+																	   final LPG2RDFConfiguration conf ) {
 		final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = translator.translateBGP( bgp,
-		                                                                            conf,
-		                                                                            hasArg(argNaive) );
+				conf,
+				hasArg(argNaive) );
 
 		final CypherQuery query;
 		if ( hasArg(argNoVarRepl) ) {
 			query = tRes.object1;
-		}
-		else {
+		} else {
 			if ( tRes.object1 instanceof CypherMatchQuery )
 				query = translator.rewriteJoins((CypherMatchQuery)tRes.object1);
 			else if ( tRes.object1 instanceof CypherUnionQuery )
@@ -175,12 +178,12 @@ public class RunBGPOverNeo4j extends CmdARQ
 			final List<MatchClause> merged = translator.mergePaths( mQuery.getMatches() );
 
 			return new Pair<>( new CypherQueryBuilder()
-			                          .addAll( merged )
-			                          .addAll( mQuery.getConditions() )
-			                          .addAll( mQuery.getIterators() )
-			                          .addAll( mQuery.getReturnExprs() )
-			                          .build(),
-			                   tRes.object2 );
+					.addAll( merged )
+					.addAll( mQuery.getConditions() )
+					.addAll( mQuery.getIterators() )
+					.addAll( mQuery.getReturnExprs() )
+					.build(),
+					tRes.object2 );
 		}
 
 		if ( query instanceof CypherUnionQuery ) {
@@ -190,16 +193,16 @@ public class RunBGPOverNeo4j extends CmdARQ
 			for ( final CypherMatchQuery q : uQuery.getSubqueries() ) {
 				final List<MatchClause> merged = translator.mergePaths( q.getMatches() );
 				final CypherMatchQuery newSubQ = new CypherQueryBuilder()
-				                                       .addAll( merged )
-				                                       .addAll( q.getConditions() )
-				                                       .addAll( q.getIterators() )
-				                                       .addAll( q.getReturnExprs() )
-				                                       .build();
+						.addAll( merged )
+						.addAll( q.getConditions() )
+						.addAll( q.getIterators() )
+						.addAll( q.getReturnExprs() )
+						.build();
 				subqueries.add(newSubQ);
 			}
 
 			return new Pair<>( new CypherUnionQueryImpl(subqueries),
-			                   tRes.object2 );
+					tRes.object2 );
 		}
 
 		throw new IllegalArgumentException( query.getClass().getName() );
@@ -212,6 +215,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 		final Neo4jInterface iface = new Neo4jInterfaceImpl(uri);
 		final Neo4jServer server = new Neo4jServer() {
 			@Override public Neo4jInterface getInterface() { return iface; }
+
 			@Override public VocabularyMapping getVocabularyMapping() { return null; }
 		};
 
@@ -224,8 +228,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 		final RecordsResponse response;
 		try {
 			response = processor.performRequest(request, server);
-		}
-		catch ( final Exception ex ) {
+		} catch ( final Exception ex ) {
 			System.out.flush();
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );
@@ -241,17 +244,17 @@ public class RunBGPOverNeo4j extends CmdARQ
 	}
 
 	protected List<SolutionMapping> performResultTranslation( final RecordsResponse response,
-	                                                          final LPG2RDFConfiguration conf,
-	                                                          final CypherQuery query,
-	                                                          final Map<CypherVar,Var> varMap ) {
+															  final LPG2RDFConfiguration conf,
+															  final CypherQuery query,
+															  final Map<CypherVar,Var> varMap ) {
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 		final Record2SolutionMappingTranslator translator = new Record2SolutionMappingTranslatorImpl();
 		final List<SolutionMapping> result = translator.translateRecords( response.getResponse(),
-		                                                                  conf,
-		                                                                  query,
-		                                                                  varMap );
+				conf,
+				query,
+				varMap );
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
@@ -265,9 +268,9 @@ public class RunBGPOverNeo4j extends CmdARQ
 		final Query q = modQuery.getQuery();
 		final ResultSet rs = JenaResultSetUtils.convertToJenaResultSet( result, q.getResultVars() );
 		QueryExecUtils.outputResultSet( rs,
-		                                q.getPrologue(),
-		                                modResults.getResultsFormat(),
-		                                System.out );
+				q.getPrologue(),
+				modResults.getResultsFormat(),
+				System.out );
 	}
 
 }
