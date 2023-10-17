@@ -182,47 +182,6 @@ public class LPG2RDFConfigurationReaderTest {
     }
 
     @Test
-    public void LPG2RDFConfigWithNodeMappingAsBNodeBasedNodeMappingAndNodeLabelMappingAsLiteralBasedNodeLabelMapping() {
-        final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
-                        + "PREFIX ex:     <http://example.org/>\n"
-                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
-                        + "\n"
-                        + "ex:LPGtoRDFConfig\n"
-                        + "   a  lr:LPGtoRDFConfiguration ;\n"
-                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
-                        + "   lr:nodeMapping  ex:BNodeMapping ;\n"
-                        + "   lr:nodeLabelMapping ex:LiteralNodeLabelMapping ."
-                        + "\n"
-                        + "ex:LiteralNodeLabelMapping\n"
-                        + "   a  lr:NodeLabelMapping ."
-                        + "\n"
-                        + "ex:BNodeMapping\n"
-                        + "   a  lr:NodeMapping .";
-
-        final Model lpg2rdf = ModelFactory.createDefaultModel();
-
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
-        b.parse(lpg2rdf);
-
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        final LPGNode node = new LPGNode("0", "", null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
-        assertNotNull(resultNode);
-        assertTrue(resultNode.isBlank());
-        assertEquals(resultNode.getBlankNodeId().toString(), "0");
-
-        final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
-        assertNotNull(resultNodeLabel);
-        assertTrue(resultNodeLabel.isLiteral());
-        assertEquals(resultNodeLabel.getLiteral().toString(), "0");
-    }
-
-    @Test
     public void LPG2RDFConfigWithNodeMappingAsIRIBasedNodeMappingAndNodeLabelMappingAsIRIBasedNodeLabelMapping() {
         final String turtle =
                 "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"

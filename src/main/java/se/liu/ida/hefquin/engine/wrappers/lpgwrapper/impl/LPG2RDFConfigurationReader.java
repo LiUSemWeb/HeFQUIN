@@ -164,7 +164,7 @@ public class LPG2RDFConfigurationReader {
             return new NodeLabelMappingToLiteralsImpl();
         }
         else {
-            throw new IllegalArgumentException("NodeMapping type (" + nodeLabelMappingResourceType + ") is unexpected!");
+            throw new IllegalArgumentException("NodeLabelMapping type (" + nodeLabelMappingResourceType + ") is unexpected!");
         }
     }
 }
