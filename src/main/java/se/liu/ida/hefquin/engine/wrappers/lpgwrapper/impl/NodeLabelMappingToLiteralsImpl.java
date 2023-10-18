@@ -13,13 +13,13 @@ public class NodeLabelMappingToLiteralsImpl implements NodeLabelMapping{
 
     @Override
     public String unmap(final Node node) {
-        if (!node.isLiteral() || !node.getLiteral().getDatatypeURI().equals(XSD.xstring.getURI()))
+        if (!isPossibleResult(node))
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not a literal.");
         return node.getLiteralLexicalForm();
     }
 
     @Override
     public boolean isPossibleResult(final Node node) {
-        return node.isLiteral() && node.getLiteral().getDatatypeURI().equals(XSD.xstring.getURI());
+        return node.isLiteral() && XSD.xstring.getURI().equals(node.getLiteral().getDatatypeURI());
     }
 }

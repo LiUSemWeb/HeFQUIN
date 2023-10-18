@@ -13,7 +13,7 @@ public class NodeMappingToBNodesImpl implements NodeMapping{
 
     @Override
     public LPGNode unmap(final Node node) {
-        if (!node.isBlank())
+        if (!isPossibleResult(node))
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not a blank node.");
         final String id = node.getBlankNodeId().toString();
         return new LPGNode(id, "", null);

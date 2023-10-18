@@ -21,7 +21,7 @@ public class NodeMappingToURIsImpl implements NodeMapping{
     public LPGNode unmap(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not an URI node.");
-        if (!node.getURI().startsWith(NSNODE))
+        if (!isPossibleResult(node))
             throw new IllegalArgumentException("The given IRI (" + node.getURI() + ") is not in the image of this node mapping.");
         final String id = node.getURI().replaceAll(NSNODE, "");
         return new LPGNode(id, "", null);
