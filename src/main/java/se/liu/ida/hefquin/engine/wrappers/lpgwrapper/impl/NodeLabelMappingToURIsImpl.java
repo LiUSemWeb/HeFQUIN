@@ -19,10 +19,8 @@ public class NodeLabelMappingToURIsImpl implements NodeLabelMapping{
 
     @Override
     public String unmap(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not an URI node.");
         if (!isPossibleResult(node))
-            throw new IllegalArgumentException("The given IRI (" + node.getURI() + ") is not in the image of this node label mapping.");
+            throw new IllegalArgumentException("The given RDF term (" + node.toString() + ") is not an URI node or not in the image of this node label mapping.");
         return node.getURI().replaceAll(NSNODELABEL, "");
     }
 
