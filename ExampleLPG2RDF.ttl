@@ -15,6 +15,17 @@ PREFIX ex:     <http://example.org/>
 #ex:IRIBasedNodeMapping a rdfs:Class ;
 #   rdfs:subClassOf ex:NodeMapping .
 #
+
+#ex:NodeLabelMapping a rdfs:Class ;
+
+#ex:LiteralBasedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
+#
+#ex:IRIBasedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
+#
+
+
 ## Properties
 #ex:labelPredicate a rdf:Property ;
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
@@ -24,15 +35,22 @@ PREFIX ex:     <http://example.org/>
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
 #   rdfs:range ex:NodeMapping .
 #
+#ex:nodeLabelMapping a rdf:Property ;
+#   rdfs:domain ex:LPGtoRDFConfiguration ;
+#   rdfs:range ex:NodeLabelMapping .
+#
 #ex:prefixOfIRIs a rdf:Property ;
-#   rdfs:domain ex:IRIBasedNodeMapping ;
 #   rdfs:range xsd:anyURI .
 
 
 # Instances
 ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
     lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
-    lr:nodeMapping ex:IRINodeMapping .
+    lr:nodeMapping ex:IRINodeMapping ;
+    lr:nodeLabelMapping ex:IRINodeLabelMapping .
 
 ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
     lr:prefixOfIRIs "https://example.org/node/"^^xsd:anyURI .
+
+ex:IRINodeLabelMapping a lr:IRIBasedNodeLabelMapping ;
+    lr:prefixOfIRIs "https://example.org/label/"^^xsd:anyURI .
