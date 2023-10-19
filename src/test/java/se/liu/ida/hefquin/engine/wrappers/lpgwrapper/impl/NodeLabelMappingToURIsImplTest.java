@@ -21,7 +21,7 @@ public class NodeLabelMappingToURIsImplTest {
     }
 
     @Test
-    public void unmapURINodeLable(){
+    public void unmapURINodeLabel(){
         final Node node = NodeFactory.createURI(NSNODELABEL + "0");
         final String resultString = nodeLabelMapping.unmap(node);
         assertNotNull(resultString);

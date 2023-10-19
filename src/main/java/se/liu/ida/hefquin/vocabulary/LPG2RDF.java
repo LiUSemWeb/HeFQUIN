@@ -24,10 +24,13 @@ public class LPG2RDF {
     public static final Resource NodeLabelMapping = resource("NodeLabelMapping");
     public static final Resource IRIBasedNodeLabelMapping = resource("IRIBasedNodeLabelMapping");
     public static final Resource LiteralBasedNodeLabelMapping = resource("LiteralBasedNodeLabelMapping");
+    public static final Resource NodeEdgeLabelMapping = resource("NodeEdgeLabelMapping");
+    public static final Resource IRIBasedNodeEdgeLabelMapping = resource("IRIBasedNodeEdgeLabelMapping");
 
     public static final Property labelPredicate = property("labelPredicate");
     public static final Property nodeMapping = property("nodeMapping");
     public static final Property nodeLabelMapping = property("nodeLabelMapping");
+    public static final Property nodeEdgeLabelMapping = property("nodeEdgeLabelMapping");
     public static final Property prefixOfIRIs = property("prefixOfIRIs");
 
 }

@@ -15,11 +15,14 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
     protected final NodeMapping nodeMapping;
 
     protected final NodeLabelMapping nodeLabelMapping;
+    protected final NodeEdgeLabelMapping nodeEdgeLabelMapping;
 
-    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping){
+    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
+                                    final NodeEdgeLabelMapping nodeEdgeLabelMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
         this.nodeLabelMapping = nodeLabelMapping;
+        this.nodeEdgeLabelMapping = nodeEdgeLabelMapping;
     }
 
     @Override
@@ -44,16 +47,12 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public Node mapEdgeLabel(final String label) {
-        return NodeFactory.createURI(NS + RELATIONSHIP + label);
+        return nodeEdgeLabelMapping.map(label);
     }
 
     @Override
     public String unmapEdgeLabel(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("Default configuration only accepts URI Edge Labels");
-        if (!node.getURI().startsWith(NS + RELATIONSHIP))
-            throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
-        return node.getURI().replaceAll(NS + RELATIONSHIP, "");
+        return nodeEdgeLabelMapping.unmap(node);
     }
 
     @Override
@@ -92,7 +91,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToEdgeLabel(final Node n) {
-        return n.isURI() && n.getURI().startsWith(NS + RELATIONSHIP);
+        return nodeEdgeLabelMapping.isPossibleResult(n);
     }
 
     @Override
