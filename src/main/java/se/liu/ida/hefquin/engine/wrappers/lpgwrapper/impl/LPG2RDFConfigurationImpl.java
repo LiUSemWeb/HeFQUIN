@@ -8,18 +8,20 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final String NS = "https://example.org/";
-    protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
 
     protected final Node label;
     protected final NodeMapping nodeMapping;
 
     protected final NodeLabelMapping nodeLabelMapping;
+    protected final EdgeLabelMapping edgeLabelMapping;
 
-    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping){
+    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
+                                    final EdgeLabelMapping edgeLabelMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
         this.nodeLabelMapping = nodeLabelMapping;
+        this.edgeLabelMapping = edgeLabelMapping;
     }
 
     @Override
@@ -44,16 +46,12 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public Node mapEdgeLabel(final String label) {
-        return NodeFactory.createURI(NS + RELATIONSHIP + label);
+        return edgeLabelMapping.map(label);
     }
 
     @Override
     public String unmapEdgeLabel(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("Default configuration only accepts URI Edge Labels");
-        if (!node.getURI().startsWith(NS + RELATIONSHIP))
-            throw new IllegalArgumentException("The provided URI is not mapping a Node Label");
-        return node.getURI().replaceAll(NS + RELATIONSHIP, "");
+        return edgeLabelMapping.unmap(node);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToEdgeLabel(final Node n) {
-        return n.isURI() && n.getURI().startsWith(NS + RELATIONSHIP);
+        return edgeLabelMapping.isPossibleResult(n);
     }
 
     @Override
