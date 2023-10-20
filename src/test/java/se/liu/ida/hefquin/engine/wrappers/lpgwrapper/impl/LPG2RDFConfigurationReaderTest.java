@@ -27,14 +27,14 @@ public class LPG2RDFConfigurationReaderTest {
               + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
               + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
               + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
-              + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+              + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
               + "\n"
               + "ex:IRINodeLabelMapping\n"
               + "   a  lr:IRIBasedNodeLabelMapping ;\n"
               + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
               + "\n"
-              + "ex:IRINodeEdgeLabelMapping\n"
-              + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+              + "ex:IRIEdgeLabelMapping\n"
+              + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
               + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
               + "\n"
               + "ex:IRINodeMapping\n"
@@ -62,10 +62,10 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultNodeEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
-        assertNotNull(resultNodeEdgeLabel);
-        assertTrue(resultNodeEdgeLabel.isURI());
-        assertEquals(resultNodeEdgeLabel.getURI(), "https://example.org/relationship/0");
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
     }
 
     @Test
@@ -80,13 +80,13 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:LiteralNodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:LiteralNodeLabelMapping\n"
                         + "   a  lr:LiteralBasedNodeLabelMapping ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -114,10 +114,10 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "0");
 
-        final Node resultNodeEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
-        assertNotNull(resultNodeEdgeLabel);
-        assertTrue(resultNodeEdgeLabel.isURI());
-        assertEquals(resultNodeEdgeLabel.getURI(), "https://example.org/relationship/0");
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
     }
 
     @Test
@@ -132,14 +132,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:BNodeMapping\n"
@@ -165,10 +165,10 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultNodeEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
-        assertNotNull(resultNodeEdgeLabel);
-        assertTrue(resultNodeEdgeLabel.isURI());
-        assertEquals(resultNodeEdgeLabel.getURI(), "https://example.org/relationship/0");
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
     }
 
     @Test
@@ -183,13 +183,13 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:LiteralNodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:LiteralNodeLabelMapping\n"
                         + "   a  lr:LiteralBasedNodeLabelMapping ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:BNodeMapping\n"
@@ -215,10 +215,10 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "0");
 
-        final Node resultNodeEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
-        assertNotNull(resultNodeEdgeLabel);
-        assertTrue(resultNodeEdgeLabel.isURI());
-        assertEquals(resultNodeEdgeLabel.getURI(), "https://example.org/relationship/0");
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
     }
 
     @Test
@@ -233,14 +233,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:NodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -269,10 +269,10 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultNodeEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
-        assertNotNull(resultNodeEdgeLabel);
-        assertTrue(resultNodeEdgeLabel.isURI());
-        assertEquals(resultNodeEdgeLabel.getURI(), "https://example.org/relationship/0");
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
     }
 
     /*
@@ -290,13 +290,13 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate 'Hello World!' ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:LiteralNodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:LiteralNodeLabelMapping\n"
                         + "   a  lr:LiteralBasedNodeLabelMapping ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -327,13 +327,13 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:LiteralNodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:LiteralNodeLabelMapping\n"
                         + "   a  lr:LiteralBasedNodeLabelMapping ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -364,14 +364,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"Hello World!\" ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:BNodeMapping\n"
@@ -387,10 +387,10 @@ public class LPG2RDFConfigurationReaderTest {
     }
 
     /*
-     * In this test case, prefixOfIRIs of NodeEdgeLabelMapping is not a URI.
+     * In this test case, prefixOfIRIs of EdgeLabelMapping is not a URI.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void InvalidNodeEdgeLabelMappingPrefixOfIRIsLPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
+    public void InvalidEdgeLabelMappingPrefixOfIRIsLPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
                 "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
@@ -401,14 +401,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"Hello World!\" ."
                         + "\n"
                         + "ex:BNodeMapping\n"
@@ -438,14 +438,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -475,13 +475,13 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -498,10 +498,10 @@ public class LPG2RDFConfigurationReaderTest {
     }
 
     /*
-     * In this test case, prefixOfIRIs is not given in IRINodeEdgeLabelMapping.
+     * In this test case, prefixOfIRIs is not given in IRIEdgeLabelMapping.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingWithoutPrefixOfIRIsForNodeEdgeLabelMapping() {
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingWithoutPrefixOfIRIsForEdgeLabelMapping() {
         final String turtle =
                 "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
@@ -512,14 +512,14 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping ex:IRINodeEdgeLabelMapping ."
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeLabelMapping\n"
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ."
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ."
                         + "\n"
                         + "ex:IRINodeMapping\n"
                         + "   a  lr:IRIBasedNodeMapping ;\n"
@@ -570,7 +570,7 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping  ex:IRINodeEdgeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping  ex:IRIEdgeLabelMapping ;\n"
                         + "   lr:nodeLabelMapping ex:LiteralNodeLabelMapping ."
                         + "\n"
                         + "ex:LiteralNodeLabelMapping\n"
@@ -580,8 +580,8 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   a  lr:NodeMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:BNodeMapping\n"
@@ -610,7 +610,7 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   a  lr:LPGtoRDFConfiguration ;\n"
                         + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
                         + "   lr:nodeMapping  ex:BNodeMapping ;\n"
-                        + "   lr:nodeEdgeLabelMapping  ex:IRINodeEdgeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping  ex:IRIEdgeLabelMapping ;\n"
                         + "   lr:nodeLabelMapping  ex:IRINodeLabelMapping ;\n"
                         + "   lr:nodeLabelMapping ex:LiteralNodeLabelMapping ."
                         + "\n"
@@ -621,8 +621,8 @@ public class LPG2RDFConfigurationReaderTest {
                         + "   a  lr:IRIBasedNodeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
                         + "\n"
-                        + "ex:IRINodeEdgeLabelMapping\n"
-                        + "   a  lr:IRIBasedNodeEdgeLabelMapping ;\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
                         + "\n"
                         + "ex:BNodeMapping\n"

@@ -47,9 +47,9 @@ PREFIX ex:     <http://example.org/>
 #ex:prefixOfIRIs a rdf:Property ;
 #   rdfs:range xsd:anyURI .
 
-#ex:nodeEdgeLabelMapping a rdf:Property ;
+#ex:edgeLabelMapping a rdf:Property ;
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
-#   rdfs:range ex:NodeEdgeLabelMapping .
+#   rdfs:range ex:EdgeLabelMapping .
 
 # Instances
 ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
@@ -64,5 +64,5 @@ ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
 ex:IRINodeLabelMapping a lr:IRIBasedNodeLabelMapping ;
     lr:prefixOfIRIs "https://example.org/label/"^^xsd:anyURI .
 
-ex:IRINodeEdgeLabelMapping a lr:IRIBasedNodeEdgeLabelMapping ;
+ex:IRINodeEdgeLabelMapping a lr:IRIBasedEdgeLabelMapping ;
     lr:prefixOfIRIs "https://example.org/relationship/"^^xsd:anyURI .

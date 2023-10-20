@@ -8,21 +8,20 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final String NS = "https://example.org/";
-    protected final String RELATIONSHIP = "relationship/";
     protected final String PROPERTY = "property/";
 
     protected final Node label;
     protected final NodeMapping nodeMapping;
 
     protected final NodeLabelMapping nodeLabelMapping;
-    protected final NodeEdgeLabelMapping nodeEdgeLabelMapping;
+    protected final EdgeLabelMapping edgeLabelMapping;
 
     public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
-                                    final NodeEdgeLabelMapping nodeEdgeLabelMapping){
+                                    final EdgeLabelMapping edgeLabelMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
         this.nodeLabelMapping = nodeLabelMapping;
-        this.nodeEdgeLabelMapping = nodeEdgeLabelMapping;
+        this.edgeLabelMapping = edgeLabelMapping;
     }
 
     @Override
@@ -47,12 +46,12 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public Node mapEdgeLabel(final String label) {
-        return nodeEdgeLabelMapping.map(label);
+        return edgeLabelMapping.map(label);
     }
 
     @Override
     public String unmapEdgeLabel(final Node node) {
-        return nodeEdgeLabelMapping.unmap(node);
+        return edgeLabelMapping.unmap(node);
     }
 
     @Override
@@ -91,7 +90,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToEdgeLabel(final Node n) {
-        return nodeEdgeLabelMapping.isPossibleResult(n);
+        return edgeLabelMapping.isPossibleResult(n);
     }
 
     @Override
