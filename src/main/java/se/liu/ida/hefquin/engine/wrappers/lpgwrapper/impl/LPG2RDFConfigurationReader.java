@@ -49,10 +49,10 @@ public class LPG2RDFConfigurationReader {
         final Node label = getLabelPredicate(lpg2rdfConfig);
         final NodeMapping nodeMapping = getNodeMapping(lpg2Rdf, lpg2rdfConfig);
         final NodeLabelMapping nodeLabelMapping = getNodeLabelMapping(lpg2Rdf, lpg2rdfConfig);
-        final EdgeLabelMapping nodeEdgeLabelMapping = getEdgeLabelMapping(lpg2Rdf, lpg2rdfConfig);
+        final EdgeLabelMapping edgeLabelMapping = getEdgeLabelMapping(lpg2Rdf, lpg2rdfConfig);
 
 
-        return new LPG2RDFConfigurationImpl(label, nodeMapping, nodeLabelMapping,nodeEdgeLabelMapping);
+        return new LPG2RDFConfigurationImpl(label, nodeMapping, nodeLabelMapping, edgeLabelMapping);
     }
 
     public Node getLabelPredicate(final Resource lpg2rdfConfig){
