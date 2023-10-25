@@ -8,7 +8,6 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final Node label;
     protected final NodeMapping nodeMapping;
-
     protected final NodeLabelMapping nodeLabelMapping;
     protected final EdgeLabelMapping edgeLabelMapping;
     protected final PropertyNameMapping propertyNameMapping;
