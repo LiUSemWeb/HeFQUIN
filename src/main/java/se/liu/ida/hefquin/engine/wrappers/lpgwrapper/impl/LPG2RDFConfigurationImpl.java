@@ -1,27 +1,24 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
-    protected final String NS = "https://example.org/";
-    protected final String PROPERTY = "property/";
-
     protected final Node label;
     protected final NodeMapping nodeMapping;
-
     protected final NodeLabelMapping nodeLabelMapping;
     protected final EdgeLabelMapping edgeLabelMapping;
+    protected final PropertyNameMapping propertyNameMapping;
 
     public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
-                                    final EdgeLabelMapping edgeLabelMapping){
+                                    final EdgeLabelMapping edgeLabelMapping, final PropertyNameMapping propertyNameMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
         this.nodeLabelMapping = nodeLabelMapping;
         this.edgeLabelMapping = edgeLabelMapping;
+        this.propertyNameMapping=propertyNameMapping;
     }
 
     @Override
@@ -55,17 +52,13 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
     }
 
     @Override
-    public Node mapProperty(final String property) {
-        return NodeFactory.createURI(NS + PROPERTY + property);
+    public Node mapProperty(final String propertyName) {
+        return propertyNameMapping.map(propertyName);
     }
 
     @Override
     public String unmapProperty(final Node node) {
-        if (!node.isURI())
-            throw new IllegalArgumentException("Default configuration only accepts URI Property mappings");
-        if (!node.getURI().startsWith(NS + PROPERTY))
-            throw new IllegalArgumentException("The provided URI is not mapping a Property");
-        return node.getURI().replaceAll(NS + PROPERTY, "");
+        return propertyNameMapping.unmap(node);
     }
 
     @Override
@@ -75,7 +68,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToProperty(final Node n) {
-        return n.isURI() && n.getURI().startsWith(NS + PROPERTY);
+        return propertyNameMapping.isPossibleResult(n);
     }
 
     @Override

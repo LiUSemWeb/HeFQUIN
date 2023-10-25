@@ -43,6 +43,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
@@ -68,6 +70,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected static final String NSNODE = "https://example.org/node/";
 	protected static final String NSNODELABEL = "https://example.org/label/";
 	protected static final String NSRELATIONSHIP = "https://example.org/relationship/";
+	protected static final String NSPROPERTY = "https://example.org/property/";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -102,7 +105,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 		final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
 		final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToURIsImpl(NSNODELABEL);
 		final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingToURIsImpl(NSRELATIONSHIP);
-		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping);
+		final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
+		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping,propertyNameMapping);
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
