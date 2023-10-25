@@ -6,15 +6,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class PropertyMappingToURIsImplTest {
+public class PropertyNameMappingToURIsImplTest {
     protected final String NSPROPERTY = "https://example.org/property/";
 
-    protected final PropertyMapping propertyMapping = new PropertyMappingToURIsImpl(NSPROPERTY);
+    protected final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
 
     @Test
     public void mapProperty() {
-        final String property = "0";
-        final Node resultNode = propertyMapping.map(property);
+        final String propertyName = "0";
+        final Node resultNode = propertyNameMapping.map(propertyName);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), NSPROPERTY + "0");
@@ -23,7 +23,7 @@ public class PropertyMappingToURIsImplTest {
     @Test
     public void unmapURIProperty(){
         final Node node = NodeFactory.createURI(NSPROPERTY + "0");
-        final String resultString = propertyMapping.unmap(node);
+        final String resultString = propertyNameMapping.unmap(node);
         assertNotNull(resultString);
         assertEquals(resultString, "0");
     }
@@ -31,17 +31,17 @@ public class PropertyMappingToURIsImplTest {
     @Test
     public void propertyIsPossibleResult(){
         final Node IRINode = NodeFactory.createURI(NSPROPERTY + "0");
-        final boolean IRIIsPossible = propertyMapping.isPossibleResult(IRINode);
+        final boolean IRIIsPossible = propertyNameMapping.isPossibleResult(IRINode);
         assertTrue(IRIIsPossible);
     }
 
 
     /*
-     * In this test case, a node with an invalid URI is provided as an argument to the PropertyMappingToURIsImpl.
+     * In this test case, a node with an invalid URI is provided as an argument to the PropertyNameMappingToURIsImpl.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void unmapPropertyWithInvalidURI(){
+    public void unmapPropertyNameWithInvalidURI(){
         final Node node = NodeFactory.createURI("https://example.com/property/3");
-        propertyMapping.unmap(node);
+        propertyNameMapping.unmap(node);
     }
 }

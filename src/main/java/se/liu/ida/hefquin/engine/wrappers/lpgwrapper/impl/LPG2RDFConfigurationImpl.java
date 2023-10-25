@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
@@ -12,15 +11,15 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     protected final NodeLabelMapping nodeLabelMapping;
     protected final EdgeLabelMapping edgeLabelMapping;
-    protected final PropertyMapping propertyMapping;
+    protected final PropertyNameMapping propertyNameMapping;
 
     public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
-                                    final EdgeLabelMapping edgeLabelMapping, final PropertyMapping propertyMapping){
+                                    final EdgeLabelMapping edgeLabelMapping, final PropertyNameMapping propertyNameMapping){
         this.label = label;
         this.nodeMapping = nodeMapping;
         this.nodeLabelMapping = nodeLabelMapping;
         this.edgeLabelMapping = edgeLabelMapping;
-        this.propertyMapping=propertyMapping;
+        this.propertyNameMapping=propertyNameMapping;
     }
 
     @Override
@@ -54,13 +53,13 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
     }
 
     @Override
-    public Node mapProperty(final String property) {
-        return propertyMapping.map(property);
+    public Node mapProperty(final String propertyName) {
+        return propertyNameMapping.map(propertyName);
     }
 
     @Override
     public String unmapProperty(final Node node) {
-        return propertyMapping.unmap(node);
+        return propertyNameMapping.unmap(node);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
 
     @Override
     public boolean mapsToProperty(final Node n) {
-        return propertyMapping.isPossibleResult(n);
+        return propertyNameMapping.isPossibleResult(n);
     }
 
     @Override
