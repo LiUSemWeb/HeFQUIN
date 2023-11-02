@@ -206,6 +206,40 @@ public class LPG2RDFConfigurationReader {
                 throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
             }
         }
+        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.RegexBasedEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.regex)) ) {
+            final StmtIterator regexIterator = edgeLabelMappingResource.listProperties(LPG2RDF.regex);
+            if (!regexIterator.hasNext()) {
+                throw new IllegalArgumentException("regex is required!");
+            }
+            final RDFNode regexObj = regexIterator.next().getObject();
+            if (regexIterator.hasNext()) {
+                throw new IllegalArgumentException("An instance of RegexEdgeLabelMapping has more than one regex property!");
+            }
+
+            if (!regexObj.isLiteral() || !regexObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
+                throw new IllegalArgumentException("Regex is invalid, it should be a xsd:string!");
+            }
+            final StmtIterator prefixOfIRIsIterator = edgeLabelMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
+            if(!prefixOfIRIsIterator.hasNext()){
+                throw new IllegalArgumentException("prefixOfIRIs is required!");
+            }
+            final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
+            if(prefixOfIRIsIterator.hasNext()){
+                throw new IllegalArgumentException("An instance of IRIBasedEdgeLabelMapping has more than one prefixOfIRIs property!");
+            }
+
+            if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+                throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
+            }
+            final String regex = regexObj.asLiteral().getString();
+            final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
+            try {
+                return new RegexBasedEdgeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+            }
+        }
         else {
             throw new IllegalArgumentException("EdgeLabelMapping type (" + edgeLabelMappingResourceType + ") is unexpected!");
         }

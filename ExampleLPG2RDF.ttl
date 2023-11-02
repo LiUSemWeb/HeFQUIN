@@ -30,6 +30,9 @@ PREFIX ex:     <http://example.org/>
 #ex:IRIBasedEdgeLabelMapping a rdfs:Class ;
 #   rdfs:subClassOf ex:EdgeLabelMapping .
 
+#ex:RegexBasedEdgeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:EdgeLabelMapping .
+
 #ex:PropertyNameMapping a rdfs:Class ;
 #
 #ex:IRIBasedPropertyNameMapping a rdfs:Class ;
@@ -57,6 +60,10 @@ PREFIX ex:     <http://example.org/>
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
 #   rdfs:range ex:EdgeLabelMapping .
 
+#ex:regex a rdf:Property ;
+#   rdfs:domain ex:RegexBasedEdgeLabelMapping ;
+#   rdfs:range xsd:string .
+
 #ex:propertyNameMapping a rdf:Property ;
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
 #   rdfs:range ex:PropertyNameMapping .
@@ -66,7 +73,8 @@ ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
     lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
     lr:nodeMapping ex:IRINodeMapping ;
     lr:nodeLabelMapping ex:IRINodeLabelMapping ;
-    lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;
+#   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;
+    lr:edgeLabelMapping ex:RegexEdgeLabelMapping ;
     lr:propertyNameMapping ex:IRIPropertyNameMapping .
 
 ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
@@ -77,6 +85,10 @@ ex:IRINodeLabelMapping a lr:IRIBasedNodeLabelMapping ;
 
 ex:IRIEdgeLabelMapping a lr:IRIBasedEdgeLabelMapping ;
     lr:prefixOfIRIs "https://example.org/relationship/"^^xsd:anyURI .
+
+ex:RegexEdgeLabelMapping a lr:RegexBasedEdgeLabelMapping ;
+    lr:regex "^\\w+" ;
+    lr:prefixOfIRIs "http://purl.org/dc/terms/"^^xsd:anyURI .
 
 ex:IRIPropertyNameMapping a lr:IRIBasedPropertyNameMapping ;
     lr:prefixOfIRIs "https://example.org/property/"^^xsd:anyURI .
