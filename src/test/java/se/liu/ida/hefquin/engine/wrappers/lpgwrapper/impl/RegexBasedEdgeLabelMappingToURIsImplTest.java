@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class RegexBasedEdgeLabelMappingToURIsImplTest {
     protected final String NSRELATIONSHIP = "https://example2.org/test/";
-    protected final String regex = "^\\w+";
+    protected final String regex = "^[0-9]+";
 
     protected final EdgeLabelMapping edgeLabelMapping = new RegexBasedEdgeLabelMappingToURIsImpl(regex, NSRELATIONSHIP);
 
@@ -44,5 +44,14 @@ public class RegexBasedEdgeLabelMappingToURIsImplTest {
     public void unmapEdgeLabelWithInvalidURI(){
         final Node node = NodeFactory.createURI("https://example.org/3");
         edgeLabelMapping.unmap(node);
+    }
+
+    /*
+     * In this test case, a label which is not match with provided regex in the RegexBasedEdgeLabelMappingToURIsImpl.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void mapEdgeLabelWithUnmatchedLabel(){
+        final String label = "test";
+        edgeLabelMapping.map(label);
     }
 }
