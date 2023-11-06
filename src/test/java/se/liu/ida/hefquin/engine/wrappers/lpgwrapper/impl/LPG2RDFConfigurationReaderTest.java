@@ -143,6 +143,71 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
     }
+    @Test
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndSingleEdgeLabelMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
+                        + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping ex:SingleIRIEdgeLabelMapping ;\n"
+                        + "   lr:propertyNameMapping ex:IRIPropertyNameMapping ."
+                        + "\n"
+                        + "ex:IRINodeLabelMapping\n"
+                        + "   a  lr:IRIBasedNodeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:SingleIRIEdgeLabelMapping\n"
+                        + "   a  lr:SingleEdgeLabelMapping ;\n"
+                        + "   lr:label \"DIRECTED\" ;\n"
+                        + "   lr:iri \"http://singleExample.org/directorOf\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIPropertyNameMapping\n"
+                        + "   a  lr:IRIBasedPropertyNameMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/property/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:IRIBasedNodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        final LPGNode node = new LPGNode("0", null, null);
+        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.isURI());
+        assertEquals(resultNode.getURI(), "https://example.org/node/0");
+
+        final String label = "0";
+        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        assertNotNull(resultNodeLabel);
+        assertTrue(resultNodeLabel.isURI());
+        assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
+
+        final String edgeLabel = "DIRECTED";
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "http://singleExample.org/directorOf");
+
+        final String propertyName = "0";
+        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
+    }
 
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndLiteralBasedNodeLabelMapping() {
