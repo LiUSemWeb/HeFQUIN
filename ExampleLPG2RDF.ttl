@@ -33,6 +33,9 @@ PREFIX ex:     <http://example.org/>
 #ex:RegexBasedEdgeLabelMapping a rdfs:Class ;
 #   rdfs:subClassOf ex:EdgeLabelMapping .
 
+#ex:SingleEdgeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:EdgeLabelMapping .
+
 #ex:PropertyNameMapping a rdfs:Class ;
 #
 #ex:IRIBasedPropertyNameMapping a rdfs:Class ;
@@ -64,6 +67,14 @@ PREFIX ex:     <http://example.org/>
 #   rdfs:domain ex:RegexBasedEdgeLabelMapping ;
 #   rdfs:range xsd:string .
 
+#ex:label a rdf:Property ;
+#   rdfs:domain ex:SingleEdgeLabelMapping ;
+#   rdfs:range xsd:string .
+
+#ex:iri a rdf:Property ;
+#   rdfs:domain ex:SingleEdgeLabelMapping ;
+#   rdfs:range xsd:anyURI .
+
 #ex:propertyNameMapping a rdf:Property ;
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
 #   rdfs:range ex:PropertyNameMapping .
@@ -74,7 +85,8 @@ ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
     lr:nodeMapping ex:IRINodeMapping ;
     lr:nodeLabelMapping ex:IRINodeLabelMapping ;
 #   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;
-    lr:edgeLabelMapping ex:RegexEdgeLabelMapping ;
+#   lr:edgeLabelMapping ex:RegexEdgeLabelMapping ;
+    lr:edgeLabelMapping ex:SingleIRIEdgeLabelMapping ;
     lr:propertyNameMapping ex:IRIPropertyNameMapping .
 
 ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
@@ -89,6 +101,10 @@ ex:IRIEdgeLabelMapping a lr:IRIBasedEdgeLabelMapping ;
 ex:RegexEdgeLabelMapping a lr:RegexBasedEdgeLabelMapping ;
     lr:regex "^\\w+" ;
     lr:prefixOfIRIs "http://purl.org/dc/terms/"^^xsd:anyURI .
+
+ex:SingleIRIEdgeLabelMapping a lr:SingleEdgeLabelMapping ;
+    lr:label "DIRECTED" ;
+    lr:iri "http://dsgfrjlk.org/kdfj/directorOf"^^xsd:anyURI .
 
 ex:IRIPropertyNameMapping a lr:IRIBasedPropertyNameMapping ;
     lr:prefixOfIRIs "https://example.org/property/"^^xsd:anyURI .

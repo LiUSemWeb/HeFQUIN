@@ -240,6 +240,43 @@ public class LPG2RDFConfigurationReader {
                 throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
             }
         }
+
+        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.SingleEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.label)
+                && edgeLabelMappingResource.hasProperty(LPG2RDF.iri))) {
+            final StmtIterator labelIterator = edgeLabelMappingResource.listProperties(LPG2RDF.label);
+            if (!labelIterator.hasNext()) {
+                throw new IllegalArgumentException("label is required!");
+            }
+            final RDFNode labelObj = labelIterator.next().getObject();
+            if (labelIterator.hasNext()) {
+                throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one label property!");
+            }
+
+            if (!labelObj.isLiteral() || !labelObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
+                throw new IllegalArgumentException("Label is invalid, it should be a xsd:string!");
+            }
+            final StmtIterator iriIterator = edgeLabelMappingResource.listProperties(LPG2RDF.iri);
+            if(!iriIterator.hasNext()){
+                throw new IllegalArgumentException("iri is required!");
+            }
+            final RDFNode iriObj = iriIterator.next().getObject();
+            if(iriIterator.hasNext()){
+                throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one iri property!");
+            }
+
+            if (!iriObj.isLiteral() || !iriObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+                throw new IllegalArgumentException("iri is invalid, it should be a xsd:anyURI!");
+            }
+            final String label = labelObj.asLiteral().getString();
+            final String iri = iriObj.asLiteral().getString();
+            try {
+                return new SingleEdgeLabelMappingToURIsImpl(label,iri);
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException("iri is an invalid URI!");
+            }
+        }
+
         else {
             throw new IllegalArgumentException("EdgeLabelMapping type (" + edgeLabelMappingResourceType + ") is unexpected!");
         }
