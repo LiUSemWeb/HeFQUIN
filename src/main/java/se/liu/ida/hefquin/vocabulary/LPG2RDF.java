@@ -30,6 +30,7 @@ public class LPG2RDF {
     public static final Resource IRIBasedPropertyNameMapping = resource("IRIBasedPropertyNameMapping");
     public static final Resource RegexBasedEdgeLabelMapping = resource("RegexBasedEdgeLabelMapping");
     public static final Resource SingleEdgeLabelMapping = resource("SingleEdgeLabelMapping");
+    public static final Resource CombinedEdgeLabelMapping = resource("CombinedEdgeLabelMapping");
 
     public static final Property labelPredicate = property("labelPredicate");
     public static final Property nodeMapping = property("nodeMapping");
@@ -38,6 +39,7 @@ public class LPG2RDF {
     public static final Property regex = property("regex");
     public static final Property label = property("label");
     public static final Property iri = property("iri");
+    public static final Property edgeLabelMappings = property("edgeLabelMappings");
     public static final Property propertyNameMapping = property("propertyNameMapping");
     public static final Property prefixOfIRIs = property("prefixOfIRIs");
 
