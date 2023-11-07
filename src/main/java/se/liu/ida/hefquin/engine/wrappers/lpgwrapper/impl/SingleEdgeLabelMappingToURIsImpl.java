@@ -7,16 +7,18 @@ public class SingleEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
 
     protected final String label;
     protected final String iri;
+    protected final Node node;
 
     public SingleEdgeLabelMappingToURIsImpl(final String label, final String iri){
         this.label=label;
         this.iri=iri;
+        this.node = NodeFactory.createURI(iri);
     }
 
     @Override
     public Node map(final String label) {
         if (label.equals(this.label)) {
-            return NodeFactory.createURI(iri);
+            return this.node;
         }
         else {
             throw new IllegalArgumentException("The given edge label (" + label + ") is not a supported label in the image of this edge label mapping.");
