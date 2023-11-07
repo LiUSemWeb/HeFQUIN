@@ -1,11 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
@@ -47,9 +45,11 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                 optPlan.add( new ArrayList<>( Arrays.asList(plan) ), plan );
             }
 
+            boolean existsConnectedSubsetInSizeNum = true;
             for ( int num = 2; num < subplans.size()+1; num ++ ){
                 // Get all subsets with size num.
                 final List<List<PhysicalPlan>> subsets = getSubSet(subplans, num);
+                int countCandidatesWithSizeNum = 0;
                 for( final List<PhysicalPlan> plans : subsets ){
                     // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
                     final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
@@ -59,7 +59,15 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         final PhysicalPlan plan_right = optPlan.get( p.object2 );
 
                         if( plan_left == null || plan_right == null ) {
-                            throw new IllegalStateException( "No query plan is recorded for the subsets." );
+                            continue;
+                        }
+
+                        // 'existsConnectedSubsetInSizeNum' can be false when there exist independent parts in all subsets of size num (exist sub-queries that cannot be joined with any other sub-queries)
+                        if ( existsConnectedSubsetInSizeNum ) {
+                            // Only measure cost for queries that contain join variables
+                            if ( ExpectedVariablesUtils.intersectionOfAllVariables(plan_left, plan_right).isEmpty() ) {
+                                continue;
+                            }
                         }
 
                         candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
@@ -77,11 +85,23 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         }
                     }
 
-                    // Prune: only the best candidate plan is retained in optPlan.
-                    // TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
-                    final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
-                    final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
-                    optPlan.add( plans, planWithLowestCost );
+                    countCandidatesWithSizeNum += candidatePlans.size();
+                    if ( candidatePlans.size() != 0 ) {
+                        // Prune: only the best candidate plan is retained in optPlan.
+                        // TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
+                        final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
+                        final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
+                        optPlan.add(plans, planWithLowestCost);
+                    }
+                }
+
+                if( countCandidatesWithSizeNum == 0 ) {
+                    // There exist independent parts for any subset (of size num). For a complete query plan, recreate candidate plans without considering join variables
+                    existsConnectedSubsetInSizeNum = false;
+                    num --;
+                }
+                else {
+                    existsConnectedSubsetInSizeNum = true;
                 }
             }
             return optPlan.get( subplans );
