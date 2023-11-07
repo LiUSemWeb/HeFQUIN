@@ -6,12 +6,10 @@ import org.apache.jena.graph.NodeFactory;
 public class SingleEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
 
     protected final String label;
-    protected final String iri;
     protected final Node node;
 
     public SingleEdgeLabelMappingToURIsImpl(final String label, final String iri){
         this.label=label;
-        this.iri=iri;
         this.node = NodeFactory.createURI(iri);
     }
 
@@ -33,7 +31,7 @@ public class SingleEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
 
     @Override
     public boolean isPossibleResult(final Node node) {
-        return node.isURI() && node.getURI().equals(this.iri);
+        return node.isURI() && node.getURI().equals(this.node.getURI());
     }
 
 }
