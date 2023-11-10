@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedEdgeLabelException;
 
 public class RegexBasedEdgeLabelMappingToURIsImpl extends EdgeLabelMappingToURIsImpl {
 
@@ -18,7 +18,7 @@ public class RegexBasedEdgeLabelMappingToURIsImpl extends EdgeLabelMappingToURIs
             return super.map(label);
         }
         else {
-            throw new IllegalArgumentException("The given edge label (" + label + ") is not a supported label in the image of this edge label mapping.");
+            throw new UnSupportedEdgeLabelException("The given edge label (" + label + ") is not a supported label in the image of this edge label mapping.");
         }
     }
 }

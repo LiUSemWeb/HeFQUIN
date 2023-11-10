@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedEdgeLabelException;
 
 import static org.junit.Assert.*;
 
@@ -39,7 +40,7 @@ public class EdgeLabelMappingToURIsImplTest {
     /*
      * In this test case, a node with an invalid URI is provided as an argument to the EdgeLabelMappingToURIsImpl.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnSupportedEdgeLabelException.class)
     public void unmapEdgeLabelWithInvalidURI(){
         final Node node = NodeFactory.createURI("https://example.com/relationship/3");
         edgeLabelMapping.unmap(node);

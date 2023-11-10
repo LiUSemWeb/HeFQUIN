@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
@@ -14,6 +15,9 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.vocabulary.LPG2RDF;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class LPG2RDFConfigurationReader {
 
@@ -170,6 +174,146 @@ public class LPG2RDFConfigurationReader {
             throw new IllegalArgumentException("NodeLabelMapping type (" + nodeLabelMappingResourceType + ") is unexpected!");
         }
     }
+
+    public EdgeLabelMapping createIRIBasedEdgeLabelMapping(final Resource edgeLabelMappingResource){
+        final StmtIterator prefixOfIRIsIterator = edgeLabelMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
+        if(!prefixOfIRIsIterator.hasNext()){
+            throw new IllegalArgumentException("prefixOfIRIs is required!");
+        }
+        final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
+        if(prefixOfIRIsIterator.hasNext()){
+            throw new IllegalArgumentException("An instance of IRIBasedEdgeLabelMapping has more than one prefixOfIRIs property!");
+        }
+
+        if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+            throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
+        }
+        final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
+        try{
+            return new EdgeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+        }
+        catch (IllegalArgumentException exception){
+            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        }
+    }
+
+    public EdgeLabelMapping createRegexBasedEdgeLabelMapping(final Resource edgeLabelMappingResource){
+        final StmtIterator regexIterator = edgeLabelMappingResource.listProperties(LPG2RDF.regex);
+        if (!regexIterator.hasNext()) {
+            throw new IllegalArgumentException("regex is required!");
+        }
+        final RDFNode regexObj = regexIterator.next().getObject();
+        if (regexIterator.hasNext()) {
+            throw new IllegalArgumentException("An instance of RegexEdgeLabelMapping has more than one regex property!");
+        }
+
+        if (!regexObj.isLiteral() || !regexObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
+            throw new IllegalArgumentException("Regex is invalid, it should be a xsd:string!");
+        }
+        final StmtIterator prefixOfIRIsIterator = edgeLabelMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
+        if(!prefixOfIRIsIterator.hasNext()){
+            throw new IllegalArgumentException("prefixOfIRIs is required!");
+        }
+        final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
+        if(prefixOfIRIsIterator.hasNext()){
+            throw new IllegalArgumentException("An instance of IRIBasedEdgeLabelMapping has more than one prefixOfIRIs property!");
+        }
+
+        if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+            throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
+        }
+        final String regex = regexObj.asLiteral().getString();
+        final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
+        try {
+            return new RegexBasedEdgeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        }
+    }
+    public EdgeLabelMapping createSingleEdgeLabelMapping(final Resource edgeLabelMappingResource){
+        final StmtIterator labelIterator = edgeLabelMappingResource.listProperties(LPG2RDF.label);
+        if (!labelIterator.hasNext()) {
+            throw new IllegalArgumentException("label is required!");
+        }
+        final RDFNode labelObj = labelIterator.next().getObject();
+        if (labelIterator.hasNext()) {
+            throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one label property!");
+        }
+
+        if (!labelObj.isLiteral() || !labelObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
+            throw new IllegalArgumentException("Label is invalid, it should be a xsd:string!");
+        }
+        final StmtIterator iriIterator = edgeLabelMappingResource.listProperties(LPG2RDF.iri);
+        if(!iriIterator.hasNext()){
+            throw new IllegalArgumentException("iri is required!");
+        }
+        final RDFNode iriObj = iriIterator.next().getObject();
+        if(iriIterator.hasNext()){
+            throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one iri property!");
+        }
+
+        if (!iriObj.isLiteral() || !iriObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
+            throw new IllegalArgumentException("iri is invalid, it should be a xsd:anyURI!");
+        }
+        final String label = labelObj.asLiteral().getString();
+        final String iri = iriObj.asLiteral().getString();
+        try {
+            return new SingleEdgeLabelMappingToURIsImpl(label,iri);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("iri is an invalid URI!");
+        }
+    }
+    public EdgeLabelMapping createCombinedEdgeLabelMapping(final Resource edgeLabelMappingResource){
+        final List<EdgeLabelMapping> edgeLabelMappings = new ArrayList<>();
+        final StmtIterator edgeLabelMappingsPropertyIterator = edgeLabelMappingResource.listProperties(LPG2RDF.edgeLabelMappings);
+        if (!edgeLabelMappingsPropertyIterator.hasNext()) {
+            throw new IllegalArgumentException("edgeLabelMappings is required!");
+        }
+        final RDFNode edgeLabelMappingsList = edgeLabelMappingsPropertyIterator.next().getObject();
+        if(!edgeLabelMappingsList.canAs(RDFList.class)){
+            throw new IllegalArgumentException("EdgeLabelMappings property of CombinedEdgeLabelMapping should be a list!");
+        }
+        final Iterator edgeLabelMappingsIterator = edgeLabelMappingsList.as(RDFList.class).iterator();
+
+        if (!edgeLabelMappingsIterator.hasNext()) {
+            throw new IllegalArgumentException("EdgeLabelMappings list of CombinedEdgeLabelMapping should not be empty!");
+        }
+
+        do{
+            final Resource edgeLabelMapping = (Resource)edgeLabelMappingsIterator.next();
+            final RDFNode edgeLabelMappingType = edgeLabelMapping.getProperty(RDF.type).getObject();
+            if(edgeLabelMappingType.equals(LPG2RDF.CombinedEdgeLabelMapping)
+                    || (edgeLabelMappingType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMapping.hasProperty(LPG2RDF.edgeLabelMappings))){
+                throw new IllegalArgumentException("CombinedEdgeLabelMapping Should not have an object of CombinedEdgeLabelMapping as edgeLabelMapping!");
+            }
+            edgeLabelMappings.add(createEdgeLabelMapping(edgeLabelMapping, edgeLabelMappingType));
+        }while(edgeLabelMappingsIterator.hasNext());
+        return new CombinedEdgeLabelMappingToURIsImpl(edgeLabelMappings);
+    }
+
+    public EdgeLabelMapping createEdgeLabelMapping(final Resource edgeLabelMappingResource, final RDFNode edgeLabelMappingResourceType){
+        if ( edgeLabelMappingResourceType.equals(LPG2RDF.IRIBasedEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
+            return createIRIBasedEdgeLabelMapping(edgeLabelMappingResource);
+        }
+        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.RegexBasedEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.regex)) ) {
+            return createRegexBasedEdgeLabelMapping(edgeLabelMappingResource);
+        }
+
+        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.SingleEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.label)
+                && edgeLabelMappingResource.hasProperty(LPG2RDF.iri))) {
+            return createSingleEdgeLabelMapping(edgeLabelMappingResource);
+        }
+        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.CombinedEdgeLabelMapping)
+                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.edgeLabelMappings))) {
+            return createCombinedEdgeLabelMapping(edgeLabelMappingResource);
+        }
+        else {
+            throw new IllegalArgumentException("EdgeLabelMapping type (" + edgeLabelMappingResourceType + ") is unexpected!");
+        }
+    }
     public EdgeLabelMapping getEdgeLabelMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
 
         final StmtIterator edgeLabelMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.edgeLabelMapping);
@@ -184,102 +328,7 @@ public class LPG2RDFConfigurationReader {
 
         final RDFNode edgeLabelMappingResourceType = lpg2Rdf.getRequiredProperty(edgeLabelMappingResource, RDF.type).getObject();
 
-        if ( edgeLabelMappingResourceType.equals(LPG2RDF.IRIBasedEdgeLabelMapping)
-                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
-            final StmtIterator prefixOfIRIsIterator = edgeLabelMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
-            if(!prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("prefixOfIRIs is required!");
-            }
-            final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
-            if(prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("An instance of IRIBasedEdgeLabelMapping has more than one prefixOfIRIs property!");
-            }
-
-            if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
-                throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
-            }
-            final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
-            try{
-                return new EdgeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
-            }
-            catch (IllegalArgumentException exception){
-                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
-            }
-        }
-        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.RegexBasedEdgeLabelMapping)
-                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.regex)) ) {
-            final StmtIterator regexIterator = edgeLabelMappingResource.listProperties(LPG2RDF.regex);
-            if (!regexIterator.hasNext()) {
-                throw new IllegalArgumentException("regex is required!");
-            }
-            final RDFNode regexObj = regexIterator.next().getObject();
-            if (regexIterator.hasNext()) {
-                throw new IllegalArgumentException("An instance of RegexEdgeLabelMapping has more than one regex property!");
-            }
-
-            if (!regexObj.isLiteral() || !regexObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
-                throw new IllegalArgumentException("Regex is invalid, it should be a xsd:string!");
-            }
-            final StmtIterator prefixOfIRIsIterator = edgeLabelMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
-            if(!prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("prefixOfIRIs is required!");
-            }
-            final RDFNode prefixOfIRIObj = prefixOfIRIsIterator.next().getObject();
-            if(prefixOfIRIsIterator.hasNext()){
-                throw new IllegalArgumentException("An instance of IRIBasedEdgeLabelMapping has more than one prefixOfIRIs property!");
-            }
-
-            if (!prefixOfIRIObj.isLiteral() || !prefixOfIRIObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
-                throw new IllegalArgumentException("prefixOfIRIs is invalid, it should be a xsd:anyURI!");
-            }
-            final String regex = regexObj.asLiteral().getString();
-            final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
-            try {
-                return new RegexBasedEdgeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
-            } catch (IllegalArgumentException exception) {
-                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
-            }
-        }
-
-        else if ( edgeLabelMappingResourceType.equals(LPG2RDF.SingleEdgeLabelMapping)
-                || (edgeLabelMappingResourceType.equals(LPG2RDF.EdgeLabelMapping) && edgeLabelMappingResource.hasProperty(LPG2RDF.label)
-                && edgeLabelMappingResource.hasProperty(LPG2RDF.iri))) {
-            final StmtIterator labelIterator = edgeLabelMappingResource.listProperties(LPG2RDF.label);
-            if (!labelIterator.hasNext()) {
-                throw new IllegalArgumentException("label is required!");
-            }
-            final RDFNode labelObj = labelIterator.next().getObject();
-            if (labelIterator.hasNext()) {
-                throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one label property!");
-            }
-
-            if (!labelObj.isLiteral() || !labelObj.asLiteral().getDatatypeURI().equals(XSD.xstring.getURI())) {
-                throw new IllegalArgumentException("Label is invalid, it should be a xsd:string!");
-            }
-            final StmtIterator iriIterator = edgeLabelMappingResource.listProperties(LPG2RDF.iri);
-            if(!iriIterator.hasNext()){
-                throw new IllegalArgumentException("iri is required!");
-            }
-            final RDFNode iriObj = iriIterator.next().getObject();
-            if(iriIterator.hasNext()){
-                throw new IllegalArgumentException("An instance of SingleEdgeLabelMapping has more than one iri property!");
-            }
-
-            if (!iriObj.isLiteral() || !iriObj.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI())){
-                throw new IllegalArgumentException("iri is invalid, it should be a xsd:anyURI!");
-            }
-            final String label = labelObj.asLiteral().getString();
-            final String iri = iriObj.asLiteral().getString();
-            try {
-                return new SingleEdgeLabelMappingToURIsImpl(label,iri);
-            } catch (IllegalArgumentException exception) {
-                throw new IllegalArgumentException("iri is an invalid URI!");
-            }
-        }
-
-        else {
-            throw new IllegalArgumentException("EdgeLabelMapping type (" + edgeLabelMappingResourceType + ") is unexpected!");
-        }
+        return createEdgeLabelMapping(edgeLabelMappingResource, edgeLabelMappingResourceType);
     }
 
     public PropertyNameMapping getPropertyNameMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
