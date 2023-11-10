@@ -15,17 +15,17 @@ public class CombinedEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
 
     @Override
     public Node map(final String label) {
-        for (EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
+        for (final EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
             try {
                 return edgeLabelMapping.map(label);
             }
-            catch (IllegalArgumentException exception) {}
+            catch (UnSupportedEdgeLabelException exception) {}
         }
         throw new UnSupportedEdgeLabelException("The given edge label (" + label + ") is not a supported label in the image of this edge label mapping.");
     }
 
     public String unmap(final Node node) {
-        for (EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
+        for (final EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
             try {
                 return edgeLabelMapping.unmap(node);
             }
@@ -36,7 +36,7 @@ public class CombinedEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
 
     @Override
     public boolean isPossibleResult(final Node node) {
-        for (EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
+        for (final EdgeLabelMapping edgeLabelMapping : edgeLabelMappings) {
                 if(edgeLabelMapping.isPossibleResult(node)){
                     return true;
                 }
