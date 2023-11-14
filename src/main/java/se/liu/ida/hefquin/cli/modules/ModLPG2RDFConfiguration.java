@@ -6,16 +6,7 @@ import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
 import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.LPG2RDFConfigurationImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.LPG2RDFConfigurationReader;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.*;
 
 public class ModLPG2RDFConfiguration extends ModBase {
     protected final ArgDecl lpg2RDFDescrDecl   = new ArgDecl(ArgDecl.HasValue, "lpg2rdfconf", "lpg2rdf", "LPG2RDFConfigurationDescription");
@@ -42,7 +33,7 @@ public class ModLPG2RDFConfiguration extends ModBase {
         }
         else{
             final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
-            final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToURIsImpl(NSNODELABEL);
+            final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToLiteralsImpl();
             final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingToURIsImpl(NSRELATIONSHIP);
             final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
             cat = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping,propertyNameMapping);
