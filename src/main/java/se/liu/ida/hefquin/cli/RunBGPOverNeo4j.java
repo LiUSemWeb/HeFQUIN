@@ -69,8 +69,8 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
 
-		addModule(modQuery);
 		addModule(modLPG2RDFConfiguration);
+		addModule(modQuery);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
 		add(argNaive, "--naive", "If you want naive translation");
