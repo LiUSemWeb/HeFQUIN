@@ -7,7 +7,6 @@ import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 
 import org.apache.jena.cmd.ArgDecl;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.Var;
@@ -16,6 +15,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
+import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
@@ -34,17 +34,8 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.LPG2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.NodeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.EdgeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.PropertyNameMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
@@ -58,19 +49,13 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ModTime modTime =            new ModTime();
 	protected final ModQuery modQuery =          new ModQuery();
 	protected final ModResultsOut modResults =   new ModResultsOut();
+	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
 
 	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
 	protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
 	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
-
-	protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
-
-	protected static final String NSNODE = "https://example.org/node/";
-	protected static final String NSNODELABEL = "https://example.org/label/";
-	protected static final String NSRELATIONSHIP = "https://example.org/relationship/";
-	protected static final String NSPROPERTY = "https://example.org/property/";
 
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
@@ -84,6 +69,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
 
+		addModule(modLPG2RDFConfiguration);
 		addModule(modQuery);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
@@ -102,11 +88,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected void exec() {
 		final BGP bgp = getBGP();
 
-		final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
-		final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToURIsImpl(NSNODELABEL);
-		final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingToURIsImpl(NSRELATIONSHIP);
-		final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
-		final LPG2RDFConfiguration conf = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping,propertyNameMapping);
+		final LPG2RDFConfiguration conf = modLPG2RDFConfiguration.getLPG2RDFConfigurationCatalog();
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
