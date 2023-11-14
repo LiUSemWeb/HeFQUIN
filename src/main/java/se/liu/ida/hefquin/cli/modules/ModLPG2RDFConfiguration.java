@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.*;
 public class ModLPG2RDFConfiguration extends ModBase {
     protected final ArgDecl lpg2RDFDescrDecl   = new ArgDecl(ArgDecl.HasValue, "lpg2rdfconf", "lpg2rdf", "LPG2RDFConfigurationDescription");
     protected static final String NSNODE = "https://example.org/node/";
-    protected static final String NSNODELABEL = "https://example.org/label/";
     protected static final String NSRELATIONSHIP = "https://example.org/relationship/";
     protected static final String NSPROPERTY = "https://example.org/property/";
     protected static final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
