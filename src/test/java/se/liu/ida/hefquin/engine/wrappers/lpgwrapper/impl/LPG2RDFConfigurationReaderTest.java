@@ -550,6 +550,226 @@ public class LPG2RDFConfigurationReaderTest {
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
     }
+    @Test
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndRegexBasedPropertyNameMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
+                        + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;\n"
+                        + "   lr:propertyNameMapping ex:RegexPropertyNameMapping ."
+                        + "\n"
+                        + "ex:IRINodeLabelMapping\n"
+                        + "   a  lr:IRIBasedNodeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:RegexPropertyNameMapping\n"
+                        + "   a  lr:RegexBasedPropertyNameMapping ;\n"
+                        + "   lr:regex  \"[0-9]+\" ;\n"
+                        + "   lr:prefixOfIRIs  \"https://test.org/test/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:IRIBasedNodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        final LPGNode node = new LPGNode("0", null, null);
+        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.isURI());
+        assertEquals(resultNode.getURI(), "https://example.org/node/0");
+
+        final String label = "0";
+        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        assertNotNull(resultNodeLabel);
+        assertTrue(resultNodeLabel.isURI());
+        assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
+
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
+
+        final String propertyName = "0";
+        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "https://test.org/test/0");
+    }
+    @Test
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndSinglePropertyNameMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
+                        + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;\n"
+                        + "   lr:propertyNameMapping ex:SingleIRIPropertyNameMapping ."
+                        + "\n"
+                        + "ex:IRINodeLabelMapping\n"
+                        + "   a  lr:IRIBasedNodeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:SingleIRIPropertyNameMapping\n"
+                        + "   a  lr:SinglePropertyNameMapping ;\n"
+                        + "   lr:propertyName \"DIRECTED\" ;\n"
+                        + "   lr:iri \"http://singleExample.org/directorOf\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:IRIBasedNodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        final LPGNode node = new LPGNode("0", null, null);
+        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.isURI());
+        assertEquals(resultNode.getURI(), "https://example.org/node/0");
+
+        final String label = "0";
+        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        assertNotNull(resultNodeLabel);
+        assertTrue(resultNodeLabel.isURI());
+        assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
+
+
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
+
+        final String propertyName = "DIRECTED";
+        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "http://singleExample.org/directorOf");
+    }
+
+    @Test
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndCombinedPropertyNameMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
+                        + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;\n"
+                        + "   lr:propertyNameMapping ex:CombinedIRIPropertyNameMapping ."
+                        + "\n"
+                        + "ex:IRINodeLabelMapping\n"
+                        + "   a  lr:IRIBasedNodeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIPropertyNameMapping\n"
+                        + "   a  lr:IRIBasedPropertyNameMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/property/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:RegexPropertyNameMapping\n"
+                        + "   a  lr:RegexBasedPropertyNameMapping ;\n"
+                        + "   lr:regex  \"^[0-9]+\" ;\n"
+                        + "   lr:prefixOfIRIs  \"https://test.org/test/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:SingleIRIPropertyNameMapping\n"
+                        + "   a  lr:SinglePropertyNameMapping ;\n"
+                        + "   lr:propertyName \"DIRECTED\" ;\n"
+                        + "   lr:iri \"http://singleExample.org/directorOf\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:CombinedIRIPropertyNameMapping\n"
+                        + "   a  lr:CombinedPropertyNameMapping ;\n"
+                        + "   lr:propertyNameMappings (ex:SingleIRIPropertyNameMapping ex:RegexPropertyNameMapping ex:IRIPropertyNameMapping) ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:IRIBasedNodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        final LPGNode node = new LPGNode("0", null, null);
+        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        assertNotNull(resultNode);
+        assertTrue(resultNode.isURI());
+        assertEquals(resultNode.getURI(), "https://example.org/node/0");
+
+        final String label = "0";
+        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        assertNotNull(resultNodeLabel);
+        assertTrue(resultNodeLabel.isURI());
+        assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
+
+        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        assertNotNull(resultEdgeLabel);
+        assertTrue(resultEdgeLabel.isURI());
+        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
+
+        String propertyName = "DIRECTED";
+        Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "http://singleExample.org/directorOf");
+
+        propertyName = "0";
+        resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "https://test.org/test/0");
+
+        propertyName = "ACTED_IN";
+        resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        assertNotNull(resultPropertyName);
+        assertTrue(resultPropertyName.isURI());
+        assertEquals(resultPropertyName.getURI(), "https://example.org/property/ACTED_IN");
+    }
+
 
     /*
      * In this test case, LabelPredicate is not a URI.
@@ -1089,6 +1309,68 @@ public class LPG2RDFConfigurationReaderTest {
                         + "ex:IRIPropertyNameMapping\n"
                         + "   a  lr:IRIBasedPropertyNameMapping ;\n"
                         + "   lr:prefixOfIRIs  \"https://example.org/property/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRINodeMapping\n"
+                        + "   a  lr:IRIBasedNodeMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/node/\"^^xsd:anyURI .";
+
+        final Model lpg2rdf = ModelFactory.createDefaultModel();
+
+        final RDFParserBuilder b = RDFParser.fromString(turtle);
+        b.lang( Lang.TURTLE );
+        b.parse(lpg2rdf);
+
+        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+    }
+
+    /*
+     * In this test case, there is an instance of CombinedPropertyNameMapping inside the propertyNameMappings list of another CombinedPropertyNameMapping.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndNestedCombinedPropertyNameMapping() {
+        final String turtle =
+                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                        + "PREFIX ex:     <http://example.org/>\n"
+                        + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
+                        + "\n"
+                        + "ex:LPGtoRDFConfig\n"
+                        + "   a  lr:LPGtoRDFConfiguration ;\n"
+                        + "   lr:labelPredicate  \"http://www.w3.org/2000/01/rdf-schema#label\"^^xsd:anyURI ;\n"
+                        + "   lr:nodeMapping  ex:IRINodeMapping ;\n"
+                        + "   lr:nodeLabelMapping ex:IRINodeLabelMapping ;\n"
+                        + "   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;\n"
+                        + "   lr:propertyNameMapping ex:CombinedIRIPropertyNameMapping ."
+                        + "\n"
+                        + "ex:IRINodeLabelMapping\n"
+                        + "   a  lr:IRIBasedNodeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/label/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIEdgeLabelMapping\n"
+                        + "   a  lr:IRIBasedEdgeLabelMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/relationship/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:IRIPropertyNameMapping\n"
+                        + "   a  lr:IRIBasedPropertyNameMapping ;\n"
+                        + "   lr:prefixOfIRIs  \"https://example.org/property/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:RegexPropertyNameMapping\n"
+                        + "   a  lr:RegexBasedPropertyNameMapping ;\n"
+                        + "   lr:regex  \"^[0-9]+\" ;\n"
+                        + "   lr:prefixOfIRIs  \"https://test.org/test/\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:SingleIRIPropertyNameMapping\n"
+                        + "   a  lr:SinglePropertyNameMapping ;\n"
+                        + "   lr:propertyName \"DIRECTED\" ;\n"
+                        + "   lr:iri \"http://singleExample.org/directorOf\"^^xsd:anyURI ."
+                        + "\n"
+                        + "ex:CombinedIRIPropertyNameMapping\n"
+                        + "   a  lr:CombinedPropertyNameMapping ;\n"
+                        + "   lr:propertyNameMappings (ex:InnerCombinedIRIPropertyNameMapping) ."
+                        + "\n"
+                        + "ex:InnerCombinedIRIPropertyNameMapping\n"
+                        + "   a  lr:PropertyNameMapping ;\n"
+                        + "   lr:propertyNameMappings (ex:SingleIRIPropertyNameMapping ex:RegexPropertyNameMapping ex:IRIPropertyNameMapping) ."
+
                         + "\n"
                         + "ex:IRINodeMapping\n"
                         + "   a  lr:IRIBasedNodeMapping ;\n"
