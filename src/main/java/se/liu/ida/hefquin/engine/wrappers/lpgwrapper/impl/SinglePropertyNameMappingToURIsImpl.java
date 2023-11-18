@@ -13,6 +13,7 @@ public class SinglePropertyNameMappingToURIsImpl implements PropertyNameMapping 
         this.propertyName=propertyName;
         this.node = NodeFactory.createURI(iri);
     }
+
     @Override
     public Node map(final String propertyName) {
         if (propertyName.equals(this.propertyName)) {

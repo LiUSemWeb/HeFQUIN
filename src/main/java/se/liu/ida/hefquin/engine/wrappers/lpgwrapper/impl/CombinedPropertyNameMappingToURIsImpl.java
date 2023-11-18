@@ -19,7 +19,7 @@ public class CombinedPropertyNameMappingToURIsImpl implements PropertyNameMappin
             try {
                 return propertyNameMapping.map(propertyName);
             }
-            catch (UnSupportedPropertyNameException exception) {}
+            catch (final UnSupportedPropertyNameException e) {}
         }
         throw new UnSupportedPropertyNameException("The given property name (" + propertyName + ") is not a supported property name in the image of this property name mapping.");
     }
@@ -29,7 +29,7 @@ public class CombinedPropertyNameMappingToURIsImpl implements PropertyNameMappin
             try {
                 return propertyNameMapping.unmap(node);
             }
-            catch (UnSupportedPropertyNameException exception) {}
+            catch (final UnSupportedPropertyNameException e) {}
         }
         throw new UnSupportedPropertyNameException("The given RDF term (" + node.toString() + ") is not an URI node or not in the image of this property name mapping.");
     }

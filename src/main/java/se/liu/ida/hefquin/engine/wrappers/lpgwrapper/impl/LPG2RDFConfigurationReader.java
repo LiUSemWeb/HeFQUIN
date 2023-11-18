@@ -81,8 +81,8 @@ public class LPG2RDFConfigurationReader {
         try{
             return NodeFactory.createURI(URI.create(label).toString());
         }
-        catch (IllegalArgumentException exception){
-            throw new IllegalArgumentException("labelPredicate is an invalid URI!");
+        catch (final IllegalArgumentException e){
+            throw new IllegalArgumentException("labelPredicate (" + label + ") is an invalid URI!");
         }
 
     }
@@ -119,8 +119,8 @@ public class LPG2RDFConfigurationReader {
             try{
                 return new NodeMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
             }
-            catch (IllegalArgumentException exception){
-                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+            catch (final IllegalArgumentException e){
+                throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
             }
         }
         else if ( nodeMappingResourceType.equals(LPG2RDF.BNodeBasedNodeMapping) || (nodeMappingResourceType.equals(LPG2RDF.NodeMapping) && !nodeMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
@@ -163,8 +163,8 @@ public class LPG2RDFConfigurationReader {
             try{
                 return new NodeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
             }
-            catch (IllegalArgumentException exception){
-                throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+            catch (final IllegalArgumentException e){
+                throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
             }
         }
         else if ( nodeLabelMappingResourceType.equals(LPG2RDF.LiteralBasedNodeLabelMapping)) {
@@ -192,8 +192,8 @@ public class LPG2RDFConfigurationReader {
         try{
             return new EdgeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
         }
-        catch (IllegalArgumentException exception){
-            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        catch (final IllegalArgumentException e){
+            throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
     }
 
@@ -226,10 +226,11 @@ public class LPG2RDFConfigurationReader {
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try {
             return new RegexBasedEdgeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
     }
+
     public EdgeLabelMapping createSingleEdgeLabelMapping(final Resource edgeLabelMappingResource){
         final StmtIterator labelIterator = edgeLabelMappingResource.listProperties(LPG2RDF.label);
         if (!labelIterator.hasNext()) {
@@ -259,10 +260,11 @@ public class LPG2RDFConfigurationReader {
         final String iri = iriObj.asLiteral().getString();
         try {
             return new SingleEdgeLabelMappingToURIsImpl(label,iri);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("iri is an invalid URI!");
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("iri (" + iri +") is an invalid URI!");
         }
     }
+
     public EdgeLabelMapping createCombinedEdgeLabelMapping(final Resource edgeLabelMappingResource){
         final List<EdgeLabelMapping> edgeLabelMappings = new ArrayList<>();
         final StmtIterator edgeLabelMappingsPropertyIterator = edgeLabelMappingResource.listProperties(LPG2RDF.edgeLabelMappings);
@@ -314,6 +316,7 @@ public class LPG2RDFConfigurationReader {
             throw new IllegalArgumentException("EdgeLabelMapping type (" + edgeLabelMappingResourceType + ") is unexpected!");
         }
     }
+
     public EdgeLabelMapping getEdgeLabelMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
 
         final StmtIterator edgeLabelMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.edgeLabelMapping);
@@ -330,6 +333,7 @@ public class LPG2RDFConfigurationReader {
 
         return createEdgeLabelMapping(edgeLabelMappingResource, edgeLabelMappingResourceType);
     }
+
     public PropertyNameMapping createIRIBasedPropertyNameMapping(final Resource propertyNameMappingResource){
         final StmtIterator prefixOfIRIsIterator = propertyNameMappingResource.listProperties(LPG2RDF.prefixOfIRIs);
         if(!prefixOfIRIsIterator.hasNext()){
@@ -347,8 +351,8 @@ public class LPG2RDFConfigurationReader {
         try{
             return new PropertyNameMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
         }
-        catch (IllegalArgumentException exception){
-            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        catch (final IllegalArgumentException e){
+            throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
     }
 
@@ -381,10 +385,11 @@ public class LPG2RDFConfigurationReader {
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try {
             return new RegexBasedPropertyNameMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("prefixOfIRIs is an invalid URI!");
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
     }
+
     public PropertyNameMapping createSinglePropertyNameMapping(final Resource propertyNameMappingResource){
         final StmtIterator propertyNameIterator = propertyNameMappingResource.listProperties(LPG2RDF.propertyName);
         if (!propertyNameIterator.hasNext()) {
@@ -414,10 +419,11 @@ public class LPG2RDFConfigurationReader {
         final String iri = iriObj.asLiteral().getString();
         try {
             return new SinglePropertyNameMappingToURIsImpl(propertyName,iri);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("iri is an invalid URI!");
+        } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("iri (" + iri + ") is an invalid URI!");
         }
     }
+
     public PropertyNameMapping createCombinedPropertyNameMapping(final Resource propertyNameMappingResource){
         final List<PropertyNameMapping> propertyNameMappings = new ArrayList<>();
         final StmtIterator propertyNameMappingsPropertyIterator = propertyNameMappingResource.listProperties(LPG2RDF.propertyNameMappings);
@@ -455,7 +461,6 @@ public class LPG2RDFConfigurationReader {
                 || (propertyNameMappingResourceType.equals(LPG2RDF.PropertyNameMapping) && propertyNameMappingResource.hasProperty(LPG2RDF.regex)) ) {
             return createRegexBasedPropertyNameMapping(propertyNameMappingResource);
         }
-
         else if ( propertyNameMappingResourceType.equals(LPG2RDF.SinglePropertyNameMapping)
                 || (propertyNameMappingResourceType.equals(LPG2RDF.PropertyNameMapping) && propertyNameMappingResource.hasProperty(LPG2RDF.propertyName)
                 && propertyNameMappingResource.hasProperty(LPG2RDF.iri))) {
@@ -469,6 +474,7 @@ public class LPG2RDFConfigurationReader {
             throw new IllegalArgumentException("PropertyNameMapping type (" + propertyNameMappingResourceType + ") is unexpected!");
         }
     }
+
     public PropertyNameMapping getPropertyNameMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
 
         final StmtIterator propertyNameMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.propertyNameMapping);
