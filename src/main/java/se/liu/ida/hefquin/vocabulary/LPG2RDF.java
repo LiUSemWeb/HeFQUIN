@@ -26,21 +26,26 @@ public class LPG2RDF {
     public static final Resource LiteralBasedNodeLabelMapping = resource("LiteralBasedNodeLabelMapping");
     public static final Resource EdgeLabelMapping = resource("EdgeLabelMapping");
     public static final Resource IRIBasedEdgeLabelMapping = resource("IRIBasedEdgeLabelMapping");
-    public static final Resource PropertyNameMapping = resource("PropertyNameMapping");
-    public static final Resource IRIBasedPropertyNameMapping = resource("IRIBasedPropertyNameMapping");
     public static final Resource RegexBasedEdgeLabelMapping = resource("RegexBasedEdgeLabelMapping");
     public static final Resource SingleEdgeLabelMapping = resource("SingleEdgeLabelMapping");
     public static final Resource CombinedEdgeLabelMapping = resource("CombinedEdgeLabelMapping");
+    public static final Resource PropertyNameMapping = resource("PropertyNameMapping");
+    public static final Resource IRIBasedPropertyNameMapping = resource("IRIBasedPropertyNameMapping");
+    public static final Resource RegexBasedPropertyNameMapping = resource("RegexBasedPropertyNameMapping");
+    public static final Resource SinglePropertyNameMapping = resource("SinglePropertyNameMapping");
+    public static final Resource CombinedPropertyNameMapping = resource("CombinedPropertyNameMapping");
 
     public static final Property labelPredicate = property("labelPredicate");
     public static final Property nodeMapping = property("nodeMapping");
     public static final Property nodeLabelMapping = property("nodeLabelMapping");
     public static final Property edgeLabelMapping = property("edgeLabelMapping");
+    public static final Property edgeLabelMappings = property("edgeLabelMappings");
+    public static final Property propertyNameMapping = property("propertyNameMapping");
+    public static final Property propertyName = property("propertyName");
+    public static final Property propertyNameMappings = property("propertyNameMappings");
+    public static final Property prefixOfIRIs = property("prefixOfIRIs");
     public static final Property regex = property("regex");
     public static final Property label = property("label");
     public static final Property iri = property("iri");
-    public static final Property edgeLabelMappings = property("edgeLabelMappings");
-    public static final Property propertyNameMapping = property("propertyNameMapping");
-    public static final Property prefixOfIRIs = property("prefixOfIRIs");
 
 }

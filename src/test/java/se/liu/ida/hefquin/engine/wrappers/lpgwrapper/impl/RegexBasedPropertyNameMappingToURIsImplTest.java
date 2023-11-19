@@ -7,13 +7,14 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupported
 
 import static org.junit.Assert.*;
 
-public class PropertyNameMappingToURIsImplTest {
-    protected final String NSPROPERTY = "https://example.org/property/";
+public class RegexBasedPropertyNameMappingToURIsImplTest {
+    protected final String NSPROPERTY = "https://example2.org/test/";
+    protected final String regex = "^[0-9]+";
 
-    protected final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
+    protected final PropertyNameMapping propertyNameMapping = new RegexBasedPropertyNameMappingToURIsImpl(regex, NSPROPERTY);
 
     @Test
-    public void mapProperty() {
+    public void mapPropertyName() {
         final String propertyName = "0";
         final Node resultNode = propertyNameMapping.map(propertyName);
         assertNotNull(resultNode);
@@ -22,7 +23,7 @@ public class PropertyNameMappingToURIsImplTest {
     }
 
     @Test
-    public void unmapURIProperty(){
+    public void unmapURIPropertyName(){
         final Node node = NodeFactory.createURI(NSPROPERTY + "0");
         final String resultString = propertyNameMapping.unmap(node);
         assertNotNull(resultString);
@@ -30,7 +31,7 @@ public class PropertyNameMappingToURIsImplTest {
     }
 
     @Test
-    public void propertyIsPossibleResult(){
+    public void propertyNameIsPossibleResult(){
         final Node IRINode = NodeFactory.createURI(NSPROPERTY + "0");
         final boolean IRIIsPossible = propertyNameMapping.isPossibleResult(IRINode);
         assertTrue(IRIIsPossible);
@@ -38,11 +39,20 @@ public class PropertyNameMappingToURIsImplTest {
 
 
     /*
-     * In this test case, a node with an invalid URI is provided as an argument to the PropertyNameMappingToURIsImpl.
+     * In this test case, a node with an invalid URI is provided as an argument to the RegexBasedPropertyNameMappingToURIsImpl.
      */
     @Test(expected = UnSupportedPropertyNameException.class)
     public void unmapPropertyNameWithInvalidURI(){
-        final Node node = NodeFactory.createURI("https://example.com/property/3");
+        final Node node = NodeFactory.createURI("https://example.org/3");
         propertyNameMapping.unmap(node);
+    }
+
+    /*
+     * In this test case, a propertyName which is not match with provided regex in the RegexBasedPropertyNameMappingToURIsImpl.
+     */
+    @Test(expected = UnSupportedPropertyNameException.class)
+    public void mapPropertyNameWithUnmatchedPropertyName(){
+        final String propertyName = "test";
+        propertyNameMapping.map(propertyName);
     }
 }

@@ -19,7 +19,7 @@ public class CombinedEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
             try {
                 return edgeLabelMapping.map(label);
             }
-            catch (UnSupportedEdgeLabelException exception) {}
+            catch (final UnSupportedEdgeLabelException e) {}
         }
         throw new UnSupportedEdgeLabelException("The given edge label (" + label + ") is not a supported label in the image of this edge label mapping.");
     }
@@ -29,7 +29,7 @@ public class CombinedEdgeLabelMappingToURIsImpl implements EdgeLabelMapping {
             try {
                 return edgeLabelMapping.unmap(node);
             }
-            catch (UnSupportedEdgeLabelException exception) {}
+            catch (final UnSupportedEdgeLabelException e) {}
         }
         throw new UnSupportedEdgeLabelException("The given RDF term (" + node.toString() + ") is not an URI node or not in the image of this edge label mapping.");
     }
