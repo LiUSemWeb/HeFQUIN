@@ -24,6 +24,10 @@ public class LPG2RDF {
     public static final Resource NodeLabelMapping = resource("NodeLabelMapping");
     public static final Resource IRIBasedNodeLabelMapping = resource("IRIBasedNodeLabelMapping");
     public static final Resource LiteralBasedNodeLabelMapping = resource("LiteralBasedNodeLabelMapping");
+    public static final Resource RegexIRIBasedNodeLabelMapping = resource("RegexIRIBasedNodeLabelMapping");
+    public static final Resource SingleLiteralBasedNodeLabelMapping = resource("SingleLiteralBasedNodeLabelMapping");
+    public static final Resource SingleIRIBasedNodeLabelMapping = resource("SingleIRIBasedNodeLabelMapping");
+    public static final Resource CombinedNodeLabelMapping = resource("CombinedNodeLabelMapping");
     public static final Resource EdgeLabelMapping = resource("EdgeLabelMapping");
     public static final Resource IRIBasedEdgeLabelMapping = resource("IRIBasedEdgeLabelMapping");
     public static final Resource RegexBasedEdgeLabelMapping = resource("RegexBasedEdgeLabelMapping");
@@ -38,6 +42,7 @@ public class LPG2RDF {
     public static final Property labelPredicate = property("labelPredicate");
     public static final Property nodeMapping = property("nodeMapping");
     public static final Property nodeLabelMapping = property("nodeLabelMapping");
+    public static final Property nodeLabelMappings = property("nodeLabelMappings");
     public static final Property edgeLabelMapping = property("edgeLabelMapping");
     public static final Property edgeLabelMappings = property("edgeLabelMappings");
     public static final Property propertyNameMapping = property("propertyNameMapping");
@@ -47,5 +52,6 @@ public class LPG2RDF {
     public static final Property regex = property("regex");
     public static final Property label = property("label");
     public static final Property iri = property("iri");
+    public static final Property literal = property("literal");
 
 }
