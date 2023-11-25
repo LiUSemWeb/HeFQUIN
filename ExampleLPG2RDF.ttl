@@ -23,7 +23,19 @@ PREFIX ex:     <http://example.org/>
 #
 #ex:IRIBasedNodeLabelMapping a rdfs:Class ;
 #   rdfs:subClassOf ex:NodeLabelMapping .
+
 #
+#ex:RegexIRIBasedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
+#
+#ex:SingleLiteralBasedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
+#
+#ex:SingleIRIBasedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
+#
+#ex:CombinedNodeLabelMapping a rdfs:Class ;
+#   rdfs:subClassOf ex:NodeLabelMapping .
 
 #ex:EdgeLabelMapping a rdfs:Class ;
 #
@@ -71,6 +83,14 @@ PREFIX ex:     <http://example.org/>
 #ex:prefixOfIRIs a rdf:Property ;
 #   rdfs:range xsd:anyURI .
 
+#ex:literal a rdf:Property ;
+#   rdfs:domain ex:SingleLiteralBasedNodeLabelMapping ;
+#   rdfs:range xsd:string .
+
+#ex:nodeLabelMappings a rdf:Property ;
+#   rdfs:domain ex:CombinedNodeLabelMapping ;
+#   rdfs:range rdfs:List .
+
 #ex:edgeLabelMapping a rdf:Property ;
 #   rdfs:domain ex:LPGtoRDFConfiguration ;
 #   rdfs:range ex:EdgeLabelMapping .
@@ -107,7 +127,12 @@ PREFIX ex:     <http://example.org/>
 ex:LPGtoRDFConfig a lr:LPGtoRDFConfiguration ;
     lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
     lr:nodeMapping ex:IRINodeMapping ;
-    lr:nodeLabelMapping ex:IRINodeLabelMapping ;
+#   lr:nodeLabelMapping ex:LiteralNodeLabelMapping ;
+#   lr:nodeLabelMapping ex:IRINodeLabelMapping ;
+#   lr:nodeLabelMapping ex:RegexIRINodeLabelMapping ;
+#   lr:nodeLabelMapping ex:SingleLiteralNodeLabelMapping ;
+#   lr:nodeLabelMapping ex:SingleIRINodeLabelMapping ;
+    lr:nodeLabelMapping ex:CombinedNodeLabelMapping ;
 #   lr:edgeLabelMapping ex:IRIEdgeLabelMapping ;
 #   lr:edgeLabelMapping ex:RegexEdgeLabelMapping ;
 #   lr:edgeLabelMapping ex:SingleIRIEdgeLabelMapping ;
@@ -122,6 +147,23 @@ ex:IRINodeMapping a lr:IRIBasedNodeMapping ;
 
 ex:IRINodeLabelMapping a lr:IRIBasedNodeLabelMapping ;
     lr:prefixOfIRIs "https://example.org/label/"^^xsd:anyURI .
+
+ex:LiteralNodeLabelMapping a lr:LiteralBasedNodeLabelMapping .
+
+ex:RegexIRINodeLabelMapping a lr:RegexIRIBasedNodeLabelMapping ;
+    lr:regex "^\\w+" ;
+    lr:prefixOfIRIs "http://purl.org/dc/terms/"^^xsd:anyURI .
+
+ex:SingleIRINodeLabelMapping a lr:SingleIRIBasedNodeLabelMapping ;
+    lr:label "DIRECTED" ;
+    lr:iri "http://dsgfrjlk.org/kdfj/directorOf"^^xsd:anyURI .
+
+ex:SingleLiteralNodeLabelMapping a lr:SingleLiteralBasedNodeLabelMapping ;
+    lr:label "DIRECTED" ;
+    lr:literal "DirectorOf" .
+
+ex:CombinedNodeLabelMapping a lr:CombinedNodeLabelMapping ;
+    lr:nodeLabelMappings (ex:SingleLiteralNodeLabelMapping ex:SingleIRINodeLabelMapping ex:RegexIRINodeLabelMapping ex:IRINodeLabelMapping) .
 
 ex:IRIEdgeLabelMapping a lr:IRIBasedEdgeLabelMapping ;
     lr:prefixOfIRIs "https://example.org/relationship/"^^xsd:anyURI .
