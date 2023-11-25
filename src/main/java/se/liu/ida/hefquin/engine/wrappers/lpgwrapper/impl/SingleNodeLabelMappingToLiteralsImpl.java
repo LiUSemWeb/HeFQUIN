@@ -33,7 +33,7 @@ public class SingleNodeLabelMappingToLiteralsImpl implements NodeLabelMapping {
 
     @Override
     public boolean isPossibleResult(final Node node) {
-        return node.isLiteral() && XSD.xstring.getURI().equals(node.getLiteral().getDatatypeURI()) && node.getLiteral().toString().equals(this.node.getLiteral().toString());
+        return node.equals( this.node );
     }
 
 }
