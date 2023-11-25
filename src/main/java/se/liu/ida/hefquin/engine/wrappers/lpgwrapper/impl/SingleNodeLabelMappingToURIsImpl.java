@@ -32,7 +32,7 @@ public class SingleNodeLabelMappingToURIsImpl implements NodeLabelMapping {
 
     @Override
     public boolean isPossibleResult(final Node node) {
-        return node.isURI() && node.getURI().equals(this.node.getURI());
+        return node.equals( this.node );
     }
 
 }
