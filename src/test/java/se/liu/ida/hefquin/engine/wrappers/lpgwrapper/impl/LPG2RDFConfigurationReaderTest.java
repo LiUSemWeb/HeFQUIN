@@ -8,7 +8,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 import static org.junit.Assert.*;

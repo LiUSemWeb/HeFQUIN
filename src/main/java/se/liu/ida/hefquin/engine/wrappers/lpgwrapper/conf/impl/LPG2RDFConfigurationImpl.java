@@ -1,7 +1,8 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
 import org.apache.jena.graph.Node;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
