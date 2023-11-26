@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -12,7 +12,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedEdgeLabelMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedNodeLabelMappingImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedPropertyNameMappingToURIsImpl;
