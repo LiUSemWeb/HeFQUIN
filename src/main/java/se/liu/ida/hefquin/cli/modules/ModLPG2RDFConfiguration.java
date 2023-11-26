@@ -6,6 +6,15 @@ import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
 import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.LPG2RDFConfigurationImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingToLiteralsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMapping;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingToURIsImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.*;
 
 public class ModLPG2RDFConfiguration extends ModBase {
