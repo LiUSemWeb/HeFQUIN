@@ -17,7 +17,6 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_AllToURIs;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.*;
 
 public class ModLPG2RDFConfiguration extends ModBase {
     protected final ArgDecl lpg2RDFDescrDecl   = new ArgDecl(ArgDecl.HasValue, "lpg2rdfconf", "lpg2rdf", "LPG2RDFConfigurationDescription");
@@ -42,11 +41,11 @@ public class ModLPG2RDFConfiguration extends ModBase {
             cat = LPG2RDFConfigurationReader.readFromFile(lpg2RDFDescrFilename);
         }
         else{
-            final NodeMapping nodeMapping = new NodeMappingImpl_AllToURIs(NSNODE);
-            final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingImpl_AllToLiterals();
-            final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingImpl_AllToURIs(NSRELATIONSHIP);
-            final PropertyNameMapping propertyNameMapping = new PropertyNameMappingImpl_AllToURIs(NSPROPERTY);
-            cat = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping,propertyNameMapping);
+            final NodeMapping nm = new NodeMappingImpl_AllToURIs(NSNODE);
+            final NodeLabelMapping nlm = new NodeLabelMappingImpl_AllToLiterals();
+            final EdgeLabelMapping elm = new EdgeLabelMappingImpl_AllToURIs(NSRELATIONSHIP);
+            final PropertyNameMapping pm = new PropertyNameMappingImpl_AllToURIs(NSPROPERTY);
+            cat = new LPG2RDFConfigurationImpl( nm, nlm, elm, pm, NodeFactory.createURI(LABEL) );
         }
     }
 

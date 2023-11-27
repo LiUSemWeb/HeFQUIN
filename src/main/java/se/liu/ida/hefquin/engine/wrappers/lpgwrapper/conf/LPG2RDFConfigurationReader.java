@@ -71,14 +71,13 @@ public class LPG2RDFConfigurationReader {
             throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration!");
         }
 
-        final Node label = getLabelPredicate(lpg2rdfConfig);
-        final NodeMapping nodeMapping = getNodeMapping(lpg2Rdf, lpg2rdfConfig);
-        final NodeLabelMapping nodeLabelMapping = getNodeLabelMapping(lpg2Rdf, lpg2rdfConfig);
-        final EdgeLabelMapping edgeLabelMapping = getEdgeLabelMapping(lpg2Rdf, lpg2rdfConfig);
-        final PropertyNameMapping propertyNameMapping = getPropertyNameMapping(lpg2Rdf,lpg2rdfConfig);
+        final NodeMapping nm = getNodeMapping(lpg2Rdf, lpg2rdfConfig);
+        final NodeLabelMapping nlm = getNodeLabelMapping(lpg2Rdf, lpg2rdfConfig);
+        final EdgeLabelMapping elm = getEdgeLabelMapping(lpg2Rdf, lpg2rdfConfig);
+        final PropertyNameMapping pm = getPropertyNameMapping(lpg2Rdf,lpg2rdfConfig);
+        final Node labelPredicate = getLabelPredicate(lpg2rdfConfig);
 
-
-        return new LPG2RDFConfigurationImpl(label, nodeMapping, nodeLabelMapping, edgeLabelMapping,propertyNameMapping);
+        return new LPG2RDFConfigurationImpl(nm, nlm, elm, pm, labelPredicate);
     }
 
     public Node getLabelPredicate(final Resource lpg2rdfConfig){

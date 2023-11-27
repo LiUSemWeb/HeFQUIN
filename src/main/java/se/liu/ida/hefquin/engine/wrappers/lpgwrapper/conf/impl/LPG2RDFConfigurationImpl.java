@@ -5,90 +5,93 @@ import org.apache.jena.graph.Node;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
-public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration {
+public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration
+{
+    protected final NodeMapping nm;
+    protected final NodeLabelMapping nlm;
+    protected final EdgeLabelMapping elm;
+    protected final PropertyNameMapping pm;
+    protected final Node labelPredicate;
 
-    protected final Node label;
-    protected final NodeMapping nodeMapping;
-    protected final NodeLabelMapping nodeLabelMapping;
-    protected final EdgeLabelMapping edgeLabelMapping;
-    protected final PropertyNameMapping propertyNameMapping;
-
-    public LPG2RDFConfigurationImpl(final Node label, final NodeMapping nodeMapping, final NodeLabelMapping nodeLabelMapping,
-                                    final EdgeLabelMapping edgeLabelMapping, final PropertyNameMapping propertyNameMapping){
-        this.label = label;
-        this.nodeMapping = nodeMapping;
-        this.nodeLabelMapping = nodeLabelMapping;
-        this.edgeLabelMapping = edgeLabelMapping;
-        this.propertyNameMapping=propertyNameMapping;
+    public LPG2RDFConfigurationImpl( final NodeMapping nm,
+                                     final NodeLabelMapping nlm,
+                                     final EdgeLabelMapping elm,
+                                     final PropertyNameMapping pm,
+                                     final Node labelPredicate ) {
+        this.labelPredicate = labelPredicate;
+        this.nm  = nm;
+        this.nlm = nlm;
+        this.elm = elm;
+        this.pm  = pm;
     }
 
     @Override
     public Node mapNode(final LPGNode node) {
-        return nodeMapping.map(node);
+        return nm.map(node);
     }
 
     @Override
     public LPGNode unmapNode(final Node node) {
-        return nodeMapping.unmap(node);
+        return nm.unmap(node);
     }
 
     @Override
     public Node mapNodeLabel(final String label) {
-        return nodeLabelMapping.map(label);
+        return nlm.map(label);
     }
 
     @Override
     public String unmapNodeLabel(final Node node) {
-        return nodeLabelMapping.unmap(node);
+        return nlm.unmap(node);
     }
 
     @Override
     public Node mapEdgeLabel(final String label) {
-        return edgeLabelMapping.map(label);
+        return elm.map(label);
     }
 
     @Override
     public String unmapEdgeLabel(final Node node) {
-        return edgeLabelMapping.unmap(node);
+        return elm.unmap(node);
     }
 
     @Override
     public Node mapProperty(final String propertyName) {
-        return propertyNameMapping.map(propertyName);
+        return pm.map(propertyName);
     }
 
     @Override
     public String unmapProperty(final Node node) {
-        return propertyNameMapping.unmap(node);
+        return pm.unmap(node);
     }
 
     @Override
     public Node getLabel() {
-        return this.label;
+        return this.labelPredicate;
     }
 
     @Override
     public boolean mapsToProperty(final Node n) {
-        return propertyNameMapping.isPossibleResult(n);
+        return pm.isPossibleResult(n);
     }
 
     @Override
     public boolean isLabelIRI(final Node n) {
-        return n.equals(label);
+        return n.equals(labelPredicate);
     }
 
     @Override
     public boolean mapsToLabel(final Node n) {
-        return nodeLabelMapping.isPossibleResult(n);
+        return nlm.isPossibleResult(n);
     }
 
     @Override
     public boolean mapsToEdgeLabel(final Node n) {
-        return edgeLabelMapping.isPossibleResult(n);
+        return elm.isPossibleResult(n);
     }
 
     @Override
     public boolean mapsToNode(final Node n) {
-        return nodeMapping.isPossibleResult(n);
+        return nm.isPossibleResult(n);
     }
 }
