@@ -12,27 +12,27 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedEdgeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedNodeLabelMappingImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CombinedPropertyNameMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositeEdgeLabelMappingImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositeNodeLabelMappingImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositePropertyNameMappingImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.LPG2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingToLiteralsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_AllToLiterals;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingToBNodesImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingImpl_AllToBNodes;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.RegexBasedEdgeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.RegexBasedNodeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.RegexBasedPropertyNameMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.SingleEdgeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.SingleNodeLabelMappingToLiteralsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.SingleNodeLabelMappingToURIsImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.SinglePropertyNameMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_AllToURIs;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingImpl_RegexMatchToURIs;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_RegexMatchToURIs;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_RegexMatchToURIs;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingImpl_SingleMatchToURI;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToLiteral;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToURI;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_SingleMatchToURI;
 import se.liu.ida.hefquin.vocabulary.LPG2RDF;
 
 import java.net.URI;
@@ -138,14 +138,14 @@ public class LPG2RDFConfigurationReader {
             }
             final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
             try{
-                return new NodeMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+                return new NodeMappingImpl_AllToURIs(URI.create(prefixOfIRIUri).toString());
             }
             catch (final IllegalArgumentException e){
                 throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
             }
         }
         else if ( nodeMappingResourceType.equals(LPG2RDF.BNodeBasedNodeMapping) || (nodeMappingResourceType.equals(LPG2RDF.NodeMapping) && !nodeMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
-            return new NodeMappingToBNodesImpl();
+            return new NodeMappingImpl_AllToBNodes();
         }
         else {
             throw new IllegalArgumentException("NodeMapping type (" + nodeMappingResourceType + ") is unexpected!");
@@ -167,7 +167,7 @@ public class LPG2RDFConfigurationReader {
         }
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try{
-            return new NodeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+            return new NodeLabelMappingImpl_AllToURIs(URI.create(prefixOfIRIUri).toString());
         }
         catch (final IllegalArgumentException e){
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
@@ -202,7 +202,7 @@ public class LPG2RDFConfigurationReader {
         final String regex = regexObj.asLiteral().getString();
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try {
-            return new RegexBasedNodeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
+            return new NodeLabelMappingImpl_RegexMatchToURIs(regex, URI.create(prefixOfIRIUri).toString());
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
@@ -236,7 +236,7 @@ public class LPG2RDFConfigurationReader {
         final String label = labelObj.asLiteral().getString();
         final String iri = iriObj.asLiteral().getString();
         try {
-            return new SingleNodeLabelMappingToURIsImpl(label,iri);
+            return new NodeLabelMappingImpl_SingleMatchToURI(label,iri);
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("iri (" + iri +") is an invalid URI!");
         }
@@ -269,7 +269,7 @@ public class LPG2RDFConfigurationReader {
         }
         final String label = labelObj.asLiteral().getString();
         final String literal = literalObj.asLiteral().getString();
-        return new SingleNodeLabelMappingToLiteralsImpl(label,literal);
+        return new NodeLabelMappingImpl_SingleMatchToLiteral(label,literal);
     }
 
     public NodeLabelMapping createCombinedNodeLabelMapping(final Resource nodeLabelMappingResource){
@@ -297,7 +297,7 @@ public class LPG2RDFConfigurationReader {
             }
             nodeLabelMappings.add(createNodeLabelMapping(nodeLabelMapping, nodeLabelMappingType));
         }while(nodeLabelMappingsIterator.hasNext());
-        return new CombinedNodeLabelMappingImpl(nodeLabelMappings);
+        return new CompositeNodeLabelMappingImpl(nodeLabelMappings);
     }
 
     public NodeLabelMapping createNodeLabelMapping(final Resource nodeLabelMappingResource, final RDFNode nodeLabelMappingResourceType){
@@ -308,7 +308,7 @@ public class LPG2RDFConfigurationReader {
                 || (nodeLabelMappingResourceType.equals(LPG2RDF.NodeLabelMapping) && nodeLabelMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
             return createIRIBasedNodeLabelMapping(nodeLabelMappingResource);
         } else if (nodeLabelMappingResourceType.equals(LPG2RDF.LiteralBasedNodeLabelMapping)) {
-            return new NodeLabelMappingToLiteralsImpl();
+            return new NodeLabelMappingImpl_AllToLiterals();
         } else if (nodeLabelMappingResourceType.equals(LPG2RDF.SingleIRIBasedNodeLabelMapping)
                 || (nodeLabelMappingResourceType.equals(LPG2RDF.NodeLabelMapping) && nodeLabelMappingResource.hasProperty(LPG2RDF.label)
                 && nodeLabelMappingResource.hasProperty(LPG2RDF.iri))) {
@@ -357,7 +357,7 @@ public class LPG2RDFConfigurationReader {
         }
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try{
-            return new EdgeLabelMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+            return new EdgeLabelMappingImpl_AllToURIs(URI.create(prefixOfIRIUri).toString());
         }
         catch (final IllegalArgumentException e){
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
@@ -392,7 +392,7 @@ public class LPG2RDFConfigurationReader {
         final String regex = regexObj.asLiteral().getString();
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try {
-            return new RegexBasedEdgeLabelMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
+            return new EdgeLabelMappingImpl_RegexMatchToURIs(regex, URI.create(prefixOfIRIUri).toString());
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
@@ -426,7 +426,7 @@ public class LPG2RDFConfigurationReader {
         final String label = labelObj.asLiteral().getString();
         final String iri = iriObj.asLiteral().getString();
         try {
-            return new SingleEdgeLabelMappingToURIsImpl(label,iri);
+            return new EdgeLabelMappingImpl_SingleMatchToURI(label,iri);
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("iri (" + iri +") is an invalid URI!");
         }
@@ -457,7 +457,7 @@ public class LPG2RDFConfigurationReader {
             }
             edgeLabelMappings.add(createEdgeLabelMapping(edgeLabelMapping, edgeLabelMappingType));
         }while(edgeLabelMappingsIterator.hasNext());
-        return new CombinedEdgeLabelMappingToURIsImpl(edgeLabelMappings);
+        return new CompositeEdgeLabelMappingImpl(edgeLabelMappings);
     }
 
     public EdgeLabelMapping createEdgeLabelMapping(final Resource edgeLabelMappingResource, final RDFNode edgeLabelMappingResourceType){
@@ -515,7 +515,7 @@ public class LPG2RDFConfigurationReader {
         }
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try{
-            return new PropertyNameMappingToURIsImpl(URI.create(prefixOfIRIUri).toString());
+            return new PropertyNameMappingImpl_AllToURIs(URI.create(prefixOfIRIUri).toString());
         }
         catch (final IllegalArgumentException e){
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
@@ -550,7 +550,7 @@ public class LPG2RDFConfigurationReader {
         final String regex = regexObj.asLiteral().getString();
         final String prefixOfIRIUri = prefixOfIRIObj.asLiteral().getString();
         try {
-            return new RegexBasedPropertyNameMappingToURIsImpl(regex, URI.create(prefixOfIRIUri).toString());
+            return new PropertyNameMappingImpl_RegexMatchToURIs(regex, URI.create(prefixOfIRIUri).toString());
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("prefixOfIRIs (" + prefixOfIRIUri + ") is an invalid URI!");
         }
@@ -584,7 +584,7 @@ public class LPG2RDFConfigurationReader {
         final String propertyName = propertyNameObj.asLiteral().getString();
         final String iri = iriObj.asLiteral().getString();
         try {
-            return new SinglePropertyNameMappingToURIsImpl(propertyName,iri);
+            return new PropertyNameMappingImpl_SingleMatchToURI(propertyName,iri);
         } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("iri (" + iri + ") is an invalid URI!");
         }
@@ -615,7 +615,7 @@ public class LPG2RDFConfigurationReader {
             }
             propertyNameMappings.add(createPropertyNameMapping(propertyNameMapping, propertyNameMappingType));
         }while(propertyNameMappingsIterator.hasNext());
-        return new CombinedPropertyNameMappingToURIsImpl(propertyNameMappings);
+        return new CompositePropertyNameMappingImpl(propertyNameMappings);
     }
 
     public PropertyNameMapping createPropertyNameMapping(final Resource propertyNameMappingResource, final RDFNode propertyNameMappingResourceType){

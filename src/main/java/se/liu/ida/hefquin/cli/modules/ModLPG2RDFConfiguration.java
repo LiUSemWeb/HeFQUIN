@@ -9,14 +9,14 @@ import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfigurationReader;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.LPG2RDFConfigurationImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingToLiteralsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_AllToLiterals;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingToURIsImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.*;
 
 public class ModLPG2RDFConfiguration extends ModBase {
@@ -42,10 +42,10 @@ public class ModLPG2RDFConfiguration extends ModBase {
             cat = LPG2RDFConfigurationReader.readFromFile(lpg2RDFDescrFilename);
         }
         else{
-            final NodeMapping nodeMapping = new NodeMappingToURIsImpl(NSNODE);
-            final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingToLiteralsImpl();
-            final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingToURIsImpl(NSRELATIONSHIP);
-            final PropertyNameMapping propertyNameMapping = new PropertyNameMappingToURIsImpl(NSPROPERTY);
+            final NodeMapping nodeMapping = new NodeMappingImpl_AllToURIs(NSNODE);
+            final NodeLabelMapping nodeLabelMapping = new NodeLabelMappingImpl_AllToLiterals();
+            final EdgeLabelMapping edgeLabelMapping = new EdgeLabelMappingImpl_AllToURIs(NSRELATIONSHIP);
+            final PropertyNameMapping propertyNameMapping = new PropertyNameMappingImpl_AllToURIs(NSPROPERTY);
             cat = new LPG2RDFConfigurationImpl(NodeFactory.createURI(LABEL), nodeMapping, nodeLabelMapping,edgeLabelMapping,propertyNameMapping);
         }
     }
