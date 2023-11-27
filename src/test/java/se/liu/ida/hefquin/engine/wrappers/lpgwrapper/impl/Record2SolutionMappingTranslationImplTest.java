@@ -68,7 +68,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarPropertyLiteralTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         final CypherQuery query = new CypherUnionQueryImpl(
@@ -100,7 +100,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarLabelClassTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -129,7 +129,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarRelationshipNodeTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -153,7 +153,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeLabelVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -176,7 +176,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodePropertyVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -199,7 +199,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeRelationshipVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -225,7 +225,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeVarNodeTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -247,7 +247,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeVarLiteralTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -272,7 +272,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeVarLabelTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
         final CypherQuery query = new CypherQueryBuilder()
@@ -293,7 +293,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarLabelVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("o"));
@@ -328,7 +328,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarRelationshipVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("o"));
@@ -374,7 +374,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarPropertyVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("o"));
@@ -420,7 +420,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarVarLabelTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("p"));
@@ -456,7 +456,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarVarNodeTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("p"));
@@ -497,7 +497,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarVarLiteral() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("p"));
@@ -538,7 +538,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateNodeVarVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
         varMap.put(ret2, Var.alloc("o"));
@@ -591,7 +591,7 @@ public class Record2SolutionMappingTranslationImplTest {
 
     @Test
     public void translateVarVarVarTest() throws JsonProcessingException, Neo4JException {
-        final LPG2RDFConfiguration conf = new DefaultConfiguration();
+        final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
         varMap.put(ret2, Var.alloc("p"));

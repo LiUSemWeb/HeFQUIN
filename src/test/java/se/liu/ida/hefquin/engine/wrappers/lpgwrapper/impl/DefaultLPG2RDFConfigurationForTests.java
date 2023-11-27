@@ -6,7 +6,7 @@ import org.apache.jena.graph.NodeFactory;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
-public class DefaultConfiguration implements LPG2RDFConfiguration {
+public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration {
 
     protected final String NS = "https://example.org/";
     protected final String NODE = "node/";
