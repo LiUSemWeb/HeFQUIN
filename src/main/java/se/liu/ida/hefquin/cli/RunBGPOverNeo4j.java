@@ -88,7 +88,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected void exec() {
 		final BGP bgp = getBGP();
 
-		final LPG2RDFConfiguration conf = modLPG2RDFConfiguration.getLPG2RDFConfigurationCatalog();
+		final LPG2RDFConfiguration conf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
 		final Pair<CypherQuery, Map<CypherVar,Var>> tRes = performQueryTranslation(bgp, conf);
 
