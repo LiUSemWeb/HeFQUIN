@@ -58,24 +58,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -123,24 +123,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://test.org/test/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -188,25 +188,25 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "DIRECTED";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "http://singleExample.org/directorOf");
 
         final String edgeLabel = "0";
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -254,25 +254,25 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "DIRECTED";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "directorOf");
 
         final String edgeLabel = "0";
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -338,44 +338,44 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
 
         String nodeLabel = "DIRECTED";
-        Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(nodeLabel);
+        Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "http://singleExample.org/directorOf");
 
         nodeLabel = "ACTED";
-        resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(nodeLabel);
+        resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "actorOf");
 
         nodeLabel = "0";
-        resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(nodeLabel);
+        resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://test.org/test/0");
 
         nodeLabel = "ACTED_IN";
-        resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(nodeLabel);
+        resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/ACTED_IN");
 
         final String label = "0";
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -423,24 +423,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://test.org/test/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -488,25 +488,25 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
         final String edgeLabel = "DIRECTED";
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "http://singleExample.org/directorOf");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -567,37 +567,37 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
         String edgeLabel = "DIRECTED";
-        Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "http://singleExample.org/directorOf");
 
         edgeLabel = "0";
-        resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://test.org/test/0");
 
         edgeLabel = "ACTED_IN";
-        resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(edgeLabel);
+        resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/ACTED_IN");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -643,24 +643,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -705,24 +705,24 @@ public class LPG2RDFConfigurationReaderTest {
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
         assertEquals(resultNode.getBlankNodeId().toString(), "0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -766,24 +766,24 @@ public class LPG2RDFConfigurationReaderTest {
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
         assertEquals(resultNode.getBlankNodeId().toString(), "0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
         assertEquals(resultNodeLabel.getLiteral().toString(), "0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -831,24 +831,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/0");
@@ -895,24 +895,24 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "0";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://test.org/test/0");
@@ -959,25 +959,25 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         final String propertyName = "DIRECTED";
-        final Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "http://singleExample.org/directorOf");
@@ -1038,36 +1038,36 @@ public class LPG2RDFConfigurationReaderTest {
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
-        final Node resultNode = lpg2RDFConfiguration.mapNode(node);
+        final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isURI());
         assertEquals(resultNode.getURI(), "https://example.org/node/0");
 
         final String label = "0";
-        final Node resultNodeLabel = lpg2RDFConfiguration.mapNodeLabel(label);
+        final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isURI());
         assertEquals(resultNodeLabel.getURI(), "https://example.org/label/0");
 
-        final Node resultEdgeLabel = lpg2RDFConfiguration.mapEdgeLabel(label);
+        final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
         assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
 
         String propertyName = "DIRECTED";
-        Node resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "http://singleExample.org/directorOf");
 
         propertyName = "0";
-        resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://test.org/test/0");
 
         propertyName = "ACTED_IN";
-        resultPropertyName = lpg2RDFConfiguration.mapProperty(propertyName);
+        resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
         assertNotNull(resultPropertyName);
         assertTrue(resultPropertyName.isURI());
         assertEquals(resultPropertyName.getURI(), "https://example.org/property/ACTED_IN");

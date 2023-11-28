@@ -26,42 +26,42 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node mapNode(final LPGNode node) {
+    public Node getRDFTermForLPGNode(final LPGNode node) {
         return nm.map(node);
     }
 
     @Override
-    public LPGNode unmapNode(final Node node) {
+    public LPGNode getLPGNodeForRDFTerm(final Node node) {
         return nm.unmap(node);
     }
 
     @Override
-    public Node mapNodeLabel(final String label) {
+    public Node getRDFTermForNodeLabel(final String label) {
         return nlm.map(label);
     }
 
     @Override
-    public String unmapNodeLabel(final Node node) {
+    public String getNodeLabelForRDFTerm(final Node node) {
         return nlm.unmap(node);
     }
 
     @Override
-    public Node mapEdgeLabel(final String label) {
+    public Node getIRIForEdgeLabel(final String label) {
         return elm.map(label);
     }
 
     @Override
-    public String unmapEdgeLabel(final Node node) {
+    public String getEdgeLabelForIRI(final Node node) {
         return elm.unmap(node);
     }
 
     @Override
-    public Node mapProperty(final String propertyName) {
+    public Node getIRIForPropertyName(final String propertyName) {
         return pm.map(propertyName);
     }
 
     @Override
-    public String unmapProperty(final Node node) {
+    public String getPropertyNameForIRI(final Node node) {
         return pm.unmap(node);
     }
 
@@ -71,22 +71,22 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration
     }
 
     @Override
-    public boolean mapsToProperty(final Node n) {
+    public boolean isIRIForPropertyName(final Node n) {
         return pm.isPossibleResult(n);
     }
 
     @Override
-    public boolean mapsToLabel(final Node n) {
+    public boolean isRDFTermForNodeLabel(final Node n) {
         return nlm.isPossibleResult(n);
     }
 
     @Override
-    public boolean mapsToEdgeLabel(final Node n) {
+    public boolean isIRIForEdgeLabel(final Node n) {
         return elm.isPossibleResult(n);
     }
 
     @Override
-    public boolean mapsToNode(final Node n) {
+    public boolean isRDFTermForLPGNode(final Node n) {
         return nm.isPossibleResult(n);
     }
 }

@@ -92,7 +92,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final BindingBuilder builder = Binding.builder();
-        builder.add(Var.alloc("s"), conf.mapNode(node6));
+        builder.add(Var.alloc("s"), conf.getRDFTermForLPGNode(node6));
         final SolutionMapping m1 = new SolutionMappingImpl(builder.build());
         assertEquals(1, solMaps.size());
         assertEquals(m1, solMaps.get(0));
@@ -119,11 +119,11 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node14))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node14))));
         assertEquals(solMaps, expected);
     }
 
@@ -146,8 +146,8 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5))));
         assertEquals(solMaps, expected);
     }
 
@@ -169,7 +169,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"),
-                conf.mapNodeLabel("Person")));
+                conf.getRDFTermForNodeLabel("Person")));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
@@ -217,9 +217,9 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.mapNode(node10))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.mapNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.mapNode(node0))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node10))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
         assertEquals(expected, solMaps);
     }
 
@@ -240,7 +240,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"),
-                conf.mapEdgeLabel("DIRECTED")));
+                conf.getIRIForEdgeLabel("DIRECTED")));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
@@ -265,7 +265,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"),
-                conf.mapProperty("name")));
+                conf.getIRIForPropertyName("name")));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
@@ -313,16 +313,16 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("o"), conf.mapNodeLabel("Movie"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
-                Var.alloc("o"), conf.mapNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2),
-                Var.alloc("o"), conf.mapNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
-                Var.alloc("o"), conf.mapNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
-                Var.alloc("o"), conf.mapNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
         assertEquals(expected, solMaps);
     }
 
@@ -359,16 +359,16 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6),
-                Var.alloc("o"), conf.mapNode(node0))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
-                Var.alloc("o"), conf.mapNode(node0))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6),
-                Var.alloc("o"), conf.mapNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
-                Var.alloc("o"), conf.mapNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6),
-                Var.alloc("o"), conf.mapNode(node10))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node10))));
         assertEquals(expected, solMaps);
     }
 
@@ -405,15 +405,15 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
                 Var.alloc("o"), NodeFactory.createLiteral("Keanu"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
                 Var.alloc("o"), NodeFactory.createLiteral("Carrie-Anne"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
                 Var.alloc("o"), NodeFactory.createLiteral("Laurence"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
                 Var.alloc("o"), NodeFactory.createLiteral("Hugo"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
                 Var.alloc("o"), NodeFactory.createLiteral("Andy"))));
         assertEquals(expected, solMaps);
     }
@@ -441,15 +441,15 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
                 Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
                 Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
                 Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
                 Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
                 Var.alloc("p"), conf.getLabelPredicate())));
         assertEquals(expected, solMaps);
     }
@@ -482,16 +482,16 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node7),
-                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node6),
-                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
-                Var.alloc("p"), conf.mapEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
-                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
-                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node7),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"))));
         assertEquals(expected, solMaps);
     }
 
@@ -530,8 +530,8 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.mapProperty("title")));
+        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("title")));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
@@ -579,13 +579,13 @@ public class Record2SolutionMappingTranslationImplTest {
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate(),
-                Var.alloc("o"), conf.mapNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("born"),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("born"),
                 Var.alloc("o"), NodeFactory.createLiteral("1986"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("name"),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("name"),
                 Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr."))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"),
-                Var.alloc("o"), conf.mapNode(node0))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
         assertEquals(expected, solMaps);
     }
 
@@ -650,19 +650,19 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
-                Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.mapNode(node87))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.getLabelPredicate(), Var.alloc("o"), conf.mapNodeLabel("Movie"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.mapProperty("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.mapProperty("tagline"), Var.alloc("o"), NodeFactory.createLiteral("Welcome to the Real World"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.mapProperty("released"), Var.alloc("o"), NodeFactory.createLiteral("1999"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.getRDFTermForLPGNode(node87))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getLabelPredicate(), Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("tagline"), Var.alloc("o"), NodeFactory.createLiteral("Welcome to the Real World"))));
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("released"), Var.alloc("o"), NodeFactory.createLiteral("1999"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"),
-                NodeFactory.createTripleNode(conf.mapNode(node1), conf.mapEdgeLabel("ACTED_IN"), conf.mapNode(node87)),
-                Var.alloc("p"), conf.mapProperty("roles"), Var.alloc("o"), NodeFactory.createLiteral("Shane Falco"))));
+                NodeFactory.createTripleNode(conf.getRDFTermForLPGNode(node1), conf.getIRIForEdgeLabel("ACTED_IN"), conf.getRDFTermForLPGNode(node87)),
+                Var.alloc("p"), conf.getIRIForPropertyName("roles"), Var.alloc("o"), NodeFactory.createLiteral("Shane Falco"))));
         for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i), solMaps.get(i));
         }

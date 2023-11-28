@@ -11,89 +11,118 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
  * Interoperable (AMAR) at SEMANTiCS 2019.
  * https://ceur-ws.org/Vol-2447/paper3.pdf
  *
- * This interface contains the functions:
- * -nm to map nodes to IRIs/BNodes
- * -nlm to map node labels to IRIs
- * -elm to map edge labels to IRIs
- * -pm to map property names to IRIs
- * -getULabel to obtain the value of u_label
- *
- * The mappings return Jena Node objects, to give flexibility if IRIs or Literals are needed
+ * Such a configuration consist of the following five components, which are
+ * captured by the methods of this interface.
+ *   i) an injective function called node mapping that maps every given LPG node
+ *      to either an IRI or a blank node,
+ *  ii) an injective function called node label mapping that maps labels of LPG
+ *      nodes to IRIs or literals,
+ * iii) an injective function called edge label mapping that maps labels of LPG
+ *      edges to IRIs,
+ *  iv) an injective function called property name mapping that maps names of
+ *      properties of LPG nodes and edge to IRIs, and
+ *   v) an IRI to be used in the predicate position of any RDF triple that
+ *      captures information about the label of some LPG node.
  */
 public interface LPG2RDFConfiguration
 {
-    /**
-     * Returns a URI or a blank node (in the form of a Jena {@link Node} object) for the given LPG node.
-     */
-    Node mapNode(final LPGNode node);
+	/**
+	 * Applies the node mapping to the given LPG node and, thus, returns
+	 * the IRI or blank node (in the form of a Jena {@link Node} object)
+	 * that the LPG node is mapped to.
+	 */
+	Node getRDFTermForLPGNode( LPGNode node );
 
-    /**
-     * Returns true if the given RDF term is in the image of the mapNode function and, thus, in the domain of the unmapNode function.
-     */
-    boolean mapsToNode(final Node n);
+	/**
+	 * Returns true if the given RDF term is in the image of the node mapping
+	 * and, thus, may be returned by {@link #getRDFTermForLPGNode(LPGNode)}
+	 * for some LPG node.
+	 */
+	boolean isRDFTermForLPGNode( Node term );
 
-    /**
-     * Returns the LPG node that corresponds to the given RDF term.
-     * This function is the inverse of mapNode. As such, it is defined only for the RDF terms that may be returned by the mapNode function and, thus, throws an {@link IllegalArgumentException} if any other RDF term is given to it.
-     */
-    LPGNode unmapNode(final Node node);
+	/**
+	 * Applies the inverse of the node mapping to the given RDF term and,
+	 * thus, returns the LPG node that is mapped to the given RDF term
+	 * (which must be an IRI or a blank node).
+	 *
+	 * If the given RDF term is not in the image of the node mapping (in
+	 * which case {@link #isRDFTermForLPGNode(Node)} returns false), this
+	 * method throws an {@link IllegalArgumentException}.
+	 */
+	LPGNode getLPGNodeForRDFTerm( Node term );
 
-    /**
-     * Returns a Jena Node for the given node label
-     * @param label the node label to be mapped
-     */
-    Node mapNodeLabel(final String label);
+	/**
+	 * Applies the node label mapping to the given node label and, thus,
+	 * returns the IRI or literal (in the form of a Jena {@link Node}
+	 * object) that the node label is mapped to.
+	 */
+	Node getRDFTermForNodeLabel( String nodeLabel );
 
-    /**
-     * Checks if the given node is the mapping of a
-     * Node Label using this configuration
-     * @param n the Node to be tested
-     */
-    boolean mapsToLabel(final Node n);
+	/**
+	 * Returns true if the given RDF term is in the image of the node label mapping
+	 * and, thus, may be returned by {@link #getRDFTermForNodeLabel(String)}
+	 * for some node label.
+	 */
+	boolean isRDFTermForNodeLabel( Node term );
 
-    /**
-     * Returns the original node label for the given mapped label
-     * @param node the mapped Jena Node of a node label
-     */
-    String unmapNodeLabel(final Node node);
+	/**
+	 * Applies the inverse of the node label mapping to the given RDF term
+	 * and, thus, returns the node label that is mapped to the given RDF term
+	 * (which must be an IRI or a literal).
+	 *
+	 * If the given RDF term is not in the image of the node label mapping (in
+	 * which case {@link #isRDFTermForNodeLabel(Node)} returns false), this
+	 * method throws an {@link IllegalArgumentException}.
+	 */
+	String getNodeLabelForRDFTerm( Node term );
 
-    /**
-     * Returns a Jena Node for a given edge label
-     * @param label the edge label to map
-     */
-    Node mapEdgeLabel(final String label);
+	/**
+	 * Applies the edge label mapping to the given edge label and, thus,
+	 * returns the IRI (in the form of a Jena {@link Node} object) that
+	 * the edge label is mapped to.
+	 */
+	Node getIRIForEdgeLabel( String edgeLabel );
 
-    /**
-     * Checks if the given node is the mapping of an
-     * Edge Label using this configuration
-     * @param n the Node to be tested
-     */
-    boolean mapsToEdgeLabel(final Node n);
+	/**
+	 * Returns true if the given IRI is in the image of the edge label mapping
+	 * and, thus, may be returned by {@link #getIRIForEdgeLabel(String)} for
+	 * some edge label.
+	 */
+	boolean isIRIForEdgeLabel( Node iri );
 
-    /**
-     * Returns the original edge label for the given mapped label
-     * @param node the mapped Jena Node of an edge label
-     */
-    String unmapEdgeLabel(final Node node);
+	/**
+	 * Applies the inverse of the edge label mapping to the given IRI
+	 * and, thus, returns the edge label that is mapped to the given IRI.
+	 *
+	 * If the given IRI is not in the image of the edge label mapping (in
+	 * which case {@link #isIRIForEdgeLabel(Node)} returns false), this
+	 * method throws an {@link IllegalArgumentException}.
+	 */
+	String getEdgeLabelForIRI( Node iri );
 
-    /**
-     * Returns a Jena Node for a given property
-     * @param property the name of the property to map
-     */
-    Node mapProperty(final String property);
+	/**
+	 * Applies the property name mapping to the given property name and, thus,
+	 * returns the IRI (in the form of a Jena {@link Node} object) that the
+	 * property name is mapped to.
+	 */
+	Node getIRIForPropertyName( String propertyName );
 
-    /**
-     * Checks if the given node is the mapping of a property using
-     * this configuration or not.
-     * @param n the Node to be tested
-     */
-    boolean mapsToProperty(final Node n);
+	/**
+	 * Returns true if the given IRI is in the image of the property name mapping
+	 * and, thus, may be returned by {@link #getIRIForPropertyName(String)} for
+	 * some property name.
+	 */
+	boolean isIRIForPropertyName( Node iri );
 
-    /**
-     * Returns the original property name of the given mapped IRI
-     * @param node the mapped Jena Node of a property
-     */
-    String unmapProperty(final Node node);
+	/**
+	 * Applies the inverse of the property name mapping to the given IRI
+	 * and, thus, returns the property name that is mapped to the given IRI.
+	 *
+	 * If the given IRI is not in the image of the property name mapping (in
+	 * which case {@link #isIRIForPropertyName(Node)} returns false), this
+	 * method throws an {@link IllegalArgumentException}.
+	 */
+	String getPropertyNameForIRI( Node iri );
 
 	/**
 	 * Returns the IRI (in the form of a Jena {@link Node} object) to be

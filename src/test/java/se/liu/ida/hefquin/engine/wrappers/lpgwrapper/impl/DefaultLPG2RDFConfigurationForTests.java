@@ -16,12 +16,12 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     protected final String LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
 
     @Override
-    public Node mapNode(final LPGNode node) {
+    public Node getRDFTermForLPGNode(final LPGNode node) {
         return NodeFactory.createURI(NS + NODE + node.getId());
     }
 
     @Override
-    public LPGNode unmapNode(final Node node) {
+    public LPGNode getLPGNodeForRDFTerm(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Node mappings");
         if (!node.getURI().startsWith(NS + NODE))
@@ -31,12 +31,12 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node mapNodeLabel(final String label) {
+    public Node getRDFTermForNodeLabel(final String label) {
         return NodeFactory.createURI(NS + NODELABEL + label);
     }
 
     @Override
-    public String unmapNodeLabel(final Node node) {
+    public String getNodeLabelForRDFTerm(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Node Labels");
         if (!node.getURI().startsWith(NS + NODELABEL))
@@ -45,12 +45,12 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node mapEdgeLabel(final String label) {
+    public Node getIRIForEdgeLabel(final String label) {
         return NodeFactory.createURI(NS + RELATIONSHIP + label);
     }
 
     @Override
-    public String unmapEdgeLabel(final Node node) {
+    public String getEdgeLabelForIRI(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Edge Labels");
         if (!node.getURI().startsWith(NS + RELATIONSHIP))
@@ -59,12 +59,12 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node mapProperty(final String property) {
+    public Node getIRIForPropertyName(final String property) {
         return NodeFactory.createURI(NS + PROPERTY + property);
     }
 
     @Override
-    public String unmapProperty(final Node node) {
+    public String getPropertyNameForIRI(final Node node) {
         if (!node.isURI())
             throw new IllegalArgumentException("Default configuration only accepts URI Property mappings");
         if (!node.getURI().startsWith(NS + PROPERTY))
@@ -78,22 +78,22 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     }
 
     @Override
-    public boolean mapsToProperty(final Node n) {
+    public boolean isIRIForPropertyName(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + PROPERTY);
     }
 
     @Override
-    public boolean mapsToLabel(final Node n) {
+    public boolean isRDFTermForNodeLabel(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + NODELABEL);
     }
 
     @Override
-    public boolean mapsToEdgeLabel(final Node n) {
+    public boolean isIRIForEdgeLabel(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + RELATIONSHIP);
     }
 
     @Override
-    public boolean mapsToNode(final Node n) {
+    public boolean isRDFTermForLPGNode(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + NODE);
     }
 }
