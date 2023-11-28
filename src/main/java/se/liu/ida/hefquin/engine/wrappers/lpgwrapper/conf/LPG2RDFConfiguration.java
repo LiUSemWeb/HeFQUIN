@@ -4,8 +4,12 @@ import org.apache.jena.graph.Node;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 /**
- * Represents an LPG-to-RDF configuration as defined in Hartig, Olaf. "Foundations to Query Labeled Property
- * Graphs using SPARQL." SEM4TRA-AMAR@ SEMANTICS. 2019.
+ * Represents the notion of an LPG-to-RDF configuration as defined in
+ * 
+ * Olaf Hartig: "Foundations to Query Labeled Property Graphs using SPARQL*."
+ * In the Proceedings of the 1st Int. Workshop on Approaches for Making Data
+ * Interoperable (AMAR) at SEMANTiCS 2019.
+ * https://ceur-ws.org/Vol-2447/paper3.pdf
  *
  * This interface contains the functions:
  * -nm to map nodes to IRIs/BNodes
@@ -16,8 +20,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
  *
  * The mappings return Jena Node objects, to give flexibility if IRIs or Literals are needed
  */
-public interface LPG2RDFConfiguration {
-
+public interface LPG2RDFConfiguration
+{
     /**
      * Returns a URI or a blank node (in the form of a Jena {@link Node} object) for the given LPG node.
      */
@@ -91,16 +95,10 @@ public interface LPG2RDFConfiguration {
      */
     String unmapProperty(final Node node);
 
-    /**
-     * Returns the Jena Node of the property defined as u_label
-     */
-    Node getLabel();
-
-    /**
-     * Checks if the given node is equal to the
-     * Label Node of this configuration or not.
-     * @param n the Node to be tested
-     */
-    boolean isLabelIRI(final Node n);
-
+	/**
+	 * Returns the IRI (in the form of a Jena {@link Node} object) to be
+	 * used in the predicate position of any RDF triple that captures
+	 * information about the label of some LPG node.
+	 */
+	Node getLabelPredicate();
 }

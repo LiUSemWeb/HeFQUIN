@@ -55,8 +55,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -120,8 +120,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -185,8 +185,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -251,8 +251,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -335,8 +335,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -420,8 +420,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -485,8 +485,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -564,8 +564,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -640,8 +640,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -703,7 +703,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -764,7 +764,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -828,8 +828,8 @@ public class LPG2RDFConfigurationReaderTest {
 
         LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -892,8 +892,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -956,8 +956,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);
@@ -1035,8 +1035,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        assert(lpg2RDFConfiguration.getLabel().isURI());
-        assert(lpg2RDFConfiguration.getLabel().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
+        assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
+        assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
         final Node resultNode = lpg2RDFConfiguration.mapNode(node);
         assertNotNull(resultNode);

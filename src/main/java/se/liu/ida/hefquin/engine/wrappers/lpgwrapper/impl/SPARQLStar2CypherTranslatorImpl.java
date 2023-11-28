@@ -42,7 +42,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 final Node p = tp.asJenaTriple().getPredicate();
                 final Node o = tp.asJenaTriple().getObject();
                 if (s.isVariable()) {
-                    if (conf.isLabelIRI(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
+                    if (conf.getLabelPredicate().equals(p) || conf.mapsToEdgeLabel(p) || conf.mapsToNode(o) || conf.mapsToLabel(o)) {
                         certainNodes.add(s);
                     }
                 }
@@ -50,7 +50,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     if (conf.mapsToEdgeLabel(p)) {
                         certainNodes.add(o);
                     }
-                    if (conf.isLabelIRI(p)) {
+                    if (conf.getLabelPredicate().equals(p)) {
                         certainNodeLabels.add(o);
                     }
                     if (conf.mapsToProperty(p) || s.isNodeTriple()) {
@@ -179,7 +179,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final Node o = b.getObject();
         final int nbOfVars = QueryPatternUtils.getNumberOfVarOccurrences(pattern);
         if (nbOfVars == 0) {
-            if (configuration.mapsToNode(s) && configuration.isLabelIRI(p) && configuration.mapsToLabel(o)){
+            if (configuration.mapsToNode(s) && configuration.getLabelPredicate().equals(p) && configuration.mapsToLabel(o)){
                 return getNodeLabelLabel(s, p, o, configuration, gen);
             }
             else if (configuration.mapsToNode(s) && configuration.mapsToProperty(p) && o.isLiteral()) {
@@ -196,7 +196,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             if (s.isVariable()) {
                 if (configuration.mapsToProperty(p) && o.isLiteral()) {
                     return getVarPropertyLiteral(s, p, o, configuration, gen, certainNodes);
-                } else if (configuration.isLabelIRI(p) && configuration.mapsToLabel(o)) {
+                } else if (configuration.getLabelPredicate().equals(p) && configuration.mapsToLabel(o)) {
                     return getVarLabelClass(s, p, o, configuration, gen);
                 } else if (configuration.mapsToEdgeLabel(p) && configuration.mapsToNode(o)){
                     return getVarRelationshipNode(s, p, o, configuration, gen);
@@ -205,7 +205,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 }
             }
             else if (o.isVariable()) {
-                if (configuration.isLabelIRI(p) && configuration.mapsToNode(s)) {
+                if (configuration.getLabelPredicate().equals(p) && configuration.mapsToNode(s)) {
                     return getNodeLabelVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToProperty(p) && configuration.mapsToNode(s)) {
                     return getNodePropertyVar(s, p, o, configuration, gen);
@@ -228,7 +228,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             }
         } else if (nbOfVars == 2) {
             if (s.isVariable() && o.isVariable()) {
-                if (configuration.isLabelIRI(p)) {
+                if (configuration.getLabelPredicate().equals(p)) {
                     return getVarLabelVar(s, p, o, configuration, gen);
                 } else if (configuration.mapsToEdgeLabel(p)) {
                     return getVarRelationshipVar(s, p, o, configuration, gen);

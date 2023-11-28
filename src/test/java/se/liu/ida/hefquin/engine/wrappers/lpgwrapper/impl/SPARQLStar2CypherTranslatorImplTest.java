@@ -71,7 +71,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
     @Test
     public void translateNodeLabelLabelTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
-        final Triple tp = new Triple(conf.mapNode(node22), conf.getLabel(), conf.mapNodeLabel("Person"));
+        final Triple tp = new Triple(conf.mapNode(node22), conf.getLabelPredicate(), conf.mapNodeLabel("Person"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(new TriplePatternImpl(tp), conf).object1;
         assertEquals(
@@ -149,7 +149,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
     @Test
     public void translateVarLabelClassTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
-        final Triple t = new Triple(Var.alloc("s"), conf.getLabel(), conf.mapNodeLabel("Person"));
+        final Triple t = new Triple(Var.alloc("s"), conf.getLabelPredicate(), conf.mapNodeLabel("Person"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
@@ -180,7 +180,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
     @Test
     public void translateNodeLabelVarTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
-        final Triple t = new Triple(conf.mapNode(node22), conf.getLabel(), Var.alloc("o"));
+        final Triple t = new Triple(conf.mapNode(node22), conf.getLabelPredicate(), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
@@ -280,7 +280,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
     @Test
     public void translateVarLabelVarTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
-        final Triple t = new Triple(Var.alloc("s"), conf.getLabel(), Var.alloc("o"));
+        final Triple t = new Triple(Var.alloc("s"), conf.getLabelPredicate(), Var.alloc("o"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(new TriplePatternImpl(t), conf).object1;
         assertEquals(
@@ -856,8 +856,8 @@ public class SPARQLStar2CypherTranslatorImplTest {
         final Var m = Var.alloc("m");
         final Var p = Var.alloc("p");
         final BGP bgp = new BGPImpl(
-                new TriplePatternImpl(m, conf.getLabel(), conf.mapNodeLabel("Movie")),
-                new TriplePatternImpl(p, conf.getLabel(), conf.mapNodeLabel("Person")),
+                new TriplePatternImpl(m, conf.getLabelPredicate(), conf.mapNodeLabel("Movie")),
+                new TriplePatternImpl(p, conf.getLabelPredicate(), conf.mapNodeLabel("Person")),
                 new TriplePatternImpl(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman")),
                 new TriplePatternImpl(m, conf.mapProperty("released"), Var.alloc("y")),
                 new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),
@@ -895,8 +895,8 @@ public class SPARQLStar2CypherTranslatorImplTest {
         final Var m = Var.alloc("m");
         final Var p = Var.alloc("p");
         final BGP bgp = new BGPImpl(
-                new TriplePatternImpl(m, conf.getLabel(), conf.mapNodeLabel("Movie")),
-                new TriplePatternImpl(p, conf.getLabel(), conf.mapNodeLabel("Person")),
+                new TriplePatternImpl(m, conf.getLabelPredicate(), conf.mapNodeLabel("Movie")),
+                new TriplePatternImpl(p, conf.getLabelPredicate(), conf.mapNodeLabel("Person")),
                 new TriplePatternImpl(p, conf.mapProperty("name"), NodeFactory.createLiteral("Uma Thurman")),
                 new TriplePatternImpl(m, conf.mapProperty("released"), Var.alloc("y")),
                 new TriplePatternImpl(NodeFactory.createTripleNode(p, conf.mapEdgeLabel("ACTED_IN"), m),

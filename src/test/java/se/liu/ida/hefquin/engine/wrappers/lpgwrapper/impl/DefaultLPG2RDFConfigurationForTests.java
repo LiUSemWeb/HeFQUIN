@@ -73,18 +73,13 @@ public class DefaultLPG2RDFConfigurationForTests implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node getLabel() {
+    public Node getLabelPredicate() {
         return NodeFactory.createURI(LABEL);
     }
 
     @Override
     public boolean mapsToProperty(final Node n) {
         return n.isURI() && n.getURI().startsWith(NS + PROPERTY);
-    }
-
-    @Override
-    public boolean isLabelIRI(final Node n) {
-        return n.isURI() && n.getURI().equals(LABEL);
     }
 
     @Override

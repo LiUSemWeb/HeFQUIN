@@ -82,7 +82,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             } else if (expression instanceof PropertyAccessExpression) {
                 builder.add(var, NodeFactory.createLiteral(current.getValue().toString()));
             } else if (expression instanceof LiteralExpression) {
-                builder.add(var, conf.getLabel());
+                builder.add(var, conf.getLabelPredicate());
             } else {
                 throw new IllegalArgumentException("Invalid Return Statement");
             }

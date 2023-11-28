@@ -66,18 +66,13 @@ public class LPG2RDFConfigurationImpl implements LPG2RDFConfiguration
     }
 
     @Override
-    public Node getLabel() {
+    public Node getLabelPredicate() {
         return this.labelPredicate;
     }
 
     @Override
     public boolean mapsToProperty(final Node n) {
         return pm.isPossibleResult(n);
-    }
-
-    @Override
-    public boolean isLabelIRI(final Node n) {
-        return n.equals(labelPredicate);
     }
 
     @Override

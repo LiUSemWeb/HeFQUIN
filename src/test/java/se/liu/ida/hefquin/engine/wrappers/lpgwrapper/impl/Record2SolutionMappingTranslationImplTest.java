@@ -286,7 +286,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabel()));
+        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate()));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
@@ -442,15 +442,15 @@ public class Record2SolutionMappingTranslationImplTest {
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
-                Var.alloc("p"), conf.getLabel())));
+                Var.alloc("p"), conf.getLabelPredicate())));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node2),
-                Var.alloc("p"), conf.getLabel())));
+                Var.alloc("p"), conf.getLabelPredicate())));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node3),
-                Var.alloc("p"), conf.getLabel())));
+                Var.alloc("p"), conf.getLabelPredicate())));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node4),
-                Var.alloc("p"), conf.getLabel())));
+                Var.alloc("p"), conf.getLabelPredicate())));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node5),
-                Var.alloc("p"), conf.getLabel())));
+                Var.alloc("p"), conf.getLabelPredicate())));
         assertEquals(expected, solMaps);
     }
 
@@ -578,7 +578,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabel(),
+        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate(),
                 Var.alloc("o"), conf.mapNodeLabel("Person"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.mapProperty("born"),
                 Var.alloc("o"), NodeFactory.createLiteral("1986"))));
@@ -653,7 +653,7 @@ public class Record2SolutionMappingTranslationImplTest {
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node1),
                 Var.alloc("p"), conf.mapEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.mapNode(node87))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
-                Var.alloc("p"), conf.getLabel(), Var.alloc("o"), conf.mapNodeLabel("Movie"))));
+                Var.alloc("p"), conf.getLabelPredicate(), Var.alloc("o"), conf.mapNodeLabel("Movie"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
                 Var.alloc("p"), conf.mapProperty("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix"))));
         expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.mapNode(node0),
