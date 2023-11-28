@@ -69,19 +69,19 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
 
-		addModule(modLPG2RDFConfiguration);
 		addModule(modQuery);
+		addModule(modLPG2RDFConfiguration);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
 		add(argNaive, "--naive", "If you want naive translation");
 		add(argNoVarRepl, "--disableVariableReplacement", "If you want to disable variable replacement");
-		add(argNoMerge, "--disablePathMerging", "If you want to diable path merging");
+		add(argNoMerge, "--disablePathMerging", "If you want to disable path merging");
 
 	}
 
 	@Override
 	protected String getSummary() {
-		return getCommandName() + "--query=<query file> --endpoint=<Neo4j endpoint URI> --time? --naive? --disableVariableReplacement? --disablePathMerging?";
+		return getCommandName() + " --query=<query file> --endpoint=<Neo4j endpoint URI> --time? --naive? --disableVariableReplacement? --disablePathMerging?";
 	}
 
 	@Override
