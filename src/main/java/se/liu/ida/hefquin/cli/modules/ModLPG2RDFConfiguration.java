@@ -25,7 +25,7 @@ public class ModLPG2RDFConfiguration extends ModBase
     public void processArgs( final CmdArgModule cmdLine ) {
         if ( cmdLine.contains(lpg2rdfConfigDecl) ) {
             final String filename = cmdLine.getValue(lpg2rdfConfigDecl);
-            lpg2rdfConfig = LPG2RDFConfigurationReader.readFromFile(filename);
+            lpg2rdfConfig = new LPG2RDFConfigurationReader().readFromFile(filename);
         }
         else{
             lpg2rdfConfig = new DefaultLPG2RDFConfigurationImpl();

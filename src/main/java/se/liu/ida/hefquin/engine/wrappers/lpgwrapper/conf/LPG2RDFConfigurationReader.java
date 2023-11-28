@@ -40,42 +40,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LPG2RDFConfigurationReader {
-
-    public static LPG2RDFConfigurationReader instance = new LPG2RDFConfigurationReader();
-
-    protected LPG2RDFConfigurationReader(){}
-
-    public static LPG2RDFConfiguration readFromFile(final String filename ) {
-        return instance.parseLPG2RDFConf(filename);
+public class LPG2RDFConfigurationReader
+{
+    public LPG2RDFConfiguration readFromFile( final String filename ) {
+        final Model m = RDFDataMgr.loadModel(filename);
+        return read(m);
     }
 
-    public static LPG2RDFConfiguration readFromModel(final Model lpg2Rdf ) {
-        return instance.parseLPG2RDFConf(lpg2Rdf);
-    }
+    public LPG2RDFConfiguration read( final Model m ) {
+        final ResIterator itConfigs = m.listResourcesWithProperty(RDF.type, LPG2RDF.LPGtoRDFConfiguration);
 
-    public LPG2RDFConfiguration parseLPG2RDFConf( final String filename ) {
-        final Model lpg2Rdf = RDFDataMgr.loadModel(filename);
-        return parseLPG2RDFConf(lpg2Rdf);
-    }
-
-    public LPG2RDFConfiguration parseLPG2RDFConf(final Model lpg2Rdf ) {
-
-        final ResIterator lpg2rdfConfigs = lpg2Rdf.listResourcesWithProperty(RDF.type, LPG2RDF.LPGtoRDFConfiguration);
-
-        if (!lpg2rdfConfigs.hasNext()){
+        if ( ! itConfigs.hasNext() ) {
             throw new IllegalArgumentException("LPGtoRDFConfiguration is required!");
         }
-        final Resource lpg2rdfConfig = lpg2rdfConfigs.next();
-        if(lpg2rdfConfigs.hasNext()){
+
+        final Resource confRsrc = itConfigs.next();
+
+        if ( itConfigs.hasNext() ) {
             throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration!");
         }
 
-        final NodeMapping nm = getNodeMapping(lpg2Rdf, lpg2rdfConfig);
-        final NodeLabelMapping nlm = getNodeLabelMapping(lpg2Rdf, lpg2rdfConfig);
-        final EdgeLabelMapping elm = getEdgeLabelMapping(lpg2Rdf, lpg2rdfConfig);
-        final PropertyNameMapping pm = getPropertyNameMapping(lpg2Rdf,lpg2rdfConfig);
-        final Node labelPredicate = getLabelPredicate(lpg2rdfConfig);
+        final NodeMapping nm = getNodeMapping(m, confRsrc);
+        final NodeLabelMapping nlm = getNodeLabelMapping(m, confRsrc);
+        final EdgeLabelMapping elm = getEdgeLabelMapping(m, confRsrc);
+        final PropertyNameMapping pm = getPropertyNameMapping(m,confRsrc);
+        final Node labelPredicate = getLabelPredicate(confRsrc);
 
         return new LPG2RDFConfigurationImpl(nm, nlm, elm, pm, labelPredicate);
     }
@@ -281,7 +270,7 @@ public class LPG2RDFConfigurationReader {
         if(!nodeLabelMappingsList.canAs(RDFList.class)){
             throw new IllegalArgumentException("NodeLabelMappings property of CombinedNodeLabelMapping should be a list!");
         }
-        final Iterator nodeLabelMappingsIterator = nodeLabelMappingsList.as(RDFList.class).iterator();
+        final Iterator<RDFNode> nodeLabelMappingsIterator = nodeLabelMappingsList.as(RDFList.class).iterator();
 
         if (!nodeLabelMappingsIterator.hasNext()) {
             throw new IllegalArgumentException("NodeLabelMappings list of CombinedNodeLabelMapping should not be empty!");
@@ -441,7 +430,7 @@ public class LPG2RDFConfigurationReader {
         if(!edgeLabelMappingsList.canAs(RDFList.class)){
             throw new IllegalArgumentException("EdgeLabelMappings property of CombinedEdgeLabelMapping should be a list!");
         }
-        final Iterator edgeLabelMappingsIterator = edgeLabelMappingsList.as(RDFList.class).iterator();
+        final Iterator<RDFNode> edgeLabelMappingsIterator = edgeLabelMappingsList.as(RDFList.class).iterator();
 
         if (!edgeLabelMappingsIterator.hasNext()) {
             throw new IllegalArgumentException("EdgeLabelMappings list of CombinedEdgeLabelMapping should not be empty!");
@@ -599,7 +588,7 @@ public class LPG2RDFConfigurationReader {
         if(!propertyNameMappingsList.canAs(RDFList.class)){
             throw new IllegalArgumentException("PropertyNameMappings property of CombinedPropertyNameMapping should be a list!");
         }
-        final Iterator propertyNameMappingsIterator = propertyNameMappingsList.as(RDFList.class).iterator();
+        final Iterator<RDFNode> propertyNameMappingsIterator = propertyNameMappingsList.as(RDFList.class).iterator();
 
         if (!propertyNameMappingsIterator.hasNext()) {
             throw new IllegalArgumentException("PropertyNameMappings list of CombinedPropertyNameMapping should not be empty!");

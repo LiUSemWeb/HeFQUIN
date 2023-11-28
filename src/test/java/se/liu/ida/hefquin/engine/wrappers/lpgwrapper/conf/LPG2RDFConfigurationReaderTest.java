@@ -1,19 +1,16 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf;
 
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
-import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfigurationReader;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class LPG2RDFConfigurationReaderTest {
 
@@ -54,7 +51,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -119,7 +116,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -184,7 +181,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -250,7 +247,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -334,7 +331,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -419,7 +416,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -484,7 +481,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -563,7 +560,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -639,7 +636,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -702,7 +699,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
         final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
@@ -763,7 +760,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         final LPGNode node = new LPGNode("0", "", null);
         final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
@@ -826,8 +823,8 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -891,7 +888,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -955,7 +952,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -1034,7 +1031,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        final LPG2RDFConfiguration lpg2RDFConfiguration = LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
         assert(lpg2RDFConfiguration.getLabelPredicate().isURI());
         assert(lpg2RDFConfiguration.getLabelPredicate().getURI().equals("http://www.w3.org/2000/01/rdf-schema#label"));
         final LPGNode node = new LPGNode("0", null, null);
@@ -1113,7 +1110,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1155,7 +1152,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1197,7 +1194,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
 
@@ -1240,7 +1237,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
 
@@ -1283,7 +1280,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
     /*
      * In this test case, prefixOfIRIs is not given in IRINodeMapping.
@@ -1324,7 +1321,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1366,7 +1363,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1408,7 +1405,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1450,7 +1447,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1471,7 +1468,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1517,7 +1514,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1563,7 +1560,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1624,7 +1621,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1685,7 +1682,7 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 
     /*
@@ -1747,6 +1744,6 @@ public class LPG2RDFConfigurationReaderTest {
         b.lang( Lang.TURTLE );
         b.parse(lpg2rdf);
 
-        LPG2RDFConfigurationReader.readFromModel(lpg2rdf);
+        new LPG2RDFConfigurationReader().read(lpg2rdf);
     }
 }
