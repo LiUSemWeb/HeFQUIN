@@ -42,9 +42,28 @@ import java.util.List;
 
 public class LPG2RDFConfigurationReader
 {
+    /**
+     * Creates a {@link LPG2RDFConfiguration} from the RDF-based description
+     * in the given file. Assumes that the file describes only one such
+     * configuration.
+     */
     public LPG2RDFConfiguration readFromFile( final String filename ) {
         final Model m = RDFDataMgr.loadModel(filename);
         return read(m);
+    }
+
+    /**
+     * Creates the {@link LPG2RDFConfiguration} that is identified by the
+     * given URI in the RDF-based description  in the given file.
+     */
+    public LPG2RDFConfiguration readFromFile( final String filename, final String uriOfConfRsrc ) {
+        final Model m = RDFDataMgr.loadModel(filename);
+        final Resource confRsrc = m.createResource(uriOfConfRsrc);
+
+        if ( ! m.contains(confRsrc, null) )
+            throw new IllegalArgumentException("There is no description of the given URI (" + uriOfConfRsrc + ") in " + filename);
+
+        return read(confRsrc);
     }
 
     public LPG2RDFConfiguration read( final Model m ) {
@@ -60,10 +79,14 @@ public class LPG2RDFConfigurationReader
             throw new IllegalArgumentException("More than one instance of LPGtoRDFConfiguration!");
         }
 
-        final NodeMapping nm = getNodeMapping(m, confRsrc);
-        final NodeLabelMapping nlm = getNodeLabelMapping(m, confRsrc);
-        final EdgeLabelMapping elm = getEdgeLabelMapping(m, confRsrc);
-        final PropertyNameMapping pm = getPropertyNameMapping(m,confRsrc);
+        return read(confRsrc);
+    }
+
+    public LPG2RDFConfiguration read( final Resource confRsrc ) {
+        final NodeMapping nm = getNodeMapping(confRsrc);
+        final NodeLabelMapping nlm = getNodeLabelMapping(confRsrc);
+        final EdgeLabelMapping elm = getEdgeLabelMapping(confRsrc);
+        final PropertyNameMapping pm = getPropertyNameMapping(confRsrc);
         final Node labelPredicate = getLabelPredicate(confRsrc);
 
         return new LPG2RDFConfigurationImpl(nm, nlm, elm, pm, labelPredicate);
@@ -96,7 +119,7 @@ public class LPG2RDFConfigurationReader
 
     }
 
-    public NodeMapping getNodeMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
+    public NodeMapping getNodeMapping( final Resource lpg2rdfConfig ) {
 
         final StmtIterator nodeMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.nodeMapping);
 
@@ -108,7 +131,7 @@ public class LPG2RDFConfigurationReader
             throw new IllegalArgumentException("More than one instance of nodeMapping!");
         }
 
-        final RDFNode nodeMappingResourceType = lpg2Rdf.getRequiredProperty(nodeMappingResource, RDF.type).getObject();
+        final RDFNode nodeMappingResourceType = lpg2rdfConfig.getModel().getRequiredProperty(nodeMappingResource, RDF.type).getObject();
 
         if ( nodeMappingResourceType.equals(LPG2RDF.IRIBasedNodeMapping)
                 || (nodeMappingResourceType.equals(LPG2RDF.NodeMapping) && nodeMappingResource.hasProperty(LPG2RDF.prefixOfIRIs)) ) {
@@ -313,7 +336,7 @@ public class LPG2RDFConfigurationReader
         }
     }
 
-    public NodeLabelMapping getNodeLabelMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
+    public NodeLabelMapping getNodeLabelMapping( final Resource lpg2rdfConfig ) {
 
         final StmtIterator nodeLabelMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.nodeLabelMapping);
 
@@ -325,7 +348,7 @@ public class LPG2RDFConfigurationReader
             throw new IllegalArgumentException("More than one instance of nodeLabelMapping!");
         }
 
-        final RDFNode nodeLabelMappingResourceType = lpg2Rdf.getRequiredProperty(nodeLabelMappingResource, RDF.type).getObject();
+        final RDFNode nodeLabelMappingResourceType = lpg2rdfConfig.getModel().getRequiredProperty(nodeLabelMappingResource, RDF.type).getObject();
 
         return createNodeLabelMapping(nodeLabelMappingResource, nodeLabelMappingResourceType);
     }
@@ -471,7 +494,7 @@ public class LPG2RDFConfigurationReader
         }
     }
 
-    public EdgeLabelMapping getEdgeLabelMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
+    public EdgeLabelMapping getEdgeLabelMapping( final Resource lpg2rdfConfig ) {
 
         final StmtIterator edgeLabelMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.edgeLabelMapping);
 
@@ -483,7 +506,7 @@ public class LPG2RDFConfigurationReader
             throw new IllegalArgumentException("More than one instance of edgeLabelMapping!");
         }
 
-        final RDFNode edgeLabelMappingResourceType = lpg2Rdf.getRequiredProperty(edgeLabelMappingResource, RDF.type).getObject();
+        final RDFNode edgeLabelMappingResourceType = lpg2rdfConfig.getModel().getRequiredProperty(edgeLabelMappingResource, RDF.type).getObject();
 
         return createEdgeLabelMapping(edgeLabelMappingResource, edgeLabelMappingResourceType);
     }
@@ -629,7 +652,7 @@ public class LPG2RDFConfigurationReader
         }
     }
 
-    public PropertyNameMapping getPropertyNameMapping(final Model lpg2Rdf, final Resource lpg2rdfConfig){
+    public PropertyNameMapping getPropertyNameMapping( final Resource lpg2rdfConfig ) {
 
         final StmtIterator propertyNameMappingIterator = lpg2rdfConfig.listProperties(LPG2RDF.propertyNameMapping);
 
@@ -641,7 +664,7 @@ public class LPG2RDFConfigurationReader
             throw new IllegalArgumentException("More than one instance of propertyNameMapping!");
         }
 
-        final RDFNode propertyNameMappingResourceType = lpg2Rdf.getRequiredProperty(propertyNameMappingResource, RDF.type).getObject();
+        final RDFNode propertyNameMappingResourceType = lpg2rdfConfig.getModel().getRequiredProperty(propertyNameMappingResource, RDF.type).getObject();
 
         return createPropertyNameMapping(propertyNameMappingResource, propertyNameMappingResourceType);
     }
