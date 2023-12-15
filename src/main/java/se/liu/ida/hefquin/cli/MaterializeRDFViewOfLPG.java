@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProc
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
@@ -122,11 +123,13 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 	public CypherQuery buildGetNodesQuery(){
 
-//		MATCH (n) RETURN n
+//		MATCH (n) RETURN n AS node, 'label' AS label, HEAD(LABELS(n)) AS value
 		final CypherVar n = new CypherVar("n");
 		return new CypherQueryBuilder()
 				.addMatch(new NodeMatchClause(n))
 				.addReturn(new AliasedExpression(n, new CypherVar("node")))
+				.addReturn(new AliasedExpression(new LiteralExpression("label"), new CypherVar("label")))
+				.addReturn(new AliasedExpression(new LabelsExpression(n), new CypherVar("value")))
 				.build();
 	}
 
@@ -136,12 +139,13 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		final CypherVar e = new CypherVar("e");
 		final CypherVar n2 = new CypherVar("n2");
 
-//		MATCH (n1)-[e]->(n2) RETURN ID(n1) AS nid1, ID(n2) AS nid2, e
+//		MATCH (n1)-[e]->(n2) RETURN ID(n1) AS nid1, ID(n2) AS nid2, e As edge, TYPE(e) AS rel
 		return new CypherQueryBuilder()
 				.addMatch(new EdgeMatchClause(n1, e, n2))
 				.addReturn(new AliasedExpression(new VariableIDExpression(n1), new CypherVar("nid1")))
 				.addReturn(new AliasedExpression(new VariableIDExpression(n2), new CypherVar("nid2")))
 				.addReturn(new AliasedExpression(e, new CypherVar("edge")))
+				.addReturn(new AliasedExpression(new TypeExpression(e), new CypherVar("rel")))
 				.build();
 	}
 
@@ -150,21 +154,52 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			modTime.startTimer();
 		}
 		for (final TableRecord record : nodesResponse.getResponse()) {
-			System.out.println((LPGNodeValue)(record.getEntry(0).getValue()));
+			final LPGNodeValue nodeValue = (LPGNodeValue)(record.getEntry(0).getValue());
+			System.out.print(nodeValue.getNode().getId());
+			System.out.print(",");
+			System.out.print((LiteralValue)(record.getEntry(1).getValue()));
+			System.out.print(",");
+			System.out.print((LiteralValue)(record.getEntry(2).getValue()));
+			System.out.println();
+
+			System.out.print(nodeValue.getNode().getId());
+			PropertyMap properties = nodeValue.getNode().getProperties();
+			for (String name: properties.getPropertyNames()) {
+				System.out.print(",");
+				System.out.print(name);
+				System.out.print(",");
+				System.out.print(properties.getValueFor(name));
+			}
+			System.out.println();
 		}
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
 			System.out.println("Result Translation Time: " + modTime.timeStr(time) + " sec");
 		}
 	}
+
 	protected void printEdgesOutput( final RecordsResponse edgesResponse) {
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 		for (final TableRecord record : edgesResponse.getResponse()) {
+			LPGEdgeValue edgeValue = (LPGEdgeValue)(record.getEntry(2).getValue());
+			System.out.print(edgeValue.getEdge().getId());
+			System.out.print(",");
 			System.out.print((LiteralValue)(record.getEntry(0).getValue()));
+			System.out.print(",");
+			System.out.print((LiteralValue)(record.getEntry(3).getValue()));
+			System.out.print(",");
 			System.out.print((LiteralValue)(record.getEntry(1).getValue()));
-			System.out.print((LPGEdgeValue)(record.getEntry(2).getValue()));
+			System.out.println();
+			PropertyMap properties = edgeValue.getEdge().getProperties();
+			for (String name: properties.getPropertyNames()) {
+				System.out.print(edgeValue.getEdge().getId());
+				System.out.print(",");
+				System.out.print(name);
+				System.out.print(",");
+				System.out.print(properties.getValueFor(name));
+			}
 			System.out.println();
 		}
 		if ( modTime.timingEnabled() ) {
