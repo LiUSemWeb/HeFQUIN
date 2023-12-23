@@ -106,18 +106,25 @@ public class LPG2RDFConfigurationReader
     public NodeMapping readNodeMappingFromConfig( final Resource lpg2rdfConfig ) {
         final Resource nm = getMappingResource( lpg2rdfConfig, LPGtoRDF.nodeMapping );
 
-        final RDFNode nmType = lpg2rdfConfig.getModel().getRequiredProperty(nm, RDF.type).getObject();
+        // try to detect the type based on an rdf:type statement
+        final RDFNode nmType = lpg2rdfConfig.getModel().getProperty(nm, RDF.type).getObject();
+        if ( nmType != null ) {
+            if ( nmType.equals(LPGtoRDF.IRIPrefixBasedNodeMapping) )
+                return readIRIPrefixBasedNodeMapping(nm);
 
-        if ( nmType.equals(LPGtoRDF.IRIPrefixBasedNodeMapping) )
-            return readIRIPrefixBasedNodeMapping(nm);
+            if ( nmType.equals(LPGtoRDF.BNodeBasedNodeMapping) )
+                return new NodeMappingImpl_AllToBNodes();
+
+            if ( ! nmType.equals(LPGtoRDF.NodeMapping) )
+                throw new IllegalArgumentException("NodeMapping type (" + nmType + ") is unexpected!");
+        }
+
+        // try to detect the type based on the properties
 
         if ( nm.hasProperty(LPGtoRDF.prefixOfIRIs) )
            	return readIRIPrefixBasedNodeMapping(nm);
 
-        if ( nmType.equals(LPGtoRDF.BNodeBasedNodeMapping) )
-            return new NodeMappingImpl_AllToBNodes();
-
-        throw new IllegalArgumentException("NodeMapping type (" + nmType + ") is unexpected!");
+        throw new IllegalArgumentException("Incomplete NodeMapping (" + nm + ")");
     }
 
     public NodeMapping readIRIPrefixBasedNodeMapping( final Resource nm ) {
