@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
@@ -107,8 +108,10 @@ public class LPG2RDFConfigurationReader
         final Resource nm = getMappingResource( lpg2rdfConfig, LPGtoRDF.nodeMapping );
 
         // try to detect the type based on an rdf:type statement
-        final RDFNode nmType = lpg2rdfConfig.getModel().getProperty(nm, RDF.type).getObject();
-        if ( nmType != null ) {
+        final Statement nmTypeStmt = nm.getProperty( RDF.type );
+        if ( nmTypeStmt != null ) {
+            final RDFNode nmType = nmTypeStmt.getObject();
+
             if ( nmType.equals(LPGtoRDF.IRIPrefixBasedNodeMapping) )
                 return readIRIPrefixBasedNodeMapping(nm);
 
@@ -142,8 +145,10 @@ public class LPG2RDFConfigurationReader
 
     public NodeLabelMapping readNodeLabelMapping( final Resource nlm ) {
         // try to detect the type based on an rdf:type statement
-        final RDFNode nlmType = nlm.getProperty(RDF.type).getObject();
-        if ( nlmType != null ) {
+        final Statement nlmTypeStmt = nlm.getProperty( RDF.type );
+        if ( nlmTypeStmt != null ) {
+            final RDFNode nlmType = nlmTypeStmt.getObject();
+
             if ( nlmType.equals(LPGtoRDF.RegexBasedNodeLabelMapping) )
                 return readRegexBasedNodeLabelMapping(nlm);
 
@@ -263,8 +268,10 @@ public class LPG2RDFConfigurationReader
 
     public EdgeLabelMapping readEdgeLabelMapping( final Resource elm ) {
         // try to detect the type based on an rdf:type statement
-        final RDFNode elmType = elm.getProperty(RDF.type).getObject();
-        if ( elmType != null ) {
+        final Statement elmTypeStmt = elm.getProperty( RDF.type );
+        if ( elmTypeStmt != null ) {
+            final RDFNode elmType = elmTypeStmt.getObject();
+
             if ( elmType.equals(LPGtoRDF.RegexBasedEdgeLabelMapping) )
                 return readRegexBasedEdgeLabelMapping(elm);
 
@@ -353,8 +360,10 @@ public class LPG2RDFConfigurationReader
 
     public PropertyNameMapping readPropertyNameMapping( final Resource pm ) {
         // try to detect the type based on an rdf:type statement
-        final RDFNode pmType = pm.getRequiredProperty(RDF.type).getObject();
-        if ( pmType != null ) {
+        final Statement pmTypeStmt = pm.getProperty( RDF.type );
+        if ( pmTypeStmt != null ) {
+            final RDFNode pmType = pmTypeStmt.getObject();
+
             if ( pmType.equals(LPGtoRDF.RegexBasedPropertyNameMapping) )
                 return readRegexBasedPropertyNameMapping(pm);
 
