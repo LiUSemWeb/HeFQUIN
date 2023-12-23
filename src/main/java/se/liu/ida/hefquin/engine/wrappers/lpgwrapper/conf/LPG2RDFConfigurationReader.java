@@ -133,30 +133,30 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeLabelMapping readNodeLabelMapping( final Resource nlm ) {
-        final RDFNode nlmType = nlm.getRequiredProperty(RDF.type).getObject();
-
         // try to detect the type based on an rdf:type statement
+        final RDFNode nlmType = nlm.getProperty(RDF.type).getObject();
+        if ( nlmType != null ) {
+            if ( nlmType.equals(LPGtoRDF.RegexBasedNodeLabelMapping) )
+                return readRegexBasedNodeLabelMapping(nlm);
 
-        if ( nlmType.equals(LPGtoRDF.RegexBasedNodeLabelMapping) )
-            return readRegexBasedNodeLabelMapping(nlm);
+            if ( nlmType.equals(LPGtoRDF.IRIPrefixBasedNodeLabelMapping) )
+                return readIRIPrefixBasedNodeLabelMapping(nlm);
 
-        if ( nlmType.equals(LPGtoRDF.IRIPrefixBasedNodeLabelMapping) )
-            return readIRIPrefixBasedNodeLabelMapping(nlm);
+            if ( nlmType.equals(LPGtoRDF.SingletonIRINodeLabelMapping) )
+                return readSingletonIRINodeLabelMapping(nlm);
 
-        if ( nlmType.equals(LPGtoRDF.SingletonIRINodeLabelMapping) )
-            return readSingletonIRINodeLabelMapping(nlm);
+            if ( nlmType.equals(LPGtoRDF.SingletonLiteralNodeLabelMapping) )
+                return readSingletonLiteralNodeLabelMapping(nlm);
 
-        if ( nlmType.equals(LPGtoRDF.SingletonLiteralNodeLabelMapping) )
-            return readSingletonLiteralNodeLabelMapping(nlm);
+            if ( nlmType.equals(LPGtoRDF.CompositeNodeLabelMapping) )
+                return readCompositeNodeLabelMapping(nlm);
 
-        if ( nlmType.equals(LPGtoRDF.CompositeNodeLabelMapping) )
-            return readCompositeNodeLabelMapping(nlm);
+            if ( nlmType.equals(LPGtoRDF.LiteralBasedNodeLabelMapping) )
+                return new NodeLabelMappingImpl_AllToLiterals();
 
-        if ( nlmType.equals(LPGtoRDF.LiteralBasedNodeLabelMapping) )
-            return new NodeLabelMappingImpl_AllToLiterals();
-
-        if ( ! nlmType.equals(LPGtoRDF.NodeLabelMapping) )
-            throw new IllegalArgumentException("NodeLabelMapping type (" + nlmType + ") is unexpected!");
+            if ( ! nlmType.equals(LPGtoRDF.NodeLabelMapping) )
+                throw new IllegalArgumentException("NodeLabelMapping type (" + nlmType + ") is unexpected!");
+        }
 
         // try to detect the type based on the properties
 
@@ -240,24 +240,24 @@ public class LPG2RDFConfigurationReader
     }
 
     public EdgeLabelMapping readEdgeLabelMapping( final Resource elm ) {
-        final RDFNode elmType = elm.getRequiredProperty(RDF.type).getObject();
-
         // try to detect the type based on an rdf:type statement
+        final RDFNode elmType = elm.getProperty(RDF.type).getObject();
+        if ( elmType != null ) {
+            if ( elmType.equals(LPGtoRDF.RegexBasedEdgeLabelMapping) )
+                return readRegexBasedEdgeLabelMapping(elm);
 
-        if ( elmType.equals(LPGtoRDF.RegexBasedEdgeLabelMapping) )
-            return readRegexBasedEdgeLabelMapping(elm);
+            if ( elmType.equals(LPGtoRDF.IRIPrefixBasedEdgeLabelMapping) )
+                return readIRIPrefixBasedEdgeLabelMapping(elm);
 
-        if ( elmType.equals(LPGtoRDF.IRIPrefixBasedEdgeLabelMapping) )
-            return readIRIPrefixBasedEdgeLabelMapping(elm);
+            if ( elmType.equals(LPGtoRDF.SingletonIRIEdgeLabelMapping) )
+                return readSingletonIRIEdgeLabelMapping(elm);
 
-        if ( elmType.equals(LPGtoRDF.SingletonIRIEdgeLabelMapping) )
-            return readSingletonIRIEdgeLabelMapping(elm);
+            if ( elmType.equals(LPGtoRDF.CompositeEdgeLabelMapping) )
+                return readCompositeEdgeLabelMapping(elm);
 
-        if ( elmType.equals(LPGtoRDF.CompositeEdgeLabelMapping) )
-            return readCompositeEdgeLabelMapping(elm);
-
-        if ( ! elmType.equals(LPGtoRDF.EdgeLabelMapping) )
-            throw new IllegalArgumentException("EdgeLabelMapping type (" + elmType + ") is unexpected!");
+            if ( ! elmType.equals(LPGtoRDF.EdgeLabelMapping) )
+                throw new IllegalArgumentException("EdgeLabelMapping type (" + elmType + ") is unexpected!");
+        }
 
         // try to detect the type based on the properties
 
@@ -330,24 +330,24 @@ public class LPG2RDFConfigurationReader
     }
 
     public PropertyNameMapping readPropertyNameMapping( final Resource pm ) {
-        final RDFNode pmType = pm.getRequiredProperty(RDF.type).getObject();
-
         // try to detect the type based on an rdf:type statement
+        final RDFNode pmType = pm.getRequiredProperty(RDF.type).getObject();
+        if ( pmType != null ) {
+            if ( pmType.equals(LPGtoRDF.RegexBasedPropertyNameMapping) )
+                return readRegexBasedPropertyNameMapping(pm);
 
-        if ( pmType.equals(LPGtoRDF.RegexBasedPropertyNameMapping) )
-            return readRegexBasedPropertyNameMapping(pm);
+            if ( pmType.equals(LPGtoRDF.IRIPrefixBasedPropertyNameMapping) )
+                return readIRIPrefixBasedPropertyNameMapping(pm);
 
-        if ( pmType.equals(LPGtoRDF.IRIPrefixBasedPropertyNameMapping) )
-            return readIRIPrefixBasedPropertyNameMapping(pm);
+            if ( pmType.equals(LPGtoRDF.SingletonIRIPropertyNameMapping) )
+                return readSingletonIRIPropertyNameMapping(pm);
 
-        if ( pmType.equals(LPGtoRDF.SingletonIRIPropertyNameMapping) )
-            return readSingletonIRIPropertyNameMapping(pm);
+            if ( pmType.equals(LPGtoRDF.CompositePropertyNameMapping) )
+                return readCompositePropertyNameMapping(pm);
 
-        if ( pmType.equals(LPGtoRDF.CompositePropertyNameMapping) )
-            return readCompositePropertyNameMapping(pm);
-
-        if ( ! pmType.equals(LPGtoRDF.EdgeLabelMapping) )
-            throw new IllegalArgumentException("PropertyNameMapping type (" + pmType + ") is unexpected!");
+            if ( ! pmType.equals(LPGtoRDF.EdgeLabelMapping) )
+                throw new IllegalArgumentException("PropertyNameMapping type (" + pmType + ") is unexpected!");
+        }
 
         // try to detect the type based on the properties
 
