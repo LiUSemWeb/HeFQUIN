@@ -40,8 +40,8 @@ public class Neo4jConnectionFactory {
                     "    \"statement\" : \""+ cypher +"\"" +
                     "  , \"parameters\" : {} } ]" +
                     "}";
-            final var request = HttpRequest.newBuilder(
-                    URI.create(this.URL))
+
+            final var request = HttpRequest.newBuilder( URI.create(this.URL) )
                     .header("Accept", "application/json;charset=UTF-8")
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(data))
@@ -50,11 +50,18 @@ public class Neo4jConnectionFactory {
             final HttpResponse<String> response;
             try {
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch ( final IOException e ) {
+            }
+            catch ( final IOException e ) {
                 throw new Neo4JConnectionException("Data could not be sent to the server", e, this);
-            } catch ( final InterruptedException e ) {
+            }
+            catch ( final InterruptedException e ) {
                 throw new Neo4JConnectionException("Neo4j server could not be reached.", e, this);
             }
+
+            if ( response.statusCode() != 200 ) {
+                throw new Neo4JConnectionException("Unexpected status code in HTTP response from Neo4j server: " + response.statusCode(), this);
+            }
+
             try {
                 return CypherUtils.parse(response.body());
             } catch ( final JsonProcessingException e ) {

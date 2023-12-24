@@ -21,13 +21,18 @@ public class CypherUtils {
      */
     public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4JException {
         final ObjectMapper mapper = new ObjectMapper();
-        final List<TableRecord> records = new LinkedList<>();
         final JsonNode root = mapper.readTree(body);
         final JsonNode errors = root.get("errors");
-        if (errors.isArray() && !errors.isEmpty()) {
-            throw new Neo4JException(errors.get(0).textValue());
+        if ( errors != null && errors.isArray() && !errors.isEmpty() ) {
+            throw new Neo4JException( errors.get(0).textValue() );
         }
+
+        final List<TableRecord> records = new LinkedList<>();
+
         final JsonNode results = root.get("results");
+        if ( results == null )
+            return records;
+
         for (final JsonNode r : results) {
             final JsonNode columns = r.get("columns");
             final JsonNode data = r.get("data");

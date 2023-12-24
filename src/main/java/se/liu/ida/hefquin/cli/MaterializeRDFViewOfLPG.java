@@ -74,29 +74,33 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 	@Override
 	protected void exec() {
+		if ( ! hasArg(argEndpointURI) ) {
+			System.err.println( "Error: URI of Neo4j endpoint not specified.");
+			System.err.println( "       Specify it using the --" + argEndpointURI.getKeyName() + " argument.");
+			return;
+		}
+
+		final String neo4jEndpointURI = getArg(argEndpointURI).getValue();
+		final Neo4jInterface neo4jIface = new Neo4jInterfaceImpl(neo4jEndpointURI);
+		final Neo4jServer neo4jServer = new Neo4jServer() {
+			@Override public Neo4jInterface getInterface() { return neo4jIface; }
+			@Override public VocabularyMapping getVocabularyMapping() { return null; }
+		};
+
 		final LPG2RDFConfiguration conf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
 		final CypherQuery getNodesQuery = buildGetNodesQuery();
 		final CypherQuery getEdgesQuery = buildGetEdgesQuery();
 
-		final RecordsResponse nodesResponse = performQueryExecution(getNodesQuery);
-		final RecordsResponse edgesResponse = performQueryExecution(getEdgesQuery);
+		final RecordsResponse nodesResponse = execQuery(getNodesQuery, neo4jServer);
+		final RecordsResponse edgesResponse = execQuery(getEdgesQuery, neo4jServer);
 
 		printNodesOutput(nodesResponse);
 		printEdgesOutput(edgesResponse);
 	}
 
-	protected RecordsResponse performQueryExecution(final CypherQuery query) {
+	protected RecordsResponse execQuery( final CypherQuery query, final Neo4jServer server ) {
 		final Neo4jRequest request = new Neo4jRequestImpl( query.toString() );
-
-		final String uri = getArg(argEndpointURI).getValue();
-		final Neo4jInterface iface = new Neo4jInterfaceImpl(uri);
-		final Neo4jServer server = new Neo4jServer() {
-			@Override public Neo4jInterface getInterface() { return iface; }
-
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
-		};
-
 		final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
 
 		if ( modTime.timingEnabled() ) {
