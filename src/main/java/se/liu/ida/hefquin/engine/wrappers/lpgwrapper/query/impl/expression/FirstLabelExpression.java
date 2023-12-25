@@ -6,11 +6,15 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisit
 import java.util.Objects;
 import java.util.Set;
 
-public class LabelsExpression implements CypherExpression {
+/**
+ * Represents an expression to obtain the first label of
+ * a graph object that is bound to a given query variable.
+ */
+public class FirstLabelExpression implements CypherExpression {
 
     protected final CypherVar var;
 
-    public LabelsExpression(final CypherVar var) {
+    public FirstLabelExpression(final CypherVar var) {
         assert var != null;
         this.var = var;
     }
@@ -30,7 +34,7 @@ public class LabelsExpression implements CypherExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LabelsExpression that = (LabelsExpression) o;
+        FirstLabelExpression that = (FirstLabelExpression) o;
         return var.equals(that.var);
     }
 

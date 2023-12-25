@@ -77,7 +77,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 } else {
                     throw new IllegalArgumentException("Invalid Return Statement");
                 }
-            } else if (expression instanceof LabelsExpression) {
+            } else if (expression instanceof FirstLabelExpression) {
                 builder.add(var, conf.getRDFTermForNodeLabel(current.getValue().toString()));
             } else if (expression instanceof PropertyAccessExpression) {
                 builder.add(var, NodeFactory.createLiteral(current.getValue().toString()));

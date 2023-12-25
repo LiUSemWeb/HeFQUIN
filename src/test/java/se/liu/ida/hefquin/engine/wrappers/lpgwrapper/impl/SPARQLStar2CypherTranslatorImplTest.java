@@ -187,7 +187,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new EqualityExpression(new VariableIDExpression(a1), id22))
-                        .add(new AliasedExpression(new LabelsExpression(a1), ret1))
+                        .add(new AliasedExpression(new FirstLabelExpression(a1), ret1))
                         .build(),
                 translation);
     }
@@ -287,7 +287,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
                         .add(new AliasedExpression(a1, ret1))
-                        .add(new AliasedExpression(new LabelsExpression(a1), ret2))
+                        .add(new AliasedExpression(new FirstLabelExpression(a1), ret2))
                         .build(),
                 translation);
     }
@@ -410,7 +410,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                                 .add(new EqualityExpression(new VariableIDExpression(a1), id22))
                                 .add(new MarkerExpression(0, marker))
                                 .add(new AliasedExpression(new LiteralExpression("label"), ret1))
-                                .add(new AliasedExpression(new LabelsExpression(a1), ret2))
+                                .add(new AliasedExpression(new FirstLabelExpression(a1), ret2))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a2))
@@ -451,7 +451,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                                 .add(new MarkerExpression(1, marker))
                                 .add(new AliasedExpression(a4, ret1))
                                 .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                                .add(new AliasedExpression(new LabelsExpression(a4), ret3))
+                                .add(new AliasedExpression(new FirstLabelExpression(a4), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
@@ -552,7 +552,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                                 .add(new MarkerExpression(1, marker))
                                 .add(new AliasedExpression(a4, ret1))
                                 .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                                .add(new AliasedExpression(new LabelsExpression(a4), ret3))
+                                .add(new AliasedExpression(new FirstLabelExpression(a4), ret3))
                                 .build(),
                         new CypherQueryBuilder()
                                 .add(new NodeMatchClause(a5))
@@ -596,7 +596,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                         .add(new NodeMatchClause(a1))
                         .add(new EqualityExpression(new VariableIDExpression(a1), id22))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret1))
-                        .add(new AliasedExpression(new LabelsExpression(a1), ret2))
+                        .add(new AliasedExpression(new FirstLabelExpression(a1), ret2))
                         .build(),
                 translation);
     }
@@ -613,7 +613,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                         .addMatch(new NodeMatchClause(a4))
                         .add(new AliasedExpression(a4, ret1))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                        .add(new AliasedExpression(new LabelsExpression(a4), ret3))
+                        .add(new AliasedExpression(new FirstLabelExpression(a4), ret3))
                         .build(),
                 translation);
     }
@@ -1017,7 +1017,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                         .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(a8, ret1))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                        .add(new AliasedExpression(new LabelsExpression(a8), ret3))
+                        .add(new AliasedExpression(new FirstLabelExpression(a8), ret3))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a9))
@@ -1065,7 +1065,7 @@ public class SPARQLStar2CypherTranslatorImplTest {
                         .add(new MarkerExpression(5, marker))
                         .add(new AliasedExpression(a8, ret1))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                        .add(new AliasedExpression(new LabelsExpression(a8), ret3))
+                        .add(new AliasedExpression(new FirstLabelExpression(a8), ret3))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a9))

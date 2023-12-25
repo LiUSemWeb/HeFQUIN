@@ -41,7 +41,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LiteralValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.LabelsExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.FirstLabelExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.TypeExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.VariableIDExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
@@ -137,7 +137,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		return new CypherQueryBuilder()
 				.addMatch( new NodeMatchClause(n) )
 				.addReturn( new AliasedExpression(n, node) )
-				.addReturn( new AliasedExpression(new LabelsExpression(n), label) )
+				.addReturn( new AliasedExpression(new FirstLabelExpression(n), label) )
 				.build();
 	}
 

@@ -376,7 +376,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                 .add(new NodeMatchClause(a1))
                 .add(new EqualityExpression(new VariableIDExpression(a1),
                         new LiteralExpression(configuration.getLPGNodeForRDFTerm(s).getId(), XSDDatatype.XSDinteger)))
-                .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                .add(new AliasedExpression(new FirstLabelExpression(a1), gen.getRetVar(o)))
                 .build();
     }
 
@@ -462,7 +462,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         return new CypherQueryBuilder()
                 .add(new NodeMatchClause(a1))
                 .add(new AliasedExpression(a1, gen.getRetVar(s)))
-                .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                .add(new AliasedExpression(new FirstLabelExpression(a1), gen.getRetVar(o)))
                 .build();
     }
 
@@ -608,7 +608,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new EqualityExpression(new VariableIDExpression(a1),
                             new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                     .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                    .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                    .add(new AliasedExpression(new FirstLabelExpression(a1), gen.getRetVar(o)))
                     .build();
         }
         final CypherVar a2 = gen.getAnonVar();
@@ -655,7 +655,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                 new LiteralExpression(node.getId(), XSDDatatype.XSDinteger)))
                         .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                        .add(new AliasedExpression(new LabelsExpression(a1), gen.getRetVar(o)))
+                        .add(new AliasedExpression(new FirstLabelExpression(a1), gen.getRetVar(o)))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
@@ -715,7 +715,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                     .add(new NodeMatchClause(a4))
                     .add(new AliasedExpression(a4, gen.getRetVar(s)))
                     .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                    .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                    .add(new AliasedExpression(new FirstLabelExpression(a4), gen.getRetVar(o)))
                     .build();
         }
 
@@ -736,7 +736,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                             .add(new MarkerExpression(1, marker))
                             .add(new AliasedExpression(a4, gen.getRetVar(s)))
                             .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                            .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                            .add(new AliasedExpression(new FirstLabelExpression(a4), gen.getRetVar(o)))
                             .build(),
                     new CypherQueryBuilder()
                             .add(new NodeMatchClause(a5))
@@ -787,7 +787,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                         .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(a4, gen.getRetVar(s)))
                         .add(new AliasedExpression(new LiteralExpression("label"), gen.getRetVar(p)))
-                        .add(new AliasedExpression(new LabelsExpression(a4), gen.getRetVar(o)))
+                        .add(new AliasedExpression(new FirstLabelExpression(a4), gen.getRetVar(o)))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a5))

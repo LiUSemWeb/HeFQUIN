@@ -160,7 +160,7 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new NodeMatchClause(cpvar1))
                 .add(new EqualityExpression(new VariableIDExpression(cpvar1),
                         new LiteralExpression("22")))
-                .add(new AliasedExpression(new LabelsExpression(cpvar1), ret1))
+                .add(new AliasedExpression(new FirstLabelExpression(cpvar1), ret1))
                 .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"Person\"],\"meta\":[null]}]}]" +
@@ -300,7 +300,7 @@ public class Record2SolutionMappingTranslationImplTest {
         final CypherQuery query = new CypherQueryBuilder()
                 .add(new NodeMatchClause(cpvar1))
                 .add(new AliasedExpression(cpvar1, ret1))
-                .add(new AliasedExpression(new LabelsExpression(cpvar1), ret2))
+                .add(new AliasedExpression(new FirstLabelExpression(cpvar1), ret2))
                 .build();
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},\"Movie\"],\"meta\":[{\"id\":0,\"type\":\"node\"},null]}," +
@@ -548,7 +548,7 @@ public class Record2SolutionMappingTranslationImplTest {
                         .add(new EqualityExpression(new VariableIDExpression(a1), new LiteralExpression("22")))
                         .add(new MarkerExpression(0, marker))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret1))
-                        .add(new AliasedExpression(new LabelsExpression(a1), ret2))
+                        .add(new AliasedExpression(new FirstLabelExpression(a1), ret2))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a2))
@@ -611,7 +611,7 @@ public class Record2SolutionMappingTranslationImplTest {
                         .add(new MarkerExpression(1, marker))
                         .add(new AliasedExpression(a4, ret1))
                         .add(new AliasedExpression(new LiteralExpression("label"), ret2))
-                        .add(new AliasedExpression(new LabelsExpression(a4), ret3))
+                        .add(new AliasedExpression(new FirstLabelExpression(a4), ret3))
                         .build(),
                 new CypherQueryBuilder()
                         .add(new NodeMatchClause(a5))
