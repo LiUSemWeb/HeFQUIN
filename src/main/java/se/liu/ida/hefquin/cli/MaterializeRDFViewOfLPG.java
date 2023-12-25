@@ -34,14 +34,15 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.ArrayValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGEdgeValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNodeValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LiteralValue;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AllLabelsExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.FirstLabelExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.TypeExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.VariableIDExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
@@ -137,7 +138,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		return new CypherQueryBuilder()
 				.addMatch( new NodeMatchClause(n) )
 				.addReturn( new AliasedExpression(n, node) )
-				.addReturn( new AliasedExpression(new FirstLabelExpression(n), label) )
+				.addReturn( new AliasedExpression(new AllLabelsExpression(n), label) )
 				.build();
 	}
 
@@ -191,20 +192,21 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			// Obtain the relevant values from the current row of the
 			// query result, which capture the current node and its label.
 			final LPGNodeValue nodeValue = (LPGNodeValue) record.getEntry(0).getValue();
-			final LiteralValue labelValue = (LiteralValue) record.getEntry(1).getValue();
+			final ArrayValue labelArray = (ArrayValue) record.getEntry(1).getValue();
 
 			final LPGNode node = nodeValue.getNode();
-			final String label = labelValue.getValue().toString();
-
 			final Node termForNode = l2rConf.getRDFTermForLPGNode(node);
 
-			// Create and write the triple that captures the label of the
-			// current LPG node, which is one of the triples in the set
-			// that is called nl in the paper.
-			final Triple t = new Triple( termForNode,
-			                             l2rConf.getLabelPredicate(),
-			                             l2rConf.getRDFTermForNodeLabel(label) );
-			rdfOutStream.triple(t);
+			// Create and write the triples that capture the labels of
+			// the current LPG node, which are triples in the set that
+			// is called nl in the paper.
+			for ( final LiteralValue labelValue : labelArray.getElements() ) {
+				final String label = labelValue.getValue().toString();
+				final Triple t = new Triple( termForNode,
+				                             l2rConf.getLabelPredicate(),
+				                             l2rConf.getRDFTermForNodeLabel(label) );
+				rdfOutStream.triple(t);
+			}
 
 			// Create and write the triples that capture the properties of
 			// the current LPG node, which are triples in the set that is
@@ -261,6 +263,10 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	                                          final StreamRDF rdfOutStream ) {
 		for ( final String pn : properties.getPropertyNames() ) {
 			final Value pv = properties.getValueFor(pn);
+
+			// TODO: Capture array values as some form of list
+			if ( pv instanceof ArrayValue )
+				continue;
 
 			// Create the RDF literal for the value of the current property,
 			// to be used as the object of the triple created for the property.
