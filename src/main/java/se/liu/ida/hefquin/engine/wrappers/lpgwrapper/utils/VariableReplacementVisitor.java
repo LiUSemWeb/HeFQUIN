@@ -72,6 +72,12 @@ public class VariableReplacementVisitor implements CypherExpressionVisitor {
     }
 
     @Override
+    public void visitLabels(final AllLabelsExpression ex) {
+        assert stack.peek() instanceof CypherVar;
+        stack.push(new AllLabelsExpression((CypherVar) stack.pop()));
+    }
+
+    @Override
     public void visitLiteral(final LiteralExpression ex) {
         stack.push(ex);
     }
