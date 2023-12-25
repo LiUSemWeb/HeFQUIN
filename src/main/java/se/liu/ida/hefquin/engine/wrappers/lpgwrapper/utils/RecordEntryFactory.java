@@ -58,12 +58,26 @@ public class RecordEntryFactory {
         return new LPGNode(id.asText(), "", new PropertyMapImpl(properties));
     }
 
-    private static Map<String, Value> parseProperties(JsonNode col) {
+    private static Map<String, Value> parseProperties( final JsonNode col ) {
         final Map<String, Value> properties = new HashMap<>();
-        for (final Iterator<String> it = col.fieldNames(); it.hasNext(); ) {
+        final Iterator<String> it = col.fieldNames();
+        while ( it.hasNext() ) {
             final String name = it.next();
-            final JsonNode val = col.get(name);
-            properties.put(name, new LiteralValue(val.asText()));
+            final JsonNode valNode = col.get(name);
+
+            final Object value;
+            if ( valNode.isInt() )
+                value = Integer.valueOf( valNode.asInt() );
+            else if ( valNode.isDouble() )
+                value = Double.valueOf( valNode.asDouble() );
+            else if ( valNode.isBoolean() )
+                value = Boolean.valueOf( valNode.asBoolean() );
+            else if ( valNode.isLong() )
+                value = Long.valueOf( valNode.asLong() );
+            else
+                value = valNode.asText();
+
+            properties.put( name, new LiteralValue(value) );
         }
         return properties;
     }
