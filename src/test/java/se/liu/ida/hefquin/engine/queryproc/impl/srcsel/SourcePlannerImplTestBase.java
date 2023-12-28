@@ -19,7 +19,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 public abstract class SourcePlannerImplTestBase extends EngineTestBase
 {
@@ -33,7 +32,6 @@ public abstract class SourcePlannerImplTestBase extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { throw new UnsupportedOperationException(); }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
-			@Override public CostModel getCostModel() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 		};
 

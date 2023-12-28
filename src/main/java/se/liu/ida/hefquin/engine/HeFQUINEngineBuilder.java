@@ -160,7 +160,7 @@ public class HeFQUINEngineBuilder
 		if ( execService == null )
 			throw new IllegalStateException("no ExecutorService for plan tasks specified");
 
-		final QueryProcContext ctxt = new QueryProcContextBase() {
+		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return isExperimentRun; }
@@ -231,18 +231,6 @@ public class HeFQUINEngineBuilder
 	protected PhysicalOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryProcContext ctxt ) {
 		final TerminationCriterionFactory tcFactory = TerminatedByNumberOfGenerations.getFactory(20);
 		return new EvolutionaryAlgorithmQueryOptimizer(l2pConverter, costModel, ctxt, 8, 2, tcFactory);
-	}
-//TODO: Current overall goal is to get rid of costModel in QueryProcContext interface 
-
-	protected static abstract class QueryProcContextBase implements QueryProcContext {
-		protected final CostModel costModel;
-
-		public QueryProcContextBase() {
-			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
-//			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
-		}
-
-		@Override public CostModel getCostModel() { return costModel; }
 	}
 
 }
