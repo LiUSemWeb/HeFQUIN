@@ -2,11 +2,13 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorith
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.PlanRewritingUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
@@ -17,8 +19,11 @@ import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
 
-public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
-    protected final QueryOptimizationContext ctxt;
+public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer
+{
+	protected final LogicalToPhysicalPlanConverter l2pConverter;
+	protected final CostModel costModel;
+    protected final QueryProcContext ctxt;
     protected final TerminationCriterionFactory tcFactory;
     protected final int nmCandidates;
     protected final int nmSurvivors;
@@ -27,13 +32,19 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
     protected final RandomizedSelection<PhysicalPlanWithCost> planRandomizedSelect = new RandomizedSelection<>();
     protected final Random rand = new Random();
 
-    public EvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt,
+    public EvolutionaryAlgorithmQueryOptimizer( final LogicalToPhysicalPlanConverter l2pConverter,
+                                                final CostModel costModel,
+                                                final QueryProcContext ctxt,
                                                 final int nmCandidates, final int nmSurvivors,
                                                 final TerminationCriterionFactory tcFactory ) {
+        assert l2pConverter != null;
+        assert costModel != null;
         assert ctxt != null;
         assert tcFactory != null;
         assert (nmCandidates - nmSurvivors) > 0;
 
+        this.l2pConverter = l2pConverter;
+        this.costModel = costModel;
         this.ctxt = ctxt;
         this.tcFactory = tcFactory;
         this.nmCandidates = nmCandidates;
@@ -47,7 +58,8 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
 
     @Override
     public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
-        final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, false );
+        final boolean keepMultiwayJoins = false;
+        final PhysicalPlan initialPhysicalPlan = l2pConverter.convert(initialPlan, keepMultiwayJoins);
         return optimize( initialPhysicalPlan, tcFactory.createInstance(initialPlan) );
     }
 
@@ -122,7 +134,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
             ruleApps.remove( ruleApplication );
         }
 
-        return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), currentGen) );
+        return new Generation( PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, currentGen) );
     }
 
     protected Generation generateNextGen( final Generation currentGen, final PlanRewritingUtils cache ) throws PhysicalOptimizationException {
@@ -146,7 +158,7 @@ public class EvolutionaryAlgorithmQueryOptimizer implements PhysicalOptimizer {
             }
         }
 
-        final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), newCandidates );
+        final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, newCandidates );
         candidatesWithCost.addAll( currentGen.plans );
 
         // select the next generation from all candidates

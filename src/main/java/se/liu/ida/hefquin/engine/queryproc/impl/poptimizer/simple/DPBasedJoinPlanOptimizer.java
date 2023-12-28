@@ -1,14 +1,11 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
@@ -17,12 +14,12 @@ import java.util.*;
 
 public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
-    protected final QueryOptimizationContext ctxt;
+    protected final CostModel costModel;
 
-    public DPBasedJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-        assert ctxt != null;
+    public DPBasedJoinPlanOptimizer( final CostModel costModel ) {
+        assert costModel != null;
 
-        this.ctxt = ctxt;
+        this.costModel = costModel;
     }
 
     @Override
@@ -79,7 +76,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
                     // Prune: only the best candidate plan is retained in optPlan.
                     // TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
-                    final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
+                    final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, candidatePlans);
                     final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
                     optPlan.add( plans, planWithLowestCost );
                 }

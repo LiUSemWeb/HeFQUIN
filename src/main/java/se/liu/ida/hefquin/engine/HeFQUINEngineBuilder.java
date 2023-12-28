@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
@@ -20,7 +21,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
@@ -46,6 +46,8 @@ public class HeFQUINEngineBuilder
 	protected boolean printLogicalPlan        = false;
 	protected boolean printPhysicalPlan       = false;
 	protected boolean isExperimentRun         = false;
+
+	protected CostModel costModel;
 
 	/**
 	 * mandatory
@@ -158,24 +160,26 @@ public class HeFQUINEngineBuilder
 		if ( execService == null )
 			throw new IllegalStateException("no ExecutorService for plan tasks specified");
 
-		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
+		final QueryProcContext ctxt = new QueryProcContextBase() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public boolean isExperimentRun() { return isExperimentRun; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
 		};
+
+		costModel = new CostModelImpl( new CardinalityEstimationImpl(ctxt) );
+		//costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(ctxt) );
 
 		final SourcePlanner srcPlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 		//final SourcePlanner srcPlanner = new ExhaustiveSourcePlannerImpl(ctxt);
 
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
 
-		final PhysicalOptimizer poptimizer = createQueryOptimizerWithoutOptimization(ctxt);
-		//final PhysicalOptimizer poptimizer = createCostModelBasedGreedyJoinPlanOptimizerImpl(ctxt);
-		//final PhysicalOptimizer poptimizer = createCardinalityBasedGreedyJoinPlanOptimizerImpl(ctxt);
-		//final PhysicalOptimizer poptimizer = createDPBasedBushyJoinPlanOptimizer(ctxt);
-		//final PhysicalOptimizer poptimizer = createDPBasedLinearJoinPlanOptimizer(ctxt);
+		final PhysicalOptimizer poptimizer = createQueryOptimizerWithoutOptimization();
+		//final PhysicalOptimizer poptimizer = createCostModelBasedGreedyJoinPlanOptimizerImpl();
+		//final PhysicalOptimizer poptimizer = createCardinalityBasedGreedyJoinPlanOptimizerImpl();
+		//final PhysicalOptimizer poptimizer = createDPBasedBushyJoinPlanOptimizer();
+		//final PhysicalOptimizer poptimizer = createDPBasedLinearJoinPlanOptimizer();
 		//final PhysicalOptimizer poptimizer = createEvolutionaryAlgorithmQueryOptimizer(ctxt);
 
 		final QueryPlanner planner = new QueryPlannerImpl( srcPlanner,
@@ -200,40 +204,40 @@ public class HeFQUINEngineBuilder
 	}
 
 
-	protected PhysicalOptimizer createQueryOptimizerWithoutOptimization( final QueryOptimizationContext ctxt ) {
-		return new PhysicalOptimizerImpl(ctxt);
+	protected PhysicalOptimizer createQueryOptimizerWithoutOptimization() {
+		return new PhysicalOptimizerImpl(l2pConverter);
 	}
 
-	protected PhysicalOptimizer createCostModelBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new CostModelBasedGreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
-		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	protected PhysicalOptimizer createCostModelBasedGreedyJoinPlanOptimizerImpl() {
+		final JoinPlanOptimizer joinOpt = new CostModelBasedGreedyJoinPlanOptimizerImpl(costModel);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, l2pConverter);
 	}
 
-	protected PhysicalOptimizer createCardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
-		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	protected PhysicalOptimizer createCardinalityBasedGreedyJoinPlanOptimizerImpl() {
+		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl(fedAccessMgr);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, l2pConverter);
 	}
 
-	protected PhysicalOptimizer createDPBasedBushyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new DPBasedBushyJoinPlanOptimizer(ctxt);
-		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	protected PhysicalOptimizer createDPBasedBushyJoinPlanOptimizer() {
+		final JoinPlanOptimizer joinOpt = new DPBasedBushyJoinPlanOptimizer(costModel);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, l2pConverter);
 	}
 
-	protected PhysicalOptimizer createDPBasedLinearJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		final JoinPlanOptimizer joinOpt = new DPBasedLinearJoinPlanOptimizer(ctxt);
-		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	protected PhysicalOptimizer createDPBasedLinearJoinPlanOptimizer() {
+		final JoinPlanOptimizer joinOpt = new DPBasedLinearJoinPlanOptimizer(costModel);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, l2pConverter);
 	}
 
-	protected PhysicalOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt ) {
+	protected PhysicalOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryProcContext ctxt ) {
 		final TerminationCriterionFactory tcFactory = TerminatedByNumberOfGenerations.getFactory(20);
-		return new EvolutionaryAlgorithmQueryOptimizer(ctxt, 8, 2, tcFactory);
+		return new EvolutionaryAlgorithmQueryOptimizer(l2pConverter, costModel, ctxt, 8, 2, tcFactory);
 	}
+//TODO: Current overall goal is to get rid of costModel in QueryProcContext interface 
 
-
-	protected static abstract class QueryOptimizationContextBase implements QueryOptimizationContext {
+	protected static abstract class QueryProcContextBase implements QueryProcContext {
 		protected final CostModel costModel;
 
-		public QueryOptimizationContextBase() {
+		public QueryProcContextBase() {
 			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
 //			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
 		}

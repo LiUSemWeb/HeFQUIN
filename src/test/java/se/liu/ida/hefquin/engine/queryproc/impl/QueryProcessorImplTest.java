@@ -49,7 +49,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
@@ -370,18 +369,17 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final LogicalToPhysicalPlanConverter l2pConverter = config.createLogicalToPhysicalPlanConverter();
 		final CostModel costModel = new CostModelImpl( new CardinalityEstimationImpl(procCxt) );
 
-		final QueryOptimizationContext ctxt = new QueryOptimizationContext() {
+		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
 			@Override public CostModel getCostModel() { return costModel; }
 		};
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
-		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(ctxt);
+		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(l2pConverter);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, false, false, false);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
