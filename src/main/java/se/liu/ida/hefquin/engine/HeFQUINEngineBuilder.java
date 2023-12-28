@@ -2,16 +2,37 @@ package se.liu.ida.hefquin.engine;
 
 import java.util.concurrent.ExecutorService;
 
-import org.apache.jena.query.ARQ;
-import org.apache.jena.sparql.engine.main.QC;
-import org.apache.jena.sparql.util.Context;
-
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
-import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
+import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminatedByNumberOfGenerations;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.TerminationCriterionFactory;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CardinalityBasedGreedyJoinPlanOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CostModelBasedGreedyJoinPlanOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedBushyJoinPlanOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedLinearJoinPlanOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.JoinPlanOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
+import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 
 public class HeFQUINEngineBuilder
 {
@@ -20,10 +41,11 @@ public class HeFQUINEngineBuilder
 	protected FederationAccessManager fedAccessMgr          = null;
 	protected LogicalToPhysicalPlanConverter l2pConverter   = null;
 	protected ExecutorService execServiceForFedAccess       = null;
-	protected ExecutorService execServiceForPlanTasks       = null;
+	protected ExecutorService execService       = null;
 	protected boolean printSourceAssignment   = false;
 	protected boolean printLogicalPlan        = false;
 	protected boolean printPhysicalPlan       = false;
+	protected boolean isExperimentRun         = false;
 
 	/**
 	 * mandatory
@@ -81,7 +103,7 @@ public class HeFQUINEngineBuilder
 		if ( es == null )
 			throw new IllegalArgumentException();
 
-		this.execServiceForPlanTasks = es;
+		this.execService = es;
 		return this;
 	}
 
@@ -109,6 +131,14 @@ public class HeFQUINEngineBuilder
 		return this;
 	}
 
+	/**
+	 * optional
+	 */
+	public HeFQUINEngineBuilder enableExperimentRun( final boolean isExperimentRun ) {
+		this.isExperimentRun = isExperimentRun;
+		return this;
+	}
+
 	public HeFQUINEngine build() {
 		if ( config == null )
 			throw new IllegalStateException("no HeFQUINEngineConfig specified");
@@ -125,28 +155,90 @@ public class HeFQUINEngineBuilder
 		if ( l2pConverter == null )
 			setLogicalToPhysicalPlanConverter( config.createLogicalToPhysicalPlanConverter() );
 
-		if ( execServiceForPlanTasks == null )
+		if ( execService == null )
 			throw new IllegalStateException("no ExecutorService for plan tasks specified");
 
-		final Context ctxt = ARQ.getContext();
-		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
+		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
+			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public boolean isExperimentRun() { return isExperimentRun; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
+		};
 
-		config.initializeContext(ctxt);
+		final SourcePlanner srcPlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
+		//final SourcePlanner srcPlanner = new ExhaustiveSourcePlannerImpl(ctxt);
 
-		ctxt.set( HeFQUINConstants.sysFederationCatalog, fedCatalog );
-		ctxt.set( HeFQUINConstants.sysFederationAccessManager, fedAccessMgr );
-		ctxt.set( HeFQUINConstants.sysLogicalToPhysicalPlanConverter, l2pConverter );
-		ctxt.set( HeFQUINConstants.sysIsExperimentRun, false );
-		ctxt.set( HeFQUINConstants.sysPrintSourceAssignments, printSourceAssignment );
-		ctxt.set( HeFQUINConstants.sysPrintLogicalPlans, printLogicalPlan );
-		ctxt.set( HeFQUINConstants.sysPrintPhysicalPlans, printPhysicalPlan );
-		ctxt.set( HeFQUINConstants.sysExecServiceForPlanTasks, execServiceForPlanTasks );
-		return new HeFQUINEngineImpl();
+		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
+
+		final PhysicalOptimizer poptimizer = createQueryOptimizerWithoutOptimization(ctxt);
+		//final PhysicalOptimizer poptimizer = createCostModelBasedGreedyJoinPlanOptimizerImpl(ctxt);
+		//final PhysicalOptimizer poptimizer = createCardinalityBasedGreedyJoinPlanOptimizerImpl(ctxt);
+		//final PhysicalOptimizer poptimizer = createDPBasedBushyJoinPlanOptimizer(ctxt);
+		//final PhysicalOptimizer poptimizer = createDPBasedLinearJoinPlanOptimizer(ctxt);
+		//final PhysicalOptimizer poptimizer = createEvolutionaryAlgorithmQueryOptimizer(ctxt);
+
+		final QueryPlanner planner = new QueryPlannerImpl( srcPlanner,
+		                                                   loptimizer,
+		                                                   poptimizer,
+		                                                   printSourceAssignment,
+		                                                   printLogicalPlan,
+		                                                   printPhysicalPlan );
+		final QueryPlanCompiler compiler = new
+				//IteratorBasedQueryPlanCompilerImpl(ctxt);
+				//PullBasedQueryPlanCompilerImpl(ctxt);
+				PushBasedQueryPlanCompilerImpl(ctxt);
+		final ExecutionEngine execEngine = new ExecutionEngineImpl();
+
+		final QueryProcessor qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
+		return new HeFQUINEngineImpl(fedAccessMgr, qProc);
 	}
 
 
 	protected void setDefaultFederationAccessManager() {
 		this.fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager(execServiceForFedAccess);
+	}
+
+
+	protected PhysicalOptimizer createQueryOptimizerWithoutOptimization( final QueryOptimizationContext ctxt ) {
+		return new PhysicalOptimizerImpl(ctxt);
+	}
+
+	protected PhysicalOptimizer createCostModelBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new CostModelBasedGreedyJoinPlanOptimizerImpl( ctxt.getCostModel() );
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createCardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new CardinalityBasedGreedyJoinPlanOptimizerImpl( ctxt.getFederationAccessMgr() );
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createDPBasedBushyJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new DPBasedBushyJoinPlanOptimizer(ctxt);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createDPBasedLinearJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
+		final JoinPlanOptimizer joinOpt = new DPBasedLinearJoinPlanOptimizer(ctxt);
+		return new SimpleJoinOrderingQueryOptimizer(joinOpt, ctxt);
+	}
+
+	protected PhysicalOptimizer createEvolutionaryAlgorithmQueryOptimizer( final QueryOptimizationContext ctxt ) {
+		final TerminationCriterionFactory tcFactory = TerminatedByNumberOfGenerations.getFactory(20);
+		return new EvolutionaryAlgorithmQueryOptimizer(ctxt, 8, 2, tcFactory);
+	}
+
+
+	protected static abstract class QueryOptimizationContextBase implements QueryOptimizationContext {
+		protected final CostModel costModel;
+
+		public QueryOptimizationContextBase() {
+			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
+//			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
+		}
+
+		@Override public CostModel getCostModel() { return costModel; }
 	}
 
 }

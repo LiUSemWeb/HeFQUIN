@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
@@ -17,47 +16,36 @@ import org.apache.jena.sparql.engine.iterator.QueryIterRepeatApply;
 import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 
+import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
-import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
-import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
-import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.SourcePlannerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
-import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.MinBasedCardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class OpExecutorHeFQUIN extends OpExecutor
 {
-    public static final OpExecutorFactory factory = new OpExecutorFactory() {
-        @Override
-        public OpExecutor create( final ExecutionContext execCxt ) {
-            return new OpExecutorHeFQUIN(execCxt);
-        }
-    };
+	public static final OpExecutorFactory factory = new OpExecutorFactory() {
+		@Override
+		public OpExecutor create( final ExecutionContext execCxt ) {
+			final HeFQUINEngine e = execCxt.getContext().get(HeFQUINConstants.sysEngine);
+			return e.createOpExecutor(execCxt);
+		}
+	};
 
-    protected final QueryProcessor qProc;
+	protected final QueryProcessor qProc;
 
+	protected OpExecutorHeFQUIN( final QueryProcessor qProc, final ExecutionContext execCxt ) {
+		super(execCxt);
+
+		assert qProc != null;
+		this.qProc= qProc;
+	}
+
+/*
 	protected OpExecutorHeFQUIN( final ExecutionContext execCxt ) {
 		super(execCxt);
 
@@ -99,6 +87,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
 	}
+*/
 
 	@Override
 	protected QueryIterator exec(Op op, QueryIterator input) {
@@ -346,18 +335,6 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	    @Override public void visit(OpGroup opGroup)              { unsupportedOpFound = true; }
 
 	    @Override public void visit(OpTopN opTop)                 { unsupportedOpFound = true; }
-	}
-
-
-	protected static abstract class QueryOptimizationContextBase implements QueryOptimizationContext {
-		protected final CostModel costModel;
-
-		public QueryOptimizationContextBase() {
-			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
-//			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
-		}
-
-		@Override public CostModel getCostModel() { return costModel; }
 	}
 
 }

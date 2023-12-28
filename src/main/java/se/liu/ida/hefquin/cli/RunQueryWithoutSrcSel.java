@@ -11,6 +11,7 @@ import org.apache.jena.cmd.TerminationException;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
+import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.Context;
 
@@ -22,12 +23,12 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.utils.Stats;
 import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
@@ -87,6 +88,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 				.enablePrintingOfLogicalPlans( contains(argPrintLogicalPlan) )
 				.enablePrintingOfPhysicalPlans( contains(argPrintPhysicalPlan) )
 				.build();
+
+
+		final Context ctxt = ARQ.getContext();
+		ctxt.set( HeFQUINConstants.sysEngine, e );
+		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
@@ -175,9 +181,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 
 		if ( contains(argFedAccessStats) ) {
-			final Context ctxt = ARQ.getContext();
-			final FederationAccessManager fedAccessMgr = ctxt.get(HeFQUINConstants.sysFederationAccessManager);
-			final Stats fedAccessStats = fedAccessMgr.getStats();
+			final Stats fedAccessStats = e.getFederationAccessStats();
 			StatsPrinter.print(fedAccessStats, System.err, true);
 		}
 	}

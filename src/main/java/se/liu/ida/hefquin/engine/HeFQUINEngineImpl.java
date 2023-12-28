@@ -10,15 +10,42 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.engine.ExecutionContext;
+import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class HeFQUINEngineImpl implements HeFQUINEngine
 {
+	protected final FederationAccessManager fedAccessMgr;
+	protected final QueryProcessor qProc;
+
+	public HeFQUINEngineImpl( final FederationAccessManager fedAccessMgr,
+	                          final QueryProcessor qProc ) {
+		assert fedAccessMgr != null;
+		assert qProc != null;
+
+		this.fedAccessMgr = fedAccessMgr;
+		this.qProc = qProc;
+	}
+
+	@Override
+	public OpExecutor createOpExecutor( final ExecutionContext execCxt ) {
+		return null;
+	}
+
+	@Override
+	public FederationAccessStats getFederationAccessStats() {
+		return fedAccessMgr.getStats();
+	}
+
 	@Override
 	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
 	                                                           final ResultsFormat outputFormat,
