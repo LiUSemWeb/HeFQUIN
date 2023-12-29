@@ -2,10 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
@@ -13,7 +10,6 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.XSD;
 
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositeEdgeLabelMappingImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositeNodeLabelMappingImpl;
@@ -37,6 +33,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingI
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToLiteral;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToURI;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_SingleMatchToURI;
+import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.vocabulary.LPGtoRDF;
 
 import java.net.URI;
@@ -97,7 +94,7 @@ public class LPG2RDFConfigurationReader
     }
 
     public Node readLabelPredicateFromConfig( final Resource lpg2rdfConfig ) {
-        final URI iri = getSingleMandatoryProperty_XSDURI( lpg2rdfConfig, LPGtoRDF.labelPredicate );
+        final URI iri = ModelUtils.getSingleMandatoryProperty_XSDURI( lpg2rdfConfig, LPGtoRDF.labelPredicate );
         return NodeFactory.createURI( iri.toString() );
     }
 
@@ -105,7 +102,7 @@ public class LPG2RDFConfigurationReader
     // ------------ node mappings ------------
 
     public NodeMapping readNodeMappingFromConfig( final Resource lpg2rdfConfig ) {
-        final Resource nm = getMappingResource( lpg2rdfConfig, LPGtoRDF.nodeMapping );
+        final Resource nm = ModelUtils.getSingleMandatoryResourceProperty( lpg2rdfConfig, LPGtoRDF.nodeMapping );
 
         // try to detect the type based on an rdf:type statement
         final Statement nmTypeStmt = nm.getProperty( RDF.type );
@@ -131,7 +128,7 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeMapping readIRIPrefixBasedNodeMapping( final Resource nm ) {
-        final URI u = getSingleMandatoryProperty_XSDURI( nm, LPGtoRDF.prefixOfIRIs );
+        final URI u = ModelUtils.getSingleMandatoryProperty_XSDURI( nm, LPGtoRDF.prefixOfIRIs );
         return new NodeMappingImpl_AllToURIs( u.toString() );
     }
 
@@ -139,7 +136,7 @@ public class LPG2RDFConfigurationReader
     // ------------ node label mappings ------------
 
     public NodeLabelMapping readNodeLabelMappingFromConfig( final Resource lpg2rdfConfig ) {
-        final Resource nlm = getMappingResource( lpg2rdfConfig, LPGtoRDF.nodeLabelMapping );
+        final Resource nlm = ModelUtils.getSingleMandatoryResourceProperty( lpg2rdfConfig, LPGtoRDF.nodeLabelMapping );
         return readNodeLabelMapping(nlm);
     }
 
@@ -193,9 +190,9 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeLabelMapping readRegexBasedNodeLabelMapping( final Resource nlm ) {
-        final String regex = getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.regex );
+        final String regex = ModelUtils.getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.regex );
 
-        final URI prefixOfIRIs = getSingleOptionalProperty_XSDURI( nlm, LPGtoRDF.prefixOfIRIs );
+        final URI prefixOfIRIs = ModelUtils.getSingleOptionalProperty_XSDURI( nlm, LPGtoRDF.prefixOfIRIs );
         if ( prefixOfIRIs == null )
             return new NodeLabelMappingImpl_RegexMatchToLiterals( regex );
         else
@@ -203,9 +200,9 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeLabelMapping readIRIPrefixBasedNodeLabelMapping( final Resource nlm ) {
-        final URI prefixOfIRIs = getSingleMandatoryProperty_XSDURI( nlm, LPGtoRDF.prefixOfIRIs );
+        final URI prefixOfIRIs = ModelUtils.getSingleMandatoryProperty_XSDURI( nlm, LPGtoRDF.prefixOfIRIs );
 
-        final String regex = getSingleOptionalProperty_XSDString( nlm, LPGtoRDF.regex );
+        final String regex = ModelUtils.getSingleOptionalProperty_XSDString( nlm, LPGtoRDF.regex );
         if ( regex == null )
             return new NodeLabelMappingImpl_AllToURIs( prefixOfIRIs.toString() );
         else
@@ -213,7 +210,7 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeLabelMapping readLiteralBasedNodeLabelMapping( final Resource nlm ) {
-        final String regex = getSingleOptionalProperty_XSDString( nlm, LPGtoRDF.regex );
+        final String regex = ModelUtils.getSingleOptionalProperty_XSDString( nlm, LPGtoRDF.regex );
         if ( regex == null )
             return new NodeLabelMappingImpl_AllToLiterals();
         else
@@ -221,21 +218,21 @@ public class LPG2RDFConfigurationReader
     }
 
     public NodeLabelMapping readSingletonIRINodeLabelMapping( final Resource nlm ) {
-        final String label = getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.label );
-        final URI iri = getSingleMandatoryProperty_XSDURI( nlm, LPGtoRDF.iri );
+        final String label = ModelUtils.getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.label );
+        final URI iri = ModelUtils.getSingleMandatoryProperty_XSDURI( nlm, LPGtoRDF.iri );
 
         return new NodeLabelMappingImpl_SingleMatchToURI( label, iri.toString() );
     }
 
     public NodeLabelMapping readSingletonLiteralNodeLabelMapping( final Resource nlm ) {
-        final String label = getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.label );
-        final String literal = getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.literal );
+        final String label = ModelUtils.getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.label );
+        final String literal = ModelUtils.getSingleMandatoryProperty_XSDString( nlm, LPGtoRDF.literal );
 
         return new NodeLabelMappingImpl_SingleMatchToLiteral( label, literal );
     }
 
     public NodeLabelMapping readCompositeNodeLabelMapping( final Resource nlm ) {
-        final RDFNode list = getSingleMandatoryProperty( nlm, LPGtoRDF.componentMappings );
+        final RDFNode list = ModelUtils.getSingleMandatoryProperty( nlm, LPGtoRDF.componentMappings );
 
         if ( ! list.canAs(RDFList.class) )
             throw new IllegalArgumentException( LPGtoRDF.componentMappings.getLocalName() + " property of " + nlm.toString() + " should be a list" );
@@ -262,7 +259,7 @@ public class LPG2RDFConfigurationReader
     // ------------ edge label mappings ------------
 
     public EdgeLabelMapping readEdgeLabelMappingFromConfig( final Resource lpg2rdfConfig ) {
-        final Resource elm = getMappingResource( lpg2rdfConfig, LPGtoRDF.edgeLabelMapping );
+        final Resource elm = ModelUtils.getSingleMandatoryResourceProperty( lpg2rdfConfig, LPGtoRDF.edgeLabelMapping );
         return readEdgeLabelMapping(elm);
     }
 
@@ -307,27 +304,27 @@ public class LPG2RDFConfigurationReader
     }
 
     public EdgeLabelMapping readRegexBasedEdgeLabelMapping( final Resource elm ) {
-        final String regex = getSingleMandatoryProperty_XSDString( elm, LPGtoRDF.regex );
-        final URI prefixOfIRIs = getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.prefixOfIRIs );
+        final String regex = ModelUtils.getSingleMandatoryProperty_XSDString( elm, LPGtoRDF.regex );
+        final URI prefixOfIRIs = ModelUtils.getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.prefixOfIRIs );
 
         return new EdgeLabelMappingImpl_RegexMatchToURIs( regex, prefixOfIRIs.toString() );
     }
 
     public EdgeLabelMapping readIRIPrefixBasedEdgeLabelMapping( final Resource elm ) {
-        final URI prefixOfIRIs = getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.prefixOfIRIs );
+        final URI prefixOfIRIs = ModelUtils.getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.prefixOfIRIs );
 
         return new EdgeLabelMappingImpl_AllToURIs( prefixOfIRIs.toString() );
     }
 
     public EdgeLabelMapping readSingletonIRIEdgeLabelMapping( final Resource elm ) {
-        final String label = getSingleMandatoryProperty_XSDString( elm, LPGtoRDF.label );
-        final URI iri = getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.iri );
+        final String label = ModelUtils.getSingleMandatoryProperty_XSDString( elm, LPGtoRDF.label );
+        final URI iri = ModelUtils.getSingleMandatoryProperty_XSDURI( elm, LPGtoRDF.iri );
 
         return new EdgeLabelMappingImpl_SingleMatchToURI( label, iri.toString() );
     }
 
     public EdgeLabelMapping readCompositeEdgeLabelMapping( final Resource elm ) {
-        final RDFNode list = getSingleMandatoryProperty( elm, LPGtoRDF.componentMappings );
+        final RDFNode list = ModelUtils.getSingleMandatoryProperty( elm, LPGtoRDF.componentMappings );
 
         if ( ! list.canAs(RDFList.class) )
             throw new IllegalArgumentException( LPGtoRDF.componentMappings.getLocalName() + " property of " + elm.toString() + " should be a list" );
@@ -354,7 +351,7 @@ public class LPG2RDFConfigurationReader
     // ------------ property name mappings ------------
 
     public PropertyNameMapping readPropertyNameMappingFromConfig( final Resource lpg2rdfConfig ) {
-        final Resource pm = getMappingResource( lpg2rdfConfig, LPGtoRDF.propertyNameMapping );
+        final Resource pm = ModelUtils.getSingleMandatoryResourceProperty( lpg2rdfConfig, LPGtoRDF.propertyNameMapping );
         return readPropertyNameMapping(pm);
     }
 
@@ -399,27 +396,27 @@ public class LPG2RDFConfigurationReader
     }
 
     public PropertyNameMapping readRegexBasedPropertyNameMapping( final Resource pm ) {
-        final String regex = getSingleMandatoryProperty_XSDString( pm, LPGtoRDF.regex );
-        final URI prefixOfIRIs = getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.prefixOfIRIs );
+        final String regex = ModelUtils.getSingleMandatoryProperty_XSDString( pm, LPGtoRDF.regex );
+        final URI prefixOfIRIs = ModelUtils.getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.prefixOfIRIs );
 
         return new PropertyNameMappingImpl_RegexMatchToURIs( regex, prefixOfIRIs.toString() );
     }
 
     public PropertyNameMapping readIRIPrefixBasedPropertyNameMapping( final Resource pm ) {
-        final URI prefixOfIRIs = getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.prefixOfIRIs );
+        final URI prefixOfIRIs = ModelUtils.getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.prefixOfIRIs );
 
         return new PropertyNameMappingImpl_AllToURIs( prefixOfIRIs.toString() );
     }
 
     public PropertyNameMapping readSingletonIRIPropertyNameMapping( final Resource pm ) {
-        final String label = getSingleMandatoryProperty_XSDString( pm, LPGtoRDF.propertyName );
-        final URI iri = getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.iri );
+        final String label = ModelUtils.getSingleMandatoryProperty_XSDString( pm, LPGtoRDF.propertyName );
+        final URI iri = ModelUtils.getSingleMandatoryProperty_XSDURI( pm, LPGtoRDF.iri );
 
         return new PropertyNameMappingImpl_SingleMatchToURI( label, iri.toString() );
     }
 
     public PropertyNameMapping readCompositePropertyNameMapping( final Resource pm ) {
-        final RDFNode list = getSingleMandatoryProperty( pm, LPGtoRDF.componentMappings );
+        final RDFNode list = ModelUtils.getSingleMandatoryProperty( pm, LPGtoRDF.componentMappings );
 
         if ( ! list.canAs(RDFList.class) )
             throw new IllegalArgumentException( LPGtoRDF.componentMappings.getLocalName() + " property of " + pm.toString() + " should be a list" );
@@ -440,106 +437,6 @@ public class LPG2RDFConfigurationReader
         }
 
         return new CompositePropertyNameMappingImpl(components);
-    }
-
-
-    // ------------- helper functions -------------
-
-    protected RDFNode getSingleOptionalProperty( final Resource r, final Property p ) {
-        return getSingleProperty(r, p, false);
-    }
-
-    protected Literal getSingleOptionalLiteralProperty( final Resource r, final Property p ) {
-        return getSingleLiteralProperty(r, p, false);
-    }
-
-    protected String getSingleOptionalProperty_XSDString( final Resource r, final Property p ) {
-        return getSingleProperty_XSDString(r, p, false);
-    }
-
-    protected URI getSingleOptionalProperty_XSDURI( final Resource r, final Property p ) {
-        return getSingleProperty_XSDURI(r, p, false);
-    }
-
-    protected RDFNode getSingleMandatoryProperty( final Resource r, final Property p ) {
-        return getSingleProperty(r, p, true);
-    }
-
-    protected Literal getSingleMandatoryLiteralProperty( final Resource r, final Property p ) {
-        return getSingleLiteralProperty(r, p, true);
-    }
-
-    protected String getSingleMandatoryProperty_XSDString( final Resource r, final Property p ) {
-        return getSingleProperty_XSDString(r, p, true);
-    }
-
-    protected URI getSingleMandatoryProperty_XSDURI( final Resource r, final Property p ) {
-        return getSingleProperty_XSDURI(r, p, true);
-    }
-
-    protected Resource getMappingResource( final Resource confRsrc, final Property mappingProperty ) {
-        return getSingleMandatoryProperty(confRsrc, mappingProperty).asResource();
-    }
-
-    protected RDFNode getSingleProperty( final Resource r, final Property p, final boolean mandatory ) {
-        final StmtIterator it = r.listProperties(p);
-
-        if( ! it.hasNext() ) {
-            if ( mandatory )
-                throw new IllegalArgumentException( p.getLocalName() + " property missing for " + r.toString() );
-            else
-                return null;
-        }
-
-        final RDFNode o = it.next().getObject();
-
-        if ( it.hasNext() ) {
-            throw new IllegalArgumentException( "More than one " + p.getLocalName() + " property given for " + r.toString() );
-        }
-
-        return o;
-    }
-
-    protected Literal getSingleLiteralProperty( final Resource r, final Property p, final boolean mandatory ) {
-        final RDFNode v = getSingleProperty(r, p, mandatory);
-
-        if ( v == null )
-            return null;
-
-        if ( ! v.isLiteral() )
-            throw new IllegalArgumentException( p.getLocalName() + " property of " + r.toString() + " is not a literal" );
-
-        return v.asLiteral();
-    }
-
-    protected String getSingleProperty_XSDString( final Resource r, final Property p, final boolean mandatory ) {
-        final Literal l = getSingleLiteralProperty(r, p, mandatory);
-
-        if ( l == null )
-            return null;
-
-        if ( ! l.getDatatypeURI().equals(XSD.xstring.getURI()) )
-            throw new IllegalArgumentException( p.getLocalName() + " property of " + r.toString() + " is not of type xsd:string" );
-
-        return l.getString();
-    }
-
-    protected URI getSingleProperty_XSDURI( final Resource r, final Property p, final boolean mandatory ) {
-        final Literal l = getSingleLiteralProperty(r, p, mandatory);
-
-        if ( l == null )
-            return null;
-
-        if ( ! l.getDatatypeURI().equals(XSD.anyURI.getURI()) )
-            throw new IllegalArgumentException( p.getLocalName() + " property of " + r.toString() + " is not of type xsd:anyURI" );
-
-        final String s = l.getString();
-        try{
-            return URI.create(s);
-        }
-        catch ( final Exception e ){
-            throw new IllegalArgumentException( p.getLocalName() + " property of " + r.toString() + " is not a valid URI", e );
-        }
     }
 
 }
