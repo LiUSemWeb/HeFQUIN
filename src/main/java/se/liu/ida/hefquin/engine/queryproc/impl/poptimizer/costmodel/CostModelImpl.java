@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +23,11 @@ public class CostModelImpl implements CostModel
     }
 
     public CostModelImpl( final CardinalityEstimation cardEstimation ) {
-    	this( getDefaultDimensions(cardEstimation) );
+        this( getDefaultDimensions(cardEstimation) );
+    }
+
+    public CostModelImpl( final QueryProcContext ctx ) {
+        this( new CardinalityEstimationImpl(ctx) );
     }
 
     public static CostDimension[] getDefaultDimensions( final CardinalityEstimation cardEstimation ) {

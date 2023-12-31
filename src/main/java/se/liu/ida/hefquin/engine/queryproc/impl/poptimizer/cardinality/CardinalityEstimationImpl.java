@@ -40,7 +40,10 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 	protected final FederationAccessManager fedAccessMgr;
     protected final VarSpecificCardinalityEstimation vsCardEstimator;
 
-    public CardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
+    // The visibility of this constructor is at the package level (i.e.,
+    // not public) such that it can be used in the unit tests, but not by
+    // the configuration framework of HeFQUIN.
+    CardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
         assert fedAccessMgr != null;
         this.fedAccessMgr = fedAccessMgr;
 
