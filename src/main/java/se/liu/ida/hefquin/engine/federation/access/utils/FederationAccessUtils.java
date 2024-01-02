@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -12,34 +11,13 @@ import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 public class FederationAccessUtils
 {
-	public static FederationAccessManager getDefaultFederationAccessManager( final ExecutorService execServiceForFedAccess ) {
-		final SPARQLRequestProcessor  reqProcSPARQL   = new SPARQLRequestProcessorImpl();
-		final TPFRequestProcessor     reqProcTPF      = new TPFRequestProcessorImpl();
-		final BRTPFRequestProcessor   reqProcBRTPF    = new BRTPFRequestProcessorImpl();
-		final Neo4jRequestProcessor   reqProcNeo4j    = new Neo4jRequestProcessorImpl();
-
-		final FederationAccessManager fedAccessMgrWithoutCache = new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProcSPARQL, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
-		final FederationAccessManager fedAccessMgrWithCache = new FederationAccessManagerWithCache(fedAccessMgrWithoutCache, 100);
-		return fedAccessMgrWithCache;
-	}
-
 	public static DataRetrievalResponse[] performRequest( final FederationAccessManager fedAccessMgr,
 	                                                      final LogicalOpRequest<?,?>... reqOps )
 			  throws FederationAccessException

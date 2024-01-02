@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CFRNumberOfRequests;
 
 import java.util.*;
@@ -30,8 +31,8 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
 {
     protected final FederationAccessManager fedAccessMgr;
 
-    public CardinalityBasedGreedyJoinPlanOptimizerImpl(final FederationAccessManager fedAccessMgr ) {
-        this.fedAccessMgr = fedAccessMgr;
+    public CardinalityBasedGreedyJoinPlanOptimizerImpl( final QueryProcContext ctx ) {
+        fedAccessMgr = ctx.getFederationAccessMgr();
     }
 
     @Override

@@ -14,9 +14,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.iterator.QueryIter;
 import org.apache.jena.sparql.engine.iterator.QueryIterRepeatApply;
 import org.apache.jena.sparql.engine.main.OpExecutor;
-import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 
-import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
@@ -28,66 +26,14 @@ import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class OpExecutorHeFQUIN extends OpExecutor
 {
-	public static final OpExecutorFactory factory = new OpExecutorFactory() {
-		@Override
-		public OpExecutor create( final ExecutionContext execCxt ) {
-			final HeFQUINEngine e = execCxt.getContext().get(HeFQUINConstants.sysEngine);
-			return e.createOpExecutor(execCxt);
-		}
-	};
-
 	protected final QueryProcessor qProc;
 
-	protected OpExecutorHeFQUIN( final QueryProcessor qProc, final ExecutionContext execCxt ) {
+	public OpExecutorHeFQUIN( final QueryProcessor qProc, final ExecutionContext execCxt ) {
 		super(execCxt);
 
 		assert qProc != null;
 		this.qProc= qProc;
 	}
-
-/*
-	protected OpExecutorHeFQUIN( final ExecutionContext execCxt ) {
-		super(execCxt);
-
-		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
-		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
-		final LogicalToPhysicalPlanConverter l2pConverter = execCxt.getContext().get(HeFQUINConstants.sysLogicalToPhysicalPlanConverter);
-		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
-
-		final Boolean printSourceAssignments = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintSourceAssignments, false);
-		final Boolean printLogicalPlans  = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintLogicalPlans, false);
-		final Boolean printPhysicalPlans = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintPhysicalPlans, false);
-		final Boolean isExperimentRun    = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
-
-		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
-		};
-
-		final SourcePlannerFactory srcPlannerFactory = execCxt.getContext().get(HeFQUINConstants.sysSourcePlannerFactory);
-		final SourcePlanner srcPlanner = srcPlannerFactory.createSourcePlanner(ctxt);
-
-		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
-
-		final PhysicalOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
-		final PhysicalOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);
-
-		final QueryPlanner planner = new QueryPlannerImpl( srcPlanner,
-		                                                   loptimizer,
-		                                                   poptimizer,
-		                                                   printSourceAssignments,
-		                                                   printLogicalPlans,printPhysicalPlans );
-		final QueryPlanCompiler compiler = new
-				//IteratorBasedQueryPlanCompilerImpl(ctxt);
-				//PullBasedQueryPlanCompilerImpl(ctxt);
-				PushBasedQueryPlanCompilerImpl(ctxt);
-		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
-	}
-*/
 
 	@Override
 	protected QueryIterator exec(Op op, QueryIterator input) {

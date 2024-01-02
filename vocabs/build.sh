@@ -37,6 +37,8 @@ function proc
     mv "$CLASS".java ${DIR}/
 }
 
-syntaxCheck  LPGtoRDFConfiguration.ttl
-proc LPGtoRDFConfiguration.ttl  LPGtoRDF  "http://www.example.org/se/liu/ida/hefquin/lpg2rdf#"
+# syntaxCheck  LPGtoRDFConfiguration.ttl
+# proc LPGtoRDFConfiguration.ttl  LPGtoRDF  "http://www.example.org/se/liu/ida/hefquin/lpg2rdf#"
 
+syntaxCheck  EngineConfiguration.ttl
+proc EngineConfiguration.ttl  ECVocab  "http://www.example.org/se/liu/ida/hefquin/engineconf#"

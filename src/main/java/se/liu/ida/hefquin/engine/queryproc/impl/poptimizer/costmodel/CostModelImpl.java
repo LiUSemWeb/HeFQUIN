@@ -21,7 +21,7 @@ public class CostModelImpl implements CostModel
     }
 
     public CostModelImpl( final CardinalityEstimation cardEstimation ) {
-    	this( getDefaultDimensions(cardEstimation) );
+        this( getDefaultDimensions(cardEstimation) );
     }
 
     public static CostDimension[] getDefaultDimensions( final CardinalityEstimation cardEstimation ) {

@@ -19,7 +19,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.HeFQUINEngineConfig;
+import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -47,7 +47,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
 
 public class QueryProcessorImplTest extends EngineTestBase
@@ -352,10 +352,8 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
-		final HeFQUINEngineConfig config = new HeFQUINEngineConfig(false, false);
-		final ExecutorService execServiceForPlanTasks = config.createExecutorServiceForPlanTasks();
-
-		final LogicalToPhysicalPlanConverter l2pConverter = config.createLogicalToPhysicalPlanConverter();
+		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+		final LogicalToPhysicalPlanConverter l2pConverter = HeFQUINEngineDefaultComponents.createDefaultLogicalToPhysicalPlanConverter();
 
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
@@ -366,7 +364,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);
 		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl(ctxt);
-		final PhysicalOptimizer poptimizer = new PhysicalOptimizerImpl(l2pConverter);
+		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization(l2pConverter);
 		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, false, false, false);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);

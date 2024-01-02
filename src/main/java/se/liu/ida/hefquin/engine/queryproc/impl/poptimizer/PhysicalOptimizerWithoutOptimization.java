@@ -6,9 +6,9 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
-public class PhysicalOptimizerImpl extends PhysicalOptimizerBase
+public class PhysicalOptimizerWithoutOptimization extends PhysicalOptimizerBase
 {
-	public PhysicalOptimizerImpl( final LogicalToPhysicalPlanConverter l2pConverter ) {
+	public PhysicalOptimizerWithoutOptimization( final LogicalToPhysicalPlanConverter l2pConverter ) {
 		super(l2pConverter);
 	}
 
@@ -26,11 +26,7 @@ public class PhysicalOptimizerImpl extends PhysicalOptimizerBase
 	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan )
 			throws PhysicalOptimizationException
 	{
-		final PhysicalOptimizationStats myStats = new PhysicalOptimizationStatsImpl();
-
-		return new Pair<>(initialPlan, myStats);
-
-		// TODO implement query optimization
+		return new Pair<>( initialPlan, new PhysicalOptimizationStatsImpl() );
 	}
 
 }
