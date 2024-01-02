@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
-import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
+import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.utils.Stats;
@@ -76,23 +76,17 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	@Override
 	protected void exec() {
-		final ExecutorService execServiceForPlanTasks = modEngineConfig.getConfig().createExecutorServiceForPlanTasks();
-		final ExecutorService execServiceForFedAccess = modEngineConfig.getConfig().createExecutorServiceForFedAccess();
+		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
+		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
 
-		final HeFQUINEngine e = new HeFQUINEngineBuilder()
-				.setConfiguration( modEngineConfig.getConfig() )
-				.setFederationCatalog( modFederation.getFederationCatalog() )
-				.setExecutorServiceForFederationAccess(execServiceForFedAccess)
-				.setExecutorServiceForPlanTasks(execServiceForPlanTasks)
-				.enablePrintingOfSourceAssignments( contains(argPrintSourceAssignment) )
-				.enablePrintingOfLogicalPlans( contains(argPrintLogicalPlan) )
-				.enablePrintingOfPhysicalPlans( contains(argPrintPhysicalPlan) )
-				.build();
-
-
-		final Context ctxt = ARQ.getContext();
-		ctxt.set( HeFQUINConstants.sysEngine, e );
-		QC.setFactory( ctxt, OpExecutorHeFQUIN.factory );
+		final HeFQUINEngine e = modEngineConfig.getEngine( execServiceForFedAccess,
+		                                                   execServiceForPlanTasks,
+		                                                   modFederation.getFederationCatalog(),
+		                                                   false, // isExperimentRun
+		                                                   contains(argPrintSourceAssignment),
+		                                                   contains(argPrintLogicalPlan),
+		                                                   contains(argPrintPhysicalPlan) );
+		e.integrateIntoJena();
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
@@ -129,14 +123,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
 				final Exception ex = statsAndExceptions.object2.get(i);
 				System.err.println( (i+1) + " " + ex.getClass().getName() + ": " + ex.getMessage() );
-				if ( ex.getCause() != null ) {
-					System.err.println("    ... caused by the following chain of exceptions:");
-					Throwable cause = ex.getCause();
-					while ( cause != null ) {
-						System.err.println( "       " + cause.getClass().getName() + ": " + cause.getMessage() );
-						cause = cause.getCause();
-					}
-				}
+				System.err.println("StackTrace:");
+				ex.printStackTrace(System.err);
 				System.err.println();
 			}
 		}

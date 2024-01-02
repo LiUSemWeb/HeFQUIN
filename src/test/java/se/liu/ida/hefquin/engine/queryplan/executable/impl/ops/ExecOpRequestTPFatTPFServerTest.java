@@ -20,12 +20,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
@@ -72,7 +72,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final FederationAccessManager fedAccessMgr = FederationAccessUtils.getDefaultFederationAccessManager(execServiceForFedAccess);
+		final FederationAccessManager fedAccessMgr = HeFQUINEngineDefaultComponents.createDefaultFederationAccessManager(execServiceForFedAccess);
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }

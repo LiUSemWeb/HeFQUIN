@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -12,6 +13,8 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.main.OpExecutor;
+import org.apache.jena.sparql.engine.main.OpExecutorFactory;
+import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
@@ -21,6 +24,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class HeFQUINEngineImpl implements HeFQUINEngine
 {
@@ -37,8 +41,15 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 	}
 
 	@Override
-	public OpExecutor createOpExecutor( final ExecutionContext execCxt ) {
-		return null;
+	public void integrateIntoJena() {
+		final OpExecutorFactory factory = new OpExecutorFactory() {
+			@Override
+			public OpExecutor create( final ExecutionContext execCxt ) {
+				return new OpExecutorHeFQUIN(qProc, execCxt);
+			}
+		};
+
+		QC.setFactory( ARQ.getContext(), factory );
 	}
 
 	@Override
