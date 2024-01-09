@@ -32,7 +32,7 @@ public class JenaResultSetUtils
 
 		@Override
 		public void output( final IndentedWriter out, final SerializationContext sCxt ) {
-			out.println( debug() );
+			out.print("QueryIterator (HeFQUIN SolutionMappings -> Jena Bindings)");
 		}
 
 		@Override
