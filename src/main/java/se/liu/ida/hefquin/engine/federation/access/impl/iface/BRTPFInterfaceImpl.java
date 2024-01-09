@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 
 import java.util.Set;
 
-import org.apache.jena.sparql.engine.http.HttpQuery;
+import org.apache.jena.sparql.exec.http.Params;
 import org.apache.jena.sparql.serializer.SerializationContext;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -44,28 +44,23 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 	}
 
 	@Override
-	public HttpQuery createHttpRequest( final BRTPFRequest req ) {
-		final HttpQuery httpReq;
-
+	public String createRequestURL( final BRTPFRequest req ) {
 		final String pageURL = req.getPageURL();
 		if ( pageURL != null ) {
-			httpReq = createHttpRequest( pageURL );
-		}
-		else {
-			httpReq = createHttpRequest( req.getTriplePattern().asJenaTriple() );
-
-			final Set<SolutionMapping> solmaps = req.getSolutionMappings();
-			if ( solmaps != null && ! solmaps.isEmpty() ) {
-				final String values = SolutionMappingUtils.createValuesClause(solmaps, scxt);
-				httpReq.addParam( httpQueryArgumentForBindings, values );
-			}
+			return pageURL;
 		}
 
-		setHeaders(httpReq);
-		return httpReq;
+		final Params params = createParams( req.getTriplePattern().asJenaTriple() );
+
+		final Set<SolutionMapping> solmaps = req.getSolutionMappings();
+		if ( solmaps != null && ! solmaps.isEmpty() ) {
+			final String values = SolutionMappingUtils.createValuesClause(solmaps, scxt);
+			params.add( httpQueryArgumentForBindings, values );
+		}
+
+		return baseURLWithFinalSeparator + params.httpString();
 	}
-  
-  
+
 	@Override
 	public String toString() {
 		return "BRTPFInterface server at " + baseURL;
