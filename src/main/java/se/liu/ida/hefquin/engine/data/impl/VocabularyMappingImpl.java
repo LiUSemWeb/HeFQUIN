@@ -51,6 +51,10 @@ public class VocabularyMappingImpl implements VocabularyMapping
 		}
 	}
 
+	public VocabularyMappingImpl(final Graph triples) {
+		vocabularyMapping = triples;
+	}
+
 	@Override
 	public SPARQLGraphPattern translateTriplePattern(final TriplePattern tp) {
 		final List<SPARQLGraphPattern> objectTranslation = new ArrayList<>();
