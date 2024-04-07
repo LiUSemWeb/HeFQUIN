@@ -191,7 +191,6 @@ public class SchemaMappingImpl implements SchemaMapping
 				// mapped by this entity mapping.
 				final Set<TermMapping> mappingsForTerm = useInverse ? l2gMap.get(node) : g2lMap.get(node);
 
-System.out.println( "mappingsForTerm: " + mappingsForTerm + " node: " + node.toString() );
 				if ( mappingsForTerm == null || mappingsForTerm.isEmpty() ) {
 					// If the URI is not mapped by this schema mapping, simply
 					// add the current var-term pair to the binding builders.
@@ -200,7 +199,6 @@ System.out.println( "mappingsForTerm: " + mappingsForTerm + " node: " + node.toS
 					}
 				}
 				else {
-System.out.println( "mappingsForTerm.size(): " + mappingsForTerm.size() );
 					// The URI is mapped by this schema mapping.
 					final Set<Node> termsForTerm;
 					if ( useInverse )
@@ -208,12 +206,10 @@ System.out.println( "mappingsForTerm.size(): " + mappingsForTerm.size() );
 					else
 						termsForTerm = extractLocalTermsForGlobalTerm(mappingsForTerm);
 
-System.out.println( "termsForTerm.size(): " + termsForTerm.size() );
 					final Set<BindingBuilder> newBuilders = new HashSet<>();
 					for( final BindingBuilder bb : builders ) {
 						final Binding b = bb.build();
 						for ( final Node newTerm : termsForTerm ) {
-System.out.println( "newTerm: " + newTerm.toString() );
 							final BindingBuilder newBB = BindingBuilder.create(b);
 							newBB.add(var, newTerm);
 							newBuilders.add(newBB);
