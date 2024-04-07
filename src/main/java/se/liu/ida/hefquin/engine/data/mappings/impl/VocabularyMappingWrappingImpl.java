@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.graph.GraphFactory;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -34,10 +33,9 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 	}
 
 	public VocabularyMappingWrappingImpl( final String rdfFile ) {
-		final Model mappingModel = RDFDataMgr.loadModel(rdfFile); //.nt file for N-Triple
-		final Graph vocabularyMapping = mappingModel.getGraph();
-		em = new EntityMappingImpl(vocabularyMapping);
-		sm = new SchemaMappingImpl(vocabularyMapping);
+		final Graph g = RDFDataMgr.loadGraph(rdfFile);
+		em = new EntityMappingImpl(g);
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(g) );
 	}
 
 	public VocabularyMappingWrappingImpl(final Set<Triple> triples) {
@@ -46,7 +44,12 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 			vocabularyMapping.add(t);
 		}
 		em = new EntityMappingImpl(vocabularyMapping);
-		sm = new SchemaMappingImpl(vocabularyMapping);
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(vocabularyMapping) );
+	}
+
+	public VocabularyMappingWrappingImpl( final Graph descriptionOfVM ) {
+		em = new EntityMappingImpl(descriptionOfVM);
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(descriptionOfVM) );
 	}
 
 	@Override
@@ -66,21 +69,6 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 
 	@Override
 	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping solmap ) {
-		final Set<SolutionMapping> emResult = em.applyToSolutionMapping(solmap);
-
-		if ( emResult.size() == 1 ) {
-			return sm.applyToSolutionMapping( emResult.iterator().next() );
-		}
-
-		final Set<SolutionMapping> result = new HashSet<>();
-		for ( final SolutionMapping solmap2 : emResult ) {
-			result.addAll( sm.applyToSolutionMapping(solmap2) );
-		}
-		return result;
-	}
-
-	@Override
-	public Set<SolutionMapping> translateSolutionMappingFromGlobal( final SolutionMapping solmap ) {
 		final Set<SolutionMapping> emResult = em.applyInverseToSolutionMapping(solmap);
 
 		if ( emResult.size() == 1 ) {
@@ -90,6 +78,21 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		final Set<SolutionMapping> result = new HashSet<>();
 		for ( final SolutionMapping solmap2 : emResult ) {
 			result.addAll( sm.applyInverseToSolutionMapping(solmap2) );
+		}
+		return result;
+	}
+
+	@Override
+	public Set<SolutionMapping> translateSolutionMappingFromGlobal( final SolutionMapping solmap ) {
+		final Set<SolutionMapping> emResult = em.applyToSolutionMapping(solmap);
+
+		if ( emResult.size() == 1 ) {
+			return sm.applyToSolutionMapping( emResult.iterator().next() );
+		}
+
+		final Set<SolutionMapping> result = new HashSet<>();
+		for ( final SolutionMapping solmap2 : emResult ) {
+			result.addAll( sm.applyToSolutionMapping(solmap2) );
 		}
 		return result;
 	}

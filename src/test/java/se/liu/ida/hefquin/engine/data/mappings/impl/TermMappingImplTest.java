@@ -10,38 +10,57 @@ import org.apache.jena.graph.NodeFactory;
 
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.data.mappings.TermMapping;
-
-public class TermMappingImplTest {
-
+public class TermMappingImplTest
+{
 	@Test
-	public void testGetTypeOfRule() {
-		final Node type = NodeFactory.createURI("http://example.org/mappingType");
-		final TermMapping mapping = new TermMappingImpl(type, NodeFactory.createURI("http://example.org/term"));
+	public void testConstructorWithSingleLocal() {
+		final Node t = NodeFactory.createURI("http://example.org/t");
+		final Node g = NodeFactory.createURI("http://example.org/g");
+		final Node l = NodeFactory.createURI("http://example.org/l");
 
-		assertEquals(type, mapping.getTypeOfRule());
+		final TermMappingImpl mapping = new TermMappingImpl(t, g, l);
+
+		assertEquals( t, mapping.type );
+		assertEquals( g, mapping.globalTerm );
+
+		final Set<Node> expectedLocals = new HashSet<>();
+		expectedLocals.add(l);
+
+		assertEquals( expectedLocals, mapping.localTerms );
 	}
 
 	@Test
-	public void testGetTranslatedTerms_SingleTerm() {
-		final Node term = NodeFactory.createURI("http://example.org/term");
-		final TermMapping mapping = new TermMappingImpl(NodeFactory.createURI("http://example.org/mappingType"), term);
+	public void testConstructorWithMultipleLocals() {
+		final Node t = NodeFactory.createURI("http://example.org/t");
+		final Node g = NodeFactory.createURI("http://example.org/g");
+		final Node l1 = NodeFactory.createURI("http://example.org/l1");
+		final Node l2 = NodeFactory.createURI("http://example.org/l2");
 
-		final Set<Node> expectedTerms = new HashSet<>();
-		expectedTerms.add(term);
+		final TermMappingImpl mapping = new TermMappingImpl(t, g, l1, l2);
 
-		assertEquals(expectedTerms, mapping.getTranslatedTerms());
+		assertEquals( t, mapping.type );
+		assertEquals( g, mapping.globalTerm );
+
+		final Set<Node> expectedLocals = new HashSet<>();
+		expectedLocals.add(l1);
+		expectedLocals.add(l2);
+
+		assertEquals( expectedLocals, mapping.localTerms );
 	}
 
 	@Test
-	public void testGetTranslatedTerms_MultipleTerms() {
-		final Node term1 = NodeFactory.createURI("http://example.org/term1");
-		final Node term2 = NodeFactory.createURI("http://example.org/term2");
-		final Set<Node> terms = new HashSet<>();
-		terms.add(term1);
-		terms.add(term2);
-		final TermMapping mapping = new TermMappingImpl(NodeFactory.createURI("http://example.org/mappingType"), terms);
+	public void testConstructorWithLocalsAsSet() {
+		final Node t = NodeFactory.createURI("http://example.org/t");
+		final Node g = NodeFactory.createURI("http://example.org/g");
 
-		assertEquals(terms, mapping.getTranslatedTerms());
+		final Set<Node> locals = new HashSet<>();
+		locals.add( NodeFactory.createURI("http://example.org/l1") );
+		locals.add( NodeFactory.createURI("http://example.org/l1") );
+
+		final TermMappingImpl mapping = new TermMappingImpl(t, g, locals);
+
+		assertEquals( t, mapping.type );
+		assertEquals( g, mapping.globalTerm );
+		assertEquals( locals, mapping.localTerms );
 	}
 }
