@@ -8,12 +8,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
-import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.resultset.ResultsFormat;
-import org.apache.jena.sparql.util.Context;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
@@ -27,8 +24,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.utils.Stats;
 import se.liu.ida.hefquin.engine.utils.StatsPrinter;
-import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
-import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
@@ -95,7 +90,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		final PrintStream out;
 		if ( contains(argSuppressResultPrintout) )
-			out = NullPrintStream.NULL_PRINT_STREAM;
+			out = NullPrintStream.INSTANCE;
 		else
 			out = System.out;
 
