@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,15 +12,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
@@ -33,53 +27,6 @@ import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
 public class EntityMappingImplTest
 {
-	@Test
-	public void parseMappingDescriptionTest() throws IOException {
-		final String mappingAsTurtle =
-				  "@prefix ex:   <http://example.org/> .  \n"
-				+ "@prefix owl:  <http://www.w3.org/2002/07/owl#> . \n"
-				+ "ex:Robert owl:sameAs ex:Bob . "
-				+ "ex:Bobby owl:sameAs ex:Bob . "
-				+ "ex:Alibaba owl:sameAs ex:Ali . ";
-		final Graph mapping = GraphFactory.createDefaultGraph();
-		RDFDataMgr.read(mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE);
-		
-		final EntityMappingImpl entityMapping = new EntityMappingImpl(mapping);
-		
-		// Create global nodes.
-		final Node bob = NodeFactory.createURI("http://example.org/Bob");
-		final Node ali = NodeFactory.createURI("http://example.org/Ali");
-		
-		final Set<Node> globalAli = new HashSet<>();
-		globalAli.add(ali);
-		final Set<Node> globalBob = new HashSet<>();
-		globalBob.add(bob);
-		
-		
-		// Create local nodes.
-		final Node robert = NodeFactory.createURI("http://example.org/Robert");
-		final Node bobby = NodeFactory.createURI("http://example.org/Bobby");
-		final Node alibaba = NodeFactory.createURI("http://example.org/Alibaba");
-		
-		final Set<Node> localAli = new HashSet<>();
-		localAli.add(alibaba);
-		final Set<Node> localBob = new HashSet<>();
-		localBob.add(bobby);
-		localBob.add(robert);
-		
-		// Reference maps.
-		final Map<Node, Set<Node>> g2lMap = new HashMap<>();
-		g2lMap.put(ali, localAli);
-		g2lMap.put(bob, localBob);
-		final Map<Node, Set<Node>> l2gMap = new HashMap<>();
-		l2gMap.put(alibaba, globalAli);
-		l2gMap.put(bobby, globalBob);
-		l2gMap.put(robert, globalBob);
-		
-		assertEquals( g2lMap, entityMapping.g2lMap );
-		assertEquals( l2gMap, entityMapping.l2gMap );
-	}
-
 	@Test
 	public void testApplyToTriplePattern_NoChange1() {
 		final Node gBob  = NodeFactory.createURI("http://example.org/global/Bob");

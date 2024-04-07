@@ -34,7 +34,7 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 
 	public VocabularyMappingWrappingImpl( final String rdfFile ) {
 		final Graph g = RDFDataMgr.loadGraph(rdfFile);
-		em = new EntityMappingImpl(g);
+		em = new EntityMappingImpl( EntityMappingReader.read(g) );
 		sm = new SchemaMappingImpl( SchemaMappingReader.read(g) );
 	}
 
@@ -43,12 +43,12 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		for ( final Triple t : triples ) {
 			vocabularyMapping.add(t);
 		}
-		em = new EntityMappingImpl(vocabularyMapping);
+		em = new EntityMappingImpl( EntityMappingReader.read(vocabularyMapping) );
 		sm = new SchemaMappingImpl( SchemaMappingReader.read(vocabularyMapping) );
 	}
 
 	public VocabularyMappingWrappingImpl( final Graph descriptionOfVM ) {
-		em = new EntityMappingImpl(descriptionOfVM);
+		em = new EntityMappingImpl( EntityMappingReader.read(descriptionOfVM) );
 		sm = new SchemaMappingImpl( SchemaMappingReader.read(descriptionOfVM) );
 	}
 
