@@ -46,3 +46,9 @@ ex:europaSPARQL
 #      fd:interface [ a                  fd:SPARQLEndpointInterface ;
 #                     fd:endpointAddress <http://dbpedia.org/sparql> ] ;
 #      fd:vocabularyMappingsFile "dbpedia/vocabularyMappings.nt" .
+
+#ex:wikidataSPARQLWithVocabMappings
+#      a            fd:FederationMember ;
+#      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+#                     fd:endpointAddress <https://query.wikidata.org/sparql> ];
+#                     fd:vocabularyMappingsFile "wikidata/vocabularyMappings.nt" .
