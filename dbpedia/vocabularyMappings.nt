@@ -1,3 +1,2 @@
-<http://data.europa.eu/euodp/jrc-names/Adam_Maher> <http://www.w3.org/2002/07/owl#sameAs> <http://dbpedia.org/resource/Adam_Maher> .
-<http://www.wikidata.org/entity/P19> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://dbpedia.org/ontology/birthPlace> .
-#<http://schema.org/birthPlace> <http://www.w3.org/2002/07/owl#equivalentProperty> <http://dbpedia.org/ontology/birthPlace> .
+<http://dbpedia.org/ontology/Artist> <http://www.w3.org/2002/07/owl#equivalentClass> <https://schema.org/artist> .
+<http://dbpedia.org/ontology/birthPlace> <http://www.w3.org/2002/07/owl#equivalentProperty> <https://schema.org/birthPlace> .
