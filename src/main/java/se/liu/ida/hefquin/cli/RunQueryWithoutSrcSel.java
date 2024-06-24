@@ -66,7 +66,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 	@Override
 	protected String getSummary() {
-		return getCommandName()+" --query=<query> --considerSPARQLEndpoint=<endpoint URI>";
+		return getCommandName()+" --query=<query> --federationDescription=<federation description>";
 	}
 
 	@Override
