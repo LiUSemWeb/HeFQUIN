@@ -99,6 +99,7 @@ public class HeFQUINEngineConfigReader
 		ExecutorService getExecutorServiceForPlanTasks();
 		FederationCatalog getFederationCatalog();
 		boolean isExperimentRun();
+		boolean skipExecution();
 		boolean withPrintingOfSourceAssignment();
 		boolean withPrintingOfLogicalPlan();
 		boolean withPrintingOfPhysicalPlan();
@@ -439,6 +440,9 @@ public class HeFQUINEngineConfigReader
 		public boolean isExperimentRun() { return ctx.isExperimentRun(); }
 
 		@Override
+		public boolean skipExecution() { return ctx.skipExecution(); }
+
+		@Override
 		public boolean withPrintingOfSourceAssignment() { return ctx.withPrintingOfSourceAssignment(); }
 
 		@Override
@@ -505,6 +509,11 @@ public class HeFQUINEngineConfigReader
 		}
 
 		@Override
+		public boolean skipExecution() {
+			return qprocCtx.skipExecution();
+		}
+
+		@Override
 		public boolean withPrintingOfSourceAssignment() { return printSourceAssignment; }
 
 		@Override
@@ -528,6 +537,9 @@ public class HeFQUINEngineConfigReader
 
 			@Override
 			public boolean isExperimentRun() { return ctx.isExperimentRun(); }
+
+			@Override
+			public boolean skipExecution() { return ctx.skipExecution(); }
 		};
 	}
 

@@ -52,6 +52,7 @@ public class ModEngineConfig extends ModBase
 	                                final ExecutorService execServiceForPlanTasks,
 	                                final FederationCatalog cat,
 	                                final boolean isExperimentRun,
+	                                final boolean skipExecution,
 	                                final boolean printSourceAssignment,
 	                                final boolean printLogicalPlan,
 	                                final boolean printPhysicalPlan ) {
@@ -60,6 +61,7 @@ public class ModEngineConfig extends ModBase
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public FederationCatalog getFederationCatalog() { return cat; }
 			@Override public boolean isExperimentRun() { return isExperimentRun; }
+			@Override public boolean skipExecution() { return skipExecution; }
 			@Override public boolean withPrintingOfSourceAssignment() { return printSourceAssignment; }
 			@Override public boolean withPrintingOfLogicalPlan() { return printLogicalPlan; }
 			@Override public boolean withPrintingOfPhysicalPlan() { return printPhysicalPlan; }

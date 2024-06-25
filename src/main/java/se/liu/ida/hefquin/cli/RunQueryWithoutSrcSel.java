@@ -36,6 +36,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
+	protected final ArgDecl argSkipExecution = new ArgDecl(ArgDecl.NoValue, "skipExecution");
 	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
 	protected final ArgDecl argOnelineTimeStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcMeasurements");
 	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
@@ -53,6 +54,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule(modResults);
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
+		add(argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)");
 		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
 		add(argOnelineTimeStats, "--printQueryProcMeasurements", "Print out measurements about the query processing time in one line that can be used for a CSV file");
 		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
@@ -75,6 +77,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		                                                   execServiceForPlanTasks,
 		                                                   modFederation.getFederationCatalog(),
 		                                                   false, // isExperimentRun
+		                                                   contains(argSkipExecution),
 		                                                   modPlanPrinting.printSrcAssignment(),
 		                                                   modPlanPrinting.printLogicalPlan(),
 		                                                   modPlanPrinting.printPhysicalPlan() );

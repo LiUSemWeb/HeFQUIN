@@ -78,6 +78,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 
 		op.execute(sink, execCxt);
@@ -135,6 +136,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 	}
 
