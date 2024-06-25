@@ -444,6 +444,7 @@ public abstract class TestsForTPAddAlgorithmsWithTranslation<MemberType extends 
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 

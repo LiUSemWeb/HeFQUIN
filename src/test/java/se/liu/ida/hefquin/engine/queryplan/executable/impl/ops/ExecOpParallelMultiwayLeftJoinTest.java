@@ -192,6 +192,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 

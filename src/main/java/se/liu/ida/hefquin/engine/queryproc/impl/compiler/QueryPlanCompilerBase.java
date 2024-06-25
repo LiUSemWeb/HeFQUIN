@@ -22,6 +22,7 @@ public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
 			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
 			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
+			@Override public boolean skipExecution() { return ctxt.skipExecution(); }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return ctxt.getExecutorServiceForPlanTasks(); }
 		};
 	}

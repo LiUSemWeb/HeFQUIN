@@ -360,6 +360,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 
 		final SourcePlanner sourcePlanner = new ServiceClauseBasedSourcePlannerImpl(ctxt);

@@ -18,4 +18,11 @@ public interface QueryProcContext
 	 * of an experiment, in which case additional statistics need to be produced.
 	 */
 	boolean isExperimentRun();
+
+	/**
+	 * Returns <code>true</code> if the user requested to skip the actual
+	 * query execution. In this case, the query processor can stop after
+	 * query planning.
+	 */
+	boolean skipExecution();
 }
