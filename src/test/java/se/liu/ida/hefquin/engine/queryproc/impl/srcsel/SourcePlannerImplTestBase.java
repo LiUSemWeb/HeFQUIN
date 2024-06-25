@@ -33,6 +33,7 @@ public abstract class SourcePlannerImplTestBase extends EngineTestBase
 			@Override public FederationAccessManager getFederationAccessMgr() { throw new UnsupportedOperationException(); }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+			@Override public boolean skipExecution() { return false; }
 		};
 
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );

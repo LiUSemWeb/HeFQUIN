@@ -294,7 +294,11 @@ public class HeFQUINEngineConfigReaderTest
 			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 
 			@Override
+			public boolean skipExecution() { throw new UnsupportedOperationException(); }
+
+			@Override
 			public boolean withPrintingOfSourceAssignment() { throw new UnsupportedOperationException(); }
+
 			@Override
 			public boolean withPrintingOfLogicalPlan() { throw new UnsupportedOperationException(); }
 
@@ -331,6 +335,11 @@ public class HeFQUINEngineConfigReaderTest
 				public boolean isExperimentRun() {
 					throw new UnsupportedOperationException();
 				}
+
+				@Override
+				public boolean skipExecution() {
+					throw new UnsupportedOperationException();
+				}
 			};
 
 			@Override
@@ -349,6 +358,9 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
+
+			@Override
+			public boolean skipExecution() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public boolean withPrintingOfSourceAssignment() { throw new UnsupportedOperationException(); }
