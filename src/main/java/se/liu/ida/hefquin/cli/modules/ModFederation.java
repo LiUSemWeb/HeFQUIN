@@ -21,13 +21,14 @@ public class ModFederation extends ModBase
 	}
 
 	@Override
-	public void processArgs( final CmdArgModule cmdLine ) {
+    public void processArgs(CmdArgModule cmdLine) {
 		if ( cmdLine.contains(fedDescrDecl) ) {
 			final String fedDescrFilename = cmdLine.getValue(fedDescrDecl);
 			cat = FederationDescriptionReader.readFromFile(fedDescrFilename);
+		} else {
+			cmdLine.cmdError("No federation description file") ;
 		}
-	}
-
+    }
 
 	public FederationCatalog getFederationCatalog() {
 		return cat;
