@@ -16,6 +16,14 @@ public class SolutionMappingImpl implements SolutionMapping
 		this.jenaObj = jenaObject;
 	}
 
+	/**
+	 * Create a SolutionMapping object that
+	 * represents the empty solution mapping.
+	 */
+	public SolutionMappingImpl() {
+		this( Binding.builder().build() );
+	}
+
 	@Override
 	public Binding asJenaBinding() {
 		return jenaObj;

@@ -2,16 +2,11 @@ package se.liu.ida.hefquin.engine.data.mappings.impl;
 
 import java.util.*;
 
-import org.apache.jena.graph.Graph;
-
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.data.mappings.SchemaMapping;
@@ -20,253 +15,241 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class SchemaMappingImpl implements SchemaMapping
 {
-	protected final Map<Node, Set<TermMapping>> g2lMap = new HashMap<>();
-	protected final Map<Node, Set<TermMapping>> l2gMap = new HashMap<>();
+	/**
+	 * The keys of this map are global terms, and the value for each such
+	 * global term is a set of all term mappings that have the global term
+	 * as their {@link TermMapping#getGlobalTerm()}.
+	 * The union of all the sets that are values in this map is exactly the
+	 * same set of term mappings as the union of all the sets that are values
+	 * in {@link #l2gMap}.
+	 */
+	protected final Map<Node, Set<TermMapping>> g2lMap;
+
+	/**
+	 * The keys of this map are local terms, and the value for each such
+	 * local term is a set of all term mappings that have the local term
+	 * as an element of their {@link TermMapping#getLocalTerms()}.
+	 * The union of all the sets that are values in this map is exactly the
+	 * same set of term mappings as the union of all the sets that are values
+	 * in {@link #g2lMap}.
+	 */
+	protected final Map<Node, Set<TermMapping>> l2gMap;
+
 	protected final boolean isEquivalenceOnly;
 
-	public SchemaMappingImpl( final Graph mappingDescription ) {
-		this.isEquivalenceOnly = parseMappingDescription(mappingDescription);
+	public SchemaMappingImpl( final Map<Node, Set<TermMapping>> g2lMap ) {
+		this.g2lMap = g2lMap;
+		this.l2gMap = new HashMap<>();
+		this.isEquivalenceOnly = populateL2G(g2lMap, l2gMap);
 	}
 
-	protected boolean parseMappingDescription( final Graph mappingDescription ) {
+	/**
+	 * Populates the given l2gMap based on the given g2lMap and returns whether
+	 * all the {@link TermMapping}s in g2lMap are equivalence mappings only.
+	 */
+	protected static boolean populateL2G( final Map<Node, Set<TermMapping>> g2lMap,
+	                                      final Map<Node, Set<TermMapping>> l2gMap ) {
+		// begin by assuming that all term mappings are equivalence mappings only
 		boolean isEquivalenceOnly = true;
-		// Populate both g2lMap and l2gMap based on the type of TermMapping statements in the given RDF graph
-		final Iterator<Triple> it = mappingDescription.find(Node.ANY, Node.ANY, Node.ANY);
-		while ( it.hasNext() ) {
-			final Triple workingTriple = it.next();
 
-			if ( workingTriple.getPredicate().equals(OWL.equivalentClass.asNode())
-				|| workingTriple.getPredicate().equals(OWL.equivalentProperty.asNode()) ) {
-				populate( Collections.singleton(workingTriple.getObject()), workingTriple.getSubject(), workingTriple.getPredicate() );
-			}
-			else if ( workingTriple.getPredicate().equals(RDFS.subClassOf.asNode())
-				|| workingTriple.getPredicate().equals(RDFS.subPropertyOf.asNode()) ) {
-				populate( Collections.singleton(workingTriple.getSubject()), workingTriple.getObject(), workingTriple.getPredicate() );
-				isEquivalenceOnly = false;
-			}
-			else if ( workingTriple.getPredicate().equals(OWL.unionOf.asNode())) {
-				isEquivalenceOnly = false;
-				final Set<Node> localTerms = new HashSet<>();
+		for ( final Map.Entry<Node, Set<TermMapping>> e : g2lMap.entrySet() ) {
+			final Node globalTerm = e.getKey();
+			for ( final TermMapping tm : e.getValue() ) {
+				assert tm.getGlobalTerm() == globalTerm;
 
-				// Get all local terms
-				Pair<Node, Node> linkMapping = getConnectedMapping( workingTriple.getObject(), mappingDescription );
-				while(true) {
-					localTerms.add(linkMapping.object1);
-					if (linkMapping.object2.equals(RDF.nil.asNode())) {
-						break;
-					}
-					linkMapping = getConnectedMapping( linkMapping.object2, mappingDescription );
+				if (    ! tm.getTypeOfRule().equals(OWL.equivalentClass.asNode())
+				     && ! tm.getTypeOfRule().equals(OWL.equivalentProperty.asNode()) ) {
+					isEquivalenceOnly = false;
 				}
 
-				populate( localTerms, workingTriple.getSubject(), OWL.unionOf.asNode() );
+				for ( final Node localTerm : tm.getLocalTerms() ) {
+					Set<TermMapping> l2gEntry = l2gMap.get(localTerm);
+
+					if ( l2gEntry == null ) {
+						l2gEntry = new HashSet<>();
+						l2gMap.put(localTerm, l2gEntry);
+					}
+
+					l2gEntry.add(tm);
+				}
 			}
 		}
+
 		return isEquivalenceOnly;
 	}
 
-	protected void populate( final Set<Node> local, final Node global, final Node mappingType ){
-		// Populate g2lMap
-		Set<TermMapping> g2ltermMappings = g2lMap.get( global );
-
-		if ( g2ltermMappings == null ) {
-			g2ltermMappings = new HashSet<>();
-			g2lMap.put(global, g2ltermMappings);
-		}
-
-		final TermMappingImpl localTerms = new TermMappingImpl(mappingType, local);
-		g2ltermMappings.add(localTerms);
-
-		// Populate l2gMap
-		for ( final Node localTerm: local ) {
-			Set<TermMapping> l2gtermMappings = l2gMap.get(localTerm);
-
-			if (l2gtermMappings == null) {
-				l2gtermMappings = new HashSet<>();
-				l2gMap.put(localTerm, l2gtermMappings);
-			}
-
-			final TermMappingImpl globalTerms = new TermMappingImpl(mappingType, global);
-			l2gtermMappings.add(globalTerms);
-		}
-
-	}
-
 	@Override
-	public SPARQLGraphPattern applyToTriplePattern( final TriplePattern tp ) {
-		// Translate the object of the given triple pattern
-		final Set<Node> localObjects = new HashSet<>();
-		if( tp.asJenaTriple().getObject().isURI() ) {
-			final Set<TermMapping> g2lObjectMappings = g2lMap.get( tp.asJenaTriple().getObject() );
-			if( g2lObjectMappings != null ) {
-				for (final TermMapping mappingType : g2lObjectMappings) {
-					localObjects.addAll( mappingType.getTranslatedTerms() );
-				}
-			}
-		}
-
-		if ( localObjects.isEmpty() ) {
-			localObjects.add( tp.asJenaTriple().getObject() );
-		}
-
-		// Translate the predicate of the given triple pattern
-		final Set<Node> localPredicate = new HashSet<>();
-		if( tp.asJenaTriple().getPredicate().isURI() ) {
-			final Set<TermMapping> g2lSubjectMappings = g2lMap.get( tp.asJenaTriple().getPredicate() );
-			if( g2lSubjectMappings != null ) {
-				for ( final TermMapping mappingType: g2lSubjectMappings ) {
-					localPredicate.addAll( mappingType.getTranslatedTerms() );
-				}
-			}
-		}
-
-		if ( localPredicate.isEmpty() ) {
-			localPredicate.add( tp.asJenaTriple().getPredicate() );
-		}
-
-		// Construct SPARQLUnionPattern
-		final SPARQLUnionPatternImpl graph = new SPARQLUnionPatternImpl();
-		for ( Node predicate : localPredicate ){
-			for ( Node object: localObjects ){
-				final TriplePattern resultTriple = new TriplePatternImpl( tp.asJenaTriple().getSubject(), predicate, object );
-				graph.addSubPattern( resultTriple );
-			}
-		}
-
-		return graph;
-	}
-
-	@Override
-	/**
-	 * Translate solution mappings that using local vocabulary to global vocabularies
-	 */
-	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
-		return applyMapToSolutionMapping(sm, false);
-	}
-
-	@Override
-	public Set<SolutionMapping> applyInverseToSolutionMapping( final SolutionMapping sm ) {
-		return applyMapToSolutionMapping(sm, true);
-	}
-
-	protected Set<SolutionMapping> applyMapToSolutionMapping(final SolutionMapping sm, final boolean useInverse ) {
-		final Binding binding = sm.asJenaBinding();
-		// If the given solution mapping is the empty mapping, simply return it unchanged.
-		if ( binding.isEmpty() ) {
-			return Collections.singleton(sm);
-		}
-
-		final Set<Binding> resultsBindings = new HashSet<>();
-		final Set<Binding> tmpBindings = new HashSet<>();
-
-		resultsBindings.add( BindingBuilder.create().build() );
-		final Iterator<Var> it = binding.vars();
-		while ( it.hasNext() ) {
-			final Var v = it.next();
-			final Set<Node> terms;
-			if ( useInverse ) {
-				terms = applyMapToGlobalURI( binding.get(v) );
-			}
-			else {
-				terms = applyMapToLocalURI( binding.get(v) );
-			}
-
-			for ( final Node uri: terms ) {
-				for ( Binding b : resultsBindings ){
-					final BindingBuilder newBinding = BindingBuilder.create(b);
-					newBinding.add(v, uri);
-					tmpBindings.add( newBinding.build() );
-				}
-			}
-			resultsBindings.clear();
-			resultsBindings.addAll( tmpBindings );
-			tmpBindings.clear();
-		}
-
-		final Set<SolutionMapping> resultsSolMaps = new HashSet<>();
-		for ( final Binding b: resultsBindings ){
-			resultsSolMaps.add( new SolutionMappingImpl(b) );
-		}
-		return resultsSolMaps;
-	}
-
-	public Set<Node> applyMapToLocalURI( final Node node ) {
-		final Set<TermMapping> termMappings = l2gMap.get(node);
-		if ( termMappings == null ) {
-			return Collections.singleton(node);
-		}
-
-		final Set<Node> results = new HashSet<>();
-		for ( final TermMapping mappingTypes : termMappings ) {
-			results.addAll( mappingTypes.getTranslatedTerms() );
-		}
-
-		return results;
-	}
-
-	/**
-	 * Only apply equivalent rules
-	 */
-	public Set<Node> applyMapToGlobalURI( final Node node ) {
-		final Set<TermMapping> termMappings = g2lMap.get(node);
-		if ( termMappings == null ) {
-			return Collections.singleton(node);
-		}
-
-		final Set<Node> results = new HashSet<>();
-		for ( final TermMapping mappingTypes : termMappings ) {
-			final Node ruletype = mappingTypes.getTypeOfRule();
-			if (    ruletype.equals(OWL.equivalentClass.asNode())
-			     || ruletype.equals(OWL.equivalentProperty.asNode()) ) {
-				results.addAll( mappingTypes.getTranslatedTerms() );
-			}
-			else  {
-				throw new IllegalArgumentException();
-			}
-		}
-
-		return results;
-	}
-
 	public boolean isEquivalenceOnly() {
 		return isEquivalenceOnly;
 	}
 
-	protected Pair<Node, Node> getConnectedMapping( final Node head, final Graph mappingDescription ){
-		Node first = RDF.nil.asNode();
-		Node rest = RDF.nil.asNode();
-		boolean hasFirst = false;
-		boolean hasRest = false;
-		final Iterator<Triple> i = mappingDescription.find(head, Node.ANY, Node.ANY);
-		while(i.hasNext()) {
-			final Triple next = i.next();
-			if ( next.getPredicate().equals(RDF.first.asNode()) ) {
-				if ( !hasFirst ) {
-					hasFirst = true;
-					first = next.getObject();
-				} else {
-					throw new IllegalArgumentException(next.getPredicate().toString());
+	@Override
+	public SPARQLGraphPattern applyToTriplePattern( final TriplePattern tp ) {
+		final Node givenSubject   = tp.asJenaTriple().getSubject();
+		final Node givenPredicate = tp.asJenaTriple().getPredicate();
+		final Node givenObject    = tp.asJenaTriple().getObject();
+
+		// Collect all ways of translating the object of the given triple pattern
+		final Set<Node> newObjects = new HashSet<>();
+		if( givenObject.isURI() ) {
+			final Set<TermMapping> mappingsForObject = g2lMap.get(givenObject);
+			if( mappingsForObject != null && ! mappingsForObject.isEmpty() ) {
+				for ( final TermMapping tm : mappingsForObject ) {
+					for ( final Node localTerm : tm.getLocalTerms() ) {
+						newObjects.add(localTerm);
+					}
 				}
-			} else if ( next.getPredicate().equals(RDF.rest.asNode()) ) {
-				if (!hasRest) {
-					hasRest = true;
-					rest = next.getObject();
-				} else {
-					throw new IllegalArgumentException(next.getPredicate().toString());
-				}
-			} else {
-				throw new IllegalArgumentException(next.getPredicate().toString());
 			}
 		}
-		if ( hasFirst && hasRest ) {
-			final Pair<Node, Node> mapping = new Pair(first, rest);
-			return mapping;
-		} else {
-			throw new IllegalArgumentException(hasFirst + ", " + hasRest);
+
+		final boolean keepGivenObject = newObjects.isEmpty();
+		if ( keepGivenObject ) {
+			newObjects.add(givenObject);
 		}
+
+		// Collect all ways of translating the predicate of the given triple pattern
+		final Set<Node> newPredicates = new HashSet<>();
+		if( givenPredicate.isURI() ) {
+			final Set<TermMapping> mappingsForPredicate = g2lMap.get(givenPredicate);
+			if( mappingsForPredicate != null && ! mappingsForPredicate.isEmpty() ) {
+				for ( final TermMapping tm : mappingsForPredicate ) {
+					for ( final Node localTerm : tm.getLocalTerms() ) {
+						newPredicates.add(localTerm);
+					}
+				}
+			}
+		}
+
+		final boolean keepGivenPredicate = newPredicates.isEmpty();
+		if ( keepGivenPredicate ) {
+			newPredicates.add(givenPredicate);
+		}
+
+		if ( keepGivenPredicate && keepGivenObject ) {
+			return tp;
+		}
+
+		if ( newPredicates.size() == 1 && newObjects.size() == 1 ) {
+			return new TriplePatternImpl( givenSubject,
+			                              newPredicates.iterator().next(),
+			                              newObjects.iterator().next() );
+		}
+
+		// Construct SPARQLUnionPattern
+		final SPARQLUnionPatternImpl newPattern = new SPARQLUnionPatternImpl();
+		for ( final Node newP : newPredicates ){
+			for ( final Node newO : newObjects ){
+				final TriplePattern newTP = new TriplePatternImpl(givenSubject, newP, newO);
+				newPattern.addSubPattern(newTP);
+			}
+		}
+
+		return newPattern;
+	}
+
+	@Override
+	public Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping sm ) {
+		return applyToSolutionMapping(sm, false);
+	}
+
+	@Override
+	public Set<SolutionMapping> applyInverseToSolutionMapping( final SolutionMapping sm ) {
+		return applyToSolutionMapping(sm, true);
+	}
+
+	protected Set<SolutionMapping> applyToSolutionMapping( final SolutionMapping solMap,
+	                                                       final boolean useInverse ) {
+		final Binding sm = solMap.asJenaBinding();
+
+		// If the given solution mapping is the empty mapping, simply return it unchanged.
+		if ( sm.isEmpty() ) {
+			return Collections.singleton(solMap);
+		}
+
+		Set<BindingBuilder> builders = new HashSet<>();
+		builders.add( BindingBuilder.create() );
+
+		final Iterator<Var> it = sm.vars();
+		while ( it.hasNext() ) {
+			final Var var = it.next();
+			final Node node = sm.get(var);
+
+			if ( ! node.isURI() ) {
+				// If the RDF term that the given solution mapping binds to
+				// the current variable is not a URI, simply add the current
+				// var-term pair to the binding builders.
+				for( final BindingBuilder bb : builders ) {
+					bb.add(var, node);
+				}
+			}
+			else {
+				// If the RDF term that the given solution mapping binds to
+				// the current variable is a URI, check whether this URI is
+				// mapped by this entity mapping.
+				final Set<TermMapping> mappingsForTerm = useInverse ? l2gMap.get(node) : g2lMap.get(node);
+
+				if ( mappingsForTerm == null || mappingsForTerm.isEmpty() ) {
+					// If the URI is not mapped by this schema mapping, simply
+					// add the current var-term pair to the binding builders.
+					for( final BindingBuilder bb : builders ) {
+						bb.add(var, node);
+					}
+				}
+				else {
+					// The URI is mapped by this schema mapping.
+					final Set<Node> termsForTerm;
+					if ( useInverse )
+						termsForTerm = extractGlobalTermsForLocalTerm(mappingsForTerm);
+					else
+						termsForTerm = extractLocalTermsForGlobalTerm(mappingsForTerm);
+
+					final Set<BindingBuilder> newBuilders = new HashSet<>();
+					for( final BindingBuilder bb : builders ) {
+						final Binding b = bb.build();
+						for ( final Node newTerm : termsForTerm ) {
+							final BindingBuilder newBB = BindingBuilder.create(b);
+							newBB.add(var, newTerm);
+							newBuilders.add(newBB);
+						}
+					}
+
+					builders = newBuilders;
+				}
+			}
+		}
+
+		final Set<SolutionMapping> result = new HashSet<>();
+		for( final BindingBuilder bb : builders ) {
+			final SolutionMapping newSolMap = new SolutionMappingImpl( bb.build() );
+			result.add(newSolMap);
+		}
+
+		return result;
+	}
+
+	protected Set<Node> extractGlobalTermsForLocalTerm( final Set<TermMapping> mappingsForTerm ) {
+		final Set<Node> result = new HashSet<>();
+		for ( final TermMapping tm : mappingsForTerm ) {
+			result.add( tm.getGlobalTerm() );
+		}
+		return result;
+	}
+
+	protected Set<Node> extractLocalTermsForGlobalTerm( final Set<TermMapping> mappingsForTerm ) {
+		// only use equivalence rules
+		final Set<Node> result = new HashSet<>();
+		for ( final TermMapping tm : mappingsForTerm ) {
+			final Node ruleType = tm.getTypeOfRule();
+			if (    OWL.equivalentClass.asNode().equals(ruleType)
+			     || OWL.equivalentProperty.asNode().equals(ruleType) ) {
+				result.addAll( tm.getLocalTerms() );
+			}
+		}
+
+		return result;
 	}
 
 }

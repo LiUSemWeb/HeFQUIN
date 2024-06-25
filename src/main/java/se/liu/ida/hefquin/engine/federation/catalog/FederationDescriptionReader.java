@@ -218,7 +218,6 @@ public class FederationDescriptionReader
 			if ( verifyValidVocabMappingFile(path) ) {
 				VocabularyMapping vm = vocabMappingByPath.get( path );
 				if ( vm == null ) {
-//					vm = new VocabularyMappingImpl(path);
 					vm = new VocabularyMappingWrappingImpl(path);
 					vocabMappingByPath.put( path, vm );
 				}

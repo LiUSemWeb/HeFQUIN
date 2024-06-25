@@ -19,7 +19,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
+import se.liu.ida.hefquin.engine.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
@@ -89,14 +89,15 @@ public class ExecOpRequestTPFWithTranslationTest extends ExecOpTestBase {
 	}
 	
 	public static VocabularyMapping createVocabularyMappingForTests() {
-		final Set<org.apache.jena.graph.Triple> mappingTriples = new HashSet<>();
 		//Equality
-		final Node s = NodeFactory.createURI("http://example.org/a");
+		final Node s = NodeFactory.createURI("http://example.org/s");
 		final Node p = OWL.sameAs.asNode();
-		final Node o  = NodeFactory.createURI("http://example.org/s");
-		mappingTriples.add(new org.apache.jena.graph.Triple(s, p, o));
-		
-		return new VocabularyMappingImpl(mappingTriples);
+		final Node o  = NodeFactory.createURI("http://example.org/a");
+
+		final Graph g = GraphFactory.createDefaultGraph();
+		g.add(s, p, o);
+
+		return new VocabularyMappingWrappingImpl(g);
 	}
 
 }

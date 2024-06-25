@@ -14,7 +14,7 @@ public class TripleImpl implements Triple
 	}
 
 	public TripleImpl( final Node s, final Node p, final Node o ) {
-		this( new org.apache.jena.graph.Triple(s,p,o) );
+		this( org.apache.jena.graph.Triple.create(s,p,o) );
 	}
 
 	@Override
