@@ -17,6 +17,7 @@ import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
+import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
@@ -30,13 +31,11 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModTime          modTime =          new ModTime();
 	protected final ModQuery         modQuery =         new ModQuery();
 	protected final ModFederation    modFederation =    new ModFederation();
+	protected final ModPlanPrinting  modPlanPrinting =  new ModPlanPrinting();
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
-	protected final ArgDecl argPrintSourceAssignment  = new ArgDecl(ArgDecl.NoValue, "printSourceAssignment");
-	protected final ArgDecl argPrintLogicalPlan   = new ArgDecl(ArgDecl.NoValue, "printLogicalPlan");
-	protected final ArgDecl argPrintPhysicalPlan  = new ArgDecl(ArgDecl.NoValue, "printPhysicalPlan");
 	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
 	protected final ArgDecl argOnelineTimeStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcMeasurements");
 	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
@@ -50,12 +49,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		addModule(modEngineConfig);
 		addModule(modTime);
+		addModule(modPlanPrinting);
 		addModule(modResults);
 
 		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
-		add(argPrintSourceAssignment, "--printSourceAssignment", "Print out the source assignment used as input to the query optimization");
-		add(argPrintLogicalPlan, "--printLogicalPlan", "Print out the logical plan produced by the logical query optimization");
-		add(argPrintPhysicalPlan, "--printPhysicalPlan", "Print out the physical plan produced by the physical query optimization and used for the query execution");
 		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
 		add(argOnelineTimeStats, "--printQueryProcMeasurements", "Print out measurements about the query processing time in one line that can be used for a CSV file");
 		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
@@ -78,9 +75,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		                                                   execServiceForPlanTasks,
 		                                                   modFederation.getFederationCatalog(),
 		                                                   false, // isExperimentRun
-		                                                   contains(argPrintSourceAssignment),
-		                                                   contains(argPrintLogicalPlan),
-		                                                   contains(argPrintPhysicalPlan) );
+		                                                   modPlanPrinting.printSrcAssignment(),
+		                                                   modPlanPrinting.printLogicalPlan(),
+		                                                   modPlanPrinting.printPhysicalPlan() );
 		e.integrateIntoJena();
 
 		final Query query = getQuery();
