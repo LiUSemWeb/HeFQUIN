@@ -1,14 +1,25 @@
+PREFIX dbc:<http://dbpedia.org/resource/Category:>
+PREFIX dct:<http://purl.org/dc/terms/>
 PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX dbo:    <http://dbpedia.org/ontology/>
 
 SELECT * WHERE {
-	SERVICE <http://dbpedia.org/sparql> {
-		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
-		?c owl:sameAs ?cc
-	}
-	SERVICE <https://query.wikidata.org/sparql> {
-		?cc rdfs:label ?o
-	}
+  { SERVICE <http://dbpedia.org/sparql> 
+  		{ <http://dbpedia.org/resource/Berlin> ?property ?hasValue } 
+  }
+  UNION
+  { SERVICE <http://dbpedia.org/sparql> 
+  		{ ?isValueOf ?property <http://dbpedia.org/resource/Berlin> }
+  }
+  UNION
+  {	SERVICE <http://dbpedia.org/sparql> 
+  		{ <http://dbpedia.org/resource/Berlin> dbo:country ?c .
+		  ?c owl:sameAs ?cc }
+	SERVICE <https://query.wikidata.org/sparql> 
+		{ ?cc rdfs:label ?o }
+  }
 }
+LIMIT 10
+
