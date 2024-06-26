@@ -20,6 +20,10 @@ import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -177,10 +181,25 @@ public class HeFQUINEngineConfigReader
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
 		final PhysicalOptimizer popt = readPhysicalOptimizer(rsrc, ctx);
 
-		return new QueryPlannerImpl( spl, lopt, popt,
-		                             ctx.withPrintingOfSourceAssignment(),
-		                             ctx.withPrintingOfLogicalPlan(),
-		                             ctx.withPrintingOfPhysicalPlan() );
+		final LogicalPlanPrinter srcasgPrinter;
+		if ( ctx.withPrintingOfSourceAssignment() )
+			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
+		else
+			srcasgPrinter = null;
+
+		final LogicalPlanPrinter lplanPrinter;
+		if ( ctx.withPrintingOfSourceAssignment() )
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
+		else
+			lplanPrinter = null;
+
+		final PhysicalPlanPrinter pplanPrinter;
+		if ( ctx.withPrintingOfSourceAssignment() )
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
+		else
+			pplanPrinter = null;
+
+		return new QueryPlannerImpl(spl, lopt, popt, srcasgPrinter, lplanPrinter, pplanPrinter);
 	}
 
 	public SourcePlanner readSourcePlanner( final Resource qplRsrc, final ExtendedContext ctx ) {

@@ -5,8 +5,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -25,27 +23,25 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final SourcePlanner sourcePlanner;
 	protected final LogicalOptimizer loptimizer;
 	protected final PhysicalOptimizer poptimizer;
-	protected final boolean printSourceAssignment;
-	protected final boolean printLogicalPlan;
-	protected final boolean printPhysicalPlan;
-	protected final LogicalPlanPrinter lpPrinter = new TextBasedLogicalPlanPrinterImpl();
-	protected final PhysicalPlanPrinter ppPrinter = new TextBasedPhysicalPlanPrinterImpl();
+	protected final LogicalPlanPrinter srcasgPrinter;
+	protected final LogicalPlanPrinter lplanPrinter;
+	protected final PhysicalPlanPrinter pplanPrinter;
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
 	                         final PhysicalOptimizer poptimizer,
-	                         final boolean printSourceAssignment,
-	                         final boolean printLogicalPlan,
-	                         final boolean printPhysicalPlan ) {
+	                         final LogicalPlanPrinter srcasgPrinter,     // may be null
+	                         final LogicalPlanPrinter lplanPrinter,      // may be null
+	                         final PhysicalPlanPrinter pplanPrinter ) {  // may be null
 		assert sourcePlanner != null;
 		assert poptimizer != null;
 
 		this.sourcePlanner = sourcePlanner;
 		this.loptimizer = loptimizer;
 		this.poptimizer = poptimizer;
-		this.printSourceAssignment = printSourceAssignment;
-		this.printLogicalPlan = printLogicalPlan;
-		this.printPhysicalPlan = printPhysicalPlan;
+		this.srcasgPrinter = srcasgPrinter;
+		this.lplanPrinter = lplanPrinter;
+		this.pplanPrinter = pplanPrinter;
 	}
 
 	@Override
@@ -62,9 +58,9 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t1 = System.currentTimeMillis();
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
 
-		if ( printSourceAssignment ) {
+		if ( srcasgPrinter != null ) {
 			System.out.println("--------- Source Assignment ---------");
-			lpPrinter.print( saAndStats.object1, System.out );
+			srcasgPrinter.print( saAndStats.object1, System.out );
 		}
 
 		final long t2 = System.currentTimeMillis();
@@ -77,9 +73,9 @@ public class QueryPlannerImpl implements QueryPlanner
 			lp = saAndStats.object1;
 		}
 
-		if ( printLogicalPlan ) {
+		if ( lplanPrinter != null ) {
 			System.out.println("--------- Logical Plan ---------");
-			lpPrinter.print( lp, System.out );
+			lplanPrinter.print( lp, System.out );
 		}
 
 		final long t3 = System.currentTimeMillis();
@@ -87,9 +83,9 @@ public class QueryPlannerImpl implements QueryPlanner
 
 		final long t4 = System.currentTimeMillis();
 
-		if ( printPhysicalPlan ) {
+		if ( pplanPrinter != null ) {
 			System.out.println("--------- Physical Plan ---------");
-			ppPrinter.print( planAndStats.object1, System.out );
+			pplanPrinter.print( planAndStats.object1, System.out );
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,
