@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
@@ -28,6 +29,7 @@ public class QueryPlannerImpl implements QueryPlanner
 	protected final boolean printLogicalPlan;
 	protected final boolean printPhysicalPlan;
 	protected final LogicalPlanPrinter lpPrinter = new TextBasedLogicalPlanPrinterImpl();
+	protected final PhysicalPlanPrinter ppPrinter = new TextBasedPhysicalPlanPrinterImpl();
 
 	public QueryPlannerImpl( final SourcePlanner sourcePlanner,
 	                         final LogicalOptimizer loptimizer, // may be null
@@ -61,6 +63,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
 
 		if ( printSourceAssignment ) {
+			System.out.println("--------- Source Assignment ---------");
 			lpPrinter.print( saAndStats.object1, System.out );
 		}
 
@@ -75,7 +78,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		if ( printLogicalPlan ) {
-System.out.println("Logical Plan!");
+			System.out.println("--------- Logical Plan ---------");
 			lpPrinter.print( lp, System.out );
 		}
 
@@ -85,8 +88,8 @@ System.out.println("Logical Plan!");
 		final long t4 = System.currentTimeMillis();
 
 		if ( printPhysicalPlan ) {
-System.out.println("Physical Plan!");
-			System.out.println( TextBasedPhysicalPlanPrinterImpl.print(planAndStats.object1) );
+			System.out.println("--------- Physical Plan ---------");
+			ppPrinter.print( planAndStats.object1, System.out );
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,

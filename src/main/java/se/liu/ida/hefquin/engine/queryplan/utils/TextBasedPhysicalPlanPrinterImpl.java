@@ -1,255 +1,274 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import java.io.PrintStream;
+
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.utils.IndentingPrintStream;
 
-public class TextBasedPhysicalPlanPrinterImpl extends TextBasedPlanPrinterBase{
+public class TextBasedPhysicalPlanPrinterImpl implements PhysicalPlanPrinter
+{
+	@Override
+	public void print( final PhysicalPlan plan, final PrintStream out ) {
+		final IndentingPrintStream iOut = new IndentingPrintStream(out);
+		final PhysicalPlanVisitor beforeVisitor = new MyBeforeVisitor(iOut);
+		final PhysicalPlanVisitor afterVisitor = new MyAfterVisitor(iOut);
 
-    protected final PhysicalPlanPrinterBeforeVisitor beforeVisitor = new PhysicalPlanPrinterBeforeVisitor();
-    protected final PhysicalPlanPrinterAfterVisitor afterVisitor = new PhysicalPlanPrinterAfterVisitor();
+		PhysicalPlanWalker.walk(plan, beforeVisitor, afterVisitor);
+		iOut.flush();
+	}
 
-    static public String print(final PhysicalPlan plan ) {
-        final TextBasedPhysicalPlanPrinterImpl printer = new TextBasedPhysicalPlanPrinterImpl();
-        PhysicalPlanWalker.walk(plan, printer.beforeVisitor, printer.afterVisitor);
-        return printer.getString();
-    }
 
-    private class PhysicalPlanPrinterBeforeVisitor implements PhysicalPlanVisitor {
-        @Override
-        public void visit( final PhysicalOpRequest<?, ?> op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append( System.lineSeparator() );
-        }
+	protected class MyBeforeVisitor implements PhysicalPlanVisitor {
 
-        @Override
-        public void visit( final PhysicalOpRequestWithTranslation<?, ?> op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append( System.lineSeparator() );
-        }
-        
-        @Override
-        public void visit( final PhysicalOpBindJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		protected final IndentingPrintStream out;
 
-        @Override
-        public void visit( final PhysicalOpBindJoinWithVALUES op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		public MyBeforeVisitor( final IndentingPrintStream out ) {
+			this.out = out;
+		}
 
-        @Override
-        public void visit( final PhysicalOpBindJoinWithFILTER op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpRequest<?, ?> op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append( System.lineSeparator() );
+		}
 
-        @Override
-        public void visit( final PhysicalOpBindJoinWithFILTERandTranslation op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpRequestWithTranslation<?, ?> op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append( System.lineSeparator() );
+		}
+		
+		@Override
+		public void visit( final PhysicalOpBindJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpBindJoinWithUNION op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpBindJoinWithVALUES op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpBindJoinWithFILTERandTranslation op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append( System.lineSeparator() );
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpBindJoinWithUNION op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpHashJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpSymmetricHashJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpHashRJoin op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append( System.lineSeparator() );
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append( System.lineSeparator() );
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpBinaryUnion op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpHashJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpMultiwayUnion op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append( System.lineSeparator() );
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpSymmetricHashJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpFilter op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpHashRJoin op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append( System.lineSeparator() );
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpLocalToGlobal op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpBinaryUnion op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpGlobalToLocal op ) {
-            addTabs();
-            builder.append( op.toString() );
-            builder.append(System.lineSeparator());
-            indentLevel++;
-        }
+		@Override
+		public void visit( final PhysicalOpMultiwayUnion op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append( System.lineSeparator() );
+			out.increaseIndentationLevel();
+		}
 
-    }
+		@Override
+		public void visit( final PhysicalOpFilter op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-    private class PhysicalPlanPrinterAfterVisitor implements PhysicalPlanVisitor {
-        @Override
-        public void visit(final PhysicalOpRequest<?, ?> op) {
-            // nothing to do here
-        }
-        
-        @Override
-        public void visit(final PhysicalOpRequestWithTranslation<?, ?> op) {
-            // nothing to do here
-        }
+		@Override
+		public void visit( final PhysicalOpLocalToGlobal op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpBindJoin op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit( final PhysicalOpGlobalToLocal op ) {
+			out.appendIndentation();
+			out.append( op.toString() );
+			out.append(System.lineSeparator());
+			out.increaseIndentationLevel();
+		}
+	}
 
-        @Override
-        public void visit(final PhysicalOpBindJoinWithVALUES op) {
-            indentLevel--;
-        }
+	protected class MyAfterVisitor implements PhysicalPlanVisitor {
 
-        @Override
-        public void visit(final PhysicalOpBindJoinWithFILTER op) {
-            indentLevel--;
-        }
+		protected final IndentingPrintStream out;
 
-        @Override
-        public void visit(final PhysicalOpBindJoinWithFILTERandTranslation op) {
-            indentLevel--;
-        }
+		public MyAfterVisitor( final IndentingPrintStream out ) {
+			this.out = out;
+		}
 
-        @Override
-        public void visit(final PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpRequest<?, ?> op) {
+			// nothing to do here
+		}
+		
+		@Override
+		public void visit(final PhysicalOpRequestWithTranslation<?, ?> op) {
+			// nothing to do here
+		}
 
-        @Override
-        public void visit(final PhysicalOpNaiveNestedLoopsJoin op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpBindJoin op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpBindJoinWithVALUES op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpParallelMultiLeftJoin op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpBindJoinWithFILTER op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpHashJoin op ) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpBindJoinWithFILTERandTranslation op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpSymmetricHashJoin op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpBindJoinWithUNION physicalOpBindJoinWithUNION) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit( final PhysicalOpHashRJoin op ) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpNaiveNestedLoopsJoin op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpBinaryUnion op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpIndexNestedLoopsJoin op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpMultiwayUnion op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit(final PhysicalOpParallelMultiLeftJoin op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpFilter op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit( final PhysicalOpHashJoin op ) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpLocalToGlobal op) {
-            indentLevel--;
-        }
+		@Override
+		public void visit( final PhysicalOpSymmetricHashJoin op) {
+			out.decreaseIndentationLevel();
+		}
 
-        @Override
-        public void visit(final PhysicalOpGlobalToLocal op) {
-            indentLevel--;
-        }
-    }
+		@Override
+		public void visit( final PhysicalOpHashRJoin op ) {
+			out.decreaseIndentationLevel();
+		}
+
+		@Override
+		public void visit(final PhysicalOpBinaryUnion op) {
+			out.decreaseIndentationLevel();
+		}
+
+		@Override
+		public void visit(final PhysicalOpMultiwayUnion op) {
+			out.decreaseIndentationLevel();
+		}
+
+		@Override
+		public void visit(final PhysicalOpFilter op) {
+			out.decreaseIndentationLevel();
+		}
+
+		@Override
+		public void visit(final PhysicalOpLocalToGlobal op) {
+			out.decreaseIndentationLevel();
+		}
+
+		@Override
+		public void visit(final PhysicalOpGlobalToLocal op) {
+			out.decreaseIndentationLevel();
+		}
+	}
+
 }

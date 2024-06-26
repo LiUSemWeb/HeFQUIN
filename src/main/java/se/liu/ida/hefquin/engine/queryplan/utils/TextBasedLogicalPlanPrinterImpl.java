@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.utils.IndentingPrintStream;
 
 public class TextBasedLogicalPlanPrinterImpl implements LogicalPlanPrinter
 {
+	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
 		final IndentingPrintStream iOut = new IndentingPrintStream(out);
 		final LogicalPlanVisitor beforeVisitor = new MyBeforeVisitor(iOut);
