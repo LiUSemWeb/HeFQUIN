@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
@@ -297,13 +299,13 @@ public class HeFQUINEngineConfigReaderTest
 			public boolean skipExecution() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean withPrintingOfSourceAssignment() { throw new UnsupportedOperationException(); }
+			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean withPrintingOfLogicalPlan() { throw new UnsupportedOperationException(); }
+			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean withPrintingOfPhysicalPlan() { throw new UnsupportedOperationException(); }
+			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
@@ -363,12 +365,13 @@ public class HeFQUINEngineConfigReaderTest
 			public boolean skipExecution() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean withPrintingOfSourceAssignment() { throw new UnsupportedOperationException(); }
-			@Override
-			public boolean withPrintingOfLogicalPlan() { throw new UnsupportedOperationException(); }
+			public LogicalPlanPrinter getSourceAssignmentPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
-			public boolean withPrintingOfPhysicalPlan() { throw new UnsupportedOperationException(); }
+			public LogicalPlanPrinter getLogicalPlanPrinter() { throw new UnsupportedOperationException(); }
+
+			@Override
+			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }

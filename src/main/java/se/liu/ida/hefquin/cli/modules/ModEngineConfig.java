@@ -17,6 +17,8 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 
 public class ModEngineConfig extends ModBase
 {
@@ -53,18 +55,18 @@ public class ModEngineConfig extends ModBase
 	                                final FederationCatalog cat,
 	                                final boolean isExperimentRun,
 	                                final boolean skipExecution,
-	                                final boolean printSourceAssignment,
-	                                final boolean printLogicalPlan,
-	                                final boolean printPhysicalPlan ) {
+	                                final LogicalPlanPrinter srcasgPrinter,
+	                                final LogicalPlanPrinter lplanPrinter,
+	                                final PhysicalPlanPrinter pplanPrinter ) {
 		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execServiceForFedAccess; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
 			@Override public FederationCatalog getFederationCatalog() { return cat; }
 			@Override public boolean isExperimentRun() { return isExperimentRun; }
 			@Override public boolean skipExecution() { return skipExecution; }
-			@Override public boolean withPrintingOfSourceAssignment() { return printSourceAssignment; }
-			@Override public boolean withPrintingOfLogicalPlan() { return printLogicalPlan; }
-			@Override public boolean withPrintingOfPhysicalPlan() { return printPhysicalPlan; }
+			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
+			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
+			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
 		};
 
 		return new HeFQUINEngineConfigReader().read(confDescr, ctx);

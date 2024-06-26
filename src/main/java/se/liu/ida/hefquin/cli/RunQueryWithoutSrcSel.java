@@ -78,9 +78,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		                                                   modFederation.getFederationCatalog(),
 		                                                   false, // isExperimentRun
 		                                                   contains(argSkipExecution),
-		                                                   modPlanPrinting.printSrcAssignment(),
-		                                                   modPlanPrinting.printLogicalPlan(),
-		                                                   modPlanPrinting.printPhysicalPlan() );
+		                                                   modPlanPrinting.getSourceAssignmentPrinter(),
+		                                                   modPlanPrinting.getLogicalPlanPrinter(),
+		                                                   modPlanPrinting.getPhysicalPlanPrinter() );
 		e.integrateIntoJena();
 
 		final Query query = getQuery();

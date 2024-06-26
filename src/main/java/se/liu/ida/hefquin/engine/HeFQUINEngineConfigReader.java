@@ -22,8 +22,6 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -104,9 +102,15 @@ public class HeFQUINEngineConfigReader
 		FederationCatalog getFederationCatalog();
 		boolean isExperimentRun();
 		boolean skipExecution();
-		boolean withPrintingOfSourceAssignment();
-		boolean withPrintingOfLogicalPlan();
-		boolean withPrintingOfPhysicalPlan();
+
+		/** may be <code>null</code> if source assignment printing is not requested by the user */
+		LogicalPlanPrinter getSourceAssignmentPrinter();
+
+		/** may be <code>null</code> if logical plan printing is not requested by the user */
+		LogicalPlanPrinter getLogicalPlanPrinter();
+
+		/** may be <code>null</code> if physical plan printing is not requested by the user */
+		PhysicalPlanPrinter getPhysicalPlanPrinter();
 	}
 
 
@@ -181,25 +185,10 @@ public class HeFQUINEngineConfigReader
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
 		final PhysicalOptimizer popt = readPhysicalOptimizer(rsrc, ctx);
 
-		final LogicalPlanPrinter srcasgPrinter;
-		if ( ctx.withPrintingOfSourceAssignment() )
-			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
-		else
-			srcasgPrinter = null;
-
-		final LogicalPlanPrinter lplanPrinter;
-		if ( ctx.withPrintingOfSourceAssignment() )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
-		else
-			lplanPrinter = null;
-
-		final PhysicalPlanPrinter pplanPrinter;
-		if ( ctx.withPrintingOfSourceAssignment() )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
-		else
-			pplanPrinter = null;
-
-		return new QueryPlannerImpl(spl, lopt, popt, srcasgPrinter, lplanPrinter, pplanPrinter);
+		return new QueryPlannerImpl( spl, lopt, popt,
+		                             ctx.getSourceAssignmentPrinter(),
+		                             ctx.getLogicalPlanPrinter(),
+		                             ctx.getPhysicalPlanPrinter() );
 	}
 
 	public SourcePlanner readSourcePlanner( final Resource qplRsrc, final ExtendedContext ctx ) {
@@ -462,31 +451,25 @@ public class HeFQUINEngineConfigReader
 		public boolean skipExecution() { return ctx.skipExecution(); }
 
 		@Override
-		public boolean withPrintingOfSourceAssignment() { return ctx.withPrintingOfSourceAssignment(); }
+		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
 
 		@Override
-		public boolean withPrintingOfLogicalPlan() { return ctx.withPrintingOfLogicalPlan(); }
+		public LogicalPlanPrinter getLogicalPlanPrinter() { return ctx.getLogicalPlanPrinter(); }
 
 		@Override
-		public boolean withPrintingOfPhysicalPlan()  { return ctx.withPrintingOfPhysicalPlan(); }
+		public PhysicalPlanPrinter getPhysicalPlanPrinter() { return ctx.getPhysicalPlanPrinter(); }
 	}
 
 	protected class ExtendedContextImpl2 implements ExtendedContext {
 		protected final QueryProcContext qprocCtx;
-		protected final ExecutorService execService4FedAccess;
-		protected final boolean printSourceAssignment;
-		protected final boolean printLogicalPlan;
-		protected final boolean printPhysicalPlan;
+		protected final Context ctx;
 
 		protected CostModel costModel = null;
 		protected boolean completed = false;
 
 		public ExtendedContextImpl2( final Context ctx, final FederationAccessManager fedAccessMgr ) {
 			qprocCtx = createQueryProcContext(ctx, fedAccessMgr);
-			execService4FedAccess = ctx.getExecutorServiceForFederationAccess();
-			printSourceAssignment = ctx.withPrintingOfSourceAssignment();
-			printLogicalPlan      = ctx.withPrintingOfLogicalPlan();
-			printPhysicalPlan     = ctx.withPrintingOfPhysicalPlan();
+			this.ctx = ctx;
 		}
 
 		@Override
@@ -509,7 +492,7 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public ExecutorService getExecutorServiceForFederationAccess() {
-			return execService4FedAccess;
+			return ctx.getExecutorServiceForFederationAccess();
 		}
 
 		@Override
@@ -524,22 +507,22 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public boolean isExperimentRun() {
-			return qprocCtx.isExperimentRun();
+			return ctx.isExperimentRun();
 		}
 
 		@Override
 		public boolean skipExecution() {
-			return qprocCtx.skipExecution();
+			return ctx.skipExecution();
 		}
 
 		@Override
-		public boolean withPrintingOfSourceAssignment() { return printSourceAssignment; }
+		public LogicalPlanPrinter getSourceAssignmentPrinter() { return ctx.getSourceAssignmentPrinter(); }
 
 		@Override
-		public boolean withPrintingOfLogicalPlan() { return printLogicalPlan; }
+		public LogicalPlanPrinter getLogicalPlanPrinter() { return ctx.getLogicalPlanPrinter(); }
 
 		@Override
-		public boolean withPrintingOfPhysicalPlan()  { return printPhysicalPlan; }
+		public PhysicalPlanPrinter getPhysicalPlanPrinter() { return ctx.getPhysicalPlanPrinter(); }
 	}
 
 	protected QueryProcContext createQueryProcContext( final Context ctx,
