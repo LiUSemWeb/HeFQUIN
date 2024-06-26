@@ -5,13 +5,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
-public class PhysicalPlanPrinter extends PlanPrinter{
+public class TextBasedPhysicalPlanPrinterImpl extends TextBasedPlanPrinterBase{
 
     protected final PhysicalPlanPrinterBeforeVisitor beforeVisitor = new PhysicalPlanPrinterBeforeVisitor();
     protected final PhysicalPlanPrinterAfterVisitor afterVisitor = new PhysicalPlanPrinterAfterVisitor();
 
     static public String print(final PhysicalPlan plan ) {
-        final PhysicalPlanPrinter printer = new PhysicalPlanPrinter();
+        final TextBasedPhysicalPlanPrinterImpl printer = new TextBasedPhysicalPlanPrinterImpl();
         PhysicalPlanWalker.walk(plan, printer.beforeVisitor, printer.afterVisitor);
         return printer.getString();
     }

@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-public class PlanPrinter {
+public class TextBasedPlanPrinterBase {
 
     protected int indentLevel = 0;
     protected StringBuilder builder = new StringBuilder();

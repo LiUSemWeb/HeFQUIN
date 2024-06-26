@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 import se.liu.ida.hefquin.engine.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
-import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
@@ -59,7 +59,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
 
 		if ( printSourceAssignment ) {
-			System.out.println( LogicalPlanPrinter.print(saAndStats.object1) );
+			System.out.println( TextBasedLogicalPlanPrinterImpl.print(saAndStats.object1) );
 		}
 
 		final long t2 = System.currentTimeMillis();
@@ -73,7 +73,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		if ( printLogicalPlan ) {
-			System.out.println( LogicalPlanPrinter.print(lp) );
+			System.out.println( TextBasedLogicalPlanPrinterImpl.print(lp) );
 		}
 
 		final long t3 = System.currentTimeMillis();
@@ -82,7 +82,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final long t4 = System.currentTimeMillis();
 
 		if ( printPhysicalPlan ) {
-			System.out.println( PhysicalPlanPrinter.print(planAndStats.object1) );
+			System.out.println( TextBasedPhysicalPlanPrinterImpl.print(planAndStats.object1) );
 		}
 
 		final QueryPlanningStats myStats = new QueryPlanningStatsImpl( t4-t1, t2-t1, t3-t2, t4-t3,

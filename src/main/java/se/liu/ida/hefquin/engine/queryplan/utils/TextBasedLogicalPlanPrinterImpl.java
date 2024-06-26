@@ -5,13 +5,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 
-public class LogicalPlanPrinter extends PlanPrinter{
-
+public class TextBasedLogicalPlanPrinterImpl extends TextBasedPlanPrinterBase
+{
 	protected final LogicalPlanPrinterBeforeVisitor beforeVisitor = new LogicalPlanPrinterBeforeVisitor();
 	protected final LogicalPlanPrinterAfterVisitor afterVisitor = new LogicalPlanPrinterAfterVisitor();
 	
 	static public String print( final LogicalPlan plan ) {
-		final LogicalPlanPrinter printer = new LogicalPlanPrinter();
+		final TextBasedLogicalPlanPrinterImpl printer = new TextBasedLogicalPlanPrinterImpl();
 		LogicalPlanWalker.walk(plan, printer.beforeVisitor, printer.afterVisitor);
 		return printer.getString();
 	}
