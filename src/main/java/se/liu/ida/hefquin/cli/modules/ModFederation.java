@@ -21,7 +21,7 @@ public class ModFederation extends ModBase
 	}
 
 	@Override
-    public void processArgs(final CmdArgModule cmdLine) {
+	public void processArgs( final CmdArgModule cmdLine ) {
 		if ( cmdLine.contains(fedDescrDecl) ) {
 			final String fedDescrFilename = cmdLine.getValue(fedDescrDecl);
 			cat = FederationDescriptionReader.readFromFile(fedDescrFilename);
