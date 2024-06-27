@@ -11,7 +11,7 @@ import java.util.Objects;
  * Base class for physical operators that implement
  * some form of a binary join algorithm.
  */
-public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLogicalOp
+public abstract class BasePhysicalOpBinaryJoin extends PhysicalOperatorBase implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpJoin lop;
 
