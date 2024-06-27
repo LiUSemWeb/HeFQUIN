@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public class PhysicalOpGlobalToLocal implements UnaryPhysicalOpForLogicalOp {
+public class PhysicalOpGlobalToLocal extends PhysicalOperatorBase implements UnaryPhysicalOpForLogicalOp {
 
 	protected final LogicalOpGlobalToLocal lop;
 

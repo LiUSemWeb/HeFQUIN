@@ -5,11 +5,15 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 
-public abstract class BasePhysicalOpMultiwayJoin implements NaryPhysicalOpForLogicalOp
+/**
+ * Base class for physical operators that implement
+ * some form of a multi-way join algorithm.
+ */
+public abstract class BasePhysicalOpMultiwayJoin extends PhysicalOperatorBase implements NaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpMultiwayJoin lop;
 
-	protected BasePhysicalOpMultiwayJoin(final LogicalOpMultiwayJoin lop ) {
+	protected BasePhysicalOpMultiwayJoin( final LogicalOpMultiwayJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}

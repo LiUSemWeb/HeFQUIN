@@ -12,7 +12,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public abstract class BasePhysicalOpSingleInputJoin implements UnaryPhysicalOpForLogicalOp
+/**
+ * Base class for physical operators that implement some form of a join
+ * algorithm that consumes only one input and produces the other input
+ * as part of the algorithm itself.
+ */
+public abstract class BasePhysicalOpSingleInputJoin extends PhysicalOperatorBase implements UnaryPhysicalOpForLogicalOp
 {
     protected final UnaryLogicalOp lop;
 

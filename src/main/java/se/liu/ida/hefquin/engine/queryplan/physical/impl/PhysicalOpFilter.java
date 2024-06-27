@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
+public class PhysicalOpFilter extends PhysicalOperatorBase implements UnaryPhysicalOpForLogicalOp {
 
 	protected final LogicalOpFilter lop;
 	
