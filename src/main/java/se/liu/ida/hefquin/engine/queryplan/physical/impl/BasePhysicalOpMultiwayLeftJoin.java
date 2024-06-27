@@ -5,6 +5,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 
+/**
+ * Base class for physical operators that implement
+ * some form of a multi-way left join algorithm.
+ */
 public abstract class BasePhysicalOpMultiwayLeftJoin implements NaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpMultiwayLeftJoin lop;

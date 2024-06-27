@@ -7,11 +7,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp
 
 import java.util.Objects;
 
+/**
+ * Base class for physical operators that implement
+ * some form of a binary join algorithm.
+ */
 public abstract class BasePhysicalOpBinaryJoin implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpJoin lop;
 
-	protected BasePhysicalOpBinaryJoin(final LogicalOpJoin lop ) {
+	protected BasePhysicalOpBinaryJoin( final LogicalOpJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}

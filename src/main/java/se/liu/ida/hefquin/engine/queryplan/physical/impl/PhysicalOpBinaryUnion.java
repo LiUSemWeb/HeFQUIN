@@ -8,6 +8,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
+/**
+ * A physical operator that implements a binary union.
+ *
+ * The actual algorithm of this operator is implemented in the
+ * {@link ExecOpBinaryUnion} class.
+ */
 public class PhysicalOpBinaryUnion implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpUnion lop;
