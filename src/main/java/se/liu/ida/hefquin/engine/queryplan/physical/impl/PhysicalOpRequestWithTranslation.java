@@ -27,7 +27,7 @@ import java.util.Objects;
  * by applying the inverse of the vocabulary mapping.
  */
 public class PhysicalOpRequestWithTranslation<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-                       implements NullaryPhysicalOpForLogicalOp
+                       extends PhysicalOperatorBase implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
 

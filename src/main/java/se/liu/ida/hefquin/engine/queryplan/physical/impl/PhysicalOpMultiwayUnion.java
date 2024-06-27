@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpMultiwayUnion implements NaryPhysicalOpForLogicalOp
+public class PhysicalOpMultiwayUnion extends PhysicalOperatorBase implements NaryPhysicalOpForLogicalOp
 {
 
 	@Override
