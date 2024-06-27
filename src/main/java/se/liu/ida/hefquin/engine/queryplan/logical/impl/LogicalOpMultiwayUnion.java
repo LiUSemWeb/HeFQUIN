@@ -50,5 +50,4 @@ public class LogicalOpMultiwayUnion extends LogicalOperatorBase implements NaryL
 		return "> mu (" + getID() + ") ";
 	}
 
-
 }
