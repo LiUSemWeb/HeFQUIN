@@ -44,7 +44,7 @@ public class PhysicalOpMultiwayUnion extends PhysicalOperatorBase implements Nar
 
 	@Override
 	public String toString(){
-		return "> multiwayUnion ";
+		return "> multiwayUnion " + "(" + getID() + ")";
 	}
 
 }

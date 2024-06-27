@@ -120,7 +120,7 @@ public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 	@Override
 	public String toString() {
 
-		return "> FILTERBindJoin" +  lop.toString();
+		return "> FILTERBindJoin " + "(" + getID() + ") " +  lop.toString();
 	}
 
 }
