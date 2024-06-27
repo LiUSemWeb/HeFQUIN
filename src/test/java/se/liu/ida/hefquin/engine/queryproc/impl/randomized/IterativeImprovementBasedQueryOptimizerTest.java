@@ -102,6 +102,11 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		public LogicalOperator getLogicalOperator() {
 			return null;
 		}
+
+		@Override
+		public int getID() {
+			return 0;
+		}
 	}
 	
 	protected static class DummyPlanForTest implements PhysicalPlan {

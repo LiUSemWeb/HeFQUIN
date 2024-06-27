@@ -35,4 +35,9 @@ public interface PhysicalOperator
 	ExpectedVariables getExpectedVariables( ExpectedVariables ... inputVars );
 
 	void visit(final PhysicalPlanVisitor visitor);
+	
+	/**
+	 * Returns an identifier of this operator, which should be unique for all the operators within the same plan.
+	 */
+	int getID();
 }
