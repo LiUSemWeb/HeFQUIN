@@ -10,13 +10,14 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpUnion implements BinaryLogicalOp
+public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogicalOp
 {
 	protected static LogicalOpUnion singleton = new LogicalOpUnion();
 
 	public static LogicalOpUnion getInstance() { return singleton; }
 
-	protected LogicalOpUnion() {}
+	protected LogicalOpUnion() {
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -51,5 +52,6 @@ public class LogicalOpUnion implements BinaryLogicalOp
 	public String toString(){
 		return "> union ";
 	}
+
 
 }

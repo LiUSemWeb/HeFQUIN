@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpTPOptAdd implements UnaryLogicalOp
+public class LogicalOpTPOptAdd extends LogicalOperatorBase implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final TriplePattern tp;
@@ -90,5 +90,6 @@ public class LogicalOpTPOptAdd implements UnaryLogicalOp
 				+ fm.getInterface().toString()
 				+ " )";
 	}
+
 
 }

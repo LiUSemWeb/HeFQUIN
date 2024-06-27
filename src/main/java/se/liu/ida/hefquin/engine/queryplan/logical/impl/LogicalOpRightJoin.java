@@ -10,13 +10,14 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpRightJoin implements BinaryLogicalOp
+public class LogicalOpRightJoin extends LogicalOperatorBase implements BinaryLogicalOp
 {
 	protected static LogicalOpRightJoin singleton = new LogicalOpRightJoin();
 
 	public static LogicalOpRightJoin getInstance() { return singleton; }
 
-	protected LogicalOpRightJoin() {}
+	protected LogicalOpRightJoin() {
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -55,5 +56,6 @@ public class LogicalOpRightJoin implements BinaryLogicalOp
 	public String toString(){
 		return "> leftjoin ";
 	}
+
 
 }

@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBind implements UnaryLogicalOp
+public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 {
 	protected final VarExprList bindExpressions;
 

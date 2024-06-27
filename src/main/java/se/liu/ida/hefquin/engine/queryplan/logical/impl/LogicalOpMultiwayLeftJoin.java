@@ -15,13 +15,15 @@ import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
  * Hence, it is not to be confused with nested OPTIONAL clauses (which would,
  * instead, be captured as multiple nested multiway left joins).
  */
-public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
+public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements NaryLogicalOp
 {
+	
 	protected static LogicalOpMultiwayLeftJoin singleton = new LogicalOpMultiwayLeftJoin();
 
 	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
 
-	protected LogicalOpMultiwayLeftJoin() {}
+	protected LogicalOpMultiwayLeftJoin() {
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -54,5 +56,6 @@ public class LogicalOpMultiwayLeftJoin implements NaryLogicalOp
 	public String toString(){
 		return "> mlj ";
 	}
+
 
 }
