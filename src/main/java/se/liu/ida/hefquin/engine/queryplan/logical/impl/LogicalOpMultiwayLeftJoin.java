@@ -21,8 +21,7 @@ public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements Na
 
 	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
 
-	protected LogicalOpMultiwayLeftJoin() {
-	}
+	protected LogicalOpMultiwayLeftJoin() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

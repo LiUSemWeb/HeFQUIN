@@ -16,8 +16,7 @@ public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogical
 
 	public static LogicalOpUnion getInstance() { return singleton; }
 
-	protected LogicalOpUnion() {
-	}
+	protected LogicalOpUnion() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {

@@ -16,8 +16,7 @@ public class LogicalOpRightJoin extends LogicalOperatorBase implements BinaryLog
 
 	public static LogicalOpRightJoin getInstance() { return singleton; }
 
-	protected LogicalOpRightJoin() {
-	}
+	protected LogicalOpRightJoin() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
