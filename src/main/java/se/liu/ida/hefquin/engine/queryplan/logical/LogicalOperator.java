@@ -16,4 +16,6 @@ public interface LogicalOperator
 	ExpectedVariables getExpectedVariables( ExpectedVariables ... inputVars );
 
 	void visit( LogicalPlanVisitor visitor ); 
+	
+	int getID();
 }
