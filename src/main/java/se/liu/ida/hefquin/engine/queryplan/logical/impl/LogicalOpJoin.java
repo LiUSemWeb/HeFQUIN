@@ -16,7 +16,8 @@ public class LogicalOpJoin extends LogicalOperatorBase implements BinaryLogicalO
 
 	public static LogicalOpJoin getInstance() { return singleton; }
 
-	protected LogicalOpJoin() {}
+	protected LogicalOpJoin() {
+	}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
