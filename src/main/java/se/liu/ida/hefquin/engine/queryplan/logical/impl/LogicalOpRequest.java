@@ -4,9 +4,11 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanCounter;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> implements NullaryLogicalOp
+
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember > extends LogicalPlanCounter implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
@@ -62,8 +64,8 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 		final int codeOfReq = req.toString().hashCode();
 		final int codeOfFm = fm.getInterface().toString().hashCode();
 
-		return "> req" +
-				"[" + codeOfReq + ", "+ codeOfFm + "]"+
+		return "> req" + " (" + this.getOperatorID() + ") \n" +
+				"\t\t[" + codeOfReq + ", "+ codeOfFm + "]"+
 				" ( " +
 				"{ " + req.toString() + " }"
 				+ ", "
