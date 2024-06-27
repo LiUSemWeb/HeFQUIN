@@ -3,7 +3,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
 public abstract class LogicalOperatorBase implements LogicalOperator {
 	private static int counter = 0;  
-    protected final int id;  
+	protected final int id;  
 
     public LogicalOperatorBase() {
         this.id = counter++;  

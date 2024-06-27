@@ -52,5 +52,4 @@ public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogical
 		return "> union ";
 	}
 
-
 }

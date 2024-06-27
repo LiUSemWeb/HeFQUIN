@@ -56,5 +56,4 @@ public class LogicalOpRightJoin extends LogicalOperatorBase implements BinaryLog
 		return "> leftjoin ";
 	}
 
-
 }

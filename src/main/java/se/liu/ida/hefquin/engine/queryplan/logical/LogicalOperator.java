@@ -17,5 +17,8 @@ public interface LogicalOperator
 
 	void visit( LogicalPlanVisitor visitor ); 
 	
+	/**
+	 * Returns an identifier of this operator, which should be unique for all the operators within the same plan.
+	 */
 	int getID();
 }

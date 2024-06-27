@@ -17,7 +17,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
  */
 public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements NaryLogicalOp
 {
-	
 	protected static LogicalOpMultiwayLeftJoin singleton = new LogicalOpMultiwayLeftJoin();
 
 	public static LogicalOpMultiwayLeftJoin getInstance() { return singleton; }
@@ -55,6 +54,5 @@ public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements Na
 	public String toString(){
 		return "> mlj ";
 	}
-
 
 }
