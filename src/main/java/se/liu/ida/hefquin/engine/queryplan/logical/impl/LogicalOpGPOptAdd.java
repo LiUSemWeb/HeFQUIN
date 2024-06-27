@@ -91,5 +91,4 @@ public class LogicalOpGPOptAdd extends LogicalOperatorBase implements UnaryLogic
 				+ " )";
 	}
 
-
 }

@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember > extends LogicalOperatorBase implements NullaryLogicalOp
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> extends LogicalOperatorBase implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
