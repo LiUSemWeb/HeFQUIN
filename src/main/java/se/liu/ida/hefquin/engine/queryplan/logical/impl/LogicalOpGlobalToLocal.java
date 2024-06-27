@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpGlobalToLocal implements UnaryLogicalOp {
+public class LogicalOpGlobalToLocal extends LogicalOperatorBase implements UnaryLogicalOp {
 
 	protected final VocabularyMapping vocabularyMapping;
 	

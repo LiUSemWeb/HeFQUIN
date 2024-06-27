@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpJoin implements BinaryLogicalOp
+public class LogicalOpJoin extends LogicalOperatorBase implements BinaryLogicalOp
 {
 	protected static LogicalOpJoin singleton = new LogicalOpJoin();
 

@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayUnion implements NaryLogicalOp
+public class LogicalOpMultiwayUnion extends LogicalOperatorBase implements NaryLogicalOp
 {
 	protected static LogicalOpMultiwayUnion singleton = new LogicalOpMultiwayUnion();
 
@@ -47,7 +47,7 @@ public class LogicalOpMultiwayUnion implements NaryLogicalOp
 
 	@Override
 	public String toString(){
-		return "> mu ";
+		return "> mu (" + getID() + ") ";
 	}
 
 }

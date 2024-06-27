@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpFilter implements UnaryLogicalOp
+public class LogicalOpFilter extends LogicalOperatorBase implements UnaryLogicalOp
 {
 	protected final ExprList filterExpressions;
 
