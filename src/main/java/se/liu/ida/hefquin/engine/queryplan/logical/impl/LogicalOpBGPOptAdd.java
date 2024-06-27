@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpBGPOptAdd implements UnaryLogicalOp
+public class LogicalOpBGPOptAdd extends LogicalOperatorBase implements UnaryLogicalOp
 {
 	protected final FederationMember fm;
 	protected final BGP bgp;
