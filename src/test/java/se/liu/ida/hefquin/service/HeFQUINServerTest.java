@@ -140,6 +140,32 @@ public class HeFQUINServerTest extends AbstractHeFQUINServerTest
 	}
 
 	@Test
+	public void postRequestWithInvalidContentType() throws Exception {
+		String uri = "/sparql";
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.content("SELECT (1 AS ?x) WHERE {}")
+				.contentType("application/invalid")
+				.accept("text/tsv"))
+				.andReturn();
+
+		final int status = mvcResult.getResponse().getStatus();
+		assertEquals(415, status);
+	}
+
+	@Test
+	public void postRequestWithInvalidAccept() throws Exception {
+		String uri = "/sparql";
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.content("SELECT (1 AS ?x) WHERE {}")
+				.contentType("application/sparql-query")
+				.accept("application/invalid"))
+				.andReturn();
+
+		final int status = mvcResult.getResponse().getStatus();
+		assertEquals(406, status);
+	}
+
+	@Test
 	public void getRequestWithXMLFormat() throws Exception {
 		String uri = "/sparql";
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -193,5 +219,17 @@ public class HeFQUINServerTest extends AbstractHeFQUINServerTest
 		assertEquals(200, status);
 		final String contentType = mvcResult.getResponse().getContentType();
 		assertTrue(contentType.contains("text/tsv"));
+	}
+
+	@Test
+	public void getRequestWithInvalidAccept() throws Exception {
+		String uri = "/sparql";
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+				.param("query", "SELECT (1 AS ?x) WHERE {}")
+				.accept("application/invalid"))
+				.andReturn();
+
+		final int status = mvcResult.getResponse().getStatus();
+		assertEquals(406, status);
 	}
 }
