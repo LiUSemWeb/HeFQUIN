@@ -16,8 +16,7 @@ public class LogicalOpMultiwayUnion extends LogicalOperatorBase implements NaryL
 
 	public static LogicalOpMultiwayUnion getInstance() { return singleton; }
 
-	protected LogicalOpMultiwayUnion() {
-	}
+	protected LogicalOpMultiwayUnion() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
