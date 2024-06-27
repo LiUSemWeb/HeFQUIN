@@ -12,6 +12,7 @@ SELECT * WHERE {
 		?cc rdfs:label ?o
 	}
 }
+<<<<<<< HEAD
 
 # An example query that must take into account vocabulary mappings
 #SELECT * WHERE {
@@ -34,3 +35,5 @@ SELECT * WHERE {
 #| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carles_Casagemas> |
 #| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carlos_Albert>    |
 #-------------------------------------------------------------------------------------------------------------------------
+=======
+>>>>>>> parent of 52db49f1 (change example query)
