@@ -32,6 +32,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOperatorBase;
 
 public class UnionPullUpTest
 {
@@ -533,9 +534,10 @@ public class UnionPullUpTest
 		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
 	}
 
-	protected static class DummyLogicalOp implements NullaryLogicalOp {
+	protected static class DummyLogicalOp extends LogicalOperatorBase implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyFederationMember implements FederationMember {
