@@ -2,8 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanCounter;
-
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
@@ -12,14 +10,13 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpMultiwayJoin extends LogicalPlanCounter implements NaryLogicalOp
+public class LogicalOpMultiwayJoin implements NaryLogicalOp
 {
 	protected static LogicalOpMultiwayJoin singleton = new LogicalOpMultiwayJoin();
 
 	public static LogicalOpMultiwayJoin getInstance() { return singleton; }
 
-	protected LogicalOpMultiwayJoin() {
-	}
+	protected LogicalOpMultiwayJoin() {}
 
 	@Override
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
@@ -50,7 +47,7 @@ public class LogicalOpMultiwayJoin extends LogicalPlanCounter implements NaryLog
 
 	@Override
 	public String toString(){
-		return "> mj (" + this.getOperatorID() + ")";
+		return "> mj ";
 	}
 
 }
