@@ -10,41 +10,54 @@ import se.liu.ida.hefquin.engine.utils.IndentingPrintStream;
 
 public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 {
-	
+	// The string represents '|  '.
+	protected final String levelIndentBase = "\u2502  ";
+	// The string represents '├──'.
+	protected final String nonLastChildIndentBase = "\u251C\u2500\u2500";
+	// The string represents '└──'.
+	protected final String lastChildIndentBase = "\u2514\u2500\u2500";
+		
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
 		final IndentingPrintStream iOut = new IndentingPrintStream(out);
-		final LogicalPlanVisitor beforeVisitor = new MyBeforeVisitor(iOut);
-		final LogicalPlanVisitor afterVisitor = new MyAfterVisitor(iOut);
-
-		LogicalPlanWalker.walk(plan, beforeVisitor, afterVisitor);
-		iOut.flush();
-		System.out.println("----------- re-impl -----------");
-		planWalk(plan, 0, 0, 0);
-	}
-	
-	public String getIndentLevelString(int indentLevel) {
-		String indentLevelString = "";
-		for ( int i = 0; i < indentLevel; i++ ) {
-			indentLevelString += "   ";
-		}
-		return indentLevelString;
-	}
-	
-	public String getIndentLevelString2(int planLevel, int planNumber, int planFlag) {
-		String indentLevelString = "";
-		for ( int i = 0; i < planLevel; i++ ) {
-			indentLevelString += "   ";
-		}
-		return indentLevelString;
-	}
-	
-	public void planWalk( final LogicalPlan plan, int planNumber, int planLevel, int planFlag ) {
-		System.out.println(getIndentLevelString(planLevel) + plan.getRootOperator().toString() +" "+planLevel + " " + planNumber);
+		//final LogicalPlanVisitor beforeVisitor = new MyBeforeVisitor(iOut);
+		//final LogicalPlanVisitor afterVisitor = new MyAfterVisitor(iOut);
+		//LogicalPlanWalker.walk(plan, beforeVisitor, afterVisitor);
+		//iOut.flush();
 		
+		planWalk(plan, 0, 0, 0, iOut);
+		iOut.flush();
+		
+	}
+	
+	public String getIndentLevelString(int planNumber, int planLevel, int numberOfSiblings) {
+		String indentLevelString = "";
+		for ( int i = 1; i < planLevel; i++ ) {
+			indentLevelString += levelIndentBase;
+		}
+		if (planNumber < numberOfSiblings-1) {
+			indentLevelString += nonLastChildIndentBase ;
+		}
+		else {
+			if (numberOfSiblings > 0) {
+				indentLevelString += lastChildIndentBase;
+			}
+			else {
+				indentLevelString = "";
+			}
+		}
+		return indentLevelString;
+	}
+	
+	public void planWalk( final LogicalPlan plan, int planNumber, int planLevel, int numberOfSiblings, IndentingPrintStream out) {
+		//System.out.println(getIndentLevelString2(planLevel, planNumber, numberOfSiblings) + plan.getRootOperator().toString() +" "+planLevel + " " + planNumber + " "+ numberOfSiblings);
+		//System.out.println(getIndentLevelString2(planLevel, planNumber, numberOfSiblings) + plan.getRootOperator().toString() );
+		//System.out.println(plan.getRootOperator().printString(getIndentLevelString2(planLevel, planNumber, numberOfSiblings)));
+		out.append( plan.getRootOperator().printString(getIndentLevelString(planNumber, planLevel, numberOfSiblings)) );
+		out.append(System.lineSeparator());
 		planLevel += 1;
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
-			planWalk( plan.getSubPlan(i), i, planLevel, i);
+			planWalk( plan.getSubPlan(i), i, planLevel, plan.numberOfSubPlans(), out );
 		}
 		
 	}
