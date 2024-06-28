@@ -61,7 +61,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	public String toString(){
 		final int codeOfReq = req.toString().hashCode();
 		final int codeOfFm = fm.getInterface().toString().hashCode();
-
+		/*
 		return "> req" + " (" + getID() + ") \n" +
 				"\t\t[" + codeOfReq + ", "+ codeOfFm + "]"+
 				" ( " +
@@ -69,6 +69,15 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 				+ ", "
 				+ fm.getInterface().toString()
 				+ " )";
+		*/
+		return "req" + " (" + getID() + ")";
+	}
+
+	@Override
+	public String printString(String identStr) {
+		return identStr + "req" + " (" + getID() + ")\n"
+			 + identStr.substring(0, identStr.length() - 3) + "\t - fm (" + fm.getInterface().toString() + ")\n"
+			 + identStr.substring(0, identStr.length() - 3) + "\t - pattern (" + req.toString() + ")";
 	}
 
 }
