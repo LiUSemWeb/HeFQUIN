@@ -61,6 +61,8 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
 	                                                           final ResultsFormat outputFormat,
 	                                                           final PrintStream output ) {
+		ValuesServiceQueryResolver.expandValuesPlusServicePattern(query);
+
 		final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
 		final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
 
