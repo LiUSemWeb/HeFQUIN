@@ -24,8 +24,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
  */
 public class LogicalToPhysicalOpConverter
 {
-	public static boolean handleVocabMappingsExplicitly = true;
-
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
 		if (      lop instanceof NullaryLogicalOp ) return convert( (NullaryLogicalOp) lop );
 		else if ( lop instanceof UnaryLogicalOp )   return convert( (UnaryLogicalOp) lop );
@@ -42,10 +40,7 @@ public class LogicalToPhysicalOpConverter
 	}
 
 	public static NullaryPhysicalOp convert( final LogicalOpRequest<?,?> lop ) {
-		if ( ! handleVocabMappingsExplicitly && lop.getFederationMember().getVocabularyMapping() != null )
-			return new PhysicalOpRequestWithTranslation<>(lop);
-		else
-			return new PhysicalOpRequest<>(lop);
+		return new PhysicalOpRequest<>(lop);
 	}
 
 	// --------- unary operators -----------
@@ -67,18 +62,6 @@ public class LogicalToPhysicalOpConverter
 	public static UnaryPhysicalOp convert( final LogicalOpTPAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
 
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			if ( fm instanceof SPARQLEndpoint )  return new PhysicalOpBindJoinWithFILTERandTranslation(lop);
-			else throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
-
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
 		else if ( fm instanceof TPFServer )      return new PhysicalOpIndexNestedLoopsJoin(lop);
@@ -90,17 +73,6 @@ public class LogicalToPhysicalOpConverter
 
 	public static UnaryPhysicalOp convert( final LogicalOpTPOptAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
-
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
 
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
@@ -114,18 +86,6 @@ public class LogicalToPhysicalOpConverter
 	public static UnaryPhysicalOp convert( final LogicalOpBGPAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
 
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			if ( fm instanceof SPARQLEndpoint )  return new PhysicalOpBindJoinWithFILTERandTranslation(lop);
-			else throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
-
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
 		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
@@ -133,17 +93,6 @@ public class LogicalToPhysicalOpConverter
 
 	public static UnaryPhysicalOp convert( final LogicalOpBGPOptAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
-
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
 
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
@@ -153,17 +102,6 @@ public class LogicalToPhysicalOpConverter
 	public static UnaryPhysicalOp convert( final LogicalOpGPAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
 
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
-
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 
 		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
@@ -171,17 +109,6 @@ public class LogicalToPhysicalOpConverter
 
 	public static UnaryPhysicalOp convert( final LogicalOpGPOptAdd lop ) {
 		final FederationMember fm = lop.getFederationMember();
-
-		// first, consider the possibility that vocabulary mappings should be
-		// handled implicitly (i.e., within the physical operators), which is
-		// not the default behavior of the engine
-
-		if ( ! handleVocabMappingsExplicitly && fm.getVocabularyMapping() != null ) {
-			throw new UnsupportedOperationException("No suitable operator for the given type of federation member: " + fm.getClass().getName() + ".");
-		}
-
-		// now, consider the default behavior in which vocabulary mappings
-		// are handled explicitly during query planning
 
 		if (      fm instanceof SPARQLEndpoint ) return new PhysicalOpBindJoinWithFILTER(lop);
 

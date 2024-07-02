@@ -64,9 +64,6 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                         if ( rightRootOp instanceof PhysicalOpRequest ) {
                             candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq((PhysicalOpRequest<?, ?>) rightRootOp, plan_left ) );
                         }
-                        if ( rightRootOp instanceof PhysicalOpRequestWithTranslation ) {
-                            candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) rightRootOp, plan_left ) );
-                        }
                         if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
                             if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(plan_right) ) {
                                 candidatePlans.add( PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(plan_left, plan_right) );

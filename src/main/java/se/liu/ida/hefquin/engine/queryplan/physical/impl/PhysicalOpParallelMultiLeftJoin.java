@@ -41,9 +41,6 @@ public class PhysicalOpParallelMultiLeftJoin extends PhysicalOperatorBase implem
 			if ( childRootOp instanceof PhysicalOpRequest<?,?> ) {
 				reqOp = ((PhysicalOpRequest<?,?>) childRootOp).getLogicalOperator();
 			}
-			else if ( childRootOp instanceof PhysicalOpRequestWithTranslation<?,?>  ) {
-				reqOp = ((PhysicalOpRequestWithTranslation<?,?>) childRootOp).getLogicalOperator();
-			}
 			else {
 				return null;
 			}

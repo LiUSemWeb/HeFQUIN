@@ -37,13 +37,6 @@ public class TextBasedPhysicalPlanPrinterImpl implements PhysicalPlanPrinter
 		}
 
 		@Override
-		public void visit( final PhysicalOpRequestWithTranslation<?, ?> op ) {
-			out.appendIndentation();
-			out.append( op.toString() );
-			out.append( System.lineSeparator() );
-		}
-		
-		@Override
 		public void visit( final PhysicalOpBindJoin op ) {
 			out.appendIndentation();
 			out.append( op.toString() );
@@ -61,14 +54,6 @@ public class TextBasedPhysicalPlanPrinterImpl implements PhysicalPlanPrinter
 
 		@Override
 		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
-			out.appendIndentation();
-			out.append( op.toString() );
-			out.append(System.lineSeparator());
-			out.increaseIndentationLevel();
-		}
-
-		@Override
-		public void visit( final PhysicalOpBindJoinWithFILTERandTranslation op ) {
 			out.appendIndentation();
 			out.append( op.toString() );
 			out.append(System.lineSeparator());
@@ -184,11 +169,6 @@ public class TextBasedPhysicalPlanPrinterImpl implements PhysicalPlanPrinter
 		public void visit(final PhysicalOpRequest<?, ?> op) {
 			// nothing to do here
 		}
-		
-		@Override
-		public void visit(final PhysicalOpRequestWithTranslation<?, ?> op) {
-			// nothing to do here
-		}
 
 		@Override
 		public void visit(final PhysicalOpBindJoin op) {
@@ -202,11 +182,6 @@ public class TextBasedPhysicalPlanPrinterImpl implements PhysicalPlanPrinter
 
 		@Override
 		public void visit(final PhysicalOpBindJoinWithFILTER op) {
-			out.decreaseIndentationLevel();
-		}
-
-		@Override
-		public void visit(final PhysicalOpBindJoinWithFILTERandTranslation op) {
 			out.decreaseIndentationLevel();
 		}
 

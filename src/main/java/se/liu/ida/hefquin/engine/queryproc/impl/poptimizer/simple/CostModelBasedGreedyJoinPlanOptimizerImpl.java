@@ -8,7 +8,6 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequestWithTranslation;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
@@ -114,15 +113,9 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
 					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
 				}
-				else if ( currentPlan.getRootOperator() instanceof PhysicalOpRequestWithTranslation ){
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
-				}
 
 				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
 					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan ) );
-				}
-				else if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequestWithTranslation ) {
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) subplans.get(i).getRootOperator(), currentPlan ));
 				}
 
 				nextPossiblePlans.put(i, plans);
