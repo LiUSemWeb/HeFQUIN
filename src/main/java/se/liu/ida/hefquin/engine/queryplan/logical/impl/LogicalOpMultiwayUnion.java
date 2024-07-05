@@ -47,7 +47,12 @@ public class LogicalOpMultiwayUnion extends LogicalOperatorBase implements NaryL
 
 	@Override
 	public String toString(){
-		return "> mu (" + getID() + ") ";
+		return "mu (" + getID() + ") ";
+	}
+	
+	@Override
+	public String printString(String identStr) {
+		return identStr + "mu" + " (" + getID() + ")";
 	}
 
 }
