@@ -4,6 +4,11 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
+/**
+ * An executable operator provides the implementation of the concrete
+ * algorithm that a physical operator is associated with. This interface
+ * is the top-level interface for all executable operators of HeFQUIN.
+ */
 public interface ExecutableOperator extends StatsProvider
 {
 	@Override

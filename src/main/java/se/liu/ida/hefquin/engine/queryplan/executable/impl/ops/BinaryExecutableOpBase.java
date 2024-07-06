@@ -10,6 +10,19 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * Top-level base class for all implementations of {@link BinaryExecutableOp}.
+ *
+ * This base class handles the collection of statistics about both the two
+ * inputs and the processing times per input block from the two inputs. To
+ * this end, it implements the major methods of the {@link BinaryExecutableOp}
+ * interface, where the actual functionality to be implemented for these methods
+ * needs to be provided by implementing four abstract functions in each sub-class
+ * of this base class. These four functions are:
+ * <ul>
+ * <li>{@link #_processBlockFromChild1(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)},</li>
+ * <li>{@link #_processBlockFromChild2(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)},</li>
+ * <li>{@link #_wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}, and</li>
+ * <li>{@link #_wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)}.</li>
+ * </ul>
  */
 public abstract class BinaryExecutableOpBase extends BaseForExecOps implements BinaryExecutableOp
 {
@@ -109,19 +122,55 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	}
 
 
+	/**
+	 * Implementations of this function need to process the given input block
+	 * coming from the first operand and send the produced result elements
+	 * (if any) to the given sink.
+	 *
+	 * If an exception occurs while processing the input block, this exception
+	 * needs to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _processBlockFromChild1(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
+	/**
+	 * Implementations of this function need to finish up any processing
+	 * related to the input coming from the first operand and send the
+	 * remaining result elements (if any) to the given sink.
+	 *
+	 * If an exception occurs during this process, then this exception needs
+	 * to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                          final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
+	/**
+	 * Implementations of this function need to process the given input block
+	 * coming from the second operand and send the produced result elements
+	 * (if any) to the given sink.
+	 *
+	 * If an exception occurs while processing the input block, this exception
+	 * needs to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _processBlockFromChild2(
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
+	/**
+	 * Implementations of this function need to finish up any processing
+	 * related to the input coming from the second operand and send the
+	 * remaining result elements (if any) to the given sink.
+	 *
+	 * If an exception occurs during this process, then this exception needs
+	 * to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                          final ExecutionContext execCxt ) throws ExecOpExecutionException;
 

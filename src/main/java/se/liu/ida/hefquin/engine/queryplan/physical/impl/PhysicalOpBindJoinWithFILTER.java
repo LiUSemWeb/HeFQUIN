@@ -14,6 +14,29 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
+/**
+ * A physical operator that implements (a batching version of) the bind
+ * join algorithm using FILTERs to capture the potential join partners
+ * that are sent to the federation member.
+ *
+ * <p>
+ * <b>Semantics:</b> This operator implements the logical operators gpAdd
+ * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
+ * That is, for a given graph pattern, a federation  member, and an input
+ * sequence of solution mappings (produced by the sub-plan under this
+ * operator), the operator produces the solutions resulting from the join
+ * (inner or left outer) between the input solutions and the solutions of
+ * evaluating the given graph pattern over the data of the federation
+ * member.
+ * </p>
+ *
+ * <p>
+ * <b>Algorithm description:</b> For a detailed description of the
+ * actual algorithm associated with this physical operator, refer
+ * to {@link ExecOpBindJoinSPARQLwithFILTER}, which provides the
+ * implementation of this algorithm.
+ * </p>
+ */
 public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
 {
 	public PhysicalOpBindJoinWithFILTER( final LogicalOpTPAdd lop ) {

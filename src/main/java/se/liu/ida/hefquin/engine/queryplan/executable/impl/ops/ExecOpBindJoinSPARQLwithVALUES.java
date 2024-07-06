@@ -25,6 +25,26 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
+/**
+ * Implementation of (a batching version of) the bind join algorithm that uses
+ * a VALUES clause to capture the potential join partners that are sent to the
+ * federation member.
+ *
+ * For every batch of solution mappings from the input, the algorithm sends a
+ * SPARQL request to the federation member; this request consists of the given
+ * graph pattern, extended with a VALUES clause that contains the solutions of
+ * the current input batch (in fact, only their projection to the join variables;
+ * also, the algorithm may decide to split the input batch into smaller batches
+ * for multiple requests).
+ * The response to such a request is the subset of the solutions for the graph
+ * pattern that are join partners for at least one of the solutions that were
+ * used for creating the request.
+ * After receiving such a response, the algorithm locally joins the solutions
+ * from the response with the solutions in the batch used for creating the
+ * request, and outputs the resulting joined solutions (if any).
+ * Thereafter, the algorithm moves on to the next batch of solutions from
+ * the input.
+ */
 public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 {
 	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {

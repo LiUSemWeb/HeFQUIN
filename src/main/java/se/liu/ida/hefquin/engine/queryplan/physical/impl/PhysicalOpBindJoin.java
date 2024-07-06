@@ -11,28 +11,27 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
- * A physical operator that implements (a batching version of) the bind join
- * algorithm for cases in which the federation member accessed by the algorithm
- * supports the brTPF interface.
+ * A physical operator that implements (a batching version of) the bind
+ * join algorithm for cases in which the federation member accessed by
+ * the algorithm supports the brTPF interface.
  *
- * For a given graph pattern, a federation member, and a (single) input
+ * <p>
+ * <b>Semantics:</b> This operator implements the logical operators tpAdd
+ * (see {@link LogicalOpTPAdd}) and tpOptAdd (see {@link LogicalOpTPOptAdd}).
+ * That is, for a given triple pattern, a federation  member, and an input
  * sequence of solution mappings (produced by the sub-plan under this
- * operator), the operator produces the solution mappings resulting from
- * the join between the solutions of evaluating the graph pattern over
- * the data of the federation member and the input solutions. To this end,
- * for every batch of solutions from the input, the algorithm sends a request
- * to the federation member, where this request consists of the graph pattern
- * and the solutions from the current input batch. The response to such a
- * request is the subset of the solutions for the graph pattern that are
- * compatible with at least one of the solutions that were attached to the
- * request. After receiving such a response, the algorithm joins (locally)
- * the solutions from the response with the solutions in the batch used for
- * making the request, and then outputs the resulting joined solutions (if
- * any). Thereafter, the algorithm moves on to the next batch of solutions
- * from the input.
+ * operator), the operator produces the solutions resulting from the join
+ * (inner or left outer) between the input solutions and the solutions of
+ * evaluating the given triple pattern over the data of the federation
+ * member.
+ * </p>
  *
- * The actual algorithm of this operator is implemented in the
- * {@link ExecOpBindJoinBRTPF} class.
+ * <p>
+ * <b>Algorithm description:</b> For a detailed description of the
+ * actual algorithm associated with this physical operator, refer
+ * to {@link ExecOpBindJoinBRTPF}, which provides the
+ * implementation of this algorithm.
+ * </p>
  */
 public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
 {

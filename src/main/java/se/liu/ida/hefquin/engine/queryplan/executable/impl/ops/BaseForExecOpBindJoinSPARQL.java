@@ -11,6 +11,10 @@ import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 
+/**
+ * A base class for all variations of the bind join algorithm that use
+ * some form of SPARQL requests.
+ */
 public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
 	protected final List<Var> varsInSubQuery;

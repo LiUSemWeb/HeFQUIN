@@ -26,21 +26,29 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * request operators for performing the requests to the federation member.
  *
  * The implementation is generic in the sense that it works with any type of
- * request operator. Each concrete implementation in a sub-class that extends
- * this base class needs to implement the {@link #createExecutableRequestOperator(Iterable)}
+ * request operator. Each concrete implementation that extends this base class
+ * needs to implement the {@link #createExecutableRequestOperator(Iterable)}
  * function to create the request operators with the types of requests that
  * are specific to that concrete implementation.
  *
- * Instead of simply using every input block of solution mappings to directly
- * create a corresponding bind-join request, this implementation can split the
- * input block into smaller blocks for the requests. On top of that, this
- * implementation automatically reduces the block size for requests in case
- * a request operator fails and, then, the implementation even tries to
- * re-process (with the reduced request block size) the input solution
- * mappings for which the request operator failed.
+ * This implementation is capable of separating out each input solution mapping
+ * that assigns a blank node to any of the join variables. Then, such solution
+ * mappings are not even considered when creating the requests because they
+ * cannot have any join partners in the results obtained from the federation
+ * member. Of course, in case the algorithm is used under outer-join semantics
+ * these solution mappings are still returned to the output (without joining
+ * them with anything).
  *
- * A potential downside of this capability is that, if this algorithm has
- * to execute multiple requests per input block, then these requests are
+ * Another capability of this implementation is that, instead of simply using
+ * every input block of solution mappings to directly create a corresponding
+ * bind-join request, this implementation can split the input block into
+ * smaller blocks for the requests. On top of that, in case a request operator
+ * fails, this implementation automatically reduces the block size for requests 
+ * and, then, tries to re-process (with the reduced request block size) the
+ * input solution mappings for which the request operator failed.
+ *
+ * A potential downside of the latter capability is that, if this algorithm
+ * has to execute multiple requests per input block, then these requests are
  * executed sequentially.
  */
 public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,

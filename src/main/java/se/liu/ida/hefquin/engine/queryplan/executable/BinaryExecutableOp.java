@@ -2,6 +2,12 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * A specialization of the {@link ExecutableOperator} interface that
+ * captures executable operators that consume a pair of two sequences
+ * of solution mappings (which both are batched into several blocks of
+ * solution mappings).
+ */
 public interface BinaryExecutableOp extends ExecutableOperator
 {
 	/**
@@ -56,6 +62,10 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * Finishes up any processing related to the input coming
 	 * from the first operand and sends the remaining result
 	 * elements (if any) to the given sink.
+	 *
+	 * This method will be called only once, after the sub-plan
+	 * that produces the input coming from the first operand has
+	 * finished producing its result.
 	 */
 	void wrapUpForChild1( IntermediateResultElementSink sink,
 	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
@@ -78,6 +88,10 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	 * Finishes up any processing related to the input coming
 	 * from the second operand and sends the remaining result
 	 * elements (if any) to the given sink.
+	 *
+	 * This method will be called only once, after the sub-plan
+	 * that produces the input coming from the second operand
+	 * has finished producing its result.
 	 *
 	 * May throw {@link IllegalStateException} for operators for which
 	 * {@link #requiresCompleteChild1InputFirst()} returns true and
