@@ -11,35 +11,44 @@ import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
+/**
+ * Implementation of (a batching version of) the bind join algorithm
+ * for cases in which the federation member accessed by the algorithm
+ * supports the brTPF interface.
+ *
+ * For every batch of solution mappings from the input, the algorithm of
+ * this operator sends a brTPF request to the federation member; this request
+ * consists of the given triple pattern and the solutions of the current
+ * input batch (in fact, the algorithm may also decide to split the input
+ * batch into smaller batches for multiple requests).
+ * The response to such a request are all triples that i) match the triple
+ * pattern and ii) are compatible with at least one of the solutions that
+ * were attached to the request.
+ * After receiving such a response, the algorithm creates solution mappings
+ * from the received triples, joins these solution mappings locally with the
+ * solutions in the batch used for making the request, and then outputs the
+ * resulting joined solutions (if any).
+ * Thereafter, the algorithm moves on to the next batch of solutions from
+ * the input.
+ */
 public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
-    protected final Set<Var> varsInTP;
-
-    public ExecOpBindJoinBRTPF( final TriplePattern tp,
-                                final BRTPFServer fm,
-                                final boolean useOuterJoinSemantics,
-                                final boolean collectExceptions ) {
-        super(tp, fm, useOuterJoinSemantics, collectExceptions );
-
-        varsInTP = QueryPatternUtils.getVariablesInPattern(tp);
-    }
-
-	@Override
-	protected Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps ) {
-		return extractUnjoinableInputSMs(solMaps, varsInTP);
+	public ExecOpBindJoinBRTPF( final TriplePattern tp,
+	                            final BRTPFServer fm,
+	                            final boolean useOuterJoinSemantics,
+	                            final boolean collectExceptions ) {
+		super(tp, fm, useOuterJoinSemantics, QueryPatternUtils.getVariablesInPattern(tp), collectExceptions );
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
-		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInTP);
+		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInPatternForFM);
 
 		if ( restrictedSMs == null ) {
 			final TriplePatternRequest req = new TriplePatternRequestImpl(query);
