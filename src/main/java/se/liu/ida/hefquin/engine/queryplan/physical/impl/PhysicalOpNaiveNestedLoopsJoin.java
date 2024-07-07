@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * Attention, this is not actually a (distributed) nested loops join;
  * see {@link ExecOpNaiveNestedLoopsJoin} for more details.
  */
-public class PhysicalOpNaiveNestedLoopsJoin extends BasePhysicalOpBinaryJoin
+public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 {
     public PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
         super(lop);

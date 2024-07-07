@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
-public class PhysicalOpParallelMultiLeftJoin extends PhysicalOperatorBase implements UnaryPhysicalOp
+public class PhysicalOpParallelMultiLeftJoin extends BaseForPhysicalOps implements UnaryPhysicalOp
 {
 	/**
 	 * Checks whether a {@link LogicalOpMultiwayLeftJoin} with the given list

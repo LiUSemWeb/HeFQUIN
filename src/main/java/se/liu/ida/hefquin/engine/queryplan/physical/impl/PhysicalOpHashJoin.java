@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpHashJoin extends BasePhysicalOpBinaryJoin
+public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 {
     public PhysicalOpHashJoin( final LogicalOpJoin lop ) {
         super(lop);

@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
  * algorithm that consumes only one input and produces the other input
  * as part of the algorithm itself.
  */
-public abstract class BasePhysicalOpSingleInputJoin extends PhysicalOperatorBase implements UnaryPhysicalOpForLogicalOp
+public abstract class BaseForPhysicalOpSingleInputJoin extends BaseForPhysicalOps implements UnaryPhysicalOpForLogicalOp
 {
     protected final UnaryLogicalOp lop;
 
@@ -28,7 +28,7 @@ public abstract class BasePhysicalOpSingleInputJoin extends PhysicalOperatorBase
      * {@link LogicalOpBGPAdd}, {@link LogicalOpBGPOptAdd},
      * {@link LogicalOpGPAdd}, or {@link LogicalOpGPOptAdd}.
      */
-    protected BasePhysicalOpSingleInputJoin( final UnaryLogicalOp lop ) {
+    protected BaseForPhysicalOpSingleInputJoin( final UnaryLogicalOp lop ) {
         assert lop != null;
         assert (lop instanceof LogicalOpBGPAdd) || (lop instanceof LogicalOpBGPOptAdd) ||
                (lop instanceof LogicalOpTPAdd) || (lop instanceof LogicalOpTPOptAdd) ||

@@ -102,7 +102,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfTerms;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin
+		else if ( pop instanceof BaseForPhysicalOpBinaryJoin
 				|| pop instanceof PhysicalOpBinaryUnion
 				|| pop instanceof PhysicalOpMultiwayUnion
 				|| pop instanceof PhysicalOpLocalToGlobal

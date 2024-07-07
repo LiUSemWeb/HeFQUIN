@@ -118,7 +118,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		else if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfVars;
 		}
-		else if ( pop instanceof BasePhysicalOpBinaryJoin
+		else if ( pop instanceof BaseForPhysicalOpBinaryJoin
 				|| pop instanceof PhysicalOpBinaryUnion
 				|| pop instanceof PhysicalOpMultiwayUnion
 				|| pop instanceof PhysicalOpGlobalToLocal

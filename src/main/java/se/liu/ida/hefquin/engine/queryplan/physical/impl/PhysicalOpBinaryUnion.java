@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpBinaryUnion} class.
  */
-public class PhysicalOpBinaryUnion extends PhysicalOperatorBase implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpBinaryUnion extends BaseForPhysicalOps implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpUnion lop;
 

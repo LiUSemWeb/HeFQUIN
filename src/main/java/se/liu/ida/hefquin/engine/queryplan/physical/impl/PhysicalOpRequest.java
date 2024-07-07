@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import java.util.Objects;
 
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> 
-                       extends PhysicalOperatorBase implements NullaryPhysicalOpForLogicalOp
+                       extends BaseForPhysicalOps implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
 

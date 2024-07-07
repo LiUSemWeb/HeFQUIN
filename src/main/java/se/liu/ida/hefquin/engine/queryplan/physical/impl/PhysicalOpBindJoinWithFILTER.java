@@ -37,7 +37,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * implementation of this algorithm.
  * </p>
  */
-public class PhysicalOpBindJoinWithFILTER extends BasePhysicalOpSingleInputJoin
+public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJoin
 {
 	public PhysicalOpBindJoinWithFILTER( final LogicalOpTPAdd lop ) {
 		super(lop);

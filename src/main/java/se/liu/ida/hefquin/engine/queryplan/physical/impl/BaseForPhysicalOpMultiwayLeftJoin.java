@@ -9,11 +9,11 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
  * Base class for physical operators that implement
  * some form of a multi-way left join algorithm.
  */
-public abstract class BasePhysicalOpMultiwayLeftJoin extends PhysicalOperatorBase implements NaryPhysicalOpForLogicalOp
+public abstract class BaseForPhysicalOpMultiwayLeftJoin extends BaseForPhysicalOps implements NaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpMultiwayLeftJoin lop;
 
-	protected BasePhysicalOpMultiwayLeftJoin( final LogicalOpMultiwayLeftJoin lop ) {
+	protected BaseForPhysicalOpMultiwayLeftJoin( final LogicalOpMultiwayLeftJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}

@@ -17,7 +17,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoin
+public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInputJoin
 {
 	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPAdd lop ) {
 		super(lop);

@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpHashRJoin extends PhysicalOperatorBase implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpHashRJoin extends BaseForPhysicalOps implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRightJoin lop;
 
