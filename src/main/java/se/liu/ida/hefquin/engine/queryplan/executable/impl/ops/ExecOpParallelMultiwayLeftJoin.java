@@ -25,6 +25,9 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * TODO: Provide a description of the algorithm implemented by this class.
+ */
 public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBase
 {
 	protected final ExpectedVariables inputVarsFromNonOptionalPart;

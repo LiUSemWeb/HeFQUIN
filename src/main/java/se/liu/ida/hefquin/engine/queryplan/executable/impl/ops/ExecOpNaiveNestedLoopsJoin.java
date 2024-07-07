@@ -10,16 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Attention, this is not actually a (distributed) nested loops join.
- * Instead, this algorithm first consumes the whole first input and
- * materializes it into a list. Thereafter, it performs a local nested
- * loops join in which the outer loop iterates over the second input
- * and the inner loop (repeatedly) iterates over the list with the
- * first input.
- * It is certainly better to use the {@link ExecOpHashJoin} instead.
- * Instead of simply putting all left-input solution mappings into a
- * list, the hash join puts them into a hash index which can than be
- * probed into for each right-input solution mapping.
+ * Attention, this is a purely local implementation of the nested loops
+ * join algorithm---nothing fancy, no requests to federation members or
+ * anything. Instead, this algorithm first consumes the whole first input
+ * and materializes it into a list. Thereafter, it performs a local nested
+ * loops join in which the outer loop iterates over the second input and
+ * the inner loop (repeatedly) iterates over the list with the first input.
+ *
+ * It is certainly better to use the {@link ExecOpHashJoin} instead. Instead 
+ * of simply putting all left-input solution mappings into a list, the hash
+ * join puts them into a hash index which can than be probed into for each
+ *  right-input solution mapping.
  */
 public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {
