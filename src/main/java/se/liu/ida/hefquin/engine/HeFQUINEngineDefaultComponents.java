@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization;
@@ -74,7 +74,8 @@ public class HeFQUINEngineDefaultComponents
 	}
 
 	public static LogicalOptimizer createDefaultLogicalOptimizer( final QueryProcContext ctx ) {
-		return new LogicalOptimizerImpl(ctx);
+		return new HeuristicsBasedLogicalOptimizerImpl( ctx,
+		                                                HeuristicsBasedLogicalOptimizerImpl.getDefaultHeuristics(ctx) );
 	}
 
 	public static PhysicalOptimizer createDefaultPhysicalOptimizer() {
