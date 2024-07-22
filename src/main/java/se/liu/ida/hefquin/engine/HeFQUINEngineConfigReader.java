@@ -219,7 +219,7 @@ public class HeFQUINEngineConfigReader
 			i = instantiate(rsrc, ctx);
 		}
 		catch ( final Exception e ) {
-			throw new IllegalArgumentException("Instantiating the LogicalOptimizer caused an exception (type: " + e.getClass().getName() + "): " + e.getMessage() );
+			throw new IllegalArgumentException("Instantiating the LogicalOptimizer caused an exception (type: " + e.getClass().getName() + "): " + e.getMessage(), e );
 		}
 
 		return (LogicalOptimizer) i;
@@ -352,10 +352,41 @@ public class HeFQUINEngineConfigReader
 			final Object argValue;
 			if ( argValueTerm == null )
 			{
+				// At this point, the argument must be either a ListBasedConstructorArgument
+				// or an InstantiationBasedConstructorArgument. Determine which one it is.
+				// In the former case it must have an elementsTypeName property whereas, in
+				// the latter case it must have an argumentTypeName property.
 				final Resource argRsrc = argDescr.asResource();
-				final String argTypeName = ModelUtils.getSingleMandatoryProperty_XSDString( argRsrc, ECVocab.argumentTypeName );
-				argType = Class.forName(argTypeName);
-				argValue = instantiate(argRsrc, ctx);
+				final String argTypeName = ModelUtils.getSingleOptionalProperty_XSDString( argRsrc, ECVocab.argumentTypeName );
+				final String elmtsTypeName = ModelUtils.getSingleOptionalProperty_XSDString( argRsrc, ECVocab.elementsTypeName );
+				if ( argTypeName != null ) {
+					// The argument is an InstantiationBasedConstructorArgument.
+					argType = Class.forName(argTypeName);
+					argValue = instantiate(argRsrc, ctx);
+				}
+				else if ( elmtsTypeName != null ) {
+					// The argument is a ListBasedConstructorArgument.
+					final RDFNode elmts = ModelUtils.getSingleMandatoryProperty( argRsrc, ECVocab.elements );
+					if ( ! elmts.canAs(RDFList.class) )
+						throw new IllegalArgumentException( ECVocab.elements.getLocalName() + " property of " + argRsrc.toString() + " should be a list." );
+
+					final Class<?> elmtsType = Class.forName(elmtsTypeName);
+					final List<Object> elmtsList = new ArrayList<>();
+					final Iterator<RDFNode> itElmts = elmts.as( RDFList.class ).iterator();
+					while ( itElmts.hasNext() ) {
+						final Resource eRsrc = itElmts.next().asResource();
+						final Object eObj = instantiate(eRsrc, ctx);
+						if ( ! elmtsType.isAssignableFrom(eObj.getClass()) ) {
+							throw new IllegalArgumentException("One of the elements of a ListBasedConstructorArgument is of a class (" + eObj.getClass().getName() + ") that is not assignable to the given element type (" + elmtsTypeName + ")");
+						}
+						elmtsList.add(eObj);
+					}
+					argType = Class.forName("java.util.List");
+					argValue = elmtsList;
+				}
+				else {
+					throw new IllegalArgumentException("One of the constructor arguments for '" + className + "' is incorrect (it should be a ListBasedConstructorArgument or an InstantiationBasedConstructorArgument, but it is not).");
+				}
 			}
 			else if ( argValueTerm.isLiteral() )
 			{
