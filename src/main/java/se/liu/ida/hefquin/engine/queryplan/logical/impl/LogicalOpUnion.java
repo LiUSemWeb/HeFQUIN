@@ -51,10 +51,5 @@ public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogical
 	public String toString(){
 		return "> union ";
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		return identStr + "> union ";
-	}
 
 }

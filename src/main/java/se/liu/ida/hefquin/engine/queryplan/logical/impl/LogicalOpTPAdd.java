@@ -86,19 +86,5 @@ public class LogicalOpTPAdd extends LogicalOperatorBase implements UnaryLogicalO
 				+ fm.getInterface().toString()
 				+ " )";
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		final int codeOfTP = tp.toString().hashCode();
-		final int codeOfFm = fm.getInterface().toString().hashCode();
-		
-		return identStr + "> tpAdd" +
-			"[" + codeOfTP + ", "+ codeOfFm + "]"+
-			" ( "
-			+ tp.toString()
-			+ ", "
-			+ fm.getInterface().toString()
-			+ " )";
-	}
 
 }

@@ -51,9 +51,5 @@ public class LogicalOpJoin extends LogicalOperatorBase implements BinaryLogicalO
 	public String toString(){
 		return "> join ";
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		return identStr + "> join ";
-	}
+
 }

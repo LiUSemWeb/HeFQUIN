@@ -33,10 +33,5 @@ public class LogicalOpLocalToGlobal extends LogicalOperatorBase implements Unary
 	public VocabularyMapping getVocabularyMapping() {
 		return this.vocabularyMapping;
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		return identStr + "> l2g " + "(vocab.mapping: " + vocabularyMapping.hashCode() + ")";
-	}
 
 }

@@ -86,19 +86,5 @@ public class LogicalOpGPAdd extends LogicalOperatorBase implements UnaryLogicalO
 				+ fm.getInterface().toString()
 				+ " )";
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		final int codeOfPattern = pattern.toString().hashCode();
-		final int codeOfFm = fm.getInterface().toString().hashCode();
-		
-		return identStr + "> gpAdd" +
-			"[" + codeOfPattern + ", "+ codeOfFm + "]"+
-			" ( "
-			+ pattern.toString()
-			+ ", "
-			+ fm.getInterface().toString()
-			+ " )";
-	}
 
 }

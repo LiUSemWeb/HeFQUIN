@@ -54,10 +54,5 @@ public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements Na
 	public String toString(){
 		return "> mlj ";
 	}
-	
-	@Override
-	public String toPrintString(String identStr) {
-		return identStr + "> mlj ";
-	}
 
 }
