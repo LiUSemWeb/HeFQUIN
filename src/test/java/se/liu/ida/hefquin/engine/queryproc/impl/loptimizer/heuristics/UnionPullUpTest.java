@@ -537,7 +537,6 @@ public class UnionPullUpTest
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
 		@Override public int getID() { throw new UnsupportedOperationException(); }
-		@Override public String toPrintString(String indentStr) { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyFederationMember implements FederationMember {
