@@ -55,5 +55,10 @@ public class LogicalOpRightJoin extends LogicalOperatorBase implements BinaryLog
 	public String toString(){
 		return "> leftjoin ";
 	}
+	
+	@Override
+	public String toPrintString(String identStr) {
+		return identStr + "> leftjoin ";
+	}
 
 }

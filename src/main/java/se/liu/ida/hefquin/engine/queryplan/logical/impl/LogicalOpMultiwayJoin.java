@@ -51,8 +51,8 @@ public class LogicalOpMultiwayJoin extends LogicalOperatorBase implements NaryLo
 	}
 	
 	@Override
-	public String printString(String identStr) {
-		return identStr + "mj" + " (" + getID() + ")";
+	public String toPrintString(String identStr) {
+		return identStr + "mj" + " (" + getID() + ")" ;
 	}
 
 }

@@ -58,4 +58,9 @@ public class LogicalOpFilter extends LogicalOperatorBase implements UnaryLogical
 	public String toString() {
 		return "> filter ( " + filterExpressions.toString() + " )";
 	}
+	
+	@Override
+	public String toPrintString(String identStr) {
+		return identStr + "> filter ( " + filterExpressions.toString() + " )";
+	}
 }

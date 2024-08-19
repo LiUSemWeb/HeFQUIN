@@ -51,7 +51,7 @@ public class LogicalOpMultiwayUnion extends LogicalOperatorBase implements NaryL
 	}
 	
 	@Override
-	public String printString(String identStr) {
+	public String toPrintString(String identStr) {
 		return identStr + "mu" + " (" + getID() + ")";
 	}
 

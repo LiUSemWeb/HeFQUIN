@@ -90,5 +90,19 @@ public class LogicalOpBGPOptAdd extends LogicalOperatorBase implements UnaryLogi
 				+ fm.getInterface().toString()
 				+ " )";
 	}
+	
+	@Override
+	public String toPrintString(String identStr) {
+		final int codeOfBGP = bgp.toString().hashCode();
+		final int codeOfFm = fm.getInterface().toString().hashCode();
+		
+		return identStr + "> bgpOptAdd" +
+				"[" + codeOfBGP + ", "+ codeOfFm + "]"+
+				" ( "
+				+ bgp.toString()
+				+ ", "
+				+ fm.getInterface().toString()
+				+ " )";
+	}
 
 }
