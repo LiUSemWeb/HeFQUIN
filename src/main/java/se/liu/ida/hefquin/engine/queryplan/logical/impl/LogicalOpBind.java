@@ -72,4 +72,5 @@ public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 	public String toString() {
 		return "> Bind ( " + bindExpressions.toString() + " )";
 	}
+
 }

@@ -47,7 +47,7 @@ public class LogicalOpMultiwayJoin extends LogicalOperatorBase implements NaryLo
 
 	@Override
 	public String toString(){
-		return "> mj (" + getID() + ")";
+		return "mj (" + getID() + ")";
 	}
 
 }
