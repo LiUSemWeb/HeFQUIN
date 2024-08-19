@@ -59,9 +59,6 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 
 	@Override
 	public String toString(){
-		final int codeOfReq = req.toString().hashCode();
-		final int codeOfFm = fm.getInterface().toString().hashCode();
-		
 		return "req" + " (" + getID() + ")"
 		  		+ "\t - fm (" + fm.getInterface().toString() + ")"
 		  		+ "\t - pattern (" + req.toString() + ")";

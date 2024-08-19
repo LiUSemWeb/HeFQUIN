@@ -90,6 +90,5 @@ public class LogicalOpGPOptAdd extends LogicalOperatorBase implements UnaryLogic
 				+ fm.getInterface().toString()
 				+ " )";
 	}
-	
 
 }
