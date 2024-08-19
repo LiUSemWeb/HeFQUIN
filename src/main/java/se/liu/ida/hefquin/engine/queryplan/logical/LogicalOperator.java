@@ -22,5 +22,6 @@ public interface LogicalOperator
 	 */
 	int getID();
 	
-	String printString(String indentStr);
+	//String toPrintString(String indentStr, String contentIndentStr);
+	String toPrintString(String indentStr);
 }
