@@ -3,10 +3,6 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import java.io.PrintStream;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWalker;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
-import se.liu.ida.hefquin.engine.utils.IndentingPrintStream;
 
 public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 {
@@ -19,9 +15,8 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
-		final IndentingPrintStream iOut = new IndentingPrintStream(out);
-		planWalk(plan, 0, 0, 0, iOut);
-		iOut.flush();	
+		planWalk(plan, 0, 0, 0, out);
+		out.flush();	
 	}
 	
 	public String getIndentLevelString(final int planNumber, final int planLevel, final int numberOfSiblings) {
@@ -32,26 +27,30 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		if (planNumber < numberOfSiblings-1) {
 			indentLevelString += nonLastChildIndentBase ;
 		}
+		else if (numberOfSiblings > 0) {
+			indentLevelString += lastChildIndentBase;
+		}
 		else {
-			if (numberOfSiblings > 0) {
-				indentLevelString += lastChildIndentBase;
-			}
-			else {
-				indentLevelString = "";
-			}
+			// This is only for the root operator.
+			indentLevelString = "";
 		}
 		return indentLevelString;
 	}
 	
-	
-	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final IndentingPrintStream out) {
-		String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
+	/**
+	 * This method recursively goes through a plan, and appends specific strings to a print stream.
+	 * @param plan The current plan (root operator) that will be formatted.
+	 * @param planNumber The number of a plan in terms of its super plan.
+	 * @param planLevel The depth of the root operator in a plan.
+	 * @param numberOfSiblings The number of sibling plans of a plan.
+	 * @param out The print stream that will print a plan.
+	 */
+	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out) {
+		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
 		if (planNumber < numberOfSiblings-1) {
-			//out.append( plan.getRootOperator().printString(indentLevelString,   levelIndentBase) );
 			out.append( indentLevelString + plan.getRootOperator().toString() );
 		}
 		else {
-			//out.append( plan.getRootOperator().printString(indentLevelString,   levelIndentBase) );
 			out.append( indentLevelString + plan.getRootOperator().toString() );
 		}
 		out.append( System.lineSeparator() );
