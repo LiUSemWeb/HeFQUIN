@@ -26,6 +26,4 @@ public interface LogicalOperator
 	int getID();
 
 	void visit( LogicalPlanVisitor visitor );
-	
-	String[] toStringArray();
 }
