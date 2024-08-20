@@ -59,34 +59,25 @@
    		<scope>test</scope>
 	</dependency>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <version>3.2.4</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <version>3.2.4</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <version>3.2.4</version>
-      <scope>test</scope>
-    </dependency>
+  <dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>5.0.0</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-server</artifactId>
+    <version>11.0.14</version>
+    <scope>test</scope>
+  </dependency>
+  
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-servlet</artifactId>
+    <version>11.0.14</version>
+    <scope>test</scope>
+  </dependency>
 
   </dependencies>
 
@@ -160,10 +151,20 @@
                 <release>11</release>
             </configuration>
         </plugin>
+        <!-- Maven WAR Plugin -->
         <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>3.3.1</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.3.2</version>
+          <executions>
+              <execution>
+                  <id>package-war</id>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>war</goal>
+                  </goals>
+              </execution>
+          </executions>
         </plugin>
     </plugins>
   </build>
