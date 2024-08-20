@@ -68,8 +68,8 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	@Override
 	public String[] toStringArray() {
 		String[] opStrings = {"req" + " (" + getID() + ")", 
-								  "- fm (" + fm.getInterface().toString() + ")",
-								  "- pattern (" + req.toString() + ")"};
+					"- fm (" + fm.getInterface().toString() + ")",
+					"- pattern (" + req.toString() + ")"};
 		return opStrings;
 	}
 
