@@ -16,53 +16,84 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 
 public class HeFQUINServerUtils {
 
-	public static HeFQUINEngine getEngine( final String fedConfFilename,
-	                                       final String engineConfFilename ) {
-		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
-		;
-		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
-		final FederationCatalog cat = FederationDescriptionReader.readFromFile(fedConfFilename);
+	public static HeFQUINEngine getEngine( final String fedConfFilename, final String engineConfFilename ) {
+		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents
+				.createExecutorServiceForFedAccess();
+		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents
+				.createExecutorServiceForPlanTasks();
+		final FederationCatalog cat = FederationDescriptionReader.readFromFile( fedConfFilename );
 		final boolean isExperimentRun = false;
 		final boolean skipExecution = false;
-		
-		
+
 		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
-			@Override public ExecutorService getExecutorServiceForFederationAccess() { return execServiceForFedAccess; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execServiceForPlanTasks; }
-			@Override public FederationCatalog getFederationCatalog() { return cat; }
-			@Override public boolean isExperimentRun() { return isExperimentRun; }
-			@Override public boolean skipExecution() { return skipExecution; }
-			@Override public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
-			@Override public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
-			@Override public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			@Override
+			public ExecutorService getExecutorServiceForFederationAccess() {
+				return execServiceForFedAccess;
+			}
+
+			@Override
+			public ExecutorService getExecutorServiceForPlanTasks() {
+				return execServiceForPlanTasks;
+			}
+
+			@Override
+			public FederationCatalog getFederationCatalog() {
+				return cat;
+			}
+
+			@Override
+			public boolean isExperimentRun() {
+				return isExperimentRun;
+			}
+
+			@Override
+			public boolean skipExecution() {
+				return skipExecution;
+			}
+
+			@Override
+			public LogicalPlanPrinter getSourceAssignmentPrinter() {
+				return null;
+			}
+
+			@Override
+			public LogicalPlanPrinter getLogicalPlanPrinter() {
+				return null;
+			}
+
+			@Override
+			public PhysicalPlanPrinter getPhysicalPlanPrinter() {
+				return null;
+			}
 		};
-		
-		final Model confDescr = RDFDataMgr.loadModel(engineConfFilename);
-		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read(confDescr, ctx);
+
+		final Model confDescr = RDFDataMgr.loadModel( engineConfFilename );
+		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read( confDescr, ctx );
 		engine.integrateIntoJena();
 		return engine;
 	}
 
-	public static ResultsFormat convert( String mimeType ) {
-		if(mimeType == null) return null;
-		
+	public static ResultsFormat convert( final String mimeType ) {
+		if ( mimeType == null )
+			return null;
+
 		ResultsFormat resultsFormat;
-		switch (mimeType) {
-			case "application/sparql-results+json":
-				resultsFormat = ResultsFormat.FMT_RS_JSON;
-				break;
-			case "application/sparql-results+xml":
-				resultsFormat = ResultsFormat.FMT_RS_XML;
-				break;
-			case "text/csv":
-				resultsFormat = ResultsFormat.FMT_RS_CSV;
-				break;
-			case "text/tsv":
-				resultsFormat = ResultsFormat.FMT_RS_TSV;
-				break;
-			default:
-				resultsFormat = ResultsFormat.FMT_RS_CSV;
-				break;
+		switch ( mimeType ) {
+		case "application/sparql-results+json":
+			resultsFormat = ResultsFormat.FMT_RS_JSON;
+			break;
+		case "application/sparql-results+xml":
+			resultsFormat = ResultsFormat.FMT_RS_XML;
+			break;
+		case "text/csv":
+			resultsFormat = ResultsFormat.FMT_RS_CSV;
+			break;
+		case "text/tsv":
+			resultsFormat = ResultsFormat.FMT_RS_TSV;
+			break;
+		default:
+			resultsFormat = ResultsFormat.FMT_RS_CSV;
+			break;
 		}
 		return resultsFormat;
 	}
