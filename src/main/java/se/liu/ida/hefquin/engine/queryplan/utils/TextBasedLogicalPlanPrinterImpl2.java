@@ -2,7 +2,13 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
 
+import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 
 public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 {
@@ -66,24 +72,43 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	 */
 	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out) {
 		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
-		//out.append( indentLevelString + plan.getRootOperator().toString() );
-		//out.append( System.lineSeparator() );
-		final String[] opStrings = plan.getRootOperator().toStringArray();
-		out.append( indentLevelString + opStrings[0] );
-		out.append( System.lineSeparator() );
-		
-		if ( opStrings.length > 1 ) {
+		final LogicalOperator rootOp = plan.getRootOperator();
+		if ( rootOp instanceof LogicalOpMultiwayJoin ) {
+			printOperatorInfoMultiwayJoin( (LogicalOpMultiwayJoin) rootOp, out, indentLevelString );
+		}
+		else if (rootOp instanceof LogicalOpMultiwayUnion) {
+			printOperatorInfoMultiwayUnion( (LogicalOpMultiwayUnion) rootOp, out, indentLevelString );
+		}
+		else if (rootOp instanceof LogicalOpRequest) {
 			String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings);
-			for (int i = 1; i < opStrings.length; i++ ) {
-				out.append( indentLevelStringForOpDetail + "  " + opStrings[i]);
-				out.append( System.lineSeparator() );
-			}
-			out.append(indentLevelStringForOpDetail);
-			out.append( System.lineSeparator() );
+			printOperatorInfoForRequest( (LogicalOpRequest) rootOp, out, indentLevelString, indentLevelStringForOpDetail );
 		}
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
 			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out );
 		}
 	}
-
+	
+	protected void printOperatorInfoForRequest( final LogicalOpRequest op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
+		final FederationMember fm = op.getFederationMember();
+		final DataRetrievalRequest req =op.getRequest();
+		out.append( indentLevelString + "req" + " (" + op.getID() + ")" );
+		out.append( System.lineSeparator() );
+		out.append( indentLevelStringForOpDetail + "  " + "- fm (" + fm.getInterface().toString() + ")" );
+		out.append( System.lineSeparator() );
+		out.append( indentLevelStringForOpDetail + "  " + "- pattern (" + req.toString() + ")" );
+		out.append( System.lineSeparator() );
+		out.append(indentLevelStringForOpDetail);
+		out.append( System.lineSeparator() );
+	}
+	
+	protected void printOperatorInfoMultiwayJoin( final LogicalOpMultiwayJoin op, final PrintStream out, final String indentLevelString ) {
+		out.append( indentLevelString + "mj (" + op.getID() + ") " );
+		out.append( System.lineSeparator() );
+	}
+	
+	protected void printOperatorInfoMultiwayUnion( final LogicalOpMultiwayUnion op, final PrintStream out, final String indentLevelString ) {
+		out.append( indentLevelString + "mu (" + op.getID() + ") " );
+		out.append( System.lineSeparator() );
+	}
+	
 }
