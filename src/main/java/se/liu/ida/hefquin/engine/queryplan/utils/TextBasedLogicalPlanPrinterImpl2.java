@@ -31,11 +31,29 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 			indentLevelString += levelIndentBase;
 		}
 		if (planNumber < numberOfSiblings-1) {
-			return indentLevelString + nonLastChildIndentBase ;
+			return indentLevelString + nonLastChildIndentBase;
 		}
 		else {
 			return indentLevelString + lastChildIndentBase;
 		}
+	}
+	
+	public String getIndentLevelStringForDetail(final int planNumber, final int planLevel, final int numberOfSiblings) {
+		String indentLevelString = "   ";
+		for ( int i = planLevel-1; i > 0 ; i-- ) {
+			if (planNumber < numberOfSiblings-1 ) {
+				if ( i == planLevel-1 ) {
+					// For op that has siblings but not the last in a plan sequence.
+					indentLevelString = levelIndentBase;
+				}
+				else {
+					indentLevelString = levelIndentBase + indentLevelString;
+				}
+			}
+			indentLevelString = levelIndentBase + indentLevelString;
+			
+		}
+		return indentLevelString;
 	}
 	
 	/**
@@ -48,8 +66,21 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	 */
 	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out) {
 		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
-		out.append( indentLevelString + plan.getRootOperator().toString() );
+		//out.append( indentLevelString + plan.getRootOperator().toString() );
+		//out.append( System.lineSeparator() );
+		final String[] opStrings = plan.getRootOperator().toStringArray();
+		out.append( indentLevelString + opStrings[0] );
 		out.append( System.lineSeparator() );
+		
+		if ( opStrings.length > 1 ) {
+			String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings);
+			for (int i = 1; i < opStrings.length; i++ ) {
+				out.append( indentLevelStringForOpDetail + "  " + opStrings[i]);
+				out.append( System.lineSeparator() );
+			}
+			out.append(indentLevelStringForOpDetail);
+			out.append( System.lineSeparator() );
+		}
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
 			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out );
 		}
