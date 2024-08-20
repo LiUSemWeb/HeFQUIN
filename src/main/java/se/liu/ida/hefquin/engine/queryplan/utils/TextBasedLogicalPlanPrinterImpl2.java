@@ -49,7 +49,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		for ( int i = planLevel-1; i > 0 ; i-- ) {
 			if (planNumber < numberOfSiblings-1 ) {
 				if ( i == planLevel-1 ) {
-					// For op that has siblings but not the last in a plan sequence.
+					// For op that has siblings but not the last in a plan sequence and the first part of string from the right side.
 					indentLevelString = levelIndentBase;
 				}
 				else {
@@ -57,7 +57,6 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 				}
 			}
 			indentLevelString = levelIndentBase + indentLevelString;
-			
 		}
 		return indentLevelString;
 	}
