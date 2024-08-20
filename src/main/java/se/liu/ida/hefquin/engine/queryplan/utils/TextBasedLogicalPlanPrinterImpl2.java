@@ -112,7 +112,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	}
 	
 	protected void printFederationMember( final FederationMember fm, final String indentLevelStringForOpDetail, final PrintStream out ) {
-		out.append( indentLevelStringForOpDetail + "  - fm (" + fm.getInterface().toString() + ")" );
+		out.append( indentLevelStringForOpDetail + "  - fm (" + fm.getInterface().hashCode() + ") " + fm.getInterface().toString() );
 		out.append( System.lineSeparator() );
 	}
 	
