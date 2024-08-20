@@ -71,8 +71,8 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	 */
 	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out) {
 		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
-		final LogicalOperator rootOp = plan.getRootOperator();
 		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings);
+		final LogicalOperator rootOp = plan.getRootOperator();
 		if ( rootOp instanceof LogicalOpMultiwayJoin ) {
 			printOperatorInfoMultiwayJoin( (LogicalOpMultiwayJoin) rootOp, out, indentLevelString );
 		}
@@ -82,18 +82,20 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		else if (rootOp instanceof LogicalOpRequest) {
 			printOperatorInfoForRequest( (LogicalOpRequest) rootOp, out, indentLevelString, indentLevelStringForOpDetail );
 		}
+		else {
+			throw new IllegalArgumentException( "Unexpected operator type: " + rootOp.getClass().getName() );
+		}
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
 			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out );
 		}
 	}
 	
 	protected void printOperatorInfoForRequest( final LogicalOpRequest op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
-		final FederationMember fm = op.getFederationMember();
 		final DataRetrievalRequest req = op.getRequest();
 		out.append( indentLevelString + "req (" + op.getID() + ")" );
 		out.append( System.lineSeparator() );
-		printFederationMember( fm, indentLevelStringForOpDetail, out );
-		out.append( indentLevelStringForOpDetail + "  " + "- pattern (" + req.toString() + ")" );
+		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail, out );
+		out.append( indentLevelStringForOpDetail + "  - pattern (" + req.toString() + ")" );
 		out.append( System.lineSeparator() );
 		out.append( indentLevelStringForOpDetail );
 		out.append( System.lineSeparator() );
@@ -110,7 +112,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	}
 	
 	protected void printFederationMember( final FederationMember fm, final String indentLevelStringForOpDetail, final PrintStream out ) {
-		out.append( indentLevelStringForOpDetail + "  " + "- fm (" + fm.getInterface().toString() + ")" );
+		out.append( indentLevelStringForOpDetail + "  - fm (" + fm.getInterface().toString() + ")" );
 		out.append( System.lineSeparator() );
 	}
 	
