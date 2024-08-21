@@ -27,12 +27,13 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
 public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 {
-	// The string represents '|  '.
-	private static String levelIndentBase = "\u2502  ";
-	// The string represents '├──'.
-	private static String nonLastChildIndentBase = "\u251C\u2500\u2500";
-	// The string represents '└──'.
-	private static String lastChildIndentBase = "\u2514\u2500\u2500";
+	// The string represents '|   '.
+	private static String levelIndentBase = "\u2502   ";
+	// The string represents '├── '.
+	private static String nonLastChildIndentBase = "\u251C\u2500\u2500 ";
+	// The string represents '└── '.
+	private static String lastChildIndentBase = "\u2514\u2500\u2500 ";
+	private static String spaceBase = "    ";
 		
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
@@ -69,7 +70,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 			}
 			else if ( upperRootOpIndentString.endsWith(lastChildIndentBase) ) {
 				for ( int i = 1; i < planLevel; i++ ) {
-					indentLevelString += "   ";
+					indentLevelString += spaceBase;
 				}
 				if ( planNumber < numberOfSiblings-1 ) {
 					return indentLevelString + nonLastChildIndentBase;
@@ -87,10 +88,10 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	public String getIndentLevelStringForDetail(final int planNumber, final int planLevel, final int numberOfSiblings, final String indentLevelString) {
 		String indentLevelStringForDetail = "";
 		if ( planLevel == 0 ) {
-			return "   ";
+			return spaceBase;
 		}
 		if ( indentLevelString == "") {
-			indentLevelStringForDetail += "   ";
+			indentLevelStringForDetail += spaceBase;
 		}
 		else if ( indentLevelString.endsWith(nonLastChildIndentBase) ) {
 			indentLevelStringForDetail = indentLevelString.substring( 0, indentLevelString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
@@ -99,7 +100,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 			indentLevelStringForDetail = indentLevelString.replaceAll( ".", " " );
 		}
 		else if ( indentLevelString.endsWith(lastChildIndentBase) && indentLevelString.startsWith(levelIndentBase) ) {
-			indentLevelStringForDetail = indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + "   ";
+			indentLevelStringForDetail = indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + spaceBase;
 		}
 		else if ( indentLevelString.equals(lastChildIndentBase) ) {
 			indentLevelStringForDetail = indentLevelString.replaceAll( ".", " " );
@@ -256,7 +257,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	
 	protected void printOperatorInfoForRequest( final LogicalOpRequest op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
 		final DataRetrievalRequest req = op.getRequest();
-		out.append( indentLevelString + " req (" + op.getID() + ")" );
+		out.append( indentLevelString + "req (" + op.getID() + ")" );
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail, out );
 		out.append( indentLevelStringForOpDetail + "  - pattern (" + req.hashCode() +  ") " + req.toString() );
@@ -294,7 +295,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	}
 	
 	protected void printFederationMember( final FederationMember fm, final String indentLevelStringForOpDetail, final PrintStream out ) {
-		out.append( indentLevelStringForOpDetail + "  - fm (" + fm.getInterface().hashCode() + ") " + fm.getInterface().toString() );
+		out.append( indentLevelStringForOpDetail + "  - fm (" + fm.getInterface().getID() + ") " + fm.getInterface().toString() );
 		out.append( System.lineSeparator() );
 	}
 	
