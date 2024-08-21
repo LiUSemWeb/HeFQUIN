@@ -9,12 +9,13 @@
     <servlet>
         <servlet-name>HeFQUINServlet</servlet-name>
         <servlet-class>se.liu.ida.hefquin.service.HeFQUINServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <!-- Servlet Mapping -->
     <servlet-mapping>
         <servlet-name>HeFQUINServlet</servlet-name>
-        <url-pattern>/sparql/*</url-pattern>
+        <url-pattern>/sparql</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
