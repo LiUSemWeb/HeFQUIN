@@ -256,7 +256,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	
 	protected void printOperatorInfoForRequest( final LogicalOpRequest op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
 		final DataRetrievalRequest req = op.getRequest();
-		out.append( indentLevelString + "req (" + op.getID() + ")" );
+		out.append( indentLevelString + " req (" + op.getID() + ")" );
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail, out );
 		out.append( indentLevelStringForOpDetail + "  - pattern (" + req.hashCode() +  ") " + req.toString() );
