@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  hefquin:
+    build: .
+    ports:
+      - "8080:8080"
+    #volumes:
+    #  # Mount a custom config.properties file and add config files
+    #  - ./example/config.properties:/usr/local/tomcat/webapps/ROOT/config.properties
+    #  - ./example/ExampleEngineConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleEngineConf.ttl
+    #  - ./example/ExampleFedConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleFedConf.ttl
