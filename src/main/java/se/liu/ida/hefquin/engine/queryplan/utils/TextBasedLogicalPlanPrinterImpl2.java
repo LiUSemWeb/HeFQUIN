@@ -45,7 +45,6 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		String indentLevelString = "";
 		if ( planLevel == 0 ) {
 			// This is only for the root operator of the overall plan to be printed.
-			//assert planLevel == 0;
 			return "";
 		}
 		else {

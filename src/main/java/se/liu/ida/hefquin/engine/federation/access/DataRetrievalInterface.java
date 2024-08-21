@@ -10,5 +10,8 @@ public interface DataRetrievalInterface
 
 	boolean supportsRequest( final DataRetrievalRequest req );
 	
+	/**
+	 * Returns an identifier of this data retrieval interface (federation member), which should be unique.
+	 */
 	int getID();
 }
