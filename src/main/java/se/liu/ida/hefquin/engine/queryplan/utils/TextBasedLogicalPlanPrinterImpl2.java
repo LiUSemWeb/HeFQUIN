@@ -36,44 +36,75 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 		
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
-		planWalk(plan, 0, 0, 0, out);
+		planWalk(plan, 0, 0, 1, out, "");
 		out.flush();	
 	}
 	
-	public String getIndentLevelString(final int planNumber, final int planLevel, final int numberOfSiblings) {
-		if ( numberOfSiblings == 0 ) {
+	public String getIndentLevelString(final int planNumber, final int planLevel, final int numberOfSiblings, final String upperRootOpIndentString) {
+		String indentLevelString = "";
+		if ( planLevel == 0 ) {
 			// This is only for the root operator of the overall plan to be printed.
-			assert planLevel == 0;
+			//assert planLevel == 0;
 			return "";
 		}
-		
-		String indentLevelString = "";
-		for ( int i = 1; i < planLevel; i++ ) {
-			indentLevelString += levelIndentBase;
-		}
-		if (planNumber < numberOfSiblings-1) {
-			return indentLevelString + nonLastChildIndentBase;
-		}
 		else {
-			return indentLevelString + lastChildIndentBase;
+			if ( upperRootOpIndentString == "" ) {
+				if ( planNumber < numberOfSiblings-1 ) {
+					return indentLevelString + nonLastChildIndentBase;
+				}
+				else {
+					return indentLevelString + lastChildIndentBase;
+				}
+			}
+			else if ( upperRootOpIndentString.endsWith(nonLastChildIndentBase) ) {
+				for ( int i = 1; i < planLevel; i++ ) {
+					indentLevelString += levelIndentBase;
+				}
+				if ( planNumber < numberOfSiblings-1 ) {
+					return indentLevelString + nonLastChildIndentBase;
+				}
+				else {
+					return indentLevelString + lastChildIndentBase;
+				}
+			}
+			else if ( upperRootOpIndentString.endsWith(lastChildIndentBase) ) {
+				for ( int i = 1; i < planLevel; i++ ) {
+					indentLevelString += "   ";
+				}
+				if ( planNumber < numberOfSiblings-1 ) {
+					return indentLevelString + nonLastChildIndentBase;
+				}
+				else {
+					return indentLevelString + lastChildIndentBase;
+				}
+			}
+			else {
+				return indentLevelString;
+			}
 		}
 	}
 	
-	public String getIndentLevelStringForDetail(final int planNumber, final int planLevel, final int numberOfSiblings) {
-		String indentLevelString = "   ";
-		for ( int i = planLevel-1; i > 0 ; i-- ) {
-			if (planNumber < numberOfSiblings-1 ) {
-				if ( i == planLevel-1 ) {
-					// For op that has siblings but not the last in a plan sequence and the first part of string from the right side.
-					indentLevelString = levelIndentBase;
-				}
-				else {
-					indentLevelString = levelIndentBase + indentLevelString;
-				}
-			}
-			indentLevelString = levelIndentBase + indentLevelString;
+	public String getIndentLevelStringForDetail(final int planNumber, final int planLevel, final int numberOfSiblings, final String indentLevelString) {
+		String indentLevelStringForDetail = "";
+		if ( planLevel == 0 ) {
+			return "   ";
 		}
-		return indentLevelString;
+		if ( indentLevelString == "") {
+			indentLevelStringForDetail += "   ";
+		}
+		else if ( indentLevelString.endsWith(nonLastChildIndentBase) ) {
+			indentLevelStringForDetail = indentLevelString.substring( 0, indentLevelString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
+		}
+		else if ( indentLevelString.endsWith(lastChildIndentBase) && indentLevelString.startsWith(" ") ) {
+			indentLevelStringForDetail = indentLevelString.replaceAll( ".", " " );
+		}
+		else if ( indentLevelString.endsWith(lastChildIndentBase) && indentLevelString.startsWith(levelIndentBase) ) {
+			indentLevelStringForDetail = indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + "   ";
+		}
+		else if ( indentLevelString.equals(lastChildIndentBase) ) {
+			indentLevelStringForDetail = indentLevelString.replaceAll( ".", " " );
+		}
+		return indentLevelStringForDetail;
 	}
 	
 	/**
@@ -84,10 +115,10 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 	 * @param numberOfSiblings The number of sibling plans of a plan.
 	 * @param out The print stream that will print a plan.
 	 */
-	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out) {
-		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings);
-		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings);
+	public void planWalk( final LogicalPlan plan, final int planNumber, final int planLevel, final int numberOfSiblings, final PrintStream out, final String rootOpIndentString ) {
 		final LogicalOperator rootOp = plan.getRootOperator();
+		final String indentLevelString = getIndentLevelString(planNumber, planLevel, numberOfSiblings, rootOpIndentString);
+		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings, indentLevelString);
 		if ( rootOp instanceof LogicalOpBGPAdd ) {
 			printOperatorInfoForBGPAdd( (LogicalOpBGPAdd) rootOp, out, indentLevelString, indentLevelStringForOpDetail );
 		}
@@ -143,7 +174,7 @@ public class TextBasedLogicalPlanPrinterImpl2 implements LogicalPlanPrinter
 			throw new IllegalArgumentException( "Unexpected operator type: " + rootOp.getClass().getName() );
 		}
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
-			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out );
+			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out, indentLevelString );
 		}
 	}
 	
