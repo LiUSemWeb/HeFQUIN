@@ -9,4 +9,6 @@ public interface DataRetrievalInterface
 	boolean supportsSPARQLPatternRequests();
 
 	boolean supportsRequest( final DataRetrievalRequest req );
+	
+	int getID();
 }

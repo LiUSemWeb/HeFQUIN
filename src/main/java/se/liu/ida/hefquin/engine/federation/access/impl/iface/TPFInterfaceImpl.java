@@ -11,8 +11,9 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.DataRetrievalInterfaceBase;
 
-public class TPFInterfaceImpl implements TPFInterface
+public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFInterface
 {
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
 

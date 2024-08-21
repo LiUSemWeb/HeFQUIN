@@ -3,8 +3,9 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.DataRetrievalInterfaceBase;
 
-public class Neo4jInterfaceImpl implements Neo4jInterface
+public class Neo4jInterfaceImpl extends DataRetrievalInterfaceBase implements Neo4jInterface
 {
     protected final String url;
 
