@@ -3,10 +3,11 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.DataRetrievalInterfaceBase;
 
 import java.util.Objects;
 
-public class SPARQLEndpointInterfaceImpl implements SPARQLEndpointInterface
+public class SPARQLEndpointInterfaceImpl extends DataRetrievalInterfaceBase implements SPARQLEndpointInterface
 {
 	protected final String url;
 
