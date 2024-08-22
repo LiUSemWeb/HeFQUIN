@@ -1,6 +1,127 @@
 # HeFQUIN
 HeFQUIN is a query federation engine for heterogeneous federations of graph data sources (e.g, federated knowledge graphs) that is currently under development by [the Semantic Web research group at Linköping University](https://www.ida.liu.se/research/semanticweb/).
 
+# Quick Start
+
+HeFQUIN can be run as a web service or using a Command Line Interface (CLI) tool. 
+
+## Running HeFQUIN as a web service
+The web service can be run using docker, an embedded server, or an existing servlet container (e.g., Tomcat or Jetty).
+
+### Run using Docker
+Download or clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build and run the latest version of the engine using:
+```bash
+$ docker-compose build
+$ docker-compose up
+```
+
+The optional build argument (`TAG`) can used to build the image from a specific release:
+```yml
+  hefquin:
+    build:
+      context: .
+      args:
+        TAG: <insert tag>
+    ports:
+      - "8080:8080"
+```
+
+The engine can be configured by mounting custom configuration files when starting up the container:
+```yml
+  hefquin:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+     - ./example/config.properties:/usr/local/tomcat/webapps/ROOT/config.properties
+     - ./example/ExampleEngineConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleEngineConf.ttl
+     - ./example/ExampleFedConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleFedConf.ttl
+```
+
+where the `config.properties` file has the following structure:
+```bash
+ENGINE_CONF_FILE=ExampleEngineConf.ttl   # the engine configuration file
+FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
+```
+
+By default the service exposes a SPARQL endpoint at `http://localhost:8080/sparql`.  
+
+### Run using embedded server
+
+__Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
+```bash
+$ mvn clean package
+```
+To use a specific release, checkout the tag before building:
+```bash
+$ git checkout <insert tag>
+$ mvn clean package
+```
+
+__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+
+Run the server from a terminal using:
+```bash
+java -cp target/HeFQUIN-x.y.z-SNAPSHOT.jar se.liu.ida.hefquin.service.HeFQUINServer
+```
+
+The engine can be configured by modifying the `config.properties` file in the working directory. The `config.properties` file has the following structure:
+```bash
+ENGINE_CONF_FILE=ExampleEngineConf.ttl   # the engine configuration file
+FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
+```
+
+### Run using an existing servlet container
+
+__Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
+```bash
+$ mvn clean package
+```
+To use a specific release, checkout the tag before building:
+```bash
+$ git checkout <insert tag>
+$ mvn clean package
+```
+
+__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+
+Deploy `target/HeFQUIN-x.y.z-SNAPSHOT.war` in your serlet container.
+
+The engine can be configured by modifying the `config.properties` file in the working directory. The `config.properties` file has the following structure:
+```bash
+ENGINE_CONF_FILE=ExampleEngineConf.ttl   # the engine configuration file
+FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
+```
+> __NOTE__: The servlet will need to be restarted for any changes in the engine configuration to take effect.
+
+
+## Run HeFQUIN using the CLI Tool
+
+__Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
+```bash
+$ mvn clean package
+```
+To use a specific release, checkout the tag before building:
+```bash
+$ git checkout <insert tag>
+$ mvn clean package
+```
+
+__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+
+Example usage:
+```bash
+java -cp target/HeFQUIN-0.0.4-SNAPSHOT.jar se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel \
+    --query ExampleQuery.rq \
+    --federationDescription ExampleFederation.ttl \
+    --confDescr ExampleEngineConf.ttl
+```
+
+For a full list of the available CLI options use:
+```bash
+java -cp target/HeFQUIN-x.y.z-SNAPSHOT.jar se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel --help
+```
+
 ### Features of HeFQUIN
 * Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)
 * So far, support for SPARQL endpoints, TPF, and brTPF
