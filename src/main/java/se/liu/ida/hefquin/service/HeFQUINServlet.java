@@ -32,7 +32,8 @@ public class HeFQUINServlet extends HttpServlet {
 	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList( "application/sparql-results+json",
 	                                                                        "application/sparql-results+xml",
 	                                                                        "text/csv",
-	                                                                        "text/tsv" );
+	                                                                        "text/tsv",
+	                                                                        "text/tab-separated-values" );
 
 	public static void setConfigProperties( final String configProperties){
 		HeFQUINServlet.configProperties = configProperties;
