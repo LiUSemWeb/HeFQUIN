@@ -107,8 +107,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getBGP(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForBGPOptAdd ( final LogicalOpBGPOptAdd op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
@@ -116,8 +116,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getBGP(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForBind( final LogicalOpBind op, final PrintStream out, final String indentLevelString ) {
@@ -140,8 +140,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForGPOptAdd ( final LogicalOpGPOptAdd op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
@@ -149,8 +149,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForJoin( final LogicalOpJoin op, final PrintStream out, final String indentLevelString ) {
@@ -199,8 +199,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getTP(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForTPOptAdd ( final LogicalOpTPOptAdd op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
@@ -208,8 +208,8 @@ public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinte
 		out.append( System.lineSeparator() );
 		printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 		printSPARQLGraphPattern( op.getTP(), indentLevelStringForOpDetail + singleBase, out );
-		out.append( indentLevelStringForOpDetail + singleBase );
-		out.append( System.lineSeparator() );
+		//out.append( indentLevelStringForOpDetail + singleBase );
+		//out.append( System.lineSeparator() );
 	}
 	
 	protected void printOperatorInfoForUnion( final LogicalOpUnion op, final PrintStream out, final String indentLevelString ) {

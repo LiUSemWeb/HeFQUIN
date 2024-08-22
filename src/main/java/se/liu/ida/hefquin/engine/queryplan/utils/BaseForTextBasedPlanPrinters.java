@@ -45,10 +45,6 @@ public class BaseForTextBasedPlanPrinters
 				}
 			}
 			else if ( upperRootOpIndentString.endsWith(lastChildIndentBase) ) {
-				/*
-				for ( int i = 1; i < planLevel; i++ ) {
-					indentLevelString += spaceBase;
-				}*/
 				indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - lastChildIndentBase.length() ) + spaceBase;
 				if ( planNumber < numberOfSiblings-1 ) {
 					return indentLevelString + nonLastChildIndentBase;
@@ -98,6 +94,8 @@ public class BaseForTextBasedPlanPrinters
 	
 	protected void printSPARQLGraphPattern (final SPARQLGraphPattern gp, final String indentLevelStringForOpDetail, final PrintStream out ) {
 		out.append( indentLevelStringForOpDetail + "  - pattern (" + gp.hashCode() +  ") (" + gp.toString() + ")" );
+		out.append( System.lineSeparator() );
+		out.append( indentLevelStringForOpDetail );
 		out.append( System.lineSeparator() );
 	}
 }
