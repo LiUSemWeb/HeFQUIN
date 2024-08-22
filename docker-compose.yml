@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   hefquin:
-    build: .
+    build:
+      context: .
+      #args:
+      #  TAG: docker-test
     ports:
       - "8080:8080"
     volumes:
