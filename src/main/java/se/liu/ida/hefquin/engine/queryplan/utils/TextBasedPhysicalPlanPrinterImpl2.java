@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
 
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -129,5 +130,20 @@ public class TextBasedPhysicalPlanPrinterImpl2 implements PhysicalPlanPrinter
 		for ( int i = 0; i < plan.numberOfSubPlans(); ++i ) {
 			planWalk( plan.getSubPlan(i), i, planLevel+1, plan.numberOfSubPlans(), out, indentLevelString );
 		}
+	}
+	
+	protected void printOperatorInfoForBinaryUnion ( final PhysicalOpBinaryUnion op, final PrintStream out, final String indentLevelString ) {
+		//out.append( indentLevelString + "binaryUnion (" + op.getID() + ") " );
+		out.append( System.lineSeparator() );
+	}
+	
+	protected void printOperatorInfoForBindJoin ( final PhysicalOpBindJoin op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
+		//out.append( indentLevelString + "bindJoin (" + op.getID() + ") " );
+		out.append( System.lineSeparator() );
+	}
+	
+	protected void printOperatorInfoForBindJoinWithFILTER ( final PhysicalOpBindJoinWithFILTER op, final PrintStream out, final String indentLevelString, final String indentLevelStringForOpDetail ) {
+		//out.append( indentLevelString + "FILTERBindJoin (" + op.getID() + ") " );
+		out.append( System.lineSeparator() );
 	}
 }
