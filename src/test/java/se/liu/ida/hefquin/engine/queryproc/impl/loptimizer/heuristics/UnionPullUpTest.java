@@ -549,6 +549,7 @@ public class UnionPullUpTest
 		@Override public boolean supportsBGPRequests() { throw new UnsupportedOperationException(); }
 		@Override public boolean supportsSPARQLPatternRequests() { throw new UnsupportedOperationException(); }
 		@Override public boolean supportsRequest(DataRetrievalRequest req) { throw new UnsupportedOperationException(); }
+		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyTriplePattern implements TriplePattern {
