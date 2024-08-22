@@ -1,8 +1,7 @@
 package se.liu.ida.hefquin.service;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class HeFQUINServer {
 
@@ -14,12 +13,11 @@ public class HeFQUINServer {
 
 	public static Server run( final int port ) {
 		final Server server = new Server( port );
-		final ServletContextHandler context = new ServletContextHandler();
-		context.setContextPath( "/" );
 
-		final ServletHolder servlet = new ServletHolder( new HeFQUINServlet() );
-		context.addServlet( servlet, "/" );
-		server.setHandler( context );
+        WebAppContext webAppContext = new WebAppContext();
+		webAppContext.setResourceBase("src/main/webapp");
+        server.setHandler(webAppContext);
+
 		return server;
 	}
 }

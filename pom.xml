@@ -77,6 +77,12 @@
     <version>11.0.14</version>
   </dependency>
 
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-webapp</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+
   </dependencies>
 
   <build>
