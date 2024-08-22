@@ -10,9 +10,6 @@ RUN git clone https://github.com/LiUSemWeb/HeFQUIN.git
 # Go into directory
 WORKDIR /HeFQUIN
 
-# Build (remove after merge into main)
-RUN git checkout remotes/origin/basic-web-service
-
 # Conditionally check if the specified TAG exists and then checkout, or use the latest version
 RUN sh -c '\
     if [ -n "$TAG" ]; then \
