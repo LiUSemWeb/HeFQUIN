@@ -91,6 +91,9 @@ public class HeFQUINServerUtils {
 		case "text/tsv":
 			resultsFormat = ResultsFormat.FMT_RS_TSV;
 			break;
+		case "text/tab-separated-values":
+			resultsFormat = ResultsFormat.FMT_RS_TSV;
+			break;
 		default:
 			resultsFormat = ResultsFormat.FMT_RS_CSV;
 			break;
