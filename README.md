@@ -5,8 +5,11 @@ HeFQUIN is a query federation engine for heterogeneous federations of graph data
 
 HeFQUIN can be run as a web service or using a Command Line Interface (CLI) tool. 
 
-## Running HeFQUIN as a web service
+## Running as a web service
 The web service can be run using docker, an embedded server, or an existing servlet container (e.g., Tomcat or Jetty).
+
+<details>
+  <summary>Run using Docker </summary>
 
 ### Run using Docker
 Download or clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build and run the latest version of the engine using:
@@ -45,8 +48,12 @@ FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
 ```
 
 By default the service exposes a SPARQL endpoint at `http://localhost:8080/sparql`.  
+</details>
 
-### Run using embedded server
+<details>
+  <summary>Run jar</summary>
+  
+### Run jar
 
 __Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
 ```bash
@@ -70,8 +77,12 @@ The engine can be configured by modifying the `config.properties` file in the wo
 ENGINE_CONF_FILE=ExampleEngineConf.ttl   # the engine configuration file
 FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
 ```
+</details>
 
-### Run using an existing servlet container
+<details>
+  <summary>Run in an existing servlet container</summary>
+  
+### Run in an existing servlet container
 
 __Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
 ```bash
@@ -93,9 +104,9 @@ ENGINE_CONF_FILE=ExampleEngineConf.ttl   # the engine configuration file
 FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
 ```
 > __NOTE__: The servlet will need to be restarted for any changes in the engine configuration to take effect.
-
-
-## Run HeFQUIN using the CLI Tool
+</details>
+  
+## Run using the CLI tool
 
 __Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
 ```bash
