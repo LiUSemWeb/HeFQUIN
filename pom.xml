@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.liu.ida.hefquin</groupId>
   <artifactId>HeFQUIN</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
 
   <!--properties>
    <maven.compiler.source>1.11</maven.compiler.source>
@@ -58,6 +58,31 @@
    		<version>4.13.2</version>
    		<scope>test</scope>
 	</dependency>
+
+  <dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>5.0.0</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-server</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+  
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-servlet</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-webapp</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+
   </dependencies>
 
   <build>
@@ -129,6 +154,21 @@
             <configuration>
                 <release>11</release>
             </configuration>
+        </plugin>
+        <!-- Maven WAR Plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.3.2</version>
+          <executions>
+              <execution>
+                  <id>package-war</id>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>war</goal>
+                  </goals>
+              </execution>
+          </executions>
         </plugin>
     </plugins>
   </build>
