@@ -4,6 +4,9 @@ services:
   hefquin:
     build:
       context: .
+      ### If you want to build the Docker image for a specific version
+      ### of HeFQUIN, uncomment the following two lines and replace
+      ### 'docker-test' by the release tag of that version.
       #args:
       #  TAG: docker-test
     ports:
