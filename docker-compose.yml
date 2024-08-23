@@ -12,7 +12,10 @@ services:
     ports:
       - "8080:8080"
     volumes:
-     # Use custom config files
+     ### If you want to use configuration files other than the default ones
+     ### or a federation description other than the default one, uncomment
+     ### the following three lines and change their respective first parts
+     ### to refer to the files that you want to use.
      #- ./src/main/resources/config.properties:/usr/local/tomcat/webapps/ROOT/config.properties
      #- ./src/main/resources/DefaultEngineConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleEngineConf.ttl
      #- ./src/main/resources/DefaultFedConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleFedConf.ttl
