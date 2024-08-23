@@ -21,10 +21,10 @@ HeFQUIN is a query federation engine for heterogeneous federations of graph data
 
 ## Quick Start
 
-HeFQUIN can be run as a web service or using a Command Line Interface (CLI) tool. 
+HeFQUIN can be used as a Web service or via a Command Line Interface (CLI) tool. 
 
-### Running as a web service
-The web service can be run using docker, an embedded server, or an existing servlet container (e.g., Tomcat or Jetty).
+### Running as a Web service
+The Web service can be run using Docker, via an embedded server, or in a separate servlet container such as Tomcat or Jetty.
 
 <details>
   <summary><b>Run using Docker</b></summary>
@@ -68,7 +68,7 @@ By default the service exposes a SPARQL endpoint at `http://localhost:8080/sparq
 </details>
 
 <details>
-  <summary><b>Run jar</b></summary>
+  <summary><b>Run the server embedded in the JAR file</b></summary>
 
 __Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
 ```bash
@@ -80,9 +80,9 @@ $ git checkout <insert tag>
 $ mvn clean package
 ```
 
-__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+__Option 2:__ Download a JAR file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
 
-Run the server from a terminal using:
+Start the server in a terminal by running the following command:
 ```bash
 java -cp target/HeFQUIN-x.y.z-SNAPSHOT.jar se.liu.ida.hefquin.service.HeFQUINServer
 ```
@@ -95,7 +95,7 @@ FED_CONF_FILE=ExampleFedConf.ttl         # the federation configuration file
 </details>
 
 <details>
-  <summary><b>Run in an existing servlet container</b></summary>
+  <summary><b>Run in a separate servlet container</b></summary>
 
 __Option 1:__ Clone the project from the HeFQUIN repository and navigate to the project root in a terminal. Build the latest version of the engine using:
 ```bash
@@ -107,7 +107,7 @@ $ git checkout <insert tag>
 $ mvn clean package
 ```
 
-__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+__Option 2:__ Download a JAR file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
 
 Deploy `target/HeFQUIN-x.y.z-SNAPSHOT.war` in your serlet container.
 
@@ -131,7 +131,7 @@ $ git checkout <insert tag>
 $ mvn clean package
 ```
 
-__Option 2:__ Download a jar file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
+__Option 2:__ Download a JAR file from the set of available releases (see [Releases](https://github.com/LiUSemWeb/HeFQUIN/releases)).
 
 Example usage:
 ```bash
@@ -141,7 +141,7 @@ java -cp target/HeFQUIN-0.0.4-SNAPSHOT.jar se.liu.ida.hefquin.cli.RunQueryWithou
     --confDescr ExampleEngineConf.ttl
 ```
 
-For a full list of the available CLI options use:
+For a full list of the parameters with which the CLI tool can be run, use the following command:
 ```bash
 java -cp target/HeFQUIN-x.y.z-SNAPSHOT.jar se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel --help
 ```
