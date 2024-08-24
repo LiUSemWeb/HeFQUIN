@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
-public class TextBasedPhysicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinters  implements PhysicalPlanPrinter
+public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinters  implements PhysicalPlanPrinter
 {	
 	@Override
 	public void print( final PhysicalPlan plan, final PrintStream out ) {

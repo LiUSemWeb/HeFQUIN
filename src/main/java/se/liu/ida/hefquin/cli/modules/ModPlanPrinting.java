@@ -8,9 +8,7 @@ import org.apache.jena.cmd.ModBase;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl2;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl2;
 
 public class ModPlanPrinting extends ModBase
 {
@@ -36,10 +34,10 @@ public class ModPlanPrinting extends ModBase
 			srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
 
 		if ( cmdLine.contains(argPrintLogicalPlan) )
-			lplanPrinter = new TextBasedLogicalPlanPrinterImpl2();
+			lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
 
 		if ( cmdLine.contains(argPrintPhysicalPlan) )
-			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl2();
+			pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
 	}
 
 	public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }

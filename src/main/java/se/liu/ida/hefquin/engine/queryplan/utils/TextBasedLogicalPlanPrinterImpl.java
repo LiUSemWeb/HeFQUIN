@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 
-public class TextBasedLogicalPlanPrinterImpl2 extends BaseForTextBasedPlanPrinters implements LogicalPlanPrinter
+public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinters implements LogicalPlanPrinter
 {
 	@Override
 	public void print( final LogicalPlan plan, final PrintStream out ) {
