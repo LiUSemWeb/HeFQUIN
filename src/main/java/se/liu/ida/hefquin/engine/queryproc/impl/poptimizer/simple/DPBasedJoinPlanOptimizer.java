@@ -28,7 +28,9 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
         return new DynamicProgrammingOptimizerImpl(subplans);
     }
 
-    protected class DynamicProgrammingOptimizerImpl implements EnumerationAlgorithm {
+
+    protected class DynamicProgrammingOptimizerImpl implements EnumerationAlgorithm
+    {
         protected final List<PhysicalPlan> subplans;
 
         public DynamicProgrammingOptimizerImpl( final List<PhysicalPlan> subplans ) {
@@ -37,8 +39,8 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
 
         @Override
         public PhysicalPlan getResultingPlan() throws PhysicalOptimizationException {
-
-            // Create a data structure that will be used to store the optimal plan for each subset of (sub)plans.
+            // Create a data structure that will be used to store
+        	// the optimal plan for each subset of the (sub)plans.
             final DataStructureForStoringPlansOfSubsets optPlan = new DataStructureForStoringPlansOfSubsets();
 
             for ( final PhysicalPlan plan: subplans ){
@@ -46,18 +48,29 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
             }
 
             boolean existsConnectedSubsetInSizeNum = true;
-            for ( int num = 2; num < subplans.size()+1; num ++ ){
-                // Get all subsets with size num.
-                final List<List<PhysicalPlan>> subsets = getSubSet(subplans, num);
+            for ( int num = 2; num < subplans.size()+1; num++ ) {
+                // Get all subsets of size num of the set of subplans.
+                final List<List<PhysicalPlan>> subsets = getAllSubSets(subplans, num);
+
                 int countCandidatesWithSizeNum = 0;
                 for( final List<PhysicalPlan> plans : subsets ){
-                    // Split the current set of subplans into two subsets, and create candidate plans with join for each of the combinations.
-                    final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> candidatePairs = splitIntoSubSets(plans);
-                    final List<PhysicalPlan> candidatePlans = new ArrayList<>();
-                    for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> p: candidatePairs ) {
-                        final PhysicalPlan plan_left = optPlan.get( p.object1 );
-                        final PhysicalPlan plan_right = optPlan.get( p.object2 );
+                    // Split the current set of subplans into two (disjoint)
+                    // subsets, in all possible ways; then, ...
+                    final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> pairs = splitIntoSubSets(plans);
 
+                    // ... for such pair of subsets, create candidate join plans.
+                    final List<PhysicalPlan> candidatePlans = new ArrayList<>();
+                    for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> pair : pairs ) {
+                        // Get the optimal plan for each of the two subsets
+                        // in the current pair, as was computed in an earlier
+                        // iteration.
+                        final PhysicalPlan plan_left = optPlan.get( pair.object1 );
+                        final PhysicalPlan plan_right = optPlan.get( pair.object2 );
+
+                        // If we don't have an optimal plan for any of the two
+                        // subsets of the current pair, then ignore this pair.
+                        // (I am not sure at the moment, how such a case may
+                        // occur.  --Olaf)
                         if( plan_left == null || plan_right == null ) {
                             continue;
                         }
@@ -114,12 +127,16 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
     /**
      * This method returns all subsets (with the given size) of the given superset.
      */
-    protected static <T> List<List<T>> getSubSet( final List<T> superset, final int n ){
-        final List<List<T>> result = new ArrayList<>();
+    protected static <T> List<List<T>> getAllSubSets( final List<T> superset, final int n ) {
         if ( n < 1 || n > superset.size() ) {
             throw new IllegalArgumentException("Does not support to get subsets with less than one element or containing more than the total number of elements in the superset (length of subset: " + n + ").");
         }
-        else if ( n == superset.size() ) {
+
+        final List<List<T>> result = new ArrayList<>();
+
+        // If the request is for subsets of the same size as the superset
+        // itself, then the superset is the only such subset.
+        if ( n == superset.size() ) {
             result.add( superset );
             return result;
         }
@@ -135,7 +152,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase {
                     continue;
                 }
 
-                // Create a copy of the current subsets, then update the copy by adding an another element.
+                // Create a copy of the current subsets and extend this copy by adding an another element.
                 final List<T> clone = new ArrayList<>( tempList.get(j) );
                 clone.add( element );
                 tempList.add(clone);
