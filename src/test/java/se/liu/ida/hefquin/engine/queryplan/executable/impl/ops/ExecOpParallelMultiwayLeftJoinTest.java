@@ -102,6 +102,8 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 	@Test
 	public void twoOptsWithNoJoinPartners() throws ExecutionException {
+		// No matching join-values in either.
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -213,6 +215,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithOneJoinPartnerInOne() throws ExecutionException {
+		// Only one of the two OPTIONAL has a matching join-value.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -269,6 +274,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithOneJoinPartnerInOneMirrored() throws ExecutionException {
+		// Same as the above, but it is the other one.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -327,6 +335,11 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithIdenticalNonOptionals() throws ExecutionException {
+		// Contains multiple solution mappings with the same join-value as
+		// an input, as well as one mapping with a join-value which finds
+		// no matches in the OPTIONALs.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -620,6 +633,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithMultiplePartnersInBoth() throws ExecutionException {
+		// Multiple triples in both OPTIONAL clauses have matching join-values.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -770,6 +786,13 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithMultiplePartnersInBothAndMultipleNonOptionals() throws ExecutionException {
+		// The most complicated and thorough test. Multiple triples in both
+		// OPTIONAL clauses have matching join-values. There are several
+		// solution mappings as input, all with different join-values, all
+		// of which match different triples from the OPTIONAL clauses but
+		// not all of whom has any matches.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -1203,6 +1226,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	
 	@Test
 	public void twoOptsWithMultiplePartnersInOne() throws ExecutionException {
+		// Multiple triples in one of the OPTIONAL clauses match.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
@@ -1295,6 +1321,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 
 	@Test
 	public void twoOptsWithMultiplePartnersInOneMirrored() throws ExecutionException {
+		// Same as above, but it is the other OPTIONAL clause.
+		// Added by https://github.com/LiUSemWeb/HeFQUIN/pull/221
+
 		final Var var0 = Var.alloc("v0"); // used as join variable
 		final Var var1 = Var.alloc("v1"); // used in first optional triple pattern
 		final Var var2 = Var.alloc("v2"); // used in second optional triple pattern
