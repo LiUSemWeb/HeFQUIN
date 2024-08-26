@@ -13,6 +13,8 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.*;
 
+import org.apache.jena.sparql.core.Var;
+
 public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 {
 	protected final QueryOptimizationContext ctxt;
@@ -40,88 +42,30 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 		public PhysicalPlan getResultingPlan() throws PhysicalOptimizationException {
 			// Create a data structure that will be used to store
 			// the optimal plan for each subset of the (sub)plans.
-			final DataStructureForStoringPlansOfSubsets optPlan = new DataStructureForStoringPlansOfSubsets();
+			final DataStructureForStoringPlansOfSubsets optmPlansPerStage = new DataStructureForStoringPlansOfSubsets();
 
 			for ( final PhysicalPlan plan: subplans ) {
-				optPlan.add( new ArrayList<>( Arrays.asList(plan) ), plan );
+				optmPlansPerStage.add( new ArrayList<>( Arrays.asList(plan) ), plan );
 			}
 
-			boolean existsConnectedSubsetInSizeNum = true;
 			for ( int num = 2; num < subplans.size()+1; num++ ) {
 				// Get all subsets of size num of the set of subplans.
 				final List<List<PhysicalPlan>> subsets = getAllSubSets(subplans, num);
 
-				int countCandidatesWithSizeNum = 0;
-				for( final List<PhysicalPlan> plans : subsets ) {
-					// Split the current set of subplans into two (disjoint)
-					// subsets, in all possible ways; then, ...
-					final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> pairs = splitIntoSubSets(plans);
-
-					// ... for such pair of subsets, create candidate join plans.
-					final List<PhysicalPlan> candidatePlans = new ArrayList<>();
-					for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> pair : pairs ) {
-						// Get the optimal plan for each of the two subsets
-						// in the current pair, as was computed in an earlier
-						// iteration.
-						final PhysicalPlan plan_left = optPlan.get( pair.object1 );
-						final PhysicalPlan plan_right = optPlan.get( pair.object2 );
-
-						// If we don't have an optimal plan for any of the two
-						// subsets of the current pair, then ignore this pair.
-						// (I am not sure at the moment, how such a case may
-						// occur.  --Olaf)
-						if( plan_left == null || plan_right == null ) {
-							continue;
-						}
-
-						// 'existsConnectedSubsetInSizeNum' can be false when there exist independent parts in all subsets of size num (exist sub-queries that cannot be joined with any other sub-queries)
-						if ( existsConnectedSubsetInSizeNum ) {
-							// Only measure cost for queries that contain join variables
-							if ( ExpectedVariablesUtils.intersectionOfAllVariables(plan_left, plan_right).isEmpty() ) {
-								continue;
-							}
-						}
-
-						candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin( plan_left,  plan_right) );
-						final PhysicalOperator rightRootOp = plan_right.getRootOperator();
-						if ( rightRootOp instanceof PhysicalOpRequest ) {
-							candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq((PhysicalOpRequest<?, ?>) rightRootOp, plan_left ) );
-						}
-						if ( rightRootOp instanceof PhysicalOpRequestWithTranslation ) {
-							candidatePlans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequestWithTranslation<?,?>) rightRootOp, plan_left ) );
-						}
-						if ( rightRootOp instanceof PhysicalOpBinaryUnion || rightRootOp instanceof PhysicalOpMultiwayUnion ){
-							if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(plan_right) ) {
-								candidatePlans.add( PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(plan_left, plan_right) );
-							}
-						}
-					}
-
-					countCandidatesWithSizeNum += candidatePlans.size();
-					if ( candidatePlans.size() != 0 ) {
-						// Prune: only the best candidate plan is retained in optPlan.
-						// TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
-						final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(ctxt.getCostModel(), candidatePlans);
-						final PhysicalPlan planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost).getPlan();
-						optPlan.add(plans, planWithLowestCost);
-					}
-				}
-
-				if ( countCandidatesWithSizeNum == 0 ) {
-					// There exist independent parts for any subset (of size num). For a complete query plan, recreate candidate plans without considering join variables
-					existsConnectedSubsetInSizeNum = false;
-					num --;
-				}
-				else {
-					existsConnectedSubsetInSizeNum = true;
+				final boolean atLeastOneFound = determineOptimalCandidatesAtStageN( subsets,
+				                                                                    optmPlansPerStage,
+				                                                                    true ); // ignoreCartesianProductJoins
+				if ( ! atLeastOneFound ) {
+					determineOptimalCandidatesAtStageN( subsets, optmPlansPerStage, false );
 				}
 			}
-			return optPlan.get( subplans );
+
+			return optmPlansPerStage.get( subplans );
 		}
 
 	}
 
-	public abstract <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset );
+	protected abstract <T> List<Pair<List<T>, List<T>>> splitIntoSubSets( final List<T> superset );
 
 	/**
 	 * This method returns all subsets (with the given size) of the given superset.
@@ -164,6 +108,100 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 		}
 
 		return result;
+	}
+
+	/**
+	 * For each of the sets of plans in 'subsets', determines the best possible
+	 * join plan and adds this best plan to 'optPlansPerStage'.
+	 *
+	 * @param subsets is the set of all sets of plans to be considered at this
+	 *          stage, where all these sets are assumed to be of the same size
+	 *
+	 * @param optPlansPerStage contains the optimal join plans for every proper
+	 *          subset of every set of plans in 'subsets', these optimal join
+	 *          plans were determined in the earlier stages of the DP algorithm
+	 *
+	 * @param ignoreCartesianProductJoins is given as true if this function has
+	 *          to ignore any joins that would produce cartesian products (i.e.,
+	 *          joins between subplans that don't share any variable)
+	 * 
+	 * @return true if at least one possible join plan was added; the only case
+	 *         in which this may be false is if 'ignoreCartesianProductJoins' is
+	 *         true and none of the sets of plans in 'subsets' can be split into
+	 *         two disjoint subsets that share a variable.
+	 */
+	protected boolean determineOptimalCandidatesAtStageN( final List<List<PhysicalPlan>> subsets,
+	                                                      final DataStructureForStoringPlansOfSubsets optPlansPerStage,
+	                                                      final boolean ignoreCartesianProductJoins )
+			throws PhysicalOptimizationException
+	{
+		boolean atLeastOnePlanFound = false;
+		for ( final List<PhysicalPlan> plans : subsets ) {
+			// Create all possible pairs of two disjoint subsets of the given set of subplans.
+			final List<Pair<List<PhysicalPlan>, List<PhysicalPlan>>> pairs = splitIntoSubSets(plans);
+
+			// For such pair of subsets, create candidate join plans.
+			final List<PhysicalPlan> candidatePlans = new ArrayList<>();
+			for ( final Pair<List<PhysicalPlan>, List<PhysicalPlan>> pair : pairs ) {
+				// Get the optimal plan for each of the two subsets
+				// in the current pair, as was computed in an earlier
+				// iteration.
+				final PhysicalPlan optmLeft  = optPlansPerStage.get( pair.object1 );
+				final PhysicalPlan optmRight = optPlansPerStage.get( pair.object2 );
+
+				// If we don't have an optimal plan for any of the two
+				// subsets of the current pair, then ignore this pair.
+				// (I am not sure at the moment, how such a case may
+				// occur.  --Olaf)
+				if( optmLeft == null || optmRight == null ) {
+					continue;
+				}
+
+				if ( ignoreCartesianProductJoins ) {
+					final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfAllVariables(optmLeft, optmRight);
+					if ( joinVars.isEmpty() ) {
+						// Since the current two optimal plans share no
+						// variables, the join between these two plans is
+						// a cartesian product join, which we ignore in the
+						// current invocation of this function.
+						continue;
+					}
+				}
+
+				candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin(optmLeft,optmRight) );
+
+				final PhysicalOperator rightRootOp = optmRight.getRootOperator();
+				if ( rightRootOp instanceof PhysicalOpRequest ) {
+					final PhysicalOpRequest<?,?> _rightRootOp = (PhysicalOpRequest<?,?>) rightRootOp;
+					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft);
+					candidatePlans.addAll(plansWithUnaryRoot);
+				}
+				else if ( rightRootOp instanceof PhysicalOpRequestWithTranslation ) {
+					final PhysicalOpRequestWithTranslation<?,?> _rightRootOp = (PhysicalOpRequestWithTranslation<?,?>) rightRootOp;
+					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft);
+					candidatePlans.addAll(plansWithUnaryRoot);
+				}
+				else if (    rightRootOp instanceof PhysicalOpBinaryUnion
+				          || rightRootOp instanceof PhysicalOpMultiwayUnion ) {
+					if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(optmRight) ) {
+						final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(optmLeft, optmRight);
+						candidatePlans.add(planWithUnariesUnderUnion);
+					}
+				}
+			}
+
+			if ( candidatePlans.size() > 0 ) {
+				atLeastOnePlanFound = true;
+
+				// Prune: we only need to keep the best plan for the current subset of subplans
+				// TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
+				final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost( ctxt.getCostModel(), candidatePlans );
+				final PhysicalPlanWithCost planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost);
+				optPlansPerStage.add( plans, planWithLowestCost.getPlan() );
+			}
+		}
+
+		return atLeastOnePlanFound;
 	}
 
 }
