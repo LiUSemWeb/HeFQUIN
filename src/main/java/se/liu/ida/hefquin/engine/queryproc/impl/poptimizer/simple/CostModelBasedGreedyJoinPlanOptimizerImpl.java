@@ -172,11 +172,6 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 			final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rootOfSubPlan, leftOrChild);
 			plans.addAll(plansWithUnaryRoot);
 		}
-		else if ( rootOfSubPlan instanceof PhysicalOpRequestWithTranslation ) {
-			final PhysicalOpRequestWithTranslation<?,?> _rootOfSubPlan = (PhysicalOpRequestWithTranslation<?,?>) rootOfSubPlan;
-			final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rootOfSubPlan, leftOrChild);
-			plans.addAll(plansWithUnaryRoot);
-		}
 		else if (    rootOfSubPlan instanceof PhysicalOpBinaryUnion
 		          || rootOfSubPlan instanceof PhysicalOpMultiwayUnion ) {
 			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(rightOrTop) ) {
