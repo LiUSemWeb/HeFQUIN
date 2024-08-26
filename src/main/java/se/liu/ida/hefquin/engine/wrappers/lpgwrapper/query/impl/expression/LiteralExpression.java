@@ -40,7 +40,7 @@ public class LiteralExpression implements CypherExpression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LiteralExpression that = (LiteralExpression) o;
-        return value.equals(that.value)  && datatype.equals(that.datatype);
+        return value.equals(that.value) && datatype.equals(that.datatype);
     }
 
     @Override

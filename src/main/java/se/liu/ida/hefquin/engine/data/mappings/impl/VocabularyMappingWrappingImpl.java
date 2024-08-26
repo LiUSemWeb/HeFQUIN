@@ -3,6 +3,10 @@ package se.liu.ida.hefquin.engine.data.mappings.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.graph.GraphFactory;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.mappings.EntityMapping;
@@ -28,6 +32,26 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		this.sm = sm;
 	}
 
+	public VocabularyMappingWrappingImpl( final String rdfFile ) {
+		final Graph g = RDFDataMgr.loadGraph(rdfFile);
+		em = new EntityMappingImpl( EntityMappingReader.read(g) );
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(g) );
+	}
+
+	public VocabularyMappingWrappingImpl(final Set<Triple> triples) {
+		final Graph vocabularyMapping = GraphFactory.createDefaultGraph();
+		for ( final Triple t : triples ) {
+			vocabularyMapping.add(t);
+		}
+		em = new EntityMappingImpl( EntityMappingReader.read(vocabularyMapping) );
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(vocabularyMapping) );
+	}
+
+	public VocabularyMappingWrappingImpl( final Graph descriptionOfVM ) {
+		em = new EntityMappingImpl( EntityMappingReader.read(descriptionOfVM) );
+		sm = new SchemaMappingImpl( SchemaMappingReader.read(descriptionOfVM) );
+	}
+
 	@Override
 	public SPARQLGraphPattern translateTriplePattern( final TriplePattern tp ) {
 		final Set<TriplePattern> emResult = em.applyToTriplePattern(tp);
@@ -45,7 +69,7 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 
 	@Override
 	public Set<SolutionMapping> translateSolutionMapping( final SolutionMapping solmap ) {
-		final Set<SolutionMapping> emResult = em.applyToSolutionMapping(solmap);
+		final Set<SolutionMapping> emResult = em.applyInverseToSolutionMapping(solmap);
 
 		if ( emResult.size() == 1 ) {
 			return sm.applyInverseToSolutionMapping( emResult.iterator().next() );
@@ -72,4 +96,10 @@ public class VocabularyMappingWrappingImpl implements VocabularyMapping
 		}
 		return result;
 	}
+
+	@Override
+	public boolean isEquivalenceOnly() {
+		return sm.isEquivalenceOnly();
+	}
+
 }

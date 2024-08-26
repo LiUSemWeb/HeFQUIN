@@ -10,7 +10,24 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpHashRJoin implements BinaryPhysicalOpForLogicalOp
+/**
+ * A physical operator that implements the hash join algorithm to perform
+ * a right outer join of two sequences of input solution mappings (produced
+ * by the two sub-plans under this operator). The hash join algorithm builds
+ * a hash table with the solution mappings of the first input sequence (using
+ * the values that they have for the join variables to decide where to place
+ * them in the hash table) and, thereafter, probes the hash table to find join
+ * partners for each of the solution mappings of the second input sequence.
+ * As this operator performs a right outer join, the solution mappings of the
+ * second input sequence that do not have a join partner are not discarded (as
+ * would be the case for an inner join) but, instead, are passed to the output
+ * as is.
+ *
+ * The actual algorithm of this operator is implemented in the
+ * {@link ExecOpHashRJoin} class.
+ */
+public class PhysicalOpHashRJoin extends BaseForPhysicalOps
+                                 implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRightJoin lop;
 

@@ -15,6 +15,18 @@ import se.liu.ida.hefquin.engine.utils.Stats;
 
 import java.util.*;
 
+/**
+ * Implementation of the symmetric hash join algorithm. This algorithm
+ * continuously builds two hash tables (one for each of the two inputs)
+ * and, at the same time, uses these hash tables to find join partners
+ * for solution mappings that arrive at the respective other input. More
+ * specifically, whenever a solution mappings appears at one of the inputs,
+ * it is added into the hash table for that input (using the value(s) that
+ * it has for the join variable(s) to decide where to place it in the hash
+ * table) and then the other hash table is probed for join partners (which
+ * must have arrived at the other input before the current solution mapping
+ * arrived at its input.
+ */
 public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 {
     protected final SolutionMappingsIndex indexForChild1;

@@ -12,3 +12,25 @@ SELECT * WHERE {
 		?cc rdfs:label ?o
 	}
 }
+
+# An example query that must take into account vocabulary mappings
+#SELECT * WHERE {
+#    SERVICE <https://query.wikidata.org/sparql> {
+#        ?pablo rdfs:label "Pablo Picasso"@en .
+#        ?pablo <https://schema.org/hasOccupation> ?artist .
+#    }
+#    SERVICE <http://dbpedia.org/sparql> {
+#        ?person rdf:type ?artist .
+#        ?person <https://schema.org/birthPlace> <http://dbpedia.org/resource/Spain> .
+#    }
+#}
+#limit 3
+
+# Expected results:
+#-------------------------------------------------------------------------------------------------------------------------
+#| pablo                                  | artist                      | person                                         |
+#=========================================================================================================================
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carles_Canut>     |
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carles_Casagemas> |
+#| <http://www.wikidata.org/entity/Q5593> | <https://schema.org/artist> | <http://dbpedia.org/resource/Carlos_Albert>    |
+#-------------------------------------------------------------------------------------------------------------------------

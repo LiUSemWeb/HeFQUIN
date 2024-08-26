@@ -3,8 +3,9 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.DataRetrievalInterfaceBase;
 
-public class GraphQLInterfaceImpl implements GraphQLInterface
+public class GraphQLInterfaceImpl extends DataRetrievalInterfaceBase implements GraphQLInterface
 {
 	protected final String url;
 

@@ -3,21 +3,22 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterNT;
-import org.apache.jena.sparql.engine.http.HttpQuery;
+import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.DataRetrievalInterfaceBase;
 
-public class TPFInterfaceImpl implements TPFInterface
+public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFInterface
 {
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
 
 	public final String baseURL;
+	public final String baseURLWithFinalSeparator;
 	public final String httpQueryArgumentForSubject;
 	public final String httpQueryArgumentForPredicate;
 	public final String httpQueryArgumentForObject;
@@ -35,6 +36,13 @@ public class TPFInterfaceImpl implements TPFInterface
 		this.httpQueryArgumentForSubject    = httpQueryArgumentForSubject;
 		this.httpQueryArgumentForPredicate  = httpQueryArgumentForPredicate;
 		this.httpQueryArgumentForObject     = httpQueryArgumentForObject;
+
+		if ( baseURL.endsWith("?") || baseURL.endsWith("&") )
+			baseURLWithFinalSeparator = baseURL;
+		else if ( baseURL.contains("?") )
+			baseURLWithFinalSeparator = baseURL + "&";
+		else
+			baseURLWithFinalSeparator = baseURL + "?";
 	}
 
 	@Override
@@ -63,31 +71,24 @@ public class TPFInterfaceImpl implements TPFInterface
 	}
 
 	@Override
-	public HttpQuery createHttpRequest( final TPFRequest req ) {
-		final HttpQuery httpReq;
-
+	public String createRequestURL( final TPFRequest req ) {
 		final String pageURL = req.getPageURL();
 		if ( pageURL != null ) {
-			httpReq = createHttpRequest( pageURL );
-		} else {
-			httpReq = createHttpRequest( req.getQueryPattern().asJenaTriple() );
+			return pageURL;
 		}
 
-		setHeaders(httpReq);
-		return httpReq;
+		final Params params = createParams( req.getQueryPattern().asJenaTriple() );
+
+		return baseURLWithFinalSeparator + params.httpString();
 	}
 
-	protected HttpQuery createHttpRequest( final String pageURL ) {
-		return new HttpQuery(pageURL);
-	}
-
-	protected HttpQuery createHttpRequest( final Triple tp ) {
-		final HttpQuery httpReq = new HttpQuery(baseURL);
+	protected Params createParams( final Triple tp ) {
+		final Params params = Params.create();
 
 		final Node s = tp.getSubject();
 		if ( s != null && s.isConcrete() ) {
 			if ( s.isURI() ) {
-				httpReq.addParam( httpQueryArgumentForSubject, s.getURI() );
+				params.add( httpQueryArgumentForSubject, s.getURI() );
 			}
 			else {
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal subject (" + s.getClass().getName() + ").");
@@ -97,46 +98,41 @@ public class TPFInterfaceImpl implements TPFInterface
 			// variables need to be included in the request;
 			// otherwise brTPF servers do not know what to do
 			// with the variables in the 'values' parameter
-			httpReq.addParam( httpQueryArgumentForSubject, "?" + s.getName() );
+			params.add( httpQueryArgumentForSubject, "?" + s.getName() );
 		}
 
 		final Node p = tp.getPredicate();
 		if ( p != null && p.isConcrete() ) {
 			if ( p.isURI() ) {
-				httpReq.addParam( httpQueryArgumentForPredicate, p.getURI() );
+				params.add( httpQueryArgumentForPredicate, p.getURI() );
 			}
 			else {
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal predicate (" + s.getClass().getName() + ").");
 			}
 		}
 		else if ( p != null && p.isVariable() ) {
-			httpReq.addParam( httpQueryArgumentForPredicate, "?" + p.getName() );
+			params.add( httpQueryArgumentForPredicate, "?" + p.getName() );
 		}
 
 		final Node o = tp.getObject();
 		if ( o != null && o.isConcrete() ) {
 			if ( o.isURI() ) {
-				httpReq.addParam( httpQueryArgumentForObject, o.getURI() );
+				params.add( httpQueryArgumentForObject, o.getURI() );
 			}
 			else if ( o.isLiteral() ) {
 				final StringWriterI w = new StringWriterI();
 				nodeFormatter.formatLiteral(w, o);
-				httpReq.addParam( httpQueryArgumentForObject, w.toString() );
+				params.add( httpQueryArgumentForObject, w.toString() );
 			}
 			else {
 				throw new IllegalArgumentException("The triple pattern of the given request has an illegal object (" + s.getClass().getName() + ").");
 			}
 		}
 		else if ( o != null && o.isVariable() ) {
-			httpReq.addParam( httpQueryArgumentForObject, "?" + o.getName() );
+			params.add( httpQueryArgumentForObject, "?" + o.getName() );
 		}
 
-		return httpReq;
-	}
-
-	protected void setHeaders( final HttpQuery httpReq ) {
-		httpReq.setAllowCompression(true);
-		httpReq.setAccept(WebContent.defaultRDFAcceptHeader);
+		return params;
 	}
 
 	@Override

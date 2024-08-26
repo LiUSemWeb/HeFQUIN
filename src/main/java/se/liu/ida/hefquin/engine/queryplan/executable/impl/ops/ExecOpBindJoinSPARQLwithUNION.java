@@ -26,6 +26,12 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 
+/**
+ * Implementation of (a batching version of) the bind join algorithm that uses UNION.
+ *
+ * The current algorithm should to be changed.
+ * See: https://github.com/LiUSemWeb/HeFQUIN/issues/344
+ */
 public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
 	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {

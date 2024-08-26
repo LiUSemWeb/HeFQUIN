@@ -7,6 +7,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
@@ -14,11 +15,7 @@ import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.op.Op2;
-import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.PathBlock;
-import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.Vars;
+import org.apache.jena.sparql.core.*;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -26,12 +23,7 @@ import org.apache.jena.sparql.expr.ExprTransformSubstitute;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.graph.NodeTransformLib;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.*;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
@@ -56,6 +48,15 @@ public class QueryPatternUtils
 			tps.add( new TriplePatternImpl(it.next()) );
 		}
 		return new BGPImpl(tps);
+	}
+
+	/**
+	 * Assumes that the given {@link ElementPathBlock} does not contain
+	 * property path patterns (but only triple patterns). If it does,
+	 * this methods throws an {@link IllegalArgumentException}.
+	 */
+	public static BGP createBGP( final ElementPathBlock pattern ) {
+		return createBGP( pattern.getPattern() );
 	}
 
 	/**
@@ -253,6 +254,12 @@ public class QueryPatternUtils
 			}
 			return tps;
 		}
+		else if ( e instanceof ElementGroup ) {
+			for ( Element el: ((ElementGroup) e).getElements() ){
+				tps.addAll( getTPsInPattern(el) );
+			}
+			return tps;
+		}
 		else if ( e instanceof ElementFilter ) {
 			// Do nothing
 			return tps;
@@ -262,7 +269,8 @@ public class QueryPatternUtils
 	}
 
 	/**
-	 * Returns the set of all variables that occur in the given graph pattern.
+	 * Returns the set of all variables that occur in the given graph pattern,
+	 * but ignoring variables in FILTER expressions.
 	 *
 	 * If the given pattern is a {@link TriplePattern}, this function returns
 	 * the result of {@link #getVariablesInPattern(TriplePattern)}. Similarly,
@@ -341,6 +349,9 @@ public class QueryPatternUtils
 		return varLeft;
 	}
 
+	/**
+	 * Ignores variables in FILTER expressions.
+	 */
 	public static Set<Var> getVariablesInPattern( final Op op ) {
 		if ( op instanceof OpBGP ) {
 			return getVariablesInPattern( (OpBGP) op);
@@ -349,7 +360,10 @@ public class QueryPatternUtils
 			return getVariablesInPattern( (Op2) op );
 		}
 		else if ( op instanceof OpService ){
-			return getVariablesInPattern( ((Op1) op).getSubOp());
+			return getVariablesInPattern( ((OpService) op).getSubOp());
+		}
+		else if ( op instanceof OpFilter ){
+			return getVariablesInPattern( ((OpFilter) op).getSubOp());
 		}
 		else {
 			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
@@ -847,6 +861,40 @@ public class QueryPatternUtils
 	}
 
 	/**
+	 * Merges the given BIND clause into the given graph pattern.
+	 */
+	public static SPARQLGraphPattern merge(final VarExprList exprs, final SPARQLGraphPattern p ) {
+		// Create a new ElementGroup object, add into it the Element represented
+		// by the given graph pattern, add into it the filters, and create a new
+		// graph pattern from it.
+		final ElementGroup group = new ElementGroup();
+
+		// - convert the given graph pattern into an Element and add it to the group
+		final Element elmt = convertToJenaElement(p);
+		if ( elmt instanceof ElementGroup ) {
+			// If the given graph pattern was converted to an ElementGroup, instead
+			// of simply adding it into the new group, copy its sub-elements over
+			// to the new group, which avoids unnecessary nesting of groups.
+			for ( final Element subElmt : ((ElementGroup) elmt).getElements() ) {
+				group.addElement(subElmt);
+			}
+		}
+		else {
+			// If the given graph pattern was converted to something other
+			// than an ElementGroup, simply add it into the new group.
+			group.addElement(elmt);
+		}
+
+		// - now add the BIND clause to the group
+		for ( final Var v : exprs.getVars() ) {
+			final ElementBind f = new ElementBind(v, exprs.getExpr(v) );
+			group.addElement(f);
+		}
+
+		return new GenericSPARQLGraphPatternImpl1(group);
+	}
+
+	/**
 	 * Merges the two graph patterns into a single one, using join semantics.
 	 * Returns a {@link BGP} if possible (for instance, if both of the given
 	 * patterns are BGPs or one of them is a BGP and the other one a triple
@@ -1093,7 +1141,7 @@ public class QueryPatternUtils
 				if ( ! bgpAdded && subElmt instanceof ElementTriplesBlock ) {
 					final ElementTriplesBlock copy = new ElementTriplesBlock();
 
-					final Iterator<Triple> it = ((ElementTriplesBlock) elmt).patternElts();
+					final Iterator<Triple> it = ((ElementTriplesBlock) subElmt).patternElts();
 					while ( it.hasNext() ) {
 						copy.addTriple( it.next() );
 					}
@@ -1108,7 +1156,7 @@ public class QueryPatternUtils
 				else if ( ! bgpAdded && subElmt instanceof ElementPathBlock ) {
 					final ElementPathBlock copy = new ElementPathBlock();
 
-					final Iterator<TriplePath> it = ((ElementPathBlock) elmt).patternElts();
+					final Iterator<TriplePath> it = ((ElementPathBlock) subElmt).patternElts();
 					while ( it.hasNext() ) {
 						copy.addTriplePath( it.next() );
 					}

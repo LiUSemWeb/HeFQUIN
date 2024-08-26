@@ -3,9 +3,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.randomized;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -17,7 +14,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.IterativeImprovementBasedQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionByNumberOfGenerations;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionForIterativeImprovement;
@@ -30,9 +26,6 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-
-
 
 public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 {
@@ -67,7 +60,7 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		rewritingRules.ruleInstances.add(dummyRuleForTest);
 
 		final StoppingConditionForIterativeImprovement cond = new StoppingConditionByNumberOfGenerations(5);
-		final IterativeImprovementBasedQueryOptimizer o = new IterativeImprovementBasedQueryOptimizer( cond, createContextForTest(), rewritingRules );
+		final IterativeImprovementBasedQueryOptimizer o = new IterativeImprovementBasedQueryOptimizer( cond, l2pConverter, costModel, rewritingRules );
 
 		// run the test
 		final PhysicalPlan resultingPlan = o.optimize( initialPlan ).object1;
@@ -79,28 +72,15 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 
 	// ----------- helper code for the tests ------------
 
-	protected QueryOptimizationContext createContextForTest() {
-		final FederationCatalog fedCat = new FederationCatalogImpl();
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl(true, true);
+	final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl(true, true);
 
-		final CostModel costModel = new CostModel() {
-			@Override
-			public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan p ) {
-				final DummyPlanForTest pp = (DummyPlanForTest) p;
-				return CompletableFuture.completedFuture( pp.cost );
-			}
-		};
-
-		return new QueryOptimizationContext() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
-			@Override public boolean isExperimentRun() { return true; }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
-			@Override public CostModel getCostModel() { return costModel; }
-		};
-	}
+	final CostModel costModel = new CostModel() {
+		@Override
+		public CompletableFuture<Double> initiateCostEstimation( final PhysicalPlan p ) {
+			final DummyPlanForTest pp = (DummyPlanForTest) p;
+			return CompletableFuture.completedFuture( pp.cost );
+		}
+	};
 
 	protected static class DummyPhysicalOperatorForTest implements PhysicalOperatorForLogicalOperator {
 		@Override
@@ -121,6 +101,11 @@ public class IterativeImprovementBasedQueryOptimizerTest extends EngineTestBase
 		@Override
 		public LogicalOperator getLogicalOperator() {
 			return null;
+		}
+
+		@Override
+		public int getID() {
+			return 0;
 		}
 	}
 	

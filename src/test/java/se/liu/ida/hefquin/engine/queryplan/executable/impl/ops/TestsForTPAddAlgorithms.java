@@ -33,7 +33,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateRe
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 /**
  * This is an abstract class with tests for any algorithm that is
@@ -521,8 +520,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
-			@Override public CostModel getCostModel() { return null; }
 			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
 		};
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 

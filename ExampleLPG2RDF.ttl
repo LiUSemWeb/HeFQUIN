@@ -1,0 +1,26 @@
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>
+PREFIX ex:     <http://example.org/>
+
+ex:myExampleConfig a lr:LPGtoRDFConfiguration ;
+    lr:labelPredicate "http://www.w3.org/2000/01/rdf-schema#label"^^xsd:anyURI ;
+    lr:nodeMapping          _:nm ;
+    lr:nodeLabelMapping     _:nlm ;
+    lr:edgeLabelMapping     _:elm ;
+    lr:propertyNameMapping  _:pm .
+
+_:nm lr:prefixOfIRIs "https://example.org/node/"^^xsd:anyURI .
+
+_:nlm a lr:LiteralBasedNodeLabelMapping .
+
+_:elm lr:componentMappings
+            (
+               [ lr:label "DIRECTED" ;
+                 lr:iri "http://example.org/directorOf"^^xsd:anyURI ]
+
+               [ lr:prefixOfIRIs "https://example.org/edge/"^^xsd:anyURI ]
+            ) .
+
+_:pm lr:prefixOfIRIs "https://example.org/property/"^^xsd:anyURI .

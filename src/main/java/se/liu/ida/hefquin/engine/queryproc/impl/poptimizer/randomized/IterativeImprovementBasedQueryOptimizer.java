@@ -5,10 +5,11 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.RandomizedJoinPlanOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
@@ -22,14 +23,15 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 	protected final SimpleJoinOrderingQueryOptimizer simpleOptimizer;
 
 	public IterativeImprovementBasedQueryOptimizer( final StoppingConditionForIterativeImprovement x,
-	                                                final QueryOptimizationContext context,
+	                                                final LogicalToPhysicalPlanConverter l2pConverter,
+	                                                final CostModel costModel,
 	                                                final RuleInstances rewritingRules ) {
-		super(context, rewritingRules);
+		super(l2pConverter, costModel, rewritingRules);
 
 		assert x != null;
 		condition = x;
 		final RandomizedJoinPlanOptimizerImpl randomizer = new RandomizedJoinPlanOptimizerImpl();
-		simpleOptimizer = new SimpleJoinOrderingQueryOptimizer(randomizer,context);
+		simpleOptimizer = new SimpleJoinOrderingQueryOptimizer(randomizer, l2pConverter);
 	}
 
 	@Override
@@ -39,12 +41,12 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 
 	@Override
 	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
-		return optimize( context.getLogicalToPhysicalPlanConverter().convert(initialPlan,true) );
+		return optimize( l2pConverter.convert(initialPlan,true) );
 	}
 
 	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws PhysicalOptimizationException {
 		// The best plan and cost we have found so far. As we have only found one plan, it is the best one so far.
-		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
+		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost(costModel, initialPlan);
 
 		// generation = number of times the outer loop has run. Has to be declared here since it will increment each outer loop.
 		int generation = 0;
@@ -52,12 +54,12 @@ public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOpti
 		while ( ! condition.readyToStop(generation) ) {
 			// Selects a random plan and uses it as the starting point for the optimization.
 			PhysicalPlan randomPlan = simpleOptimizer.optimizePlan(initialPlan);
-			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), randomPlan );
+			PhysicalPlanWithCost currentPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost(costModel, randomPlan);
 			
 			boolean improvementFound = false;
 
 			do {
-				final List<PhysicalPlanWithCost> neighbours = PhysicalPlanWithCostUtils.annotatePlansWithCost( context.getCostModel(), getNeighbours(currentPlan.getPlan()));
+				final List<PhysicalPlanWithCost> neighbours = PhysicalPlanWithCostUtils.annotatePlansWithCost( costModel, getNeighbours(currentPlan.getPlan()) );
 				final List<PhysicalPlanWithCost> betterPlans = new ArrayList<>();
 				improvementFound = false;
 

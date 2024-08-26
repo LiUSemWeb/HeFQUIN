@@ -2,6 +2,12 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+/**
+ * A specialization of the {@link ExecutableOperator} interface that
+ * captures executable operators that consume an arbitrary number of
+ * sequences of solution mappings (where each such sequence is batched
+ * into several blocks of solution mappings).
+ */
 public interface NaryExecutableOp extends ExecutableOperator
 {
 	/**
@@ -27,6 +33,10 @@ public interface NaryExecutableOp extends ExecutableOperator
 	 * Finishes up any processing related to the input coming
 	 * from the x-th operand and sends the remaining result
 	 * elements (if any) to the given sink.
+	 *
+	 * This method will be called once for each of the operands,
+	 * after the sub-plan that produces the input coming from
+	 * the operand has finished producing its result.
 	 */
 	void wrapUpForXthChild( int x,
 	                        IntermediateResultElementSink sink,

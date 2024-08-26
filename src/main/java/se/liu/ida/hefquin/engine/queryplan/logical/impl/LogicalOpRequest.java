@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> implements NullaryLogicalOp
+public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> extends LogicalOperatorBase implements NullaryLogicalOp
 {
 	protected final MemberType fm;
 	protected final ReqType req;
@@ -59,16 +59,10 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 
 	@Override
 	public String toString(){
-		final int codeOfReq = req.toString().hashCode();
-		final int codeOfFm = fm.getInterface().toString().hashCode();
-
-		return "> req" +
-				"[" + codeOfReq + ", "+ codeOfFm + "]"+
-				" ( " +
-				"{ " + req.toString() + " }"
-				+ ", "
-				+ fm.getInterface().toString()
-				+ " )";
+		return "req" + " (" + getID() + ")"
+		  		+ "\t - fm (" + fm.getInterface().toString() + ")"
+		  		+ "\t - pattern (" + req.toString() + ")";
+		
 	}
 
 }

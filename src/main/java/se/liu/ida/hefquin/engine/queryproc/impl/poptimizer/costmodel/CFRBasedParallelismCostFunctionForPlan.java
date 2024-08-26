@@ -6,6 +6,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -26,19 +28,21 @@ public class CFRBasedParallelismCostFunctionForPlan extends CFRBasedCostFunction
 	}
 
 	@Override
-	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final CompletableFuture<Integer> futureForRoot, final PhysicalPlan plan ) {
+	public CompletableFuture<Integer> aggregateValueForAllSubPlans( final Set<PhysicalPlan> visitedPlans, final CompletableFuture<Integer> futureForRoot, final PhysicalPlan plan ) {
 		final PhysicalOperator pop = plan.getRootOperator();
 		if ( pop instanceof PhysicalOpBinaryUnion || pop instanceof PhysicalOpMultiwayUnion || pop instanceof PhysicalOpSymmetricHashJoin ){
 			CompletableFuture<Integer> cardForSubPlan = CompletableFuture.completedFuture( 0 );
 			CompletableFuture<Integer> f = futureForRoot;
 			for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
 				final PhysicalPlan subPlan = plan.getSubPlan(i);
-				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation(subPlan), (m, v) -> Math.max(m, v));
+
+				// To get a fair maximum value, the visited subPlans should not be skipped.
+				cardForSubPlan = cardForSubPlan.thenCombine( initiateCostEstimation( new HashSet<>(), subPlan), (m, v) -> Math.max(m, v));
 			}
 			return f.thenCombine(cardForSubPlan, ( total, valueForSubPlan) -> (total + valueForSubPlan) < 0 ? Integer.MAX_VALUE : (total + valueForSubPlan) );
 		}
 		else
-			return super.aggregateValueForAllSubPlans(futureForRoot, plan);
+			return super.aggregateValueForAllSubPlans(new HashSet<>(), futureForRoot, plan);
 	}
 
 }

@@ -17,7 +17,20 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
-public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
+/**
+ * A physical operator that implements a left-outer join for multiple optional
+ * parts; as a unary operator, the operator has a single input, which provides
+ * the solutions of the non-optional part.
+ *
+ * The idea of the algorithm associated with this operator is to perform bind
+ * joins for all the optional parts in parallel and then merge the results.
+ *
+ * TODO: describe the algorithm in more detail.
+ *
+ * The actual algorithm of this operator is implemented
+ * in the {@link ExecOpParallelMultiwayLeftJoin} class.
+ */
+public class PhysicalOpParallelMultiLeftJoin extends BaseForPhysicalOps implements UnaryPhysicalOp
 {
 	/**
 	 * Checks whether a {@link LogicalOpMultiwayLeftJoin} with the given list
@@ -40,9 +53,6 @@ public class PhysicalOpParallelMultiLeftJoin implements UnaryPhysicalOp
 			final LogicalOpRequest<?,?> reqOp;
 			if ( childRootOp instanceof PhysicalOpRequest<?,?> ) {
 				reqOp = ((PhysicalOpRequest<?,?>) childRootOp).getLogicalOperator();
-			}
-			else if ( childRootOp instanceof PhysicalOpRequestWithTranslation<?,?>  ) {
-				reqOp = ((PhysicalOpRequestWithTranslation<?,?>) childRootOp).getLogicalOperator();
 			}
 			else {
 				return null;

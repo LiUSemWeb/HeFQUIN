@@ -1,16 +1,15 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerBase;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
@@ -22,18 +21,16 @@ import se.liu.ida.hefquin.engine.utils.Pair;
  * not hard-coded but, instead, can be specified by means of providing
  * an implementation of {@link JoinPlanOptimizer}.
  */
-public class SimpleJoinOrderingQueryOptimizer implements PhysicalOptimizer
+public class SimpleJoinOrderingQueryOptimizer extends PhysicalOptimizerBase
 {
     protected final JoinPlanOptimizer joinPlanOptimizer;
-    protected final QueryOptimizationContext ctxt;
 
     public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer,
-                                             final QueryOptimizationContext ctxt ) {
-        assert joinPlanOptimizer != null;
-        assert ctxt != null;
+                                             final LogicalToPhysicalPlanConverter l2pConverter ) {
+        super(l2pConverter);
 
+        assert joinPlanOptimizer != null;
         this.joinPlanOptimizer = joinPlanOptimizer;
-        this.ctxt = ctxt;
     }
 
     @Override
@@ -42,10 +39,13 @@ public class SimpleJoinOrderingQueryOptimizer implements PhysicalOptimizer
     }
 
     @Override
-    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
-        final boolean keepMultiwayJoins = true;
-        final PhysicalPlan initialPhysicalPlan = ctxt.getLogicalToPhysicalPlanConverter().convert( initialPlan, keepMultiwayJoins );
-        final PhysicalPlan bestPlan = optimizePlan( initialPhysicalPlan );
+    public boolean keepMultiwayJoinsInInitialPhysicalPlan() {
+        return true;
+    }
+
+    @Override
+    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws PhysicalOptimizationException {
+        final PhysicalPlan bestPlan = optimizePlan(initialPlan);
 
         final PhysicalOptimizationStatsImpl myStats = new PhysicalOptimizationStatsImpl();
 

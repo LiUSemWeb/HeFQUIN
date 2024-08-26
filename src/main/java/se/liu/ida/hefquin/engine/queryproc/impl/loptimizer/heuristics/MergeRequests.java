@@ -23,23 +23,7 @@ import se.liu.ida.hefquin.engine.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
 
 /**
@@ -200,6 +184,19 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 					return mergeFilterIntoSPARQLEndpointRequest( (LogicalOpFilter) rootOp,
 					                                             (SPARQLEndpoint) reqOp.getFederationMember(),
 					                                             (SPARQLRequest) reqOp.getRequest() );
+				}
+			}
+		}
+		else if ( rootOp instanceof LogicalOpBind)
+		{
+			// The BIND clause can be merged into a request operator if that request is for a SPARQL endpoint.
+			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
+			if ( childOp instanceof LogicalOpRequest<?,?> ) {
+				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) childOp;
+				if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
+					return mergeBindIntoSPARQLEndpointRequest( (LogicalOpBind) rootOp,
+					                                           (SPARQLEndpoint) reqOp.getFederationMember(),
+					                                           (SPARQLRequest) reqOp.getRequest() );
 				}
 			}
 		}
@@ -376,6 +373,16 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 	                                                                final SPARQLEndpoint ep,
 	                                                                final SPARQLRequest req ) {
 		final SPARQLGraphPattern mergedPattern = QueryPatternUtils.merge( filterOp.getFilterExpressions(),
+		                                                                  req.getQueryPattern() );
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mergedReq);
+		return new LogicalPlanWithNullaryRootImpl(reqOp);
+	}
+
+	public static LogicalPlan mergeBindIntoSPARQLEndpointRequest( final LogicalOpBind bindOp,
+	                                                              final SPARQLEndpoint ep,
+	                                                              final SPARQLRequest req ) {
+		final SPARQLGraphPattern mergedPattern = QueryPatternUtils.merge( bindOp.getBindExpressions(),
 		                                                                  req.getQueryPattern() );
 		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
 		final LogicalOpRequest<?,?> reqOp = new LogicalOpRequest<>(ep, mergedReq);

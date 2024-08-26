@@ -8,10 +8,16 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public class PhysicalOpFilter  implements UnaryPhysicalOpForLogicalOp {
-
+/**
+ * A physical operator that filters the input solution mappings.
+ *
+ * The actual algorithm of this operator is implemented in the
+ * {@link ExecOpFilter} class.
+ */
+public class PhysicalOpFilter extends BaseForPhysicalOps implements UnaryPhysicalOpForLogicalOp
+{
 	protected final LogicalOpFilter lop;
-	
+
 	public PhysicalOpFilter( final LogicalOpFilter lop ) {
 		this.lop = lop;
 	}

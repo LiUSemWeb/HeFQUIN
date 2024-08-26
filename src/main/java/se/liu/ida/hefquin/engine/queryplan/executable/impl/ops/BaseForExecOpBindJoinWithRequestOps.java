@@ -20,21 +20,35 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
- * Abstract base class to implement bind joins by using request operators.
+ * A generic implementation of the bind join algorithm that uses executable
+ * request operators for performing the requests to the federation member.
  *
- * Instead of simply using every input block of solution mappings to directly
- * create a corresponding bind-join request, this implementation can split the
- * input block into smaller blocks for the requests. On top of that, this
- * implementation automatically reduces the block size for requests in case
- * a request operator fails and, then, the implementation even tries to
- * re-process (with the reduced request block size) the input solution
- * mappings for which the request operator failed.
+ * The implementation is generic in the sense that it works with any type of
+ * request operator. Each concrete implementation that extends this base class
+ * needs to implement the {@link #createExecutableRequestOperator(Iterable)}
+ * function to create the request operators with the types of requests that
+ * are specific to that concrete implementation.
  *
- * A potential downside of this capability is that, if this algorithm has
- * to execute multiple requests per input block, then these requests are
+ * This implementation is capable of separating out each input solution mapping
+ * that assigns a blank node to any of the join variables. Then, such solution
+ * mappings are not even considered when creating the requests because they
+ * cannot have any join partners in the results obtained from the federation
+ * member. Of course, in case the algorithm is used under outer-join semantics
+ * these solution mappings are still returned to the output (without joining
+ * them with anything).
+ *
+ * Another capability of this implementation is that, instead of simply using
+ * every input block of solution mappings to directly create a corresponding
+ * bind-join request, this implementation can split the input block into
+ * smaller blocks for the requests. On top of that, in case a request operator
+ * fails, this implementation automatically reduces the block size for requests 
+ * and, then, tries to re-process (with the reduced request block size) the
+ * input solution mappings for which the request operator failed.
+ *
+ * A potential downside of the latter capability is that, if this algorithm
+ * has to execute multiple requests per input block, then these requests are
  * executed sequentially.
  */
 public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
@@ -42,6 +56,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
            extends BaseForExecOpBindJoin<QueryType,MemberType>
 {
 	protected final boolean useOuterJoinSemantics;
+	protected final Set<Var> varsInPatternForFM;
 
 	/**
 	 * The number of solution mappings that this operator uses for each
@@ -61,13 +76,33 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	protected ExecutableOperatorStats statsOfFirstReqOp = null;
 	protected ExecutableOperatorStats statsOfLastReqOp = null;
 
+	/**
+	 * @param varsInPatternForFM
+	 *             may be used by sub-classes to provide the set of variables
+	 *             that occur in the graph pattern that the bind join evaluates
+	 *             at the federation member; sub-classes that cannot extract
+	 *             this set in their constructor may pass <code>null</code> as
+	 *             value for this argument; if provided, this implementation
+	 *             can filter out input solution mappings that contain blank
+	 *             nodes for the join variables and, thus, cannot be joined
+	 *             with the solution mappings obtained via the requests
+	 */
+	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
+	                                            final MemberType fm,
+	                                            final boolean useOuterJoinSemantics,
+	                                            final Set<Var> varsInPatternForFM,
+	                                            final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
+		this.useOuterJoinSemantics = useOuterJoinSemantics;
+		this.varsInPatternForFM = varsInPatternForFM;
+		this.requestBlockSize = preferredInputBlockSize();
+	}
+
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
 	                                            final boolean useOuterJoinSemantics,
 	                                            final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
-		this.useOuterJoinSemantics = useOuterJoinSemantics;
-		this.requestBlockSize = preferredInputBlockSize();
+		this(query, fm, useOuterJoinSemantics, null, collectExceptions);
 	}
 
 	@Override
@@ -75,18 +110,30 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		final Pair<List<SolutionMapping>, List<SolutionMapping>> splitInput = extractUnjoinableInputSMs( input.getSolutionMappings() );
-		final List<SolutionMapping> unjoinableInputSMs = splitInput.object1;
-		final List<SolutionMapping> joinableInputSMs   = splitInput.object2;
+		final Iterable<SolutionMapping> inputSMsForJoin;
+		if ( varsInPatternForFM != null ) {
+			final List<SolutionMapping> unjoinableInputSMs = new ArrayList<>();
+			final List<SolutionMapping> joinableInputSMs = new ArrayList<>();
 
-		if ( useOuterJoinSemantics ) {
-			for ( final SolutionMapping sm : unjoinableInputSMs ) {
-				numberOfOutputMappingsProduced++;
-				sink.send(sm);
+			extractUnjoinableInputSMs( input.getSolutionMappings(),
+			                           varsInPatternForFM,
+			                           unjoinableInputSMs,
+			                           joinableInputSMs );
+
+			if ( useOuterJoinSemantics ) {
+				for ( final SolutionMapping sm : unjoinableInputSMs ) {
+					numberOfOutputMappingsProduced++;
+					sink.send(sm);
+				}
 			}
+
+			inputSMsForJoin = joinableInputSMs;
+		}
+		else {
+			inputSMsForJoin = input.getSolutionMappings();
 		}
 
-		_process( joinableInputSMs, sink, execCxt );
+		_process( inputSMsForJoin, sink, execCxt );
 	}
 
 	protected void _process( final Iterable<SolutionMapping> joinableInputSMs,
@@ -167,6 +214,12 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 	/**
+	 * The returned operator should be created such that it throws exceptions
+	 * instead of collecting them.
+	 */
+	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
+
+	/**
 	 * Splits the given collection of solution mappings into two such that the
 	 * first list contains all the solution mappings that are guaranteed not to
 	 * have any join partner and the second list contains the rest of the given
@@ -174,22 +227,10 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 * solution mappings that are guaranteed not to have join partners are the
 	 * ones that have a blank node for one of the join variables.
 	 */
-	protected abstract Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( Iterable<SolutionMapping> solMaps );
-
-	/**
-	 * The returned operator should be created such that it throws exceptions
-	 * instead of collecting them.
-	 */
-	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
-
-	/**
-	 * This function may be used to implement {@link #extractUnjoinableInputSMs(Iterable).
-	 */
-	protected Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps,
-	                                                                                        final Iterable<Var> potentialJoinVars ) {
-		final List<SolutionMapping> unjoinable = new ArrayList<>();
-		final List<SolutionMapping> joinable   = new ArrayList<>();
-
+	protected void extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps,
+	                                          final Iterable<Var> potentialJoinVars,
+	                                          final List<SolutionMapping> unjoinable,
+	                                          final List<SolutionMapping> joinable ) {
 		for ( final SolutionMapping sm : solMaps) {
 			boolean isJoinable = true;
 			for ( final Var joinVar : potentialJoinVars ) {
@@ -205,8 +246,6 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			else
 				unjoinable.add(sm);
 		}
-
-		return new Pair<>(unjoinable, joinable);
 	}
 
 

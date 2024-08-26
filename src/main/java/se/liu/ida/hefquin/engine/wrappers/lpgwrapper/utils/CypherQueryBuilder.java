@@ -80,4 +80,10 @@ public class CypherQueryBuilder {
         }
         return this;
     }
+
+    public CypherQueryBuilder addAll(final List<? extends Object> objects) {
+        for (final Object o : objects)
+            this.add(o);
+        return this;
+    }
 }

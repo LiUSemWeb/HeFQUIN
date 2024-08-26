@@ -8,10 +8,19 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
-public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp {
-
+/**
+ * A physical operator that applies a given vocabulary mapping to all input
+ * solution mappings, converting them from using local vocabulary terms to
+ * using global vocabulary terms.
+ *
+ * The actual algorithm of this operator is implemented in the
+ * {@link ExecOpLocalToGlobal} class.
+ */
+public class PhysicalOpLocalToGlobal extends BaseForPhysicalOps
+                                     implements UnaryPhysicalOpForLogicalOp
+{
 	protected final LogicalOpLocalToGlobal lop;
-	
+
 	public PhysicalOpLocalToGlobal( final LogicalOpLocalToGlobal lop ) {
 		this.lop = lop;
 	}
@@ -24,7 +33,6 @@ public class PhysicalOpLocalToGlobal implements UnaryPhysicalOpForLogicalOp {
 	@Override
 	public void visit(final PhysicalPlanVisitor visitor) {
 		visitor.visit(this);
-		
 	}
 
 	@Override

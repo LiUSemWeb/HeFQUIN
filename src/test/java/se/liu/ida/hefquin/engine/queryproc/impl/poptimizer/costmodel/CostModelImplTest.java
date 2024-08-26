@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -20,9 +21,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostDimension;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostFunctionForPlan;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 
 /**
  * Attention: the tests here do NOT actually test the cost model. Instead,
@@ -184,7 +182,7 @@ public class CostModelImplTest extends EngineTestBase
 		final TriplePattern tp = new TriplePatternImpl(
 				NodeFactory.createBlankNode(),
 				NodeFactory.createBlankNode(),
-				NodeFactory.createBlankNode() ); 
+				NodeFactory.createBlankNode() );
 		final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
 		final FederationMember fm = new TPFServerForTest();
 
@@ -218,7 +216,7 @@ public class CostModelImplTest extends EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<Integer> initiateCostEstimation( final PhysicalPlan plan ) {
+		public CompletableFuture<Integer> initiateCostEstimation( final Set<PhysicalPlan> visitedPlan, final PhysicalPlan plan ) {
 			return CompletableFuture.supplyAsync( () -> {
 				if ( sleepMillis > 0L ) {
 					try {

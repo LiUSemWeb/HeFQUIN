@@ -77,18 +77,18 @@ public class CypherMatchQueryImpl implements CypherMatchQuery {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (matches.size()>0) {
-            builder.append(matches.stream().map(Objects::toString).collect(Collectors.joining("\n")));
-            builder.append("\n");
+            builder.append(matches.stream().map(Objects::toString).collect(Collectors.joining(" ")));
+            builder.append(" ");
         }
         if (conditions!=null && conditions.size()>0) {
             builder.append("WHERE ");
             builder.append(conditions.stream().map(Objects::toString).collect(Collectors.joining(" AND ")));
-            builder.append("\n");
+            builder.append(" ");
         }
         if (iterators!=null && iterators.size()>0) {
             for (final UnwindIterator it : iterators) {
                 builder.append(it);
-                builder.append("\n");
+                builder.append(" ");
             }
         }
         if (returnExprs.size()>0) {

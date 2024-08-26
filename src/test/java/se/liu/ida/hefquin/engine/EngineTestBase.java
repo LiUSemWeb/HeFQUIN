@@ -511,8 +511,7 @@ public abstract class EngineTestBase
 				final SPARQLRequest req,
 				final SPARQLEndpoint fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -520,8 +519,7 @@ public abstract class EngineTestBase
 				final TPFRequest req,
 				final TPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -529,8 +527,7 @@ public abstract class EngineTestBase
 				final TPFRequest req,
 				final BRTPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -538,20 +535,17 @@ public abstract class EngineTestBase
 				final BRTPFRequest req,
 				final BRTPFServer fm ) throws FederationAccessException
 		{
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void resetStats() {
-			// TODO Auto-generated method stub
-			
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public FederationAccessStats getStats() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 	}
 

@@ -3,10 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -48,12 +45,15 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
             // The join cardinality is the minimum cardinality of subPlans
             worker = new WorkerForJoin( this, plan.getSubPlan(0), plan.getSubPlan(1) );
         }
-        else if ( rootOp instanceof UnaryLogicalOp ) {
+        else if ( rootOp instanceof LogicalOpTPAdd || rootOp instanceof LogicalOpBGPAdd || rootOp instanceof LogicalOpGPAdd ) {
             worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan((UnaryLogicalOp) rootOp));
         }
         else if ( rootOp instanceof LogicalOpMultiwayUnion || rootOp instanceof LogicalOpUnion ) {
             // The estimated cardinality is the sum up cardinality of subPlans
             worker = new WorkerForUnion( this, plan );
+        }
+        else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ) {
+            return _initiateCardinalityEstimation( plan.getSubPlan(0) );
         }
         else {
             throw new IllegalArgumentException("The type of the root operator of the given plan is currently not supported (" + rootOp.getClass().getName() + ").");

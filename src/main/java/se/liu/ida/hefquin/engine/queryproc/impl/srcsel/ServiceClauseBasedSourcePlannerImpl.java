@@ -5,14 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpConditional;
-import org.apache.jena.sparql.algebra.op.OpFilter;
-import org.apache.jena.sparql.algebra.op.OpJoin;
-import org.apache.jena.sparql.algebra.op.OpLeftJoin;
-import org.apache.jena.sparql.algebra.op.OpSequence;
-import org.apache.jena.sparql.algebra.op.OpService;
-import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.algebra.op.*;
 import org.apache.jena.sparql.core.BasicPattern;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -29,15 +22,7 @@ import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -86,6 +71,9 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		}
 		else if ( jenaOp instanceof OpFilter ) {
 			return createPlanForFilter( (OpFilter) jenaOp );
+		}
+		else if ( jenaOp instanceof OpExtend ) {
+			return createPlanForBind( (OpExtend) jenaOp );
 		}
 		else if ( jenaOp instanceof OpService ) {
 			return createPlanForServicePattern( (OpService) jenaOp ); 
@@ -139,6 +127,12 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp ) {
 		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
+		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
+	}
+
+	protected LogicalPlan createPlanForBind( final OpExtend jenaOp ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
+		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList() );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 

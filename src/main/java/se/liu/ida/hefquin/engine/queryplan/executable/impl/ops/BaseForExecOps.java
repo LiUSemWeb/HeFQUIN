@@ -6,6 +6,12 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 
+/**
+ * Top-level base class for all implementations of {@link ExecutableOperator}.
+ *
+ * This base class handles the collection of exceptions that may occur during
+ * the execution of the algorithm implemented by an executable operator.
+ */
 public abstract class BaseForExecOps implements ExecutableOperator
 {
 	/**

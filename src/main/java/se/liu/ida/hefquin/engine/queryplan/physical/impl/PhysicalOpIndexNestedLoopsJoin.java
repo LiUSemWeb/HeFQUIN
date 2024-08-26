@@ -17,7 +17,46 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpIndexNestedLoopsJoin extends BasePhysicalOpSingleInputJoin
+/**
+ * A physical operator that implements a version of the index nested loops
+ * join algorithm where the federation member is used as an index to request
+ * join partners for the input solution mappings.
+ *
+ * <p>
+ * <b>Semantics:</b> This operator implements the logical operators gpAdd
+ * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
+ * That is, for a given graph pattern, a federation  member, and an input
+ * sequence of solution mappings (produced by the sub-plan under this
+ * operator), the operator produces the solutions resulting from the join
+ * (inner or left outer) between the input solutions and the solutions of
+ * evaluating the given graph pattern over the data of the federation
+ * member.
+ * </p>
+ *
+ * <p>
+ * <b>Algorithm description:</b> The outer loop iterates over the sequence
+ * of input solution mappings. For each such solution mapping, join partners
+ * within the result of the given graph pattern over the data of the federation
+ * member are retrieved by using the federation member as a form of index. The
+ * inner loop then iterates over these join partners and merges them with the
+ * current input solution mapping from the outer loop. The retrieval of join
+ * partners is done by applying the current input solution mapping from the
+ * outer loop to the given graph pattern of the operator (i.e., substituting
+ * the join variables in the pattern by the values assigned in the current
+ * input solution mapping) and, then, performing a request with the graph
+ * pattern resulting from the substitution.
+ * </p>
+ *
+ * The actual algorithm of this operator is implemented in the following three
+ * classes, where each of them is specific to a different type of federation
+ * member.
+ * <ul>
+ * <li>{@link ExecOpIndexNestedLoopsJoinTPF}</li>
+ * <li>{@link ExecOpIndexNestedLoopsJoinBRTPF}</li>
+ * <li>{@link ExecOpIndexNestedLoopsJoinSPARQL}</li>
+ * </ul>
+ */
+public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInputJoin
 {
 	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpTPAdd lop ) {
 		super(lop);

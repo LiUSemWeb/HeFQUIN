@@ -52,7 +52,10 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 
 	@Override
 	public String toString(){
-		return this.asJenaOp().toString();
+		// converting the Op object into an Element object
+		// because the toString() function of that one uses
+		// pretty printing via FormatterElement
+		return OpAsQuery.asQuery(jenaPatternOp).getQueryPattern().toString();
 	}
 
 }

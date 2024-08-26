@@ -26,8 +26,10 @@ public class ModFederation extends ModBase
 			final String fedDescrFilename = cmdLine.getValue(fedDescrDecl);
 			cat = FederationDescriptionReader.readFromFile(fedDescrFilename);
 		}
-	}
-
+		else {
+			cmdLine.cmdError("No federation description file") ;
+		}
+    }
 
 	public FederationCatalog getFederationCatalog() {
 		return cat;

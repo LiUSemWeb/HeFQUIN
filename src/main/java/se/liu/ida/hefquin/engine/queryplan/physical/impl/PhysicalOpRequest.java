@@ -20,8 +20,22 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 import java.util.Objects;
 
-public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-                       implements NullaryPhysicalOpForLogicalOp
+/**
+ * A physical operator that performs a request at a federation member
+ * and, then, outputs the solution mappings obtained via this request.
+ *
+ * The actual algorithm of this operator is implemented in the following
+ * classes, where each of them is specific to a different type of request
+ * and federation member.
+ * <ul>
+ * <li>{@link ExecOpRequestTPFatTPFServer}</li>
+ * <li>{@link ExecOpRequestTPFatBRTPFServer}</li>
+ * <li>{@link ExecOpRequestBRTPF}</li>
+ * <li>{@link ExecOpRequestSPARQL}</li>
+ * </ul>
+ */
+public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> 
+                       extends BaseForPhysicalOps implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
 
@@ -72,12 +86,12 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 	}
 
 	@Override
-	public void visit(final PhysicalPlanVisitor visitor) {
+	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return lop.toString();
 	}
 

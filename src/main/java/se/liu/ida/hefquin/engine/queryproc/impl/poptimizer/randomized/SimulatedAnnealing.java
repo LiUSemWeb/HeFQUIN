@@ -3,10 +3,11 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
@@ -17,9 +18,10 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 	protected final EquilibriumConditionForSimulatedAnnealing condition;
 
 	public SimulatedAnnealing( final EquilibriumConditionForSimulatedAnnealing x,
-	                           final QueryOptimizationContext context,
+	                           final LogicalToPhysicalPlanConverter l2pConverter,
+	                           final CostModel costModel,
 	                           final RuleInstances rewritingRules) {
-		super(context, rewritingRules);
+		super(l2pConverter, costModel, rewritingRules);
 		condition = x;
 	}
 
@@ -30,7 +32,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 
 	@Override
 	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final LogicalPlan initialPlan ) throws PhysicalOptimizationException {
-		final PhysicalPlan initialPP = context.getLogicalToPhysicalPlanConverter().convert(initialPlan,false);
+		final PhysicalPlan initialPP = l2pConverter.convert(initialPlan,false);
 		final int numberOfSubplans = LogicalPlanUtils.countSubplans(initialPlan);
 		return optimize(initialPP, numberOfSubplans);
 	}
@@ -45,7 +47,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 	                                                            final int numberOfSubplans,
 	                                                            final double temperatureModifier) throws PhysicalOptimizationException {
 		// The first plan, which is currently the best plan we know of.
-		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), initialPlan );
+		PhysicalPlanWithCost bestPlan = PhysicalPlanWithCostUtils.annotatePlanWithCost(costModel, initialPlan);
 		PhysicalPlanWithCost currentPlan = bestPlan;
 
 		// A temperature value is assigned based on the cost. Because of how this value is used, the only important thing is its size relative to the cost of the current plan.
@@ -61,7 +63,7 @@ public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 			while( ! condition.isEquilibrium(generation, numberOfSubplans) ) {
 				// Here we want a random neighbour, and its cost
 				final PhysicalPlan temporaryPlan = getRandomElement(getNeighbours(currentPlan.getPlan()));
-				final PhysicalPlanWithCost alternativePlan = PhysicalPlanWithCostUtils.annotatePlanWithCost( context.getCostModel(), temporaryPlan );
+				final PhysicalPlanWithCost alternativePlan = PhysicalPlanWithCostUtils.annotatePlanWithCost(costModel, temporaryPlan);
 
 				final double costDelta = currentPlan.getWeight() - alternativePlan.getWeight();
 				if ( costDelta <= 0 ) {

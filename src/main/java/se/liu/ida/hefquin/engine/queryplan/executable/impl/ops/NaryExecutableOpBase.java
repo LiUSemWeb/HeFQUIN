@@ -10,6 +10,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * Top-level base class for all implementations of {@link NaryExecutableOp}.
+ *
+ * This base class handles the collection of statistics about each of the
+ * inputs and about the processing times per input block from each of the
+ * inputs. To this end, this base class implements the major methods of the
+ * {@link NaryExecutableOp} interface, where the actual functionality to be
+ * implemented for these methods needs to be provided by implementing two
+ * abstract functions in each sub-class of this base class.
+ * These two functions are:
+ * <ul>
+ * <li>{@link #_processBlockFromXthChild(int, IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)} and</li>
+ * <li>{@link #_wrapUpForXthChild(int, IntermediateResultElementSink, ExecutionContext)}.</li>
+ * </ul>
  */
 public abstract class NaryExecutableOpBase extends BaseForExecOps implements NaryExecutableOp
 {
@@ -95,12 +107,31 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		}
 	}
 
+
+	/**
+	 * Implementations of this function need to process the given input block
+	 * coming from the x-th operand and send the produced result elements (if
+	 * any) to the given sink.
+	 *
+	 * If an exception occurs while processing the input block, this exception
+	 * needs to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _processBlockFromXthChild(
 			final int x,
 			final IntermediateResultBlock input,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
+	/**
+	 * Implementations of this function need to finish up any processing
+	 * related to the input coming from the x-th operand and send the
+	 * remaining result elements (if any) to the given sink.
+	 *
+	 * If an exception occurs during this process, then this exception needs
+	 * to either be collected or be thrown, depending on whether {@link
+	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 */
 	protected abstract void _wrapUpForXthChild( final int x,
 	                                            final IntermediateResultElementSink sink,
 	                                            final ExecutionContext execCxt ) throws ExecOpExecutionException;

@@ -26,7 +26,8 @@ public interface CypherExpressionVisitor {
     void visitEXISTS(final EXISTSExpression ex);
     void visitGetItem(final GetItemExpression ex);
     void visitKeys(final KeysExpression ex);
-    void visitLabels(final LabelsExpression ex);
+    void visitLabels(final FirstLabelExpression ex);
+    void visitLabels(final AllLabelsExpression ex);
     void visitLiteral(final LiteralExpression ex);
     void visitMembership(final MembershipExpression ex);
     void visitPropertyAccess(final PropertyAccessExpression ex);

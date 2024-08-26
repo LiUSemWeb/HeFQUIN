@@ -34,6 +34,7 @@ public class BGPImpl implements BGP
 		builder.append( "(bgp ");
 		for ( TriplePattern tp: tps){
 			builder.append( tp.toString() );
+			builder.append( " ." );
 		}
 		builder.append( " )");
 

@@ -1,0 +1,2 @@
+<http://www.wikidata.org/prop/direct/P106> <http://www.w3.org/2002/07/owl#equivalentProperty> <https://schema.org/hasOccupation> .
+<http://www.wikidata.org/entity/Q1028181> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://schema.org/artist> .

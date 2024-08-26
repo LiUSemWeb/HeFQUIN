@@ -11,11 +11,12 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.data.impl.VocabularyMappingImpl;
+import se.liu.ida.hefquin.engine.data.mappings.impl.VocabularyMappingWrappingImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
@@ -47,6 +48,7 @@ public class FederationDescriptionReader
 	}
 
 	public static FederationDescriptionReader instance = new FederationDescriptionReader();
+	final Map<String, VocabularyMapping> vocabMappingByPath = new HashMap<>();
 
 	protected FederationDescriptionReader() {}
 
@@ -68,8 +70,16 @@ public class FederationDescriptionReader
 			final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 
 			// Check the type of interface
-			if ( ifaceType.equals(FD.SPARQLEndpointInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+			if ( ifaceType.equals(FD.SPARQLEndpointInterface) )
+			{
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -85,8 +95,16 @@ public class FederationDescriptionReader
 				final FederationMember fm = createSPARQLEndpoint(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.TPFInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+			else if ( ifaceType.equals(FD.TPFInterface) )
+			{
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
+
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -102,8 +120,16 @@ public class FederationDescriptionReader
 				final FederationMember fm = createTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.brTPFInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.exampleFragmentAddress).getObject();
+			else if ( ifaceType.equals(FD.brTPFInterface) )
+			{
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				if ( ! exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
+
+				final RDFNode addr = exampleFragmentAddressesIterator.next().getObject();
+
+				if ( exampleFragmentAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -119,8 +145,16 @@ public class FederationDescriptionReader
 				final FederationMember fm = createBRTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.BoltInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+			else if ( ifaceType.equals(FD.BoltInterface) )
+			{
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("Bolt endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -136,8 +170,16 @@ public class FederationDescriptionReader
 				final FederationMember fm = createNeo4jServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) ) {
-				final RDFNode addr = fd.getRequiredProperty(iface, FD.endpointAddress).getObject();
+			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) )
+			{
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				if ( ! endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
+
+				final RDFNode addr = endpointAddressesIterator.next().getObject();
+
+				if ( endpointAddressesIterator.hasNext() )
+					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
 
 				final String addrStr;
 				if ( addr.isLiteral() ) {
@@ -174,7 +216,12 @@ public class FederationDescriptionReader
 
 			final String path = pathToMappingFile.toString();
 			if ( verifyValidVocabMappingFile(path) ) {
-				return new VocabularyMappingImpl(path);
+				VocabularyMapping vm = vocabMappingByPath.get( path );
+				if ( vm == null ) {
+					vm = new VocabularyMappingWrappingImpl(path);
+					vocabMappingByPath.put( path, vm );
+				}
+				return vm;
 			}
 		}
 

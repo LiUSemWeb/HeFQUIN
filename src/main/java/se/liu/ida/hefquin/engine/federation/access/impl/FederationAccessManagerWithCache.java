@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.engine.datastructures.Cache;
 import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntry;
@@ -58,6 +59,16 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	                                         final int cacheCapacity ) 
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
+	}
+
+	/**
+	 * Creates a {@link FederationAccessManagerWithCache} with a default configuration.
+	 */
+	public FederationAccessManagerWithCache( final ExecutorService execService ) 
+	{
+		this( new AsyncFederationAccessManagerImpl(execService),
+		      100,
+		      new MyDefaultCachePolicies() );
 	}
 
 

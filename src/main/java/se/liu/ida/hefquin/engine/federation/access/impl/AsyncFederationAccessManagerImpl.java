@@ -11,9 +11,13 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 
 public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBase2
 {
@@ -39,6 +43,17 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 
 		assert execService != null;
 		threadPool = execService;
+	}
+
+	/**
+	 * Creates an {@link AsyncFederationAccessManagerImpl} with a default configuration.
+	 */
+	public AsyncFederationAccessManagerImpl( final ExecutorService execService ) {
+		this( execService,
+		      new SPARQLRequestProcessorImpl(),
+		      new TPFRequestProcessorImpl(),
+		      new BRTPFRequestProcessorImpl(),
+		      new Neo4jRequestProcessorImpl() );
 	}
 
 	@Override

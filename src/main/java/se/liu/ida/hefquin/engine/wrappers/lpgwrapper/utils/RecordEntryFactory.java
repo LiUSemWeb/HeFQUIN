@@ -8,24 +8,29 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.Cyphe
 
 import java.util.*;
 
-public class RecordEntryFactory {
+public class RecordEntryFactory
+{
     public static RecordEntry create(final JsonNode col, final Iterator<JsonNode> metaRow, final CypherVar name) {
         final Value val;
         if (col.get("s") != null && col.get("e") != null && col.get("t") != null) {
             val = new MapValue(parseAsMap(col, metaRow));
-        } else {
+        }
+        else {
             final JsonNode metaCol = metaRow.next();
             final JsonNode type = metaCol.get("type");
             if (type != null) {
                 if (type.asText().equals("node")) {
                     val = new LPGNodeValue(parseAsNode(col, metaCol.get("id")));
-                } else if (type.asText().equals("relationship")) {
-                    val = new LPGEdgeValue(parseAsEdge(col, metaCol.get("id")));
-                } else {
-                    val = null;
                 }
-            } else {
-                val = new LiteralValue(col.asText());
+                else if (type.asText().equals("relationship")) {
+                    val = new LPGEdgeValue(parseAsEdge(col, metaCol.get("id")));
+                }
+                else {
+                    throw new IllegalArgumentException( "Unexpected type of record entry: " + type.toString() );
+                }
+            }
+            else {
+                val = parseAsLiteralOrArrayValue(col);
             }
         }
         return new RecordEntryImpl(name, val);
@@ -40,7 +45,8 @@ public class RecordEntryFactory {
             final Object mapObject;
             if (val.isObject()) {
                 mapObject = parseAsNode(val, metaCol.get("id"));
-            } else {
+            }
+            else {
                 mapObject = val.asText();
             }
             values.put(name, mapObject);
@@ -58,13 +64,45 @@ public class RecordEntryFactory {
         return new LPGNode(id.asText(), "", new PropertyMapImpl(properties));
     }
 
-    private static Map<String, Value> parseProperties(JsonNode col) {
+    private static Map<String, Value> parseProperties( final JsonNode col ) {
         final Map<String, Value> properties = new HashMap<>();
-        for (final Iterator<String> it = col.fieldNames(); it.hasNext(); ) {
+        final Iterator<String> it = col.fieldNames();
+        while ( it.hasNext() ) {
             final String name = it.next();
-            final JsonNode val = col.get(name);
-            properties.put(name, new LiteralValue(val.asText()));
+            final JsonNode valNode = col.get(name);
+            properties.put( name, parseAsLiteralOrArrayValue(valNode) );
         }
         return properties;
     }
+
+    protected static Value parseAsLiteralOrArrayValue( final JsonNode valNode ) {
+        if ( valNode.isArray() ) {
+            final Iterator<JsonNode> it = valNode.elements();
+            final List<LiteralValue> list = new ArrayList<>( valNode.size() );
+            while ( it.hasNext() ) {
+                final JsonNode elmt = it.next();
+                final LiteralValue v = (LiteralValue) parseAsLiteralOrArrayValue(elmt);
+                list.add(v);
+            }
+
+            return new ArrayValue(list);
+        }
+
+        final Object value;
+        if ( valNode.isInt() )
+            value = Integer.valueOf( valNode.asInt() );
+        else if ( valNode.isDouble() )
+            value = Double.valueOf( valNode.asDouble() );
+        else if ( valNode.isBoolean() )
+            value = Boolean.valueOf( valNode.asBoolean() );
+        else if ( valNode.isLong() )
+            value = Long.valueOf( valNode.asLong() );
+        else if ( valNode.isTextual() )
+            value = valNode.asText();
+        else
+            throw new IllegalArgumentException( "Unexpected type of value node in record entry: " + valNode.toString() );
+
+        return new LiteralValue(value);
+    }
+
 }

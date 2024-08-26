@@ -10,7 +10,30 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
-public class PhysicalOpBindJoin extends BasePhysicalOpSingleInputJoin
+/**
+ * A physical operator that implements (a batching version of) the bind
+ * join algorithm for cases in which the federation member accessed by
+ * the algorithm supports the brTPF interface.
+ *
+ * <p>
+ * <b>Semantics:</b> This operator implements the logical operators tpAdd
+ * (see {@link LogicalOpTPAdd}) and tpOptAdd (see {@link LogicalOpTPOptAdd}).
+ * That is, for a given triple pattern, a federation  member, and an input
+ * sequence of solution mappings (produced by the sub-plan under this
+ * operator), the operator produces the solutions resulting from the join
+ * (inner or left outer) between the input solutions and the solutions of
+ * evaluating the given triple pattern over the data of the federation
+ * member.
+ * </p>
+ *
+ * <p>
+ * <b>Algorithm description:</b> For a detailed description of the
+ * actual algorithm associated with this physical operator, refer
+ * to {@link ExecOpBindJoinBRTPF}, which provides the
+ * implementation of this algorithm.
+ * </p>
+ */
+public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 {
     public PhysicalOpBindJoin( final LogicalOpTPAdd lop ) {
         super(lop);

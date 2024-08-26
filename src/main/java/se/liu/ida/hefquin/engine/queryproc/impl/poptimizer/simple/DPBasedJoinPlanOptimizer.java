@@ -1,19 +1,19 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
+import java.util.*;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
 import se.liu.ida.hefquin.engine.utils.Pair;
-
-import java.util.*;
-
-import org.apache.jena.sparql.core.Var;
 
 public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 {

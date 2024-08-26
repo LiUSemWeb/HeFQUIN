@@ -2,6 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
+/**
+ * The top-level interface for all types of logical operators of HeFQUIN.
+ */
 public interface LogicalOperator
 {
 	/**
@@ -15,5 +18,12 @@ public interface LogicalOperator
 	 */
 	ExpectedVariables getExpectedVariables( ExpectedVariables ... inputVars );
 
-	void visit( LogicalPlanVisitor visitor ); 
+	/**
+	 * Returns an identifier of this operator, which should be unique
+	 * for all the operators within the same plan (no matter what type
+	 * of operator they are).
+	 */
+	int getID();
+
+	void visit( LogicalPlanVisitor visitor );
 }

@@ -7,7 +7,11 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorSta
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
- * An abstract base class for implementations of the bind join algorithm.
+ * An abstract base class for the different variants to implement the bind join algorithm.
+ *
+ * All that is needed for concrete classes that extend this base class is to implement the
+ * {@link UnaryExecutableOpBase#_process(se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)}
+ * function.
  */
 public abstract class BaseForExecOpBindJoin<QueryType extends Query,
                                             MemberType extends FederationMember>

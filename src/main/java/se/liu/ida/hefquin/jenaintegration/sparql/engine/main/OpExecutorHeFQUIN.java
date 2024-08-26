@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.jenaintegration.sparql.engine.main;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.QueryExecException;
 import org.apache.jena.sparql.algebra.Op;
@@ -15,89 +14,25 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.iterator.QueryIter;
 import org.apache.jena.sparql.engine.iterator.QueryIterRepeatApply;
 import org.apache.jena.sparql.engine.main.OpExecutor;
-import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
-import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
-import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizerFactory;
-import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
-import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
-import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.SourcePlannerFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.MaterializingQueryResultSinkImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.*;
-import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.LogicalOptimizerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.MinBasedCardinalityEstimationImpl;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 public class OpExecutorHeFQUIN extends OpExecutor
 {
-    public static final OpExecutorFactory factory = new OpExecutorFactory() {
-        @Override
-        public OpExecutor create( final ExecutionContext execCxt ) {
-            return new OpExecutorHeFQUIN(execCxt);
-        }
-    };
+	protected final QueryProcessor qProc;
 
-    protected final QueryProcessor qProc;
-
-	protected OpExecutorHeFQUIN( final ExecutionContext execCxt ) {
+	public OpExecutorHeFQUIN( final QueryProcessor qProc, final ExecutionContext execCxt ) {
 		super(execCxt);
 
-		final FederationAccessManager fedAccessMgr = execCxt.getContext().get(HeFQUINConstants.sysFederationAccessManager);
-		final FederationCatalog fedCatalog = execCxt.getContext().get(HeFQUINConstants.sysFederationCatalog);
-		final LogicalToPhysicalPlanConverter l2pConverter = execCxt.getContext().get(HeFQUINConstants.sysLogicalToPhysicalPlanConverter);
-		final ExecutorService execService = execCxt.getContext().get(HeFQUINConstants.sysExecServiceForPlanTasks);
-
-		final Boolean printSourceAssignments = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintSourceAssignments, false);
-		final Boolean printLogicalPlans  = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintLogicalPlans, false);
-		final Boolean printPhysicalPlans = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysPrintPhysicalPlans, false);
-		final Boolean isExperimentRun    = (Boolean) execCxt.getContext().get(HeFQUINConstants.sysIsExperimentRun, false);
-
-		final QueryOptimizationContext ctxt = new QueryOptimizationContextBase() {
-			@Override public FederationCatalog getFederationCatalog() { return fedCatalog; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public boolean isExperimentRun() { return isExperimentRun.booleanValue(); }
-			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return l2pConverter; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
-		};
-
-		final SourcePlannerFactory srcPlannerFactory = execCxt.getContext().get(HeFQUINConstants.sysSourcePlannerFactory);
-		final SourcePlanner srcPlanner = srcPlannerFactory.createSourcePlanner(ctxt);
-
-		final LogicalOptimizer loptimizer = new LogicalOptimizerImpl();
-
-		final PhysicalOptimizerFactory optimizerFactory = execCxt.getContext().get(HeFQUINConstants.sysQueryOptimizerFactory);
-		final PhysicalOptimizer poptimizer = optimizerFactory.createQueryOptimizer(ctxt);
-
-		final QueryPlanner planner = new QueryPlannerImpl( srcPlanner,
-		                                                   loptimizer,
-		                                                   poptimizer,
-		                                                   printSourceAssignments,
-		                                                   printLogicalPlans,printPhysicalPlans );
-		final QueryPlanCompiler compiler = new
-				//IteratorBasedQueryPlanCompilerImpl(ctxt);
-				//PullBasedQueryPlanCompilerImpl(ctxt);
-				PushBasedQueryPlanCompilerImpl(ctxt);
-		final ExecutionEngine execEngine = new ExecutionEngineImpl();
-		qProc = new QueryProcessorImpl( planner, compiler, execEngine, ctxt );
+		assert qProc != null;
+		this.qProc= qProc;
 	}
 
 	@Override
@@ -162,6 +97,16 @@ public class OpExecutorHeFQUIN extends OpExecutor
 		}
 		else {
 			return super.execute(opConditional, input);
+		}
+	}
+
+	@Override
+	protected QueryIterator execute( final OpExtend opExtend, final QueryIterator input ) {
+		if ( isSupportedOp(opExtend) ) {
+			return executeSupportedOp( opExtend, input );
+		}
+		else {
+			return super.execute(opExtend, input);
 		}
 	}
 
@@ -289,7 +234,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpDisjunction opDisjunction)  { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
+		@Override public void visit(OpLeftJoin opLeftJoin)        {} // supported
 
 	    @Override public void visit(OpConditional opCond)         {} // supported
 
@@ -317,7 +262,7 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpAssign opAssign)            { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpExtend opExtend)            { unsupportedOpFound = true; }
+	    @Override public void visit(OpExtend opExtend)            {} // supported
 
 	    //@Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
 
@@ -336,18 +281,6 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	    @Override public void visit(OpGroup opGroup)              { unsupportedOpFound = true; }
 
 	    @Override public void visit(OpTopN opTop)                 { unsupportedOpFound = true; }
-	}
-
-
-	protected static abstract class QueryOptimizationContextBase implements QueryOptimizationContext {
-		protected final CostModel costModel;
-
-		public QueryOptimizationContextBase() {
-			costModel = new CostModelImpl( new CardinalityEstimationImpl(this) );
-//			costModel = new CostModelImpl( new MinBasedCardinalityEstimationImpl(this) );
-		}
-
-		@Override public CostModel getCostModel() { return costModel; }
 	}
 
 }

@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.QueryOptimizationContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.List;
 
 public class DPBasedBushyJoinPlanOptimizer extends DPBasedJoinPlanOptimizer {
 
-    public DPBasedBushyJoinPlanOptimizer(final QueryOptimizationContext ctxt ) {
-        super(ctxt);
+    public DPBasedBushyJoinPlanOptimizer(final CostModel costModel ) {
+        super(costModel);
     }
 
     @Override

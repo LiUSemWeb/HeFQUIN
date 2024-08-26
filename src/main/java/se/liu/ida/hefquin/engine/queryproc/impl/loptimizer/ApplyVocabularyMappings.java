@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.data.mappings.VocabularyMappingUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -31,34 +32,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRo
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 
 public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization {
-
-	/**
-	 * Rewrites the given logical plan with a request operator as root into
-	 * a logical plan that uses the local vocabulary of the federation member of
-	 * the request.
-	 */
-	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalPlan inputPlan ) {
-		if(!(inputPlan.getRootOperator() instanceof LogicalOpRequest)) {
-			throw new IllegalArgumentException( "Input plan does not have a request operator as root: " + inputPlan.getRootOperator().getClass().getName() );
-		}
-		final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) inputPlan.getRootOperator();
-		final FederationMember fm = reqOp.getFederationMember();
-		if (fm.getVocabularyMapping() == null) { // If no vocabulary mapping, nothing to translate.
-			return inputPlan;
-		}
-		
-		if(!(reqOp.getRequest() instanceof SPARQLRequest)) {
-			throw new IllegalArgumentException( "Request must be a SPARQLRequest: " + reqOp.getRequest().getClass().getName() );
-		}
-		
-		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-		final SPARQLGraphPattern p = req.getQueryPattern();
-
-		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
-		return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);
-	}
-	
-	
 	/**
 	 * Rewrites an initial logical plan into a second plan which incorporates translations of local to global vocabulary and request-operator rewriting.
 	 * This method implements the rewriteLogPlan pseudocode of Helgesson's B.Sc thesis.
@@ -67,14 +40,19 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		if (inputPlan.getRootOperator() instanceof LogicalOpRequest) {
 			final LogicalOpRequest<?,?> requestOp = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
-			if(requestOp.getFederationMember().getVocabularyMapping() != null) { // If fm has a vocabulary mapping vm
-				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(requestOp.getFederationMember().getVocabularyMapping());
-				final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan);
-				return new LogicalPlanWithUnaryRootImpl(l2g,rw);
-			} else {
+
+			final VocabularyMapping vm = requestOp.getFederationMember().getVocabularyMapping();
+			if ( vm != null) { // If fm has a vocabulary mapping vm
+				final LogicalPlan newInputPlan = rewriteToUseLocalVocabulary(inputPlan);
+
+				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm);
+				return new LogicalPlanWithUnaryRootImpl(l2g, newInputPlan);
+			}
+			else {
 				return inputPlan;
 			}
-		} else if ((inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) || (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion)) {
+		}
+		else if ((inputPlan.getRootOperator() instanceof LogicalOpMultiwayJoin) || (inputPlan.getRootOperator() instanceof LogicalOpMultiwayUnion)) {
 			final List<LogicalPlan> rewrittenSubplans = new ArrayList<>();
 			final Iterator<LogicalPlan> it = ((LogicalPlanWithNaryRoot) inputPlan).getSubPlans();
 			boolean rewritten = false;
@@ -93,13 +71,39 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			}
 		} else if (inputPlan.getRootOperator() instanceof LogicalOpFilter){
             final LogicalOpFilter filterOp = (LogicalOpFilter) inputPlan.getRootOperator();
-            final LogicalPlan rw = rewriteToUseLocalVocabulary(inputPlan.getSubPlan(0));
+			final LogicalPlan rw = apply( inputPlan.getSubPlan(0) );
+            // TODO: the expressions of 'filterOp' should be rewritten too
             return new LogicalPlanWithUnaryRootImpl(filterOp,rw);
         } else {
             throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
         }
 	}
 
+	/**
+	 * Rewrites the given logical plan with a request operator as root into
+	 * a logical plan that uses the local vocabulary of the federation member of
+	 * the request.
+	 */
+	public static LogicalPlan rewriteToUseLocalVocabulary( final LogicalPlan inputPlan ) {
+		if(!(inputPlan.getRootOperator() instanceof LogicalOpRequest)) {
+			throw new IllegalArgumentException( "Input plan does not have a request operator as root: " + inputPlan.getRootOperator().getClass().getName() );
+		}
+		final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) inputPlan.getRootOperator();
+		final FederationMember fm = reqOp.getFederationMember();
+		if (fm.getVocabularyMapping() == null) { // If no vocabulary mapping, nothing to translate.
+			return inputPlan;
+		}
+
+		if(!(reqOp.getRequest() instanceof SPARQLRequest)) {
+			throw new IllegalArgumentException( "Request must be a SPARQLRequest: " + reqOp.getRequest().getClass().getName() );
+		}
+
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+		final SPARQLGraphPattern p = req.getQueryPattern();
+
+		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
+		return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);
+	}
 
 	/**
 	 * Creates a logical plan where all requests are TriplePatternRequests

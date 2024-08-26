@@ -5,14 +5,16 @@ import java.util.List;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
+/**
+ * A base class for all variations of the bind join algorithm that use
+ * some form of SPARQL requests.
+ */
 public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
 	protected final List<Var> varsInSubQuery;
@@ -21,29 +23,23 @@ public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinW
 	                                    final SPARQLEndpoint fm,
 	                                    final boolean useOuterJoinSemantics,
 	                                    final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		super(query, fm, useOuterJoinSemantics, QueryPatternUtils.getVariablesInPattern(query), collectExceptions);
+		varsInSubQuery = new ArrayList<>(varsInPatternForFM);
 	}
 
 	public BaseForExecOpBindJoinSPARQL( final BGP query,
 	                                    final SPARQLEndpoint fm,
 	                                    final boolean useOuterJoinSemantics,
 	                                    final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		super(query, fm, useOuterJoinSemantics, QueryPatternUtils.getVariablesInPattern(query), collectExceptions);
+		varsInSubQuery = new ArrayList<>(varsInPatternForFM);
 	}
 
 	public BaseForExecOpBindJoinSPARQL( final SPARQLGraphPattern query,
 	                                    final SPARQLEndpoint fm,
 	                                    final boolean useOuterJoinSemantics,
 	                                    final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
-		varsInSubQuery = new ArrayList<>( QueryPatternUtils.getVariablesInPattern(query) );
+		super(query, fm, useOuterJoinSemantics, QueryPatternUtils.getVariablesInPattern(query), collectExceptions);
+		varsInSubQuery = new ArrayList<>(varsInPatternForFM);
 	}
-
-	@Override
-	protected Pair<List<SolutionMapping>, List<SolutionMapping>> extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps ) {
-		return extractUnjoinableInputSMs(solMaps, varsInSubQuery);
-	}
-
 }

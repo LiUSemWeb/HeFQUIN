@@ -3,11 +3,8 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CypherQueryCombinator {
     public static CypherQuery combine(final CypherQuery q1, final CypherQuery q2, final CypherVarGenerator gen) {

@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.liu.ida.hefquin</groupId>
   <artifactId>HeFQUIN</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
 
-  <!--properties>
-   <maven.compiler.source>1.11</maven.compiler.source>
-   <maven.compiler.target>1.11</maven.compiler.target>
-   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties-->
+  <properties>
+<!--     <maven.compiler.source>1.11</maven.compiler.source> -->
+<!--     <maven.compiler.target>1.11</maven.compiler.target> -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <dependencies>
 <!--
@@ -38,12 +38,12 @@
 		<groupId>org.apache.jena</groupId>
 		<artifactId>apache-jena-libs</artifactId>
 		<type>pom</type>
-		<version>4.1.0</version>
+		<version>4.10.0</version>
 	</dependency>
 	<dependency>
 		<groupId>org.apache.jena</groupId>
 		<artifactId>jena-cmds</artifactId>
-		<version>4.1.0</version>
+		<version>4.10.0</version>
 	</dependency>
 <!--
 	<dependency>
@@ -58,6 +58,31 @@
    		<version>4.13.2</version>
    		<scope>test</scope>
 	</dependency>
+
+  <dependency>
+    <groupId>jakarta.servlet</groupId>
+    <artifactId>jakarta.servlet-api</artifactId>
+    <version>5.0.0</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-server</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+  
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-servlet</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-webapp</artifactId>
+    <version>11.0.14</version>
+  </dependency>
+
   </dependencies>
 
   <build>
@@ -127,8 +152,23 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.8.0</version>
             <configuration>
-                <release>11</release>
+                <release>17</release>  <!-- Java version -->
             </configuration>
+        </plugin>
+        <!-- Maven WAR Plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.3.2</version>
+          <executions>
+              <execution>
+                  <id>package-war</id>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>war</goal>
+                  </goals>
+              </execution>
+          </executions>
         </plugin>
     </plugins>
   </build>

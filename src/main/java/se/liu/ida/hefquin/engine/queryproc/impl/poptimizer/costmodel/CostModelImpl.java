@@ -5,7 +5,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class CostModelImpl implements CostModel
@@ -19,7 +21,7 @@ public class CostModelImpl implements CostModel
     }
 
     public CostModelImpl( final CardinalityEstimation cardEstimation ) {
-    	this( getDefaultDimensions(cardEstimation) );
+        this( getDefaultDimensions(cardEstimation) );
     }
 
     public static CostDimension[] getDefaultDimensions( final CardinalityEstimation cardEstimation ) {
@@ -30,7 +32,10 @@ public class CostModelImpl implements CostModel
                 new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInRequests(cardEstimation)) ),
                 new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfTermsShippedInResponses(cardEstimation)) ),
                 new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfVarsShippedInResponses(cardEstimation)) ),
+
+                  // Two functions can be used to estimate the amount of work that needs to be done (for all operators) at the federation engine
                 new CostDimension( 1.0, new CFRBasedCostFunctionForPlan(new CFRNumberOfProcessedSolMaps(cardEstimation)) )
+//                new CostDimension( 1.0, new CFRBasedParallelismCostFunctionForPlan(new CFRNumberOfProcessedSolMaps(cardEstimation)) )
             };
     	}
 
@@ -76,12 +81,13 @@ public class CostModelImpl implements CostModel
     {
         CompletableFuture<Double> f = CompletableFuture.completedFuture( Double.valueOf(0) );
         for ( int i = 0; i < dimensions.length; ++i ) {
+            final Set<PhysicalPlan> visitedPlans = new HashSet<>();
+
             final CostFunctionForPlan costFct = dimensions[i].costFct;
             final double weight = dimensions[i].weight;
-            f = f.thenCombine( costFct.initiateCostEstimation(plan),
-                               (aggregate,costValue) -> aggregate + weight * (costValue < 0 ? Integer.MAX_VALUE: costValue) );
+            f = f.thenCombine( costFct.initiateCostEstimation( visitedPlans, plan),
+                    (aggregate,costValue) -> aggregate + weight * (costValue < 0 ? Integer.MAX_VALUE: costValue) );
         }
-
         return f;
     }
 

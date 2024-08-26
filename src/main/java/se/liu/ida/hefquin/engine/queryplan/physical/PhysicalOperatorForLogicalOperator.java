@@ -3,8 +3,11 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
 /**
- * This interface is a base for such types of physical
- * operators that implement exactly one logical operator.
+ * An interface for any type of {@link PhysicalOperator}
+ * that directly implements a particular logical operator.
+ *
+ * That logical operator can be accessed via the
+ * {@link #getLogicalOperator()} function.
  */
 public interface PhysicalOperatorForLogicalOperator extends PhysicalOperator
 {
