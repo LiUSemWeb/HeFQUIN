@@ -26,9 +26,9 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     };
 
     @Test
-    public void getSubsets_1()
+    public void getAllSubSets_1()
     {
-        final List<List<Integer>> subsets = DPBasedJoinPlanOptimizer.getSubSet( list, 3 );
+        final List<List<Integer>> subsets = DPBasedJoinPlanOptimizer.getAllSubSets( list, 3 );
 
         assertEquals( 10, subsets.size() );
 
@@ -45,10 +45,10 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     }
 
     @Test
-    public void getSubsets_2()
+    public void getAllSubSets_2()
     {
         try {
-            DPBasedJoinPlanOptimizer.getSubSet( list, 0 );
+            DPBasedJoinPlanOptimizer.getAllSubSets( list, 0 );
         } catch ( IllegalArgumentException ex ) {
             assertEquals( "Does not support to get subsets with less than one element or containing more than the total number of elements in the superset (length of subset: 0).", ex.getMessage());
         }
@@ -56,14 +56,13 @@ public class DPBasedOptimizerHelperTest extends EngineTestBase {
     }
 
     @Test
-    public void getSubsets_3()
+    public void getAllSubSets_3()
     {
         try {
-            DPBasedJoinPlanOptimizer.getSubSet(list, 7);
+            DPBasedJoinPlanOptimizer.getAllSubSets(list, 7);
         } catch ( IllegalArgumentException ex ) {
             assertEquals( "Does not support to get subsets with less than one element or containing more than the total number of elements in the superset (length of subset: 7).", ex.getMessage());
         }
-
     }
 
     @Test

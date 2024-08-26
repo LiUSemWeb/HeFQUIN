@@ -2,10 +2,18 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import java.util.HashMap;
-import se.liu.ida.hefquin.engine.utils.Pair;
+
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import java.util.List;
 
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -17,7 +25,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 {
 	protected final CostModel costModel;
 
-	public CostModelBasedGreedyJoinPlanOptimizerImpl(final CostModel costModel ) {
+	public CostModelBasedGreedyJoinPlanOptimizerImpl( final CostModel costModel ) {
 		assert costModel != null;
 		this.costModel= costModel;
 	}
@@ -80,49 +88,99 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 		{
 			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = createNextPossiblePlans(currentPlan);
 
-			Pair<Integer, Integer> indexOfBestPlan = new Pair<>(0, 0);
-			double leastCost = Double.MAX_VALUE;
-			for ( int indexOfSubPlan = 0; indexOfSubPlan < subplans.size(); indexOfSubPlan ++ ){
-				final Double[] costs = CostEstimationUtils.getEstimates(costModel, nextPossiblePlans.get(indexOfSubPlan));
+			PhysicalPlan bestCandidate = null;
+			int indexOfBestCandidate = -1;
+			double costOfBestCandidate = Double.MAX_VALUE;
 
-				for ( int i = 0; i < costs.length; i ++ ){
-					if ( leastCost > costs[i] ) {
-						leastCost = costs[i];
-						indexOfBestPlan = new Pair<>(indexOfSubPlan, i);
+			for ( int indexOfSubPlan = 0; indexOfSubPlan < subplans.size(); indexOfSubPlan++ ){
+				final List<PhysicalPlan> candidatePlansForSubPlan = nextPossiblePlans.get(indexOfSubPlan);
+				if ( candidatePlansForSubPlan == null || candidatePlansForSubPlan.isEmpty() ){
+					continue;
+				}
+
+				final Double[] costs = CostEstimationUtils.getEstimates(costModel, candidatePlansForSubPlan);
+
+				for ( int i = 0; i < costs.length; i++ ){
+					if ( costOfBestCandidate > costs[i] ) {
+						bestCandidate = candidatePlansForSubPlan.get(i);
+						indexOfBestCandidate = indexOfSubPlan;
+						costOfBestCandidate = costs[i];
 					}
 				}
 			}
 
-			int indexOfSubPlan = indexOfBestPlan.object1;
-			subplans.remove( indexOfSubPlan );
-			return nextPossiblePlans.get(indexOfBestPlan.object1).get(indexOfBestPlan.object2);
+			subplans.remove(indexOfBestCandidate);
+			return bestCandidate;
 		}
 
 		/**
 		 * Creates all possible binary join plans with the given plan as left
 		 * child and one of the remaining subplans (see {@link #subplans}) as
-		 * the right child.
+		 * the right child, as well as plans with unary (gpAdd-based) joins
+		 * with the given plan as the child. In the returned map, the index
+		 * that each of these remaining subplans has within {@link #subplans}
+		 * is mapped to the collection of possible join plans created using
+		 * this subplan.
 		 */
 		protected Map<Integer, List<PhysicalPlan>> createNextPossiblePlans( final PhysicalPlan currentPlan ) {
 			final Map<Integer, List<PhysicalPlan>> nextPossiblePlans = new HashMap<>();
 
-			for ( int i = 0; i < subplans.size(); ++i ) {
-				final List<PhysicalPlan> plans = new ArrayList<>();
-				plans.add( PhysicalPlanFactory.createPlanWithJoin(currentPlan, subplans.get(i)) );
-
-				if ( currentPlan.getRootOperator() instanceof PhysicalOpRequest ){
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) currentPlan.getRootOperator(), subplans.get(i) ));
+			// First, consider only those subplans that share variables
+			// with the currentPlan, which would then be the respective
+			// join variables. We ignore the other subplans at this stage
+			// because joining currentPlan with any of them would become
+			// a cartesian product.
+			for ( int i = 0; i < subplans.size(); i++ ) {
+				final PhysicalPlan subplan = subplans.get(i);
+				final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfAllVariables(currentPlan, subplan);
+				if ( ! joinVars.isEmpty() ) {
+					nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan) );
 				}
+			}
 
-				if ( subplans.get(i).getRootOperator() instanceof PhysicalOpRequest ) {
-					plans.addAll( PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq( (PhysicalOpRequest<?,?>) subplans.get(i).getRootOperator(), currentPlan ) );
-				}
+			// If there are subplans that share variables with the currentPlan,
+			// return the join plans created using these plans.
+			if ( ! nextPossiblePlans.isEmpty() ) {
+				return nextPossiblePlans;
+			}
 
-				nextPossiblePlans.put(i, plans);
+			// If there are no subplans that share variables with the
+			// currentPlan, create join plans using all of the subplans,
+			// which will all be cartesian products.
+			for ( int i = 0; i < subplans.size(); i++ ) {
+				final PhysicalPlan subplan = subplans.get(i);
+				nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan) );
 			}
 
 			return nextPossiblePlans;
 		}
+	}
+
+	/**
+	 * Creates a list of join plans, including a (default) binary join of the
+	 * given two plans as well as possible plans with unary (gpAdd-based) joins
+	 * in which the first given plan is the child.
+	 */
+	protected List<PhysicalPlan> createAllJoinPlans( final PhysicalPlan leftOrChild,
+	                                                 final PhysicalPlan rightOrTop ) {
+		final List<PhysicalPlan> plans = new ArrayList<>();
+		plans.add( PhysicalPlanFactory.createPlanWithJoin(leftOrChild,rightOrTop) );
+
+		final PhysicalOperator rootOfSubPlan = rightOrTop.getRootOperator();
+		if ( rootOfSubPlan instanceof PhysicalOpRequest ) {
+			final PhysicalOpRequest<?,?> _rootOfSubPlan = (PhysicalOpRequest<?,?>) rootOfSubPlan;
+			final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rootOfSubPlan, leftOrChild);
+			plans.addAll(plansWithUnaryRoot);
+		}
+		else if (    rootOfSubPlan instanceof PhysicalOpBinaryUnion
+		          || rootOfSubPlan instanceof PhysicalOpMultiwayUnion ) {
+			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(rightOrTop) ) {
+				final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(leftOrChild, rightOrTop);
+				plans.add(planWithUnariesUnderUnion);
+			}
+		}
+
+		return plans;
 	}
 
 }
