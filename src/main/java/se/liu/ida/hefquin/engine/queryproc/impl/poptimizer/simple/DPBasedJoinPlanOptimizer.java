@@ -42,7 +42,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 		public PhysicalPlan getResultingPlan() throws PhysicalOptimizationException {
 			// Create a data structure that will be used to store
 			// the optimal plan for each subset of the (sub)plans.
-			final DataStructureForStoringPlansOfSubsets optmPlansPerStage = new DataStructureForStoringPlansOfSubsets();
+			final OptimalPlansPerStage optmPlansPerStage = new OptimalPlansPerStage();
 
 			for ( final PhysicalPlan plan: subplans ) {
 				optmPlansPerStage.add( new ArrayList<>( Arrays.asList(plan) ), plan );
@@ -131,7 +131,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	 *         two disjoint subsets that share a variable.
 	 */
 	protected boolean determineOptimalCandidatesAtStageN( final List<List<PhysicalPlan>> subsets,
-	                                                      final DataStructureForStoringPlansOfSubsets optPlansPerStage,
+	                                                      final OptimalPlansPerStage optPlansPerStage,
 	                                                      final boolean ignoreCartesianProductJoins )
 			throws PhysicalOptimizationException
 	{
@@ -202,6 +202,33 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 		}
 
 		return atLeastOnePlanFound;
+	}
+
+
+	/*
+	 * Data structure for storing the optimal plan for each subset of the plans.
+	 */
+	protected static class OptimalPlansPerStage
+	{
+		protected Map< Integer, Map<List<PhysicalPlan>, PhysicalPlan> > map = new HashMap<>();
+
+		public void add( final List<PhysicalPlan> subsets, final PhysicalPlan plan ) {
+			final int size = subsets.size();
+			final Map<List<PhysicalPlan>, PhysicalPlan> mapValue = map.get(size);
+
+			if ( mapValue == null) {
+				final Map<List<PhysicalPlan>, PhysicalPlan> mapTemp = new HashMap<>();
+				mapTemp.put(subsets, plan);
+				map.put(size, mapTemp);
+			}
+			else
+				mapValue.put(subsets, plan);
+		}
+
+		public PhysicalPlan get( final List<PhysicalPlan> subsets ) {
+			final Map<List<PhysicalPlan>, PhysicalPlan> mapValue = map.get( subsets.size() );
+			return ( mapValue == null) ? null : mapValue.get(subsets);
+		}
 	}
 
 }
