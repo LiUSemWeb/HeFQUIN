@@ -17,11 +17,11 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 
 public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 {
-	protected final QueryOptimizationContext ctxt;
+	protected final CostModel costModel;
 
-	public DPBasedJoinPlanOptimizer( final QueryOptimizationContext ctxt ) {
-		assert ctxt != null;
-		this.ctxt = ctxt;
+	public DPBasedJoinPlanOptimizer( final CostModel costModel ) {
+		assert costModel != null;
+		this.costModel = costModel;
 	}
 
 	@Override
@@ -176,11 +176,6 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft);
 					candidatePlans.addAll(plansWithUnaryRoot);
 				}
-				else if ( rightRootOp instanceof PhysicalOpRequestWithTranslation ) {
-					final PhysicalOpRequestWithTranslation<?,?> _rightRootOp = (PhysicalOpRequestWithTranslation<?,?>) rightRootOp;
-					final List<PhysicalPlan> plansWithUnaryRoot = PhysicalPlanFactory.enumeratePlansWithUnaryOpFromReq(_rightRootOp, optmLeft);
-					candidatePlans.addAll(plansWithUnaryRoot);
-				}
 				else if (    rightRootOp instanceof PhysicalOpBinaryUnion
 				          || rightRootOp instanceof PhysicalOpMultiwayUnion ) {
 					if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(optmRight) ) {
@@ -195,7 +190,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 
 				// Prune: we only need to keep the best plan for the current subset of subplans
 				// TODO: Move the cost annotation out of this for-loop. For all plans of the same size, invoke the cost function once.
-				final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost( ctxt.getCostModel(), candidatePlans );
+				final List<PhysicalPlanWithCost> candidatesWithCost = PhysicalPlanWithCostUtils.annotatePlansWithCost(costModel, candidatePlans);
 				final PhysicalPlanWithCost planWithLowestCost = PhysicalPlanWithCostUtils.findPlanWithLowestCost(candidatesWithCost);
 				optPlansPerStage.add( plans, planWithLowestCost.getPlan() );
 			}
