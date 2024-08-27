@@ -1,6 +1,6 @@
 # Compilation and build artifacts
 *.class
-/target/
+target/
 
 # Log file
 *.log
@@ -30,3 +30,5 @@ hs_err_pid*
 
 # Settings
 /.settings
+
+.DS_Store
