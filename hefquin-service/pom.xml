@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>se.liu.ida.hefquin</groupId>
+    <artifactId>HeFQUIN</artifactId>
+    <version>0.0.4-SNAPSHOT</version>
+  </parent>
+  
+  <artifactId>hefquin-service</artifactId>
+
+  <dependencies>
+    <!-- hefquin-engine -->
+    <dependency>
+      <groupId>se.liu.ida.hefquin</groupId>
+      <artifactId>hefquin-engine</artifactId>
+      <version>0.0.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>11.0.14</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>11.0.14</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>11.0.14</version>
+    </dependency>
+  </dependencies>
+</project>
