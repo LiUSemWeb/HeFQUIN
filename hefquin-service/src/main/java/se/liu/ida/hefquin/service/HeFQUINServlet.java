@@ -13,8 +13,6 @@ import java.util.Properties;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -26,7 +24,6 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 
 @WebServlet
 public class HeFQUINServlet extends HttpServlet {
-	private static Logger logger = LoggerFactory.getLogger(HeFQUINServlet.class);
 	private static String configProperties = "config.properties";
 	private static HeFQUINEngine engine;
 	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList( "application/sparql-results+json",
@@ -47,12 +44,12 @@ public class HeFQUINServlet extends HttpServlet {
 		final String fedConfFile = props.getProperty( "FED_CONF_FILE", "DefaultFedConf.ttl");
 		final String engineConfFile = props.getProperty( "ENGINE_CONF_FILE", "DefaultEngineConf.ttl" );
 
-		logger.info( "--- Settings ---" );
-		logger.info( "FED_CONF_FILE:    " + fedConfFile );
-		logger.info( "ENGINE_CONF_FILE: " + engineConfFile );
-
+		System.out.println( "--- Settings ---" );
+		System.out.println( "FED_CONF_FILE:    " + fedConfFile );
+		System.out.println( "ENGINE_CONF_FILE: " + engineConfFile );
 		// Initialize engine
 		engine = HeFQUINServerUtils.getEngine( fedConfFile, engineConfFile );
+		System.out.println( "Engine initilized" );
 	}
 
 	@Override
