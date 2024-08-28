@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -81,6 +82,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		                                                   modPlanPrinting.getSourceAssignmentPrinter(),
 		                                                   modPlanPrinting.getLogicalPlanPrinter(),
 		                                                   modPlanPrinting.getPhysicalPlanPrinter() );
+		ARQ.init();
 		e.integrateIntoJena();
 
 		final Query query = getQuery();
