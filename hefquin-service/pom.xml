@@ -7,9 +7,7 @@
     <artifactId>HeFQUIN</artifactId>
     <version>0.0.4-SNAPSHOT</version>
   </parent>
-  
   <artifactId>hefquin-service</artifactId>
-
   <dependencies>
     <!-- hefquin-engine -->
     <dependency>
@@ -38,4 +36,33 @@
       <version>11.0.14</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
