@@ -13,9 +13,8 @@ public class HeFQUINServer {
 
 	public static Server run( final int port ) {
 		final Server server = new Server( port );
-
 		final WebAppContext webAppContext = new WebAppContext();
-		webAppContext.setResourceBase("src/main/webapp");
+		webAppContext.setResourceBase("hefquin-service/src/main/webapp");
 		server.setHandler(webAppContext);
 
 		return server;
