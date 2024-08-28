@@ -18,8 +18,6 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 public class HeFQUINServerUtils {
 
 	public static HeFQUINEngine getEngine( final String fedConfFilename, final String engineConfFilename ) {
-		// Make sure ARQ is initiated
-		ARQ.init();
 		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents
 				.createExecutorServiceForFedAccess();
 		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents
@@ -72,6 +70,7 @@ public class HeFQUINServerUtils {
 
 		final Model confDescr = RDFDataMgr.loadModel( engineConfFilename );
 		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read( confDescr, ctx );
+		ARQ.init();
 		engine.integrateIntoJena();
 		return engine;
 	}
