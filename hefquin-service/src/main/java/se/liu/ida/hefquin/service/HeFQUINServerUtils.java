@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.service;
 
 import java.util.concurrent.ExecutorService;
 
+import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -17,6 +18,8 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 public class HeFQUINServerUtils {
 
 	public static HeFQUINEngine getEngine( final String fedConfFilename, final String engineConfFilename ) {
+		// Make sure ARQ is initiated
+		ARQ.init();
 		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents
 				.createExecutorServiceForFedAccess();
 		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents
