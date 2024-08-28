@@ -38,10 +38,11 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Uber Jar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -62,6 +63,22 @@
             </filter>
           </filters>
         </configuration>
+      </plugin>
+      <!-- Plugin for creating an Uber WAR -->
+      <!-- Maven WAR Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.3.2</version>
+        <executions>
+          <execution>
+            <id>package-war</id>
+            <phase>package</phase>
+            <goals>
+              <goal>war</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
