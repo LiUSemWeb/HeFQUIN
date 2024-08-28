@@ -23,15 +23,13 @@ RUN sh -c '\
     else \
         echo "No specific tag supplied, using the latest version"; \
     fi'
-RUN mvn clean package -q
+RUN mvn clean package
 
 # # Use tomcat:latest for running
 FROM tomcat:latest
 
 # Copy the built war file from the previous stage
-# COPY --from=build /HeFQUIN/target/HeFQUIN-*.war /usr/local/tomcat/webapps/ROOT.war
-
-COPY --from=build /HeFQUIN/target/HeFQUIN-*.war /tmp/HeFQUIN.war
+COPY --from=build /HeFQUIN/hefquin-service/target/hefquin-service-*.war /tmp/HeFQUIN.war
 RUN mkdir /usr/local/tomcat/webapps/ROOT \
     && cd /usr/local/tomcat/webapps/ROOT \
     && jar -xvf /tmp/HeFQUIN.war \
