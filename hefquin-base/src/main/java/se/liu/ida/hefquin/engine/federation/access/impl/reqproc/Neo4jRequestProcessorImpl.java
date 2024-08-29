@@ -3,6 +3,9 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.RecordsResponseImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4JConnectionException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
 import java.util.Date;

@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl
 import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;

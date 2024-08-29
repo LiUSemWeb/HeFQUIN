@@ -1,6 +1,7 @@
-package se.liu.ida.hefquin.engine.federation.access;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn;
 
-import se.liu.ida.hefquin.engine.federation.access.Neo4jConnectionFactory.Neo4jConnection;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory.Neo4jConnection;
 
 public class Neo4JConnectionException extends Neo4JException
 {

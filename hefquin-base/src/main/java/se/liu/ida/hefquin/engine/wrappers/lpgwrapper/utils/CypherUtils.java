@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import se.liu.ida.hefquin.engine.federation.access.Neo4JException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;

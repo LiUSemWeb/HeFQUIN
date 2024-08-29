@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
 public class Neo4JException extends Exception {
 

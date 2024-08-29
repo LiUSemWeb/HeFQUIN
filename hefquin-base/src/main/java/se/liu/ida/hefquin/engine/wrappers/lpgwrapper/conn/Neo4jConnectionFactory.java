@@ -1,6 +1,8 @@
-package se.liu.ida.hefquin.engine.federation.access;
+package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
