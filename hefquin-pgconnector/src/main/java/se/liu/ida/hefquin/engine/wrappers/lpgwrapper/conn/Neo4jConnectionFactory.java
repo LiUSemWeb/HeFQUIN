@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,11 +32,11 @@ public class Neo4jConnectionFactory {
             return URL;
         }
 
-        public List<TableRecord> execute(final Neo4jRequest req ) throws Neo4JException {
-            return executeQuery( req.getCypherQuery() );
+        public List<TableRecord> execute( final CypherQuery q ) throws Neo4JException {
+            return execute( q.toString() );
         }
 
-        protected List<TableRecord> executeQuery(final String cypher ) throws Neo4JException {
+        public List<TableRecord> execute(final String cypher ) throws Neo4JException {
             final String data = "{ " +
                     "\"statements\" : [ {" +
                     "    \"statement\" : \""+ cypher +"\"" +

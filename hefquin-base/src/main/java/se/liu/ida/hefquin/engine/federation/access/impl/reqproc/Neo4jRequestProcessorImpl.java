@@ -22,7 +22,7 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
         final Neo4jConnectionFactory.Neo4jConnection conn = Neo4jConnectionFactory.connect( fm.getInterface().getURL() );
         final List<TableRecord> result;
         try {
-            result = conn.execute( req );
+            result = conn.execute( req.getCypherQuery() );
         }
         catch ( final Neo4JConnectionException ex ) {
             throw new FederationAccessException("Executing the given request at the Neo4j endpoint at '"
