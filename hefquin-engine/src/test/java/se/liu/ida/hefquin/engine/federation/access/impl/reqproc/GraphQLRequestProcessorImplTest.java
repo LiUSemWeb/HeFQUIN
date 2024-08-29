@@ -9,7 +9,7 @@ import java.util.Set;
 import org.apache.jena.atlas.json.JsonString;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -27,7 +27,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldT
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 
-public class GraphQLRequestProcessorImplTest extends EngineTestBaseCopy {
+public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 
     protected static class GraphQLEndpointTest implements GraphQLEndpoint {
 

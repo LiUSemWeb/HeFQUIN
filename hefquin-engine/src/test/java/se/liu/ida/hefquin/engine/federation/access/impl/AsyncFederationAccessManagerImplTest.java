@@ -15,7 +15,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -31,7 +31,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class AsyncFederationAccessManagerImplTest extends EngineTestBaseCopy
+public class AsyncFederationAccessManagerImplTest extends EngineTestBase
 {
 	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;

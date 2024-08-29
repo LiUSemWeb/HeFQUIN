@@ -9,7 +9,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.data.Triple;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class TPFRequestProcessorImplTest extends EngineTestBaseCopy
+public class TPFRequestProcessorImplTest extends EngineTestBase
 {
 	@Test
 	public void performRequestOnDBpedia_onePage() throws FederationAccessException {
