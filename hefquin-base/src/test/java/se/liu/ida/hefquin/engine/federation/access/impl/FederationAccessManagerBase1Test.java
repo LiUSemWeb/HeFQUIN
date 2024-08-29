@@ -13,7 +13,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class FederationAccessManagerBase1Test extends EngineTestBase
+public class FederationAccessManagerBase1Test extends EngineTestBaseCopy
 {
 	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;

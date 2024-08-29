@@ -14,14 +14,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class FederationAccessManagerWithCacheTest extends EngineTestBase
+public class FederationAccessManagerWithCacheTest extends EngineTestBaseCopy
 {
 	protected static boolean PRINT_TIME = false; protected static final long SLEEP_MILLIES = 0L;
 	//protected static boolean PRINT_TIME = true;  protected static final long SLEEP_MILLIES = 100L;

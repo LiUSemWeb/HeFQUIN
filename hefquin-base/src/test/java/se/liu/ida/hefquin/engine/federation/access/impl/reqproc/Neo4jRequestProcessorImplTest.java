@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
 import org.junit.Test;
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
 
 import static org.junit.Assert.assertEquals;
 
-public class Neo4jRequestProcessorImplTest extends EngineTestBase {
+public class Neo4jRequestProcessorImplTest extends EngineTestBaseCopy {
 
     @Test
     public void testLocalhost() throws FederationAccessException {

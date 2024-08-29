@@ -4,14 +4,14 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 
 /**
  * This is a class with helper functions for testing SolutionMappingsIndex
  */
-public abstract class TestsForSolutionMappingsIndex extends EngineTestBase
+public abstract class TestsForSolutionMappingsIndex extends EngineTestBaseCopy
 {
 	final Var var1 = Var.alloc("v1");
 	final Var var2 = Var.alloc("v2");

@@ -5,11 +5,11 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
 
-public abstract class TestsForSolutionMappingsIterators extends EngineTestBase
+public abstract class TestsForSolutionMappingsIterators extends EngineTestBaseCopy
 {
 	/**
 	 * Use this method instead of {@link SolutionMappingUtils#createSolutionMapping(Var, Node)}

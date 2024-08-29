@@ -12,7 +12,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.engine.query.impl.TriplePatternImpl;
 
-public class SPARQLRequestProcessorImplTest extends EngineTestBase
+public class SPARQLRequestProcessorImplTest extends EngineTestBaseCopy
 {
 	@Test
 	public void performRequestWithPatternOnDBpedia() throws FederationAccessException {

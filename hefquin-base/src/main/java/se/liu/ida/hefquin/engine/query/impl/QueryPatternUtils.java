@@ -37,7 +37,7 @@ import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtilsCopy;
 
 public class QueryPatternUtils
 {
@@ -615,8 +615,8 @@ public class QueryPatternUtils
 				evs[i] = getExpectedVariablesInPattern( gp.getSubPatterns(i) );
 			}
 
-			final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(evs);
-			final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfPossibleVariables(evs);
+			final Set<Var> certainVars = ExpectedVariablesUtilsCopy.unionOfCertainVariables(evs);
+			final Set<Var> possibleVars = ExpectedVariablesUtilsCopy.unionOfPossibleVariables(evs);
 			possibleVars.removeAll(certainVars);
 
 			return new ExpectedVariables() {
@@ -631,8 +631,8 @@ public class QueryPatternUtils
 				evs[i] = getExpectedVariablesInPattern( up.getSubPatterns(i) );
 			}
 
-			final Set<Var> certainVars = ExpectedVariablesUtils.intersectionOfCertainVariables(evs);
-			final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(evs);
+			final Set<Var> certainVars = ExpectedVariablesUtilsCopy.intersectionOfCertainVariables(evs);
+			final Set<Var> possibleVars = ExpectedVariablesUtilsCopy.unionOfAllVariables(evs);
 			possibleVars.removeAll(certainVars);
 
 			return new ExpectedVariables() {
