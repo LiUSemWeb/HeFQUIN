@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.wrappers.EngineTestBase;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
@@ -18,7 +17,12 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointIni
 /**
  * Unit tests for the GraphQLEndpoint initializer
  */
-public class GraphQLEndpointInitializerTest extends EngineTestBase {
+public class GraphQLEndpointInitializerTest
+{
+	/**
+	 * If true, skip tests to local GraphQL endpoint
+	 */
+	public static boolean skipLocalGraphQLTests = true;
     
     final GraphQLEndpointInitializer initializer = new GraphQLEndpointInitializerImpl();
 

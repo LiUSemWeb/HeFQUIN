@@ -3,12 +3,13 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.wrappers.EngineTestBase;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
@@ -19,7 +20,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class CypherUtilsTest extends EngineTestBase {
+public class CypherUtilsTest
+{
+	/**
+	 * If this flag is true, tests that make requests to local neo4j
+	 * instances will be skipped.
+	 */
+	public static boolean skipLocalNeo4jTests = true;
 
     /**
      * This test makes use of the example Movie database provided in most neo4j clients.
@@ -166,5 +173,21 @@ public class CypherUtilsTest extends EngineTestBase {
     public void malformedJSONparseTest() throws JsonProcessingException, Neo4JException {
         CypherUtils.parse("{\"notResults\"}");
     }
+
+
+	protected static class Neo4jServerImpl4Test implements Neo4jServer {
+
+		public Neo4jServerImpl4Test() {}
+
+		@Override
+		public Neo4jInterface getInterface() {
+			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+		}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() {
+			return null;
+		}
+	}
 
 }
