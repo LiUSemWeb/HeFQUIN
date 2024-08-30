@@ -25,8 +25,8 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryTranslatingE
 /**
  * Verifies functionality of SPARQL2GraphQLTranslatorImpl
  */
-public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
-
+public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase
+{
     @Test
     public void test1() throws QueryTranslatingException{
         /**
@@ -41,7 +41,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var1, uri4, var2));
         tps.add(new TriplePatternImpl(var2, uri6, var4));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -72,7 +72,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         final Set<TriplePattern> tps = new HashSet<>();
         tps.add(new TriplePatternImpl(var6, var7, var8));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -115,7 +115,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var1, uri4, var2));
         tps.add(new TriplePatternImpl(var2, var7, var8));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -151,7 +151,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var6, uri10, uri11));
         tps.add(new TriplePatternImpl(var6, var7, var8));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -184,7 +184,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var2, uri7, lit3));
         tps.add(new TriplePatternImpl(var2, uri9, var1));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -221,7 +221,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var2, uri8, lit5));
         tps.add(new TriplePatternImpl(var2, uri6, var4));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();
@@ -263,7 +263,7 @@ public class SPARQL2GraphQLTranslatorTest extends GraphQLWrapperTestBase {
         tps.add(new TriplePatternImpl(var9,uri4,var2));
         tps.add(new TriplePatternImpl(var2,uri6,var4));
         final BGP bgp = new BGPImpl(tps);
-        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, endpoint);
+        final GraphQLQuery translatedQuery = translator.translateBGP(bgp, config, schema);
 
         // Expected result
         final Set<QueryEntrypointInfo> expectedQueryInfo = new HashSet<>();

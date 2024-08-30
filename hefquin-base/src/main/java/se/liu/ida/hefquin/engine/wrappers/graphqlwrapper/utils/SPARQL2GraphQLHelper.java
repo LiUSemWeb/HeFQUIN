@@ -12,10 +12,10 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.graph.impl.LiteralLabel;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
@@ -31,16 +31,16 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQuery
 public class SPARQL2GraphQLHelper
 {
     protected final GraphQL2RDFConfiguration config;
-    protected final GraphQLEndpoint endpoint;
+    protected final GraphQLSchema schema;
     protected final Map<Node, StarPattern> indexedStarPatterns;
     protected final Map<TriplePattern,StarPattern> connectors;
 
     public SPARQL2GraphQLHelper( final GraphQL2RDFConfiguration config,
-                                 final GraphQLEndpoint endpoint,
+                                 final GraphQLSchema schema,
                                  final Map<Node, StarPattern> indexedStarPatterns,
                                  final Map<TriplePattern, StarPattern> connectors ) {
         this.config                = config;
-        this.endpoint              = endpoint;
+        this.schema                = schema;
         this.indexedStarPatterns   = indexedStarPatterns;
         this.connectors            = connectors;
     }
@@ -51,19 +51,19 @@ public class SPARQL2GraphQLHelper
     public GraphQLQuery materializeAll() {
         int entrypointCounter = 0;
         final Set<String> finishedFieldPaths = new HashSet<>();
-        final Set<String> objectTypeNames = endpoint.getGraphQLObjectTypes();
+        final Set<String> objectTypeNames = schema.getGraphQLObjectTypes();
         for(final String objectTypeName : objectTypeNames){
             // Get the full list entrypoint
             
-            final GraphQLEntrypoint e = endpoint.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
+            final GraphQLEntrypoint e = schema.getEntrypoint(objectTypeName,GraphQLEntrypointType.FULL);
             if(e == null){
                 continue;
             }
             final String currentPath = new GraphQLEntrypointPath(e, entrypointCounter).toString();
             finishedFieldPaths.add(currentPath + new GraphQLIDPath(objectTypeName,config.getJsonIDKeyPrefix()));
 
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, config, endpoint );
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, config, endpoint );
+            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.OBJECT, config, schema );
+            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(objectTypeName,GraphQLFieldType.SCALAR, config, schema );
 
             // Add all fields that nests another object
             for(final String uri : allObjectURI){
@@ -106,14 +106,14 @@ public class SPARQL2GraphQLHelper
 
             if(predicate.isVariable()){
                 // If the current TP predicate is a variable we need to add everything
-                final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,endpoint);
+                final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType, GraphQLFieldType.OBJECT,config,schema);
 
                 for(final String uri : allObjectURI){
                     finishedFieldPaths.addAll(addObjectField(connectedSP,currentPath,sgpType,uri));
                 }
 
             }
-            else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint)
+            else if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,schema)
                     && sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
                 // If the current TP predicate is a URI, add the GraphQL field it corresponds to
                 finishedFieldPaths.addAll(addObjectField(connectedSP,currentPath,sgpType,predicate.getURI()));
@@ -123,8 +123,8 @@ public class SPARQL2GraphQLHelper
         // Add fields that do not link to another star pattern
         if(addAllFields){
             // If variable predicate exist in the current SGP, then query for everything in current object
-            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.OBJECT,config,endpoint);
-            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR,config,endpoint);
+            final Set<String> allObjectURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.OBJECT,config,schema);
+            final Set<String> allScalarURI = URI2GraphQLHelper.getPropertyURIs(sgpType,GraphQLFieldType.SCALAR,config,schema);
 
             for(final String uri : allObjectURI){
                 finishedFieldPaths.add( addEmptyObjectField(currentPath,sgpType,uri) );
@@ -139,10 +139,10 @@ public class SPARQL2GraphQLHelper
             // If no variable predicate exists, only the necessary fields from the star pattern have to be added.
             for ( final TriplePattern tp : sp.getTriplePatterns() ) {
                 final Node predicate = tp.asJenaTriple().getPredicate();
-                if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,endpoint) 
+                if(predicate.isURI() && URI2GraphQLHelper.containsPropertyURI(predicate.getURI(),config,schema) 
                         && sgpType.equals(config.mapPropertyToType(predicate.getURI()))){
                     final String fieldName = config.mapPropertyToField(predicate.getURI());
-                    if(endpoint.getGraphQLFieldType(sgpType,fieldName) == GraphQLFieldType.OBJECT){
+                    if(schema.getGraphQLFieldType(sgpType,fieldName) == GraphQLFieldType.OBJECT){
                         finishedFieldPaths.add( addEmptyObjectField(currentPath,sgpType,predicate.getURI()) );
                     }
                     else{
@@ -167,7 +167,7 @@ public class SPARQL2GraphQLHelper
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         final String newPath = currentPath + new GraphQLObjectPath(fieldName,config.getJsonObjectKeyPrefix());
-        final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
+        final String nestedType = schema.getGraphQLFieldValueType(sgpType, fieldName);
 
         return addSgp(sp, newPath, nestedType);
     }
@@ -181,7 +181,7 @@ public class SPARQL2GraphQLHelper
         final String alias = config.removePropertyPrefix(predicateURI);
         final String fieldName = config.removePropertySuffix(alias);
         final String newPath = currentPath + new GraphQLObjectPath(fieldName,config.getJsonObjectKeyPrefix());
-        final String nestedType = endpoint.getGraphQLFieldValueType(sgpType, fieldName);
+        final String nestedType = schema.getGraphQLFieldValueType(sgpType, fieldName);
         return newPath + new GraphQLIDPath(nestedType,config.getJsonIDKeyPrefix());
     }
 

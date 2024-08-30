@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
@@ -31,18 +32,28 @@ public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 
     protected static class GraphQLEndpointTest implements GraphQLEndpoint {
 
-		public GraphQLEndpointTest() {}
+		protected final GraphQLInterface iface = new GraphQLInterfaceImpl("http://localhost:4000/graphql");
+		protected final GraphQLSchema schema = new GraphQLSchemaForTest();
 
 		@Override
 		public VocabularyMapping getVocabularyMapping() {
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public GraphQLInterface getInterface() {
-			return new GraphQLInterfaceImpl("http://localhost:4000/graphql");
+			return iface;
 		}
 
+		@Override
+		public GraphQLSchema getSchema() {
+			return schema;
+		}
+
+	}
+
+	protected static class GraphQLSchemaForTest implements GraphQLSchema
+	{
 		@Override
 		public boolean containsGraphQLObjectType(String className) {
 			// TODO Auto-generated method stub

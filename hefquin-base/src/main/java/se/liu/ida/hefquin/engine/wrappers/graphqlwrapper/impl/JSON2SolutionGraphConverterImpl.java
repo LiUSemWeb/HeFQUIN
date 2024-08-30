@@ -14,10 +14,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraphConverter;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 
 /**
  * An implementation of the JSON2SolutionMappings approach
@@ -25,12 +25,12 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraphConve
 public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConverter {
 
     final protected GraphQL2RDFConfiguration config;
-    final protected GraphQLEndpoint endpoint;
+    final protected GraphQLSchema schema;
 
-    public JSON2SolutionGraphConverterImpl(final GraphQL2RDFConfiguration config, 
-                                     final GraphQLEndpoint endpoint){
+    public JSON2SolutionGraphConverterImpl( final GraphQL2RDFConfiguration config, 
+                                            final GraphQLSchema schema ) {
         this.config = config;
-        this.endpoint = endpoint;
+        this.schema = schema;
     }
 
     @Override
@@ -164,7 +164,7 @@ public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConver
     /**
      * Utility function used to create a Literal from a json value @param primitive
      * usable by @param model. @param graphqlTypeName and @param graphqlFieldName are 
-     * used to fetch value type data from the GraphQLEndpoint to ensure that the correct 
+     * used to fetch value type data from the GraphQL endpoint to ensure that the correct 
      * XML datatype is used when creating the literal.
      */
     protected Literal jsonPrimitiveToLiteral(final JsonValue primitive, final String graphqlTypeName, 
@@ -172,7 +172,7 @@ public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConver
 
         assert primitive.isPrimitive();
 
-        final String valueType = endpoint.getGraphQLFieldValueType(graphqlTypeName, graphqlFieldName);
+        final String valueType = schema.getGraphQLFieldValueType(graphqlTypeName, graphqlFieldName);
 
         // The scalar value types from GraphQL ( GraphQL String, ID and custom scalar types etc. are assumed as XSD Strings)
         switch(valueType){

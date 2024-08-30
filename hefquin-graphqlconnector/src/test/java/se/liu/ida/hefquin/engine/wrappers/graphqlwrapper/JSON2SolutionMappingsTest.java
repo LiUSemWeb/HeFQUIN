@@ -23,10 +23,6 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.JSONResponseImpl;
 import se.liu.ida.hefquin.engine.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
@@ -38,8 +34,8 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryExecutionExc
 /**
  * Unit tests for JSON2SolutionGraph and SolutionGraph2SolutionMappings
  */
-public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
-    
+public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase
+{
     @Test
     public void test1() throws ParseException, JsonException, QueryExecutionException {
 
@@ -73,7 +69,6 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth3"), "ID!"));
         final GraphQLQuery graphqlQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
-        final GraphQLRequest req = new GraphQLRequestImpl(graphqlQuery);
 
         /* How the JSON response can look like
         ----------------------------------------------
@@ -115,10 +110,9 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
             "\"scalar_title\": \"The Return of the King\"}],\"scalar_id\": \"auth3\",\"scalar_name\": \"J.R.R. Tolkien\"}}}";
 
         final JsonObject jsonObject = JSON.parse(jsonString);
-        final JSONResponse response = new JSONResponseImpl(jsonObject, endpoint,req, new Date());
         
         // Translated JSON to solution mappings
-        final Model solutionGraph = jsonTranslator.translateJSON(response);
+        final Model solutionGraph = jsonTranslator.translateJSON(jsonObject);
         final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
             solutionGraphTranslator.execSelectQuery(solutionGraph, sparqlQuery)
         );
@@ -185,7 +179,6 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
         queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth6"), "ID!"));
         queryArgs.add(new GraphQLArgumentImpl("var1", "id", new JsonString("auth7"), "ID!"));
         final GraphQLQuery graphqlQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
-        final GraphQLRequest req = new GraphQLRequestImpl(graphqlQuery);
 
         /* How the JSON response can look like
         ----------------------------------------------
@@ -230,10 +223,9 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase{
             "}],\"scalar_id\": \"auth7\"}}}";
 
         final JsonObject jsonObject = JSON.parse(jsonString);
-        final JSONResponse response = new JSONResponseImpl(jsonObject, endpoint,req, new Date());
         
         // Translated JSON to solution mappings
-        final Model solutionGraph = jsonTranslator.translateJSON(response);
+        final Model solutionGraph = jsonTranslator.translateJSON(jsonObject);
         final Set<SolutionMapping> actualSolutionMappings = new HashSet<>(
             solutionGraphTranslator.execSelectQuery(solutionGraph, sparqlQuery)
         );

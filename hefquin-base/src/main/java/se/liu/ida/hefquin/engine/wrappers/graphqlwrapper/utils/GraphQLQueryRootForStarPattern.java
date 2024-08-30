@@ -7,10 +7,10 @@ import java.util.Set;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.impl.LiteralLabel;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 
 /**
@@ -22,7 +22,7 @@ public class GraphQLQueryRootForStarPattern
 {
 	protected final StarPattern sp;
 	protected final GraphQL2RDFConfiguration config;
-	protected final GraphQLEndpoint endpoint;
+	protected final GraphQLSchema schema;
 
 	private boolean graphqlTypeHasBeenDetermined = false;
 	private String graphqlType = null;
@@ -31,10 +31,10 @@ public class GraphQLQueryRootForStarPattern
 
 	public GraphQLQueryRootForStarPattern( final StarPattern sp,
 	                                       final GraphQL2RDFConfiguration config,
-	                                       final GraphQLEndpoint endpoint ) {
+	                                       final GraphQLSchema schema ) {
 		this.sp         = sp;
 		this.config     = config;
-		this.endpoint   = endpoint;
+		this.schema     = schema;
 	}
 
 	public StarPattern getStarPattern() { return sp; }
@@ -126,19 +126,19 @@ public class GraphQLQueryRootForStarPattern
 		final Set<String> argNames = getGraphQLArguments().keySet();
 
 		// First, try single-object entry point
-		final GraphQLEntrypoint e1 = endpoint.getEntrypoint(type, GraphQLEntrypointType.SINGLE);
+		final GraphQLEntrypoint e1 = schema.getEntrypoint(type, GraphQLEntrypointType.SINGLE);
 		if (e1 != null && SPARQL2GraphQLHelper.hasAllNecessaryArguments(argNames, e1.getArgumentDefinitions().keySet()) ) {
 			return e1;
 		}
 
 		// Next, try filtered list entry point
-		final GraphQLEntrypoint e2 = endpoint.getEntrypoint(type, GraphQLEntrypointType.FILTERED);
+		final GraphQLEntrypoint e2 = schema.getEntrypoint(type, GraphQLEntrypointType.FILTERED);
 		if (e2 != null && SPARQL2GraphQLHelper.hasNecessaryArguments(argNames, e2.getArgumentDefinitions().keySet()) ) {
 			return e2;
 		}
 
 		// Get full list entry point (No argument values)
-		final GraphQLEntrypoint e3 = endpoint.getEntrypoint(type, GraphQLEntrypointType.FULL);
+		final GraphQLEntrypoint e3 = schema.getEntrypoint(type, GraphQLEntrypointType.FULL);
 
 		if(e3 == null){
 			throw new QueryTranslatingException("No valid entrypoint for the star pattern was found!");

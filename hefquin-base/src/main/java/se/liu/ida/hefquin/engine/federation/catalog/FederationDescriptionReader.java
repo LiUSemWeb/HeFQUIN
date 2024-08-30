@@ -25,16 +25,20 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceUtils;
+import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLEndpointInitializer;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointInitializerImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLException;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSchemaInitializer;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLSchemaInitializerImpl;
 import se.liu.ida.hefquin.vocabulary.FD;
 
 public class FederationDescriptionReader
@@ -283,21 +287,29 @@ public class FederationDescriptionReader
 	protected FederationMember createGraphQLServer( final String uri, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
 
-		final GraphQLEndpointInitializer init = new GraphQLEndpointInitializerImpl();
+		final GraphQLSchemaInitializer init = new GraphQLSchemaInitializerImpl();
 
 		final int connTimeout = 5000;
-        final int readTimeout = 5000;
+		final int readTimeout = 5000;
 
-		final GraphQLEndpoint fm;
+		final GraphQLSchema schema;
 		try {
-			fm = init.initializeEndpoint(uri, connTimeout, readTimeout);
-			return fm;
+			schema = init.initializeSchema(uri, connTimeout, readTimeout);
 		}
-		catch ( final FederationAccessException | ParseException e ) {
+		catch ( final GraphQLException | ParseException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new IllegalArgumentException(e);
 		}
+
+		final GraphQLInterface iface = new GraphQLInterfaceImpl(uri);
+
+		return new GraphQLEndpoint() {
+			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
+			@Override public GraphQLInterface getInterface() { return iface; }
+			@Override public GraphQLSchema getSchema() { return schema; }
+			@Override public String toString( ) { return "GraphQL endpoint at " + uri; }
+		};
 	}
 
 	/**

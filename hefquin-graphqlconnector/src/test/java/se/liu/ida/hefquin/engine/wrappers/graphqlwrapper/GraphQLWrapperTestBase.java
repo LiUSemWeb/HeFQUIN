@@ -10,17 +10,15 @@ import org.apache.jena.datatypes.xsd.impl.XSDBaseStringType;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLSchemaImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.DefaultGraphQL2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLEndpointImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.JSON2SolutionGraphConverterImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.SPARQL2GraphQLTranslatorImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLSolutionGraphSolverImpl;
@@ -65,14 +63,14 @@ public class GraphQLWrapperTestBase {
     protected static final GraphQLEntrypoint e6 = new GraphQLEntrypointImpl("allBooks", new HashMap<>(), "Book",
             GraphQLEntrypointType.FULL);
 
-    // Translator, config and endpoint
+    // Translator, config and schema
     protected static final String classPrefix = "http://example.org/c/";
     protected static final String propertyPrefix = "http://example.org/p/";
     protected static final SPARQL2GraphQLTranslator translator = new SPARQL2GraphQLTranslatorImpl();
     protected static final GraphQL2RDFConfiguration config = new DefaultGraphQL2RDFConfiguration(classPrefix,
             propertyPrefix);
-    protected static final GraphQLEndpoint endpoint = initializeGraphQLTestEndpoint();
-    protected static final JSON2SolutionGraphConverter jsonTranslator = new JSON2SolutionGraphConverterImpl(config, endpoint);
+    protected static final GraphQLSchema schema = initializeGraphQLTestSchema();
+    protected static final JSON2SolutionGraphConverter jsonTranslator = new JSON2SolutionGraphConverterImpl(config, schema);
     protected static final GraphQLSolutionGraphSolver solutionGraphTranslator = new GraphQLSolutionGraphSolverImpl();
 
     // Variables nodes
@@ -112,7 +110,7 @@ public class GraphQLWrapperTestBase {
     /**
      * Initializes a GraphQL endpoint for the tests
      */
-    protected static GraphQLEndpoint initializeGraphQLTestEndpoint(){
+    protected static GraphQLSchema initializeGraphQLTestSchema(){
         Map<String,GraphQLField> authorFields = new HashMap<>();
         Map<String,GraphQLField> bookFields = new HashMap<>();
         Map<String,Map<String,GraphQLField>> objectTypeToFields = new HashMap<>();
@@ -142,7 +140,7 @@ public class GraphQLWrapperTestBase {
 
         objectTypeToEntrypoint.put("Author", authorEntrypoints);
         objectTypeToEntrypoint.put("Book", bookEntrypoints);
-        final GraphQLInterface graphqlInterface = new GraphQLInterfaceImpl("");
-        return new GraphQLEndpointImpl(objectTypeToFields, objectTypeToEntrypoint, graphqlInterface);
+
+        return new GraphQLSchemaImpl(objectTypeToFields, objectTypeToEntrypoint);
     }
 }

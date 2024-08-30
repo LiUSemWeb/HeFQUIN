@@ -9,27 +9,30 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
-import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
-import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
+//import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
+//import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
+//import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
+//import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
+//import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
+//import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.GraphQLRequestProcessor;
+//import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLEndpointInitializer;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLException;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSchemaInitializer;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnection;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnectionException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLSchemaImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
 
-public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitializer {
+public class GraphQLSchemaInitializerImpl implements GraphQLSchemaInitializer {
 
     // Introspection constant variables used to build the GraphQL introspection paths
     // and also parse the JSON results with
@@ -68,27 +71,21 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
     static final protected String mutationPath = schemaPath + iMutationType + "/";
 
     @Override
-    public GraphQLEndpoint initializeEndpoint(  final String url,
-                                                final int connectionTimeout,
-                                                final int readTimeout) throws FederationAccessException, ParseException {
+    public GraphQLSchema initializeSchema(  final String url,
+                                            final int connectionTimeout,
+                                            final int readTimeout) throws GraphQLException, ParseException {
 
-        final GraphQLInterface iface = new GraphQLInterfaceImpl(url);
-        final GraphQLEndpoint tmpEndpoint = new GraphQLEndpointImpl(null, null, iface);
-        final GraphQLRequestProcessor requestProcessor = new GraphQLRequestProcessorImpl(connectionTimeout,readTimeout);
         final GraphQLQuery introspectionQuery = getIntrospectionQuery();
-        final GraphQLRequest req = new GraphQLRequestImpl(introspectionQuery);
-        final JSONResponse response;
         try {
-            response = requestProcessor.performRequest(req, tmpEndpoint);
-            final JsonObject jsonObject = response.getJsonObject();
+            final JsonObject jsonObject = GraphQLConnection.performRequest(introspectionQuery, url, connectionTimeout, readTimeout );
             if(!jsonObject.hasKey("data")){
-                throw new FederationAccessException("Error at endpoint.", req, tmpEndpoint);
+                throw new GraphQLException("Error at endpoint.");
             }
             final JsonObject data = jsonObject.getObj("data");
 
-            return validateTypesAndEntrypoints(parseTypesAndFields(data),parseEntrypoints(data),iface);
+            return validateTypesAndEntrypoints(parseTypesAndFields(data),parseEntrypoints(data));
         } 
-        catch (final FederationAccessException e) {
+        catch (final GraphQLException e) {
             throw e;
         }
     }
@@ -156,9 +153,8 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
      * Removes the types, fields and entrypoints from the @param typesAndFields and @param entrypoints
      * and notes their removal if they don't meet the criteria for the approach. (each type needs an id field etc.)
      */
-    protected GraphQLEndpoint validateTypesAndEntrypoints(final Map<String, Map<String, GraphQLField>> typesAndFields,
-            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> entrypoints,
-            final GraphQLInterface iface){
+    protected GraphQLSchema validateTypesAndEntrypoints(final Map<String, Map<String, GraphQLField>> typesAndFields,
+            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> entrypoints){
 
         final Set<String> typesToRemove = new HashSet<>();
 
@@ -206,7 +202,7 @@ public class GraphQLEndpointInitializerImpl implements GraphQLEndpointInitialize
         typesAndFields.keySet().removeAll(typesToRemove);
         entrypoints.keySet().removeAll(typesToRemove);
 
-        return new GraphQLEndpointImpl(typesAndFields,entrypoints,iface);
+        return new GraphQLSchemaImpl(typesAndFields,entrypoints);
     }
 
     /**

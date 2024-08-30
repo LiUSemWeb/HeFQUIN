@@ -14,10 +14,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
-import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraphConverter;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 
 /**
  * An implementation of the JSON2SolutionMappings approach
@@ -25,29 +24,27 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.JSON2SolutionGraphConve
 public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConverter {
 
     final protected GraphQL2RDFConfiguration config;
-    final protected GraphQLEndpoint endpoint;
+    final protected GraphQLSchema schema;
 
-    public JSON2SolutionGraphConverterImpl(final GraphQL2RDFConfiguration config, 
-                                     final GraphQLEndpoint endpoint){
+    public JSON2SolutionGraphConverterImpl( final GraphQL2RDFConfiguration config, 
+                                            final GraphQLSchema schema ) {
         this.config = config;
-        this.endpoint = endpoint;
+        this.schema = schema;
     }
 
     @Override
-    public Model translateJSON( final JSONResponse jsonResponse) throws ParseException, JsonException {
-
-        final JsonObject outerJson = jsonResponse.getJsonObject();
+    public Model translateJSON( final JsonObject jsonObj ) throws ParseException, JsonException {
         final Model solutionGraph = ModelFactory.createDefaultModel();
         
         // Maps a GraphQL <ID,Type> to a blank node representing the GraphQL object
         final Map<PairOfSameType<String>,Resource> blankNodes = new HashMap<>();
 
         // Verify that the JSONResponse contains correct data throw error
-        if(!outerJson.hasKey("data")){
+        if ( ! jsonObj.hasKey("data") ) {
             throw new ParseException("The json response did not contain a data key.");
         }
 
-        final JsonObject json = outerJson.getObj("data");
+        final JsonObject json = jsonObj.getObj("data");
 
         // Parse through each individual entrypoint in the JSON 
         // (the return value from parseJSON isn't necessary on the original call)
@@ -164,7 +161,7 @@ public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConver
     /**
      * Utility function used to create a Literal from a json value @param primitive
      * usable by @param model. @param graphqlTypeName and @param graphqlFieldName are 
-     * used to fetch value type data from the GraphQLEndpoint to ensure that the correct 
+     * used to fetch value type data from the GraphQL endpoint to ensure that the correct 
      * XML datatype is used when creating the literal.
      */
     protected Literal jsonPrimitiveToLiteral(final JsonValue primitive, final String graphqlTypeName, 
@@ -172,7 +169,7 @@ public class JSON2SolutionGraphConverterImpl implements JSON2SolutionGraphConver
 
         assert primitive.isPrimitive();
 
-        final String valueType = endpoint.getGraphQLFieldValueType(graphqlTypeName, graphqlFieldName);
+        final String valueType = schema.getGraphQLFieldValueType(graphqlTypeName, graphqlFieldName);
 
         // The scalar value types from GraphQL ( GraphQL String, ID and custom scalar types etc. are assumed as XSD Strings)
         switch(valueType){

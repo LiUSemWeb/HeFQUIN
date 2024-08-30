@@ -1,17 +1,17 @@
-package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl;
+package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl;
 
 import java.util.Map;
 import java.util.Set;
 
 import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 
-public class GraphQLEndpointImpl implements GraphQLEndpoint {
+public class GraphQLSchemaImpl implements GraphQLSchema {
 
     // Maps object type names to a map, which in turn maps field names to GraphQLField objects
     protected final Map<String, Map<String,GraphQLField>> objectTypeToFields;
@@ -19,25 +19,10 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
     // Maps object type names to a map, which in turn maps a GraphQLEntrypointType to a GraphQLEntrypoint
     protected final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> objectTypeToEntrypoint;
 
-    // GraphQL Interface
-    protected final GraphQLInterface graphqlInterface;
-
-    public GraphQLEndpointImpl(final Map<String, Map<String,GraphQLField>> objectTypeToFields,
-            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> objectTypeToEntrypoint, 
-            final GraphQLInterface graphqlInterface){
+    public GraphQLSchemaImpl(final Map<String, Map<String,GraphQLField>> objectTypeToFields,
+            final Map<String, Map<GraphQLEntrypointType,GraphQLEntrypoint>> objectTypeToEntrypoint){
         this.objectTypeToFields = objectTypeToFields;
         this.objectTypeToEntrypoint = objectTypeToEntrypoint;
-        this.graphqlInterface = graphqlInterface;
-    }
-
-    @Override
-    public VocabularyMapping getVocabularyMapping() {
-        return null;
-    }
-
-    @Override
-    public GraphQLInterface getInterface() {
-        return graphqlInterface;
     }
 
     @Override
@@ -94,7 +79,7 @@ public class GraphQLEndpointImpl implements GraphQLEndpoint {
 
     @Override
     public String toString( ) {
-        return "GraphQL endpoint (" + graphqlInterface.toString() + ")";
+        return "GraphQL schema";
     }
 
 }

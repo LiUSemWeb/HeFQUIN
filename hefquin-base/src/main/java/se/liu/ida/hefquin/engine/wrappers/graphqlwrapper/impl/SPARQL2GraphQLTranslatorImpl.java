@@ -12,13 +12,13 @@ import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.impl.LiteralLabel;
 
-import se.liu.ida.hefquin.engine.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.engine.query.BGP;
 import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQL2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.SPARQL2GraphQLTranslator;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointPath;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
@@ -34,7 +34,7 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
 
     @Override
     public GraphQLQuery translateBGP(final BGP bgp, final GraphQL2RDFConfiguration config,
-            final GraphQLEndpoint endpoint) throws QueryTranslatingException {
+            final GraphQLSchema schema) throws QueryTranslatingException {
 
         // Initialize necessary data structures
         // - collection of subject-based star patterns of the given
@@ -46,9 +46,9 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
         final Map<TriplePattern, StarPattern> connectors = createConnectors(indexedStarPatterns);
         // - subset of the star patterns, contains only the ones from
         //   which we need to create entry points for the GraphQL query.
-        final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config, endpoint );
+        final Set<GraphQLQueryRootForStarPattern> queryRoots = determineRootStarPatterns( indexedStarPatterns.values(), connectors, config, schema );
 
-        final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, endpoint, indexedStarPatterns, connectors);
+        final SPARQL2GraphQLHelper helper = new SPARQL2GraphQLHelper(config, schema, indexedStarPatterns, connectors);
 
         // Check whether it was possible to create suitable root star patterns.
         // If not, we need to return a GraphQL query that fetches everything
@@ -139,12 +139,12 @@ public class SPARQL2GraphQLTranslatorImpl implements SPARQL2GraphQLTranslator {
     protected Set<GraphQLQueryRootForStarPattern> determineRootStarPatterns( final Collection<StarPattern> sps,
                                                                              final Map<TriplePattern, StarPattern> connectors,
                                                                              final GraphQL2RDFConfiguration cfg,
-                                                                             final GraphQLEndpoint ep ) {
+                                                                             final GraphQLSchema schema ) {
         final Set<GraphQLQueryRootForStarPattern> result = new HashSet<>();
         for ( final StarPattern sp : sps ) {
             final boolean hasConnectors = connectors.containsValue(sp);
             if ( ! hasConnectors ) { // ignore star patterns that have incoming connectors
-                final GraphQLQueryRootForStarPattern r = new GraphQLQueryRootForStarPattern(sp, cfg, ep);
+                final GraphQLQueryRootForStarPattern r = new GraphQLQueryRootForStarPattern(sp, cfg, schema);
                 // If the GraphQL object type for the current star pattern cannot
                 // be determined, then we can immediately return null.
                 if ( r.getGraphQLObjectType() == null ) {
