@@ -3,13 +3,6 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.federation.Neo4jServer;
-import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
@@ -23,87 +16,6 @@ import static org.junit.Assert.*;
 
 public class CypherUtilsTest
 {
-	/**
-	 * If this flag is true, tests that make requests to local neo4j
-	 * instances will be skipped.
-	 */
-	public static boolean skipLocalNeo4jTests = true;
-
-    /**
-     * This test makes use of the example Movie database provided in most neo4j clients.
-     * The database has two types of nodes: Person and Movie.
-     * The database has two types of relationships: DIRECTED and ACTED_IN
-     *
-     * cf. https://neo4j.com/developer/example-data/
-     *
-     * @throws FederationAccessException
-     */
-    @Test
-    public void parseEdgeAndNodesTest() throws FederationAccessException {
-        if (!skipLocalNeo4jTests) {
-            final String cypherQuery = "MATCH (x)-[e:ACTED_IN]->(y) RETURN x, e, y LIMIT 2";
-            final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
-
-            final Neo4jServer fm = new Neo4jServerImpl4Test();
-
-            final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
-
-            final RecordsResponse response = processor.performRequest(req, fm);
-
-            assertEquals(2, response.getResponse().size());
-            for (final TableRecord rec : response.getResponse()) {
-                Iterator<RecordEntry> iterator = rec.getRecordEntries().iterator();
-                assertTrue(iterator.hasNext());
-                final RecordEntry nodeX = iterator.next();
-                assertEquals(new CypherVar("x"), nodeX.getName());
-                assertTrue(nodeX.getValue() instanceof LPGNodeValue);
-                assertTrue(iterator.hasNext());
-                final RecordEntry edgeE = iterator.next();
-                assertEquals(new CypherVar("e"), edgeE.getName());
-                assertTrue(edgeE.getValue() instanceof LPGEdgeValue);
-                assertTrue(iterator.hasNext());
-                final RecordEntry nodeY = iterator.next();
-                assertEquals(new CypherVar("y"), nodeY.getName());
-                assertTrue(nodeY.getValue() instanceof LPGNodeValue);
-                assertFalse(iterator.hasNext());
-            }
-        }
-    }
-
-    /**
-     * This test does not use a specific dataset, since the Cypher query returns hardcoded literals.
-     * It is, however, necessary to have a local neo4j instance running.
-     *
-     * @throws FederationAccessException
-     */
-    @Test
-    public void parseLiteralsMapsAndArraysTest() throws FederationAccessException {
-        if (!skipLocalNeo4jTests) {
-            final String cypherQuery = "RETURN 2 AS a, {x:1, y:2} AS c";
-            final Neo4jRequest req = new Neo4jRequestImpl(cypherQuery);
-
-            final Neo4jServer fm = new Neo4jServerImpl4Test();
-
-            final Neo4jRequestProcessor processor = new Neo4jRequestProcessorImpl();
-
-            final RecordsResponse response = processor.performRequest(req, fm);
-
-            assertEquals(1, response.getResponse().size());
-            for (final TableRecord rec : response.getResponse()) {
-                Iterator<RecordEntry> iterator = rec.getRecordEntries().iterator();
-                assertTrue(iterator.hasNext());
-                final RecordEntry a = iterator.next();
-                assertEquals(new CypherVar("a"), a.getName());
-                assertTrue(a.getValue() instanceof LiteralValue);
-                assertTrue(iterator.hasNext());
-                final RecordEntry c = iterator.next();
-                assertEquals(new CypherVar("c"), c.getName());
-                assertTrue(c.getValue() instanceof MapValue);
-                assertFalse(iterator.hasNext());
-            }
-        }
-    }
-
     @Test
     public void parseNodesFromStringTest() throws JsonProcessingException, Neo4JException {
         final String response = "{\"results\": [" +
@@ -174,21 +86,5 @@ public class CypherUtilsTest
     public void malformedJSONparseTest() throws JsonProcessingException, Neo4JException {
         CypherUtils.parse("{\"notResults\"}");
     }
-
-
-	protected static class Neo4jServerImpl4Test implements Neo4jServer {
-
-		public Neo4jServerImpl4Test() {}
-
-		@Override
-		public Neo4jInterface getInterface() {
-			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-	}
 
 }
