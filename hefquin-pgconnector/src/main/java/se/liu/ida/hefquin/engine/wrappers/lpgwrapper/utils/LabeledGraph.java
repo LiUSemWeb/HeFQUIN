@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-
 import java.util.*;
 import java.util.stream.Collectors;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 /**
  * This class models graphs with labeled edges. Nodes and edge labels are modeled as {@link CypherVar} objects.

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
@@ -30,7 +31,7 @@ public class RecordEntryFactory
                 }
             }
             else {
-                val = parseAsLiteralOrArrayValue(col);
+                val = parseAsPropertyValue(col);
             }
         }
         return new RecordEntryImpl(name, val);
@@ -70,22 +71,33 @@ public class RecordEntryFactory
         while ( it.hasNext() ) {
             final String name = it.next();
             final JsonNode valNode = col.get(name);
-            properties.put( name, parseAsLiteralOrArrayValue(valNode) );
+            properties.put( name, parseAsPropertyValue(valNode) );
         }
         return properties;
     }
 
-    protected static Value parseAsLiteralOrArrayValue( final JsonNode valNode ) {
+    protected static Value parseAsPropertyValue( final JsonNode valNode ) {
         if ( valNode.isArray() ) {
             final Iterator<JsonNode> it = valNode.elements();
             final List<LiteralValue> list = new ArrayList<>( valNode.size() );
             while ( it.hasNext() ) {
                 final JsonNode elmt = it.next();
-                final LiteralValue v = (LiteralValue) parseAsLiteralOrArrayValue(elmt);
+                final LiteralValue v = (LiteralValue) parseAsPropertyValue(elmt);
                 list.add(v);
             }
 
             return new ArrayValue(list);
+        }
+
+        if ( valNode.isObject() ) {
+            final Iterator<Map.Entry<String, JsonNode>> it = valNode.fields();
+            final Map<String, Object> m = new HashMap<>();
+            while ( it.hasNext() ) {
+                final Map.Entry<String, JsonNode> e = it.next();
+                m.put( e.getKey(), e.getValue() );
+            }
+
+            return new MapValue(m);
         }
 
         final Object value;
@@ -100,7 +112,7 @@ public class RecordEntryFactory
         else if ( valNode.isTextual() )
             value = valNode.asText();
         else
-            throw new IllegalArgumentException( "Unexpected type of value node in record entry: " + valNode.toString() );
+            throw new IllegalArgumentException( "Unexpected type of value node (" + valNode.getNodeType().name() + ") in record entry: " + valNode.toString() );
 
         return new LiteralValue(value);
     }

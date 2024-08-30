@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
+import java.util.*;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
-
-import java.util.*;
 
 public class CypherQueryCombinator {
     public static CypherQuery combine(final CypherQuery q1, final CypherQuery q2, final CypherVarGenerator gen) {

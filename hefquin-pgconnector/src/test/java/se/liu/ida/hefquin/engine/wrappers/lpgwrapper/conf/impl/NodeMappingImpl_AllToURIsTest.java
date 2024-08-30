@@ -1,14 +1,15 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
-import org.apache.jena.graph.Node;
-
-import static org.junit.Assert.*;
 
 public class NodeMappingImpl_AllToURIsTest {
     protected final String NSNODE = "https://example.org/node/";

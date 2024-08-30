@@ -1,11 +1,11 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
+import java.util.List;
+import java.util.Set;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a Cypher Query with a MATCH-WHERE-RETURN structure,

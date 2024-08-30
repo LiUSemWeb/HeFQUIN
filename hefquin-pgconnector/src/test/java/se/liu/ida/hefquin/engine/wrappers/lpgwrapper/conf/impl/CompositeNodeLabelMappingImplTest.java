@@ -1,22 +1,19 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.junit.Test;
-
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.CompositeNodeLabelMappingImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_AllToURIs;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_RegexMatchToURIs;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToLiteral;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToURI;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedNodeLabelException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.junit.Test;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedNodeLabelException;
 
 public class CompositeNodeLabelMappingImplTest {
 

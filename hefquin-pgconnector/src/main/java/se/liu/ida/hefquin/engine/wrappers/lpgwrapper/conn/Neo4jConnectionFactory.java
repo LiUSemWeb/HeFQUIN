@@ -1,10 +1,11 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,63 +14,68 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-public class Neo4jConnectionFactory {
+public class Neo4jConnectionFactory
+{
+	static public Neo4jConnection connect( final String url ) {
+		return new Neo4jConnection(url);
+	}
 
-    static public Neo4jConnection connect(final String URL){
-        return new Neo4jConnection(URL);
-    }
+	public static class Neo4jConnection
+	{
+		protected final URI uri;
 
-    public static class Neo4jConnection
-    {
-        protected final String URL;
+		public Neo4jConnection( final String url ) {
+			this( URI.create(url) );
+		}
 
-        public Neo4jConnection( final String URL ) {
-            assert URL != null;
-            this.URL = URL;
-        }
+		public Neo4jConnection( final URI uri ) {
+			assert uri != null;
+			this.uri = uri;
+		}
 
-        public String getURL() {
-            return URL;
-        }
+		public URI getURI() {
+			return uri;
+		}
 
-        public List<TableRecord> execute( final CypherQuery q ) throws Neo4JException {
-            return execute( q.toString() );
-        }
+		public List<TableRecord> execute( final CypherQuery q ) throws Neo4jException {
+			return execute( q.toString() );
+		}
 
-        public List<TableRecord> execute(final String cypher ) throws Neo4JException {
-            final String data = "{ " +
-                    "\"statements\" : [ {" +
-                    "    \"statement\" : \""+ cypher +"\"" +
-                    "  , \"parameters\" : {} } ]" +
-                    "}";
+		public List<TableRecord> execute( final String cypherQuery ) throws Neo4jException {
+			final String data = "{ "
+					+ "\"statements\" : [ {"
+					+ "    \"statement\" : \""+ cypherQuery +"\""
+					+ "  , \"parameters\" : {} } ]"
+					+ "}";
 
-            final var request = HttpRequest.newBuilder( URI.create(this.URL) )
-                    .header("Accept", "application/json;charset=UTF-8")
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(data))
-                    .build();
-            final HttpClient client = HttpClient.newHttpClient();
-            final HttpResponse<String> response;
-            try {
-                response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            }
-            catch ( final IOException e ) {
-                throw new Neo4JConnectionException("Data could not be sent to the server", e, this);
-            }
-            catch ( final InterruptedException e ) {
-                throw new Neo4JConnectionException("Neo4j server could not be reached.", e, this);
-            }
+			final var request = HttpRequest.newBuilder(uri)
+					.header("Accept", "application/json;charset=UTF-8")
+					.header("Content-Type", "application/json")
+					.POST( HttpRequest.BodyPublishers.ofString(data) )
+					.build();
+			final HttpClient client = HttpClient.newHttpClient();
+			final HttpResponse<String> response;
+			try {
+				response = client.send( request, HttpResponse.BodyHandlers.ofString() );
+			}
+			catch ( final IOException e ) {
+				throw new Neo4jConnectionException(this, "Data could not be sent to the server", e);
+			}
+			catch ( final InterruptedException e ) {
+				throw new Neo4jConnectionException(this, "Neo4j server could not be reached.", e);
+			}
 
-            if ( response.statusCode() != 200 ) {
-                throw new Neo4JConnectionException("Unexpected status code in HTTP response from Neo4j server: " + response.statusCode(), this);
-            }
+			if ( response.statusCode() != 200 ) {
+				throw new Neo4jConnectionException(this, "Unexpected status code in HTTP response from Neo4j server: " + response.statusCode());
+			}
 
-            try {
-                return CypherUtils.parse(response.body());
-            } catch ( final JsonProcessingException e ) {
-                throw new Neo4JException("Neo4j server responded a malformed or unexpected JSON object", e);
-            }
-        }
-    }
+			try {
+				return CypherUtils.parse( response.body() );
+			}
+			catch ( final JsonProcessingException e ) {
+				throw new Neo4jException("Neo4j server responded a malformed or unexpected JSON object", e);
+			}
+		}
+	}
 
 }

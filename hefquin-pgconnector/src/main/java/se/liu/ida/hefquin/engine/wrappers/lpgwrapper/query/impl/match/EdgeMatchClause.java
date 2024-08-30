@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 /**
  * Represents a directed path match statement. Conditions on the labels of the nodes or edges, as well as

@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
-
 import java.util.Map;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
 
 public class MapValue implements Value {
 

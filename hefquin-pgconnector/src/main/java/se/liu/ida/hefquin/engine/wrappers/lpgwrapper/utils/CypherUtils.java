@@ -3,7 +3,8 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.TableRecordImpl;
@@ -17,14 +18,14 @@ public class CypherUtils {
     /**
      * This method parses a JSON response obtained from a Neo4j HTTP server into a list of POJOs
      * @throws JsonProcessingException if the received body is not valid JSON
-     * @throws Neo4JException if the server responds with an error object
+     * @throws Neo4jException if the server responds with an error object
      */
-    public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4JException {
+    public static List<TableRecord> parse(final String body) throws JsonProcessingException, Neo4jException {
         final ObjectMapper mapper = new ObjectMapper();
         final JsonNode root = mapper.readTree(body);
         final JsonNode errors = root.get("errors");
         if ( errors != null && errors.isArray() && !errors.isEmpty() ) {
-            throw new Neo4JException( errors.get(0).textValue() );
+            throw new Neo4jException( errors.get(0).textValue() );
         }
 
         final List<TableRecord> records = new LinkedList<>();

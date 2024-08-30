@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
-
-import java.util.List;
 
 public class TableRecordImpl implements TableRecord {
 

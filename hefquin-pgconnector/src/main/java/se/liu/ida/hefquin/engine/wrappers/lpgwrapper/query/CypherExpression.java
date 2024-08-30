@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
+import java.util.Set;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-
-import java.util.Set;
 
 /**
  * This interface represents a generic Cypher Expression. As per the grammar defining expressions

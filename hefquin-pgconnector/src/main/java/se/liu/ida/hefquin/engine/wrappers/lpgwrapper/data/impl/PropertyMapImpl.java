@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl;
 
+import java.util.Map;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
-
-import java.util.Map;
 
 public class PropertyMapImpl implements PropertyMap {
 

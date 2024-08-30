@@ -7,10 +7,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
-
 import static org.junit.Assert.*;
 import org.junit.Test;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 
 public class LPG2RDFConfigurationReaderTest {
 

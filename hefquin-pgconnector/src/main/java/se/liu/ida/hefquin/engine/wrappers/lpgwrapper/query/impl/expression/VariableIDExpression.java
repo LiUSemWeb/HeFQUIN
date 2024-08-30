@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-
 import java.util.Objects;
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 public class VariableIDExpression implements CypherExpression {
 

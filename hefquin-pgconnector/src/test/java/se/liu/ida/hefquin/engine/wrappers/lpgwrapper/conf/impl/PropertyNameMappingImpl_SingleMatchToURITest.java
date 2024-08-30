@@ -1,14 +1,14 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_SingleMatchToURI;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedPropertyNameException;
-
-import static org.junit.Assert.*;
 
 public class PropertyNameMappingImpl_SingleMatchToURITest {
 

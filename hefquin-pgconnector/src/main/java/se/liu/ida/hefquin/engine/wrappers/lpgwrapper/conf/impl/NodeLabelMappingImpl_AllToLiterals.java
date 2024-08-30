@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.vocabulary.XSD;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedNodeLabelException;
 
 public class NodeLabelMappingImpl_AllToLiterals implements NodeLabelMapping{

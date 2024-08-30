@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherMatchQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CypherQueryBuilder {
 

@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-
 import java.util.*;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 public class LabeledGraphBuilder {
     protected final Map<CypherVar, List<LabeledGraph.Edge>> adjacencyList = new HashMap<>();

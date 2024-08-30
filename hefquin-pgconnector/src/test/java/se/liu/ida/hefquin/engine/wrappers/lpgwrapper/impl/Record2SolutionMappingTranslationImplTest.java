@@ -1,6 +1,12 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -8,29 +14,45 @@ import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.EXISTSExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.EqualityExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.FirstLabelExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.GetItemExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.KeysExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.LiteralExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.MarkerExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.PropertyAccessExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.PropertyAccessWithVarExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.TripleMapExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.TypeExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.UnwindIteratorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.VariableIDExpression;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.VariableLabelExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-
 /**
  * This tests are outdated, they need to be changed to include the latest changes
+ *
+ * ----
+ * I am not sure what "the latest changes" are that the comment above refers to.
+ * The comment itself was introduced in the following commit by Sebastian.
+ *                                                                        -Olaf
+ *
+ * https://github.com/LiUSemWeb/HeFQUIN/commit/bdadb79d3d9edb8130b9cbb0ec90db692a7d9c4e
+ *
  */
 public class Record2SolutionMappingTranslationImplTest {
 
@@ -68,7 +90,7 @@ public class Record2SolutionMappingTranslationImplTest {
     final CypherVar marker = new CypherVar("m1");
 
     @Test
-    public void translateVarPropertyLiteralTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarPropertyLiteralTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -85,22 +107,24 @@ public class Record2SolutionMappingTranslationImplTest {
                                 new LiteralExpression("Lana Wachowski")))
                         .add(new AliasedExpression(new TripleMapExpression(src1, edge1, tgt1), ret1))
                         .build());
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}]," +
                     "\"meta\":[{\"id\":6,\"type\":\"node\",\"deleted\":false}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
         final BindingBuilder builder = Binding.builder();
         builder.add(Var.alloc("s"), conf.getRDFTermForLPGNode(node6));
-        final SolutionMapping m1 = new SolutionMappingImpl(builder.build());
+        final Binding m1 = builder.build();
         assertEquals(1, solMaps.size());
         assertEquals(m1, solMaps.get(0));
     }
 
     @Test
-    public void translateVarLabelClassTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarLabelClassTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -109,6 +133,7 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new VariableLabelExpression(cpvar1, "Person"))
                 .add(new AliasedExpression(cpvar1, ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"]," +
                 "\"data\":[{\"row\":[{\"born\":1964,\"name\":\"Keanu\"}],\"meta\":[{\"id\":1,\"type\":\"node\"}]}," +
                 "{\"row\":[{\"born\":1967,\"name\":\"Carrie-Anne\"}],\"meta\":[{\"id\":2,\"type\":\"node\"}]}," +
@@ -117,19 +142,21 @@ public class Record2SolutionMappingTranslationImplTest {
                 "{\"row\":[{\"born\":1944,\"name\":\"Taylor\"}],\"meta\":[{\"id\":14,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node14))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node14)) );
         assertEquals(solMaps, expected);
     }
 
     @Test
-    public void translateVarRelationshipNodeTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarRelationshipNodeTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -139,21 +166,24 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new VariableLabelExpression(a1, "DIRECTED"))
                 .add(new AliasedExpression(cpvar1, ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}],\"meta\":[{\"id\":6,\"type\":\"node\"}]}" +
                 ",{\"row\":[{\"born\":1967,\"name\":\"Andy Wachowski\"}],\"meta\":[{\"id\":5,\"type\":\"node\"}]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5)) );
         assertEquals(solMaps, expected);
     }
 
     @Test
-    public void translateNodeLabelVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeLabelVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
@@ -163,20 +193,23 @@ public class Record2SolutionMappingTranslationImplTest {
                         new LiteralExpression("22")))
                 .add(new AliasedExpression(new FirstLabelExpression(cpvar1), ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"Person\"],\"meta\":[null]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"),
-                conf.getRDFTermForNodeLabel("Person")));
+
+        final Binding expected = BindingFactory.binding( Var.alloc("o"),
+                                                         conf.getRDFTermForNodeLabel("Person") );
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateNodePropertyVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodePropertyVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
@@ -186,20 +219,22 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new EXISTSExpression(new PropertyAccessExpression(a1, "name")))
                 .add(new AliasedExpression(new PropertyAccessExpression(a1, "name"), ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"Cuba Gooding Jr.\"],\"meta\":[null]}]}],\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(
-                BindingFactory.binding(Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr."))
-        );
+
+        final Binding expected = BindingFactory.binding( Var.alloc("o"),
+                                                         NodeFactory.createLiteral("Cuba Gooding Jr.") );
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateNodeRelationshipVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeRelationshipVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("o"));
@@ -209,23 +244,26 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new VariableLabelExpression(a2, "DIRECTED"))
                 .add(new AliasedExpression(cpvar1, ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[{\"title\":\"The Matrix Revolutions\",\"released\":2003}],\"meta\":[{\"id\":10,\"type\":\"node\"}]}," +
                 "{\"row\":[{\"title\":\"The Matrix Reloaded\",\"released\":2003}],\"meta\":[{\"id\":9,\"type\":\"node\"}]}," +
                 "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999}],\"meta\":[{\"id\":0,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node10))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node10)) );
+        expected.add( BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node9)) );
+        expected.add( BindingFactory.binding(Var.alloc("o"), conf.getRDFTermForLPGNode(node0)) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateNodeVarNodeTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeVarNodeTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
@@ -235,19 +273,22 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new EqualityExpression(new VariableIDExpression(a2), new LiteralExpression("9")))
                 .add(new AliasedExpression(new TypeExpression(cpvar1), ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"DIRECTED\"],\"meta\":[null]}]}],\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"),
-                conf.getIRIForEdgeLabel("DIRECTED")));
+
+        final Binding expected = BindingFactory.binding( Var.alloc("p"),
+                                                         conf.getIRIForEdgeLabel("DIRECTED") );
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateNodeVarLiteralTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeVarLiteralTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
@@ -260,19 +301,22 @@ public class Record2SolutionMappingTranslationImplTest {
                         List.of(vark), a2))
                 .add(new AliasedExpression(new GetItemExpression(a2, 0), ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"name\"],\"meta\":[null]}]}],\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"),
-                conf.getIRIForPropertyName("name")));
+
+        final Binding expected = BindingFactory.binding( Var.alloc("p"),
+                                                         conf.getIRIForPropertyName("name") );
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateNodeVarLabelTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeVarLabelTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
@@ -282,18 +326,21 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new VariableLabelExpression(a1, "Person"))
                 .add(new AliasedExpression(new LiteralExpression("label"), ret1))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\"],\"data\":[" +
                 "{\"row\":[\"label\"],\"meta\":[null]}]}],\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate()));
+
+        final Binding expected = BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate());
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateVarLabelVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarLabelVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -303,6 +350,7 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new AliasedExpression(cpvar1, ret1))
                 .add(new AliasedExpression(new FirstLabelExpression(cpvar1), ret2))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[{\"title\":\"The Matrix\",\"released\":1999},\"Movie\"],\"meta\":[{\"id\":0,\"type\":\"node\"},null]}," +
                 "{\"row\":[{\"born\":1964,\"name\":\"Keanu\"},\"Person\"],\"meta\":[{\"id\":1,\"type\":\"node\"},null]}," +
@@ -311,24 +359,26 @@ public class Record2SolutionMappingTranslationImplTest {
                 "{\"row\":[{\"born\":1960,\"name\":\"Hugo\"},\"Person\"],\"meta\":[{\"id\":4,\"type\":\"node\"},null]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person")) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarRelationshipVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarRelationshipVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -339,6 +389,7 @@ public class Record2SolutionMappingTranslationImplTest {
                 .add(new AliasedExpression(cpvar1, ret1))
                 .add(new AliasedExpression(cpvar2, ret2))
                 .build();
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[{\"born\":1965,\"name\":\"Lana Wachowski\"}," +
                     "{\"title\":\"The Matrix\",\"released\":1999}]," +
@@ -357,24 +408,26 @@ public class Record2SolutionMappingTranslationImplTest {
                     "\"meta\":[{\"id\":6,\"type\":\"node\"},{\"id\":10,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node9))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node10))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node9)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node9)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node10)) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarPropertyVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarPropertyVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -395,6 +448,7 @@ public class Record2SolutionMappingTranslationImplTest {
                         .add(new AliasedExpression(new PropertyAccessExpression(cpvar1, "name"), ret2))
                         .build()
         );
+
         final String neo4jResponse = "{\"results\":[{\"columns\":[\"m1\",\"ret1\",\"ret2\"],\"data\":[" +
                 "{\"row\":[\"$1\",{\"born\":1964,\"name\":\"Keanu\"},\"Keanu\"],\"meta\":[null,{\"id\":1,\"type\":\"node\"},null]}," +
                 "{\"row\":[\"$1\",{\"born\":1967,\"name\":\"Carrie-Anne\"},\"Carrie-Anne\"],\"meta\":[null,{\"id\":2,\"type\":\"node\"},null]}," +
@@ -403,24 +457,26 @@ public class Record2SolutionMappingTranslationImplTest {
                 "{\"row\":[\"$1\",{\"born\":1967,\"name\":\"Andy\"},\"Andy\"],\"meta\":[null,{\"id\":5,\"type\":\"node\"},null]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
-                Var.alloc("o"), NodeFactory.createLiteral("Keanu"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
-                Var.alloc("o"), NodeFactory.createLiteral("Carrie-Anne"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
-                Var.alloc("o"), NodeFactory.createLiteral("Laurence"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
-                Var.alloc("o"), NodeFactory.createLiteral("Hugo"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
-                Var.alloc("o"), NodeFactory.createLiteral("Andy"))));
+
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("o"), NodeFactory.createLiteral("Keanu")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
+                Var.alloc("o"), NodeFactory.createLiteral("Carrie-Anne")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("o"), NodeFactory.createLiteral("Laurence")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("o"), NodeFactory.createLiteral("Hugo")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("o"), NodeFactory.createLiteral("Andy")) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarVarLabelTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarVarLabelTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -439,24 +495,24 @@ public class Record2SolutionMappingTranslationImplTest {
                 "{\"row\":[{\"born\":1967,\"name\":\"Andy\"},\"label\"],\"meta\":[{\"id\":5,\"type\":\"node\"},null]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
-                Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
-                Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
-                Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
-                Var.alloc("p"), conf.getLabelPredicate())));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
-                Var.alloc("p"), conf.getLabelPredicate())));
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("p"), conf.getLabelPredicate()) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node2),
+                Var.alloc("p"), conf.getLabelPredicate()) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("p"), conf.getLabelPredicate()) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("p"), conf.getLabelPredicate()) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("p"), conf.getLabelPredicate()) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarVarNodeTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarVarNodeTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -480,24 +536,24 @@ public class Record2SolutionMappingTranslationImplTest {
                     "\"meta\":[{\"id\":3,\"type\":\"node\"}, null]}]}]" +
                 ",\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node7),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"))));
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node7),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node6),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node5),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("DIRECTED")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node4),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node3),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN")) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarVarLiteral() throws JsonProcessingException, Neo4JException {
+    public void translateVarVarLiteral() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -529,16 +585,16 @@ public class Record2SolutionMappingTranslationImplTest {
                 "\"meta\":[null,{\"id\":0,\"type\":\"node\",\"deleted\":false},null]}]}]" +
                 ",\"errors\":[]}}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final SolutionMapping expected = new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("p"), conf.getIRIForPropertyName("title")));
+        final Binding expected = BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("title"));
         assertEquals(1, solMaps.size());
         assertEquals(expected, solMaps.get(0));
     }
 
     @Test
-    public void translateNodeVarVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateNodeVarVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("p"));
@@ -576,22 +632,22 @@ public class Record2SolutionMappingTranslationImplTest {
                     "\"meta\":[null,null,{\"id\":0,\"type\":\"node\"}]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate(),
-                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("born"),
-                Var.alloc("o"), NodeFactory.createLiteral("1986"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("name"),
-                Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr."))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"),
-                Var.alloc("o"), conf.getRDFTermForLPGNode(node0))));
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("p"), conf.getLabelPredicate(),
+                Var.alloc("o"), conf.getRDFTermForNodeLabel("Person")) );
+        expected.add( BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("born"),
+                Var.alloc("o"), NodeFactory.createLiteral("1986")) );
+        expected.add( BindingFactory.binding(Var.alloc("p"), conf.getIRIForPropertyName("name"),
+                Var.alloc("o"), NodeFactory.createLiteral("Cuba Gooding Jr.")) );
+        expected.add( BindingFactory.binding(Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"),
+                Var.alloc("o"), conf.getRDFTermForLPGNode(node0)) );
         assertEquals(expected, solMaps);
     }
 
     @Test
-    public void translateVarVarVarTest() throws JsonProcessingException, Neo4JException {
+    public void translateVarVarVarTest() throws JsonProcessingException, Neo4jException {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Map<CypherVar, Var> varMap = new HashMap<>();
         varMap.put(ret1, Var.alloc("s"));
@@ -648,22 +704,22 @@ public class Record2SolutionMappingTranslationImplTest {
                 "\"meta\":[null,null,{\"id\":1,\"type\":\"node\"},{\"id\":87,\"type\":\"node\"},null,null]}]}]," +
                 "\"errors\":[]}";
         final List<TableRecord> records = CypherUtils.parse(neo4jResponse);
-        final List<SolutionMapping> solMaps = new Record2SolutionMappingTranslatorImpl()
+        final List<Binding> solMaps = new Record2SolutionMappingTranslatorImpl()
                 .translateRecords(records, conf, query, varMap);
-        final List<SolutionMapping> expected = new ArrayList<>();
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
-                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.getRDFTermForLPGNode(node87))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("p"), conf.getLabelPredicate(), Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("p"), conf.getIRIForPropertyName("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("p"), conf.getIRIForPropertyName("tagline"), Var.alloc("o"), NodeFactory.createLiteral("Welcome to the Real World"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
-                Var.alloc("p"), conf.getIRIForPropertyName("released"), Var.alloc("o"), NodeFactory.createLiteral("1999"))));
-        expected.add(new SolutionMappingImpl(BindingFactory.binding(Var.alloc("s"),
+        final List<Binding> expected = new ArrayList<>();
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node1),
+                Var.alloc("p"), conf.getIRIForEdgeLabel("ACTED_IN"), Var.alloc("o"), conf.getRDFTermForLPGNode(node87)) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getLabelPredicate(), Var.alloc("o"), conf.getRDFTermForNodeLabel("Movie")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("title"), Var.alloc("o"), NodeFactory.createLiteral("The Matrix")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("tagline"), Var.alloc("o"), NodeFactory.createLiteral("Welcome to the Real World")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"), conf.getRDFTermForLPGNode(node0),
+                Var.alloc("p"), conf.getIRIForPropertyName("released"), Var.alloc("o"), NodeFactory.createLiteral("1999")) );
+        expected.add( BindingFactory.binding(Var.alloc("s"),
                 NodeFactory.createTripleNode(conf.getRDFTermForLPGNode(node1), conf.getIRIForEdgeLabel("ACTED_IN"), conf.getRDFTermForLPGNode(node87)),
-                Var.alloc("p"), conf.getIRIForPropertyName("roles"), Var.alloc("o"), NodeFactory.createLiteral("Shane Falco"))));
+                Var.alloc("p"), conf.getIRIForPropertyName("roles"), Var.alloc("o"), NodeFactory.createLiteral("Shane Falco")) );
         for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i), solMaps.get(i));
         }

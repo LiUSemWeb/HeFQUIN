@@ -1,14 +1,15 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
-import org.junit.Test;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 public class LabeledGraphTest {
 

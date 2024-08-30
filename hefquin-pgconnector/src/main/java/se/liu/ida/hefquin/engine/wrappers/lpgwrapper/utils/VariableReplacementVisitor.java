@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
+import java.util.*;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.EdgeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.NodeMatchClause;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match.PathMatchClause;
-
-import java.util.*;
 
 public class VariableReplacementVisitor implements CypherExpressionVisitor {
     protected final Map<CypherVar, CypherVar> equivalences;

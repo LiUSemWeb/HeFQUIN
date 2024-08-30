@@ -1,23 +1,27 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Test;
-
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.*;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4jException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGEdgeValue;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNodeValue;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LiteralValue;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 public class CypherUtilsTest
 {
     @Test
-    public void parseNodesFromStringTest() throws JsonProcessingException, Neo4JException {
+    public void parseNodesFromStringTest() throws JsonProcessingException, Neo4jException {
         final String response = "{\"results\": [" +
                 "{\"columns\": [\"x\", \"y\", \"z\"]," +
                 "\"data\": [{" +
@@ -50,7 +54,7 @@ public class CypherUtilsTest
     }
 
     @Test
-    public void parseMiscTest() throws JsonProcessingException, Neo4JException {
+    public void parseMiscTest() throws JsonProcessingException, Neo4jException {
         final String response = "{\"results\": [" +
                 "{\"columns\": [\"x\", \"y\", \"z\"]," +
                     "\"data\": [{" +
@@ -83,7 +87,7 @@ public class CypherUtilsTest
     }
 
     @Test(expected = JsonProcessingException.class)
-    public void malformedJSONparseTest() throws JsonProcessingException, Neo4JException {
+    public void malformedJSONparseTest() throws JsonProcessingException, Neo4jException {
         CypherUtils.parse("{\"notResults\"}");
     }
 

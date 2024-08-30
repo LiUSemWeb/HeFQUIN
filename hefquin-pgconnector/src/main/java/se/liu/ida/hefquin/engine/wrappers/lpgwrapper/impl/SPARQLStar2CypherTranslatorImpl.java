@@ -3,13 +3,8 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.base.utils.Pair;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQL2CypherTranslationResult;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.impl.LPGNode;
@@ -30,7 +25,7 @@ import java.util.stream.Collectors;
 public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTranslator {
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Var>> translateBGP(final BGP bgp, final LPG2RDFConfiguration conf,
+    public SPARQL2CypherTranslationResult translateBGP(final Set<Triple> bgp, final LPG2RDFConfiguration conf,
                                                                final boolean naive) {
         final Set<Node> certainNodes = new HashSet<>();
         final Set<Node> certainEdgeLabels = new HashSet<>();
@@ -38,10 +33,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         final Set<Node> certainPropertyNames = new HashSet<>();
         final Set<Node> certainPropertyValues = new HashSet<>();
         if (!naive) {
-            for (final TriplePattern tp : bgp.getTriplePatterns()) {
-                final Node s = tp.asJenaTriple().getSubject();
-                final Node p = tp.asJenaTriple().getPredicate();
-                final Node o = tp.asJenaTriple().getObject();
+            for ( final Triple tp : bgp ) {
+                final Node s = tp.getSubject();
+                final Node p = tp.getPredicate();
+                final Node o = tp.getObject();
                 if (s.isVariable()) {
                     if (conf.getLabelPredicate().equals(p) || conf.isIRIForEdgeLabel(p) || conf.isRDFTermForLPGNode(o) || conf.isRDFTermForNodeLabel(o)) {
                         certainNodes.add(s);
@@ -70,34 +65,36 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
         }
         CypherQuery result = null;
         final CypherVarGenerator gen = new CypherVarGenerator();
-        for (final TriplePattern tp : bgp.getTriplePatterns()) {
-            CypherQuery tpTranslation = translateTriplePattern(tp, conf, gen, certainNodes,
-                    certainEdgeLabels, certainNodeLabels, certainPropertyNames, certainPropertyValues).object1;
+        for ( final Triple tp : bgp ) {
+            final SPARQL2CypherTranslationResult translationResult = translateTriplePattern(tp, conf, gen, certainNodes,
+                    certainEdgeLabels, certainNodeLabels, certainPropertyNames, certainPropertyValues);
+            final CypherQuery cypherForTP = translationResult.getCypherQuery();
             if (result == null){
-                result = tpTranslation;
+                result = cypherForTP;
             } else {
-                result = CypherQueryCombinator.combine(result, tpTranslation, gen);
+                result = CypherQueryCombinator.combine(result, cypherForTP, gen);
             }
         }
-        return new Pair<>(result, gen.getReverseMap());
+
+        return new SPARQL2CypherTranslationResultImpl( result, gen.getReverseMap() );
     }
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Var>> translateTriplePattern(TriplePattern tp, LPG2RDFConfiguration conf) {
+    public SPARQL2CypherTranslationResult translateTriplePattern(Triple tp, LPG2RDFConfiguration conf) {
         return translateTriplePattern(tp, conf, new CypherVarGenerator(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
                 new HashSet<>(), new HashSet<>());
     }
 
     @Override
-    public Pair<CypherQuery, Map<CypherVar, Var>> translateTriplePattern(final TriplePattern tp,
-                                                                          final LPG2RDFConfiguration conf,
-                                                                          final CypherVarGenerator generator,
-                                                                          final Set<Node> certainNodes,
-                                                                          final Set<Node> certainEdgeLabels,
-                                                                          final Set<Node> certainNodeLabels,
-                                                                          final Set<Node> certainPropertyNames,
-                                                                          final Set<Node> certainPropertyValues) {
-        return new Pair<>(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
+    public SPARQL2CypherTranslationResult translateTriplePattern( final Triple tp,
+                                                                  final LPG2RDFConfiguration conf,
+                                                                  final CypherVarGenerator generator,
+                                                                  final Set<Node> certainNodes,
+                                                                  final Set<Node> certainEdgeLabels,
+                                                                  final Set<Node> certainNodeLabels,
+                                                                  final Set<Node> certainPropertyNames,
+                                                                  final Set<Node> certainPropertyValues) {
+        return new SPARQL2CypherTranslationResultImpl(handleTriplePattern(tp, conf, generator, certainNodes, certainEdgeLabels,
                 certainNodeLabels, certainPropertyNames, certainPropertyValues), generator.getReverseMap());
     }
 
@@ -107,7 +104,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
      * the direct translation of it. If the triple pattern is nested, it first translates the embedded
      * triple pattern, and then adds conditions, iterators or return statements depending on the case.
      */
-    protected static CypherQuery handleTriplePattern(final TriplePattern pattern,
+    protected static CypherQuery handleTriplePattern(final Triple tp,
                                                      final LPG2RDFConfiguration configuration,
                                                      final CypherVarGenerator gen,
                                                      final Set<Node> certainNodes,
@@ -115,21 +112,20 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                      final Set<Node> certainNodeLabels,
                                                      final Set<Node> certainPropertyNames,
                                                      final Set<Node> certainPropertyValues) {
-        final Triple b = pattern.asJenaTriple();
-        final Node s = b.getSubject();
+        final Node s = tp.getSubject();
         if (!s.isNodeTriple()) {
-            return translateTriplePattern(pattern, configuration, gen, certainNodes, certainEdgeLabels,
+            return translateTriplePattern(tp, configuration, gen, certainNodes, certainEdgeLabels,
                     certainNodeLabels, certainPropertyNames, certainPropertyValues, false);
         }
-        final CypherQuery translation = translateTriplePattern(new TriplePatternImpl(s.getTriple()),
+        final CypherQuery translation = translateTriplePattern(s.getTriple(),
                 configuration, gen, certainNodes, certainEdgeLabels, certainNodeLabels, certainPropertyNames,
                 certainPropertyValues, true);
         if (!(translation instanceof CypherMatchQuery)){
             return null; //TODO throw exception
         }
         final CypherMatchQuery innerTPTranslation = (CypherMatchQuery) translation;
-        final Node p = b.getPredicate();
-        final Node o = b.getObject();
+        final Node p = tp.getPredicate();
+        final Node o = tp.getObject();
 
         final CypherVar edgeVar = ((EdgeMatchClause) innerTPTranslation.getMatches().get(0)).getEdge();
 
@@ -165,7 +161,7 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
      * This method translates non-nested triple patterns into Cypher, leveraging knowledge of properties that
      * the variables in the triple pattern may hold like boundedness to given LPG elements or edge-compatibility.
      */
-    protected static CypherQuery translateTriplePattern(final TriplePattern pattern,
+    protected static CypherQuery translateTriplePattern(final Triple tp,
                                                       final LPG2RDFConfiguration configuration,
                                                       final CypherVarGenerator gen,
                                                       final Set<Node> certainNodes,
@@ -174,11 +170,10 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
                                                       final Set<Node> certainPropertyNames,
                                                       final Set<Node> certainPropertyValues,
                                                       final boolean isEdgeCompatible) {
-        final Triple b = pattern.asJenaTriple();
-        final Node s = b.getSubject();
-        final Node p = b.getPredicate();
-        final Node o = b.getObject();
-        final int nbOfVars = QueryPatternUtils.getNumberOfVarOccurrences(pattern);
+        final Node s = tp.getSubject();
+        final Node p = tp.getPredicate();
+        final Node o = tp.getObject();
+        final int nbOfVars = getNumberOfVarOccurrences(tp);
         if (nbOfVars == 0) {
             if (configuration.isRDFTermForLPGNode(s) && configuration.getLabelPredicate().equals(p) && configuration.isRDFTermForNodeLabel(o)){
                 return getNodeLabelLabel(s, p, o, configuration, gen);
@@ -921,6 +916,17 @@ public class SPARQLStar2CypherTranslatorImpl implements SPARQLStar2CypherTransla
             }
         }
         return equivalenceMap;
+    }
+
+    /**
+     * Returns the number of elements of the given triple pattern that are variables.
+     */
+    public static int getNumberOfVarOccurrences( final Triple tp ) {
+        int n = 0;
+        if ( tp.getSubject().isVariable() )   { n += 1; }
+        if ( tp.getPredicate().isVariable() ) { n += 1; }
+        if ( tp.getObject().isVariable() )    { n += 1; }
+        return n;
     }
 
 }

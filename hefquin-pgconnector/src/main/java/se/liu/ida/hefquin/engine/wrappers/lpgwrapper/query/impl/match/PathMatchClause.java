@@ -1,14 +1,14 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.match;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.LabeledGraph;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.LabeledGraph;
 
 public class PathMatchClause implements MatchClause {
 

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 

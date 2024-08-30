@@ -6,8 +6,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.RecordEntry;
@@ -31,8 +29,10 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     private List<AliasedExpression> returnExpressions = null;
 
     @Override
-    public SolutionMapping translateRecord(final TableRecord record, final LPG2RDFConfiguration conf,
-                                           final CypherQuery query, final Map<CypherVar, Var> varMap) {
+    public Binding translateRecord( final TableRecord record,
+                                    final LPG2RDFConfiguration conf,
+                                    final CypherQuery query,
+                                    final Map<CypherVar, Var> varMap ) {
         final BindingBuilder builder = Binding.builder();
         final int n = record.size();
         if (returnExpressions == null)
@@ -57,7 +57,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             }
             if (expression instanceof CountLargerThanZeroExpression) {
                 if (current.getValue().toString().equals("true")) continue;
-                else return new SolutionMappingImpl(BindingFactory.binding());
+                else return BindingFactory.binding();
             }
             if (expression instanceof CypherVar) {
                 builder.add(var, conf.getRDFTermForLPGNode(((LPGNodeValue) current.getValue()).getNode()));
@@ -89,7 +89,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
             }
         }
 
-        return new SolutionMappingImpl(builder.build());
+        return builder.build();
     }
 
     private int extractIndex(CypherExpression dataMarker) {
@@ -104,12 +104,13 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
     }
 
     @Override
-    public List<SolutionMapping> translateRecords(final List<TableRecord> records,
-                                                  final LPG2RDFConfiguration conf, final CypherQuery query,
-                                                  final Map<CypherVar, Var> varMap) {
-        final List<SolutionMapping> results = new ArrayList<>();
-        for (final TableRecord record : records) {
-            results.add(translateRecord(record, conf, query, varMap));
+    public List<Binding> translateRecords( final List<TableRecord> records,
+                                           final LPG2RDFConfiguration conf,
+                                           final CypherQuery query,
+                                           final Map<CypherVar, Var> varMap ) {
+        final List<Binding> results = new ArrayList<>();
+        for ( final TableRecord record : records ) {
+            results.add( translateRecord(record, conf, query, varMap) );
         }
         return results;
     }

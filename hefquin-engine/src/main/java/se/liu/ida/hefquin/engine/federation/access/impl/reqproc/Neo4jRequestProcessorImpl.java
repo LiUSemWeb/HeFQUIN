@@ -3,9 +3,9 @@ package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.RecordsResponseImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4JException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4JConnectionException;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionException;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 
 import java.util.Date;
@@ -24,11 +24,11 @@ public class Neo4jRequestProcessorImpl implements Neo4jRequestProcessor
         try {
             result = conn.execute( req.getCypherQuery() );
         }
-        catch ( final Neo4JConnectionException ex ) {
+        catch ( final Neo4jConnectionException ex ) {
             throw new FederationAccessException("Executing the given request at the Neo4j endpoint at '"
                     + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
         }
-        catch ( final Neo4JException ex ) {
+        catch ( final Neo4jException ex ) {
             throw new FederationAccessException("Executing the given request at the Neo4j endpoint at '"
                     + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
         }

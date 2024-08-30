@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.*;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.AliasedExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class CypherMatchQueryImpl implements CypherMatchQuery {
 

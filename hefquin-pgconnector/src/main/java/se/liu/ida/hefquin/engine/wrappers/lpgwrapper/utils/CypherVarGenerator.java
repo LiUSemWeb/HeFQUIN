@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 
 import java.util.HashMap;

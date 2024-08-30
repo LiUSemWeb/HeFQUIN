@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
 import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedNodeLabelException;
 
 public class NodeLabelMappingImpl_RegexMatchToURIs extends NodeLabelMappingImpl_AllToURIs {

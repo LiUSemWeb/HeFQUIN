@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-
 import java.util.Objects;
 import java.util.Set;
+
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
 
 public class VariableLabelExpression implements BooleanCypherExpression {
 

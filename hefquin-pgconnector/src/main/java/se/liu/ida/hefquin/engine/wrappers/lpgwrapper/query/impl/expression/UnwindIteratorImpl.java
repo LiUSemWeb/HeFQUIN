@@ -1,11 +1,11 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.UnwindIterator;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherExpressionVisitor;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class UnwindIteratorImpl implements UnwindIterator {
 

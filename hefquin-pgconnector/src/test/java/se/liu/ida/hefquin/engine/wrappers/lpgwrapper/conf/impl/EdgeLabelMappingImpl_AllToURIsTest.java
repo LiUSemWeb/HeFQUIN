@@ -1,14 +1,14 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMapping;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingImpl_AllToURIs;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedEdgeLabelException;
-
-import static org.junit.Assert.*;
 
 public class EdgeLabelMappingImpl_AllToURIsTest {
     protected final String NSRELATIONSHIP = "https://example.org/relationship/";

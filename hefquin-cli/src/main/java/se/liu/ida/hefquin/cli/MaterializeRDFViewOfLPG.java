@@ -20,17 +20,10 @@ import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.graph.GraphFactory;
 
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.federation.Neo4jServer;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
-import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.federation.access.RecordsResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory.Neo4jConnection;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.PropertyMap;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.Value;
@@ -51,6 +44,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public class MaterializeRDFViewOfLPG extends CmdARQ
@@ -91,11 +85,6 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 
 		final String neo4jEndpointURI = getArg(argEndpointURI).getValue();
-		final Neo4jInterface neo4jIface = new Neo4jInterfaceImpl(neo4jEndpointURI);
-		final Neo4jServer neo4jServer = new Neo4jServer() {
-			@Override public Neo4jInterface getInterface() { return neo4jIface; }
-			@Override public VocabularyMapping getVocabularyMapping() { return null; }
-		};
 
 		final LPG2RDFConfiguration l2rConf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
@@ -106,16 +95,15 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 		final CypherQuery getNodesQuery = buildGetNodesQuery();
 		final CypherQuery getEdgesQuery = buildGetEdgesQuery();
-		final Neo4jRequestProcessor proc = new Neo4jRequestProcessorImpl();
 
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 
-		final RecordsResponse nodesResponse = execQuery(getNodesQuery, neo4jServer, proc);
+		final List<TableRecord> nodesResponse = execQuery(getNodesQuery, neo4jEndpointURI);
 		writeTriplesForNodes(nodesResponse, l2rConf, rdfOutStream);
 
-		final RecordsResponse edgesResponse = execQuery(getEdgesQuery, neo4jServer, proc);
+		final List<TableRecord>  edgesResponse = execQuery(getEdgesQuery, neo4jEndpointURI);
 		writeTriplesForEdges(edgesResponse, l2rConf, rdfOutStream);
 
 		rdfOutStream.finish();
@@ -164,14 +152,13 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 				.build();
 	}
 
-	protected RecordsResponse execQuery( final CypherQuery query,
-	                                     final Neo4jServer server,
-	                                     final Neo4jRequestProcessor proc ) {
-		final Neo4jRequest request = new Neo4jRequestImpl( query.toString() );
+	protected List<TableRecord> execQuery( final CypherQuery query,
+	                                       final String neo4jEndpointURI ) {
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect(neo4jEndpointURI);
 
-		final RecordsResponse response;
+		final List<TableRecord> result;
 		try {
-			response = proc.performRequest(request, server);
+			result = conn.execute(query);
 		}
 		catch ( final Exception ex ) {
 			System.out.flush();
@@ -182,13 +169,13 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			throw new IllegalStateException(ex);
 		}
 
-		return response;
+		return result;
 	}
 
-	protected void writeTriplesForNodes( final RecordsResponse nodesResponse,
+	protected void writeTriplesForNodes( final List<TableRecord> nodesResponse,
 	                                     final LPG2RDFConfiguration l2rConf,
 	                                     final StreamRDF rdfOutStream ) {
-		for ( final TableRecord record : nodesResponse.getResponse() ) {
+		for ( final TableRecord record : nodesResponse ) {
 			// Obtain the relevant values from the current row of the
 			// query result, which capture the current node and its label.
 			final LPGNodeValue nodeValue = (LPGNodeValue) record.getEntry(0).getValue();
@@ -215,10 +202,10 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 	}
 
-	protected void writeTriplesForEdges( final RecordsResponse edgesResponse,
+	protected void writeTriplesForEdges( final List<TableRecord> edgesResponse,
 	                                     final LPG2RDFConfiguration l2rConf,
 	                                     final StreamRDF rdfOutStream ) {
-		for ( final TableRecord record : edgesResponse.getResponse() ) {
+		for ( final TableRecord record : edgesResponse ) {
 			// Obtain the relevant values from the current row of the
 			// query result, which capture the current edge, its label,
 			// and its incident nodes.

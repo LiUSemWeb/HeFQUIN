@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl;
 
 import org.apache.jena.graph.Node;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.exceptions.UnSupportedPropertyNameException;
 
 public class PropertyNameMappingImpl_RegexMatchToURIs extends PropertyNameMappingImpl_AllToURIs {

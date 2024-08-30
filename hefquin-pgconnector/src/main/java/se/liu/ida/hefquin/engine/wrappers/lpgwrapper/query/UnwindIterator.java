@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.BooleanCypherExpression;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.CypherVar;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.expression.ListCypherExpression;
-
-import java.util.List;
 
 /**
  * This interface represents an UNWIND clause of a Match Query.
