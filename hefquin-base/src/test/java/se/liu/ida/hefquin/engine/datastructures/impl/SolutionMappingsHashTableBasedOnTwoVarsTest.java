@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.datastructures.SolutionMappingsIndex;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static se.liu.ida.hefquin.testutils.AssertExt.assertHasNext;
 
 public class SolutionMappingsHashTableBasedOnTwoVarsTest extends TestsForSolutionMappingsIndex {
     @Test

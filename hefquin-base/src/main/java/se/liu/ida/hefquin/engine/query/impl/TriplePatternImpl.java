@@ -19,7 +19,7 @@ public class TriplePatternImpl implements TriplePattern
 	}
 
 	public TriplePatternImpl( final Node s, final Node p, final Node o ) {
-		this( new Triple(s,p,o) );
+		this( Triple.create(s,p,o) );
 	}
 
 	@Override

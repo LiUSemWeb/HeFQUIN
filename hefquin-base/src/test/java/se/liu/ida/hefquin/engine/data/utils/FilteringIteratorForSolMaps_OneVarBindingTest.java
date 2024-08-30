@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
 import java.util.*;
 import static org.junit.Assert.*;
+import static se.liu.ida.hefquin.testutils.AssertExt.assertHasNext;
 
 public class FilteringIteratorForSolMaps_OneVarBindingTest extends TestsForSolutionMappingsIterableWithFilter
 {

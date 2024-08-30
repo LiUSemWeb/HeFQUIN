@@ -24,7 +24,6 @@ import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFInterface;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLEndpointInterface;

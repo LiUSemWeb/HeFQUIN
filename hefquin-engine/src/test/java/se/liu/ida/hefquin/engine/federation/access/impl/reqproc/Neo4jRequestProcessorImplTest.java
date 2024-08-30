@@ -6,8 +6,6 @@ import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.engine.federation.access.RecordsResponse;
-import se.liu.ida.hefquin.engine.federation.access.StringResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.Neo4jRequestImpl;
 
 import static org.junit.Assert.assertEquals;

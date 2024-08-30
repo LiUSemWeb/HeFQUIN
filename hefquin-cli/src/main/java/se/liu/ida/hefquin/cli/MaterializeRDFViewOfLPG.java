@@ -202,9 +202,9 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			// is called nl in the paper.
 			for ( final LiteralValue labelValue : labelArray.getElements() ) {
 				final String label = labelValue.getValue().toString();
-				final Triple t = new Triple( termForNode,
-				                             l2rConf.getLabelPredicate(),
-				                             l2rConf.getRDFTermForNodeLabel(label) );
+				final Triple t = Triple.create( termForNode,
+				                                l2rConf.getLabelPredicate(),
+				                                l2rConf.getRDFTermForNodeLabel(label) );
 				rdfOutStream.triple(t);
 			}
 
@@ -233,9 +233,9 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 			// Create the triple that captures the current edge, which is
 			// one of the triples in the set that is called e in the paper.
-			final Triple edgeTriple = new Triple( l2rConf.getRDFTermForLPGNode(srcNode),
-			                                      l2rConf.getIRIForEdgeLabel(label),
-			                                      l2rConf.getRDFTermForLPGNode(tgtNode) );
+			final Triple edgeTriple = Triple.create( l2rConf.getRDFTermForLPGNode(srcNode),
+			                                         l2rConf.getIRIForEdgeLabel(label),
+			                                         l2rConf.getRDFTermForLPGNode(tgtNode) );
 			rdfOutStream.triple(edgeTriple);
 
 			// Create and write the triples that capture the properties of
@@ -279,7 +279,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 				lit = NodeFactory.createLiteralByValue( lpv.getValue(), dt );
 
 			// Create and write the triple.
-			final Triple t = new Triple( subject, l2rConf.getIRIForPropertyName(pn), lit );
+			final Triple t = Triple.create( subject, l2rConf.getIRIForPropertyName(pn), lit );
 			rdfOutStream.triple(t);
 		}
 	}

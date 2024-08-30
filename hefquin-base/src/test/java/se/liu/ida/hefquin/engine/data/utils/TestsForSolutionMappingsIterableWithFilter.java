@@ -4,7 +4,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.engine.EngineTestBaseCopy;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 
 import java.util.*;
@@ -12,7 +11,7 @@ import java.util.*;
 /**
  * This is a class with helper functions for testing SolutionMappingsIterableWithFilter
  */
-public abstract class TestsForSolutionMappingsIterableWithFilter extends EngineTestBaseCopy
+public abstract class TestsForSolutionMappingsIterableWithFilter
 {
 	final Var var1 = Var.alloc("v1");
 	final Var var2 = Var.alloc("v2");

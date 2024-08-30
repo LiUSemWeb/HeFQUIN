@@ -22,7 +22,7 @@ public class DPBasedLinearJoinPlanOptimizer extends DPBasedJoinPlanOptimizer {
         final List< Pair<List<T>, List<T>> > result = new ArrayList<>();
         for ( T element : superset ) {
             final List<T> right = Arrays.asList(element);
-            final List<T> left = new ArrayList(superset);
+            final List<T> left = new ArrayList<>(superset);
             left.remove(element);
 
             result.add( new Pair<>(left, right));

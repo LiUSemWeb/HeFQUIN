@@ -11,8 +11,6 @@ import org.junit.Test;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterOverResultElementIter;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterator;
 
 public class ResultBlockIterOverResultElementIterTest
 {

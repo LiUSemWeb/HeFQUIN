@@ -16,8 +16,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RewritingRule;
-import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.rules.RuleMergeTPAddOfBGPAddIntoBGPAdd;
 
 import java.util.*;

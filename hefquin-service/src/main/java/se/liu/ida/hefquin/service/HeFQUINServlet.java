@@ -23,7 +23,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 
 @WebServlet
-public class HeFQUINServlet extends HttpServlet {
+public class HeFQUINServlet extends HttpServlet
+{
+	private static final long serialVersionUID = 5902821543508443162L;
+
 	private static String configProperties = "config.properties";
 	private static HeFQUINEngine engine;
 	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList( "application/sparql-results+json",

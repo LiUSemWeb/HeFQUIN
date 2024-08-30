@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonParseException;
@@ -22,8 +21,6 @@ public class GraphQLConnection
 	                                         final int connectionTimeout,
 	                                         final int readTimeout )
 			throws GraphQLConnectionException {
-
-		final Date startTime = new Date();
 
 		HttpURLConnection con = null;
 		OutputStreamWriter outWriter = null;

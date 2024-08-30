@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.data.utils;
 
 import static org.junit.Assert.assertFalse;
+import static se.liu.ida.hefquin.testutils.AssertExt.assertHasNext;
 
 import java.util.ArrayList;
 import java.util.Iterator;

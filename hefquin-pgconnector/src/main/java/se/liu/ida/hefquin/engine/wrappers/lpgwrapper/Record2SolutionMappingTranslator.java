@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;

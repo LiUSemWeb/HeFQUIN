@@ -8,6 +8,7 @@ import java.util.Properties;
 
 public class ConfigLoader {
 
+	@SuppressWarnings("resource")
 	public static Properties load( final String propertiesFileName ) {
 		final Properties properties = new Properties();
 
@@ -15,14 +16,25 @@ public class ConfigLoader {
 		InputStream resourceStream;
 		try {
 			resourceStream = new FileInputStream( propertiesFileName );
-		} catch ( FileNotFoundException e ) {
+		}
+		catch ( final FileNotFoundException e ) {
 			resourceStream = ConfigLoader.class.getClassLoader().getResourceAsStream( propertiesFileName );
 		}
 
 		try {
 			properties.load( resourceStream );
-		} catch ( IOException e ) {
+		}
+		catch ( final IOException e ) {
 			System.err.println( "Failed to load properties file: " + propertiesFileName );
+			e.printStackTrace();
+		}
+
+		try {
+			resourceStream.close();
+		}
+		catch ( final IOException e ) {
+			System.err.println( "Failed to close properties file: " + propertiesFileName );
+			e.printStackTrace();
 		}
 
 		return properties;

@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 
-public class QueryExecutionException extends Exception  {
+public class QueryExecutionException extends Exception
+{
+	private static final long serialVersionUID = -6937277621497349998L;
 
-    private static final long serialVersionUID = -6937277621497349998L;
-
-    public QueryExecutionException(final String message, final Exception e) {
-        super(message,e);
-    }
+	public QueryExecutionException( final String message, final Exception e ) {
+		super(message,e);
+	}
 }

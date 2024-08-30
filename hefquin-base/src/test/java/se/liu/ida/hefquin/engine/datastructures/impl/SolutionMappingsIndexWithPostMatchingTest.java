@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
 import java.util.*;
 
 import static org.junit.Assert.*;
+import static se.liu.ida.hefquin.testutils.AssertExt.assertHasNext;
 
 public class SolutionMappingsIndexWithPostMatchingTest extends TestsForSolutionMappingsIndex {
     @Test

@@ -3,12 +3,9 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl;
 import java.util.Map;
 import java.util.Set;
 
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
 
 public class GraphQLSchemaImpl implements GraphQLSchema {
 

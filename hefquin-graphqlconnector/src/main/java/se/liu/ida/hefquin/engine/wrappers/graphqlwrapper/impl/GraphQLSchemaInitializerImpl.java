@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.engine.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnection;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnectionException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;

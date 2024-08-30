@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.data.SolutionMapping;
 import java.util.*;
 
 import static org.junit.Assert.assertFalse;
+import static se.liu.ida.hefquin.testutils.AssertExt.assertHasNext;
 
 public class SolutionMappingsIteratorOverCollectionOfListsTest extends TestsForSolutionMappingsIterableWithFilter
 {
