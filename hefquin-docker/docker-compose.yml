@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  hefquin:
+    build:
+      context: .
+      ### If you want to build the Docker image for a specific version
+      ### of HeFQUIN, uncomment the following two lines and replace
+      ### 'docker-test' by the release tag of that version.
+      #args:
+      #  TAG: docker-test
+    ports:
+      - "8080:8080"
+    volumes:
+      ### If you want to use configuration files other than the default ones
+      ### or a federation description other than the default one, uncomment
+      ### the following three lines and change their respective first parts
+      ### to refer to the files that you want to use.
+      #- ../hefquin-service/src/main/resources/config.properties:/usr/local/tomcat/webapps/ROOT/config.properties
+      #- ../hefquin-service/src/main/resources/DefaultEngineConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleEngineConf.ttl
+      #- ../hefquin-service/src/main/resources/DefaultFedConf.ttl:/usr/local/tomcat/webapps/ROOT/ExampleFedConf.ttl
