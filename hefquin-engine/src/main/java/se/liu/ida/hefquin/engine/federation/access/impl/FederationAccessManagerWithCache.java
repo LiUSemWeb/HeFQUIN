@@ -5,26 +5,26 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import se.liu.ida.hefquin.engine.datastructures.Cache;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntry;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryBase;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryBaseFactory;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheEntryFactory;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheInvalidationPolicy;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CachePolicies;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicy;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicyFactory;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.CacheReplacementPolicyLRU;
-import se.liu.ida.hefquin.engine.datastructures.impl.cache.GenericCacheImpl;
+import se.liu.ida.hefquin.base.datastructures.Cache;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBaseFactory;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.GenericCacheImpl;
+import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager
 {

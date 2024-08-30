@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public interface HeFQUINEngine
 {

@@ -5,8 +5,8 @@ import java.util.Set;
 import org.apache.jena.sparql.exec.http.Params;
 import org.apache.jena.sparql.serializer.SerializationContext;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;

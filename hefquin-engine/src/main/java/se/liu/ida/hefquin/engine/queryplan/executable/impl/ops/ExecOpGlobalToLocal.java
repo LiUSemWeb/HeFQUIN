@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Iterator;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
-import se.liu.ida.hefquin.engine.data.utils.RewritingIteratorForSolMapsG2L;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.data.utils.RewritingIteratorForSolMapsG2L;
 
 public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithIterator
 {

@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
 
 public class CollectingIntermediateResultElementSinkWithTranslation extends CollectingIntermediateResultElementSink
 {

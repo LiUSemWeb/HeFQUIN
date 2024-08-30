@@ -1,8 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 
 import org.apache.jena.graph.Node;
+
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;

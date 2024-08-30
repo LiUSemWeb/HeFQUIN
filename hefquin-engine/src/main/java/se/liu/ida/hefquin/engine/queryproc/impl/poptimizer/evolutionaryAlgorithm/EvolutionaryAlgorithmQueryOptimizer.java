@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm;
 
+import se.liu.ida.hefquin.base.utils.Pair;
+import se.liu.ida.hefquin.base.utils.RandomizedSelection;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -14,8 +16,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplica
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
-import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 import java.util.*;
 

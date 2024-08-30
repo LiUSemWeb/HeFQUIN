@@ -8,8 +8,8 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.vocabulary.VOID;
 
-import se.liu.ida.hefquin.engine.data.Triple;
-import se.liu.ida.hefquin.engine.data.impl.TripleImpl;
+import se.liu.ida.hefquin.base.data.Triple;
+import se.liu.ida.hefquin.base.data.impl.TripleImpl;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;

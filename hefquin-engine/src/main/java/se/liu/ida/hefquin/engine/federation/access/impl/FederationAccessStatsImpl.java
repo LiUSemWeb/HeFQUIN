@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public class FederationAccessStatsImpl extends StatsImpl implements FederationAccessStats
 {

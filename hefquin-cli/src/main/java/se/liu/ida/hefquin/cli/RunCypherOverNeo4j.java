@@ -3,7 +3,8 @@ package se.liu.ida.hefquin.cli;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModTime;
 import org.apache.jena.cmd.ArgDecl;
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jInterface;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;

@@ -1,11 +1,11 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseBuilder;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implements BRTPFRequestProcessor
 {

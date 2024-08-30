@@ -10,9 +10,9 @@ import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.sparql.core.Quad;
 
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseBuilder;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 /**
  * Base class for {@link RequestProcessor} implementations that retrieve {@link TPFResponse}.

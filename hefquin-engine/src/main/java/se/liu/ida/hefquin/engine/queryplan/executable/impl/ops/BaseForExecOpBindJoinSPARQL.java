@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.apache.jena.sparql.core.Var;
 
+import se.liu.ida.hefquin.base.query.BGP;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.QueryPatternUtils;
 
 /**
  * A base class for all variations of the bind join algorithm that use

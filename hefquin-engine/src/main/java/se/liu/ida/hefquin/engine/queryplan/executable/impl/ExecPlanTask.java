@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
+import se.liu.ida.hefquin.base.utils.StatsProvider;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
-import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
 public interface ExecPlanTask extends Runnable, StatsProvider
 {

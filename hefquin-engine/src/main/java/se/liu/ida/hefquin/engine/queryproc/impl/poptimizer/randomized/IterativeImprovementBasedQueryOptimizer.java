@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -15,7 +16,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.RandomizedJoin
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class IterativeImprovementBasedQueryOptimizer extends RandomizedQueryOptimizerBase
 {

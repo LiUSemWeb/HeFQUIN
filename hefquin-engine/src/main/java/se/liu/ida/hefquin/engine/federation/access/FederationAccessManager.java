@@ -2,13 +2,13 @@ package se.liu.ida.hefquin.engine.federation.access;
 
 import java.util.concurrent.CompletableFuture;
 
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.utils.StatsProvider;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.Neo4jServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
-import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
 public interface FederationAccessManager extends StatsProvider
 {

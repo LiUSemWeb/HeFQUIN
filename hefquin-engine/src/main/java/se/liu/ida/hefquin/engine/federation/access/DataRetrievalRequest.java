@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 
 public interface DataRetrievalRequest
 {

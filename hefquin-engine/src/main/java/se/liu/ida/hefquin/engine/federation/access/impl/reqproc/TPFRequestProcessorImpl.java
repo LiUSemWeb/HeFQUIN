@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.reqproc;
 
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -8,7 +9,6 @@ import se.liu.ida.hefquin.engine.federation.access.TPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseBuilder;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements TPFRequestProcessor
 {

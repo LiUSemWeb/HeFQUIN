@@ -1,11 +1,12 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple;
 
 import org.junit.Test;
+
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 import java.util.Arrays;
 import java.util.List;

@@ -20,10 +20,10 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingBuilder;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
-import se.liu.ida.hefquin.engine.query.impl.SPARQLQueryImpl;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
+import se.liu.ida.hefquin.base.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
@@ -67,6 +67,8 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase
         fieldPaths.add("ep_single0:author(id:$var0)/scalar_name:name");
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth3"), "ID!"));
+
+        @SuppressWarnings("unused")
         final GraphQLQuery graphqlQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
 
         /* How the JSON response can look like
@@ -177,6 +179,8 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase
         final Set<GraphQLArgument> queryArgs = new HashSet<>();
         queryArgs.add(new GraphQLArgumentImpl("var0", "id", new JsonString("auth6"), "ID!"));
         queryArgs.add(new GraphQLArgumentImpl("var1", "id", new JsonString("auth7"), "ID!"));
+        
+        @SuppressWarnings("unused")
         final GraphQLQuery graphqlQuery = new GraphQLQueryImpl(fieldPaths, queryArgs);
 
         /* How the JSON response can look like

@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import java.util.NoSuchElementException;
 
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 
 public interface PhysicalPlan
 {

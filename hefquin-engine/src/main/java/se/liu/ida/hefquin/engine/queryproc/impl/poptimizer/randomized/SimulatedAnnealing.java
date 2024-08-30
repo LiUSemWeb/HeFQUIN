@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized;
 
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -11,7 +12,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationS
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public class SimulatedAnnealing extends RandomizedQueryOptimizerBase
 {

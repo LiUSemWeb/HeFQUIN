@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
 
 /**
  * Helper class representing the nodes used to check for cyclic bindings between SGPs

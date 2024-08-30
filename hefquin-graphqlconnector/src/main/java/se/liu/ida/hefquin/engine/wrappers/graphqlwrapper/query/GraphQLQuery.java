@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonObject;
 
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.base.query.Query;
 
 /**
  * Represents a GraphQL query

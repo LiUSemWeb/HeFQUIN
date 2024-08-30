@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc;
 
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.query.Query;
-import se.liu.ida.hefquin.engine.utils.Pair;
+import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.utils.Pair;
 
 public interface QueryProcessor
 {

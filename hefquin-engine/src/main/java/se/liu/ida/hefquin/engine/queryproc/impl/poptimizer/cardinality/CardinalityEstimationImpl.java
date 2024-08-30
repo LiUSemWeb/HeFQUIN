@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 
 import org.apache.jena.sparql.core.Var;
 
+import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -17,7 +18,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.engine.utils.CompletableFutureUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

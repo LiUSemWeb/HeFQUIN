@@ -3,8 +3,7 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 import java.util.HashSet;
 import java.util.Set;
 
-
-import se.liu.ida.hefquin.engine.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
 
 public class GraphCycleDetector {
 

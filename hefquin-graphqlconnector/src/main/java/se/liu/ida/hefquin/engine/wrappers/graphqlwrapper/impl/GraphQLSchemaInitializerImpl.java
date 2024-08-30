@@ -9,7 +9,7 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
 
-import se.liu.ida.hefquin.engine.utils.Pair;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnection;

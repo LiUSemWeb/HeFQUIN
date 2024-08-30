@@ -3,7 +3,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 import java.util.Collections;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.utils.Pair;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
@@ -16,8 +18,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
-import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 /**
  * Simple implementation of {@link QueryProcessor}.

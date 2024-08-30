@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper;
 
-import se.liu.ida.hefquin.engine.query.BGP;
+import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryTranslatingException;

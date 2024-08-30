@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl;
 
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public class QueryProcStatsImpl extends StatsImpl implements QueryProcStats
 {

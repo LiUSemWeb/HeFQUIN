@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 public interface QueryPlanner
 {

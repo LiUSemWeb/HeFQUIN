@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable;
 
 import java.util.List;
 
+import se.liu.ida.hefquin.base.utils.StatsProvider;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
-import se.liu.ida.hefquin.engine.utils.StatsProvider;
 
 public interface ExecutablePlan extends StatsProvider
 {

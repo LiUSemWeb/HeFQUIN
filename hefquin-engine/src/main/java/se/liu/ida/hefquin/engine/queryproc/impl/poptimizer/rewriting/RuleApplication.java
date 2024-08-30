@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting;
 
+import se.liu.ida.hefquin.base.utils.RandomizedSelection;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.utils.RandomizedSelection;
 
 public interface RuleApplication extends RandomizedSelection.WeightedObject {
 	/**

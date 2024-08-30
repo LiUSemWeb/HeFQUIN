@@ -8,9 +8,9 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.impl.SolutionMappingImpl;
-import se.liu.ida.hefquin.engine.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
+import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSolutionGraphSolver;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils.QueryExecutionException;
 

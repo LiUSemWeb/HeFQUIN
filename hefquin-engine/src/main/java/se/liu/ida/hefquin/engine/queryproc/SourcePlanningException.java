@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.base.query.Query;
 
 /**
  * An exception that occurred when creating a source assignment for a given query.

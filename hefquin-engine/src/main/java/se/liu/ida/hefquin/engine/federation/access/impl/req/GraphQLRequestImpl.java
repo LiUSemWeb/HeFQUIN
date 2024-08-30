@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
+import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
 
 public class GraphQLRequestImpl implements GraphQLRequest

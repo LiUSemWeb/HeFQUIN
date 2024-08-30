@@ -3,7 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
@@ -14,7 +15,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputExce
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 /**
  * Push-based implementation of {@link ExecPlanTask}.

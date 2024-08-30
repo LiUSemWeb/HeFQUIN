@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
-import se.liu.ida.hefquin.engine.utils.Stats;
+import se.liu.ida.hefquin.base.utils.Stats;
 
 /**
  * This interface captures statistics collected during

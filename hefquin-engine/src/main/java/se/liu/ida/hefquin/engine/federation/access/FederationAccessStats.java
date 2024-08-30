@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.utils.Stats;
+import se.liu.ida.hefquin.base.utils.Stats;
 
 public interface FederationAccessStats extends Stats
 {

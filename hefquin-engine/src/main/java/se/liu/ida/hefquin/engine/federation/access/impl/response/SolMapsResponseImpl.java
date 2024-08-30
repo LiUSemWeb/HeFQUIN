@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl.response;
 import java.util.Date;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;

@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.data.Triple;
+import se.liu.ida.hefquin.base.data.Triple;
 
 public interface TPFResponse extends TriplesResponse
 {

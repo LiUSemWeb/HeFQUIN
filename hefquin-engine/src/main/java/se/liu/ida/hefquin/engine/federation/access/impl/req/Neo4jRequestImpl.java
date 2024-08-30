@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
+import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.access.Neo4jRequest;
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
 
 import java.util.Objects;
 

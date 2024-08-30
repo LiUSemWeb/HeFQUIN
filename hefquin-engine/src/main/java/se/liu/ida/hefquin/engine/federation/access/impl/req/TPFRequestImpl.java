@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
 import org.apache.jena.graph.Triple;
 
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
 
 public class TPFRequestImpl extends TriplePatternRequestImpl implements TPFRequest
 {

@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.utils;
 
 import org.apache.jena.graph.Node;
 
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.query.impl.BGPImpl;
+import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 
 /**
  * This class represents a subject-based star pattern, that is,

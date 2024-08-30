@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public abstract class ExecPlanTaskBase implements ExecPlanTask
 {

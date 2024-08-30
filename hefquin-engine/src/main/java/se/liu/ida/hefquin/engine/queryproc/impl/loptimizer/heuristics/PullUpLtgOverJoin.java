@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 
-import se.liu.ida.hefquin.engine.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;

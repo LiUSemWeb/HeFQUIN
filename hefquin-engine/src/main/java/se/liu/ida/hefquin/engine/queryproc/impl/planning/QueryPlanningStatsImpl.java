@@ -1,11 +1,11 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 public class QueryPlanningStatsImpl extends StatsImpl implements QueryPlanningStats
 {

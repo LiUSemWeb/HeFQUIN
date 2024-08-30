@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.utils.StatsImpl;
 
 /**
  * An implementation of {@link ExecutablePlanStats}

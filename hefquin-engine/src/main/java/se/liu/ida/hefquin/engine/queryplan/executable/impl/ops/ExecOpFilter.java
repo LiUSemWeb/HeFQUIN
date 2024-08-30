@@ -5,8 +5,8 @@ import java.util.Iterator;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 
-import se.liu.ida.hefquin.engine.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.data.utils.FilteringIteratorForSolMaps_ExprList;
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.FilteringIteratorForSolMaps_ExprList;
 
 public class ExecOpFilter extends UnaryExecutableOpBaseWithIterator
 {

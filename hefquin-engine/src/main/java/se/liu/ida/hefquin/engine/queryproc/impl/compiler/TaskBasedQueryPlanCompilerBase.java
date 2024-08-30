@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import java.util.LinkedList;
 
-import se.liu.ida.hefquin.engine.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;

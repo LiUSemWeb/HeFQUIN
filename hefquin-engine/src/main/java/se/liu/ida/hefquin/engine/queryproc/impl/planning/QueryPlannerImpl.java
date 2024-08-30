@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.planning;
 
-import se.liu.ida.hefquin.engine.query.Query;
+import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
@@ -13,7 +14,6 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
-import se.liu.ida.hefquin.engine.utils.Pair;
 
 /**
  * Simple implementation of {@link QueryPlanner}.

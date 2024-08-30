@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
-import se.liu.ida.hefquin.engine.utils.Stats;
+import se.liu.ida.hefquin.base.utils.Stats;
 
 public interface QueryProcStats extends Stats
 {

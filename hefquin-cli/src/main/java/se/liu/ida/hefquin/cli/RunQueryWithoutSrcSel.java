@@ -16,6 +16,9 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
+import se.liu.ida.hefquin.base.utils.Pair;
+import se.liu.ida.hefquin.base.utils.Stats;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -23,9 +26,6 @@ import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
-import se.liu.ida.hefquin.engine.utils.Pair;
-import se.liu.ida.hefquin.engine.utils.Stats;
-import se.liu.ida.hefquin.engine.utils.StatsPrinter;
 
 public class RunQueryWithoutSrcSel extends CmdARQ
 {

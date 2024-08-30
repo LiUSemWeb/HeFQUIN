@@ -2,9 +2,10 @@ package se.liu.ida.hefquin.engine.wrappers.lpgwrapper;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
-import se.liu.ida.hefquin.engine.query.BGP;
-import se.liu.ida.hefquin.engine.query.TriplePattern;
-import se.liu.ida.hefquin.engine.utils.Pair;
+
+import se.liu.ida.hefquin.base.query.BGP;
+import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
