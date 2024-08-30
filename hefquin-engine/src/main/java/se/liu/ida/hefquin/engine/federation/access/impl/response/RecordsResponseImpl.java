@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl.response;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.RecordsResponse;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
+import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 
 import java.util.Date;
 import java.util.List;

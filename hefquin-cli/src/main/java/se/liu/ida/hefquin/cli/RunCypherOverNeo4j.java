@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.cli;
 
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModTime;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory.Neo4jConnection;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory.Neo4jConnection;
+import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 
 import org.apache.jena.cmd.ArgDecl;
 

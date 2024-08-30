@@ -20,22 +20,22 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.Record2SolutionMappingTranslator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQL2CypherTranslationResult;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.SPARQLStar2CypherTranslator;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conn.Neo4jConnectionFactory.Neo4jConnection;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.data.TableRecord;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.Record2SolutionMappingTranslatorImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQL2CypherTranslationResultImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.impl.SPARQLStar2CypherTranslatorImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherMatchQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.CypherUnionQuery;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.MatchClause;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.query.impl.CypherUnionQueryImpl;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.utils.CypherQueryBuilder;
+import se.liu.ida.hefquin.engine.wrappers.lpg.Record2SolutionMappingTranslator;
+import se.liu.ida.hefquin.engine.wrappers.lpg.SPARQL2CypherTranslationResult;
+import se.liu.ida.hefquin.engine.wrappers.lpg.SPARQLStar2CypherTranslator;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory.Neo4jConnection;
+import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
+import se.liu.ida.hefquin.engine.wrappers.lpg.impl.Record2SolutionMappingTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.impl.SPARQL2CypherTranslationResultImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.impl.SPARQLStar2CypherTranslatorImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.query.CypherMatchQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpg.query.CypherQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpg.query.CypherUnionQuery;
+import se.liu.ida.hefquin.engine.wrappers.lpg.query.MatchClause;
+import se.liu.ida.hefquin.engine.wrappers.lpg.query.impl.CypherUnionQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.utils.CypherQueryBuilder;
 
 public class RunBGPOverNeo4j extends CmdARQ
 {

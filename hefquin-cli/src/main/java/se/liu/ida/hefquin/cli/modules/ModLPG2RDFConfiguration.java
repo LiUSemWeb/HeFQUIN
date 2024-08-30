@@ -5,9 +5,9 @@ import org.apache.jena.cmd.CmdArgModule;
 import org.apache.jena.cmd.CmdGeneral;
 import org.apache.jena.cmd.ModBase;
 
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfiguration;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.LPG2RDFConfigurationReader;
-import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.DefaultLPG2RDFConfigurationImpl;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfigurationReader;
+import se.liu.ida.hefquin.engine.wrappers.lpg.conf.impl.DefaultLPG2RDFConfigurationImpl;
 
 public class ModLPG2RDFConfiguration extends ModBase
 {
