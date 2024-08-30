@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.vocabulary;
+package se.liu.ida.hefquin.engine.vocabulary;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-PKG="se.liu.ida.hefquin.vocabulary"
-DIR=../src/main/java/se/liu/ida/hefquin/vocabulary/
-
 # Check that JENA_HOME is not empty
 if [ -z "$JENA_HOME" ]; then
   echo "JENA_HOME is not set"
@@ -25,6 +22,10 @@ function proc
     shift
     NS="$1"
     shift
+    PKG="$1"
+    shift
+    DIR="$1"
+    shift
     echo "Schemagen: $FILE"
 
     # -e syntax
@@ -38,7 +39,7 @@ function proc
 }
 
 # syntaxCheck  LPGtoRDFConfiguration.ttl
-# proc LPGtoRDFConfiguration.ttl  LPGtoRDF  "http://www.example.org/se/liu/ida/hefquin/lpg2rdf#"
+# proc LPGtoRDFConfiguration.ttl  LPGtoRDF  "http://www.example.org/se/liu/ida/hefquin/lpg2rdf#" "se.liu.ida.hefquin.engine.wrappers.lpgwrapper.vocabulary" ../hefquin-pgconnector/src/main/java/se/liu/ida/hefquin/engine/wrappers/lpgwrapper/vocabulary/
 
 syntaxCheck  EngineConfiguration.ttl
-proc EngineConfiguration.ttl  ECVocab  "http://www.example.org/se/liu/ida/hefquin/engineconf#"
+proc EngineConfiguration.ttl  ECVocab  "http://www.example.org/se/liu/ida/hefquin/engineconf#" "se.liu.ida.hefquin.engine.vocabulary" ../hefquin-engine/src/main/java/se/liu/ida/hefquin/engine/vocabulary/

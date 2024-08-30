@@ -38,7 +38,7 @@ import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.impl.GraphQLSchemaInitializerImpl;
-import se.liu.ida.hefquin.vocabulary.FD;
+import se.liu.ida.hefquin.engine.vocabulary.FD;
 
 public class FederationDescriptionReader
 {

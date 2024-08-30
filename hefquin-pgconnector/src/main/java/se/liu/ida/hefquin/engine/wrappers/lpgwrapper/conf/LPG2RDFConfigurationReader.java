@@ -33,8 +33,8 @@ import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.EdgeLabelMappingI
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToLiteral;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.NodeLabelMappingImpl_SingleMatchToURI;
 import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.conf.impl.PropertyNameMappingImpl_SingleMatchToURI;
+import se.liu.ida.hefquin.engine.wrappers.lpgwrapper.vocabulary.LPGtoRDF;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
-import se.liu.ida.hefquin.vocabulary.LPGtoRDF;
 
 import java.net.URI;
 import java.util.ArrayList;
