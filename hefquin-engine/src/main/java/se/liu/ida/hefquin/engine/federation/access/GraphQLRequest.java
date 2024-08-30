@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 
 public interface GraphQLRequest extends DataRetrievalRequest
 {

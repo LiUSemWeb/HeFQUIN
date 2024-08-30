@@ -18,15 +18,15 @@ import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLArgument;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLEntrypoint;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLField;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.GraphQLSchema;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLArgumentImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLEntrypointType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.data.impl.GraphQLFieldType;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.impl.GraphQLQueryImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLArgument;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLEntrypoint;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLField;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLArgumentImpl;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLEntrypointType;
+import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLFieldType;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 
 public class GraphQLRequestProcessorImplTest extends EngineTestBase {
 

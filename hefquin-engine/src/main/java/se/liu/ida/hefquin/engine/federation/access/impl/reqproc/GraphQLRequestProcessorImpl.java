@@ -9,9 +9,9 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.JSONResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.JSONResponseImpl;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.query.GraphQLQuery;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnection;
-import se.liu.ida.hefquin.engine.wrappers.graphqlwrapper.conn.GraphQLConnectionException;
+import se.liu.ida.hefquin.engine.wrappers.graphql.conn.GraphQLConnection;
+import se.liu.ida.hefquin.engine.wrappers.graphql.conn.GraphQLConnectionException;
+import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 
 public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 	protected final int connectionTimeout;
