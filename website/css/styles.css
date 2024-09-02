@@ -1,0 +1,159 @@
+:root {
+    --bg-color: #f5faff;
+    --header-bg-color: #4A314D;
+    --footer-bg-color: #4A314D;
+    --logo-color: ##f5faff;
+    --nav-color: #f5faff;
+    --footer-color: #f5faff;
+
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* General Styles */
+body {
+    font-family: Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background-color: var(--bg-color);
+    min-width: 400px;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+
+}
+
+/* Header and Navigation */
+header {
+    font-family: UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    padding: 10px 20px;
+    background-color: var(--header-bg-color);
+    position: relative;
+    height: 60px;
+}
+
+nav {
+    font-family: Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    color: var(--nav-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-icon {
+    display: none;
+    height: 25px
+}
+
+
+.logo {
+    color: var(--logo-color);
+    font-size: 2em;
+}
+
+.logo a {
+    text-decoration: none;
+    color: white;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    position: relative;
+}
+
+/* Hover Effect */
+.nav-links li a:hover {
+    color: #cce6ff;
+    /* Lightens the link color */
+    transform: translateY(-3px);
+    /* Slight upward movement */
+    border-bottom: 2px solid #cce6ff;
+    /* Adds an underline effect */
+}
+
+.menu-icon {
+    display: none;
+}
+
+main {
+    min-height: 100%;
+    padding: 0 .5rem;
+    width: 800px;
+    margin: auto;
+}
+
+main a {
+    color: #740008;
+    text-decoration: none;
+
+}
+
+main a:hover {
+    text-decoration: underline;
+
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 10px 0;
+    background-color: var(--footer-bg-color);
+    color: var(--footer-color);
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+}
+
+ul {
+    padding: 0;
+    padding-left: 1em;
+}
+
+li {
+    line-height: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    .menu-icon {
+        display: block;
+        cursor: pointer;
+        font-size: 2em;
+    }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #0056b3;
+        position: absolute;
+        top: 40px;
+        /* Adjust to align with header */
+        right: 0;
+        width: 100%;
+        padding: 20px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .nav-links li {
+        text-align: center;
+    }
+}
