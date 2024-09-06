@@ -1,0 +1,68 @@
+#!/bin/sh
+HEFQUIN_CP="$HEFQUIN_HOME"'/libs/hefquin-cli-0.0.4-SNAPSHOT.jar'
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source ${SCRIPT_DIR}/common.sh
+
+# Default values for the arguments
+FED_DESC_FILE="ExampleFederation.ttl"
+CONF_DESC_FILE="ExampleEngineConf.ttl"
+
+# Function to display help message
+usage() {
+    echo "Usage: hefquin -q <query_file> [-f <federation_description_file>] [-c <configuration_description_file>]"
+    echo ""
+    echo "Options:"
+    echo "  -q, --query                 Query file (required)"
+    echo "  -f, --federationDescription Federation description file (required)"
+    echo "  -c, --confDescr             Configuration description file"
+    echo "  -h, --help                  Show this help message"
+    exit 1
+}
+
+# Parse command-line arguments
+ARGS=()
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -q|--query)
+            QUERY_FILE="$2"
+            shift 2
+            ;;
+        -f|--federationDescription)
+            FED_DESC_FILE="$2"
+            shift 2
+            ;;
+        -c|--confDescr)
+            CONF_DESC_FILE="$2"
+            ARGS+=("--confDescr" "$2")
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Add arguments
+if [ -n "$QUERY_FILE" ]; then
+    ARGS+=("--query" "$QUERY_FILE")
+fi
+if [ -n "$FED_DESC_FILE" ]; then
+    ARGS+=("--federationDescription" "$FED_DESC_FILE")
+fi
+if [ -n "$CONF_DESC_FILE" ]; then
+    ARGS+=("--confDescr" "$CONF_DESC_FILE")
+fi
+
+# Check if the required argument is provided
+if [ -z "${QUERY_FILE}" ]; then
+    echo "Error: Missing required argument: --query or -q"
+    usage
+fi
+
+# Run the Java command
+"$JAVA" $JVM_ARGS -cp "$HEFQUIN_CP" se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel "${ARGS[@]}" 
