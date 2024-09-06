@@ -8,11 +8,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -23,36 +24,33 @@ import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 
 @WebServlet
-public class HeFQUINServlet extends HttpServlet
-{
+public class HeFQUINServlet extends HttpServlet {
+	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
 	private static final long serialVersionUID = 5902821543508443162L;
 
-	private static String configProperties = "config.properties";
 	private static HeFQUINEngine engine;
-	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList( "application/sparql-results+json",
-	                                                                        "application/sparql-results+xml",
-	                                                                        "text/csv",
-	                                                                        "text/tsv",
-	                                                                        "text/tab-separated-values" );
-
-	public static void setConfigProperties( final String configProperties){
-		HeFQUINServlet.configProperties = configProperties;
-	}
+	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList(
+		"application/sparql-results+json",
+		"application/sparql-results+xml",
+		"text/csv",
+		"text/tsv",
+		"text/tab-separated-values"
+	);
 
 	@Override
 	public void init( ServletConfig config ) throws ServletException {
 		super.init( config );
-		
-		final Properties props = ConfigLoader.load( configProperties );
-		final String fedConfFile = props.getProperty( "FED_CONF_FILE", "DefaultFedConf.ttl");
-		final String engineConfFile = props.getProperty( "ENGINE_CONF_FILE", "DefaultEngineConf.ttl" );
 
-		System.out.println( "--- Settings ---" );
-		System.out.println( "FED_CONF_FILE:    " + fedConfFile );
-		System.out.println( "ENGINE_CONF_FILE: " + engineConfFile );
+		final String configurationFile = System.getProperty( "hefquin.configuration" );
+		final String federationFile = System.getProperty( "hefquin.federation" );
+
+		logger.info( "--- Settings ---" );
+		logger.info( "hefquin.configuration: " + configurationFile );
+		logger.info( "hefquin.federation:    " + federationFile );
+
 		// Initialize engine
-		engine = HeFQUINServerUtils.getEngine( fedConfFile, engineConfFile );
-		System.out.println( "Engine initilized" );
+		engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
+		logger.info( "Engine initilized" );
 	}
 
 	@Override
@@ -166,7 +164,8 @@ public class HeFQUINServlet extends HttpServlet
 		}
 	}
 
-	private static String execute( final String queryString, final String mimeType ) throws UnsupportedEncodingException {
+	private static String execute( final String queryString, final String mimeType )
+			throws UnsupportedEncodingException {
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
