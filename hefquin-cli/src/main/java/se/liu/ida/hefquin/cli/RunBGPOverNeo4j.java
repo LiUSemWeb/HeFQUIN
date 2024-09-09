@@ -45,13 +45,15 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
 
 	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
+	protected final ArgDecl argEndpointUsername   = new ArgDecl(ArgDecl.HasValue, "username");
+	protected final ArgDecl argEndpointPassword   = new ArgDecl(ArgDecl.HasValue, "password");
 	protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
 	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
 	protected final ArgDecl argPrintCypher = new ArgDecl(ArgDecl.NoValue, "printCypherQuery");
 	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
 	protected final ArgDecl argSkipExecution = new ArgDecl(ArgDecl.NoValue, "skipExecution");
-
+	
 	public static void main( final String[] args ) {
 		new RunBGPOverNeo4j(args).mainRun();
 	}
@@ -70,10 +72,11 @@ public class RunBGPOverNeo4j extends CmdARQ
 		addModule(modLPG2RDFConfiguration);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
+		add(argEndpointUsername, "--username", "Username for the Neo4j endpoint");
+		add(argEndpointPassword, "--password", "Password for the Neo4j endpoint");
 		add(argNaive, "--naive", "If you want naive translation");
 		add(argNoVarRepl, "--disableVariableReplacement", "If you want to disable variable replacement");
 		add(argNoMerge, "--disablePathMerging", "If you want to disable path merging");
-
 	}
 
 	@Override
@@ -215,12 +218,15 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 	protected List<TableRecord> performQueryExecution( final CypherQuery query ) {
 		final String uri = getArg(argEndpointURI).getValue();
-
+		final String neo4jUsername = contains(argEndpointUsername) ?
+		                             getArg(argEndpointUsername).getValue() : null;
+		final String neo4jPassword = contains(argEndpointPassword) ?
+		                             getArg(argEndpointPassword).getValue() : null;
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 
-		final Neo4jConnection conn = Neo4jConnectionFactory.connect(uri);
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect( uri, neo4jUsername, neo4jPassword );
 
 		final List<TableRecord> result;
 		try {
