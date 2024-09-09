@@ -54,6 +54,8 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
 
 	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
+	protected final ArgDecl argEndpointUsername   = new ArgDecl(ArgDecl.HasValue, "username");
+	protected final ArgDecl argEndpointPassword   = new ArgDecl(ArgDecl.HasValue, "password");
 
 
 	public static void main( final String[] args ) {
@@ -69,6 +71,8 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		addModule(modLPG2RDFConfiguration);
 
 		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
+		add(argEndpointUsername, "--username", "Username for the Neo4j endpoint");
+		add(argEndpointPassword, "--password", "Passowrd for the Neo4j endpoint");
 	}
 
 	@Override
@@ -85,6 +89,10 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 
 		final String neo4jEndpointURI = getArg(argEndpointURI).getValue();
+		final String neo4jUsername = contains(argEndpointUsername) ?
+		                             getArg(argEndpointUsername).getValue() : null;
+		final String neo4jPassword = contains(argEndpointPassword) ?
+		                             getArg(argEndpointPassword).getValue() : null;
 
 		final LPG2RDFConfiguration l2rConf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
@@ -100,10 +108,16 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			modTime.startTimer();
 		}
 
-		final List<TableRecord> nodesResponse = execQuery(getNodesQuery, neo4jEndpointURI);
+		final List<TableRecord> nodesResponse = execQuery( getNodesQuery,
+		                                                   neo4jEndpointURI,
+		                                                   neo4jUsername,
+		                                                   neo4jPassword );
 		writeTriplesForNodes(nodesResponse, l2rConf, rdfOutStream);
 
-		final List<TableRecord>  edgesResponse = execQuery(getEdgesQuery, neo4jEndpointURI);
+		final List<TableRecord>  edgesResponse = execQuery( getEdgesQuery,
+		                                                    neo4jEndpointURI,
+		                                                    neo4jUsername,
+		                                                    neo4jPassword );
 		writeTriplesForEdges(edgesResponse, l2rConf, rdfOutStream);
 
 		rdfOutStream.finish();
@@ -153,9 +167,12 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	}
 
 	protected List<TableRecord> execQuery( final CypherQuery query,
-	                                       final String neo4jEndpointURI ) {
-		final Neo4jConnection conn = Neo4jConnectionFactory.connect(neo4jEndpointURI);
-
+	                                       final String neo4jEndpointURI,
+	                                       final String neo4jEndpointUsername,
+	                                       final String neo4jEndpointPassword ) {
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect( neo4jEndpointURI,
+		                                                             neo4jEndpointUsername,
+		                                                             neo4jEndpointPassword );
 		final List<TableRecord> result;
 		try {
 			result = conn.execute(query);
