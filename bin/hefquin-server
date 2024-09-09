@@ -5,7 +5,7 @@ source ${SCRIPT_DIR}/common.sh
 
 # Function to display help message
 usage() {
-    echo "Usage: hefquin-server [-f <federation_description_file>] [-c <configuration_description_file>]"
+    echo "Usage: hefquin-server [-f <federation_description_file>] [-c <configuration_description_file>] [-p <port>]"
     echo ""
     echo "Options:"
     echo "  -f, --federationDescription Federation description file"
