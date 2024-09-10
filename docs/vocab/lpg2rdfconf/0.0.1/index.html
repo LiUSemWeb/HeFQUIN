@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDF Vocabulary Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .box {
+            padding: 5px 10px;
+            border: 1px solid black;
+            border-bottom: 0;
+        }
+        .wrapper > .box:last-child {
+            border-bottom: 1px solid black;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>RDF Vocabulary Documentation</h1>
+    <div class="general-info">
+        <h2>General Information</h2>
+        <p><strong>Creator:</strong> Olaf Hartig</p>
+        <p><strong>Date:</strong> 2023-11-29</p>
+        <p><strong>Format:</strong> RDF</p>
+        <p><strong>Identifier:</strong> http://w3id.org/hefquin/lpg2rdf</p>
+        <p><strong>Title:</strong> Vocabulary for describing LPG-to-RDF configurations</p>
+        <p><strong>Label:</strong> Vocabulary for describing LPG-to-RDF configurations</p>
+        <p><strong>Description:</strong> This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN.</p>
+        <p><strong>Comment:</strong> This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN.</p>
+        <p><strong>Download:</strong>
+            <a href="http://w3id.org/hefquin/lpg2rdf/0.0.1/lpg2rdfconf.ttl">ttl</a>
+            <a href="http://w3id.org/hefquin/lpg2rdf/0.0.1/lpg2rdfconf.rdf">rdf</a>
+            <a href="http://w3id.org/hefquin/lpg2rdf/0.0.1/lpg2rdfconf.jsonld">jsonld</a>
+        </p>
+    </div>
+    
+    <h2>Prefixes</h2>
+    <div class="wrapper">
+        <div class="box prefixes">
+        
+            <p>brick: https://brickschema.org/schema/Brick#</p>
+        
+            <p>csvw: http://www.w3.org/ns/csvw#</p>
+        
+            <p>dc: http://purl.org/dc/elements/1.1/</p>
+        
+            <p>dcat: http://www.w3.org/ns/dcat#</p>
+        
+            <p>dcmitype: http://purl.org/dc/dcmitype/</p>
+        
+            <p>dcterms: http://purl.org/dc/terms/</p>
+        
+            <p>dcam: http://purl.org/dc/dcam/</p>
+        
+            <p>doap: http://usefulinc.com/ns/doap#</p>
+        
+            <p>foaf: http://xmlns.com/foaf/0.1/</p>
+        
+            <p>geo: http://www.opengis.net/ont/geosparql#</p>
+        
+            <p>odrl: http://www.w3.org/ns/odrl/2/</p>
+        
+            <p>org: http://www.w3.org/ns/org#</p>
+        
+            <p>prof: http://www.w3.org/ns/dx/prof/</p>
+        
+            <p>prov: http://www.w3.org/ns/prov#</p>
+        
+            <p>qb: http://purl.org/linked-data/cube#</p>
+        
+            <p>schema: https://schema.org/</p>
+        
+            <p>sh: http://www.w3.org/ns/shacl#</p>
+        
+            <p>skos: http://www.w3.org/2004/02/skos/core#</p>
+        
+            <p>sosa: http://www.w3.org/ns/sosa/</p>
+        
+            <p>ssn: http://www.w3.org/ns/ssn/</p>
+        
+            <p>time: http://www.w3.org/2006/time#</p>
+        
+            <p>vann: http://purl.org/vocab/vann/</p>
+        
+            <p>void: http://rdfs.org/ns/void#</p>
+        
+            <p>wgs: https://www.w3.org/2003/01/geo/wgs84_pos#</p>
+        
+            <p>owl: http://www.w3.org/2002/07/owl#</p>
+        
+            <p>rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#</p>
+        
+            <p>rdfs: http://www.w3.org/2000/01/rdf-schema#</p>
+        
+            <p>xsd: http://www.w3.org/2001/XMLSchema#</p>
+        
+            <p>xml: http://www.w3.org/XML/1998/namespace</p>
+        
+            <p>xsd1: http://www.w3.org/2000/10/XMLSchema#</p>
+        
+            <p>ec: http://w3id.org/hefquin/engineconf#</p>
+        
+            <p>lr: http://w3id.org/hefquin/lpg2rdf#</p>
+        
+        </div>
+    </div>
+
+    <h2>Classes</h2>
+    <div class="wrapper">
+        
+        <div id="LPGtoRDFConfiguration" class="box class">
+            <h3>lr:LPGtoRDFConfiguration</h3>
+            <div class="details">
+                <p><strong>Label:</strong> LPG-to-RDF Configuration</p>
+                <p><strong>Comment:</strong> Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="NodeMapping" class="box class">
+            <h3>lr:NodeMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Node Mapping</p>
+                <p><strong>Comment:</strong> A node mapping is an injective function that maps every given LPG node to either an IRI or a blank node, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node mapping. Concrete types of node mappings are captured by the subclasses of this class.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="BNodeBasedNodeMapping" class="box class">
+            <h3>lr:BNodeBasedNodeMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Blank Node-based Node Mapping</p>
+                <p><strong>Comment:</strong> Class of node mappings that map every given LPG node to a blank node.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="IRIPrefixBasedNodeMapping" class="box class">
+            <h3>lr:IRIPrefixBasedNodeMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI-based Node Mapping</p>
+                <p><strong>Comment:</strong> Class of node mappings that map every given LPG node to an IRI by attaching the ID of the node to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="NodeLabelMapping" class="box class">
+            <h3>lr:NodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Node Label Mapping</p>
+                <p><strong>Comment:</strong> A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="LiteralBasedNodeLabelMapping" class="box class">
+            <h3>lr:LiteralBasedNodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Literal-based Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="IRIPrefixBasedNodeLabelMapping" class="box class">
+            <h3>lr:IRIPrefixBasedNodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI-based Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="RegexBasedNodeLabelMapping" class="box class">
+            <h3>lr:RegexBasedNodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Regex-based Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="SingletonLiteralNodeLabelMapping" class="box class">
+            <h3>lr:SingletonLiteralNodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Singleton-Literal Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="SingletonIRINodeLabelMapping" class="box class">
+            <h3>lr:SingletonIRINodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Singleton-IRI Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="CompositeNodeLabelMapping" class="box class">
+            <h3>lr:CompositeNodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Composite Node Label Mapping</p>
+                <p><strong>Comment:</strong> Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:NodeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="EdgeLabelMapping" class="box class">
+            <h3>lr:EdgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Edge Label Mapping</p>
+                <p><strong>Comment:</strong> An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="IRIPrefixBasedEdgeLabelMapping" class="box class">
+            <h3>lr:IRIPrefixBasedEdgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI-based Edge Label Mapping</p>
+                <p><strong>Comment:</strong> Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:EdgeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="RegexBasedEdgeLabelMapping" class="box class">
+            <h3>lr:RegexBasedEdgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Regex-based Edge Label Mapping</p>
+                <p><strong>Comment:</strong> Class of edge label mappings that focus only on edge labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:IRIPrefixBasedEdgeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="SingletonIRIEdgeLabelMapping" class="box class">
+            <h3>lr:SingletonIRIEdgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Singleton-IRI Edge Label Mapping</p>
+                <p><strong>Comment:</strong> Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:EdgeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="CompositeEdgeLabelMapping" class="box class">
+            <h3>lr:CompositeEdgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Composite Edge Label Mapping</p>
+                <p><strong>Comment:</strong> Class of edge label mappings that are based on other edge label mappings and, for every given edge label, consider these other mappings one after another until one of them is found that has the given edge label in its domain; this other edge label mapping is then invoked. The list of the other edge label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:EdgeLabelMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="PropertyNameMapping" class="box class">
+            <h3>lr:PropertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Property Name Mapping</p>
+                <p><strong>Comment:</strong> A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="IRIPrefixBasedPropertyNameMapping" class="box class">
+            <h3>lr:IRIPrefixBasedPropertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI-based Property Name Mapping</p>
+                <p><strong>Comment:</strong> Class of property name mappings that map every given property name to an IRI by attaching the property name to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:PropertyNameMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="RegexBasedPropertyNameMapping" class="box class">
+            <h3>lr:RegexBasedPropertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Regex-based Property Name Mapping</p>
+                <p><strong>Comment:</strong> Class of property name mappings that focus only on property names that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:IRIPrefixBasedPropertyNameMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="SingletonIRIPropertyNameMapping" class="box class">
+            <h3>lr:SingletonIRIPropertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Singleton-IRI Property Name Mapping</p>
+                <p><strong>Comment:</strong> Class of property name mappings that focus only on a single property name and map it to a given IRI. This IRI is specified by the lr:iri property and the specific property name considered by this mapping is specified by the lr:propertyName property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:PropertyNameMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="CompositePropertyNameMapping" class="box class">
+            <h3>lr:CompositePropertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Composite Property Name Mapping</p>
+                <p><strong>Comment:</strong> Class of property name mappings that are based on other property name mappings and, for every given property name, consider these other mappings one after another until one of them is found that has the given property name in its domain; this other property name mapping is then invoked. The list of the other property name mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    lr:PropertyNameMapping
+                    
+                </p>
+            </div>
+        </div>
+        
+    </div>
+
+    <h2>Properties</h2>
+    <div class="wrapper">
+        
+        <div id="nodeMapping" class="box property">
+            <h3>lr:nodeMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> node mapping</p>
+                <p><strong>Comment:</strong> Specifies the node mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node mapping.</p>
+                <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
+                <p><strong>Range:</strong> lr:NodeMapping</p>
+            </div>
+        </div>
+        
+        <div id="nodeLabelMapping" class="box property">
+            <h3>lr:nodeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> node label mapping</p>
+                <p><strong>Comment:</strong> Specifies the node label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node label mapping.</p>
+                <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
+                <p><strong>Range:</strong> lr:NodeLabelMapping</p>
+            </div>
+        </div>
+        
+        <div id="edgeLabelMapping" class="box property">
+            <h3>lr:edgeLabelMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> edge label mapping</p>
+                <p><strong>Comment:</strong> Specifies the edge label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one edge label mapping.</p>
+                <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
+                <p><strong>Range:</strong> lr:EdgeLabelMapping</p>
+            </div>
+        </div>
+        
+        <div id="propertyNameMapping" class="box property">
+            <h3>lr:propertyNameMapping</h3>
+            <div class="details">
+                <p><strong>Label:</strong> property name mapping</p>
+                <p><strong>Comment:</strong> Specifies the property name mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one property mapping.</p>
+                <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
+                <p><strong>Range:</strong> lr:PropertyNameMapping</p>
+            </div>
+        </div>
+        
+        <div id="labelPredicate" class="box property">
+            <h3>lr:labelPredicate</h3>
+            <div class="details">
+                <p><strong>Label:</strong> label predicate</p>
+                <p><strong>Comment:</strong> Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate.</p>
+                <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
+                <p><strong>Range:</strong> xsd1:anyURI</p>
+            </div>
+        </div>
+        
+        <div id="prefixOfIRIs" class="box property">
+            <h3>lr:prefixOfIRIs</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI prefix</p>
+                <p><strong>Comment:</strong> Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property.</p>
+                <p><strong>Domain:</strong> N/A</p>
+                <p><strong>Range:</strong> xsd1:anyURI</p>
+            </div>
+        </div>
+        
+        <div id="regex" class="box property">
+            <h3>lr:regex</h3>
+            <div class="details">
+                <p><strong>Label:</strong> regular expression</p>
+                <p><strong>Comment:</strong> Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property.</p>
+                <p><strong>Domain:</strong> N/A</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="literal" class="box property">
+            <h3>lr:literal</h3>
+            <div class="details">
+                <p><strong>Label:</strong> literal</p>
+                <p><strong>Comment:</strong> Specifies the literal that a lr:SingletonLiteralNodeLabelMapping maps its matching node label to. Each such mapping has exactly one such property</p>
+                <p><strong>Domain:</strong> lr:SingletonLiteralNodeLabelMapping</p>
+                <p><strong>Range:</strong> N/A</p>
+            </div>
+        </div>
+        
+        <div id="iri" class="box property">
+            <h3>lr:iri</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI</p>
+                <p><strong>Comment:</strong> Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property</p>
+                <p><strong>Domain:</strong> N/A</p>
+                <p><strong>Range:</strong> xsd1:anyURI</p>
+            </div>
+        </div>
+        
+        <div id="label" class="box property">
+            <h3>lr:label</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI</p>
+                <p><strong>Comment:</strong> Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property.</p>
+                <p><strong>Domain:</strong> N/A</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="propertyName" class="box property">
+            <h3>lr:propertyName</h3>
+            <div class="details">
+                <p><strong>Label:</strong> IRI</p>
+                <p><strong>Comment:</strong> Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property.</p>
+                <p><strong>Domain:</strong> lr:SingletonIRIPropertyNameMapping</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="componentMappings" class="box property">
+            <h3>lr:componentMappings</h3>
+            <div class="details">
+                <p><strong>Label:</strong> list of component mappings</p>
+                <p><strong>Comment:</strong> Specifies the list of mappings that a lr:CompositeNodeLabelMapping, a lr:CompositeEdgeLabelMapping, or a lr:CompositePropertyNameMapping consists of. Hence, the domain of this property is the union of these three classes (lr:CompositeNodeLabelMapping, lr:CompositeEdgeLabelMapping, and lr:CompositePropertyNameMapping), and each such mapping has exactly one such property. More specifically, for every lr:CompositeNodeLabelMapping, the list provided by this property must contain only other lr:NodeLabelMapping instances. Similarly, for every lr:CompositeEdgeLabelMapping, the list provided by this property must contain only other lr:EdgeLabelMapping instances, and for every lr:CompositePropertyNameMapping, the list must contain only other lr:PropertyNameMapping instances.</p>
+                <p><strong>Domain:</strong> N/A</p>
+                <p><strong>Range:</strong> rdf:List</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <h2>Instances</h2>
+    <div class="wrapper">
+        <div class="box instances">
+            
+        </div>
+    </div>
+</body>
+</html>
