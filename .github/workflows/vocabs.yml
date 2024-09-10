@@ -1,0 +1,39 @@
+name: Publish vocabularies
+run-name: Build
+on:
+  push:
+    branches:
+      - gh-pages
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: install python packages
+        run: pip install -r ./docs-scripts/requirements.txt
+
+      - name: build docs
+        run: python ./docs-scripts/build.py
+          
+      - name: commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f docs/
+          git commit -m "update docs" -a
+          
+      - name: push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
