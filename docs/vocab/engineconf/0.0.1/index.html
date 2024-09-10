@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDF Vocabulary Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .box {
+            padding: 5px 10px;
+            border: 1px solid black;
+            border-bottom: 0;
+        }
+        .wrapper > .box:last-child {
+            border-bottom: 1px solid black;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>RDF Vocabulary Documentation</h1>
+    <div class="general-info">
+        <h2>General Information</h2>
+        <p><strong>Creator:</strong> Olaf Hartig</p>
+        <p><strong>Date:</strong> 2023-11-29</p>
+        <p><strong>Format:</strong> RDF</p>
+        <p><strong>Identifier:</strong> http://w3id.org/hefquin/engineconf</p>
+        <p><strong>Title:</strong> Vocabulary for describing configurations of the HeFQUIN engine</p>
+        <p><strong>Label:</strong> Vocabulary for describing configurations of the HeFQUIN engine</p>
+        <p><strong>Description:</strong> None</p>
+        <p><strong>Comment:</strong> None</p>
+        <p><strong>Download:</strong>
+            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.ttl">ttl</a>
+            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.rdf">rdf</a>
+            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.jsonld">jsonld</a>
+        </p>
+    </div>
+    
+    <h2>Prefixes</h2>
+    <div class="wrapper">
+        <div class="box prefixes">
+        
+            <p>brick: https://brickschema.org/schema/Brick#</p>
+        
+            <p>csvw: http://www.w3.org/ns/csvw#</p>
+        
+            <p>dc: http://purl.org/dc/elements/1.1/</p>
+        
+            <p>dcat: http://www.w3.org/ns/dcat#</p>
+        
+            <p>dcmitype: http://purl.org/dc/dcmitype/</p>
+        
+            <p>dcterms: http://purl.org/dc/terms/</p>
+        
+            <p>dcam: http://purl.org/dc/dcam/</p>
+        
+            <p>doap: http://usefulinc.com/ns/doap#</p>
+        
+            <p>foaf: http://xmlns.com/foaf/0.1/</p>
+        
+            <p>geo: http://www.opengis.net/ont/geosparql#</p>
+        
+            <p>odrl: http://www.w3.org/ns/odrl/2/</p>
+        
+            <p>org: http://www.w3.org/ns/org#</p>
+        
+            <p>prof: http://www.w3.org/ns/dx/prof/</p>
+        
+            <p>prov: http://www.w3.org/ns/prov#</p>
+        
+            <p>qb: http://purl.org/linked-data/cube#</p>
+        
+            <p>schema: https://schema.org/</p>
+        
+            <p>sh: http://www.w3.org/ns/shacl#</p>
+        
+            <p>skos: http://www.w3.org/2004/02/skos/core#</p>
+        
+            <p>sosa: http://www.w3.org/ns/sosa/</p>
+        
+            <p>ssn: http://www.w3.org/ns/ssn/</p>
+        
+            <p>time: http://www.w3.org/2006/time#</p>
+        
+            <p>vann: http://purl.org/vocab/vann/</p>
+        
+            <p>void: http://rdfs.org/ns/void#</p>
+        
+            <p>wgs: https://www.w3.org/2003/01/geo/wgs84_pos#</p>
+        
+            <p>owl: http://www.w3.org/2002/07/owl#</p>
+        
+            <p>rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#</p>
+        
+            <p>rdfs: http://www.w3.org/2000/01/rdf-schema#</p>
+        
+            <p>xsd: http://www.w3.org/2001/XMLSchema#</p>
+        
+            <p>xml: http://www.w3.org/XML/1998/namespace</p>
+        
+            <p>xsd1: http://www.w3.org/2000/10/XMLSchema#</p>
+        
+            <p>ec: http://w3id.org/hefquin/engineconf#</p>
+        
+        </div>
+    </div>
+
+    <h2>Classes</h2>
+    <div class="wrapper">
+        
+        <div id="HeFQUINEngineConfiguration" class="box class">
+            <h3>ec:HeFQUINEngineConfiguration</h3>
+            <div class="details">
+                <p><strong>Label:</strong> HeFQUIN Engine Configuration</p>
+                <p><strong>Comment:</strong> Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="InstantiableJavaClass" class="box class">
+            <h3>ec:InstantiableJavaClass</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Instantiable Java Class</p>
+                <p><strong>Comment:</strong> Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="ConstructorArgument" class="box class">
+            <h3>ec:ConstructorArgument</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Constructor Argument</p>
+                <p><strong>Comment:</strong> This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="InstantiationBasedConstructorArgument" class="box class">
+            <h3>ec:InstantiationBasedConstructorArgument</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Instantiation-Based Constructor Argument</p>
+                <p><strong>Comment:</strong> Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:ConstructorArgument, ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="ListBasedConstructorArgument" class="box class">
+            <h3>ec:ListBasedConstructorArgument</h3>
+            <div class="details">
+                <p><strong>Label:</strong> List-Based Constructor Argument</p>
+                <p><strong>Comment:</strong> Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:ConstructorArgument
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="ValueBasedConstructorArgument" class="box class">
+            <h3>ec:ValueBasedConstructorArgument</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Value-Based Constructor Argument</p>
+                <p><strong>Comment:</strong> Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:ConstructorArgument
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="DesignatedArgumentValue" class="box class">
+            <h3>ec:DesignatedArgumentValue</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Designated Argument Value</p>
+                <p><strong>Comment:</strong> The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="FederationAccessManager" class="box class">
+            <h3>ec:FederationAccessManager</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Federation Access Manager</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="QueryProcessor" class="box class">
+            <h3>ec:QueryProcessor</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Query Processor</p>
+                <p><strong>Comment:</strong> Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="CostModel" class="box class">
+            <h3>ec:CostModel</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Cost Model</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="QueryPlanner" class="box class">
+            <h3>ec:QueryPlanner</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Query Planner</p>
+                <p><strong>Comment:</strong> Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property.</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    None
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="SourcePlanner" class="box class">
+            <h3>ec:SourcePlanner</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Source Planner</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="LogicalOptimizer" class="box class">
+            <h3>ec:LogicalOptimizer</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Logical Optimizer</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="PhysicalOptimizer" class="box class">
+            <h3>ec:PhysicalOptimizer</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Physical Optimizer</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="PlanCompiler" class="box class">
+            <h3>ec:PlanCompiler</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Plan Compiler</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+        <div id="ExecutionEngine" class="box class">
+            <h3>ec:ExecutionEngine</h3>
+            <div class="details">
+                <p><strong>Label:</strong> Execution Engine</p>
+                <p><strong>Comment:</strong> N/A</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    
+                    ec:InstantiableJavaClass
+                    
+                </p>
+            </div>
+        </div>
+        
+    </div>
+
+    <h2>Properties</h2>
+    <div class="wrapper">
+        
+        <div id="fedAccessMgr" class="box property">
+            <h3>ec:fedAccessMgr</h3>
+            <div class="details">
+                <p><strong>Label:</strong> federation access manager</p>
+                <p><strong>Comment:</strong> Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager.</p>
+                <p><strong>Domain:</strong> ec:HeFQUINEngineConfiguration</p>
+                <p><strong>Range:</strong> ec:FederationAccessManager</p>
+            </div>
+        </div>
+        
+        <div id="queryProcessor" class="box property">
+            <h3>ec:queryProcessor</h3>
+            <div class="details">
+                <p><strong>Label:</strong> query processor</p>
+                <p><strong>Comment:</strong> Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor.</p>
+                <p><strong>Domain:</strong> ec:HeFQUINEngineConfiguration</p>
+                <p><strong>Range:</strong> ec:QueryProcessor</p>
+            </div>
+        </div>
+        
+        <div id="costModel" class="box property">
+            <h3>ec:costModel</h3>
+            <div class="details">
+                <p><strong>Label:</strong> cost model</p>
+                <p><strong>Comment:</strong> Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model.</p>
+                <p><strong>Domain:</strong> ec:QueryProcessor</p>
+                <p><strong>Range:</strong> ec:CostModel</p>
+            </div>
+        </div>
+        
+        <div id="queryPlanner" class="box property">
+            <h3>ec:queryPlanner</h3>
+            <div class="details">
+                <p><strong>Label:</strong> query planner</p>
+                <p><strong>Comment:</strong> Specifies the query planner to be used by the query processor.</p>
+                <p><strong>Domain:</strong> ec:QueryProcessor</p>
+                <p><strong>Range:</strong> ec:QueryPlanner</p>
+            </div>
+        </div>
+        
+        <div id="planCompiler" class="box property">
+            <h3>ec:planCompiler</h3>
+            <div class="details">
+                <p><strong>Label:</strong> plan compiler</p>
+                <p><strong>Comment:</strong> Specifies the plan compiler to be used by the query processor.</p>
+                <p><strong>Domain:</strong> ec:QueryProcessor</p>
+                <p><strong>Range:</strong> ec:PlanCompiler</p>
+            </div>
+        </div>
+        
+        <div id="executionEngine" class="box property">
+            <h3>ec:executionEngine</h3>
+            <div class="details">
+                <p><strong>Label:</strong> execution engine</p>
+                <p><strong>Comment:</strong> Specifies the execution engine to be used by the query processor.</p>
+                <p><strong>Domain:</strong> ec:QueryProcessor</p>
+                <p><strong>Range:</strong> ec:ExecutionEngine</p>
+            </div>
+        </div>
+        
+        <div id="sourcePlanner" class="box property">
+            <h3>ec:sourcePlanner</h3>
+            <div class="details">
+                <p><strong>Label:</strong> source planner</p>
+                <p><strong>Comment:</strong> Specifies the source planner to be used by the query planner.</p>
+                <p><strong>Domain:</strong> ec:QueryPlanner</p>
+                <p><strong>Range:</strong> ec:SourcePlanner</p>
+            </div>
+        </div>
+        
+        <div id="logicalOptimizer" class="box property">
+            <h3>ec:logicalOptimizer</h3>
+            <div class="details">
+                <p><strong>Label:</strong> logical optimizer</p>
+                <p><strong>Comment:</strong> Specifies the logical optimizer to be used by the query planner.</p>
+                <p><strong>Domain:</strong> ec:QueryPlanner</p>
+                <p><strong>Range:</strong> ec:LogicalOptimizer</p>
+            </div>
+        </div>
+        
+        <div id="physicalOptimizer" class="box property">
+            <h3>ec:physicalOptimizer</h3>
+            <div class="details">
+                <p><strong>Label:</strong> physical optimizer</p>
+                <p><strong>Comment:</strong> Specifies the physical optimizer to be used by the query planner.</p>
+                <p><strong>Domain:</strong> ec:QueryPlanner</p>
+                <p><strong>Range:</strong> ec:PhysicalOptimizer</p>
+            </div>
+        </div>
+        
+        <div id="javaClassName" class="box property">
+            <h3>ec:javaClassName</h3>
+            <div class="details">
+                <p><strong>Label:</strong> name of Java class</p>
+                <p><strong>Comment:</strong> Specifies the full name of a Java class.</p>
+                <p><strong>Domain:</strong> ec:InstantiableJavaClass</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="constructorArguments" class="box property">
+            <h3>ec:constructorArguments</h3>
+            <div class="details">
+                <p><strong>Label:</strong> constructor arguments</p>
+                <p><strong>Comment:</strong> Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'.</p>
+                <p><strong>Domain:</strong> ec:InstantiableJavaClass</p>
+                <p><strong>Range:</strong> rdf:List</p>
+            </div>
+        </div>
+        
+        <div id="argumentTypeName" class="box property">
+            <h3>ec:argumentTypeName</h3>
+            <div class="details">
+                <p><strong>Label:</strong> name of Java class or a Java interface</p>
+                <p><strong>Comment:</strong> Specifies the full name of a Java class or of a Java interface.</p>
+                <p><strong>Domain:</strong> ec:InstantiationBasedConstructorArgument</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="elementsTypeName" class="box property">
+            <h3>ec:elementsTypeName</h3>
+            <div class="details">
+                <p><strong>Label:</strong> name of Java class or a Java interface</p>
+                <p><strong>Comment:</strong> Specifies the full name of a Java class or of a Java interface.</p>
+                <p><strong>Domain:</strong> ec:ListBasedConstructorArgument</p>
+                <p><strong>Range:</strong> xsd1:string</p>
+            </div>
+        </div>
+        
+        <div id="elements" class="box property">
+            <h3>ec:elements</h3>
+            <div class="details">
+                <p><strong>Label:</strong> list elements</p>
+                <p><strong>Comment:</strong> Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'.</p>
+                <p><strong>Domain:</strong> ec:ListBasedConstructorArgument</p>
+                <p><strong>Range:</strong> rdf:List</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <h2>Instances</h2>
+    <div class="wrapper">
+        <div class="box instances">
+            
+            <p id="DefaultFederationAccessManager">ec:DefaultFederationAccessManager</p>
+            
+            <p id="DefaultCostModel">ec:DefaultCostModel</p>
+            
+            <p id="DefaultSourcePlanner">ec:DefaultSourcePlanner</p>
+            
+            <p id="DefaultLogicalOptimizer">ec:DefaultLogicalOptimizer</p>
+            
+            <p id="DefaultPhysicalOptimizer">ec:DefaultPhysicalOptimizer</p>
+            
+            <p id="DefaultPlanCompiler">ec:DefaultPlanCompiler</p>
+            
+            <p id="DefaultExecutionEngine">ec:DefaultExecutionEngine</p>
+            
+            <p id="value:ExecServiceForFedAccess">ec:value:ExecServiceForFedAccess</p>
+            
+            <p id="value:QueryProcContext">ec:value:QueryProcContext</p>
+            
+            <p id="value:CostModel">ec:value:CostModel</p>
+            
+        </div>
+    </div>
+</body>
+</html>
