@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDF Vocabulary Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .box {
+            padding: 5px 10px;
+            border: 1px solid black;
+            border-bottom: 0;
+        }
+        .wrapper > .box:last-child {
+            border-bottom: 1px solid black;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>RDF Vocabulary Documentation</h1>
+    <div class="general-info">
+        <h2>General Information</h2>
+        <p><strong>Creator:</strong> {{ creator }}</p>
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Format:</strong> {{ format }}</p>
+        <p><strong>Identifier:</strong> {{ identifier }}</p>
+        <p><strong>Title:</strong> {{ title }}</p>
+        <p><strong>Label:</strong> {{ label }}</p>
+        <p><strong>Description:</strong> {{ description }}</p>
+        <p><strong>Comment:</strong> {{ comment }}</p>
+        <p><strong>Download:</strong>
+            <a href="{{ location }}.ttl">ttl</a>
+            <a href="{{ location }}.rdf">rdf</a>
+            <a href="{{ location }}.jsonld">jsonld</a>
+        </p>
+    </div>
+    
+    <h2>Prefixes</h2>
+    <div class="wrapper">
+        <div class="box prefixes">
+        {% for prefix, uri in prefixes.items() %}
+            <p>{{ prefix }}: {{ uri }}</p>
+        {% endfor %}
+        </div>
+    </div>
+
+    <h2>Classes</h2>
+    <div class="wrapper">
+        {% for cls in classes %}
+        <div id="{{ cls.uri | fragment }}" class="box class">
+            <h3>{{ cls.uri | prefix }}</h3>
+            <div class="details">
+                <p><strong>Label:</strong> {{ cls.label }}</p>
+                <p><strong>Comment:</strong> {{ cls.comment }}</p>
+                <p>
+                    <strong>Subclasses:</strong>
+                    {% if cls.subclasses %}
+                    {{ cls.subclasses | prefix_list | join(", ") }}
+                    {% else %}
+                    None
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Properties</h2>
+    <div class="wrapper">
+        {% for prop in properties %}
+        <div id="{{ prop.uri | fragment }}" class="box property">
+            <h3>{{ prop.uri | prefix }}</h3>
+            <div class="details">
+                <p><strong>Label:</strong> {{ prop.label }}</p>
+                <p><strong>Comment:</strong> {{ prop.comment }}</p>
+                <p><strong>Domain:</strong> {{ prop.domain | prefix }}</p>
+                <p><strong>Range:</strong> {{ prop.range | prefix }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Instances</h2>
+    <div class="wrapper">
+        <div class="box instances">
+            {% for inst in instances %}
+            <p id="{{ inst.uri | fragment }}">{{ inst.uri | prefix }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
