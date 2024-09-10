@@ -1,0 +1,2 @@
+rdflib
+jinja2
