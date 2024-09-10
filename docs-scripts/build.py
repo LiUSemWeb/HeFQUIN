@@ -3,6 +3,7 @@ import os
 import re
 from jinja2 import Environment, FileSystemLoader, Template
 from rdflib import DC, RDF, RDFS, Graph, URIRef
+from rdflib.namespace import NamespaceManager
 import logging
 
 prefixes = {}
@@ -48,7 +49,7 @@ def create_documentation(vocabs):
         latest_target = f"docs/vocab/{name}/latest/index.html"
         
         # Load RDF data into a graph
-        g = Graph()
+        g = Graph(bind_namespaces="none")
         g.parse(file=open(f"hefquin-vocabs/{name}.ttl"), format="turtle")
         
         # Set up Jinja2 environment and load the template
