@@ -1,93 +1,37 @@
 [
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#propertyName",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRIPropertyNameMapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#RegexBasedNodeLabelMapping",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes."
+        "@value": "Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Regex-based Node Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
+        "@value": "LPG-to-RDF Configuration"
       }
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class."
+        "@value": "A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Edge Label Mapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedEdgeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI-based Edge Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping"
+        "@value": "Property Name Mapping"
       }
     ]
   },
@@ -111,6 +55,29 @@
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#RegexBasedNodeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Regex-based Node Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
       }
     ]
   },
@@ -143,25 +110,270 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#literal",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#regex",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Specifies the literal that a lr:SingletonLiteralNodeLabelMapping maps its matching node label to. Each such mapping has exactly one such property"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping"
+        "@value": "Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "literal"
+        "@value": "regular expression"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#LiteralBasedNodeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Literal-based Node Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#prefixOfIRIs",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI prefix"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#labelPredicate",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "label predicate"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRIEdgeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Singleton-IRI Edge Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#nodeLabelMapping",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the node label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node label mapping."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "node label mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI-based Node Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#componentMappings",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the list of mappings that a lr:CompositeNodeLabelMapping, a lr:CompositeEdgeLabelMapping, or a lr:CompositePropertyNameMapping consists of. Hence, the domain of this property is the union of these three classes (lr:CompositeNodeLabelMapping, lr:CompositeEdgeLabelMapping, and lr:CompositePropertyNameMapping), and each such mapping has exactly one such property. More specifically, for every lr:CompositeNodeLabelMapping, the list provided by this property must contain only other lr:NodeLabelMapping instances. Similarly, for every lr:CompositeEdgeLabelMapping, the list provided by this property must contain only other lr:EdgeLabelMapping instances, and for every lr:CompositePropertyNameMapping, the list must contain only other lr:PropertyNameMapping instances."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "list of component mappings"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#iri",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#label",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#propertyName",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRIPropertyNameMapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
       }
     ]
   },
@@ -236,99 +448,25 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Singleton-Literal Node Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#labelPredicate",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#literal",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate."
+        "@value": "Specifies the literal that a lr:SingletonLiteralNodeLabelMapping maps its matching node label to. Each such mapping has exactly one such property"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#domain": [
       {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
+        "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "label predicate"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRIEdgeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Singleton-IRI Edge Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#componentMappings",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the list of mappings that a lr:CompositeNodeLabelMapping, a lr:CompositeEdgeLabelMapping, or a lr:CompositePropertyNameMapping consists of. Hence, the domain of this property is the union of these three classes (lr:CompositeNodeLabelMapping, lr:CompositeEdgeLabelMapping, and lr:CompositePropertyNameMapping), and each such mapping has exactly one such property. More specifically, for every lr:CompositeNodeLabelMapping, the list provided by this property must contain only other lr:NodeLabelMapping instances. Similarly, for every lr:CompositeEdgeLabelMapping, the list provided by this property must contain only other lr:EdgeLabelMapping instances, and for every lr:CompositePropertyNameMapping, the list must contain only other lr:PropertyNameMapping instances."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "list of component mappings"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+        "@value": "literal"
       }
     ]
   },
@@ -379,117 +517,25 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#iri",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#CompositeNodeLabelMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class."
+        "@value": "Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Node Label Mapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#label",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRINodeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Singleton-IRI Node Label Mapping"
+        "@value": "Composite Node Label Mapping"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#nodeMapping",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the node mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node mapping."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "node mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeMapping"
       }
     ]
   },
@@ -508,52 +554,6 @@
       {
         "@language": "en",
         "@value": "Node Mapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#regex",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "regular expression"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI-based Node Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
       }
     ]
   },
@@ -586,38 +586,56 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property."
+        "@value": "An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "LPG-to-RDF Configuration"
+        "@value": "Edge Label Mapping"
       }
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#LiteralBasedNodeLabelMapping",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal."
+        "@value": "A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Literal-based Node Label Mapping"
+        "@value": "Node Label Mapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Singleton-Literal Node Label Mapping"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
@@ -627,71 +645,48 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#nodeLabelMapping",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the node label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node label mapping."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "node label mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#prefixOfIRIs",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "IRI prefix"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#anyURI"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping",
+    "@id": "http://w3id.org/hefquin/lpg2rdf#SingletonIRINodeLabelMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class."
+        "@value": "Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Property Name Mapping"
+        "@value": "Singleton-IRI Node Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedEdgeLabelMapping",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "IRI-based Edge Label Mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping"
       }
     ]
   },
@@ -742,6 +737,34 @@
     ]
   },
   {
+    "@id": "http://w3id.org/hefquin/lpg2rdf#nodeMapping",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the node mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node mapping."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "node mapping"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeMapping"
+      }
+    ]
+  },
+  {
     "@id": "http://w3id.org/hefquin/lpg2rdf#CompositeEdgeLabelMapping",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
@@ -761,29 +784,6 @@
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/lpg2rdf#CompositeNodeLabelMapping",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Composite Node Label Mapping"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping"
       }
     ]
   },

@@ -49,65 +49,13 @@
     <div class="wrapper">
         <div class="box prefixes">
         
-            <p>brick: https://brickschema.org/schema/Brick#</p>
-        
-            <p>csvw: http://www.w3.org/ns/csvw#</p>
-        
-            <p>dc: http://purl.org/dc/elements/1.1/</p>
-        
-            <p>dcat: http://www.w3.org/ns/dcat#</p>
-        
-            <p>dcmitype: http://purl.org/dc/dcmitype/</p>
-        
-            <p>dcterms: http://purl.org/dc/terms/</p>
-        
-            <p>dcam: http://purl.org/dc/dcam/</p>
-        
-            <p>doap: http://usefulinc.com/ns/doap#</p>
-        
-            <p>foaf: http://xmlns.com/foaf/0.1/</p>
-        
-            <p>geo: http://www.opengis.net/ont/geosparql#</p>
-        
-            <p>odrl: http://www.w3.org/ns/odrl/2/</p>
-        
-            <p>org: http://www.w3.org/ns/org#</p>
-        
-            <p>prof: http://www.w3.org/ns/dx/prof/</p>
-        
-            <p>prov: http://www.w3.org/ns/prov#</p>
-        
-            <p>qb: http://purl.org/linked-data/cube#</p>
-        
-            <p>schema: https://schema.org/</p>
-        
-            <p>sh: http://www.w3.org/ns/shacl#</p>
-        
-            <p>skos: http://www.w3.org/2004/02/skos/core#</p>
-        
-            <p>sosa: http://www.w3.org/ns/sosa/</p>
-        
-            <p>ssn: http://www.w3.org/ns/ssn/</p>
-        
-            <p>time: http://www.w3.org/2006/time#</p>
-        
-            <p>vann: http://purl.org/vocab/vann/</p>
-        
-            <p>void: http://rdfs.org/ns/void#</p>
-        
-            <p>wgs: https://www.w3.org/2003/01/geo/wgs84_pos#</p>
-        
-            <p>owl: http://www.w3.org/2002/07/owl#</p>
-        
             <p>rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#</p>
         
             <p>rdfs: http://www.w3.org/2000/01/rdf-schema#</p>
         
-            <p>xsd: http://www.w3.org/2001/XMLSchema#</p>
+            <p>xsd: http://www.w3.org/2000/10/XMLSchema#</p>
         
-            <p>xml: http://www.w3.org/XML/1998/namespace</p>
-        
-            <p>xsd1: http://www.w3.org/2000/10/XMLSchema#</p>
+            <p>dc: http://purl.org/dc/elements/1.1/</p>
         
             <p>ec: http://w3id.org/hefquin/engineconf#</p>
         
@@ -464,7 +412,7 @@
                 <p><strong>Label:</strong> label predicate</p>
                 <p><strong>Comment:</strong> Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate.</p>
                 <p><strong>Domain:</strong> lr:LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> xsd1:anyURI</p>
+                <p><strong>Range:</strong> xsd:anyURI</p>
             </div>
         </div>
         
@@ -474,7 +422,7 @@
                 <p><strong>Label:</strong> IRI prefix</p>
                 <p><strong>Comment:</strong> Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property.</p>
                 <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> xsd1:anyURI</p>
+                <p><strong>Range:</strong> xsd:anyURI</p>
             </div>
         </div>
         
@@ -484,7 +432,7 @@
                 <p><strong>Label:</strong> regular expression</p>
                 <p><strong>Comment:</strong> Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property.</p>
                 <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> xsd1:string</p>
+                <p><strong>Range:</strong> xsd:string</p>
             </div>
         </div>
         
@@ -504,7 +452,7 @@
                 <p><strong>Label:</strong> IRI</p>
                 <p><strong>Comment:</strong> Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property</p>
                 <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> xsd1:anyURI</p>
+                <p><strong>Range:</strong> xsd:anyURI</p>
             </div>
         </div>
         
@@ -514,7 +462,7 @@
                 <p><strong>Label:</strong> IRI</p>
                 <p><strong>Comment:</strong> Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property.</p>
                 <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> xsd1:string</p>
+                <p><strong>Range:</strong> xsd:string</p>
             </div>
         </div>
         
@@ -524,7 +472,7 @@
                 <p><strong>Label:</strong> IRI</p>
                 <p><strong>Comment:</strong> Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property.</p>
                 <p><strong>Domain:</strong> lr:SingletonIRIPropertyNameMapping</p>
-                <p><strong>Range:</strong> xsd1:string</p>
+                <p><strong>Range:</strong> xsd:string</p>
             </div>
         </div>
         
