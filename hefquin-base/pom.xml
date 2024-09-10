@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.liu.ida.hefquin</groupId>
     <artifactId>HeFQUIN</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>${project.version}</version>
   </parent>
 
   <artifactId>hefquin-base</artifactId>
