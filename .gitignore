@@ -1,6 +1,7 @@
 # Compilation and build artifacts
 *.class
 target/
+docs/
 
 # Log file
 *.log
@@ -50,6 +51,7 @@ hefquin-service/dependency-reduced-pom.xml
 
 *.iml
 /.idea
+/.vscode
 
 # Settings
 /.settings
