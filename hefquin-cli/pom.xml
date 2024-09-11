@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.liu.ida.hefquin</groupId>
     <artifactId>HeFQUIN</artifactId>
-    <version>${project.version}</version>
+    <version>0.0.4-SNAPSHOT</version>
   </parent>
   
   <artifactId>hefquin-cli</artifactId>
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>se.liu.ida.hefquin</groupId>
       <artifactId>hefquin-engine</artifactId>
-      <version>${project.version}</version>
+      <version>0.0.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
