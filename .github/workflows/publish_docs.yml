@@ -21,8 +21,17 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: build javadoc
-        run: mvn package -Pgenerate-javadoc -DskipTest
+      - name: build and copy javadoc
+        run: |
+          mvn clean package -DskipTest
+          project_version=$(ls -d target/reports/*/ | head -n 1 | xargs basename)
+          if [ -z "$project_version" ]; then
+            echo "Error: \$project_version is not defined. Check build process and project version." >&2
+            exit 1
+          fi
+          rm -rf docs/javadoc/"$project_version" 2>/dev/null
+          cp -r target/reports/"$project_version"/apidocs docs/javadoc/"$project_version"
+          echo "const latest=\"${project_version}\";" > docs/javadoc/latest/latest.js
       
       - name: install python packages
         run: pip install -r ./docs-scripts/requirements.txt
