@@ -1,210 +1,253 @@
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
-@prefix ec: <http://w3id.org/hefquin/engineconf#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix xsd1: <http://www.w3.org/2000/10/XMLSchema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2000/10/XMLSchema#> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix ec:     <http://w3id.org/hefquin/engineconf#> .
 
-ec:ConstructorArgument a rdfs:Class ;
-    rdfs:label "Constructor Argument"@en ;
-    rdfs:comment "This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class."@en .
+<http://w3id.org/hefquin/engineconf>
+    dc:creator       "Olaf Hartig" ;
+    dc:date          "2023-11-29" ;
+    dc:format        "RDF" ;
+    dc:identifier    <http://w3id.org/hefquin/engineconf> ;
+    dc:title         "Vocabulary for describing configurations of the HeFQUIN engine"@en ;
+    rdfs:label       "Vocabulary for describing configurations of the HeFQUIN engine"@en .
 
-ec:CostModel a rdfs:Class ;
-    rdfs:label "Cost Model"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
+## ==== CLASS DECLARATIONS ====
 
-ec:DesignatedArgumentValue a rdfs:Class ;
-    rdfs:label "Designated Argument Value"@en ;
-    rdfs:comment "The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'."@en .
+ec:HeFQUINEngineConfiguration rdf:type rdfs:Class ;
+    rdfs:label      "HeFQUIN Engine Configuration"@en ;
+    rdfs:comment    "Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property."@en .
 
-ec:ExecutionEngine a rdfs:Class ;
-    rdfs:label "Execution Engine"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
 
-ec:FederationAccessManager a rdfs:Class ;
-    rdfs:label "Federation Access Manager"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
+ec:InstantiableJavaClass rdf:type rdfs:Class ;
+    rdfs:label      "Instantiable Java Class"@en ;
+    rdfs:comment    "Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property."@en .
 
-ec:HeFQUINEngineConfiguration a rdfs:Class ;
-    rdfs:label "HeFQUIN Engine Configuration"@en ;
-    rdfs:comment "Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property."@en .
+ec:ConstructorArgument rdf:type rdfs:Class ;
+    rdfs:label      "Constructor Argument"@en ;
+    rdfs:comment    "This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class."@en .
 
-ec:InstantiableJavaClass a rdfs:Class ;
-    rdfs:label "Instantiable Java Class"@en ;
-    rdfs:comment "Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property."@en .
+ec:InstantiationBasedConstructorArgument rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:ConstructorArgument ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Instantiation-Based Constructor Argument"@en ;
+    rdfs:comment    "Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property."@en .
 
-ec:InstantiationBasedConstructorArgument a rdfs:Class ;
-    rdfs:label "Instantiation-Based Constructor Argument"@en ;
-    rdfs:comment "Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property."@en ;
-    rdfs:subClassOf ec:ConstructorArgument,
-        ec:InstantiableJavaClass .
+ec:ListBasedConstructorArgument rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:ConstructorArgument ;
+    rdfs:label      "List-Based Constructor Argument"@en ;
+    rdfs:comment    "Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property."@en .
 
-ec:ListBasedConstructorArgument a rdfs:Class ;
-    rdfs:label "List-Based Constructor Argument"@en ;
-    rdfs:comment "Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property."@en ;
-    rdfs:subClassOf ec:ConstructorArgument .
+ec:ValueBasedConstructorArgument rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:ConstructorArgument ;
+    rdfs:label      "Value-Based Constructor Argument"@en ;
+    rdfs:comment    "Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary."@en .
 
-ec:LogicalOptimizer a rdfs:Class ;
-    rdfs:label "Logical Optimizer"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
+ec:DesignatedArgumentValue rdf:type rdfs:Class ;
+    rdfs:label      "Designated Argument Value"@en ;
+    rdfs:comment    "The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'."@en .
 
-ec:PhysicalOptimizer a rdfs:Class ;
-    rdfs:label "Physical Optimizer"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
 
-ec:PlanCompiler a rdfs:Class ;
-    rdfs:label "Plan Compiler"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
+ec:FederationAccessManager rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Federation Access Manager"@en .
 
-ec:QueryPlanner a rdfs:Class ;
-    rdfs:label "Query Planner"@en ;
-    rdfs:comment "Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property."@en .
 
-ec:QueryProcessor a rdfs:Class ;
-    rdfs:label "Query Processor"@en ;
-    rdfs:comment "Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property."@en .
+ec:QueryProcessor rdf:type rdfs:Class ;
+    rdfs:label      "Query Processor"@en ;
+    rdfs:comment    "Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property."@en .
 
-ec:SourcePlanner a rdfs:Class ;
-    rdfs:label "Source Planner"@en ;
-    rdfs:subClassOf ec:InstantiableJavaClass .
+ec:CostModel rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Cost Model"@en .
 
-ec:ValueBasedConstructorArgument a rdfs:Class ;
-    rdfs:label "Value-Based Constructor Argument"@en ;
-    rdfs:comment "Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary."@en ;
-    rdfs:subClassOf ec:ConstructorArgument .
+ec:QueryPlanner rdf:type rdfs:Class ;
+    rdfs:label      "Query Planner"@en ;
+    rdfs:comment    "Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property."@en .
 
-ec:DefaultCostModel a ec:CostModel ;
-    ec:constructorArguments ( [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation" ;
-                ec:constructorArguments ( [ rdf:value <http://w3id.org/hefquin/engineconf#value:QueryProcContext> ] ) ;
-                ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl" ] ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl" .
+ec:SourcePlanner rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Source Planner"@en .
 
-ec:DefaultExecutionEngine a ec:ExecutionEngine ;
-    ec:constructorArguments () ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl" .
+ec:LogicalOptimizer rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Logical Optimizer"@en .
 
-ec:DefaultFederationAccessManager a ec:FederationAccessManager ;
-    ec:constructorArguments ( [ ec:argumentTypeName "se.liu.ida.hefquin.engine.federation.access.FederationAccessManager" ;
-                ec:constructorArguments ( <http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess> ) ;
-                ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl" ] 100 ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache" .
+ec:PhysicalOptimizer rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Physical Optimizer"@en .
 
-ec:DefaultLogicalOptimizer a ec:LogicalOptimizer ;
-    ec:constructorArguments ( [ rdf:value <http://w3id.org/hefquin/engineconf#value:QueryProcContext> ] [ ec:elements ( [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ] [ ec:constructorArguments ( [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity" ;
-                                        ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount" ] ) ;
-                            ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.GreedyBasedReordering" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ] [ ec:constructorArguments ( <http://w3id.org/hefquin/engineconf#value:QueryProcContext> ) ;
-                            ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverJoin" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PushJoinUnderUnionWithRequests" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ] [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g" ] ) ;
-                ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ] ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl" .
+ec:PlanCompiler rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Plan Compiler"@en .
 
-ec:DefaultPhysicalOptimizer a ec:PhysicalOptimizer ;
-    ec:constructorArguments ( [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter" ;
-                ec:constructorArguments ( [ rdf:value false ] [ rdf:value false ] ) ;
-                ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ] ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" .
+ec:ExecutionEngine rdf:type rdfs:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Execution Engine"@en .
 
-ec:DefaultPlanCompiler a ec:PlanCompiler ;
-    ec:constructorArguments ( [ rdf:value <http://w3id.org/hefquin/engineconf#value:QueryProcContext> ] ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl" .
 
-ec:DefaultSourcePlanner a ec:SourcePlanner ;
-    ec:constructorArguments ( [ rdf:value <http://w3id.org/hefquin/engineconf#value:QueryProcContext> ] ) ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" .
+## ==== PROPERTY DECLARATIONS ====
 
-ec:argumentTypeName a rdf:Property ;
-    rdfs:label "name of Java class or a Java interface"@en ;
-    rdfs:comment "Specifies the full name of a Java class or of a Java interface."@en ;
-    rdfs:domain ec:InstantiationBasedConstructorArgument ;
-    rdfs:range xsd1:string .
+ec:fedAccessMgr rdf:type rdf:Property ;
+    rdfs:domain     ec:HeFQUINEngineConfiguration ;
+    rdfs:range      ec:FederationAccessManager ;
+    rdfs:label      "federation access manager"@en ;
+    rdfs:comment    "Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager."@en .
 
-ec:constructorArguments a rdf:Property ;
-    rdfs:label "constructor arguments"@en ;
-    rdfs:comment "Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'."@en ;
-    rdfs:domain ec:InstantiableJavaClass ;
-    rdfs:range rdf:List .
+ec:queryProcessor rdf:type rdf:Property ;
+    rdfs:domain     ec:HeFQUINEngineConfiguration ;
+    rdfs:range      ec:QueryProcessor ;
+    rdfs:label      "query processor"@en ;
+    rdfs:comment    "Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor."@en .
 
-ec:costModel a rdf:Property ;
-    rdfs:label "cost model"@en ;
-    rdfs:comment "Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model."@en ;
-    rdfs:domain ec:QueryProcessor ;
-    rdfs:range ec:CostModel .
+ec:costModel rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryProcessor ;
+    rdfs:range      ec:CostModel ;
+    rdfs:label      "cost model"@en ;
+    rdfs:comment    "Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model."@en .
 
-ec:elements a rdf:Property ;
-    rdfs:label "list elements"@en ;
-    rdfs:comment "Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'."@en ;
-    rdfs:domain ec:ListBasedConstructorArgument ;
-    rdfs:range rdf:List .
+ec:queryPlanner rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryProcessor ;
+    rdfs:range      ec:QueryPlanner ;
+    rdfs:label      "query planner"@en ;
+    rdfs:comment    "Specifies the query planner to be used by the query processor."@en .
 
-ec:elementsTypeName a rdf:Property ;
-    rdfs:label "name of Java class or a Java interface"@en ;
-    rdfs:comment "Specifies the full name of a Java class or of a Java interface."@en ;
-    rdfs:domain ec:ListBasedConstructorArgument ;
-    rdfs:range xsd1:string .
+ec:planCompiler rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryProcessor ;
+    rdfs:range      ec:PlanCompiler ;
+    rdfs:label      "plan compiler"@en ;
+    rdfs:comment    "Specifies the plan compiler to be used by the query processor."@en .
 
-ec:executionEngine a rdf:Property ;
-    rdfs:label "execution engine"@en ;
-    rdfs:comment "Specifies the execution engine to be used by the query processor."@en ;
-    rdfs:domain ec:QueryProcessor ;
-    rdfs:range ec:ExecutionEngine .
+ec:executionEngine rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryProcessor ;
+    rdfs:range      ec:ExecutionEngine ;
+    rdfs:label      "execution engine"@en ;
+    rdfs:comment    "Specifies the execution engine to be used by the query processor."@en .
 
-ec:fedAccessMgr a rdf:Property ;
-    rdfs:label "federation access manager"@en ;
-    rdfs:comment "Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager."@en ;
-    rdfs:domain ec:HeFQUINEngineConfiguration ;
-    rdfs:range ec:FederationAccessManager .
+ec:sourcePlanner rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryPlanner ;
+    rdfs:range      ec:SourcePlanner ;
+    rdfs:label      "source planner"@en ;
+    rdfs:comment    "Specifies the source planner to be used by the query planner."@en .
 
-ec:javaClassName a rdf:Property ;
-    rdfs:label "name of Java class"@en ;
-    rdfs:comment "Specifies the full name of a Java class."@en ;
-    rdfs:domain ec:InstantiableJavaClass ;
-    rdfs:range xsd1:string .
+ec:logicalOptimizer rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryPlanner ;
+    rdfs:range      ec:LogicalOptimizer ;
+    rdfs:label      "logical optimizer"@en ;
+    rdfs:comment    "Specifies the logical optimizer to be used by the query planner."@en .
 
-ec:logicalOptimizer a rdf:Property ;
-    rdfs:label "logical optimizer"@en ;
-    rdfs:comment "Specifies the logical optimizer to be used by the query planner."@en ;
-    rdfs:domain ec:QueryPlanner ;
-    rdfs:range ec:LogicalOptimizer .
+ec:physicalOptimizer rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryPlanner ;
+    rdfs:range      ec:PhysicalOptimizer ;
+    rdfs:label      "physical optimizer"@en ;
+    rdfs:comment    "Specifies the physical optimizer to be used by the query planner."@en .
 
-ec:physicalOptimizer a rdf:Property ;
-    rdfs:label "physical optimizer"@en ;
-    rdfs:comment "Specifies the physical optimizer to be used by the query planner."@en ;
-    rdfs:domain ec:QueryPlanner ;
-    rdfs:range ec:PhysicalOptimizer .
 
-ec:planCompiler a rdf:Property ;
-    rdfs:label "plan compiler"@en ;
-    rdfs:comment "Specifies the plan compiler to be used by the query processor."@en ;
-    rdfs:domain ec:QueryProcessor ;
-    rdfs:range ec:PlanCompiler .
+ec:javaClassName rdf:type rdf:Property ;
+    rdfs:domain     ec:InstantiableJavaClass ;
+    rdfs:range      xsd:string ;
+    rdfs:label      "name of Java class"@en ;
+    rdfs:comment    "Specifies the full name of a Java class."@en .
 
-ec:queryPlanner a rdf:Property ;
-    rdfs:label "query planner"@en ;
-    rdfs:comment "Specifies the query planner to be used by the query processor."@en ;
-    rdfs:domain ec:QueryProcessor ;
-    rdfs:range ec:QueryPlanner .
+ec:constructorArguments rdf:type rdf:Property ;
+    rdfs:domain     ec:InstantiableJavaClass ;
+    rdfs:range      rdf:List ;
+    rdfs:label      "constructor arguments"@en ;
+    rdfs:comment    "Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'."@en .
 
-ec:queryProcessor a rdf:Property ;
-    rdfs:label "query processor"@en ;
-    rdfs:comment "Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor."@en ;
-    rdfs:domain ec:HeFQUINEngineConfiguration ;
-    rdfs:range ec:QueryProcessor .
+ec:argumentTypeName rdf:type rdf:Property ;
+    rdfs:domain     ec:InstantiationBasedConstructorArgument ;
+    rdfs:range      xsd:string ;
+    rdfs:label      "name of Java class or a Java interface"@en ;
+    rdfs:comment    "Specifies the full name of a Java class or of a Java interface."@en .
 
-ec:sourcePlanner a rdf:Property ;
-    rdfs:label "source planner"@en ;
-    rdfs:comment "Specifies the source planner to be used by the query planner."@en ;
-    rdfs:domain ec:QueryPlanner ;
-    rdfs:range ec:SourcePlanner .
+ec:elementsTypeName rdf:type rdf:Property ;
+    rdfs:domain     ec:ListBasedConstructorArgument ;
+    rdfs:range      xsd:string ;
+    rdfs:label      "name of Java class or a Java interface"@en ;
+    rdfs:comment    "Specifies the full name of a Java class or of a Java interface."@en .
 
-<http://w3id.org/hefquin/engineconf#value:CostModel> a ec:DesignatedArgumentValue .
+ec:elements         rdf:type rdf:Property ;
+    rdfs:domain     ec:ListBasedConstructorArgument ;
+    rdfs:range      rdf:List ;
+    rdfs:label      "list elements"@en ;
+    rdfs:comment    "Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'."@en .
 
-<http://w3id.org/hefquin/engineconf> rdfs:label "Vocabulary for describing configurations of the HeFQUIN engine"@en ;
-    dc:creator "Olaf Hartig" ;
-    dc:date "2023-11-29" ;
-    dc:format "RDF" ;
-    dc:identifier <http://w3id.org/hefquin/engineconf> ;
-    dc:title "Vocabulary for describing configurations of the HeFQUIN engine"@en .
 
-<http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess> a ec:DesignatedArgumentValue .
+## ==== INSTANCES ====
 
-<http://w3id.org/hefquin/engineconf#value:QueryProcContext> a ec:DesignatedArgumentValue .
+ec:DefaultFederationAccessManager rdf:type ec:FederationAccessManager ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache" ;
+    ec:constructorArguments (
+        [ ec:argumentTypeName "se.liu.ida.hefquin.engine.federation.access.FederationAccessManager" ;
+          ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl" ;
+          ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
+        100  # cacheCapacity
+    ) .
 
+ec:DefaultCostModel rdf:type ec:CostModel ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl" ;
+    ec:constructorArguments (
+          [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation" ;
+            ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl" ;
+            ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] )
+          ]
+    ) .
+
+ec:DefaultSourcePlanner rdf:type ec:SourcePlanner ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" ;
+    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
+
+ec:DefaultLogicalOptimizer rdf:type ec:LogicalOptimizer ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl" ;
+    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] _:bListOfHeuristics ) .
+
+_:bListOfHeuristics
+    ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ;
+    ec:elements (
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.GreedyBasedReordering" ;
+          ec:constructorArguments (_:bFormulaForSelectivity) ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ;
+          ec:constructorArguments (ec:value:QueryProcContext) ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverJoin" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PushJoinUnderUnionWithRequests" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g" ]
+    ) .
+    
+_:bFormulaForSelectivity
+    ec:argumentTypeName
+        "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity" ;
+    ec:javaClassName
+        "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount" .
+
+ec:DefaultPhysicalOptimizer rdf:type ec:PhysicalOptimizer ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" ;
+    ec:constructorArguments (
+          [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter" ;
+            ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
+            ec:constructorArguments ( [rdf:value false]    # ignorePhysicalOpsForLogicalAddOps
+                                      [rdf:value false] )  # ignoreParallelMultiLeftJoin
+          ]
+    ) .
+
+ec:DefaultPlanCompiler rdf:type ec:PlanCompiler ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl" ;
+    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
+
+ec:DefaultExecutionEngine rdf:type ec:ExecutionEngine ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl" ;
+    ec:constructorArguments ( ) .
+
+
+ec:value:ExecServiceForFedAccess rdf:type ec:DesignatedArgumentValue .
+
+ec:value:QueryProcContext rdf:type ec:DesignatedArgumentValue .
+
+ec:value:CostModel rdf:type ec:DesignatedArgumentValue .
