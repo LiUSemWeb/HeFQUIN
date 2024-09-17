@@ -34,8 +34,11 @@
 <body>
     <p>If you are not redirected in a few seconds, <a id="redirect">click here</a>.</p>
 
-    <script src="./latest.js"></script>
     <script>
+        const script = document.createElement('script');
+        script.src = './latest.js?v=' + new Date().getTime(); // Adds timestamp to bust cache
+        document.body.appendChild(script);
+
         // Dynamically set the redirect link based on the latest version
         const link = `../${latest}/`;
 
