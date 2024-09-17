@@ -31,58 +31,27 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>generate-javadoc</id>
-      <build>
-        <plugins>
-          <!-- Configure the Maven Javadoc Plugin -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.10.0</version>
-            <executions>
-              <execution>
-                <id>generate-javadoc</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>docs/javadoc/${project.version}</outputDirectory>
-                  <failOnError>false</failOnError>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- Configure the Maven Antrun Plugin to copy Javadoc -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-              <execution>
-                <id>copy-javadoc</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <mkdir dir="docs/javadoc/latest"/>
-                    <copy todir="docs/javadoc/latest">
-                    <fileset dir="docs/javadoc/${project.version}">
-                      <include name="**/*"/>
-                    </fileset>
-                  </copy>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.10.0</version>
+        <executions>
+          <execution>
+            <id>generate-javadoc</id>
+            <phase>package</phase>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/reports/${project.version}</outputDirectory>
+              <failOnError>false</failOnError>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
