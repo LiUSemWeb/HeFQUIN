@@ -1,299 +1,5 @@
 [
   {
-    "@id": "http://w3id.org/hefquin/engineconf#ConstructorArgument",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Constructor Argument"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#value:CostModel",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#logicalOptimizer",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the logical optimizer to be used by the query planner."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "logical optimizer"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#LogicalOptimizer"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#PlanCompiler",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Plan Compiler"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#javaClassName",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the full name of a Java class."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "name of Java class"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#FederationAccessManager",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Federation Access Manager"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultSourcePlanner",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#SourcePlanner"
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b9"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b9",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Value-Based Constructor Argument"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#ConstructorArgument"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#elementsTypeName",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the full name of a Java class or of a Java interface."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "name of Java class or a Java interface"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#physicalOptimizer",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the physical optimizer to be used by the query planner."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "physical optimizer"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#PhysicalOptimizer"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#ExecutionEngine",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Execution Engine"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#sourcePlanner",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the source planner to be used by the query planner."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "source planner"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#SourcePlanner"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#elements",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "list elements"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
-      }
-    ]
-  },
-  {
     "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
@@ -312,70 +18,93 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#QueryProcessor",
+    "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property."
+        "@value": "Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Query Processor"
+        "@value": "Query Planner"
       }
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultCostModel",
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultFederationAccessManager",
     "@type": [
-      "http://w3id.org/hefquin/engineconf#CostModel"
+      "http://w3id.org/hefquin/engineconf#FederationAccessManager"
     ],
     "http://w3id.org/hefquin/engineconf#constructorArguments": [
       {
         "@list": [
           {
-            "@id": "_:n905c4c77aec544d499db817225508f61b5"
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb1"
+          },
+          {
+            "@value": 100
           }
         ]
       }
     ],
     "http://w3id.org/hefquin/engineconf#javaClassName": [
       {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl"
+        "@value": "se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache"
       }
     ]
   },
   {
-    "@id": "_:n905c4c77aec544d499db817225508f61b5",
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb1",
     "http://w3id.org/hefquin/engineconf#argumentTypeName": [
       {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation"
+        "@value": "se.liu.ida.hefquin.engine.federation.access.FederationAccessManager"
       }
     ],
     "http://w3id.org/hefquin/engineconf#constructorArguments": [
       {
         "@list": [
           {
-            "@id": "_:n905c4c77aec544d499db817225508f61b6"
+            "@id": "http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess"
           }
         ]
       }
     ],
     "http://w3id.org/hefquin/engineconf#javaClassName": [
       {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl"
+        "@value": "se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl"
       }
     ]
   },
   {
-    "@id": "_:n905c4c77aec544d499db817225508f61b6",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+    "@id": "http://w3id.org/hefquin/engineconf#constructorArguments",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
-        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
+        "@language": "en",
+        "@value": "Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "constructor arguments"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       }
     ]
   },
@@ -408,6 +137,429 @@
     ]
   },
   {
+    "@id": "http://w3id.org/hefquin/engineconf#ConstructorArgument",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Constructor Argument"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#value:CostModel",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#PhysicalOptimizer",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Physical Optimizer"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultCostModel",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#CostModel"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb5"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel.CostModelImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb5",
+    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation"
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb6"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality.CardinalityEstimationImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb6",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#sourcePlanner",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the source planner to be used by the query planner."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "source planner"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#SourcePlanner"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#javaClassName",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the full name of a Java class."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "name of Java class"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#ExecutionEngine",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Execution Engine"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultLogicalOptimizer",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#LogicalOptimizer"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb11"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb12"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb11",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb12",
+    "http://w3id.org/hefquin/engineconf#elements": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb15"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb16"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb17"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb18"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb21"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb22"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb24"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb25"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb26"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb27"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb28"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb29"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#elementsTypeName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb15",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb16",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb17",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb18",
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb19"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.GreedyBasedReordering"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb19",
+    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity"
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb21",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb22",
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb24",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb25",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb26",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverJoin"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb27",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PushJoinUnderUnionWithRequests"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb28",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb29",
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#elements",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "list elements"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#CostModel",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Cost Model"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
     "@id": "http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
@@ -430,6 +582,181 @@
       },
       {
         "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#QueryProcessor",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Query Processor"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#physicalOptimizer",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the physical optimizer to be used by the query planner."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "physical optimizer"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#PhysicalOptimizer"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#PlanCompiler",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Plan Compiler"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultExecutionEngine",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#ExecutionEngine"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": []
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#FederationAccessManager",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Federation Access Manager"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#fedAccessMgr",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "federation access manager"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#FederationAccessManager"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultPlanCompiler",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#PlanCompiler"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb48"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb48",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "List-Based Constructor Argument"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#ConstructorArgument"
       }
     ]
   },
@@ -469,458 +796,6 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#SourcePlanner",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Source Planner"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultPhysicalOptimizer",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#PhysicalOptimizer"
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b42"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b42",
-    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter"
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b43"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b44"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b43",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
-      {
-        "@value": false
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b44",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
-      {
-        "@value": false
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Query Planner"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Designated Argument Value"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#LogicalOptimizer",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Logical Optimizer"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#fedAccessMgr",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "federation access manager"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#FederationAccessManager"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "HeFQUIN Engine Configuration"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultLogicalOptimizer",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#LogicalOptimizer"
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b11"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b12"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b11",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b12",
-    "http://w3id.org/hefquin/engineconf#elements": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b15"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b16"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b17"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b18"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b21"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b22"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b24"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b25"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b26"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b27"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b28"
-          },
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b29"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#elementsTypeName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b15",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b16",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b17",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b18",
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b19"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.GreedyBasedReordering"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b19",
-    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity"
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b21",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b22",
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b24",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemoveUnnecessaryL2gAndG2l"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b25",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b26",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverJoin"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b27",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PushJoinUnderUnionWithRequests"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b28",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b29",
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultExecutionEngine",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#ExecutionEngine"
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": []
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#constructorArguments",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "constructor arguments"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#CostModel",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Cost Model"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
-      }
-    ]
-  },
-  {
     "@id": "http://w3id.org/hefquin/engineconf#costModel",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -949,14 +824,42 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#PhysicalOptimizer",
+    "@id": "http://w3id.org/hefquin/engineconf#logicalOptimizer",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the logical optimizer to be used by the query planner."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#QueryPlanner"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "logical optimizer"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#LogicalOptimizer"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#LogicalOptimizer",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Physical Optimizer"
+        "@value": "Logical Optimizer"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
@@ -966,64 +869,30 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultPlanCompiler",
-    "@type": [
-      "http://w3id.org/hefquin/engineconf#PlanCompiler"
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b48"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b48",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
-      {
-        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
-      }
-    ]
-  },
-  {
-    "@id": "http://w3id.org/hefquin/engineconf#executionEngine",
+    "@id": "http://w3id.org/hefquin/engineconf#elementsTypeName",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Specifies the execution engine to be used by the query processor."
+        "@value": "Specifies the full name of a Java class or of a Java interface."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#domain": [
       {
-        "@id": "http://w3id.org/hefquin/engineconf#QueryProcessor"
+        "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "execution engine"
+        "@value": "name of Java class or a Java interface"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#range": [
       {
-        "@id": "http://w3id.org/hefquin/engineconf#ExecutionEngine"
+        "@id": "http://www.w3.org/2000/10/XMLSchema#string"
       }
     ]
   },
@@ -1056,47 +925,19 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#DefaultFederationAccessManager",
+    "@id": "http://w3id.org/hefquin/engineconf#SourcePlanner",
     "@type": [
-      "http://w3id.org/hefquin/engineconf#FederationAccessManager"
+      "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+    "http://www.w3.org/2000/01/rdf-schema#label": [
       {
-        "@list": [
-          {
-            "@id": "_:n905c4c77aec544d499db817225508f61b1"
-          },
-          {
-            "@value": 100
-          }
-        ]
+        "@language": "en",
+        "@value": "Source Planner"
       }
     ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
-        "@value": "se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache"
-      }
-    ]
-  },
-  {
-    "@id": "_:n905c4c77aec544d499db817225508f61b1",
-    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.federation.access.FederationAccessManager"
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#constructorArguments": [
-      {
-        "@list": [
-          {
-            "@id": "http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess"
-          }
-        ]
-      }
-    ],
-    "http://w3id.org/hefquin/engineconf#javaClassName": [
-      {
-        "@value": "se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl"
+        "@id": "http://w3id.org/hefquin/engineconf#InstantiableJavaClass"
       }
     ]
   },
@@ -1157,25 +998,184 @@
     ]
   },
   {
-    "@id": "http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument",
+    "@id": "http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property."
+        "@value": "Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "List-Based Constructor Argument"
+        "@value": "HeFQUIN Engine Configuration"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultPhysicalOptimizer",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#PhysicalOptimizer"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb42"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb42",
+    "http://w3id.org/hefquin/engineconf#argumentTypeName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter"
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb43"
+          },
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb44"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb43",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@value": false
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb44",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@value": false
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue"
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DesignatedArgumentValue",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Designated Argument Value"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Value-Based Constructor Argument"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://w3id.org/hefquin/engineconf#ConstructorArgument"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#executionEngine",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Specifies the execution engine to be used by the query processor."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#QueryProcessor"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "execution engine"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#ExecutionEngine"
+      }
+    ]
+  },
+  {
+    "@id": "http://w3id.org/hefquin/engineconf#DefaultSourcePlanner",
+    "@type": [
+      "http://w3id.org/hefquin/engineconf#SourcePlanner"
+    ],
+    "http://w3id.org/hefquin/engineconf#constructorArguments": [
+      {
+        "@list": [
+          {
+            "@id": "_:n51d9386846364b3eac2da83f72b5b5feb9"
+          }
+        ]
+      }
+    ],
+    "http://w3id.org/hefquin/engineconf#javaClassName": [
+      {
+        "@value": "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl"
+      }
+    ]
+  },
+  {
+    "@id": "_:n51d9386846364b3eac2da83f72b5b5feb9",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@id": "http://w3id.org/hefquin/engineconf#value:QueryProcContext"
       }
     ]
   }
