@@ -31,7 +31,9 @@ jobs:
           fi
           rm -rf docs/javadoc/"$project_version" 2>/dev/null
           cp -r target/reports/"$project_version"/apidocs docs/javadoc/"$project_version"
-          echo "const latest=\"${project_version}\";" > docs/javadoc/latest/latest.js
+          template=$(<docs-scripts/latest-template.html)
+          output="${template//\{project_version\}/$project_version}"
+          echo -e "$output" > docs/javadoc/latest/index.html
       
       - name: install python packages
         run: pip install -r ./docs-scripts/requirements.txt
