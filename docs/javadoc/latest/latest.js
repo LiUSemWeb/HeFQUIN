@@ -1,1 +1,1 @@
-const latest="dummy value"
+const latest="0.0.4-SNAPSHOT";
