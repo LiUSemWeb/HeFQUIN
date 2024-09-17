@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        p {
+            font-size: 18px;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <p>If you are not redirected in a few seconds, <a id="redirect">click here</a>.</p>
+
+    <script src="./latest.js"></script>
+    <script>
+        // Dynamically set the redirect link based on the latest version
+        const link = `../${latest}/apidocs/`;
+
+        // Perform the redirection
+        window.location.href = link;
+
+        // Update the anchor tag's href after page load
+        window.onload = () => {
+            const redirect = document.getElementById("redirect");
+            redirect.href = link;
+        }
+    </script>
+</body>
+
+</html>
