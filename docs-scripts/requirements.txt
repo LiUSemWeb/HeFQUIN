@@ -1,2 +1,2 @@
 rdflib
-jinja2
+git+https://github.com/LiUSemWeb/pyLODE.git
