@@ -1,10 +1,12 @@
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:    <http://www.w3.org/2000/10/XMLSchema#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
 @prefix lr:     <http://w3id.org/hefquin/lpg2rdf#> .
 
 <http://w3id.org/hefquin/lpg2rdf>
+    rdf:type owl:Ontology ;
     dc:creator       "Olaf Hartig" ;
     dc:date          "2023-11-29" ;
     dc:format        "RDF" ;
@@ -16,110 +18,110 @@
 
 ## ==== CLASS DECLARATIONS ====
 
-lr:LPGtoRDFConfiguration rdf:type rdfs:Class ;
+lr:LPGtoRDFConfiguration rdf:type owl:Class ;
     rdfs:label      "LPG-to-RDF Configuration"@en ;
     rdfs:comment    "Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property."@en .
 
 ## ---- Classes for node mappings ----
 
-lr:NodeMapping rdf:type rdfs:Class ;
+lr:NodeMapping rdf:type owl:Class ;
     rdfs:label      "Node Mapping"@en ;
     rdfs:comment    "A node mapping is an injective function that maps every given LPG node to either an IRI or a blank node, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node mapping. Concrete types of node mappings are captured by the subclasses of this class."@en .
 
-lr:BNodeBasedNodeMapping rdf:type rdfs:Class ;
+lr:BNodeBasedNodeMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeMapping ;
     rdfs:label       "Blank Node-based Node Mapping"@en ;
     rdfs:comment     "Class of node mappings that map every given LPG node to a blank node."@en .
 
-lr:IRIPrefixBasedNodeMapping rdf:type rdfs:Class ;
+lr:IRIPrefixBasedNodeMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeMapping ;
     rdfs:label       "IRI-based Node Mapping"@en ;
     rdfs:comment     "Class of node mappings that map every given LPG node to an IRI by attaching the ID of the node to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."@en .
 
 ## ---- Classes for node label mappings ----
 
-lr:NodeLabelMapping rdf:type rdfs:Class ;
+lr:NodeLabelMapping rdf:type owl:Class ;
     rdfs:label      "Node Label Mapping"@en ;
     rdfs:comment    "A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class."@en .
 
-lr:LiteralBasedNodeLabelMapping rdf:type rdfs:Class ;
+lr:LiteralBasedNodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "Literal-based Node Label Mapping"@en ;
     rdfs:comment     "Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal."@en .
 
-lr:IRIPrefixBasedNodeLabelMapping rdf:type rdfs:Class ;
+lr:IRIPrefixBasedNodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "IRI-based Node Label Mapping"@en ;
     rdfs:comment     "Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."@en .
 
-lr:RegexBasedNodeLabelMapping rdf:type rdfs:Class ;
+lr:RegexBasedNodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "Regex-based Node Label Mapping"@en ;
     rdfs:comment     "Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes."@en .
 
-lr:SingletonLiteralNodeLabelMapping rdf:type rdfs:Class ;
+lr:SingletonLiteralNodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "Singleton-Literal Node Label Mapping"@en ;
     rdfs:comment     "Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."@en .
 
-lr:SingletonIRINodeLabelMapping rdf:type rdfs:Class ;
+lr:SingletonIRINodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "Singleton-IRI Node Label Mapping"@en ;
     rdfs:comment     "Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."@en .
 
-lr:CompositeNodeLabelMapping rdf:type rdfs:Class ;
+lr:CompositeNodeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:NodeLabelMapping ;
     rdfs:label       "Composite Node Label Mapping"@en ;
     rdfs:comment     "Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property."@en .
 
 ## ---- Classes for edge label mappings ----
 
-lr:EdgeLabelMapping rdf:type rdfs:Class ;
+lr:EdgeLabelMapping rdf:type owl:Class ;
     rdfs:label      "Edge Label Mapping"@en ;
     rdfs:comment    "An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class."@en .
 
-lr:IRIPrefixBasedEdgeLabelMapping rdf:type rdfs:Class ;
+lr:IRIPrefixBasedEdgeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:EdgeLabelMapping ;
     rdfs:label       "IRI-based Edge Label Mapping"@en ;
     rdfs:comment     "Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."@en .
 
-lr:RegexBasedEdgeLabelMapping rdf:type rdfs:Class ;
+lr:RegexBasedEdgeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:IRIPrefixBasedEdgeLabelMapping ;
     rdfs:label       "Regex-based Edge Label Mapping"@en ;
     rdfs:comment     "Class of edge label mappings that focus only on edge labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property."@en .
 
-lr:SingletonIRIEdgeLabelMapping rdf:type rdfs:Class ;
+lr:SingletonIRIEdgeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:EdgeLabelMapping ;
     rdfs:label       "Singleton-IRI Edge Label Mapping"@en ;
     rdfs:comment     "Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties."@en .
 
-lr:CompositeEdgeLabelMapping rdf:type rdfs:Class ;
+lr:CompositeEdgeLabelMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:EdgeLabelMapping ;
     rdfs:label       "Composite Edge Label Mapping"@en ;
     rdfs:comment     "Class of edge label mappings that are based on other edge label mappings and, for every given edge label, consider these other mappings one after another until one of them is found that has the given edge label in its domain; this other edge label mapping is then invoked. The list of the other edge label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property."@en .
 
 ## ---- Classes for property name mappings ----
 
-lr:PropertyNameMapping rdf:type rdfs:Class ;
+lr:PropertyNameMapping rdf:type owl:Class ;
     rdfs:label      "Property Name Mapping"@en ;
     rdfs:comment    "A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class."@en .
 
-lr:IRIPrefixBasedPropertyNameMapping rdf:type rdfs:Class ;
+lr:IRIPrefixBasedPropertyNameMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:PropertyNameMapping ;
     rdfs:label       "IRI-based Property Name Mapping"@en ;
     rdfs:comment     "Class of property name mappings that map every given property name to an IRI by attaching the property name to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property."@en .
 
-lr:RegexBasedPropertyNameMapping rdf:type rdfs:Class ;
+lr:RegexBasedPropertyNameMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:IRIPrefixBasedPropertyNameMapping ;
     rdfs:label       "Regex-based Property Name Mapping"@en ;
     rdfs:comment     "Class of property name mappings that focus only on property names that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property."@en .
 
-lr:SingletonIRIPropertyNameMapping rdf:type rdfs:Class ;
+lr:SingletonIRIPropertyNameMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:PropertyNameMapping ;
     rdfs:label       "Singleton-IRI Property Name Mapping"@en ;
     rdfs:comment     "Class of property name mappings that focus only on a single property name and map it to a given IRI. This IRI is specified by the lr:iri property and the specific property name considered by this mapping is specified by the lr:propertyName property. Hence, every instance of this class must have exactly one of each of these two properties."@en .
 
-lr:CompositePropertyNameMapping rdf:type rdfs:Class ;
+lr:CompositePropertyNameMapping rdf:type owl:Class ;
     rdfs:subClassOf  lr:PropertyNameMapping ;
     rdfs:label       "Composite Property Name Mapping"@en ;
     rdfs:comment     "Class of property name mappings that are based on other property name mappings and, for every given property name, consider these other mappings one after another until one of them is found that has the given property name in its domain; this other property name mapping is then invoked. The list of the other property name mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property."@en .

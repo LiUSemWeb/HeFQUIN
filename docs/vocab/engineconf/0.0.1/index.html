@@ -1,465 +1,1937 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeFQUIN: Vocabulary</title>
+<html>
+  <head>
+    <title>Vocabulary for describing configurations of the HeFQUIN engine</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        #pylode {
+            position: fixed;
+            top: 205px;
+            left: -150px;
+            font-size: small;
+            transform: rotate(-90deg);
+            color: grey;
         }
-        h1 {
+        #pylode a {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #005A9C;
+        }
+        #pylode a:hover {
             color: #333;
         }
+        #pylode #p {
+            color: #329545;
+        }
+        #pylode #y {
+            color: #f9cb33;
+        }
+        #pylode #version {
+            font-size: 1.0em;
+        }
+
+        #profile {
+            font-style: italic;
+            font-size: 1.25em;
+            color: darkred!important;
+        }
+
+        .cardinality {
+            font-style: italic;
+            color: #aa00aa;
+        }
+
+        dl {
+            /*border: 1px solid navy;*/
+            /*padding:5px;*/
+        }
+
+        dt {
+            font-weight: bold;
+            padding: 0;
+        }
+
+        dd {
+            margin-bottom: 10px;
+            padding-top: 7px;
+        }
+
+        #metadata ul,
+        #classes ul {
+            list-style-type: none;
+        }
+
+        #metadata ul li,
+        #classes ul li {
+            margin-left: -40px;
+        }
+
+        ul.hlist {
+            list-style-type: none;
+            border: 1px solid navy;
+            padding:5px;
+            background-color: #F4FFFF;
+        }
+
+        ul.hierarchy {
+            border: 1px solid navy;
+            padding: 5px 25px 5px 25px;
+            background-color: #F4FFFF;
+        }
+
+
+        ul.hlist li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        .entity {
+            border: 1px solid navy;
+            margin:5px 0 5px 0;
+            padding: 5px;
+        }
+
+        .entity th {
+            width: 150px;
+            vertical-align: top;
+        }
+
+        .entity th,
+        .entity td {
+            padding-bottom: 20px;
+        }
+
+        .entity table th {
+            text-align: left;
+        }
+
+        section#overview img {
+            max-width: 1000px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            text-align: left
+        }
+        h1, h2, h3 {
+            color: #005A9C; background: white
+        }
+        h1 {
+            font: 170% sans-serif;
+            line-height: 110%;
+        }
         h2 {
-            color: #555;
+            font: 140% sans-serif;
+            margin-top:40px;
         }
-        .box {
-            padding: 5px 10px;
-            border: 1px solid black;
-            border-bottom: 0;
+        h3 {
+            font: 120% sans-serif;
+            margin-top: 20px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid navy;
         }
-        .wrapper > .box:last-child {
-            border-bottom: 1px solid black;
+        h4 { font: bold 100% sans-serif }
+        h5 { font: italic 100% sans-serif }
+        h6 { font: small-caps 100% sans-serif }
+
+        body {
+            padding: 2em 70px 2em 70px;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+            background: white;
+            background-position: top left;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            text-align: left;
         }
 
-    </style>
-</head>
-<body>
-    <h1>Vocabulary for describing configurations of the HeFQUIN engine</h1>
-    <div class="general-info">
-        <h2>General Information</h2>
-        <p><strong>Creator:</strong> Olaf Hartig</p>
-        <p><strong>Date:</strong> 2023-11-29</p>
-        <p><strong>Format:</strong> RDF</p>
-        <p><strong>Identifier:</strong> http://w3id.org/hefquin/engineconf</p>
-        <p><strong>Label:</strong> Vocabulary for describing configurations of the HeFQUIN engine</p>
-        <p><strong>Description:</strong> None</p>
-        <p><strong>Comment:</strong> None</p>
-        <p><strong>Download:</strong>
-            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.ttl">ttl</a>
-            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.rdf">rdf</a>
-            <a href="http://w3id.org/hefquin/engineconf/0.0.1/engineconf.jsonld">jsonld</a>
-        </p>
-    </div>
-    
-    <h2>Prefixes</h2>
-    <div class="wrapper">
-        <div class="box prefixes">
-        
-            <p>rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#</p>
-        
-            <p>rdfs: http://www.w3.org/2000/01/rdf-schema#</p>
-        
-            <p>xsd: http://www.w3.org/2000/10/XMLSchema#</p>
-        
-            <p>dc: http://purl.org/dc/elements/1.1/</p>
-        
-            <p>ec: http://w3id.org/hefquin/engineconf#</p>
-        
-        </div>
-    </div>
+        section {
+            max-width: 1500px;
+        }
 
-    <h2>Classes</h2>
-    <div class="wrapper">
-        
-        <div id="HeFQUINEngineConfiguration" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration</h3>
-            <div class="details">
-                <p><strong>Label:</strong> HeFQUIN Engine Configuration</p>
-                <p><strong>Comment:</strong> Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="InstantiableJavaClass" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#InstantiableJavaClass</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Instantiable Java Class</p>
-                <p><strong>Comment:</strong> Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="ConstructorArgument" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#ConstructorArgument</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Constructor Argument</p>
-                <p><strong>Comment:</strong> This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="InstantiationBasedConstructorArgument" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Instantiation-Based Constructor Argument</p>
-                <p><strong>Comment:</strong> Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#ConstructorArgument, http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="ListBasedConstructorArgument" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument</h3>
-            <div class="details">
-                <p><strong>Label:</strong> List-Based Constructor Argument</p>
-                <p><strong>Comment:</strong> Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#ConstructorArgument
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="ValueBasedConstructorArgument" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Value-Based Constructor Argument</p>
-                <p><strong>Comment:</strong> Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#ConstructorArgument
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="DesignatedArgumentValue" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#DesignatedArgumentValue</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Designated Argument Value</p>
-                <p><strong>Comment:</strong> The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="FederationAccessManager" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#FederationAccessManager</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Federation Access Manager</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="QueryProcessor" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#QueryProcessor</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Query Processor</p>
-                <p><strong>Comment:</strong> Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="CostModel" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#CostModel</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Cost Model</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="QueryPlanner" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#QueryPlanner</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Query Planner</p>
-                <p><strong>Comment:</strong> Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="SourcePlanner" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#SourcePlanner</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Source Planner</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="LogicalOptimizer" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#LogicalOptimizer</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Logical Optimizer</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="PhysicalOptimizer" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#PhysicalOptimizer</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Physical Optimizer</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="PlanCompiler" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#PlanCompiler</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Plan Compiler</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="ExecutionEngine" class="box class">
-            <h3>http://w3id.org/hefquin/engineconf#ExecutionEngine</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Execution Engine</p>
-                <p><strong>Comment:</strong> N/A</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/engineconf#InstantiableJavaClass
-                    
-                </p>
-            </div>
-        </div>
-        
-    </div>
+        .figure {
+            margin-bottom: 20px;
+        }
 
-    <h2>Properties</h2>
-    <div class="wrapper">
-        
-        <div id="fedAccessMgr" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#fedAccessMgr</h3>
-            <div class="details">
-                <p><strong>Label:</strong> federation access manager</p>
-                <p><strong>Comment:</strong> Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#FederationAccessManager</p>
-            </div>
-        </div>
-        
-        <div id="queryProcessor" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#queryProcessor</h3>
-            <div class="details">
-                <p><strong>Label:</strong> query processor</p>
-                <p><strong>Comment:</strong> Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#QueryProcessor</p>
-            </div>
-        </div>
-        
-        <div id="costModel" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#costModel</h3>
-            <div class="details">
-                <p><strong>Label:</strong> cost model</p>
-                <p><strong>Comment:</strong> Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryProcessor</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#CostModel</p>
-            </div>
-        </div>
-        
-        <div id="queryPlanner" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#queryPlanner</h3>
-            <div class="details">
-                <p><strong>Label:</strong> query planner</p>
-                <p><strong>Comment:</strong> Specifies the query planner to be used by the query processor.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryProcessor</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#QueryPlanner</p>
-            </div>
-        </div>
-        
-        <div id="planCompiler" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#planCompiler</h3>
-            <div class="details">
-                <p><strong>Label:</strong> plan compiler</p>
-                <p><strong>Comment:</strong> Specifies the plan compiler to be used by the query processor.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryProcessor</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#PlanCompiler</p>
-            </div>
-        </div>
-        
-        <div id="executionEngine" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#executionEngine</h3>
-            <div class="details">
-                <p><strong>Label:</strong> execution engine</p>
-                <p><strong>Comment:</strong> Specifies the execution engine to be used by the query processor.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryProcessor</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#ExecutionEngine</p>
-            </div>
-        </div>
-        
-        <div id="sourcePlanner" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#sourcePlanner</h3>
-            <div class="details">
-                <p><strong>Label:</strong> source planner</p>
-                <p><strong>Comment:</strong> Specifies the source planner to be used by the query planner.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryPlanner</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#SourcePlanner</p>
-            </div>
-        </div>
-        
-        <div id="logicalOptimizer" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#logicalOptimizer</h3>
-            <div class="details">
-                <p><strong>Label:</strong> logical optimizer</p>
-                <p><strong>Comment:</strong> Specifies the logical optimizer to be used by the query planner.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryPlanner</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#LogicalOptimizer</p>
-            </div>
-        </div>
-        
-        <div id="physicalOptimizer" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#physicalOptimizer</h3>
-            <div class="details">
-                <p><strong>Label:</strong> physical optimizer</p>
-                <p><strong>Comment:</strong> Specifies the physical optimizer to be used by the query planner.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#QueryPlanner</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/engineconf#PhysicalOptimizer</p>
-            </div>
-        </div>
-        
-        <div id="javaClassName" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#javaClassName</h3>
-            <div class="details">
-                <p><strong>Label:</strong> name of Java class</p>
-                <p><strong>Comment:</strong> Specifies the full name of a Java class.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#InstantiableJavaClass</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="constructorArguments" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#constructorArguments</h3>
-            <div class="details">
-                <p><strong>Label:</strong> constructor arguments</p>
-                <p><strong>Comment:</strong> Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#InstantiableJavaClass</p>
-                <p><strong>Range:</strong> http://www.w3.org/1999/02/22-rdf-syntax-ns#List</p>
-            </div>
-        </div>
-        
-        <div id="argumentTypeName" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#argumentTypeName</h3>
-            <div class="details">
-                <p><strong>Label:</strong> name of Java class or a Java interface</p>
-                <p><strong>Comment:</strong> Specifies the full name of a Java class or of a Java interface.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="elementsTypeName" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#elementsTypeName</h3>
-            <div class="details">
-                <p><strong>Label:</strong> name of Java class or a Java interface</p>
-                <p><strong>Comment:</strong> Specifies the full name of a Java class or of a Java interface.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="elements" class="box property">
-            <h3>http://w3id.org/hefquin/engineconf#elements</h3>
-            <div class="details">
-                <p><strong>Label:</strong> list elements</p>
-                <p><strong>Comment:</strong> Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument</p>
-                <p><strong>Range:</strong> http://www.w3.org/1999/02/22-rdf-syntax-ns#List</p>
-            </div>
-        </div>
-        
-    </div>
+        :link { color: #00C; background: transparent }
+        :visited { color: #609; background: transparent }
+        a:active { color: #C00; background: transparent }
 
-    <h2>Instances</h2>
-    <div class="wrapper">
-        <div class="box instances">
-            
-            <p id="DefaultFederationAccessManager">http://w3id.org/hefquin/engineconf#DefaultFederationAccessManager</p>
-            
-            <p id="DefaultCostModel">http://w3id.org/hefquin/engineconf#DefaultCostModel</p>
-            
-            <p id="DefaultSourcePlanner">http://w3id.org/hefquin/engineconf#DefaultSourcePlanner</p>
-            
-            <p id="DefaultLogicalOptimizer">http://w3id.org/hefquin/engineconf#DefaultLogicalOptimizer</p>
-            
-            <p id="DefaultPhysicalOptimizer">http://w3id.org/hefquin/engineconf#DefaultPhysicalOptimizer</p>
-            
-            <p id="DefaultPlanCompiler">http://w3id.org/hefquin/engineconf#DefaultPlanCompiler</p>
-            
-            <p id="DefaultExecutionEngine">http://w3id.org/hefquin/engineconf#DefaultExecutionEngine</p>
-            
-            <p id="value:ExecServiceForFedAccess">http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess</p>
-            
-            <p id="value:QueryProcContext">http://w3id.org/hefquin/engineconf#value:QueryProcContext</p>
-            
-            <p id="value:CostModel">http://w3id.org/hefquin/engineconf#value:CostModel</p>
-            
+        .sup-c,
+        .sup-op,
+        .sup-fp,
+        .sup-dp,
+        .sup-ap,
+        .sup-p,
+        .sup-ni,
+        .sup-con,
+        .sup-col {
+            cursor:help;
+        }
+
+        .sup-c {
+            color:orange;
+        }
+
+        .sup-op {
+            color:navy;
+        }
+
+        .sup-fp {
+            color:lightskyblue;
+        }
+
+        .sup-dp {
+            color:green;
+        }
+
+        .sup-ap {
+            color:darkred;
+        }
+
+        .sup-p {
+            color:black;
+        }
+
+        .sup-ni {
+            color:brown;
+        }
+
+        .sup-con {
+            color:orange;
+        }
+
+        .sup-col {
+            color:darkred;
+        }
+
+        sup {
+            margin-left: -3px;
+        }
+        code {
+            font-size: large;
+            color: darkred;
+        }
+
+        /* less prominent links for properties */
+        .proplink {
+            color: #336;
+            text-decoration: none;
+        }
+
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+    border: solid 1px navy;
+    font-size: small;
+    width: 180px;
+}
+#toc h3 {
+    margin-top: 5px;
+}
+
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#toc .first > li {
+    margin-top: 5px;
+}
+
+#toc .second,
+#toc .third {
+    padding-left: 10px;
+}
+
+#content {
+    width: calc(100% - 150px);
+}
+
+.hover_property {
+    cursor: help;
+    text-decoration: none;
+    border-bottom: dashed 1px;
+}
+
+.setclass {
+    list-style-type: none;
+}
+
+code{
+    word-wrap: break-word;
+  }
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+td {
+    word-wrap: break-word;
+}
+#legend table.entity {
+    width: 25%;
+}
+
+/* hide duplicate restictions bug */
+#content > span {
+    display: none;
+}
+
+ul, p {
+    margin: 0;
+}
+	</style>
+    <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhklEQVQ4jbWPzStEURjG3yQLirlGKUnKFO45Z+SjmXvnnmthQcpCoVhYmD/AwmJiI3OvZuZc2U3UlKU0/gAslMw9JgvhHxAr2fko7r0jHSsl+TgbTz2Lt5731/MASEiJW9ONml2QyX6rsGalmnT74v8BDf12hxJfpV8d1uwNKUBYszabdFv84L8B9X0rESVmmUup2fme0cVhJWaZHw4NWL1SewEAfDe6H3Dy6Ll456WEJsRZS630MwCAOI20ei5OBpxse5zcBZw8eS4uPpfIuDiCainIg9umBCU0GZzgLZ9Hn31OgoATL+CkLDGB5H1OKj4nFd/FBxUXJ0UZNb4edw/6nLyJXaj5FeCVyPLNIVmYK8TG1IwWb16L1gEACAFV90ftoT8bdOX0EeyY99gxBXZMgRz6qGb1KantAACI0UvE6F5XJqEjpsdURouI0Vt5gGOUkUNnPu7ObGIIMfNaGqDmjDRi9FZldF1lRgYzeqUyeoiY4ag5Iy3RgOYRM8+/M2bG8efsO4hGrpmJseyMAAAAAElFTkSuQmCC" rel="icon" sizes="16x16" type="image/png">
+    <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC40lEQVRYhe2UT0hUQRzHp6Iss1B3VZKIDbbdfW9mnoi4f3zzjkJQeOgS0SEIb1EWBGGlLLu460zQPQM1unUIIjA6rfpm6ZAhHjoIRVQUFUlEbG+euTsdXG1d3VL3bVD4g+9h+L35fT/8fvN7ADgY9aHY5fpIvK82HO9ysu66wxWOzbkjcekKx0a2ALYA/n2AGi3a6ArFezcidziecQygNhhrcUficjP6PwBqtGijKxy/thnVBePHywYoDsFhl53GV8SEcsTx4usCMLUewTVpc23BNvEzm6Neyf1+KcG2vwqwUjgrOJq2JmHftwmkVBRGTvncFodnbI7vChO/FRznCmHsNM7aHM9Yk7Df5iqsLMw9sMNOK2g+jS4IEz0UJv4iuJZb2RltWnB4UZqH6ioGAgAAGe5vtiZhtzDx7OoRadLmeM7m6IRjhnLMW2Vx1bA5GhAmnhIcz6/xNj4Ujsky8UspwfayjDPjsF2Y6L7N8Vzx/BfP+KPg6LbgSqd8DnfJW2CnbaLhfH5ephpqygJYvQU4Z3P82TLRsDDhUTnmrSq+Y3N0Mg+Xldy/zwEAnLMWZ3pHpNExmfLs/t0dOdVcbT0JeKxUwFP2VljjqiE47Jp53LTXNxhsUZjerTByXWX6VZWRs/4bIQ2ACv+UAomgDzLCISNZxAxZKMhIDjLy1JfsaK+I+eGBUBNk5E2x8RogX/PdcDZUqieWTSh5D6nOVKqfhoycUmlHFFIyu5RXqf7AcQDISCpv/tqbMBqK883RtmpISRoxQyJKPgGn3wNk5NEigDFa6hslqV/Kj+FdBQD0bshIDlKSLlVcoWQo36UhR80BAMB73lulMn0EMpJTqD6qJiOt3mho/8GbkT2BZNgDB/V+RI0fkOrT3kRIVQbaDizJm2hdNbINBxwk5xAj3yEjuV9rZ1iIkgxixkLBA83mz8uCjLwoGwAx0vOnFSy5mtR4VTaAQvVORMnwZgSpzkrV/QmdE2tKe46+MQAAAABJRU5ErkJggg==" rel="icon" sizes="32x32" type="image/png">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <script id="schema.org" type="application/ld+json">
+[
+  {
+    "@id": "http://w3id.org/hefquin/engineconf",
+    "@type": [
+      "https://schema.org/DefinedTermSet"
+    ],
+    "https://schema.org/creator": [
+      {
+        "@value": "Olaf Hartig"
+      }
+    ],
+    "https://schema.org/name": [
+      {
+        "@language": "en",
+        "@value": "Vocabulary for describing configurations of the HeFQUIN engine"
+      }
+    ]
+  }
+]
+	</script>
+  </head>
+  <body>
+    <div id="content">
+      <div class="section" id="metadata">
+        <h1>Vocabulary for describing configurations of the HeFQUIN engine</h1>
+        <h2>Metadata</h2>
+        <dl>
+          <div>
+            <dt>
+              <strong>IRI</strong>
+            </dt>
+            <dd>
+              <code>http://w3id.org/hefquin/engineconf</code>
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <a class="hover_property" href="http://purl.org/dc/terms/title" title="A name given to the resource. Defined in DCMI Metadata Terms">Title</a>
+            </dt>
+            <dd><p>Vocabulary for describing configurations of the HeFQUIN engine</p></dd>
+          </div>
+          <div>
+            <dt>
+              <a class="hover_property" href="http://purl.org/dc/terms/creator" title="An entity responsible for making the resource. Defined in DCMI Metadata Terms">Creator</a>
+            </dt>
+            <dd><p>Olaf Hartig</p></dd>
+          </div>
+        </dl>
+      </div>
+      <div class="section" id="classes">
+        <h2>Classes</h2>
+        <div class="property entity" id="HeFQUINEngineConfiguration">
+          <h3>HeFQUIN Engine Configuration
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#fedAccessMgr">federation access manager</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#queryProcessor">query processor</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
         </div>
+        <div class="property entity" id="InstantiableJavaClass">
+          <h3>Instantiable Java Class
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#InstantiableJavaClass</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#javaClassName">name of Java class</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#constructorArguments">constructor arguments</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#InstantiationBasedConstructorArgument">Instantiation-Based Constructor Argument</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#FederationAccessManager">Federation Access Manager</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#CostModel">Cost Model</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#SourcePlanner">Source Planner</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#LogicalOptimizer">Logical Optimizer</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#PhysicalOptimizer">Physical Optimizer</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#PlanCompiler">Plan Compiler</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#ExecutionEngine">Execution Engine</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="ConstructorArgument">
+          <h3>Constructor Argument
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#ConstructorArgument</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#InstantiationBasedConstructorArgument">Instantiation-Based Constructor Argument</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#ListBasedConstructorArgument">List-Based Constructor Argument</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#ValueBasedConstructorArgument">Value-Based Constructor Argument</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="InstantiationBasedConstructorArgument">
+          <h3>Instantiation-Based Constructor Argument
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#InstantiationBasedConstructorArgument</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#ConstructorArgument">Constructor Argument</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#argumentTypeName">name of Java class or a Java interface</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="ListBasedConstructorArgument">
+          <h3>List-Based Constructor Argument
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#ListBasedConstructorArgument</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#ConstructorArgument">Constructor Argument</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#elementsTypeName">name of Java class or a Java interface</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#elements">list elements</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="ValueBasedConstructorArgument">
+          <h3>Value-Based Constructor Argument
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#ValueBasedConstructorArgument</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#ConstructorArgument">Constructor Argument</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="DesignatedArgumentValue">
+          <h3>Designated Argument Value
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#DesignatedArgumentValue</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#value:ExecServiceForFedAccess">http://w3id.org/hefquin/engineconf#value:ExecServiceForFedAccess</a>
+                      <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#value:QueryProcContext">http://w3id.org/hefquin/engineconf#value:QueryProcContext</a>
+                      <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#value:CostModel">http://w3id.org/hefquin/engineconf#value:CostModel</a>
+                      <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="FederationAccessManager">
+          <h3>Federation Access Manager
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#FederationAccessManager</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#fedAccessMgr">federation access manager</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultFederationAccessManager">ec:DefaultFederationAccessManager</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="QueryProcessor">
+          <h3>Query Processor
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#QueryProcessor</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#costModel">cost model</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#queryPlanner">query planner</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#planCompiler">plan compiler</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#executionEngine">execution engine</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#queryProcessor">query processor</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="CostModel">
+          <h3>Cost Model
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#CostModel</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#costModel">cost model</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultCostModel">ec:DefaultCostModel</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="QueryPlanner">
+          <h3>Query Planner
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#QueryPlanner</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#sourcePlanner">source planner</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#logicalOptimizer">logical optimizer</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#physicalOptimizer">physical optimizer</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#queryPlanner">query planner</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="SourcePlanner">
+          <h3>Source Planner
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#SourcePlanner</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#sourcePlanner">source planner</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultSourcePlanner">ec:DefaultSourcePlanner</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="LogicalOptimizer">
+          <h3>Logical Optimizer
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#LogicalOptimizer</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#logicalOptimizer">logical optimizer</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultLogicalOptimizer">ec:DefaultLogicalOptimizer</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="PhysicalOptimizer">
+          <h3>Physical Optimizer
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#PhysicalOptimizer</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#physicalOptimizer">physical optimizer</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultPhysicalOptimizer">ec:DefaultPhysicalOptimizer</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="PlanCompiler">
+          <h3>Plan Compiler
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#PlanCompiler</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#planCompiler">plan compiler</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultPlanCompiler">ec:DefaultPlanCompiler</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="ExecutionEngine">
+          <h3>Execution Engine
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#ExecutionEngine</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#executionEngine">execution engine</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2002/07/owl#NamedIndividual" title="Named Individuals. Defined in The OWL 2 Schema vocabulary (OWL 2)">Named Individuals</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#DefaultExecutionEngine">ec:DefaultExecutionEngine</a>
+                  <sup class="sup-ni" title="OWL Named Individual">ni</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="section" id="properties">
+        <h2>Properties</h2>
+        <div class="property entity" id="fedAccessMgr">
+          <h3>federation access manager
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#fedAccessMgr</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the federation access manager to be used in a configuration of the HeFQUIN engine. Every such configuration has only one federation access manager.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#HeFQUINEngineConfiguration">HeFQUIN Engine Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#FederationAccessManager">Federation Access Manager</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="queryProcessor">
+          <h3>query processor
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#queryProcessor</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the query processor to be used in a configuration of the HeFQUIN engine. Every such configuration has only one query processor.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#HeFQUINEngineConfiguration">HeFQUIN Engine Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryProcessor">Query Processor</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="costModel">
+          <h3>cost model
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#costModel</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the cost model to be used by the query processor. This property is optional because not all configurations of the HeFQUIN query processor use a cost model.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryProcessor">Query Processor</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#CostModel">Cost Model</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="queryPlanner">
+          <h3>query planner
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#queryPlanner</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the query planner to be used by the query processor.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryProcessor">Query Processor</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="planCompiler">
+          <h3>plan compiler
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#planCompiler</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the plan compiler to be used by the query processor.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryProcessor">Query Processor</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PlanCompiler">Plan Compiler</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="executionEngine">
+          <h3>execution engine
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#executionEngine</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the execution engine to be used by the query processor.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryProcessor">Query Processor</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#ExecutionEngine">Execution Engine</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="sourcePlanner">
+          <h3>source planner
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#sourcePlanner</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the source planner to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#SourcePlanner">Source Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="logicalOptimizer">
+          <h3>logical optimizer
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#logicalOptimizer</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the logical optimizer to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LogicalOptimizer">Logical Optimizer</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="physicalOptimizer">
+          <h3>physical optimizer
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#physicalOptimizer</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the physical optimizer to be used by the query planner.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#QueryPlanner">Query Planner</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PhysicalOptimizer">Physical Optimizer</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="javaClassName">
+          <h3>name of Java class
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#javaClassName</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the full name of a Java class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="constructorArguments">
+          <h3>constructor arguments
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#constructorArguments</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the list of arguments that must be passed to the constructor of the Java class. Every element of this list is expected to be of type 'ConstructorArgument'.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">List</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="argumentTypeName">
+          <h3>name of Java class or a Java interface
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#argumentTypeName</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the full name of a Java class or of a Java interface.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#InstantiationBasedConstructorArgument">Instantiation-Based Constructor Argument</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="elementsTypeName">
+          <h3>name of Java class or a Java interface
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#elementsTypeName</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the full name of a Java class or of a Java interface.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#ListBasedConstructorArgument">List-Based Constructor Argument</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="elements">
+          <h3>list elements
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/engineconf#elements</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the elements to be included in a list that is created as an argument for the constructor of a Java class. Every element of this list is expected to be of type 'InstantiableJavaClass'.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#ListBasedConstructorArgument">List-Based Constructor Argument</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">List</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="namespaces">
+        <h2>Namespaces</h2>
+        <dl>
+          <dt id="dc">dc</dt>
+          <dd>
+            <code>http://purl.org/dc/elements/1.1/</code>
+          </dd>
+          <dt id="dcterms">dcterms</dt>
+          <dd>
+            <code>http://purl.org/dc/terms/</code>
+          </dd>
+          <dt id="ec">ec</dt>
+          <dd>
+            <code>http://w3id.org/hefquin/engineconf#</code>
+          </dd>
+          <dt id="ns1">ns1</dt>
+          <dd>
+            <code>http://w3id.org/hefquin/</code>
+          </dd>
+          <dt id="owl">owl</dt>
+          <dd>
+            <code>http://www.w3.org/2002/07/owl#</code>
+          </dd>
+          <dt id="prov">prov</dt>
+          <dd>
+            <code>http://www.w3.org/ns/prov#</code>
+          </dd>
+          <dt id="rdf">rdf</dt>
+          <dd>
+            <code>http://www.w3.org/1999/02/22-rdf-syntax-ns#</code>
+          </dd>
+          <dt id="rdfs">rdfs</dt>
+          <dd>
+            <code>http://www.w3.org/2000/01/rdf-schema#</code>
+          </dd>
+          <dt id="xsd1">xsd1</dt>
+          <dd>
+            <code>http://www.w3.org/2000/10/XMLSchema#</code>
+          </dd>
+        </dl>
+      </div>
+      <div id="legend">
+        <h2>Legend</h2>
+        <table class="entity">
+          <tr>
+            <td>
+              <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+            </td>
+            <td>Classes</td>
+          </tr>
+          <tr>
+            <td>
+              <sup class="sup-p" title="RDF Property">p</sup>
+            </td>
+            <td>Properties</td>
+          </tr>
+        </table>
+      </div>
     </div>
-</body>
+    <div id="pylode">
+      <p>made by 
+        <a href="https://github.com/rdflib/pyLODE">
+          <span id="p">p</span>
+          <span id="y">y</span>
+          <span>LODE</span>
+        </a>
+        <a href="https://github.com/rdflib/pyLODE/release/3.0.5a" id="version">3.0.5a</a>
+        <span> with the </span>
+        <a href="https://w3id.org/profile/vocpub" id="profile">VocPub</a>
+        <span>profile</span>
+      </p>
+    </div>
+    <div id="toc">
+      <h3>Table of Contents</h3>
+      <ul class="first">
+        <li>
+          <h4>
+            <a href="#metadata">Metadata</a>
+          </h4>
+        </li>
+        <li>
+          <h4>
+            <a href="#classes">Classes</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#HeFQUINEngineConfiguration">HeFQUIN Engine Configuration</a>
+            </li>
+            <li>
+              <a href="#InstantiableJavaClass">Instantiable Java Class</a>
+            </li>
+            <li>
+              <a href="#ConstructorArgument">Constructor Argument</a>
+            </li>
+            <li>
+              <a href="#InstantiationBasedConstructorArgument">Instantiation-Based Constructor Argument</a>
+            </li>
+            <li>
+              <a href="#ListBasedConstructorArgument">List-Based Constructor Argument</a>
+            </li>
+            <li>
+              <a href="#ValueBasedConstructorArgument">Value-Based Constructor Argument</a>
+            </li>
+            <li>
+              <a href="#DesignatedArgumentValue">Designated Argument Value</a>
+            </li>
+            <li>
+              <a href="#FederationAccessManager">Federation Access Manager</a>
+            </li>
+            <li>
+              <a href="#QueryProcessor">Query Processor</a>
+            </li>
+            <li>
+              <a href="#CostModel">Cost Model</a>
+            </li>
+            <li>
+              <a href="#QueryPlanner">Query Planner</a>
+            </li>
+            <li>
+              <a href="#SourcePlanner">Source Planner</a>
+            </li>
+            <li>
+              <a href="#LogicalOptimizer">Logical Optimizer</a>
+            </li>
+            <li>
+              <a href="#PhysicalOptimizer">Physical Optimizer</a>
+            </li>
+            <li>
+              <a href="#PlanCompiler">Plan Compiler</a>
+            </li>
+            <li>
+              <a href="#ExecutionEngine">Execution Engine</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#properties">Properties</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#fedAccessMgr">federation access manager</a>
+            </li>
+            <li>
+              <a href="#queryProcessor">query processor</a>
+            </li>
+            <li>
+              <a href="#costModel">cost model</a>
+            </li>
+            <li>
+              <a href="#queryPlanner">query planner</a>
+            </li>
+            <li>
+              <a href="#planCompiler">plan compiler</a>
+            </li>
+            <li>
+              <a href="#executionEngine">execution engine</a>
+            </li>
+            <li>
+              <a href="#sourcePlanner">source planner</a>
+            </li>
+            <li>
+              <a href="#logicalOptimizer">logical optimizer</a>
+            </li>
+            <li>
+              <a href="#physicalOptimizer">physical optimizer</a>
+            </li>
+            <li>
+              <a href="#javaClassName">name of Java class</a>
+            </li>
+            <li>
+              <a href="#constructorArguments">constructor arguments</a>
+            </li>
+            <li>
+              <a href="#argumentTypeName">name of Java class or a Java interface</a>
+            </li>
+            <li>
+              <a href="#elementsTypeName">name of Java class or a Java interface</a>
+            </li>
+            <li>
+              <a href="#elements">list elements</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#namespaces">Namespaces</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#dc">dc</a>
+            </li>
+            <li>
+              <a href="#dcterms">dcterms</a>
+            </li>
+            <li>
+              <a href="#ec">ec</a>
+            </li>
+            <li>
+              <a href="#ns1">ns1</a>
+            </li>
+            <li>
+              <a href="#owl">owl</a>
+            </li>
+            <li>
+              <a href="#prov">prov</a>
+            </li>
+            <li>
+              <a href="#rdf">rdf</a>
+            </li>
+            <li>
+              <a href="#rdfs">rdfs</a>
+            </li>
+            <li>
+              <a href="#xsd1">xsd1</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#legend">Legend</a>
+          </h4>
+          <ul class="second"></ul>
+        </li>
+      </ul>
+    </div>
+  </body>
 </html>

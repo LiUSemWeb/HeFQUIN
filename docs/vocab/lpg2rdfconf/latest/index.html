@@ -1,495 +1,1823 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeFQUIN: Vocabulary</title>
+<html>
+  <head>
+    <title>Vocabulary for describing LPG-to-RDF configurations</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        #pylode {
+            position: fixed;
+            top: 205px;
+            left: -150px;
+            font-size: small;
+            transform: rotate(-90deg);
+            color: grey;
         }
-        h1 {
+        #pylode a {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            color: #005A9C;
+        }
+        #pylode a:hover {
             color: #333;
         }
+        #pylode #p {
+            color: #329545;
+        }
+        #pylode #y {
+            color: #f9cb33;
+        }
+        #pylode #version {
+            font-size: 1.0em;
+        }
+
+        #profile {
+            font-style: italic;
+            font-size: 1.25em;
+            color: darkred!important;
+        }
+
+        .cardinality {
+            font-style: italic;
+            color: #aa00aa;
+        }
+
+        dl {
+            /*border: 1px solid navy;*/
+            /*padding:5px;*/
+        }
+
+        dt {
+            font-weight: bold;
+            padding: 0;
+        }
+
+        dd {
+            margin-bottom: 10px;
+            padding-top: 7px;
+        }
+
+        #metadata ul,
+        #classes ul {
+            list-style-type: none;
+        }
+
+        #metadata ul li,
+        #classes ul li {
+            margin-left: -40px;
+        }
+
+        ul.hlist {
+            list-style-type: none;
+            border: 1px solid navy;
+            padding:5px;
+            background-color: #F4FFFF;
+        }
+
+        ul.hierarchy {
+            border: 1px solid navy;
+            padding: 5px 25px 5px 25px;
+            background-color: #F4FFFF;
+        }
+
+
+        ul.hlist li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        .entity {
+            border: 1px solid navy;
+            margin:5px 0 5px 0;
+            padding: 5px;
+        }
+
+        .entity th {
+            width: 150px;
+            vertical-align: top;
+        }
+
+        .entity th,
+        .entity td {
+            padding-bottom: 20px;
+        }
+
+        .entity table th {
+            text-align: left;
+        }
+
+        section#overview img {
+            max-width: 1000px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            text-align: left
+        }
+        h1, h2, h3 {
+            color: #005A9C; background: white
+        }
+        h1 {
+            font: 170% sans-serif;
+            line-height: 110%;
+        }
         h2 {
-            color: #555;
+            font: 140% sans-serif;
+            margin-top:40px;
         }
-        .box {
-            padding: 5px 10px;
-            border: 1px solid black;
-            border-bottom: 0;
+        h3 {
+            font: 120% sans-serif;
+            margin-top: 20px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid navy;
         }
-        .wrapper > .box:last-child {
-            border-bottom: 1px solid black;
+        h4 { font: bold 100% sans-serif }
+        h5 { font: italic 100% sans-serif }
+        h6 { font: small-caps 100% sans-serif }
+
+        body {
+            padding: 2em 70px 2em 70px;
+            margin: 0;
+            font-family: sans-serif;
+            color: black;
+            background: white;
+            background-position: top left;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            text-align: left;
         }
 
-    </style>
-</head>
-<body>
-    <h1>Vocabulary for describing LPG-to-RDF configurations</h1>
-    <div class="general-info">
-        <h2>General Information</h2>
-        <p><strong>Creator:</strong> Olaf Hartig</p>
-        <p><strong>Date:</strong> 2023-11-29</p>
-        <p><strong>Format:</strong> RDF</p>
-        <p><strong>Identifier:</strong> http://w3id.org/hefquin/lpg2rdf</p>
-        <p><strong>Label:</strong> Vocabulary for describing LPG-to-RDF configurations</p>
-        <p><strong>Description:</strong> This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN.</p>
-        <p><strong>Comment:</strong> This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN.</p>
-        <p><strong>Download:</strong>
-            <a href="http://w3id.org/hefquin/lpg2rdf/latest/lpg2rdfconf.ttl">ttl</a>
-            <a href="http://w3id.org/hefquin/lpg2rdf/latest/lpg2rdfconf.rdf">rdf</a>
-            <a href="http://w3id.org/hefquin/lpg2rdf/latest/lpg2rdfconf.jsonld">jsonld</a>
-        </p>
-    </div>
-    
-    <h2>Prefixes</h2>
-    <div class="wrapper">
-        <div class="box prefixes">
-        
-            <p>rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#</p>
-        
-            <p>rdfs: http://www.w3.org/2000/01/rdf-schema#</p>
-        
-            <p>xsd: http://www.w3.org/2000/10/XMLSchema#</p>
-        
-            <p>dc: http://purl.org/dc/elements/1.1/</p>
-        
-            <p>lr: http://w3id.org/hefquin/lpg2rdf#</p>
-        
-        </div>
-    </div>
+        section {
+            max-width: 1500px;
+        }
 
-    <h2>Classes</h2>
-    <div class="wrapper">
-        
-        <div id="LPGtoRDFConfiguration" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</h3>
-            <div class="details">
-                <p><strong>Label:</strong> LPG-to-RDF Configuration</p>
-                <p><strong>Comment:</strong> Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="NodeMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#NodeMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Node Mapping</p>
-                <p><strong>Comment:</strong> A node mapping is an injective function that maps every given LPG node to either an IRI or a blank node, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node mapping. Concrete types of node mappings are captured by the subclasses of this class.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="BNodeBasedNodeMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#BNodeBasedNodeMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Blank Node-based Node Mapping</p>
-                <p><strong>Comment:</strong> Class of node mappings that map every given LPG node to a blank node.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="IRIPrefixBasedNodeMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI-based Node Mapping</p>
-                <p><strong>Comment:</strong> Class of node mappings that map every given LPG node to an IRI by attaching the ID of the node to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="NodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Node Label Mapping</p>
-                <p><strong>Comment:</strong> A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="LiteralBasedNodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#LiteralBasedNodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Literal-based Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="IRIPrefixBasedNodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI-based Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="RegexBasedNodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#RegexBasedNodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Regex-based Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="SingletonLiteralNodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Singleton-Literal Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="SingletonIRINodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#SingletonIRINodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Singleton-IRI Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="CompositeNodeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#CompositeNodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Composite Node Label Mapping</p>
-                <p><strong>Comment:</strong> Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="EdgeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Edge Label Mapping</p>
-                <p><strong>Comment:</strong> An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="IRIPrefixBasedEdgeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedEdgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI-based Edge Label Mapping</p>
-                <p><strong>Comment:</strong> Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="RegexBasedEdgeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#RegexBasedEdgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Regex-based Edge Label Mapping</p>
-                <p><strong>Comment:</strong> Class of edge label mappings that focus only on edge labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedEdgeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="SingletonIRIEdgeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#SingletonIRIEdgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Singleton-IRI Edge Label Mapping</p>
-                <p><strong>Comment:</strong> Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="CompositeEdgeLabelMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#CompositeEdgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Composite Edge Label Mapping</p>
-                <p><strong>Comment:</strong> Class of edge label mappings that are based on other edge label mappings and, for every given edge label, consider these other mappings one after another until one of them is found that has the given edge label in its domain; this other edge label mapping is then invoked. The list of the other edge label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="PropertyNameMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Property Name Mapping</p>
-                <p><strong>Comment:</strong> A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    None
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="IRIPrefixBasedPropertyNameMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedPropertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI-based Property Name Mapping</p>
-                <p><strong>Comment:</strong> Class of property name mappings that map every given property name to an IRI by attaching the property name to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="RegexBasedPropertyNameMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#RegexBasedPropertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Regex-based Property Name Mapping</p>
-                <p><strong>Comment:</strong> Class of property name mappings that focus only on property names that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedPropertyNameMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="SingletonIRIPropertyNameMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#SingletonIRIPropertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Singleton-IRI Property Name Mapping</p>
-                <p><strong>Comment:</strong> Class of property name mappings that focus only on a single property name and map it to a given IRI. This IRI is specified by the lr:iri property and the specific property name considered by this mapping is specified by the lr:propertyName property. Hence, every instance of this class must have exactly one of each of these two properties.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-        <div id="CompositePropertyNameMapping" class="box class">
-            <h3>http://w3id.org/hefquin/lpg2rdf#CompositePropertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> Composite Property Name Mapping</p>
-                <p><strong>Comment:</strong> Class of property name mappings that are based on other property name mappings and, for every given property name, consider these other mappings one after another until one of them is found that has the given property name in its domain; this other property name mapping is then invoked. The list of the other property name mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p>
-                <p>
-                    <strong>Subclasses:</strong>
-                    
-                    http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping
-                    
-                </p>
-            </div>
-        </div>
-        
-    </div>
+        .figure {
+            margin-bottom: 20px;
+        }
 
-    <h2>Properties</h2>
-    <div class="wrapper">
-        
-        <div id="nodeMapping" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#nodeMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> node mapping</p>
-                <p><strong>Comment:</strong> Specifies the node mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node mapping.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/lpg2rdf#NodeMapping</p>
-            </div>
-        </div>
-        
-        <div id="nodeLabelMapping" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#nodeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> node label mapping</p>
-                <p><strong>Comment:</strong> Specifies the node label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node label mapping.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping</p>
-            </div>
-        </div>
-        
-        <div id="edgeLabelMapping" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#edgeLabelMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> edge label mapping</p>
-                <p><strong>Comment:</strong> Specifies the edge label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one edge label mapping.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping</p>
-            </div>
-        </div>
-        
-        <div id="propertyNameMapping" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#propertyNameMapping</h3>
-            <div class="details">
-                <p><strong>Label:</strong> property name mapping</p>
-                <p><strong>Comment:</strong> Specifies the property name mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one property mapping.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping</p>
-            </div>
-        </div>
-        
-        <div id="labelPredicate" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#labelPredicate</h3>
-            <div class="details">
-                <p><strong>Label:</strong> label predicate</p>
-                <p><strong>Comment:</strong> Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#anyURI</p>
-            </div>
-        </div>
-        
-        <div id="prefixOfIRIs" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#prefixOfIRIs</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI prefix</p>
-                <p><strong>Comment:</strong> Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property.</p>
-                <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#anyURI</p>
-            </div>
-        </div>
-        
-        <div id="regex" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#regex</h3>
-            <div class="details">
-                <p><strong>Label:</strong> regular expression</p>
-                <p><strong>Comment:</strong> Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property.</p>
-                <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="literal" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#literal</h3>
-            <div class="details">
-                <p><strong>Label:</strong> literal</p>
-                <p><strong>Comment:</strong> Specifies the literal that a lr:SingletonLiteralNodeLabelMapping maps its matching node label to. Each such mapping has exactly one such property</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping</p>
-                <p><strong>Range:</strong> N/A</p>
-            </div>
-        </div>
-        
-        <div id="iri" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#iri</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI</p>
-                <p><strong>Comment:</strong> Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property</p>
-                <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#anyURI</p>
-            </div>
-        </div>
-        
-        <div id="label" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#label</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI</p>
-                <p><strong>Comment:</strong> Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property.</p>
-                <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="propertyName" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#propertyName</h3>
-            <div class="details">
-                <p><strong>Label:</strong> IRI</p>
-                <p><strong>Comment:</strong> Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property.</p>
-                <p><strong>Domain:</strong> http://w3id.org/hefquin/lpg2rdf#SingletonIRIPropertyNameMapping</p>
-                <p><strong>Range:</strong> http://www.w3.org/2000/10/XMLSchema#string</p>
-            </div>
-        </div>
-        
-        <div id="componentMappings" class="box property">
-            <h3>http://w3id.org/hefquin/lpg2rdf#componentMappings</h3>
-            <div class="details">
-                <p><strong>Label:</strong> list of component mappings</p>
-                <p><strong>Comment:</strong> Specifies the list of mappings that a lr:CompositeNodeLabelMapping, a lr:CompositeEdgeLabelMapping, or a lr:CompositePropertyNameMapping consists of. Hence, the domain of this property is the union of these three classes (lr:CompositeNodeLabelMapping, lr:CompositeEdgeLabelMapping, and lr:CompositePropertyNameMapping), and each such mapping has exactly one such property. More specifically, for every lr:CompositeNodeLabelMapping, the list provided by this property must contain only other lr:NodeLabelMapping instances. Similarly, for every lr:CompositeEdgeLabelMapping, the list provided by this property must contain only other lr:EdgeLabelMapping instances, and for every lr:CompositePropertyNameMapping, the list must contain only other lr:PropertyNameMapping instances.</p>
-                <p><strong>Domain:</strong> N/A</p>
-                <p><strong>Range:</strong> http://www.w3.org/1999/02/22-rdf-syntax-ns#List</p>
-            </div>
-        </div>
-        
-    </div>
+        :link { color: #00C; background: transparent }
+        :visited { color: #609; background: transparent }
+        a:active { color: #C00; background: transparent }
 
-    <h2>Instances</h2>
-    <div class="wrapper">
-        <div class="box instances">
-            
+        .sup-c,
+        .sup-op,
+        .sup-fp,
+        .sup-dp,
+        .sup-ap,
+        .sup-p,
+        .sup-ni,
+        .sup-con,
+        .sup-col {
+            cursor:help;
+        }
+
+        .sup-c {
+            color:orange;
+        }
+
+        .sup-op {
+            color:navy;
+        }
+
+        .sup-fp {
+            color:lightskyblue;
+        }
+
+        .sup-dp {
+            color:green;
+        }
+
+        .sup-ap {
+            color:darkred;
+        }
+
+        .sup-p {
+            color:black;
+        }
+
+        .sup-ni {
+            color:brown;
+        }
+
+        .sup-con {
+            color:orange;
+        }
+
+        .sup-col {
+            color:darkred;
+        }
+
+        sup {
+            margin-left: -3px;
+        }
+        code {
+            font-size: large;
+            color: darkred;
+        }
+
+        /* less prominent links for properties */
+        .proplink {
+            color: #336;
+            text-decoration: none;
+        }
+
+#toc {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+    border: solid 1px navy;
+    font-size: small;
+    width: 180px;
+}
+#toc h3 {
+    margin-top: 5px;
+}
+
+#toc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#toc .first > li {
+    margin-top: 5px;
+}
+
+#toc .second,
+#toc .third {
+    padding-left: 10px;
+}
+
+#content {
+    width: calc(100% - 150px);
+}
+
+.hover_property {
+    cursor: help;
+    text-decoration: none;
+    border-bottom: dashed 1px;
+}
+
+.setclass {
+    list-style-type: none;
+}
+
+code{
+    word-wrap: break-word;
+  }
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+td {
+    word-wrap: break-word;
+}
+#legend table.entity {
+    width: 25%;
+}
+
+/* hide duplicate restictions bug */
+#content > span {
+    display: none;
+}
+
+ul, p {
+    margin: 0;
+}
+	</style>
+    <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhklEQVQ4jbWPzStEURjG3yQLirlGKUnKFO45Z+SjmXvnnmthQcpCoVhYmD/AwmJiI3OvZuZc2U3UlKU0/gAslMw9JgvhHxAr2fko7r0jHSsl+TgbTz2Lt5731/MASEiJW9ONml2QyX6rsGalmnT74v8BDf12hxJfpV8d1uwNKUBYszabdFv84L8B9X0rESVmmUup2fme0cVhJWaZHw4NWL1SewEAfDe6H3Dy6Ll456WEJsRZS630MwCAOI20ei5OBpxse5zcBZw8eS4uPpfIuDiCainIg9umBCU0GZzgLZ9Hn31OgoATL+CkLDGB5H1OKj4nFd/FBxUXJ0UZNb4edw/6nLyJXaj5FeCVyPLNIVmYK8TG1IwWb16L1gEACAFV90ftoT8bdOX0EeyY99gxBXZMgRz6qGb1KantAACI0UvE6F5XJqEjpsdURouI0Vt5gGOUkUNnPu7ObGIIMfNaGqDmjDRi9FZldF1lRgYzeqUyeoiY4ag5Iy3RgOYRM8+/M2bG8efsO4hGrpmJseyMAAAAAElFTkSuQmCC" rel="icon" sizes="16x16" type="image/png">
+    <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC40lEQVRYhe2UT0hUQRzHp6Iss1B3VZKIDbbdfW9mnoi4f3zzjkJQeOgS0SEIb1EWBGGlLLu460zQPQM1unUIIjA6rfpm6ZAhHjoIRVQUFUlEbG+euTsdXG1d3VL3bVD4g+9h+L35fT/8fvN7ADgY9aHY5fpIvK82HO9ysu66wxWOzbkjcekKx0a2ALYA/n2AGi3a6ArFezcidziecQygNhhrcUficjP6PwBqtGijKxy/thnVBePHywYoDsFhl53GV8SEcsTx4usCMLUewTVpc23BNvEzm6Neyf1+KcG2vwqwUjgrOJq2JmHftwmkVBRGTvncFodnbI7vChO/FRznCmHsNM7aHM9Yk7Df5iqsLMw9sMNOK2g+jS4IEz0UJv4iuJZb2RltWnB4UZqH6ioGAgAAGe5vtiZhtzDx7OoRadLmeM7m6IRjhnLMW2Vx1bA5GhAmnhIcz6/xNj4Ujsky8UspwfayjDPjsF2Y6L7N8Vzx/BfP+KPg6LbgSqd8DnfJW2CnbaLhfH5ephpqygJYvQU4Z3P82TLRsDDhUTnmrSq+Y3N0Mg+Xldy/zwEAnLMWZ3pHpNExmfLs/t0dOdVcbT0JeKxUwFP2VljjqiE47Jp53LTXNxhsUZjerTByXWX6VZWRs/4bIQ2ACv+UAomgDzLCISNZxAxZKMhIDjLy1JfsaK+I+eGBUBNk5E2x8RogX/PdcDZUqieWTSh5D6nOVKqfhoycUmlHFFIyu5RXqf7AcQDISCpv/tqbMBqK883RtmpISRoxQyJKPgGn3wNk5NEigDFa6hslqV/Kj+FdBQD0bshIDlKSLlVcoWQo36UhR80BAMB73lulMn0EMpJTqD6qJiOt3mho/8GbkT2BZNgDB/V+RI0fkOrT3kRIVQbaDizJm2hdNbINBxwk5xAj3yEjuV9rZ1iIkgxixkLBA83mz8uCjLwoGwAx0vOnFSy5mtR4VTaAQvVORMnwZgSpzkrV/QmdE2tKe46+MQAAAABJRU5ErkJggg==" rel="icon" sizes="32x32" type="image/png">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <script id="schema.org" type="application/ld+json">
+[
+  {
+    "@id": "http://w3id.org/hefquin/lpg2rdf",
+    "@type": [
+      "https://schema.org/DefinedTermSet"
+    ],
+    "https://schema.org/creator": [
+      {
+        "@value": "Olaf Hartig"
+      }
+    ],
+    "https://schema.org/description": [
+      {
+        "@language": "en",
+        "@value": "This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN."
+      }
+    ],
+    "https://schema.org/name": [
+      {
+        "@language": "en",
+        "@value": "Vocabulary for describing LPG-to-RDF configurations"
+      }
+    ]
+  }
+]
+	</script>
+  </head>
+  <body>
+    <div id="content">
+      <div class="section" id="metadata">
+        <h1>Vocabulary for describing LPG-to-RDF configurations</h1>
+        <h2>Metadata</h2>
+        <dl>
+          <div>
+            <dt>
+              <strong>IRI</strong>
+            </dt>
+            <dd>
+              <code>http://w3id.org/hefquin/lpg2rdf</code>
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <a class="hover_property" href="http://purl.org/dc/terms/title" title="A name given to the resource. Defined in DCMI Metadata Terms">Title</a>
+            </dt>
+            <dd><p>Vocabulary for describing LPG-to-RDF configurations</p></dd>
+          </div>
+          <div>
+            <dt>
+              <a class="hover_property" href="http://purl.org/dc/terms/creator" title="An entity responsible for making the resource. Defined in DCMI Metadata Terms">Creator</a>
+            </dt>
+            <dd><p>Olaf Hartig</p></dd>
+          </div>
+          <div>
+            <dt>
+              <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+            </dt>
+            <dd><p>This vocabulary can be used to describe LPG-to-RDF configurations which are the basis of the user-configurable LPG-to-RDF mapping that is defined in the paper titled 'Foundations to Query Labeled Property Graphs using SPARQL*' by Olaf Hartig (2019) and that is implemented in HeFQUIN.</p></dd>
+          </div>
+        </dl>
+      </div>
+      <div class="section" id="classes">
+        <h2>Classes</h2>
+        <div class="property entity" id="LPG-to-RDFConfiguration">
+          <h3>LPG-to-RDF Configuration
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#LPGtoRDFConfiguration</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of LPG-to-RDF configurations. Instances of this class must have exactly one lr:nodeMapping property, one lr:nodeLabelMapping property, one lr:edgeLabelMapping property, one lr:propertyNameMapping property, and one lr:labelPredicate property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#nodeMapping">node mapping</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#nodeLabelMapping">node label mapping</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#edgeLabelMapping">edge label mapping</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#propertyNameMapping">property name mapping</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#labelPredicate">label predicate</a>
+                      <sup class="sup-p" title="RDF Property">p</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
         </div>
+        <div class="property entity" id="NodeMapping">
+          <h3>Node Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#NodeMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>A node mapping is an injective function that maps every given LPG node to either an IRI or a blank node, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node mapping. Concrete types of node mappings are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#nodeMapping">node mapping</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#BNodeBasedNodeMapping">Blank Node-based Node Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#IRIPrefixBasedNodeMapping">IRI-based Node Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="BNodeBasedNodeMapping">
+          <h3>Blank Node-based Node Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#BNodeBasedNodeMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node mappings that map every given LPG node to a blank node.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeMapping">Node Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRIPrefixBasedNodeMapping">
+          <h3>IRI-based Node Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node mappings that map every given LPG node to an IRI by attaching the ID of the node to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeMapping">Node Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="NodeLabelMapping">
+          <h3>Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#NodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>A node label mapping is an injective function that maps labels of LPG nodes to IRIs or literals, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of node label mapping. Concrete types of node label mappings are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#nodeLabelMapping">node label mapping</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#LiteralBasedNodeLabelMapping">Literal-based Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#IRIPrefixBasedNodeLabelMapping">IRI-based Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#RegexBasedNodeLabelMapping">Regex-based Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#SingletonLiteralNodeLabelMapping">Singleton-Literal Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#SingletonIRINodeLabelMapping">Singleton-IRI Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#CompositeNodeLabelMapping">Composite Node Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="LiteralBasedNodeLabelMapping">
+          <h3>Literal-based Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#LiteralBasedNodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node label mappings that map every given node label to a string literal by using the label as the value of the literal.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRIPrefixBasedNodeLabelMapping">
+          <h3>IRI-based Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedNodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node label mappings that map every given node label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="RegexBasedNodeLabelMapping">
+          <h3>Regex-based Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#RegexBasedNodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node label mappings that focus only on node labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property. The way the matching node labels are mapped is then determined depending on whether the instance of this class is an instance of lr:LiteralBasedNodeLabelMapping or of lr:IRIPrefixBasedNodeLabelMapping. Hence, every instance of this class should also be an instance of one of these other two classes.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="SingletonLiteralNodeLabelMapping">
+          <h3>Singleton-Literal Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#SingletonLiteralNodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node mappings that focus only on a single node label and map it to a given literal. This literal is node label by the lr:literal property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#literal">literal</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="SingletonIRINodeLabelMapping">
+          <h3>Singleton-IRI Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#SingletonIRINodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node label mappings that focus only on a single node label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific node label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="CompositeNodeLabelMapping">
+          <h3>Composite Node Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#CompositeNodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of node label mappings that are based on other node label mappings and, for every given node label, consider these other mappings one after another until one of them is found that has the given node label in its domain; this other node label mapping is then invoked. The list of the other node label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="EdgeLabelMapping">
+          <h3>Edge Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#EdgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>An edge label mapping is an injective function that maps labels of edges in LPGs to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of edge label mapping. Concrete types of edge label mappings are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#edgeLabelMapping">edge label mapping</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#IRIPrefixBasedEdgeLabelMapping">IRI-based Edge Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#SingletonIRIEdgeLabelMapping">Singleton-IRI Edge Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#CompositeEdgeLabelMapping">Composite Edge Label Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRIPrefixBasedEdgeLabelMapping">
+          <h3>IRI-based Edge Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedEdgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of edge label mappings that map every given edge label to an IRI by attaching the label to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#EdgeLabelMapping">Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#RegexBasedEdgeLabelMapping">Regex-based Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="RegexBasedEdgeLabelMapping">
+          <h3>Regex-based Edge Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#RegexBasedEdgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of edge label mappings that focus only on edge labels that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#IRIPrefixBasedEdgeLabelMapping">IRI-based Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="SingletonIRIEdgeLabelMapping">
+          <h3>Singleton-IRI Edge Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#SingletonIRIEdgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of edge label mappings that focus only on a single edge label and map it to a given IRI. This IRI is specified by the lr:iri property and the specific edge label considered by this mapping is specified by the lr:label property. Hence, every instance of this class must have exactly one of each of these two properties.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#EdgeLabelMapping">Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="CompositeEdgeLabelMapping">
+          <h3>Composite Edge Label Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#CompositeEdgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of edge label mappings that are based on other edge label mappings and, for every given edge label, consider these other mappings one after another until one of them is found that has the given edge label in its domain; this other edge label mapping is then invoked. The list of the other edge label mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#EdgeLabelMapping">Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="PropertyNameMapping">
+          <h3>Property Name Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#PropertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>A property name mapping is an injective function that maps names of properties of LPG nodes and edges to IRIs, and it is one of the five components of an LPG-to-RDF configuration. This class is a superclass of any kind of property name mapping. Concrete types of property name mappings are captured by the subclasses of this class.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inRangeOf" title="Inverse of rdfs:range. Defined in Ontology Documentation Profile">In Range Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#propertyNameMapping">property name mapping</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <ul>
+                  <li>
+                    <span>
+                      <a href="#IRIPrefixBasedPropertyNameMapping">IRI-based Property Name Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#SingletonIRIPropertyNameMapping">Singleton-IRI Property Name Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <a href="#CompositePropertyNameMapping">Composite Property Name Mapping</a>
+                      <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                    </span>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRIPrefixBasedPropertyNameMapping">
+          <h3>IRI-based Property Name Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#IRIPrefixBasedPropertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of property name mappings that map every given property name to an IRI by attaching the property name to a common IRI prefix. This prefix is specified by the lr:prefixOfIRIs property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PropertyNameMapping">Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/superClassOf" title="Inverse of RDFS' subClassOf. Defined in Ontology Documentation Profile">Super Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#RegexBasedPropertyNameMapping">Regex-based Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="RegexBasedPropertyNameMapping">
+          <h3>Regex-based Property Name Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#RegexBasedPropertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of property name mappings that focus only on property names that match a given regular expression. This regular expression is specified by the lr:regex property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#IRIPrefixBasedPropertyNameMapping">IRI-based Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="SingletonIRIPropertyNameMapping">
+          <h3>Singleton-IRI Property Name Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#SingletonIRIPropertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of property name mappings that focus only on a single property name and map it to a given IRI. This IRI is specified by the lr:iri property and the specific property name considered by this mapping is specified by the lr:propertyName property. Hence, every instance of this class must have exactly one of each of these two properties.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PropertyNameMapping">Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="https://w3id.org/profile/ontdoc/inDomainOf" title="Inverse of rdfs:domain. Defined in Ontology Documentation Profile">In Domain Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#propertyName">IRI</a>
+                  <sup class="sup-p" title="RDF Property">p</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="CompositePropertyNameMapping">
+          <h3>Composite Property Name Mapping
+            <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#CompositePropertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Class of property name mappings that are based on other property name mappings and, for every given property name, consider these other mappings one after another until one of them is found that has the given property name in its domain; this other property name mapping is then invoked. The list of the other property name mappings is specified by the lr:componentMappings property. Hence, every instance of this class must have exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#subClassOf" title="The subject is a subclass of a class. Defined in The RDF Schema vocabulary (RDFS)">Sub Class Of</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PropertyNameMapping">Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="section" id="properties">
+        <h2>Properties</h2>
+        <div class="property entity" id="nodeMapping">
+          <h3>node mapping
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#nodeMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the node mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node mapping.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeMapping">Node Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="nodeLabelMapping">
+          <h3>node label mapping
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#nodeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the node label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one node label mapping.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#NodeLabelMapping">Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="edgeLabelMapping">
+          <h3>edge label mapping
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#edgeLabelMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the edge label mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one edge label mapping.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#EdgeLabelMapping">Edge Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="propertyNameMapping">
+          <h3>property name mapping
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#propertyNameMapping</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the property name mapping that is part of an LPG-to-RDF configuration. Every such configuration has only one property mapping.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#PropertyNameMapping">Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="labelPredicate">
+          <h3>label predicate
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#labelPredicate</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the label predicate that is part of an LPG-to-RDF configuration. Every such configuration has only one label predicate.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#anyURI">xsd1:anyURI</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRIprefix">
+          <h3>IRI prefix
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#prefixOfIRIs</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the IRI prefix used by IRI-based node mappings, by IRI-based node label mappings, by IRI-based edge label mappings, and by IRI-based property name mappings. Hence, the domain of this property is the union of the following four classes: lr:IRIPrefixBasedNodeMapping, lr:IRIPrefixBasedNodeLabelMapping, lr:IRIPrefixBasedEdgeLabelMapping, and lr:IRIPrefixBasedPropertyNameMapping. Every such mapping has only one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#anyURI">xsd1:anyURI</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="regularexpression">
+          <h3>regular expression
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#regex</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the regular expression used by regex-based node label mappings, by regex-based edge label mappings, and by regex-based property name mappings. Hence, the domain of this property is the union of the following three classes: lr:RegexBasedNodeLabelMapping, lr:RegexBasedNodeLabelMapping, and lr:RegexBasedPropertyNameMapping. Every such mapping has only one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="literal">
+          <h3>literal
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#literal</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the literal that a lr:SingletonLiteralNodeLabelMapping maps its matching node label to. Each such mapping has exactly one such property</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#SingletonLiteralNodeLabelMapping">Singleton-Literal Node Label Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="IRI">
+          <h3>IRI
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#iri</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the IRI that a lr:SingletonIRINodeLabelMapping, a lr:SingletonIRIEdgeLabelMapping, or a lr:SingletonIRIPropertyNameMapping maps its matching label or property name to. Hence, the domain of this property is the union of these three classes (lr:SingletonIRINodeLabelMapping, lr:SingletonIRIEdgeLabelMapping, and lr:SingletonIRIPropertyNameMapping), and each such mapping has exactly one such property</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#anyURI">xsd1:anyURI</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="label">
+          <h3>IRI
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#label</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the particular node or edge label that a lr:SingletonLiteralNodeLabelMapping, a lr:SingletonIRINodeLabelMapping, or a lr:SingletonIRIEdgeLabelMapping considers. Hence, the domain of this property is the union of these three classes (lr:SingletonLiteralNodeLabelMapping, lr:SingletonIRINodeLabelMapping, and lr:SingletonIRIEdgeLabelMapping), and each such mapping has exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="propertyName">
+          <h3>IRI
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#propertyName</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the particular property name that a lr:SingletonIRIPropertyNameMapping considers. Each such mapping has exactly one such property.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#domain" title="A domain of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Domain</a>
+              </th>
+              <td>
+                <span>
+                  <a href="#SingletonIRIPropertyNameMapping">Singleton-IRI Property Name Mapping</a>
+                  <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/2000/10/XMLSchema#string">xsd1:string</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="property entity" id="listofcomponentmappings">
+          <h3>list of component mappings
+            <sup class="sup-p" title="RDF Property">p</sup>
+          </h3>
+          <table>
+            <tr>
+              <th>IRI</th>
+              <td>
+                <code>http://w3id.org/hefquin/lpg2rdf#componentMappings</code>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://purl.org/dc/terms/description" title="An account of the resource. Defined in DCMI Metadata Terms">Description</a>
+              </th>
+              <td><p>Specifies the list of mappings that a lr:CompositeNodeLabelMapping, a lr:CompositeEdgeLabelMapping, or a lr:CompositePropertyNameMapping consists of. Hence, the domain of this property is the union of these three classes (lr:CompositeNodeLabelMapping, lr:CompositeEdgeLabelMapping, and lr:CompositePropertyNameMapping), and each such mapping has exactly one such property. More specifically, for every lr:CompositeNodeLabelMapping, the list provided by this property must contain only other lr:NodeLabelMapping instances. Similarly, for every lr:CompositeEdgeLabelMapping, the list provided by this property must contain only other lr:EdgeLabelMapping instances, and for every lr:CompositePropertyNameMapping, the list must contain only other lr:PropertyNameMapping instances.</p></td>
+            </tr>
+            <tr>
+              <th>
+                <a class="hover_property" href="http://www.w3.org/2000/01/rdf-schema#range" title="A range of the subject property. Defined in The RDF Schema vocabulary (RDFS)">Range</a>
+              </th>
+              <td>
+                <a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">List</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="namespaces">
+        <h2>Namespaces</h2>
+        <dl>
+          <dt id="dc">dc</dt>
+          <dd>
+            <code>http://purl.org/dc/elements/1.1/</code>
+          </dd>
+          <dt id="dcterms">dcterms</dt>
+          <dd>
+            <code>http://purl.org/dc/terms/</code>
+          </dd>
+          <dt id="lr">lr</dt>
+          <dd>
+            <code>http://w3id.org/hefquin/lpg2rdf#</code>
+          </dd>
+          <dt id="ns1">ns1</dt>
+          <dd>
+            <code>http://w3id.org/hefquin/</code>
+          </dd>
+          <dt id="owl">owl</dt>
+          <dd>
+            <code>http://www.w3.org/2002/07/owl#</code>
+          </dd>
+          <dt id="prov">prov</dt>
+          <dd>
+            <code>http://www.w3.org/ns/prov#</code>
+          </dd>
+          <dt id="rdf">rdf</dt>
+          <dd>
+            <code>http://www.w3.org/1999/02/22-rdf-syntax-ns#</code>
+          </dd>
+          <dt id="rdfs">rdfs</dt>
+          <dd>
+            <code>http://www.w3.org/2000/01/rdf-schema#</code>
+          </dd>
+          <dt id="xsd1">xsd1</dt>
+          <dd>
+            <code>http://www.w3.org/2000/10/XMLSchema#</code>
+          </dd>
+        </dl>
+      </div>
+      <div id="legend">
+        <h2>Legend</h2>
+        <table class="entity">
+          <tr>
+            <td>
+              <sup class="sup-c" title="OWL/RDFS Class">c</sup>
+            </td>
+            <td>Classes</td>
+          </tr>
+          <tr>
+            <td>
+              <sup class="sup-p" title="RDF Property">p</sup>
+            </td>
+            <td>Properties</td>
+          </tr>
+        </table>
+      </div>
     </div>
-</body>
+    <div id="pylode">
+      <p>made by 
+        <a href="https://github.com/rdflib/pyLODE">
+          <span id="p">p</span>
+          <span id="y">y</span>
+          <span>LODE</span>
+        </a>
+        <a href="https://github.com/rdflib/pyLODE/release/3.0.5a" id="version">3.0.5a</a>
+        <span> with the </span>
+        <a href="https://w3id.org/profile/vocpub" id="profile">VocPub</a>
+        <span>profile</span>
+      </p>
+    </div>
+    <div id="toc">
+      <h3>Table of Contents</h3>
+      <ul class="first">
+        <li>
+          <h4>
+            <a href="#metadata">Metadata</a>
+          </h4>
+        </li>
+        <li>
+          <h4>
+            <a href="#classes">Classes</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#LPG-to-RDFConfiguration">LPG-to-RDF Configuration</a>
+            </li>
+            <li>
+              <a href="#NodeMapping">Node Mapping</a>
+            </li>
+            <li>
+              <a href="#BNodeBasedNodeMapping">Blank Node-based Node Mapping</a>
+            </li>
+            <li>
+              <a href="#IRIPrefixBasedNodeMapping">IRI-based Node Mapping</a>
+            </li>
+            <li>
+              <a href="#NodeLabelMapping">Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#LiteralBasedNodeLabelMapping">Literal-based Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#IRIPrefixBasedNodeLabelMapping">IRI-based Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#RegexBasedNodeLabelMapping">Regex-based Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#SingletonLiteralNodeLabelMapping">Singleton-Literal Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#SingletonIRINodeLabelMapping">Singleton-IRI Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#CompositeNodeLabelMapping">Composite Node Label Mapping</a>
+            </li>
+            <li>
+              <a href="#EdgeLabelMapping">Edge Label Mapping</a>
+            </li>
+            <li>
+              <a href="#IRIPrefixBasedEdgeLabelMapping">IRI-based Edge Label Mapping</a>
+            </li>
+            <li>
+              <a href="#RegexBasedEdgeLabelMapping">Regex-based Edge Label Mapping</a>
+            </li>
+            <li>
+              <a href="#SingletonIRIEdgeLabelMapping">Singleton-IRI Edge Label Mapping</a>
+            </li>
+            <li>
+              <a href="#CompositeEdgeLabelMapping">Composite Edge Label Mapping</a>
+            </li>
+            <li>
+              <a href="#PropertyNameMapping">Property Name Mapping</a>
+            </li>
+            <li>
+              <a href="#IRIPrefixBasedPropertyNameMapping">IRI-based Property Name Mapping</a>
+            </li>
+            <li>
+              <a href="#RegexBasedPropertyNameMapping">Regex-based Property Name Mapping</a>
+            </li>
+            <li>
+              <a href="#SingletonIRIPropertyNameMapping">Singleton-IRI Property Name Mapping</a>
+            </li>
+            <li>
+              <a href="#CompositePropertyNameMapping">Composite Property Name Mapping</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#properties">Properties</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#nodeMapping">node mapping</a>
+            </li>
+            <li>
+              <a href="#nodeLabelMapping">node label mapping</a>
+            </li>
+            <li>
+              <a href="#edgeLabelMapping">edge label mapping</a>
+            </li>
+            <li>
+              <a href="#propertyNameMapping">property name mapping</a>
+            </li>
+            <li>
+              <a href="#labelPredicate">label predicate</a>
+            </li>
+            <li>
+              <a href="#IRIprefix">IRI prefix</a>
+            </li>
+            <li>
+              <a href="#regularexpression">regular expression</a>
+            </li>
+            <li>
+              <a href="#literal">literal</a>
+            </li>
+            <li>
+              <a href="#IRI">IRI</a>
+            </li>
+            <li>
+              <a href="#label">IRI</a>
+            </li>
+            <li>
+              <a href="#propertyName">IRI</a>
+            </li>
+            <li>
+              <a href="#listofcomponentmappings">list of component mappings</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#namespaces">Namespaces</a>
+          </h4>
+          <ul class="second">
+            <li>
+              <a href="#dc">dc</a>
+            </li>
+            <li>
+              <a href="#dcterms">dcterms</a>
+            </li>
+            <li>
+              <a href="#lr">lr</a>
+            </li>
+            <li>
+              <a href="#ns1">ns1</a>
+            </li>
+            <li>
+              <a href="#owl">owl</a>
+            </li>
+            <li>
+              <a href="#prov">prov</a>
+            </li>
+            <li>
+              <a href="#rdf">rdf</a>
+            </li>
+            <li>
+              <a href="#rdfs">rdfs</a>
+            </li>
+            <li>
+              <a href="#xsd1">xsd1</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h4>
+            <a href="#legend">Legend</a>
+          </h4>
+          <ul class="second"></ul>
+        </li>
+      </ul>
+    </div>
+  </body>
 </html>
