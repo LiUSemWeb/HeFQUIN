@@ -61,7 +61,7 @@ public class Neo4jConnectionFactory
 	public static class Neo4jConnection
 	{
 		protected final URI uri;
-		protected String authHeader;
+		protected final String authHeader;
 
 		public Neo4jConnection( final String url ) {
 			this( URI.create(url), null, null );
