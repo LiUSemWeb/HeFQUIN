@@ -79,6 +79,9 @@ public class Neo4jConnectionFactory
 				final String encodedAuth = Base64.getEncoder().encodeToString( auth.getBytes() );
 				authHeader = "Basic " + encodedAuth;
 			}
+			else {
+				authHeader = null;
+			}
 		}
 
 		public URI getURI() {
