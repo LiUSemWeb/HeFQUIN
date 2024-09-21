@@ -20,6 +20,7 @@ import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.graph.GraphFactory;
 
+import se.liu.ida.hefquin.cli.modules.ModEndpoint;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
@@ -49,6 +50,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class MaterializeRDFViewOfLPG extends CmdARQ
 {
+	protected final ModEndpoint modEndpoint = new ModEndpoint();
 	protected final ModTime modTime =            new ModTime();
 	protected final ModLangOutput modLangOut =   new ModLangOutput();
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
@@ -59,7 +61,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 
 	public static void main( final String[] args ) {
-		new MaterializeRDFViewOfLPG(args).mainRun();
+		new MaterializeRDFViewOfLPG( args ).mainRun();
 	}
 
 	protected MaterializeRDFViewOfLPG( final String[] argv ) {
@@ -67,32 +69,23 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 
 		addModule(modTime);
 		addModule(modLangOut);
-
 		addModule(modLPG2RDFConfiguration);
-
-		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
-		add(argEndpointUsername, "--username", "Username for the Neo4j endpoint");
-		add(argEndpointPassword, "--password", "Passowrd for the Neo4j endpoint");
+		addModule(modEndpoint);
 	}
 
 	@Override
 	protected String getSummary() {
-		return getCommandName() + "--endpoint=<Neo4j endpoint URI> --time?";
+		return "Usage: " + getCommandName() + " " + 
+			"--endpoint=<neo4j-endpoint-url> " +
+			"--username=<neo4j-username> " +
+			"--password=<neo4j-password>";
 	}
 
 	@Override
 	protected void exec() {
-		if ( ! hasArg(argEndpointURI) ) {
-			System.err.println( "Error: URI of Neo4j endpoint not specified.");
-			System.err.println( "       Specify it using the --" + argEndpointURI.getKeyName() + " argument.");
-			return;
-		}
-
-		final String neo4jEndpointURI = getArg(argEndpointURI).getValue();
-		final String neo4jUsername = contains(argEndpointUsername) ?
-		                             getArg(argEndpointUsername).getValue() : null;
-		final String neo4jPassword = contains(argEndpointPassword) ?
-		                             getArg(argEndpointPassword).getValue() : null;
+		final String neo4jEndpointURI = getArg( "endpoint" ).getValue();
+		final String neo4jUsername = getArg( "username" ) != null ? getArg( "username" ).getValue() : null;
+		final String neo4jPassword = getArg( "password" ) != null ? getArg( "password" ).getValue() : null;
 
 		final LPG2RDFConfiguration l2rConf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
