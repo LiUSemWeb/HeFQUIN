@@ -48,6 +48,12 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * A command-line tool to materialize an RDF view of a labeled property graph
+ * (LPG) retrieved from a Neo4j endpoint using Cypher queries. This tool takes
+ * various configuration options and outputs RDF data that conforms to a given
+ * LPG-to-RDF configuration.
+ */
 public class MaterializeRDFViewOfLPG extends CmdARQ
 {
 	protected final ModEndpoint modEndpoint = new ModEndpoint();
@@ -59,11 +65,22 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	protected final ArgDecl argEndpointUsername   = new ArgDecl(ArgDecl.HasValue, "username");
 	protected final ArgDecl argEndpointPassword   = new ArgDecl(ArgDecl.HasValue, "password");
 
-
+	/**
+	 * Main entry point of the tool, accepting command-line arguments to specify the
+	 * Neo4j connection details and output format options.
+	 *
+	 * @param args Command-line arguments.
+	 */
 	public static void main( final String[] args ) {
 		new MaterializeRDFViewOfLPG( args ).mainRun();
 	}
 
+	/**
+	 * Constructor that initializes the command-line tool with necessary argument
+	 * modules for endpoint configuration, output format, and timing options.
+	 *
+	 * @param argv Command-line arguments.
+	 */
 	protected MaterializeRDFViewOfLPG( final String[] argv ) {
 		super(argv);
 
@@ -73,6 +90,12 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		addModule(modEndpoint);
 	}
 
+	/**
+	 * Returns the usage summary string of the command, showing the required and
+	 * optional arguments.
+	 *
+	 * @return A string that describes the usage of the command.
+	 */
 	@Override
 	protected String getSummary() {
 		return "Usage: " + getCommandName() + " " + 
@@ -81,6 +104,20 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			"--password=<neo4j-password>";
 	}
 
+	/**
+	 * Returns the command name used to invoke the tool.
+	 *
+	 * @return The name of the command.
+	 */
+	@Override
+	protected String getCommandName() {
+		return "hefquin-pgmat";
+	}
+
+	/**
+	 * Retrieves nodes and edges from a Neo4j database, converts them to RDF
+	 * triples, and writes the triples to the output stream System.out.
+	 */
 	@Override
 	protected void exec() {
 		final String neo4jEndpointURI = getArg( "endpoint" ).getValue();
@@ -121,6 +158,12 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 	}
 
+	/**
+	 * Builds and returns the Cypher query used to retrieve nodes from the Neo4j
+	 * database.
+	 *
+	 * @return A CypherQuery for retrieving nodes.
+	 */
 	public CypherQuery buildGetNodesQuery() {
 		// MATCH (n)
 		// RETURN n AS node, HEAD(LABELS(n)) AS label
@@ -137,6 +180,12 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 				.build();
 	}
 
+	/**
+	 * Builds and returns the Cypher query used to retrieve edges from the Neo4j
+	 * database.
+	 *
+	 * @return A CypherQuery for retrieving edges.
+	 */
 	public CypherQuery buildGetEdgesQuery() {
 		// MATCH (n1)-[e]->(n2)
 		// RETURN ID(n1) AS nid1, ID(n2) AS nid2, e AS edge, TYPE(e) AS reltype
@@ -159,6 +208,16 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 				.build();
 	}
 
+	/**
+	 * Executes the given Cypher query against the Neo4j database using the provided
+	 * connection details.
+	 *
+	 * @param query                 The Cypher query to be executed.
+	 * @param neo4jEndpointURI      The URI of the Neo4j endpoint.
+	 * @param neo4jEndpointUsername The username for the Neo4j endpoint.
+	 * @param neo4jEndpointPassword The password for the Neo4j endpoint.
+	 * @return A list of table records containing the results of the query.
+	 */
 	protected List<TableRecord> execQuery( final CypherQuery query,
 	                                       final String neo4jEndpointURI,
 	                                       final String neo4jEndpointUsername,
@@ -182,6 +241,14 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		return result;
 	}
 
+	/**
+	 * Writes RDF triples representing the nodes retrieved from the Neo4j database
+	 * to the provided stream.
+	 *
+	 * @param nodesResponse The list of table records containing the nodes.
+	 * @param lpg2rdfConf   The LPG-to-RDF configuration used for conversion.
+	 * @param rdfOutStream  The output stream to write the RDF triples to.
+	 */
 	protected void writeTriplesForNodes( final List<TableRecord> nodesResponse,
 	                                     final LPG2RDFConfiguration l2rConf,
 	                                     final StreamRDF rdfOutStream ) {
@@ -212,6 +279,14 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 	}
 
+	/**
+	 * Writes RDF triples representing the edges retrieved from the Neo4j database
+	 * to the provided stream.
+	 *
+	 * @param edgesResponse The list of table records containing the edges.
+	 * @param lpg2rdfConf   The LPG-to-RDF configuration used for conversion.
+	 * @param rdfOutStream  The output stream to write the RDF triples to.
+	 */
 	protected void writeTriplesForEdges( final List<TableRecord> edgesResponse,
 	                                     final LPG2RDFConfiguration l2rConf,
 	                                     final StreamRDF rdfOutStream ) {
@@ -281,6 +356,15 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 	}
 
+	/**
+	 * Sets up the output stream for writing RDF data. If the output should be
+	 * compressed, a GZIP stream is created. The RDF format for output is determined
+	 * by the configuration.
+	 *
+	 * @param outStreamBase The base output stream (e.g., System.out).
+	 * @return The StreamRDF configured for the appropriate RDF format and
+	 *         compression.
+	 */
 	protected StreamRDF setupOutputStream( final OutputStream outStreamBase ) {
 		final OutputStream outStream;
 		if ( modLangOut.compressedOutput() ) {
