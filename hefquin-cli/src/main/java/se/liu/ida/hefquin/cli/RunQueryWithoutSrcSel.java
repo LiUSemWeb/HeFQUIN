@@ -42,14 +42,13 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ArgDecl argOnelineTimeStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcMeasurements");
 	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
 
-	public static void main( final String... argv ) {
-		new RunQueryWithoutSrcSel(argv).mainRun();
+	public static void main( final String[] argv ) {
+		new RunQueryWithoutSrcSel(new String[]{"--help"}).mainRun();
 	}
 
 	public RunQueryWithoutSrcSel( final String[] argv ) {
 		super(argv);
 
-		addModule(modEngineConfig);
 		addModule(modTime);
 		addModule(modPlanPrinting);
 		addModule(modResults);
@@ -61,12 +60,18 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
 
 		addModule(modQuery);
+		addModule(modEngineConfig);
 		addModule(modFederation);
 	}
 
 	@Override
 	protected String getSummary() {
 		return getCommandName()+" --query=<query> --federationDescription=<federation description>";
+	}
+
+	@Override
+	protected String getCommandName() {
+		return "hefquin";
 	}
 
 	@Override
