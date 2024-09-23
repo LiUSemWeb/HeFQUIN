@@ -84,6 +84,16 @@ public class RunBGPOverNeo4j extends CmdARQ
 		return getCommandName() + " --query=<query file> --endpoint=<Neo4j endpoint URI> --time? --naive? --disableVariableReplacement? --disablePathMerging?";
 	}
 
+	/**
+	 * Returns the command name used to invoke the tool.
+	 *
+	 * @return The name of the command.
+	 */
+	@Override
+	protected String getCommandName() {
+		return "hefquin-pg";
+	}
+
 	@Override
 	protected void exec() {
 		final Set<Triple> bgp = getBGP();
