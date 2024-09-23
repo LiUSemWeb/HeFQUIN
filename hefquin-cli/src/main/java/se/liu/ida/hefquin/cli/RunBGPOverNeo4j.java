@@ -18,6 +18,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
+import se.liu.ida.hefquin.cli.modules.ModEndpoint;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpg.Record2SolutionMappingTranslator;
@@ -40,13 +41,11 @@ import se.liu.ida.hefquin.engine.wrappers.lpg.utils.CypherQueryBuilder;
 public class RunBGPOverNeo4j extends CmdARQ
 {
 	protected final ModTime modTime =            new ModTime();
+	protected final ModEndpoint modEndoint =     new ModEndpoint();
 	protected final ModQuery modQuery =          new ModQuery();
 	protected final ModResultsOut modResults =   new ModResultsOut();
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
 
-	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
-	protected final ArgDecl argEndpointUsername   = new ArgDecl(ArgDecl.HasValue, "username");
-	protected final ArgDecl argEndpointPassword   = new ArgDecl(ArgDecl.HasValue, "password");
 	protected final ArgDecl argNaive   = new ArgDecl(ArgDecl.NoValue, "naive");
 	protected final ArgDecl argNoVarRepl   = new ArgDecl(ArgDecl.NoValue, "disableVariableReplacement");
 	protected final ArgDecl argNoMerge   = new ArgDecl(ArgDecl.NoValue, "disablePathMerging");
@@ -55,7 +54,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 	protected final ArgDecl argSkipExecution = new ArgDecl(ArgDecl.NoValue, "skipExecution");
 	
 	public static void main( final String[] args ) {
-		new RunBGPOverNeo4j(args).mainRun();
+		new RunBGPOverNeo4j( args ).mainRun();
 	}
 
 	protected RunBGPOverNeo4j( final String[] argv ) {
@@ -69,19 +68,27 @@ public class RunBGPOverNeo4j extends CmdARQ
 		add(argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)");
 
 		addModule(modQuery);
+		addModule(modEndoint);
 		addModule(modLPG2RDFConfiguration);
 
-		add(argEndpointURI, "--endpoint", "The URI of the Neo4j endpoint");
-		add(argEndpointUsername, "--username", "Username for the Neo4j endpoint");
-		add(argEndpointPassword, "--password", "Password for the Neo4j endpoint");
 		add(argNaive, "--naive", "If you want naive translation");
 		add(argNoVarRepl, "--disableVariableReplacement", "If you want to disable variable replacement");
 		add(argNoMerge, "--disablePathMerging", "If you want to disable path merging");
 	}
 
+	/**
+	 * Returns the usage summary string of the command.
+	 *
+	 * @return A string that describes the usage of the command.
+	 */
 	@Override
 	protected String getSummary() {
-		return getCommandName() + " --query=<query file> --endpoint=<Neo4j endpoint URI> --time? --naive? --disableVariableReplacement? --disablePathMerging?";
+		return "Usage: " + getCommandName() + " " +
+		    "--query=<query-file> " +
+			"--endpoint=<neo4j-endpoint-url> " +
+			"--username=<neo4j-username> " +
+			"--password=<neo4j-password>" +
+			"[--time] [--naive] [--disableVariableReplacement] [--disablePathMerging]";
 	}
 
 	/**
@@ -227,16 +234,15 @@ public class RunBGPOverNeo4j extends CmdARQ
 	}
 
 	protected List<TableRecord> performQueryExecution( final CypherQuery query ) {
-		final String uri = getArg(argEndpointURI).getValue();
-		final String neo4jUsername = contains(argEndpointUsername) ?
-		                             getArg(argEndpointUsername).getValue() : null;
-		final String neo4jPassword = contains(argEndpointPassword) ?
-		                             getArg(argEndpointPassword).getValue() : null;
+		final String neo4jEndpointURI = getArg( "endpoint" ).getValue();
+		final String neo4jUsername = getArg( "username" ) != null ? getArg( "username" ).getValue() : null;
+		final String neo4jPassword = getArg( "password" ) != null ? getArg( "password" ).getValue() : null;
+
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 
-		final Neo4jConnection conn = Neo4jConnectionFactory.connect( uri, neo4jUsername, neo4jPassword );
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect( neo4jEndpointURI, neo4jUsername, neo4jPassword );
 
 		final List<TableRecord> result;
 		try {
@@ -282,5 +288,4 @@ public class RunBGPOverNeo4j extends CmdARQ
 		                                modResults.getResultsFormat(),
 		                                System.out );
 	}
-
 }
