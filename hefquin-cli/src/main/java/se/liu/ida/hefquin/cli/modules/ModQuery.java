@@ -10,6 +10,9 @@ import org.apache.jena.query.Syntax;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.NotFoundException;
 
+/**
+ * Command-line argument module for specifying query-related arguments.
+ */
 public class ModQuery extends ModBase
 {
 	protected final ArgDecl queryFileDecl = new ArgDecl( ArgDecl.HasValue, "query", "file" );
@@ -53,6 +56,5 @@ public class ModQuery extends ModBase
 		} catch ( NotFoundException ex ) {
 			throw new JenaException( "Failed to load Query: " + ex.getMessage() );
 		}
-
 	}
 }
