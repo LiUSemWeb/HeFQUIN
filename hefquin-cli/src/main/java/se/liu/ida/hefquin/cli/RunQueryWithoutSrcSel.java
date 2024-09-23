@@ -27,6 +27,13 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
+/**
+ * A command-line tool that executes SPARQL queries using the HeFQUIN federation
+ * engine without source selection. This class extends {@code CmdARQ} for query
+ * processing, execution, and result handling within the HeFQUIN system. It also
+ * supports printing various statistics about query execution and federation
+ * access.
+ */
 public class RunQueryWithoutSrcSel extends CmdARQ
 {
 	protected final ModTime          modTime =          new ModTime();
@@ -42,10 +49,22 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcMeasurements" );
 	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.NoValue, "printFedAccessStats" );
 
+	/**
+	 * Main entry point of the tool, accepting command-line arguments to specify the
+	 * query, configuration, and output format.
+	 *
+	 * @param argv Command-line arguments.
+	 */
 	public static void main( final String[] argv ) {
 		new RunQueryWithoutSrcSel( argv ).mainRun();
 	}
 
+	/**
+	 * Constructor that initializes the command-line tool with necessary argument
+	 * modules for speciffying, e.g., federation configuration, engine configuration, and output format.
+	 *
+	 * @param argv Command-line arguments.
+	 */
 	public RunQueryWithoutSrcSel( final String[] argv ) {
 		super( argv );
 
@@ -65,16 +84,31 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		addModule( modFederation );
 	}
 
+	/**
+	 * Returns the usage summary string of the command, showing the required arguments.
+	 *
+	 * @return A string that describes the usage of the command.
+	 */
 	@Override
 	protected String getSummary() {
 		return getCommandName() + " --query=<query> --federationDescription=<federation description>";
 	}
 
+
+	/**
+	 * Returns the command name used to invoke the tool.
+	 *
+	 * @return The name of the command.
+	 */
 	@Override
 	protected String getCommandName() {
 		return "hefquin";
 	}
 
+	/**
+	 * Executes the query using the HeFQUIN federation engine and handles the
+	 * results and statistics.
+	 */
 	@Override
 	protected void exec() {
 		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
@@ -178,6 +212,12 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		}
 	}
 
+    /**
+     * Rturns the SPARQL query to be executed.
+     *
+     * @return the {@code Query} object
+     * @throws TerminationException if the query file could not be found
+     */
 	protected Query getQuery() {
 		try {
 			return modQuery.getQuery();
