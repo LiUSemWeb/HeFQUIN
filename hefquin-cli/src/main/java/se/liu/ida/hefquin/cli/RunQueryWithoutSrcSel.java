@@ -36,37 +36,38 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	protected final ModResultsOut    modResults =       new ModResultsOut();
 	protected final ModEngineConfig  modEngineConfig =  new ModEngineConfig();
 
-	protected final ArgDecl argSuppressResultPrintout = new ArgDecl(ArgDecl.NoValue, "suppressResultPrintout");
-	protected final ArgDecl argSkipExecution = new ArgDecl(ArgDecl.NoValue, "skipExecution");
-	protected final ArgDecl argQueryProcStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcStats");
-	protected final ArgDecl argOnelineTimeStats = new ArgDecl(ArgDecl.NoValue, "printQueryProcMeasurements");
-	protected final ArgDecl argFedAccessStats = new ArgDecl(ArgDecl.NoValue, "printFedAccessStats");
+	protected final ArgDecl argSuppressResultPrintout = new ArgDecl( ArgDecl.NoValue, "suppressResultPrintout" );
+	protected final ArgDecl argSkipExecution = new ArgDecl( ArgDecl.NoValue, "skipExecution" );
+	protected final ArgDecl argQueryProcStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcStats" );
+	protected final ArgDecl argOnelineTimeStats = new ArgDecl( ArgDecl.NoValue, "printQueryProcMeasurements" );
+	protected final ArgDecl argFedAccessStats = new ArgDecl( ArgDecl.NoValue, "printFedAccessStats" );
 
 	public static void main( final String[] argv ) {
-		new RunQueryWithoutSrcSel(new String[]{"--help"}).mainRun();
+		new RunQueryWithoutSrcSel( argv ).mainRun();
 	}
 
 	public RunQueryWithoutSrcSel( final String[] argv ) {
-		super(argv);
+		super( argv );
 
-		addModule(modTime);
-		addModule(modPlanPrinting);
-		addModule(modResults);
+		addModule( modTime );
+		addModule( modPlanPrinting );
+		addModule( modResults );
 
-		add(argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result");
-		add(argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)");
-		add(argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process");
-		add(argOnelineTimeStats, "--printQueryProcMeasurements", "Print out measurements about the query processing time in one line that can be used for a CSV file");
-		add(argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager");
+		add( argSuppressResultPrintout, "--suppressResultPrintout", "Do not print out the query result" );
+		add( argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)" );
+		add( argQueryProcStats, "--printQueryProcStats", "Print out statistics about the query execution process" );
+		add( argOnelineTimeStats, "--printQueryProcMeasurements",
+				"Print out measurements about the query processing time in one line that can be used for a CSV file" );
+		add( argFedAccessStats, "--printFedAccessStats", "Print out statistics of the federation access manager" );
 
-		addModule(modQuery);
-		addModule(modEngineConfig);
-		addModule(modFederation);
+		addModule( modQuery );
+		addModule( modEngineConfig );
+		addModule( modFederation );
 	}
 
 	@Override
 	protected String getSummary() {
-		return getCommandName()+" --query=<query> --federationDescription=<federation description>";
+		return getCommandName() + " --query=<query> --federationDescription=<federation description>";
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		                                                   execServiceForPlanTasks,
 		                                                   modFederation.getFederationCatalog(),
 		                                                   false, // isExperimentRun
-		                                                   contains(argSkipExecution),
+		                                                   contains( argSkipExecution ),
 		                                                   modPlanPrinting.getSourceAssignmentPrinter(),
 		                                                   modPlanPrinting.getLogicalPlanPrinter(),
 		                                                   modPlanPrinting.getPhysicalPlanPrinter() );
@@ -96,17 +97,17 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		modTime.startTimer();
 
 		final PrintStream out;
-		if ( contains(argSuppressResultPrintout) )
+		if ( contains( argSuppressResultPrintout ) ) {
 			out = NullPrintStream.INSTANCE;
-		else
+		} else {
 			out = System.out;
+		}
 
 		Pair<QueryProcStats, List<Exception>> statsAndExceptions = null;
 
 		try {
-			statsAndExceptions = e.executeQuery(query, resFmt, out);
-		}
-		catch ( final Exception ex ) {
+			statsAndExceptions = e.executeQuery( query, resFmt, out );
+		} catch ( final Exception ex ) {
 			System.out.flush();
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );
@@ -116,63 +117,64 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		     && statsAndExceptions.object2 != null
 		     && ! statsAndExceptions.object2.isEmpty() ) {
 			final int numberOfExceptions = statsAndExceptions.object2.size();
-			if ( numberOfExceptions > 1 )
-				System.err.println("Attention: The query result may be incomplete because the following " + numberOfExceptions + " exceptions were caught when executing the query plan.");
-			else
-				System.err.println("Attention: The query result may be incomplete because the following exception was caught when executing the query plan.");
+			if ( numberOfExceptions > 1 ) {
+				System.err.println( "Attention: The query result may be incomplete because the following "
+						+ numberOfExceptions + " exceptions were caught when executing the query plan." );
+			} else {
+				System.err.println( "Attention: The query result may be incomplete because the following "
+						+ "exception was caught when executing the query plan" );
+			}
 
 			System.err.println();
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
-				final Exception ex = statsAndExceptions.object2.get(i);
-				System.err.println( (i+1) + " " + ex.getClass().getName() + ": " + ex.getMessage() );
-				System.err.println("StackTrace:");
-				ex.printStackTrace(System.err);
+				final Exception ex = statsAndExceptions.object2.get( i );
+				System.err.println( (i + 1) + " " + ex.getClass().getName() + ": " + ex.getMessage() );
+				System.err.println( "StackTrace:" );
+				ex.printStackTrace( System.err );
 				System.err.println();
 			}
 		}
 
 		if ( modTime.timingEnabled() ) {
 			final long time = modTime.endTimer();
-			System.err.println("Time: " + modTime.timeStr(time) + " sec");
+			System.err.println( "Time: " + modTime.timeStr( time ) + " sec" );
 		}
 
 		execServiceForPlanTasks.shutdownNow();
 		execServiceForFedAccess.shutdownNow();
 
 		try {
-			execServiceForPlanTasks.awaitTermination(500L, TimeUnit.MILLISECONDS);
-		}
-		catch ( final InterruptedException ex )  {
-			System.err.println("Terminating the thread pool for query plan tasks was interrupted." );
+			execServiceForPlanTasks.awaitTermination( 500L, TimeUnit.MILLISECONDS );
+		} catch ( final InterruptedException ex ) {
+			System.err.println( "Terminating the thread pool for query plan tasks was interrupted." );
 			ex.printStackTrace();
 		}
 
 		try {
-			execServiceForFedAccess.awaitTermination(500L, TimeUnit.MILLISECONDS);
-		}
-		catch ( final InterruptedException ex )  {
-			System.err.println("Terminating the thread pool for federation access was interrupted." );
+			execServiceForFedAccess.awaitTermination( 500L, TimeUnit.MILLISECONDS );
+		} catch ( final InterruptedException ex ) {
+			System.err.println( "Terminating the thread pool for federation access was interrupted." );
 			ex.printStackTrace();
 		}
 
-		if (    statsAndExceptions != null
-		     && statsAndExceptions.object1 != null) {
-			if ( contains(argQueryProcStats) ) {
-				StatsPrinter.print(statsAndExceptions.object1, System.err, true);
+		if ( statsAndExceptions != null && statsAndExceptions.object1 != null ) {
+			if ( contains( argQueryProcStats ) ) {
+				StatsPrinter.print( statsAndExceptions.object1, System.err, true );
 			}
-			if ( contains(argOnelineTimeStats) ) {
+			if ( contains( argOnelineTimeStats ) ) {
 				final long overallQueryProcessingTime = statsAndExceptions.object1.getOverallQueryProcessingTime();
 				final long planningTime = statsAndExceptions.object1.getPlanningTime();
 				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
 				final long executionTime = statsAndExceptions.object1.getExecutionTime();
-				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime +", " + compilationTime + ", " + executionTime;
-				System.out.println(queryProcStats);
+				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
+						+ ", " + executionTime;
+				System.out.println( queryProcStats );
 			}
 		}
 
-		if ( contains(argFedAccessStats) ) {
+		if ( contains( argFedAccessStats ) ) {
 			final Stats fedAccessStats = e.getFederationAccessStats();
-			StatsPrinter.print(fedAccessStats, System.err, true);
+			StatsPrinter.print( fedAccessStats, System.err, true );
 		}
 	}
 
@@ -180,8 +182,8 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		try {
 			return modQuery.getQuery();
 		} catch ( final NotFoundException ex ) {
-			System.err.println( "Failed to load query: "+ex.getMessage() );
-			throw new TerminationException(1);
+			System.err.println( "Failed to load query: " + ex.getMessage() );
+			throw new TerminationException( 1 );
 		}
 	}
 
