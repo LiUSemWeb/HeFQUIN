@@ -8,6 +8,7 @@ import arq.cmdline.ModTime;
 
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.TriplePath;
@@ -103,6 +104,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 
 	@Override
 	protected void exec() {
+		ARQ.init();
 		final Set<Triple> bgp = getBGP();
 
 		final LPG2RDFConfiguration conf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
