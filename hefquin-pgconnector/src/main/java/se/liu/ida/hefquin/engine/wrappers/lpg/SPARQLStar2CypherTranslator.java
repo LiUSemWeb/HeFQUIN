@@ -54,7 +54,7 @@ public interface SPARQLStar2CypherTranslator
     /**
      * Receives a {@link CypherMatchQuery} and rewrites explicit variable joins in the WHERE clause
      * as implicit joins in the MATCH clauses. Then, it removes redundant MATCH clauses.
-     * e.g. query MATCH (a)-[b]->(c) MATCH (x) WHERE a=x RETURN x is rewritten as MATCH (a)-[b]->(c) RETURN a
+     * e.g. query {@code MATCH (a)-[b]->(c) MATCH (x) WHERE a=x RETURN x} is rewritten as {@code MATCH (a)-[b]->(c) RETURN a}
      */
     CypherMatchQuery rewriteJoins(CypherMatchQuery query);
 
@@ -71,7 +71,7 @@ public interface SPARQLStar2CypherTranslator
 
     /**
      * Receives a list of {@link MatchClause} and merges compatible clauses into longer paths.
-     * e.g., if receives (x)-[a]->(y) and (z)-[b]->(y) returns (z)-[b]->(y)<-[a]-(x).
+     * e.g., if receives {@code (x)-[a]->(y) and (z)-[b]->(y)} returns {@code (z)-[b]->(y)<-[a]-(x)}.
      */
     List<MatchClause> mergePaths(List<MatchClause> matchClauses);
 

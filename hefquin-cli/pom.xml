@@ -11,7 +11,7 @@
   <artifactId>hefquin-cli</artifactId>
 
   <dependencies>
-      <!-- hefquin-engine -->
+    <!-- hefquin-engine -->
     <dependency>
       <groupId>se.liu.ida.hefquin</groupId>
       <artifactId>hefquin-engine</artifactId>

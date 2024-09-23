@@ -7,7 +7,9 @@
     <artifactId>HeFQUIN</artifactId>
     <version>0.0.4-SNAPSHOT</version>
   </parent>
+
   <artifactId>hefquin-engine</artifactId>
+
   <dependencies>
     <!-- hefquin-base -->
     <dependency>
