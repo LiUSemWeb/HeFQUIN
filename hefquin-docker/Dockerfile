@@ -23,7 +23,10 @@ RUN sh -c '\
     else \
         echo "No specific tag supplied, using the latest version"; \
     fi'
-RUN mvn clean package
+
+# Build only the uber war
+RUN mvn clean install
+RUN mvn package -pl hefquin-service -P build-war
 
 # # Use tomcat:latest for running
 FROM tomcat:latest
