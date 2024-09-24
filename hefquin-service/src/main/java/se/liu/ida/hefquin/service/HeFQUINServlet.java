@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.atlas.web.TypedInputStream;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.riot.system.stream.StreamManager;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +50,20 @@ public class HeFQUINServlet extends HttpServlet {
 		logger.info( "hefquin.configuration: " + configurationFile );
 		logger.info( "hefquin.federation:    " + federationFile );
 
+		check( configurationFile );
+		check( federationFile );
+
 		// Initialize engine
 		engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
-		logger.info( "Engine initialized" );
+		logger.info( "Engine initilized" );
+	}
+
+	public void check( String filenameOrURI ) {
+		TypedInputStream in = StreamManager.get().open(filenameOrURI);
+		if ( in == null ) {
+			throw new RuntimeException( "File not found: " + filenameOrURI );
+		}
+		in.close();
 	}
 
 	@Override
