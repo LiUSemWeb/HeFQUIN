@@ -34,36 +34,36 @@ function proc
     echo "Schemagen: $FILE"
 
     # -e syntax
-    ${JENA_HOME}/bin/schemagen --rdfs -e TURTLE -i "$FILE" -n "$CLASS" -a "$NS" -o "$CLASS".java  "$@" 
+    ${JENA_HOME}/bin/schemagen --owl -e TURTLE -i "$FILE" -n "$CLASS" -a "$NS" -o "$CLASS".java  "$@" 
     # Add imports
     echo "package ${PKG};" >> "$TMP"
     echo >>"$TMP"
     cat "$CLASS".java >> "$TMP"
     mv "$TMP" "$CLASS".java
-    mv "$CLASS".java ${DIR}/
+    mv "$CLASS".java ${DIR}
 }
 
 function procLPGtoRDF
 {
-    syntaxCheck  LPGtoRDFConfiguration.ttl
-    proc LPGtoRDFConfiguration.ttl \
+    syntaxCheck  lpg2rdfconf.ttl
+    proc lpg2rdfconf.ttl \
          LPGtoRDF \
-         "http://www.example.org/se/liu/ida/hefquin/lpg2rdf#" \
-         "se.liu.ida.hefquin.engine.wrappers.lpgwrapper.vocabulary" \
-         ../hefquin-pgconnector/src/main/java/se/liu/ida/hefquin/engine/wrappers/lpgwrapper/vocabulary/
+         "http://w3id.org/hefquin/lpg2rdf#" \
+         "se.liu.ida.hefquin.engine.wrappers.lpg.vocabulary" \
+         ../hefquin-pgconnector/src/main/java/se/liu/ida/hefquin/engine/wrappers/lpg/vocabulary/
 }
 
 function procECVocab
 {
-    syntaxCheck  EngineConfiguration.ttl
-    proc EngineConfiguration.ttl \
+    syntaxCheck  engineconf.ttl
+    proc engineconf.ttl \
          ECVocab \
-         "http://www.example.org/se/liu/ida/hefquin/engineconf#" \
+         "http://w3id.org/hefquin/engineconf#" \
          "se.liu.ida.hefquin.engine.vocabulary" \
          ../hefquin-engine/src/main/java/se/liu/ida/hefquin/engine/vocabulary/
 }
 
 ### Below, uncomment the line for which you want to run the script.
 
-#procLPGtoRDF
+procLPGtoRDF
 procECVocab
