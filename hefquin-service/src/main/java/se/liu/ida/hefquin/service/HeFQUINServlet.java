@@ -41,8 +41,8 @@ public class HeFQUINServlet extends HttpServlet {
 	public void init( ServletConfig config ) throws ServletException {
 		super.init( config );
 
-		final String configurationFile = System.getProperty( "hefquin.configuration" );
-		final String federationFile = System.getProperty( "hefquin.federation" );
+		final String configurationFile = System.getProperty( "hefquin.configuration", "DefaultEngineConf.ttl" );
+		final String federationFile = System.getProperty( "hefquin.federation", "DefaultEngineConf.ttl" );
 
 		logger.info( "--- Settings ---" );
 		logger.info( "hefquin.configuration: " + configurationFile );
