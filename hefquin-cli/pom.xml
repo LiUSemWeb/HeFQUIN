@@ -17,6 +17,12 @@
       <artifactId>hefquin-engine</artifactId>
       <version>0.0.4-SNAPSHOT</version>
     </dependency>
+      <!-- hefquin-service -->
+    <dependency>
+      <groupId>se.liu.ida.hefquin</groupId>
+      <artifactId>hefquin-service</artifactId>
+      <version>0.0.4-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
