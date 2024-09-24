@@ -1,59 +1,6 @@
 #!/bin/sh
-HEFQUIN_CP="$HEFQUIN_HOME"'/libs/hefquin-service-0.0.4-SNAPSHOT.jar'
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source ${SCRIPT_DIR}/common.sh
 
-# Function to display help message
-usage() {
-    echo "Usage: hefquin-server [-f <federation_description_file>] [-c <configuration_description_file>] [-p <port>]"
-    echo ""
-    echo "Options:"
-    echo "  -f, --federationDescription Federation description file"
-    echo "  -c, --confDescr             Engine configuration description file"
-    echo "  -p, --port                  Server port (default: 8080)"
-    echo "  -h, --help                  Show this help message"
-    exit 1
-}
-
-# Parse command-line arguments
-ARGS=()
-
-while [ "$#" -gt 0 ]; do
-    case "$1" in
-        -f|--federationDescription)
-            FED_DESC_FILE="$2"
-            shift 2
-            ;;
-        -c|--confDescr)
-            CONF_DESC_FILE="$2"
-            shift 2
-            ;;
-        -p|--port)
-            PORT="$2"
-            shift 2
-            ;;
-        -h|--help)
-            usage
-            ;;
-        *)
-            echo "Unknown option: $1"
-            usage
-            ;;
-    esac
-done
-
-# Check if the required argument is provided
-if [ -n "$FED_DESC_FILE" ]; then
-    ARGS+=("--federationDescription" "$FED_DESC_FILE")
-fi
-if [ -n "$CONF_DESC_FILE" ]; then
-    ARGS+=("--confDescr" "$CONF_DESC_FILE")
-fi
-if [ -n "$PORT" ]; then
-    ARGS+=("--port" "$PORT")
-fi
-
-echo "${ARGS[@]}"
-
 # Run the Java command
-"$JAVA" $JVM_ARGS -cp "$HEFQUIN_CP" se.liu.ida.hefquin.service.HeFQUINServer "${ARGS[@]}" 
+"$JAVA" $JVM_ARGS -cp $HEFQUIN_CP se.liu.ida.hefquin.cli.RunHeFQUINServer $@
