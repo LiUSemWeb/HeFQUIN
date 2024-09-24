@@ -1,7 +1,6 @@
 #!/bin/sh
-HEFQUIN_CP="$HEFQUIN_HOME"'/libs/hefquin-cli-0.0.4-SNAPSHOT.jar'
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source ${SCRIPT_DIR}/common.sh
 
 # Run the Java command
-"$JAVA" $JVM_ARGS -cp "$HEFQUIN_CP" se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel "$@"
+"$JAVA" $JVM_ARGS -cp $HEFQUIN_CP se.liu.ida.hefquin.cli.RunQueryWithoutSrcSel $@
