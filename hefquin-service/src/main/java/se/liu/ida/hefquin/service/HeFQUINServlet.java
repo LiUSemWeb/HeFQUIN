@@ -50,7 +50,7 @@ public class HeFQUINServlet extends HttpServlet {
 
 		// Initialize engine
 		engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
-		logger.info( "Engine initilized" );
+		logger.info( "Engine initialized" );
 	}
 
 	@Override
