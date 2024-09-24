@@ -26,7 +26,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateImplicitCtor() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
 			  + System.lineSeparator()
@@ -43,7 +43,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateEmptyCtor1() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
 			  + System.lineSeparator()
@@ -63,7 +63,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateEmptyCtor2() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
 			  + System.lineSeparator()
@@ -84,7 +84,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateCtorArgs1() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -111,7 +111,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateCtorArgs2() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -139,7 +139,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test(expected = NoSuchMethodException.class)
 	public void instantiateNoSuchConstructor1() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -159,7 +159,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test(expected = NoSuchMethodException.class)
 	public void instantiateNoSuchConstructor2() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -177,7 +177,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test(expected = IllegalArgumentException.class)
 	public void instantiateWithIllegalConstructorArgs() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -197,7 +197,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test(expected = IllegalArgumentException.class)
 	public void instantiateWithUnknownDesignatedArgValue() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -215,7 +215,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateWithDesignatedArgValue1() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
@@ -241,7 +241,7 @@ public class HeFQUINEngineConfigReaderTest
 	@Test
 	public void instantiateWithDesignatedArgValue2() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException, IllegalAccessException {
 		final Resource r = parseAndCreateResource(
-			  "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+			  "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 			  + "PREFIX ex:  <http://example.org/>" + System.lineSeparator()
 			  + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 			  + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
