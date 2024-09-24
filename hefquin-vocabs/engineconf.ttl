@@ -1,86 +1,89 @@
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:    <http://www.w3.org/2000/10/XMLSchema#> .
 @prefix dc:     <http://purl.org/dc/elements/1.1/> .
-@prefix ec:     <http://www.example.org/se/liu/ida/hefquin/engineconf#> .
+@prefix ec:     <http://w3id.org/hefquin/engineconf#> .
 
-ec:  dc:creator       "Olaf Hartig" ;
-     dc:date          "2023-11-29" ;
-     dc:format        "RDF" ;
-     dc:identifier    ec: ;
-     dc:title         "Vocabulary for describing configurations of the HeFQUIN engine"@en ;
-     rdfs:label       "Vocabulary for describing configurations of the HeFQUIN engine"@en .
+<http://w3id.org/hefquin/engineconf>
+    rdf:type owl:Ontology ;
+    dc:creator       "Olaf Hartig" ;
+    dc:date          "2023-11-29" ;
+    dc:format        "RDF" ;
+    dc:identifier    <http://w3id.org/hefquin/engineconf> ;
+    dc:title         "Vocabulary for describing configurations of the HeFQUIN engine"@en ;
+    rdfs:label       "Vocabulary for describing configurations of the HeFQUIN engine"@en .
 
 ## ==== CLASS DECLARATIONS ====
 
-ec:HeFQUINEngineConfiguration rdf:type rdfs:Class ;
+ec:HeFQUINEngineConfiguration rdf:type owl:Class ;
     rdfs:label      "HeFQUIN Engine Configuration"@en ;
     rdfs:comment    "Class of configurations of the HeFQUIN engine. Instances of this class must have exactly one 'fedAccessMgr' property and one 'queryProcessor' property."@en .
 
 
-ec:InstantiableJavaClass rdf:type rdfs:Class ;
+ec:InstantiableJavaClass rdf:type owl:Class ;
     rdfs:label      "Instantiable Java Class"@en ;
     rdfs:comment    "Every instance of this class represents a Java class that can be instantiated based on the given RDF description. Instances of this class must have exactly one 'javaClassName' property. Additionally, they may have a 'constructorArguments' property."@en .
 
-ec:ConstructorArgument rdf:type rdfs:Class ;
+ec:ConstructorArgument rdf:type owl:Class ;
     rdfs:label      "Constructor Argument"@en ;
     rdfs:comment    "This class is a superclass of any kind of argument to be passed to the constructor of a corresponding Java class. Concrete types of arguments are captured by the subclasses of this class."@en .
 
-ec:InstantiationBasedConstructorArgument rdf:type rdfs:Class ;
+ec:InstantiationBasedConstructorArgument rdf:type owl:Class ;
     rdfs:subClassOf ec:ConstructorArgument ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Instantiation-Based Constructor Argument"@en ;
     rdfs:comment    "Every instance of this class represents a Java object that is obtained by instantiating a Java class and that is meant to be passed to a constructor in order to instantiate another Java class. In addition to the 'javaClassName' property and the (optional) 'constructorArguments' property, every instance of this class must have exactly one 'argumentTypeName' property. The value of this property is either the same as the value of the 'javaClassName' property or it is the name of a superclass or an interface of the class mentioned by the 'javaClassName' property."@en .
 
-ec:ListBasedConstructorArgument rdf:type rdfs:Class ;
+ec:ListBasedConstructorArgument rdf:type owl:Class ;
     rdfs:subClassOf ec:ConstructorArgument ;
     rdfs:label      "List-Based Constructor Argument"@en ;
     rdfs:comment    "Every instance of this class represents a 'java.util.List' that is populated and then passed as an argument to the constructor of a corresponding Java class. Instances of this class must have exactly one 'elementsTypeName' property and exactly one 'elements' property. Each element of the 'rdf:List' that the latter property refers to is expected to be of type 'InstantiableJavaClass' and the values of their respective 'javaClassName' properties are expected to be either the same as the value of the 'elementsTypeName' property (of this 'ListBasedConstructorArgument') or the name of a sub-class of the class mentioned by the 'elementsTypeName' property."@en .
 
-ec:ValueBasedConstructorArgument rdf:type rdfs:Class ;
+ec:ValueBasedConstructorArgument rdf:type owl:Class ;
     rdfs:subClassOf ec:ConstructorArgument ;
     rdfs:label      "Value-Based Constructor Argument"@en ;
     rdfs:comment    "Every instance of this class refers to a concrete value to be passed as an argument to the constructor of a corresponding Java class. In particular, to refer to this value, instances of this class must have exactly one 'rdf:value' property. The value may be either a literal or any 'DesignatedArgumentValue' defined in this vocabulary."@en .
 
-ec:DesignatedArgumentValue rdf:type rdfs:Class ;
+ec:DesignatedArgumentValue rdf:type owl:Class ;
     rdfs:label      "Designated Argument Value"@en ;
     rdfs:comment    "The instances of this class that are defined in this vocabulary can be referred to as values by a 'ValueBasedConstructorArgument'."@en .
 
 
-ec:FederationAccessManager rdf:type rdfs:Class ;
+ec:FederationAccessManager rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Federation Access Manager"@en .
 
 
-ec:QueryProcessor rdf:type rdfs:Class ;
+ec:QueryProcessor rdf:type owl:Class ;
     rdfs:label      "Query Processor"@en ;
     rdfs:comment    "Instances of this class must have exactly one 'queryPlanner' property, one 'planCompiler' property, one 'executionEngine' property. Additionally, they may have a 'costModel' property."@en .
 
-ec:CostModel rdf:type rdfs:Class ;
+ec:CostModel rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Cost Model"@en .
 
-ec:QueryPlanner rdf:type rdfs:Class ;
+ec:QueryPlanner rdf:type owl:Class ;
     rdfs:label      "Query Planner"@en ;
     rdfs:comment    "Instances of this class must have exactly one 'sourcePlanner' property, one 'logicalOptimizer' property, one 'physicalOptimizer' property."@en .
 
-ec:SourcePlanner rdf:type rdfs:Class ;
+ec:SourcePlanner rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Source Planner"@en .
 
-ec:LogicalOptimizer rdf:type rdfs:Class ;
+ec:LogicalOptimizer rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Logical Optimizer"@en .
 
-ec:PhysicalOptimizer rdf:type rdfs:Class ;
+ec:PhysicalOptimizer rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Physical Optimizer"@en .
 
-ec:PlanCompiler rdf:type rdfs:Class ;
+ec:PlanCompiler rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Plan Compiler"@en .
 
-ec:ExecutionEngine rdf:type rdfs:Class ;
+ec:ExecutionEngine rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Execution Engine"@en .
 
