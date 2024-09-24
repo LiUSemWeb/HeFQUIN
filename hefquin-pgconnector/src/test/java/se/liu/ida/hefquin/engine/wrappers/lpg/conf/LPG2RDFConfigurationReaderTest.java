@@ -19,7 +19,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
               + "PREFIX ex:     <http://example.org/>\n"
               + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
               + "\n"
@@ -83,7 +83,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndRegexIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -148,7 +148,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndSingleIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -214,7 +214,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndSingleLiteralBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -280,7 +280,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndCombinedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -383,7 +383,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndRegexBasedEdgeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -448,7 +448,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndSingleEdgeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -514,7 +514,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndCombinedEdgeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -605,7 +605,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndLiteralBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -668,7 +668,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -730,7 +730,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithBNodeBasedNodeMappingAndLiteralBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -791,7 +791,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithNodeMappingAsIRIBasedNodeMappingAndNodeLabelMappingAsIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -855,7 +855,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndRegexBasedPropertyNameMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -919,7 +919,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndSinglePropertyNameMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -985,7 +985,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndCombinedPropertyNameMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1079,7 +1079,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidLabelLPG2RDFConfigWithIRIBasedNodeMappingAndLiteralBasedNodeLabelMapping() {
         final String turtle =
-                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1121,7 +1121,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidNodeMappingPrefixOfIRIsLPG2RDFConfigWithIRIBasedNodeMappingAndLiteralBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1163,7 +1163,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidNodeLabelMappingPrefixOfIRIsLPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1206,7 +1206,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidEdgeLabelMappingPrefixOfIRIsLPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1249,7 +1249,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void InvalidPropertyNameMappingPrefixOfIRIsLPG2RDFConfigWithBNodeBasedNodeMappingAndIRIBasedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1290,7 +1290,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeLabelMappingAndIRIBasedNodeMappingWithoutPrefixOfIRIs() {
         final String turtle =
-                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1332,7 +1332,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingWithoutPrefixOfIRIs() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1374,7 +1374,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingWithoutPrefixOfIRIsForEdgeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1416,7 +1416,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingWithoutPrefixOfIRIsForPropertyNameMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1458,7 +1458,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFWrongConfig() {
         final String turtle =
-                          "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                          "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "\n"
                         + "ex:IRINodeMapping\n"
@@ -1479,7 +1479,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithMultipleNodeMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1525,7 +1525,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithMultipleNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1571,7 +1571,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndNestedCombinedNodeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1632,7 +1632,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndNestedCombinedEdgeLabelMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
@@ -1693,7 +1693,7 @@ public class LPG2RDFConfigurationReaderTest {
     @Test(expected = IllegalArgumentException.class)
     public void LPG2RDFConfigWithIRIBasedNodeMappingAndIRIBasedNodeLabelMappingAndNestedCombinedPropertyNameMapping() {
         final String turtle =
-                "PREFIX lr:     <http://www.example.org/se/liu/ida/hefquin/lpg2rdf#>\n"
+                "PREFIX lr:     <http://w3id.org/hefquin/lpg2rdf#>\n"
                         + "PREFIX ex:     <http://example.org/>\n"
                         + "PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>\n"
                         + "\n"
