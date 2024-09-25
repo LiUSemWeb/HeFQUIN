@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Set;
 import java.util.Base64;
 
 public class Neo4jConnectionFactory
@@ -91,8 +92,13 @@ public class Neo4jConnectionFactory
 				throw new Neo4jConnectionException(this, "Neo4j server could not be reached.", e);
 			}
 
-			System.err.println("Code: " + response.statusCode());
-			if ( ! ( response.statusCode() >= 200 && response.statusCode() < 300 ) ) {
+			// According to the Neo4J API documentation, a query can return 200 OK or 201
+			// Created when executed over the HTTP API because it wraps the request in an
+			// implicit transaction (i.e., the 201 can indicate that the transaction was
+			// successfully created, not that data was inserted/changed). It also lists 202
+			// Accepted as a possible response code in some circumstances. See
+			// https://neo4j.com/docs/query-api/current/query/
+			if ( ! (Set.of( 200, 201, 202 ).contains( response.statusCode() )) ) {
 				throw new Neo4jConnectionException(this, "Unexpected status code in HTTP response from Neo4j server: " + response.statusCode());
 			}
 
