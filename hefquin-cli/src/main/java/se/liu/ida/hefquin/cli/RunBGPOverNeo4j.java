@@ -19,7 +19,7 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
-import se.liu.ida.hefquin.cli.modules.ModEndpoint;
+import se.liu.ida.hefquin.cli.modules.ModNeo4jEndpoint;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.wrappers.lpg.Record2SolutionMappingTranslator;
@@ -42,7 +42,7 @@ import se.liu.ida.hefquin.engine.wrappers.lpg.utils.CypherQueryBuilder;
 public class RunBGPOverNeo4j extends CmdARQ
 {
 	protected final ModTime modTime =            new ModTime();
-	protected final ModEndpoint modEndoint =     new ModEndpoint();
+	protected final ModNeo4jEndpoint modEndpoint = new ModNeo4jEndpoint();
 	protected final ModQuery modQuery =          new ModQuery();
 	protected final ModResultsOut modResults =   new ModResultsOut();
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
@@ -69,7 +69,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 		add(argSkipExecution, "--skipExecution", "Do not execute the query (but create the execution plan)");
 
 		addModule(modQuery);
-		addModule(modEndoint);
+		addModule(modEndpoint);
 		addModule(modLPG2RDFConfiguration);
 
 		add(argNaive, "--naive", "If you want naive translation");
@@ -236,15 +236,15 @@ public class RunBGPOverNeo4j extends CmdARQ
 	}
 
 	protected List<TableRecord> performQueryExecution( final CypherQuery query ) {
-		final String neo4jEndpointURI = getArg( "endpoint" ).getValue();
-		final String neo4jUsername = getArg( "username" ) != null ? getArg( "username" ).getValue() : null;
-		final String neo4jPassword = getArg( "password" ) != null ? getArg( "password" ).getValue() : null;
+		final String endpoint = modEndpoint.getEndpoint();
+		final String username = modEndpoint.getUsername();
+		final String password = modEndpoint.getPassword();
 
 		if ( modTime.timingEnabled() ) {
 			modTime.startTimer();
 		}
 
-		final Neo4jConnection conn = Neo4jConnectionFactory.connect( neo4jEndpointURI, neo4jUsername, neo4jPassword );
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect( endpoint, username, password );
 
 		final List<TableRecord> result;
 		try {
