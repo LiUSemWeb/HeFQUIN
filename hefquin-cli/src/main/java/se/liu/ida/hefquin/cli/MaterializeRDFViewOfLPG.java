@@ -5,7 +5,6 @@ import arq.cmdline.ModLangOutput;
 import arq.cmdline.ModTime;
 
 import org.apache.jena.atlas.RuntimeIOException;
-import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.graph.Graph;
@@ -20,7 +19,7 @@ import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.graph.GraphFactory;
 
-import se.liu.ida.hefquin.cli.modules.ModEndpoint;
+import se.liu.ida.hefquin.cli.modules.ModNeo4jEndpoint;
 import se.liu.ida.hefquin.cli.modules.ModLPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conf.LPG2RDFConfiguration;
 import se.liu.ida.hefquin.engine.wrappers.lpg.conn.Neo4jConnectionFactory;
@@ -56,14 +55,10 @@ import java.util.zip.GZIPOutputStream;
  */
 public class MaterializeRDFViewOfLPG extends CmdARQ
 {
-	protected final ModEndpoint modEndpoint = new ModEndpoint();
+	protected final ModNeo4jEndpoint modEndpoint = new ModNeo4jEndpoint();
 	protected final ModTime modTime =            new ModTime();
 	protected final ModLangOutput modLangOut =   new ModLangOutput();
 	protected final ModLPG2RDFConfiguration modLPG2RDFConfiguration = new ModLPG2RDFConfiguration();
-
-	protected final ArgDecl argEndpointURI   = new ArgDecl(ArgDecl.HasValue, "endpoint");
-	protected final ArgDecl argEndpointUsername   = new ArgDecl(ArgDecl.HasValue, "username");
-	protected final ArgDecl argEndpointPassword   = new ArgDecl(ArgDecl.HasValue, "password");
 
 	/**
 	 * Main entry point of the tool, accepting command-line arguments to specify the
@@ -120,9 +115,9 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
-		final String neo4jEndpointURI = getArg( "endpoint" ).getValue();
-		final String neo4jUsername = getArg( "username" ) != null ? getArg( "username" ).getValue() : null;
-		final String neo4jPassword = getArg( "password" ) != null ? getArg( "password" ).getValue() : null;
+		final String endpoint = modEndpoint.getEndpoint();
+		final String username = modEndpoint.getUsername();
+		final String password = modEndpoint.getPassword();
 
 		final LPG2RDFConfiguration l2rConf = modLPG2RDFConfiguration.getLPG2RDFConfiguration();
 
@@ -139,15 +134,15 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 		}
 
 		final List<TableRecord> nodesResponse = execQuery( getNodesQuery,
-		                                                   neo4jEndpointURI,
-		                                                   neo4jUsername,
-		                                                   neo4jPassword );
+		                                                   endpoint,
+		                                                   username,
+		                                                   password );
 		writeTriplesForNodes(nodesResponse, l2rConf, rdfOutStream);
 
 		final List<TableRecord>  edgesResponse = execQuery( getEdgesQuery,
-		                                                    neo4jEndpointURI,
-		                                                    neo4jUsername,
-		                                                    neo4jPassword );
+		                                                    endpoint,
+		                                                    username,
+		                                                    password );
 		writeTriplesForEdges(edgesResponse, l2rConf, rdfOutStream);
 
 		rdfOutStream.finish();
@@ -213,18 +208,16 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 	 * connection details.
 	 *
 	 * @param query                 The Cypher query to be executed.
-	 * @param neo4jEndpointURI      The URI of the Neo4j endpoint.
-	 * @param neo4jEndpointUsername The username for the Neo4j endpoint.
-	 * @param neo4jEndpointPassword The password for the Neo4j endpoint.
+	 * @param endpoint      The URI of the Neo4j endpoint.
+	 * @param username The username for the Neo4j endpoint.
+	 * @param password The password for the Neo4j endpoint.
 	 * @return A list of table records containing the results of the query.
 	 */
 	protected List<TableRecord> execQuery( final CypherQuery query,
-	                                       final String neo4jEndpointURI,
-	                                       final String neo4jEndpointUsername,
-	                                       final String neo4jEndpointPassword ) {
-		final Neo4jConnection conn = Neo4jConnectionFactory.connect( neo4jEndpointURI,
-		                                                             neo4jEndpointUsername,
-		                                                             neo4jEndpointPassword );
+	                                       final String endpoint,
+	                                       final String username,
+	                                       final String password ) {
+		final Neo4jConnection conn = Neo4jConnectionFactory.connect( endpoint, username, password );
 		final List<TableRecord> result;
 		try {
 			result = conn.execute(query);
