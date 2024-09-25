@@ -40,6 +40,23 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <resources>
+      <!-- Default resources (src/main/resources) -->
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!-- Include webapp directory -->
+      <resource>
+        <directory>src/main/webapp</directory>
+        <targetPath>webapp</targetPath>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+
   <profiles>
     <profile>
       <id>build-war</id>
