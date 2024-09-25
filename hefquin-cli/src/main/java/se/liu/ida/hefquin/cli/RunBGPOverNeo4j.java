@@ -88,7 +88,7 @@ public class RunBGPOverNeo4j extends CmdARQ
 		    "--query=<query-file> " +
 			"--endpoint=<neo4j-endpoint-url> " +
 			"--username=<neo4j-username> " +
-			"--password=<neo4j-password>" +
+			"--password=<neo4j-password> " +
 			"[--time] [--naive] [--disableVariableReplacement] [--disablePathMerging]";
 	}
 
