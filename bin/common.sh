@@ -45,11 +45,24 @@ if [ -z "$JAVA" ]; then
   exit 1  # Exit the script with an error code
 fi
 
-# Look for the hefquin-cli JAR file in either HEFQUIN_HOME/libs or HEFQUIN_HOME/hefquin-cli/target/
+# Look for the directory that is expected to contain the hefquin-cli JAR file
 if [ -d "${HEFQUIN_HOME}/libs/" ]; then
-  # If the libs directory exists, set HEFQUIN_CP to the hefquin-cli JAR found there
-  HEFQUIN_CP=$(echo ${HEFQUIN_HOME}/libs/hefquin-cli-*.jar)
+  # If the libs directory exists, use it
+  HEFQUIN_JAR_DIR=${HEFQUIN_HOME}/libs/
+elif [ -d "${HEFQUIN_HOME}/hefquin-cli/target/" ]; then
+  # Otherwise, if hefquin-cli/target/ exists, use that one
+  HEFQUIN_JAR_DIR=${HEFQUIN_HOME}/hefquin-cli/target/
 else
-  # Otherwise, look for the JAR in the target directory under hefquin-cli
-  HEFQUIN_CP=$(echo ${HEFQUIN_HOME}/hefquin-cli/target/hefquin-cli-*.jar)
+  # Otherwise, print an error message
+  echo "Cannot find the directory ${HEFQUIN_HOME}/hefquin-cli/target/"
+  echo "Did you forget to compile the project?"
+  exit 2  # Exit the script with an error code
+fi
+
+# After determining the directory, look for the hefquin-cli JAR file in that directory, and ..
+HEFQUIN_CP=$(echo ${HEFQUIN_JAR_DIR}hefquin-cli-*.jar)
+# .. check that the JAR file is actually there
+if [ ! -f ${HEFQUIN_CP} ]; then
+  echo "Cannot find the HeFQUIN JAR file in ${HEFQUIN_JAR_DIR}"
+  exit 3  # Exit the script with an error code
 fi
