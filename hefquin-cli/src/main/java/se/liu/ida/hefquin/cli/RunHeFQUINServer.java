@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.cli;
 
+import java.io.File;
+
 import org.apache.jena.cmd.CmdGeneral;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -78,7 +80,17 @@ public class RunHeFQUINServer extends CmdGeneral
 		final Server server = new Server( port );
 		System.out.println("Running on: http://localhost:" + port);
 		final WebAppContext webAppContext = new WebAppContext();
-		webAppContext.setResourceBase( "hefquin-service/src/main/webapp" );
+
+		final File webAppDir = new File("hefquin-service/src/main/webapp");
+		if ( webAppDir.exists() ) {
+			// Running from source (for development)
+			webAppContext.setResourceBase(webAppDir.getAbsolutePath());
+		} else {
+			// Running from a JAR - load the webapp directory from the classpath
+			String webappPath = RunHeFQUINServer.class.getClassLoader().getResource("webapp").toExternalForm();
+			webAppContext.setResourceBase(webappPath);
+		}
+
 		server.setHandler( webAppContext );
 
 		return server;
