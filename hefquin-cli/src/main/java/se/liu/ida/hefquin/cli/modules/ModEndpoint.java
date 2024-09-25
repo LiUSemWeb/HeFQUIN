@@ -29,7 +29,7 @@ public class ModEndpoint extends ModBase {
 		for ( ArgDecl arg : requiredArgs ) {
 			if ( ! cmdLine.contains( argEndpointURI ) ) {
 				System.err.println( "Error: Missing required argument: --" + arg.getKeyName() );
-				System.exit(1);;
+				System.exit(1);
 			}
 		}
 	}
