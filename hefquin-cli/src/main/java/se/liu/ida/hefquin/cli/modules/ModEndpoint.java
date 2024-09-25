@@ -25,7 +25,7 @@ public class ModEndpoint extends ModBase {
 	@Override
 	public void processArgs( final CmdArgModule cmdLine ) {
 		// Required args
-		Set<ArgDecl> requiredArgs = Set.of( argEndpointURI );
+		final Set<ArgDecl> requiredArgs = Set.of( argEndpointURI );
 		for ( ArgDecl arg : requiredArgs ) {
 			if ( ! cmdLine.contains( argEndpointURI ) ) {
 				System.err.println( "Error: Missing required argument: --" + arg.getKeyName() );
