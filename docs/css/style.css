@@ -36,6 +36,18 @@ header {
     height: 60px;
 }
 
+h1 {
+    font-size: 1.6em;
+}
+
+h2 {
+    font-size: 1.4em;
+}
+
+h3 {
+    font-size: 1.2em;
+}
+
 nav {
     font-family: Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     color: var(--nav-color);
@@ -139,7 +151,7 @@ li {
         display: none;
         flex-direction: column;
         gap: 10px;
-        background-color: #0056b3;
+        background-color: var(--header-bg-color);
         position: absolute;
         top: 40px;
         /* Adjust to align with header */
@@ -157,3 +169,4 @@ li {
         text-align: center;
     }
 }
+
