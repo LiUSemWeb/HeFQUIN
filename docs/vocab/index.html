@@ -6,53 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN - Vocabularies</title>
-    <link rel="stylesheet" href="css/styles.css">
+
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <a href="/">
-                    <img src="./img/hefquin-logo.png" class="logo-icon" alt="HeFQUIN logo">
-                    HeFQUIN
-                </a>
-            </div>
-            <div class="menu-icon" onclick="toggleMenu()">☰</div>
-            <ul class="nav-links">
-                <li><a href="index.html">About</a></li>
-                <li><a href="docs.html">Docs</a></li>
-                <li><a href="javadoc/latest/">Javadoc</a></li>
-                <li><a href="research.html">Research</a></li>
-                <li><a href="vocabs.html">Vocbularies</a></li>
-                <li><a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="header"></div>
 
     <main>
-        <section id="docs" class="section">
+        <section class="section">
             <h2>Vocabularies</h2>
             <p>
-                The following vocabularies are used to describe different configuration aspects of the HeFQUIN engine. 
+                The following vocabularies are used to describe different configuration aspects of the HeFQUIN engine.
             </p>
             <ul>
                 <li>
-                    <a href="http://w3id.org/hefquin/engineconf/latest/">Vocabulary for describing configurations of the HeFQUIN engine</a>
+                    <a href="http://w3id.org/hefquin/engineconf/latest/">
+                        Vocabulary for describing configurations of the HeFQUIN engine
+                    </a>
                 </li>
                 <li>
-                    <a href="http://w3id.org/hefquin/lpg2rdfconf/latest/">Vocabulary for describing LPG-to-RDF configurations</a>
+                    <a href="http://w3id.org/hefquin/lpg2rdfconf/latest/">
+                        Vocabulary for describing LPG-to-RDF configurations
+                    </a>
                 </li>
             </ul>
         </section>
     </main>
 
-    <footer>
-        <p>© 2024 HeFQUIN</p>
-        <p>Linköping University, Sweden.</p>
-    </footer>
-
-    <script src="js/script.js"></script>
+    <div id="footer"></div>
 </body>
 
 </html>

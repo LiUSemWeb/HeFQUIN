@@ -6,59 +6,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN - Research</title>
-    <link rel="stylesheet" href="css/styles.css">
+    
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <a href="/">
-                    <img src="./img/hefquin-logo.png" class="logo-icon" alt="HeFQUIN logo">
-                    HeFQUIN
-                </a>
-            </div>
-            <div class="menu-icon" onclick="toggleMenu()">☰</div>
-            <ul class="nav-links">
-                <li><a href="index.html">About</a></li>
-                <li><a href="docs.html">Docs</a></li>
-                <li><a href="javadoc/latest/">Javadoc</a></li>
-                <li><a href="research.html">Research</a></li>
-                <li><a href="vocabs.html">Vocbularies</a></li>
-                <li><a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="header"></div>
 
     <main>
         <h1>Publications related to HeFQUIN</h1>
         <ul>
-            <li>Sijin Cheng and Olaf Hartig:
-                <a href="https://olafhartig.de/files/ChengHartig_FedQPL_iiWAS2020_Extended.pdf">FedQPL: A Language for
-                    Logical Query Plans over Heterogeneous Federations of RDF Data Sources</a>. In Proceedings of the
-                22nd International Conference on Information Integration and Web-based Applications & Services (iiWAS),
-                2020.</li>
-
-            <li>Sijin Cheng and Olaf Hartig: <a href="https://olafhartig.de/files/ChengHartig_QuWeDa2022.pdf">Source
-                    Selection for SPARQL Endpoints: Fit for Heterogeneous Federations of RDF Data Sources?</a>. In
-                Proceedings of the 6th Workshop on Storing, Querying and Benchmarking Knowledge Graphs (QuWeDa), 2022.
+            <li>
+                Sijin Cheng and Olaf Hartig: <a href="https://olafhartig.de/files/ChengHartig_FedQPL_iiWAS2020_Extended.pdf">FedQPL: A Language for Logical Query Plans over Heterogeneous Federations of RDF Data Sources</a>. In Proceedings of the 22nd International Conference on Information Integration and Web-based Applications & Services (iiWAS), 2020.
             </li>
-            <li>Sijin Cheng and Olaf Hartig: <a href="https://olafhartig.de/files/ChengHartig_CostModel_DMKG2023.pdf">A
-                    Cost Model to Optimize Queries over Heterogeneous Federations of RDF Data Sources</a>. In
-                Proceedings of the 1st International Workshop on Data Management for Knowledge Graphs (DMKG), 2023.</li>
-            <li>Sijin Cheng, Sebastian Ferrada, and Olaf Hartig: <a
-                    href="https://olafhartig.de/files/ChengEtAL_VocabMappings_CoopIS2023.pdf">Considering Vocabulary
-                    Mappings in Query Plans for Federations of RDF Data Sources</a>. In Proceedings of the 29th International Conference on Cooperative Information Systems (CoopIS), 2023.
+
+            <li>
+                Sijin Cheng and Olaf Hartig: <a href="https://olafhartig.de/files/ChengHartig_QuWeDa2022.pdf">Source Selection for SPARQL Endpoints: Fit for Heterogeneous Federations of RDF Data Sources?</a>. In Proceedings of the 6th Workshop on Storing, Querying and Benchmarking Knowledge Graphs (QuWeDa), 2022.
+            </li>
+            <li>
+                Sijin Cheng and Olaf Hartig: <a href="https://olafhartig.de/files/ChengHartig_CostModel_DMKG2023.pdf">A Cost Model to Optimize Queries over Heterogeneous Federations of RDF Data Sources</a>. In Proceedings of the 1st International Workshop on Data Management for Knowledge Graphs (DMKG), 2023.
+            </li>
+            <li>
+                Sijin Cheng, Sebastian Ferrada, and Olaf Hartig: <a href="https://olafhartig.de/files/ChengEtAL_VocabMappings_CoopIS2023.pdf">Considering Vocabulary Mappings in Query Plans for Federations of RDF Data Sources</a>. In Proceedings of the 29th International Conference on Cooperative Information Systems (CoopIS), 2023.
             </li>
         </ul>
     </main>
 
-    <footer>
-        <p>© 2024 HeFQUIN</p>
-        <p>Linköping University, Sweden.</p>
-    </footer>
-
-    <script src="js/script.js"></script>
+    <div id="footer"></div>
 </body>
 
 </html>

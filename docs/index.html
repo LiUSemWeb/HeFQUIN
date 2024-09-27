@@ -6,29 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN</title>
-    <link rel="stylesheet" href="css/style.css">
+
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <a href="index.html">
-                    <img src="./img/hefquin-logo.png" class="logo-icon" alt="HeFQUIN logo">
-                    HeFQUIN
-                </a>
-            </div>
-            <div class="menu-icon" onclick="toggleMenu()">☰</div>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="doc/">Docs</a></li>
-                <li><a href="research/">Research</a></li>
-                <li><a href="vocab/">Vocbularies</a></li>
-                <li><a href="javadoc/latest/">Javadoc</a></li>
-                <li><a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="header"></div>
 
     <main>
         <h1>About HeFQUIN</h1>
@@ -77,12 +62,7 @@
         </ul>
     </main>
 
-    <footer>
-        <p>&copy; 2024 HeFQUIN</p>
-        <p>Linköping University, Sweden.</p>
-    </footer>
-
-    <script src="js/script.js"></script>
+    <div id="footer"></div>
 </body>
 
 </html>
