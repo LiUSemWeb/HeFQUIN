@@ -41,7 +41,8 @@ public class HeFQUINServletTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		HeFQUINServlet.setConfigProperties("config-test.properties");
+		System.setProperty( "hefquin.configuration", "TestEngineConf.ttl" );
+		System.setProperty( "hefquin.federation", "TestFedConf.ttl" );
 		server = TestServer.run( port );
 		httpClient = HttpClients.createDefault();
 		server.start();
