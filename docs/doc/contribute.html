@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting started as a Contributor</title>
+
+    <!-- Prism -->
+    <link href="/css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="/js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="/js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="/js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="/js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="/js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="/css/prism-toolbar.min.css" rel="stylesheet" />
+
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <section class="section">
+            <h1>Getting started as a contributor</h1>
+            <p>
+                HeFQUIN is an open-source project focused on enabling efficient querying over heterogeneous data sources. Developers and users are encouraged to contribute to the project, whether by adding creating new extensions, suggesting new features, fixing bugs, or improving documentation.
+            </p>
+            <p>
+                Please read on if you're interested in contributing!
+            </p>
+        </section>
+
+        <section class="section">
+            <h1>Set up your programming environment</h1>
+            <p>
+                Here's what you have to do to set up your programming environment to work on HeFQUIN.
+            </p>
+            <p>Start by creating a local clone of the HeFQUIN repo using SSH:</p>
+
+            <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
+            
+            or using HTTPS:
+            
+            <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
+
+            <h2>Import the project into your favorite IDE</h2>
+            <ul>
+                <li>
+                    <a href="https://www.eclipse.org/" target="_blank">Eclipse IDE</a>
+                    <ol>
+                        <li>
+                            Start Eclipse and create a new workspace.
+                        </li>
+                        <li>
+                            In the <code>File</code> menu, select <code>Import...</code>.
+                        </li>
+                        <li>
+                            In the <code>Import</code> dialog that pops up, select as import source <code>Maven->Existing Maven Projects</code>.
+                        </li>
+                        <li>
+                            An <code>Import Maven Projects</code> dialog pops up. Click on the button <code>Browse...</code> (next to the <code>Root Directory</code> text field).
+                        </li>
+                        <li>
+                            In the file dialog that pops up now, navigate to the folder into which you have cloned the HeFQUIN git repo and click <code>OK</code>.
+                        </li>
+                        <li>
+                            Now, back in the <code>Import Maven Projects</code> dialog, the file <code>pom.xml</code> should be selected. Click on <code>Finish</code>.
+                        </li>
+                        <li>
+                            If you are still in the Welcome screen of Eclipse, click on <code>Go to Workbench</code>.
+                        </li>
+                    </ol>
+                    <p>
+                        You should now see HeFQUIN as a project in the <code>Project Explorer</code> window.
+                    </p>
+                </li>
+                <li>
+                    <a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a>
+                    <ol>
+                        <li>
+                            Start Visual Studio Code.
+                        </li>
+                        <li>
+                            From the file dialog, open the folder into which you cloned the HeFQUIN
+                            git repo. Visual Studio Code should automatically configure the Maven project.
+                        </li>
+                    </ol>
+                    <p>
+                        You should now see HeFQUIN as a project in the <code>Explorer</code> window.
+                    </p>
+                </li>
+            </ul>
+
+            <h1>Build HeFQUIN using Maven</h1>
+            <p>
+                The HeFQUIN source code is a Maven project. Hence, instead of using Eclipse (or any other IDE for Java),
+                you can also compile and build the project using Maven on the command line. To do this, enter the
+                directory into which you have cloned the HeFQUIN git repo. Next, build the project using the following
+                command:
+            </p>
+            <pre><code class="language-bash">mvn package</code></pre>
+            <p>
+                Assuming the build process completes without errors, you can now directly run the scripts in the
+                <code>bin/</code> directory:
+            </p>
+            <ol>
+                <li>
+                    <code>hefquin</code> - Run a single query via the engine. E.g.:
+                    <pre><code class="language-bash">
+    ./bin/hefquin \
+        --query ../ExampleQuery.rq \
+        --federationDescription ../ExampleFederation.ttl </code></pre>
+                </li>
+                <li>
+                    <code>hefquin-server</code> - Start the engine as a service in an embedded web server (<a
+                        href="http://localhost:8080/">http://localhost:8080/</a>). E.g.:
+                    <pre><code class="language-bash">./bin/hefquin-server</code></pre>
+                </li>
+                <li>
+                    <code>hefquin-pg</code> - Run a SPARQL query over a PG store. E.g.:
+                    <pre><code class="language-bash">
+    ./bin/hefquin-pg \
+        --query ExampleBGP.rq \
+        --lpg2rdfconf ExampleLPG2RDF.ttl \
+        --endpoint http://localhost:7474/db/neo4j/tx \
+        --username neo4j-username \
+        --password neo4j-password
+                        </code></pre>
+                </li>
+                <li>
+                    <code>hefquin-pg</code> - Materialize an RDF view of a PG store. E.g.:
+                    <pre><code class="language-bash">
+    ./bin/hefquin-pgmat \
+        --endpoint http://localhost:7474/db/neo4j/tx \
+        --username neo4j-username \
+        --password neo4j-password
+                        </code></pre>
+                </li>
+            </ol>
+            <p>
+                To see the list of other possible arguments for the command line tools, you may execute the
+                script using the <code>--help</code> argument. E.g.:
+            </p>
+            <pre><code class="language-bash">./bin/hefquin --help</code></pre>
+        </section>
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
