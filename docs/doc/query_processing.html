@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Processing in HeFQUIN</title>
+
+    <script src="/js/mustache.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <section class="section">
+            <h1>Query Processing in HeFQUIN</h1>
+            <p>Queries to be processed by the HeFQUIN engine are SPARQL queries. Given such a query, the query processor component of the engine first invokes the query planner which consists of a source planner and a query optimizer. The purpose of the source planner is to create a logical query plan that presents a source assignment for the given query, and the query optimizer selects a corresponding physical query plan for the logical one, with the aim to find a physical plan based on which the query result can be produced <em>efficiently</em>. Once the query processor component has obtained the selected physical plan, it invokes the plan compiler which converts the physical plan into an executable plan that can then be passed to the query execution component. This component takes care of running the executable plan and having it write the query result to a given result sink from which the result can be consumed.</p>
+            
+            <p>The remainder of this page describes the steps of the whole process and the corresponding types of query plans in more detail, and it also includes pointers to the corresponding components in the source code of HeFQUIN.</p>
+        
+            <h2>Input to the Process</h2>
+            <p>HeFQUIN's query processor component as a whole is captured by an implementation of the <code>QueryProcessor</code> interface. Every SPARQL query to be processed is passed to this component in the form of a <code>SPARQLGraphPattern</code> object, which currently is just a wrapper of an Apache Jena <code>Op</code> object that captures an algebraic representation of the SPARQL query pattern.</p>
+            
+            <p>The query processor passes the given query to its query planner (<code>QueryPlanner</code>) which, in turn, passes it on to the source planner (<code>SourcePlanner</code>). The purpose of the source planner would be to produce a logical query plan that presents a source assignment for the given query. However, the source planner is not actually implemented yet and, instead, we assume that the source assignment is already specified in the given queries by means of the SERVICE feature of SPARQL. Therefore, the only task of the source planner for the moment is to create a logical plan, which is currently implemented in the <code>SourcePlannerImpl</code> class.</p>
+        
+            <h2>Logical Plans and Source Assignments</h2>
+            <p>Logical query plans are captured by the <code>LogicalPlan</code> interface and consist of <a href="logical_operators.html">logical operators</a>.</p>
+        
+            <p>Each such logical plan has a root operator, which can be one of the operators defined by our FedQPL language (see our <a href="http://olafhartig.de/files/ChengHartig_FedQPL_iiWAS2020_Extended.pdf">FedQPL paper</a> for the details). The main interface for these operators is called <code>LogicalOperator</code> and some of implementing classes are <code>LogicalOpRequest</code>, <code>LogicalOpTPAdd</code>, <code>LogicalOpBGPAdd</code>, <code>LogicalOpJoin</code>, <code>LogicalOpUnion</code>, <code>LogicalOpMultiwayJoin</code>, and <code>LogicalOpMultiwayUnion</code> (the latter two represent operators to join/union multiple inputs, not just two).</p>
+        
+            <p>Additionally, logical plans may have subplans where each of them represents a logical plan to produce the intermediate result that is one of the inputs to the root operator. Consequently, the number of subplans that a logical plan has depends on the arity of the root operator and, thus, we distinguish the following subtypes of the <code>LogicalPlan</code> interface: <code>LogicalPlanWithNullaryRoot</code>, <code>LogicalPlanWithUnaryRoot</code>, <code>LogicalPlanWithBinaryRoot</code>, and <code>LogicalPlanWithNaryRoot</code>.</p>
+        
+            <h2>Physical Plans and Query Optimization</h2>
+            <p>Physical query plans are captured by the <code>PhysicalPlan</code> interface and, exactly as described for the logical plans, each physical plan has a root operator and may have subplans.</p>
+        
+            <p>The main interface for the <a href="./physical_operators.html">physical operators</a> in this case is the <code>PhysicalOperator</code> interface. In contrast to the logical operators, each type of physical operator has a concrete algorithm for producing its output from its input(s). This algorithm is captured in the form of an <code>ExecutableOperator</code> that can be obtained via the <code>createExecOp</code> method of the <code>PhysicalOperator</code> interface and that will be used when creating an executable plan (see below).</p>
+        
+            <p>While, in principle, there does not need to be a direct mapping between the physical operators and the logical operators for which they are used, in HeFQUIN at the moment we only have physical operators that map directly to one of the logical operators (which we have captured by means of a sub-interface called <code>PhysicalOperatorForLogicalOperator</code>). The actual mapping from the logical operators to the respective <em>default</em> type of physical operator is implemented in a helper class called <code>LogicalToPhysicalOpConverter</code>. Another relevant helper class in this context is <code>PhysicalPlanFactory</code> which provides convenience methods for creating physical plans based on any given logical operator; this includes methods not only for creating physical plans with the corresponding default physical operator as root, but also for physical plans with any other possible physical operator as root. Finally, the conversion of a complete logical plan into a corresponding physical plan is provided by an implementation of the <code>LogicalToPhysicalPlanConverter</code> interface, which uses the <code>PhysicalPlanFactory</code> with the default mapping options.</p>
+        
+            <p><strong>TODO:</strong> Refer to the different optimizers (implementations of the <code>QueryOptimizer</code> interface) and emphasize that many of them rely on a cost model (see the <code>CostModel</code> interface) and on rewriting rules (see the <code>RewritingRule</code> interface and the collection of rewriting rules that we currently have in the <code>RuleInstances</code> class).</p>
+        
+            <h2>Executable Plans</h2>
+            <p><strong>TODO:</strong> Refer to the plan compiler (<code>QueryPlanCompiler</code>), executable plans and executable operators (relevant interfaces: <code>ExecutablePlan</code> and <code>ExecutableOperator</code>), and the query execution component (<code>ExecutionEngine</code>).</p>
+            
+        </section>
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
