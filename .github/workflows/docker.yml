@@ -3,7 +3,7 @@ name: Build and Publish Docker image to GHCR
 on:
   workflow_dispatch: # allows manual triggers via the GitHub UI
   release:
-    types: [published]
+    types: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
