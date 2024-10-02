@@ -169,3 +169,7 @@ li {
     }
 }
 
+/* Make prism code boxes more compact */
+pre[class*="language-"] {
+    padding: 0.5em !important;
+}
