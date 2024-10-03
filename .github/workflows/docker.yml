@@ -45,8 +45,8 @@ jobs:
           echo "$tags" | while read -r tag; do
             echo "Adding tag: $tag"
             docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
-         done
-fi
+          done
+        fi
 
     # Push the Docker image to GitHub Container Registry (GHCR)
     - name: Push Docker image to GHCR
