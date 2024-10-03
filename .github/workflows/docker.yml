@@ -31,10 +31,13 @@ jobs:
     - name: Build Docker image
       run: |
         cd hefquin-docker/
-        docker build -t ghcr.io/liusemweb/hefquin:dev .
-        # TODO: Identify tags from commit and loop through these tags and add to the image
-        # docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:v1.0.0
-    
+        docker build -t ghcr.io/liusemweb/hefquin:latest .
+        # Get the tags for the current commit and add to image
+        tags=$(git tag --points-at HEAD)
+        for tag in $tags; do
+          docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
+        done
+
     # Push the Docker image to GitHub Container Registry (GHCR)
     - name: Push Docker image to GHCR
       run: |
