@@ -32,6 +32,7 @@ jobs:
         cd hefquin-docker/
         docker build -t ghcr.io/liusemweb/hefquin:latest .
         # Get the tags for the current commit and add to image
+        echo "Find tags"
         tags=$(git tag --points-at HEAD)
         for tag in $tags; do
           echo "Adding tag: " $tag
