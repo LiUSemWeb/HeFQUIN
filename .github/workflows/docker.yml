@@ -34,6 +34,8 @@ jobs:
       run: |
         cd hefquin-docker/
         git fetch --tags
+        git log --oneline --decorate
+        git show
         docker build -t ghcr.io/liusemweb/hefquin:latest .
         # Get the tags for the current commit and add to image
         echo "Find tags"
@@ -42,8 +44,9 @@ jobs:
         if [ -z "$tags" ]; then
           echo "No tags found for the current commit."
         else
-          # Loop through the tags line by line
-          echo "$tags" | while read -r tag; do
+          # Loop tags
+          tags=$(git tag --points-at HEAD)
+          for tag in $tags; do
             echo "Adding tag: $tag"
             docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
           done
