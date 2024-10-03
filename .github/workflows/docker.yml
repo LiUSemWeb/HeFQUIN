@@ -17,10 +17,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # This ensures a full history is fetched, not just a shallow clone
+        fetch-depth: 0  # This ensures a full history is fetched
 
-    # Fetch all tags if the repository is shallow
-    - name: Fetch tags if needed
+    # Fetch all tags
+    - name: Fetch tags
       run: |
         git fetch --prune --tags
   
@@ -45,20 +45,18 @@ jobs:
       run: |
         cd hefquin-docker/
         docker build -t ghcr.io/liusemweb/hefquin:latest .
+    
+    - name: Tag and push Docker image
+      run: |
         # Get the tags for the current commit and add to image
-        echo "Adding tags"
         tags=$(git tag --points-at HEAD)
-        # Check if there are any tags
-        if [ -z "$tags" ]; then
-          echo "No tags found for the current commit."
-        else
-          # Loop tags
-          tags=$(git tag --points-at HEAD)
-          for tag in $tags; do
-            echo "Adding tag: $tag"
-            docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
-          done
-        fi
+        git tag --list
+        # Loop tags
+        tags=$(git tag --points-at HEAD)
+        for tag in $tags; do
+          echo "Adding tag: $tag"
+          docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
+        done
 
     # Push the Docker image to GitHub Container Registry (GHCR)
     - name: Push Docker image to GHCR
