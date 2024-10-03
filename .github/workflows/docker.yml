@@ -37,10 +37,16 @@ jobs:
         # Get the tags for the current commit and add to image
         echo "Find tags"
         tags=$(git tag --points-at HEAD)
-        for tag in $tags; do
-          echo "Adding tag: " $tag
-          docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
-        done
+        # Check if there are any tags
+        if [ -z "$tags" ]; then
+          echo "No tags found for the current commit."
+        else
+          # Loop through the tags line by line
+          echo "$tags" | while read -r tag; do
+            echo "Adding tag: $tag"
+            docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
+         done
+fi
 
     # Push the Docker image to GitHub Container Registry (GHCR)
     - name: Push Docker image to GHCR
