@@ -34,6 +34,7 @@ jobs:
         # Get the tags for the current commit and add to image
         tags=$(git tag --points-at HEAD)
         for tag in $tags; do
+          echo "Adding tag: " $tag
           docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:$tag
         done
 
