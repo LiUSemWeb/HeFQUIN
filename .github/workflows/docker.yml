@@ -15,10 +15,19 @@ jobs:
     steps:
     # Checkout the repository
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-        fetch-tags: true
+        fetch-depth: 0  # This ensures a full history is fetched, not just a shallow clone
+
+    # Fetch all tags
+    - name: Fetch all tags
+      run: |
+        git fetch --prune --unshallow --tags
+        echo "Exit code for fetch: $?"
+        
+        # List all the tags to confirm they are fetched
+        echo "Listing all tags:"
+        git tag --list
 
     # Set up Docker Buildx for cross-platform builds (optional but recommended)
     - name: Set up Docker Buildx
