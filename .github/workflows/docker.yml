@@ -31,7 +31,7 @@ jobs:
     - name: Build Docker image
       run: |
         cd hefquin-docker/
-        docker build -t ghcr.io/liusemweb/hefquin:latest .
+        docker build -t ghcr.io/liusemweb/hefquin:dev .
         # TODO: Identify tags from commit and loop through these tags and add to the image
         # docker tag ghcr.io/liusemweb/hefquin:latest ghcr.io/liusemweb/hefquin:v1.0.0
     
