@@ -33,6 +33,7 @@ jobs:
     - name: Build Docker image
       run: |
         cd hefquin-docker/
+        git fetch --tags
         docker build -t ghcr.io/liusemweb/hefquin:latest .
         # Get the tags for the current commit and add to image
         echo "Find tags"
