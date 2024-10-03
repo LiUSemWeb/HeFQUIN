@@ -49,8 +49,8 @@ jobs:
     - name: Tag and push Docker image
       run: |
         # Get the tags for the current commit and add to image
-        tags=$(git tag --points-at HEAD)
         git tag --list
+        git log --oneline --decorate
         # Loop tags
         tags=$(git tag --points-at HEAD)
         for tag in $tags; do
