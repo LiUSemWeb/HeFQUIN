@@ -15,7 +15,10 @@ jobs:
     steps:
     # Checkout the repository
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     # Set up Docker Buildx for cross-platform builds (optional but recommended)
     - name: Set up Docker Buildx
@@ -33,12 +36,9 @@ jobs:
     - name: Build Docker image
       run: |
         cd hefquin-docker/
-        git fetch --tags
-        git log --oneline --decorate
-        git show
         docker build -t ghcr.io/liusemweb/hefquin:latest .
         # Get the tags for the current commit and add to image
-        echo "Find tags"
+        echo "Adding tags"
         tags=$(git tag --points-at HEAD)
         # Check if there are any tags
         if [ -z "$tags" ]; then
