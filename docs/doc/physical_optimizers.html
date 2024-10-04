@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cost Based Physical Query Optimizers</title>
 
-    <script src="/js/mustache.min.js"></script>
-    <script src="/js/script.js"></script>
-    <link rel="stylesheet" href="/css/style.css">
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -18,22 +18,22 @@
     <main>
         <section class="section">
             <h1>Cost Based Physical Query Optimizers</h1>
-            <p>HeFQUIN comes with several cost-based query optimizers for its physical plans. The relevant source code can be found in the <a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/package-summary.html">se.liu.ida.hefquin.engine.queryproc.impl.poptimizer</a> package and its sub-packages.</p>
+            <p>HeFQUIN comes with several cost-based query optimizers for its physical plans. The relevant source code can be found in the <a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/package-summary.html">se.liu.ida.hefquin.engine.queryproc.impl.poptimizer</a> package and its sub-packages.</p>
             
             <p>Physical optimizers that are currently implemented:</p>
             <ul>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/SimulatedAnnealing.html">SimulatedAnnealing (simulated annealing-based join optimizer)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/IterativeImprovementBasedQueryOptimizer.html">IterativeImprovementBasedQueryOptimizer (randomized iterative improvement-based join optimizer)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/TwoPhaseQueryOptimizer.html">TwoPhaseQueryOptimizer (two-phase join optimizer that combines iterative improvement and simulated annealing)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/evolutionaryAlgorithm/EvolutionaryAlgorithmQueryOptimizer.html">EvolutionaryAlgorithmQueryOptimizer</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/SimulatedAnnealing.html">SimulatedAnnealing (simulated annealing-based join optimizer)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/IterativeImprovementBasedQueryOptimizer.html">IterativeImprovementBasedQueryOptimizer (randomized iterative improvement-based join optimizer)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/randomized/TwoPhaseQueryOptimizer.html">TwoPhaseQueryOptimizer (two-phase join optimizer that combines iterative improvement and simulated annealing)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/evolutionaryAlgorithm/EvolutionaryAlgorithmQueryOptimizer.html">EvolutionaryAlgorithmQueryOptimizer</a></li>
 
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/CardinalityBasedGreedyJoinPlanOptimizerImpl.html">CardinalityBasedGreedyJoinPlanOptimizerImpl</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/CostModelBasedGreedyJoinPlanOptimizerImpl.html">CostModelBasedGreedyJoinPlanOptimizerImpl</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedBushyJoinPlanOptimizer.html">DPBasedBushyJoinPlanOptimizer</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedJoinPlanOptimizer.html">DPBasedJoinPlanOptimizer</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedLinearJoinPlanOptimizer.html">DPBasedLinearJoinPlanOptimizer</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/RandomizedJoinPlanOptimizerImpl.html">RandomizedJoinPlanOptimizerImpl</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/SimpleJoinOrderingQueryOptimizer.html">SimpleJoinOrderingQueryOptimizer</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/CardinalityBasedGreedyJoinPlanOptimizerImpl.html">CardinalityBasedGreedyJoinPlanOptimizerImpl</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/CostModelBasedGreedyJoinPlanOptimizerImpl.html">CostModelBasedGreedyJoinPlanOptimizerImpl</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedBushyJoinPlanOptimizer.html">DPBasedBushyJoinPlanOptimizer</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedJoinPlanOptimizer.html">DPBasedJoinPlanOptimizer</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/DPBasedLinearJoinPlanOptimizer.html">DPBasedLinearJoinPlanOptimizer</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/RandomizedJoinPlanOptimizerImpl.html">RandomizedJoinPlanOptimizerImpl</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryproc/impl/poptimizer/simple/SimpleJoinOrderingQueryOptimizer.html">SimpleJoinOrderingQueryOptimizer</a></li>
             </ul>
               
         </section>

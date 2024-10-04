@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logical Operators</title>
 
-    <script src="/js/mustache.min.js"></script>
-    <script src="/js/script.js"></script>
-    <link rel="stylesheet" href="/css/style.css">
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -19,39 +19,39 @@
         <section class="section">
             <h1>Logical Operators</h1>
         
-            <p>Logical plans of HeFQUIN are FedQPL expressions<sup><a href="#1">[1]</a></sup>. Hence, the logical operators that HeFQUIN uses are the FedQPL operators. The main interface for these operators is called <a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/LogicalOperator.html">LogicalOperator</a>. Their implementations can be found in the <a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/package-summary.html">se.liu.ida.hefquin.engine.queryplan.logical.impl</a> package and include:</p>
+            <p>Logical plans of HeFQUIN are FedQPL expressions<sup><a href="#1">[1]</a></sup>. Hence, the logical operators that HeFQUIN uses are the FedQPL operators. The main interface for these operators is called <a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/LogicalOperator.html">LogicalOperator</a>. Their implementations can be found in the <a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/package-summary.html">se.liu.ida.hefquin.engine.queryplan.logical.impl</a> package and include:</p>
         
-            <h2><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/NullaryLogicalOp.html">Nullary Operators</a></h2>
+            <h2><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/NullaryLogicalOp.html">Nullary Operators</a></h2>
             <ul>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpRequest.html">LogicalOpRequest (req)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpRequest.html">LogicalOpRequest (req)</a></li>
             </ul>
         
-            <h2><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/UnaryLogicalOp.html">Unary Operators</a></h2>
+            <h2><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/UnaryLogicalOp.html">Unary Operators</a></h2>
             <ul>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpTPAdd.html">LogicalOpTPAdd (tpAdd)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpTPOptAdd.html">LogicalOpTPOptAdd (tpOptAdd)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpBGPAdd.html">LogicalOpBGPAdd (bgpAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpTPAdd.html">LogicalOpTPAdd (tpAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpTPOptAdd.html">LogicalOpTPOptAdd (tpOptAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpBGPAdd.html">LogicalOpBGPAdd (bgpAdd)</a></li>
 
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpBGPOptAdd.html">LogicalOpBGPOptAdd (bgpOptAdd)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGPAdd.html">LogicalOpGPAdd (gpAdd)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGPOptAdd.html">LogicalOpGPOptAdd (gpOptAdd)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpFilter.html">LogicalOpFilter (filter)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGlobalToLocal.html">LogicalOpGlobalToLocal (g2l)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpLocalToGlobal.html">LogicalOpLocalToGlobal (l2g)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpBGPOptAdd.html">LogicalOpBGPOptAdd (bgpOptAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGPAdd.html">LogicalOpGPAdd (gpAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGPOptAdd.html">LogicalOpGPOptAdd (gpOptAdd)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpFilter.html">LogicalOpFilter (filter)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpGlobalToLocal.html">LogicalOpGlobalToLocal (g2l)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpLocalToGlobal.html">LogicalOpLocalToGlobal (l2g)</a></li>
             </ul>
         
-            <h2><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/BinaryLogicalOp.html">Binary Operators</a></h2>
+            <h2><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/BinaryLogicalOp.html">Binary Operators</a></h2>
             <ul>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpJoin.html">LogicalOpJoin (join)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpRightJoin.html">LogicalOpRightJoin (rightjoin)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpUnion.html">LogicalOpUnion (union)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpJoin.html">LogicalOpJoin (join)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpRightJoin.html">LogicalOpRightJoin (rightjoin)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpUnion.html">LogicalOpUnion (union)</a></li>
             </ul>
         
-            <h2><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/NaryLogicalOp.html">N-ary Operators</a></h2>
+            <h2><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/NaryLogicalOp.html">N-ary Operators</a></h2>
             <ul>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayJoin.html">LogicalOpMultiwayJoin (mj)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayLeftJoin.html">LogicalOpMultiwayLeftJoin (mlj)</a></li>
-                <li><a href="/javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayUnion.html">LogicalOpMultiwayUnion (mu)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayJoin.html">LogicalOpMultiwayJoin (mj)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayLeftJoin.html">LogicalOpMultiwayLeftJoin (mlj)</a></li>
+                <li><a href="../javadoc/latest/se/liu/ida/hefquin/engine/queryplan/logical/impl/LogicalOpMultiwayUnion.html">LogicalOpMultiwayUnion (mu)</a></li>
             </ul>
         
             <p><sup id="1">[1]</sup> Sijin Cheng and Olaf Hartig: <a href="http://olafhartig.de/files/ChengHartig_FedQPL_iiWAS2020_Extended.pdf">FedQPL: A Language for Logical Query Plans over Heterogeneous Federations of RDF Data Sources</a>. In Proceedings of the 22nd International Conference on Information Integration and Web-based Applications &amp; Services (iiWAS), 2020.</p>

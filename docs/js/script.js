@@ -1,14 +1,14 @@
 // Run when DOM is fully loaded
 window.onload = () => {
     relPath = getRelPath();
+    console.log(relPath)
     renderTemplates(relPath);
-    trimCode();
 };
 
 // Function to get relative path (used to find assets)
 function getRelPath(){
     const basePath = window.location.pathname;
-    const depth = window.location.pathname.split('/').length - 2;
+    const depth = window.location.pathname.split('/').length - 3;
     return './' + '../'.repeat(depth);
 }
 
@@ -36,20 +36,6 @@ async function renderTemplates() {
     const footerTemplate = await loadTemplate(`${relPath}/templates/footer.mustache`);
     const renderedFooter = Mustache.render(footerTemplate, {});
     document.getElementById('footer').innerHTML = renderedFooter;
-}
-
-// Trim whitespaces around code blocks.
-function trimCode(){
-    // Select all <code> elements inside <pre> blocks
-    const codeBlocks = document.querySelectorAll('pre code');
-
-    // Loop through each code block and trim the content
-    codeBlocks.forEach((block) => {
-        block.textContent = block.textContent.trim();
-    });
-
-    // Re-apply Prism syntax highlighting
-    Prism.highlightAll();
 }
 
 
