@@ -5,7 +5,7 @@ name: Maven Package
 on:
   push:
     branches:
-      - main
+      - 365-publish-maven-dependency
   #release:
   #  types: [publish]
 
