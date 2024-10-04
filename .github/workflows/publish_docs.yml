@@ -30,10 +30,9 @@ jobs:
             exit 1
           fi
           rm -rf docs/javadoc/"$project_version" 2>/dev/null
+          rm -rf docs/javadoc/latest 2>/dev/null
           cp -r target/reports/"$project_version"/apidocs docs/javadoc/"$project_version"
-          template=$(<docs-scripts/latest-template.html)
-          output="${template//\{project_version\}/$project_version}"
-          echo -e "$output" > docs/javadoc/latest/index.html
+          cp -r target/reports/"$project_version"/apidocs docs/javadoc/latest
       
       - name: install python packages
         run: pip install -r ./docs-scripts/requirements.txt
