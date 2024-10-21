@@ -43,7 +43,7 @@
   <scm>
     <connection>scm:git:git://github.com/LiUSemWeb/HeFQUIN.git</connection>
     <developerConnection>scm:git:ssh://github.com:LiUSemWeb/HeFQUIN.git</developerConnection>
-    <url>http://github.com/LiUSemWeb/HeFQUIN/tree/main</url>
+    <url>https://github.com/LiUSemWeb/HeFQUIN</url>
   </scm>
 
   <!-- Properties -->
