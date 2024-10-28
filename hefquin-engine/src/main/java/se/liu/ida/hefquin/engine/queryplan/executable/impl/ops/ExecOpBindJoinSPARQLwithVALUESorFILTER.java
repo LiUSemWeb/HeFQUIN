@@ -11,25 +11,31 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-
 /**
- * Version of the VALUES-based bind join algorithm that can fall back to FILTER
+ * Implementation of (a batching version of) the bind join algorithm that starts by
+ * using a VALUES clause exactly as done by {@link ExecOpBindJoinSPARQLwithVALUES}.
+ * If this fails for the first request, the implementation repeats the request by
+ * using FILTERs as done by {@link ExecOpBindJoinSPARQLwithFILTER} and, then,
+ * continues using the FILTER-based approach for the rest of the requests. If the
+ * first VALUES-based request succeeds, however, then the implementation continues
+ * using the VALUES-based approach for the rest of the requests. 
  */
 public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoinSPARQL {
 
-	BaseForExecOpBindJoinSPARQL currentInstance;
+	// will be initialized when processing the first input block of solution mappings
+	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
 	
 	
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER(	final TriplePattern query, 
-													final SPARQLEndpoint fm, 
-													final boolean useOuterJoinSemantics,
-													final boolean collectExceptions) {
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final TriplePattern query, 
+	                                               final SPARQLEndpoint fm,
+	                                               final boolean useOuterJoinSemantics,
+	                                               final boolean collectExceptions ) {
 		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 
 	@Override
-	protected void _process(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt)
+	protected void _process( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
 		
 		//If this is the first request
@@ -38,25 +44,15 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 				// Try using VALUES-based bind join
 				currentInstance= new ExecOpBindJoinSPARQLwithVALUES (this.query, this.fm, false);
 				currentInstance.process(input, sink, execCxt);
-			} catch (Exception e ) {
+			} catch ( final ExecOpExecutionException e ) {
 				// Use FILTER-based bind join instead
-				try {
-					currentInstance = new ExecOpBindJoinSPARQLwithFILTER(this.query, this.fm , currentInstance.useOuterJoinSemantics, this.collectExceptions);
-					currentInstance.process(input, sink, execCxt);
-				} catch (Exception filterException ) {
-					throw filterException;
-				}
-				
+				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
+				currentInstance.process(input, sink, execCxt);
 			}
 		
 		}
 		else {
-			try {
-				currentInstance.process(input, sink, execCxt);
-			} catch (Exception e ) {
-				throw e;
-			}
-			
+			currentInstance.process(input, sink, execCxt);
 		}
 	}
 
@@ -68,7 +64,7 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator(Iterable<SolutionMapping> solMaps) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps) {
 		return currentInstance.createExecutableRequestOperator(solMaps);
 	}
 }
