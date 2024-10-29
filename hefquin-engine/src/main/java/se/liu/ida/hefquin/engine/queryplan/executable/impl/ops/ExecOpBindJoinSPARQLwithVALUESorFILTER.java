@@ -40,15 +40,21 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		
 		//If this is the first request
 		if (currentInstance == null) {
+			currentInstance= new ExecOpBindJoinSPARQLwithVALUES (this.query, this.fm, collectExceptions);
 			try {
 				// Try using VALUES-based bind join
-				currentInstance= new ExecOpBindJoinSPARQLwithVALUES (this.query, this.fm, false);
 				currentInstance.process(input, sink, execCxt);
+				if (!currentInstance.getExceptionsCaughtDuringExecution().isEmpty()) {
+					// Use FILTER-based bind join instead
+					currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
+					currentInstance.process(input, sink, execCxt);
+				}	
 			} catch ( final ExecOpExecutionException e ) {
 				// Use FILTER-based bind join instead
 				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
 				currentInstance.process(input, sink, execCxt);
 			}
+
 		
 		}
 		else {
