@@ -23,8 +23,6 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 
 	// will be initialized when processing the first input block of solution mappings
 	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
-	boolean valuesBasedRequestFailed;
-	
 	
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final TriplePattern query, 
 	                                               final SPARQLEndpoint fm,
@@ -41,7 +39,7 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		//If this is the first request
 		if (currentInstance == null) {
 			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, collectExceptions);
-			valuesBasedRequestFailed = false;
+			boolean valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
 				currentInstance.process(input, sink, execCxt);
@@ -62,23 +60,16 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		}
 	}
 
-	
 	@Override
 	public List<Exception> getExceptionsCaughtDuringExecution() {
 		return currentInstance.getExceptionsCaughtDuringExecution();
 	}
 
-
-    @Override
-    protected void _concludeExecution(
-            final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt ) {
-    	if (currentInstance!= null) {
-    		 try {
-				currentInstance.concludeExecution(sink, execCxt);
-			} catch (ExecOpExecutionException e) {
-				e.printStackTrace();
-			}
-    	}
-    }
+	@Override
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		if ( currentInstance != null ) {
+			currentInstance.concludeExecution(sink, execCxt);
+		}
+	}
 }
