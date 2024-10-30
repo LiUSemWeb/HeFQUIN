@@ -40,7 +40,7 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		
 		//If this is the first request
 		if (currentInstance == null) {
-			currentInstance= new ExecOpBindJoinSPARQLwithVALUES (this.query, this.fm, collectExceptions);
+			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, collectExceptions);
 			try {
 				// Try using VALUES-based bind join
 				currentInstance.process(input, sink, execCxt);
@@ -54,8 +54,6 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
 				currentInstance.process(input, sink, execCxt);
 			}
-
-		
 		}
 		else {
 			currentInstance.process(input, sink, execCxt);
