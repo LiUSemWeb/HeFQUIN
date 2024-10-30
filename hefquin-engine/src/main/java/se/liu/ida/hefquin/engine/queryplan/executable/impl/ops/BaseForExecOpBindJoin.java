@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -41,7 +42,7 @@ public abstract class BaseForExecOpBindJoin<QueryType extends Query,
     @Override
     protected void _concludeExecution(
             final IntermediateResultElementSink sink,
-            final ExecutionContext execCxt )
+            final ExecutionContext execCxt ) throws ExecOpExecutionException
     {
         // nothing to be done here
     }
