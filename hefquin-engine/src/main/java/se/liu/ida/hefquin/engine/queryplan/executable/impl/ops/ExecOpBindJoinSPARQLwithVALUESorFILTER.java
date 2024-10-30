@@ -2,13 +2,12 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -20,17 +19,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * first VALUES-based request succeeds, however, then the implementation continues
  * using the VALUES-based approach for the rest of the requests. 
  */
-public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoinSPARQL {
+public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoin<SPARQLGraphPattern, SPARQLEndpoint> {
 
 	// will be initialized when processing the first input block of solution mappings
 	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
+	boolean valuesBasedRequestFailed;
 	
 	
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final TriplePattern query, 
 	                                               final SPARQLEndpoint fm,
 	                                               final boolean useOuterJoinSemantics,
 	                                               final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
+		super(query, fm, collectExceptions);
 	}
 
 
@@ -41,17 +41,19 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		//If this is the first request
 		if (currentInstance == null) {
 			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, collectExceptions);
+			valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
 				currentInstance.process(input, sink, execCxt);
 				if (!currentInstance.getExceptionsCaughtDuringExecution().isEmpty()) {
-					// Use FILTER-based bind join instead
-					currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
-					currentInstance.process(input, sink, execCxt);
+					valuesBasedRequestFailed = true;
 				}	
 			} catch ( final ExecOpExecutionException e ) {
+				valuesBasedRequestFailed = true;
+			}
+			if (valuesBasedRequestFailed == true) {
 				// Use FILTER-based bind join instead
-				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
+				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, currentInstance.useOuterJoinSemantics, collectExceptions);
 				currentInstance.process(input, sink, execCxt);
 			}
 		}
@@ -67,8 +69,16 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	}
 
 
-	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps) {
-		return currentInstance.createExecutableRequestOperator(solMaps);
-	}
+    @Override
+    protected void _concludeExecution(
+            final IntermediateResultElementSink sink,
+            final ExecutionContext execCxt ) {
+    	if (currentInstance!= null) {
+    		 try {
+				currentInstance.concludeExecution(sink, execCxt);
+			} catch (ExecOpExecutionException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
 }
