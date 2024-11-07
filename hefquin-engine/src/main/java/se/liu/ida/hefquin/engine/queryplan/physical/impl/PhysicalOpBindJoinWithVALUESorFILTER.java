@@ -25,15 +25,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingleInputJoin
 {
-
 	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpTPAdd lop ) {
 		super(lop);
-		assert lop.getFederationMember() instanceof SPARQLEndpoint;
-	}
-
-	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpTPOptAdd lop ) {
-		super(lop);
-
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
@@ -48,32 +41,24 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 	                                       final ExpectedVariables... inputVars ) {
 		final TriplePattern pt;
 		final FederationMember fm;
-		final boolean useOuterJoinSemantics;
 
 		if ( lop instanceof LogicalOpTPAdd ) {
 			pt = ( (LogicalOpTPAdd) lop ).getTP();
 			fm = ( (LogicalOpTPAdd) lop ).getFederationMember();
-			useOuterJoinSemantics = false;
-		}
-		else if ( lop instanceof LogicalOpTPOptAdd ) {
-			pt = ( (LogicalOpTPOptAdd) lop ).getTP();
-			fm = ( (LogicalOpTPOptAdd) lop ).getFederationMember();
-			useOuterJoinSemantics = true;
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 		}
 
-		return createExecOp(pt, fm, useOuterJoinSemantics, collectExceptions);
+		return createExecOp(pt, fm, collectExceptions);
 	}
 	
 	
 	protected UnaryExecutableOp createExecOp( final TriplePattern pattern,
-            final FederationMember fm,
-            final boolean useOuterJoinSemantics,
-            final boolean collectExceptions ) {
+	                                          final FederationMember fm,
+	                                          final boolean collectExceptions ) {
 		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithVALUESorFILTER(pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			return new ExecOpBindJoinSPARQLwithVALUESorFILTER(pattern, (SPARQLEndpoint) fm, collectExceptions );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
