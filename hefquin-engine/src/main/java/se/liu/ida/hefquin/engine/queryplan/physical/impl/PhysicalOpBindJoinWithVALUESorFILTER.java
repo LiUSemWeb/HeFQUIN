@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPA
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -51,12 +50,20 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final ExpectedVariables... inputVars ) {
-		final TriplePattern pt;
+		final SPARQLGraphPattern pt;
 		final FederationMember fm;
 
 		if ( lop instanceof LogicalOpTPAdd ) {
 			pt = ( (LogicalOpTPAdd) lop ).getTP();
 			fm = ( (LogicalOpTPAdd) lop ).getFederationMember();
+		}
+		else if ( lop instanceof LogicalOpBGPAdd ) {
+			pt = ( (LogicalOpBGPAdd) lop ).getBGP();
+			fm = ( (LogicalOpBGPAdd) lop ).getFederationMember();
+		}
+		else if ( lop instanceof LogicalOpGPAdd ) {
+			pt = ( (LogicalOpGPAdd) lop ).getPattern();
+			fm = ( (LogicalOpGPAdd) lop ).getFederationMember();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
@@ -66,7 +73,7 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 	}
 	
 	
-	protected UnaryExecutableOp createExecOp( final TriplePattern pattern,
+	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
 	                                          final FederationMember fm,
 	                                          final boolean collectExceptions ) {
 		if ( fm instanceof SPARQLEndpoint )

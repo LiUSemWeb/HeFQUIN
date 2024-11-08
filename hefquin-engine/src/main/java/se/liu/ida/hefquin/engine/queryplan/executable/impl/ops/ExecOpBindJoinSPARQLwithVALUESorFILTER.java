@@ -1,7 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.List;
-
+import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -29,7 +29,18 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	                                               final boolean collectExceptions ) {
 		super(query, fm, collectExceptions);
 	}
-
+	
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final BGP query, 
+			                                       final SPARQLEndpoint fm,
+			                                       final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
+	}
+	
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query, 
+			                                       final SPARQLEndpoint fm,
+			                                       final boolean collectExceptions ) {
+		super(query, fm, collectExceptions);
+	}
 
 	@Override
 	protected void _process( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt )
