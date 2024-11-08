@@ -26,7 +26,6 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final TriplePattern query, 
 	                                               final SPARQLEndpoint fm,
-	                                               final boolean useOuterJoinSemantics,
 	                                               final boolean collectExceptions ) {
 		super(query, fm, collectExceptions);
 	}
