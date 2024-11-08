@@ -30,15 +30,15 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 		super(query, fm, collectExceptions);
 	}
 	
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final BGP query, 
-			                                       final SPARQLEndpoint fm,
-			                                       final boolean collectExceptions ) {
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final BGP query,
+	                                               final SPARQLEndpoint fm,
+	                                               final boolean collectExceptions ) {
 		super(query, fm, collectExceptions);
 	}
 	
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query, 
-			                                       final SPARQLEndpoint fm,
-			                                       final boolean collectExceptions ) {
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
+	                                               final SPARQLEndpoint fm,
+	                                               final boolean collectExceptions ) {
 		super(query, fm, collectExceptions);
 	}
 
