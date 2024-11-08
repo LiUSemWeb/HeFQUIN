@@ -31,15 +31,14 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
+
 	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpBGPAdd lop ) {
 		super(lop);
-
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
 	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
-
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
