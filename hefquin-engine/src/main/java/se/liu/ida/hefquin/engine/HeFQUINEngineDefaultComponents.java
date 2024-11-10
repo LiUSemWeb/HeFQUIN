@@ -43,7 +43,7 @@ public class HeFQUINEngineDefaultComponents
 	}
 
 	public static String getDefaultConfigurationDescription() {
-		return "PREFIX ec:  <http://www.example.org/se/liu/ida/hefquin/engineconf#>" + System.lineSeparator()
+		return "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
 		     + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
 		     + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
 		     + System.lineSeparator()
