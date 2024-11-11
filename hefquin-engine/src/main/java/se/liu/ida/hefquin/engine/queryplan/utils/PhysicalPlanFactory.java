@@ -128,6 +128,15 @@ public class PhysicalPlanFactory
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
 		return createPlan(pop, subplan);
 	}
+	
+	/**
+	 * Creates a plan with a bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpTPAdd lop,
+	                                                                 final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
+		return createPlan(pop, subplan);
+	}
 
 	/**
 	 * Creates a plan with an index nested loops join as root operator.
@@ -175,6 +184,15 @@ public class PhysicalPlanFactory
 	}
 
 	/**
+	 * Creates a plan with a bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpBGPAdd lop,
+	                                                                 final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
 	 * Creates a plan with an index nested loops join as root operator.
 	 */
 	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpGPAdd lop,
@@ -207,6 +225,15 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpGPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
+	 * Creates a plan with a VALUES-based bind join that can switch to FILTER-based bind join as root operator.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpGPAdd lop,
+	                                                                 final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -248,6 +275,9 @@ public class PhysicalPlanFactory
 		}
 		else if ( PhysicalOpBindJoinWithVALUES.class.isAssignableFrom(opClass) ) {
 			return createPlanWithBindJoinVALUES( lop, subplan );
+		}
+		else if ( PhysicalOpBindJoinWithVALUESorFILTER.class.isAssignableFrom(opClass) ) {
+			return createPlanWithBindJoinVALUESorFILTER( lop, subplan );
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
@@ -500,7 +530,8 @@ public class PhysicalPlanFactory
 			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
 				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUESorFILTER(tpAdd, subplan) );
 			}
 
 			if ( tpAdd.getFederationMember() instanceof BRTPFServer ) {
@@ -515,7 +546,8 @@ public class PhysicalPlanFactory
 			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
 				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUESorFILTER(bgpAdd, subplan) );
 			}
 		}
 		else if ( newRoot instanceof LogicalOpGPAdd ) {
@@ -524,7 +556,8 @@ public class PhysicalPlanFactory
 			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
 			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
 			plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+			//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+			plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
 		}
 		else {
 			throw new UnsupportedOperationException("unsupported operator: " + newRoot.getClass().getName() );

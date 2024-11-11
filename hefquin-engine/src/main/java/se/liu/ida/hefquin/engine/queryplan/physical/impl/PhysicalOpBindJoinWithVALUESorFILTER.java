@@ -5,7 +5,7 @@ import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUESorFILTER;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
@@ -15,64 +15,54 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
- * A physical operator that implements (a batching version of) the bind
- * join algorithm using a VALUES clause to capture the potential join
- * partners that are sent to the federation member.
- *
- * <p>
- * <b>Semantics:</b> This operator implements the logical operators gpAdd
- * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
- * That is, for a given graph pattern, a federation  member, and an input
- * sequence of solution mappings (produced by the sub-plan under this
- * operator), the operator produces the solutions resulting from the join
- * (inner or left outer) between the input solutions and the solutions of
- * evaluating the given graph pattern over the data of the federation
- * member.
- * </p>
- *
+* A physical operator that implements (a batching version of) the bind
+ * join algorithm. It starts by using a VALUES clause to capture the potential join
+ * partners that are sent to the federation member. If this fails, it uses the bind join
+ * algorithm with a FILTER clause instead.
+
  * <p>
  * <b>Algorithm description:</b> For a detailed description of the
  * actual algorithm associated with this physical operator, refer
- * to {@link ExecOpBindJoinSPARQLwithVALUES}, which provides the
+ * to {@link ExecOpBindJoinSPARQLwithVALUESorFILTER}, which provides the
  * implementation of this algorithm.
  * </p>
  */
-public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJoin
+public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpTPAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpTPAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpTPOptAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpTPOptAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpBGPAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpBGPAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpBGPOptAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpBGPOptAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpGPAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpGPOptAdd lop ) {
+	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBindJoinWithVALUES
-				&& ((PhysicalOpBindJoinWithVALUES) o).lop.equals(lop);
+		return o instanceof PhysicalOpBindJoinWithVALUESorFILTER
+				&& ((PhysicalOpBindJoinWithVALUESorFILTER) o).lop.equals(lop);
 	}
 
 	@Override
@@ -133,7 +123,7 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 	                                          final boolean useOuterJoinSemantics,
 	                                          final boolean collectExceptions ) {
 		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithVALUES( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+			return new ExecOpBindJoinSPARQLwithVALUESorFILTER(pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
@@ -145,8 +135,7 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 
 	@Override
 	public String toString() {
-
-		return "> VALUESBindJoin" + lop.toString();
+		return "> VALUESorFILTERBindJoin" + lop.toString();
 	}
 
 }
