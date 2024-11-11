@@ -191,7 +191,7 @@ public class PhysicalPlanFactory
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
 		return createPlan(pop, subplan);
 	}
-	
+
 	/**
 	 * Creates a plan with an index nested loops join as root operator.
 	 */
@@ -226,7 +226,7 @@ public class PhysicalPlanFactory
 	                                                         final PhysicalPlan subplan ) {
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
 		return createPlan(pop, subplan);
-	} 
+	}
 
 	/**
 	 * Creates a plan with a VALUES-based bind join that can switch to FILTER-based bind join as root operator.
@@ -236,7 +236,7 @@ public class PhysicalPlanFactory
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
 		return createPlan(pop, subplan);
 	}
-	
+
 	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
@@ -530,7 +530,7 @@ public class PhysicalPlanFactory
 			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
 				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
 				plans.add( createPlanWithBindJoinVALUESorFILTER(tpAdd, subplan) );
 			}
 
@@ -546,7 +546,7 @@ public class PhysicalPlanFactory
 			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
 				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
 				plans.add( createPlanWithBindJoinVALUESorFILTER(bgpAdd, subplan) );
 			}
 		}
@@ -556,7 +556,7 @@ public class PhysicalPlanFactory
 			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
 			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
 			plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+			//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
 			plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
 		}
 		else {

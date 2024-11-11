@@ -47,16 +47,25 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
  */
 public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 {
-	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
+	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithVALUES( final BGP query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
+	public ExecOpBindJoinSPARQLwithVALUES( final BGP query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
-	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
+	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, collectExceptions);
 	}
 
 	@Override
