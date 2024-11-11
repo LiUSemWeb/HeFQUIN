@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.Collections;
 import java.util.List;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
@@ -8,6 +9,7 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -79,15 +81,36 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	}
 
 	@Override
-	public List<Exception> getExceptionsCaughtDuringExecution() {
-		return currentInstance.getExceptionsCaughtDuringExecution();
-	}
-
-	@Override
 	protected void _concludeExecution( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		if ( currentInstance != null ) {
 			currentInstance.concludeExecution(sink, execCxt);
 		}
+	}
+
+	@Override
+	public List<Exception> getExceptionsCaughtDuringExecution() {
+		if ( currentInstance != null ) {
+			return currentInstance.getExceptionsCaughtDuringExecution();
+		}
+		else {
+			return Collections.emptyList();
+		}
+	}
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+
+		if ( currentInstance != null ) {
+			currentInstance.resetStats();
+		}
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "currentInstance",  currentInstance.getStats() );
+		return s;
 	}
 }
