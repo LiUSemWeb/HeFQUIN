@@ -77,14 +77,14 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpBinaryUnion op ) {
-			out.append( indentLevelString + "binaryUnion (" + op.getID() + ") " );
+			out.append( indentLevelString + "binary union (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
 
 		@Override
 		public void visit( final PhysicalOpBindJoin op ) {
-			out.append( indentLevelString + "bindJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "brTPF bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
@@ -92,7 +92,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpBindJoinWithFILTER op ) {
-			out.append( indentLevelString + "FILTERBindJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "FILTER-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
@@ -100,7 +100,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpBindJoinWithUNION op ) {
-			out.append( indentLevelString + "UNIONBindJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "UNION-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
@@ -108,7 +108,15 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpBindJoinWithVALUES op ) {
-			out.append( indentLevelString + "VALUESBindJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "VALUES-based bind join (" + op.getID() + ") " );
+			out.append( System.lineSeparator() );
+			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
+			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBindJoinWithVALUESorFILTER op ) {
+			out.append( indentLevelString + "VALUES/FILTER-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
@@ -138,21 +146,21 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpHashJoin op ) {
-			out.append( indentLevelString + "hashJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "hash join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
 
 		@Override
 		public void visit( final PhysicalOpHashRJoin op ) {
-			out.append( indentLevelString + "hashRJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "right-outer hash join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
 
 		@Override
 		public void visit( final PhysicalOpIndexNestedLoopsJoin op ) {
-			out.append( indentLevelString + "indexNestedLoop (" + op.getID() + ") " );
+			out.append( indentLevelString + "indexNLJ (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 			printOperatorInfoFmAndPattern( op, out, indentLevelStringForOpDetail );
@@ -171,39 +179,41 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpMultiwayUnion op ) {
-			out.append( indentLevelString + "multiwayUnion (" + op.getID() + ") " );
+			out.append( indentLevelString + "multiway union (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
 
 		@Override
 		public void visit( final PhysicalOpNaiveNestedLoopsJoin op ) {
-			out.append( indentLevelString + "naiveNestedLoop (" + op.getID() + ") " );
+			out.append( indentLevelString + "naive NLJ (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
 
 		@Override
 		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
-			out.append( indentLevelString + "parallelMultiLeftJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "parallel multiway left-outer join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpRequest<?,?> op ) {
-			final LogicalOpRequest<?,?> lop = op.getLogicalOperator();
-			final DataRetrievalRequest req = lop.getRequest();
 			out.append( indentLevelString + "req (" + op.getID() + ")" );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail, out, lopNP );
+
+			final LogicalOpRequest<?,?> lop = op.getLogicalOperator();
 			printFederationMember( lop.getFederationMember(), indentLevelStringForOpDetail, out );
+
+			final DataRetrievalRequest req = lop.getRequest();
 			out.append( indentLevelStringForOpDetail + "  - pattern (" + req.hashCode() +  ") (" + req.toString() + ")" );
 			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final PhysicalOpSymmetricHashJoin op ) {
-			out.append( indentLevelString + "symmetricHashJoin (" + op.getID() + ") " );
+			out.append( indentLevelString + "SHJ (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 		}
