@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
+import se.liu.ida.hefquin.engine.queryproc.impl.ExecutionContextImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
@@ -558,22 +559,11 @@ public class HeFQUINEngineConfigReader
 
 	protected QueryProcContext createQueryProcContext( final Context ctx,
 	                                                   final FederationAccessManager fedAccessMgr ) {
-		return new QueryProcContext() {
-			@Override
-			public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-
-			@Override
-			public FederationCatalog getFederationCatalog() { return ctx.getFederationCatalog(); }
-
-			@Override
-			public ExecutorService getExecutorServiceForPlanTasks() { return ctx.getExecutorServiceForPlanTasks(); }
-
-			@Override
-			public boolean isExperimentRun() { return ctx.isExperimentRun(); }
-
-			@Override
-			public boolean skipExecution() { return ctx.skipExecution(); }
-		};
+		return new ExecutionContextImpl( fedAccessMgr,
+		                                 ctx.getFederationCatalog(),
+		                                 ctx.getExecutorServiceForPlanTasks(),
+		                                 ctx.isExperimentRun(),
+		                                 ctx.skipExecution() );
 	}
 
 }
