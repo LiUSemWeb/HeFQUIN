@@ -27,7 +27,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  *
  * The implementation is generic in the sense that it works with any type of
  * request operator. Each concrete implementation that extends this base class
- * needs to implement the {@link #createExecutableRequestOperator(Iterable)}
+ * needs to implement the {@link #createExecutableReqOp(Iterable)}
  * function to create the request operators with the types of requests that
  * are specific to that concrete implementation.
  *
@@ -159,7 +159,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	                                                   final IntermediateResultElementSink sink,
 	                                                   final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator(joinableInputSMs);
+		final NullaryExecutableOp reqOp = createExecutableReqOp(joinableInputSMs);
 
 		if ( reqOp != null ) {
 			numberOfRequestOpsUsed++;
@@ -214,10 +214,14 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 	/**
-	 * The returned operator should be created such that it throws exceptions
-	 * instead of collecting them.
+	 * Implementations of this function should create an executable operator
+	 * that can perform a bind join request in which the query of this bind
+	 * join operator is combined with the given solution mappings.
+	 *
+	 * The operator created by this function should throws exceptions instead
+	 * of collecting them.
 	 */
-	protected abstract NullaryExecutableOp createExecutableRequestOperator( Iterable<SolutionMapping> solMaps );
+	protected abstract NullaryExecutableOp createExecutableReqOp( Iterable<SolutionMapping> solMaps );
 
 	/**
 	 * Splits the given collection of solution mappings into two such that the

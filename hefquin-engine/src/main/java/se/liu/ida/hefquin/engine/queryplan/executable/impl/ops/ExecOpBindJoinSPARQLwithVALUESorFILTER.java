@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Collections;
 import java.util.List;
-import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -27,22 +25,6 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 
 	// will be initialized when processing the first input block of solution mappings
 	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
-
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final TriplePattern query, 
-	                                               final SPARQLEndpoint fm,
-	                                               final boolean useOuterJoinSemantics,
-	                                               final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
-		this.useOuterJoinSemantics = useOuterJoinSemantics;
-	}
-
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final BGP query,
-	                                               final SPARQLEndpoint fm,
-	                                               final boolean useOuterJoinSemantics,
-	                                               final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
-		this.useOuterJoinSemantics = useOuterJoinSemantics;
-	}
 
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
 	                                               final SPARQLEndpoint fm,

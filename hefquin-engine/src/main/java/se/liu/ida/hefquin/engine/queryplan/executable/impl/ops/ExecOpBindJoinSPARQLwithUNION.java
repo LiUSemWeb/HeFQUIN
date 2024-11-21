@@ -16,9 +16,7 @@ import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -27,27 +25,22 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 /**
- * Implementation of (a batching version of) the bind join algorithm that uses UNION.
+ * Implementation of (a batching version of) the bind join algorithm
+ * that uses UNION clauses with FILTERs inside.
  *
  * The current algorithm should to be changed.
  * See: https://github.com/LiUSemWeb/HeFQUIN/issues/344
  */
 public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
-	public ExecOpBindJoinSPARQLwithUNION( final TriplePattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
-	}
-
-	public ExecOpBindJoinSPARQLwithUNION( final BGP query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
-	}
-
-	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query, final SPARQLEndpoint fm, final boolean collectExceptions ) {
+	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query,
+	                                      final SPARQLEndpoint fm,
+	                                      final boolean collectExceptions ) {
 		super(query, fm, false, collectExceptions);
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+	protected NullaryExecutableOp createExecutableReqOp( final Iterable<SolutionMapping> solMaps ) {
 		final Op op = createUnion(solMaps);
 		if ( op == null ) {
 			return null;

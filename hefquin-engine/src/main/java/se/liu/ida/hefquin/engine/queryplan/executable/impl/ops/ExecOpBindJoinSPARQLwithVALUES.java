@@ -15,9 +15,7 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -47,20 +45,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
  */
 public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 {
-	public ExecOpBindJoinSPARQLwithVALUES( final TriplePattern query,
-	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
-	}
-
-	public ExecOpBindJoinSPARQLwithVALUES( final BGP query,
-	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
-	}
-
 	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
 	                                       final boolean useOuterJoinSemantics,
@@ -69,7 +53,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> solMaps ) {
+	protected NullaryExecutableOp createExecutableReqOp( final Iterable<SolutionMapping> solMaps ) {
 		final Set<Binding> bindings = new HashSet<>();
 		final Set<Var> joinVars = new HashSet<>();
 

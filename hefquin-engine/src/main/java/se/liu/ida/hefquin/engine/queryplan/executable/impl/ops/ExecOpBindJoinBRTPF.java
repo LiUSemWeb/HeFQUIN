@@ -47,7 +47,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final Iterable<SolutionMapping> inputSolMaps ) {
+	protected NullaryExecutableOp createExecutableReqOp( final Iterable<SolutionMapping> inputSolMaps ) {
 		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInPatternForFM);
 
 		if ( restrictedSMs == null ) {
