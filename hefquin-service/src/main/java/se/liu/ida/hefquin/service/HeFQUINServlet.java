@@ -171,7 +171,7 @@ public class HeFQUINServlet extends HttpServlet {
 			final StringBuilder body = new StringBuilder();
 			String line;
 			while ( (line = reader.readLine()) != null ) {
-				body.append( line );
+				body.append( line + "\n" );
 			}
 			return body.toString();
 		}
