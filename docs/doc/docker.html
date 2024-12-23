@@ -29,7 +29,7 @@
     <main>
         <h1>Running a HeFQUIN Service via Docker</h1>
         <p>
-            HeFQUIN can be deployed as a web service in a Docker container, either <a href="#use-published-image">using one of our published Docker images</a> or <a href="#build-docker-image">using a Docker image that you build yourself</a>. In either case, after starting it up, you can <a href="hefquin-service.html">interact with the service like a SPARQL endpoint</a>.
+            HeFQUIN can be deployed as a web service in a Docker container, either <a href="#use-published-image">using one of our published Docker images</a> or <a href="#build-docker-image">using a Docker image that you build yourself</a>. In either case, after starting it up, you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a>.
         </p>
 
         <section id="use-published-image">
@@ -43,7 +43,7 @@
             </p>
             <pre><code class="language-bash">docker run -p 8080:8080 hefquin:latest</code></pre>
             <p>
-                Now, the HeFQUIN service should be running, which you can test by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
+                Now, the HeFQUIN service should be running, which you can test by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser, and you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a> (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
             </p>
             <p>
                 To use the HeFQUIN service for your own federation, create a <a href="federation_description.html">description of your federation</a> and, then, mount the file with this description (e.g., <code>MyFedConf.ttl</code>) when starting the HeFQUIN service using Docker as follows.
@@ -83,7 +83,7 @@ docker-compose up
 </code></pre>
             </p>
             <p>
-                Now, the HeFQUIN service should be running, which you can test by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
+                Now, the HeFQUIN service should be running, which you can test by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser, and you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a> (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
             </p>
             <p>
                 If you want to build the Docker image for a specific version of HeFQUIN, specify the release tag of that version at the <code>TAG</code> argument in the <code>docker-compose.yml</code> file before running the aforementioned <code>docker-compose</code> commands.
