@@ -64,11 +64,19 @@
         <section id="use-repo">
             <h2>Use a Version of the Source Code</h2>
             <p>
-                If you want to run a HeFQUIN service that is based on the current developer version of HeFQUIN (or any other snapshot of the HeFQUIN source code), you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>. If you have not cloned the repository already, you can clone it either by using the SSH URL:
+                If you want to run a HeFQUIN service that is based on the current developer version of HeFQUIN (or any other snapshot of the HeFQUIN source code), you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>.
+            </p>
+            <p>
+                If you have not cloned the repository already, you can clone it either by using the SSH URL:
                 <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
                 or by using the HTTP URL:
                 <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
             </p>
+            <p>
+                If you have cloned the repository earlier, make sure that you pull the latest version of the source code into your local clone:
+            </p>
+            <pre><code class="language-bash">git checkout main
+git pull</code></pre>
             <p>
                 Within the directory into which you have cloned the repo, you can now compile the source code using Maven by executing the following command.
             </p>
