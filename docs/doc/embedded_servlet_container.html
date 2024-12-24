@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Running a HeFQUIN Service via the embedded servlet container</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Running a HeFQUIN Service via the embedded servlet container</h1>
+        <p>
+            HeFQUIN can be deployed as a web service using a <a href="https://jetty.org/">Jetty</a> servlet container embedded in each release. This page documents how you can do this
+        </p>
+        <ul>
+            <li><a href="#use-release">by using one of the available releases</a> or</li>
+            <li><a href="#use-repo">by using the current developer version in the source code repository</a>.</li>
+        </ul>
+        <p>
+            In either case, after starting it up, you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a>.
+        </p>
+
+        <section id="use-release">
+            <h2>Use an Available Release</h2>
+            <p>
+                The <a href="https://github.com/LiUSemWeb/HeFQUIN/releases">HeFQUIN releases</a> include a command-line program to start the HeFQUIN service using the embedded servlet container. After downloading the release package and unpacking it, enter the resulting directory in a command-line terminal and, then, execute the following command.
+            </p>
+            <pre><code class="language-bash">bin/hefquin-server</code></pre>
+            <p>
+                (or <code class="language-bash">bat\hefquin-server.bat</code> if you are using Windows.)
+            </p>
+            <p>
+                Now, the HeFQUIN service should be running, which you can test by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser, and you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a> (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
+            </p>
+            <p>
+                To use the HeFQUIN service for your own federation, create a <a href="federation_description.html">description of your federation</a> and, then, refer the aforementioned command-line program to the file with this description (e.g., <code>MyFedConf.ttl</code>) by providing a <code>--federationDescription</code> argument as follows.
+            </p>
+            <pre><code class="language-bash">bin/hefquin-server --federationDescription=MyFedConf.ttl</code></pre>
+            <p>
+                Further arguments can be passed to the command-line program (e.g., to specify the port used by the HeFQUIN service). To see a list of supported arguments, use the argument <code>--help</code>.
+            </p>
+            <pre><code class="language-bash">bin/hefquin-server --help</code></pre>
+        </section>
+
+        <section id="use-repo">
+            <h2>Use a Version of the Source Code</h2>
+            <p>
+                If you want to run a HeFQUIN service that is based on the current developer version of HeFQUIN (or any other snapshot of the HeFQUIN source code), you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>. If you have not cloned the repository already, you can clone it either by using the SSH URL:
+                <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
+                or by using the HTTP URL:
+                <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
+            </p>
+            <p>
+                Within the directory into which you have cloned the repo, you can now compile the source code using Maven by executing the following command.
+            </p>
+            <pre><code class="language-bash">mvn clean package</code></pre>
+            <p>
+                Assuming the build finishes successfully, you can now <a href="#use-release">start the service using the <code>hefquin-server</code> as described above</a>.
+            </p>
+            <p>
+                Alternatively, you can use the Java interpreter directly to start the Java program that runs the service. To this end, execute the following command, where <code>x.y.z-SNAPSHOT</code> needs to be replaced by the current version that was built. Notice also that you may add any of the arguments that can be passed to the program, including <code>--federationDescription</code> (<a href="#use-release">see above</a>); use the argument <code>--help</code> to have all possible arguments listed.
+            </p>
+            <pre><code class="language-bash">java -cp hefquin-cli/target/hefquin-cli-0.0.4-SNAPSHOT.jar se.liu.ida.hefquin.cli.RunHeFQUINServer</code></pre>
+
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
