@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Running a HeFQUIN Service via a separate servlet container</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Running a HeFQUIN Service via a separate servlet container</h1>
+        <p>
+            HeFQUIN can be deployed as a web service using any Java servlet container such as a <a href="https://tomcat.apache.org/">Apache Tomcat</a> server or a <a href="https://jetty.org/">Eclipse Jetty</a> server. This page describes how you can do this
+        </p>
+        <ul>
+            <li><a href="#use-release">by using one of the available releases</a> or</li>
+            <li><a href="#use-repo">by using the current developer version in the source code repository</a>.</li>
+        </ul>
+        <p>
+            In either case, after starting it up, you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a>.
+        </p>
+
+        <section id="use-release">
+            <h2>Use an Available Release</h2>
+            <p>
+                With every <a href="https://github.com/LiUSemWeb/HeFQUIN/releases">HeFQUIN release</a>, we provide a WAR file that you can download and, then, simply deploy in your servlet container. After starting the servlet, you can test it by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser, and you can <a href="hefquin_service.html">interact with the service like a SPARQL endpoint</a> (the SPARQL endpoint should be exposed at <code>http://localhost:8080/sparql</code>).
+            </p>
+            <p>
+                If you want to configure the HeFQUIN service (e.g., with a a <a href="federation_description.html">description of your own federation</a>), you can do so by placing a <code>config.properties</code> file in the working directory. The content of this file may look as follows.
+            </p>
+            <pre><code class="language-bash">FED_CONF_FILE=MyFedConf.ttl         # description of your federation
+
+### Uncomment the following line if you want to use
+### a custom configuration of the HeFQUIN engine.
+#ENGINE_CONF_FILE=MyCustomEngineConf.ttl</code></pre>
+        </section>
+
+        <section id="use-repo">
+            <h2>Use a Version of the Source Code</h2>
+            <p>
+                You can also create a WAR file of the current developer version of HeFQUIN (or any other snapshot of the HeFQUIN source code). To do so, you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>.
+            </p>
+            <p>
+                If you have not cloned the repository already, you can clone it either by using the SSH URL:
+                <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
+                or by using the HTTP URL:
+                <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
+            </p>
+            <p>
+                If you have cloned the repository earlier, make sure that you pull the latest version of the source code into your local clone:
+            </p>
+            <pre><code class="language-bash">git checkout main
+git pull</code></pre>
+            <p>
+                Within the directory into which you have cloned the repo, you can now compile the WAR file using Maven by executing the following command.
+            </p>
+            <pre><code class="language-bash">mvn clean package && mvn package -pl hefquin-service -P build-war -am</code></pre>
+            <p>
+                Assuming the build finishes successfully, you find the WAR file in the subdirectory <code>./hefquin-service/target/</code>. After deploying it in your servlet container, you can test and configure the service <a href="#use-release">as described above</a>.
+            </p>
+
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
