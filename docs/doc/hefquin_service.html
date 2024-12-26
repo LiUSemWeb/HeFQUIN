@@ -29,8 +29,40 @@
     <main>
         <h1>Interacting with a HeFQUIN Service</h1>
         <p>
-            TODO ...
+            After starting a HeFQUIN service (which you can do either <a href="docker.html">using Docker</a>, <a href="embedded_servlet_container.html">using a servlet container embedded in HeFQUIN</a>, or <a href="separate_servlet_container.html">using your own, separate servlet container</a>), you can first test it by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser (assuming that you have started the service at port 8080). If this works (i.e., you see a page that describes the service), you can start interacting with the service via HTTP.
         </p>
+
+        <section id="issuing-queries">
+            <h2>Issuing Queries</h2>
+            <p>
+                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue SPARQL queries to be executed over the federation for which the service has been set up. To this end, the client may send a GET request or a POST request.
+            </p>
+            <p>
+                In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code>, as introduced for <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the HeFQUIN service).
+            </p>
+            <p>
+                In a <b>POST request</b>, the (unencoded) query may be provided directly in the request body, in which case the request header must contain a <code>Content-Type</code> field with <code>application/sparql-query</code> as value. Alternatively, the request body of the POST request may contain the <code>query</code> parameter with the URL-encoded query as value, in which case the value of the <code>Content-Type</code> field in the request header must be <code>application/x-www-form-urlencoded</code> (also for POST requests, the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code> are not supported by HeFQUIN).
+            </p>
+            <p>
+                In any case (using GET requests or POST requests), the client may <b>specify the format</b> in which it wants to receive the query result in the response. To this end, the client may include an <code>Accept</code> field in the request header, using any of the following media types (with the first being used as the default).
+            </p>
+            <ul>
+                <li><a href="https://www.w3.org/TR/sparql11-results-json/"><code>application/sparql-results+json</code></a> (used as the default)</li>
+                <li><a href="https://www.w3.org/TR/rdf-sparql-XMLres/"><code>application/sparql-results+xml</code></a></li>
+                <li><a href="https://www.w3.org/TR/sparql11-results-csv-tsv/"><code>text/csv</code></a></li>
+                <li><a href="https://www.w3.org/TR/sparql11-results-csv-tsv/"><code>text/tab-separated-values</code></a></li>
+            </ul>
+            <p>
+                Responses returned by the HeFQUIN service may use any of the following HTTP status codes.
+            </p>
+            <ul>
+                <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the response body contains the query result, represented using the specified media type.</li>
+                <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was empty.</li>
+                <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> or the given <code>Accept</code> value is not supported.</li>
+                <li><code>500 Internal Server Error</code> - Returned if an error occurs during query execution.</li>
+            </ul>
+
+        </section>
 
     </main>
 
