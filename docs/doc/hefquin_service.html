@@ -44,6 +44,10 @@
                 In a <b>POST request</b>, the (unencoded) query may be provided directly in the request body, in which case the request header must contain a <code>Content-Type</code> field with <code>application/sparql-query</code> as value. Alternatively, the request body of the POST request may contain the <code>query</code> parameter with the URL-encoded query as value, in which case the value of the <code>Content-Type</code> field in the request header must be <code>application/x-www-form-urlencoded</code> (also for POST requests, the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code> are not supported by HeFQUIN).
             </p>
             <p>
+                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the following command to issue the query in a file called <code>ExampleQuery.rq</code>.
+            </p>
+            <pre><code class="language-bash">curl -X POST http://localhost:8080/sparql --data-binary @ExampleQuery.rq -H 'Content-Type: application/sparql-query'</code></pre>
+            <p>
                 In any case (using GET requests or POST requests), the client may <b>specify the format</b> in which it wants to receive the query result in the response. To this end, the client may include an <code>Accept</code> field in the request header, using any of the following media types (with the first being used as the default).
             </p>
             <ul>
