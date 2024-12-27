@@ -35,7 +35,7 @@
         <section id="issuing-queries">
             <h2>Issuing Queries</h2>
             <p>
-                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue SPARQL queries to be executed over the federation for which the service has been set up. To this end, the client may send a GET request or a POST request.
+                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue <a href="queries.html">SPARQL queries to be executed over the federation</a> for which the service has been set up. To this end, the client may send a GET request or a POST request.
             </p>
             <p>
                 In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code>, as introduced for <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the HeFQUIN service).

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Queries and Query Features</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Queries and Query Features</h1>
+        <p>
+            Generally, HeFQUIN supports queries that are written in the <a href="https://www.w3.org/TR/sparql11-query/">SPARQL query language</a>. Yet, for the time being, every query must be given in the form of a so-called source assignment (using <code>SERVICE</code> clauses) and only a subset of the language features is supported natively within the HeFQUIN engine (with the rest being supported through integration with <a href="https://jena.apache.org/">Apache Jena</a>). This page provides information about:
+        </p>
+        <ul>
+            <li><a href="#source-assignments">the expected source-assignment representation of queries</a> and</li>
+            <li><a href="#sparql-features">the SPARQL features supported natively by the HeFQUIN engine</a>.</li>
+        </ul>
+
+        <section id="source-assignments">
+            <h2>Source Assignments</h2>
+            <p>
+                Since HeFQUIN does not (yet) have a proper source selection &amp; query decomposition component, you need to indicate explicitly which part of the overall query pattern in the <code>WHERE</code> clause is expected to be matched in the data of which federation member(s). To this end, <em>all triple patterns</em> of the query pattern must be wrapped within <code>SERVICE</code> clauses. Of course, any such <code>SERVICE</code> clause may contain multiple triple patterns, and the same triple pattern may be repeated in different <code>SERVICE</code> clauses (e.g., to consider matching triples from multiple federation members). Any other part of the query pattern (e.g., a <code>FILTER</code>, a <code>BIND</code> clause, <code>UNION</code>, <code>OPTIONAL</code>, etc.) may be specified within or outside of the <code>SERVICE</code> clauses.
+            </p>
+            <p>
+                As an example of a correct source-assignment representation, consider the following query.
+            </p>
+            <pre><code class="language-sparql">PREFIX rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:    &lt;http://www.w3.org/2002/07/owl#>
+PREFIX dbo:    &lt;http://dbpedia.org/ontology/>
+
+SELECT * WHERE {
+	SERVICE &lt;http://dbpedia.org/sparql> {
+		&lt;http://dbpedia.org/resource/Berlin> dbo:country ?c .
+		?c owl:sameAs ?cc
+	}
+	FILTER STRSTARTS( STR(?cc), "http://www.wikidata.org/" )
+	SERVICE &lt;https://query.wikidata.org/sparql> {
+		?cc rdfs:label ?o
+	}
+}</code></pre>
+            <p>
+                <b>Placement and order of sub-patterns.</b> Notice, that the placement of SPARQL features within or outside of the <code>SERVICE</code> clauses has no relevance for the query planner of the HeFQUIN engine, and neither has the order in which the <code>SERVICE</code> clauses are listed. For instance, the fact that the example query above has a <code>FILTER</code> in between (and outside of) the two <code>SERVICE</code> clauses is not meant to be understood that the query has to be executed in this order (with the <code>FILTER</code> to be applied after the result of the first <code>SERVICE</code> clause has been retrieved). Instead, the query planning component of HeFQUIN may decide to move operators (such as the aforementioned <code>FILTER</code>) into or outside of subqueries if it considers such a change as the more efficient query plan (and, of course, only if such a change does not affect the overall query result).
+            </p>
+            <p>
+                In this context it is also important to mention that the <code>SERVICE</code> clause for a particular federation member does <em>not</em> need to reflect the potential limitations of the type of data access interface provided by the federation member. For instance, even if a TPF server with its Triple Pattern Fragment interface can only handle requests consisting of a single triple pattern, a <code>SERVICE</code> clause for such a TPF server may contain multiple triple patterns (and even other query features such as a <code>FILTER</code> or a <code>UNION</code>). The query planning component of HeFQUIN takes care of creating a suitable query execution plan for these cases.
+            </p>
+            <p>
+                <b>Service IRIs.</b> Both of the two <code>SERVICE</code> clauses in the example query above provide a service IRI (namely,
+                    <!--the IRI <code>http://dbpedia.org/sparql</code> of the public <a href="https://www.dbpedia.org/resources/sparql/">DBpedia SPARQL endpoint</a> and the IRI <code>https://query.wikidata.org/sparql</code> of the <a href="https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service">Wikidata SPARQL endpoint</a>).-->
+                    <code>http://dbpedia.org/sparql</code> and <code>https://query.wikidata.org/sparql</code>, respectively).
+                With one exception (see below), HeFQUIN expects all <code>SERVICE</code> clauses to be of this form (rather than having a variable in place of the service IRI). The IRIs to be used as such service IRIs are the IRIs specified as a value of either the <code>endpointAddress</code> property or the <code>exampleFragmentAddress</code> property of the federation members mentioned in the <a href="federation_description.html">description of your federation</a>. If your query mentions a service IRI that is not the <code>endpointAddress</code> or the <code>exampleFragmentAddress</code> of any federation member in the federation to be queried, then the HeFQUIN query planner returns an error.
+            </p>
+            <p>
+                <b>Providing the service IRIs via a <code>VALUES</code> clause.</b> The only case in which the <code>SERVICE</code> clauses may have a variable in place of a service IRI is in queries in which a <code>VALUES</code> clause is used to specify the service IRIs. In particular, such a query must satisfy the following conditions:
+            </p>
+            <ul>
+                <li>The <code>WHERE</code> clause of the query must begin with a <code>VALUES</code> clause.</li>
+                <li>None of the variables bound by this <code>VALUES</code> clause is mentioned anywhere else in the query pattern except as the variable of a <code>SERVICE</code> clause.</li>
+                <li>The <code>VALUES</code> clause must mention every variable that is a variable of a <code>SERVICE</code> clause.</li>
+                <li>The query pattern must contain at least one <code>SERVICE</code> clause with a variable.</li>
+                <li>The <code>WHERE</code> clause of the query must not contain any other <code>VALUES</code> clause.</li>
+            </ul>
+            <p>
+                Given such a query, HeFQUIN rewrites the query pattern of the query by applying the solution mappings of the <code>VALUES</code> clause to the <code>SERVICE</code> clauses and, then, removing the <code>VALUES</code> clause. If the <code>VALUES</code> clause contains multiple solution mappings, then the group of <code>SERVICE</code> clauses is copied for each of these solution mappings, and the resulting groups are combined via <code>UNION</code>.
+            </p>
+            <p>
+                As an example, consider the following query.
+            </p>
+            <pre><code class="language-sparql">PREFIX ex: &lt;http://example.org/>
+
+SELECT * WHERE {
+  VALUES (?s1 ?s2) {
+    (ex:endpoint1 ex:endpoint2)
+    (ex:endpoint1 ex:endpoint3)
+  }
+  SERVICE ?s1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
+  SERVICE ?s2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
+}</code></pre>
+            <p>
+                This query is rewritten as follows.
+            </p>
+            <pre><code class="language-sparql">PREFIX ex: &lt;http://example.org/>
+
+SELECT * WHERE {
+  {
+    SERVICE ex:endpoint1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
+    SERVICE ex:endpoint2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
+  }
+  UNION
+  {
+    SERVICE ex:endpoint1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
+    SERVICE ex:endpoint3 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
+  }
+}</code></pre>
+
+        </section>
+
+        <section id="sparql-features">
+            <h2>SPARQL Features Supported Natively by the HeFQUIN Engine</h2>
+            <p>
+                While all of the features of version&nbsp;1.1 of the <a href="https://www.w3.org/TR/sparql11-query/">SPARQL query language</a> can be used in the queries given to HeFQUIN, the query planning and query execution components of the HeFQUIN engine support only a subset of these features. For queries that use other features, HeFQUIN relies on the SPARQL processor of <a href="https://jena.apache.org/">Apache Jena</a>. That is, any such query is compiled into a query execution plan by Jena's query processor such that the subplan(s) for the parts of the query pattern that the HeFQUIN engine supports are handled by the HeFQUIN engine. The solution mappings that the HeFQUIN engine produces for such a subplan are then passed to Jena's query processor. Due to this setup, queries that use features not supported natively by the HeFQUIN engine may experience a performance penalty. Currently, the HeFQUIN engine supports the following features natively (support for further features may be added in the future).
+            </p>
+            <ul>
+                <li>Basic graph patterns</li>
+                <li>Optional patterns</li>
+                <li>Union patterns</li>
+                <li><code>FILTER</code> with arbitrary conditions</li>
+<!--                 <li><code>BIND</code> clauses</li> -->
+                <li>Grouping of any of the aforementioned types of patterns (i.e., joining the results of sub-patterns)</li>
+            </ul>
+
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
