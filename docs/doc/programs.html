@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Command-Line Programs</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>HeFQUIN Command-Line Programs</h1>
+        <p>
+            HeFQUIN comes with several command-line programs, including:
+        </p>
+        <ul>
+            <li><code>hefquin</code> - <a href="cli.html">execute queries over a federation</a>,</li>
+            <li><code>hefquin-server</code> - <a href="embedded_servlet_container.html">start HeFQUIN as a Web service</a>,</li>
+            <li><code>hefquin-pg</code> - <a href="pg-connector.html">execute SPARQL queries over a virtual RDF view of a Property Graph</a>, and</li>
+            <li><code>hefquin-pgmat</code> - <a href="pg-connector.html">create an RDF representation of a Property Graph</a>.</li>
+        </ul>
+        <p>
+        This page describes how to set up and run these programs ...
+        </p>
+        <ul>
+            <li><a href="#use-release">by using one of the available releases</a> or</li>
+            <li><a href="#use-repo">by using the current developer version in the source code repository</a>.</li>
+        </ul>
+
+        <section id="use-release">
+            <h2>Setting Up the Programs Using an Available Release</h2>
+            <p>
+                As the HeFQUIN programs are Java programs, you need to have a relatively recent version of a Java Runtime Environment installed.
+            </p>
+            <p>
+                Then, download the latest package from the <a href="https://github.com/LiUSemWeb/HeFQUIN/releases">HeFQUIN release page</a>. After downloading the release package and unpacking it, you can enter the resulting directory in a command-line terminal and run the programs by using the scripts in the <code>./bin/</code> subdirectory (or <code>.\bat\</code> if you are using Windows). For instance, you can execute the following command.
+            </p>
+            <pre><code class="language-bash">bin/hefquin --help</code></pre>
+            <p>
+                (or <code class="language-bash">bat\hefquin.bat --help</code> if you are using Windows.)
+            </p>
+            <p>
+                If you want to be able to start the HeFQUIN programs from within any directory, it is recommended that you define the environment variable <code>HEFQUIN_HOME</code> and add the scripts to the <code>PATH</code> variable, which you can do with the following commands.
+            </p>
+            <p>
+                On Linux and Mac:
+            </p>
+            <pre><code class="language-bash">export HEFQUIN_HOME="the directory created when unpacking the HeFQUIN release package"
+export PATH=$PATH:$HEFQUIN_HOME/bin</code></pre>
+            <p>
+                On Windows:
+            </p>
+            <pre><code class="language-bash">SET HEFQUIN_HOME="the directory created when unpacking the HeFQUIN release package"
+SET PATH=%PATH%;%HEFQUIN_HOME%\bat</code></pre>
+
+        </section>
+
+        <section id="use-repo">
+            <h2>Setting Up the Programs From the Source Code Repository</h2>
+            <p>
+                To set up the programs from the source code repository you need a Java build environment with Maven, and you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>.
+            </p>
+            <p>
+                If you have not cloned the repository already, you can clone it either by using the SSH URL:
+                <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
+                or by using the HTTP URL:
+                <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
+            </p>
+            <p>
+                If you have cloned the repository earlier, make sure that you pull the latest version of the source code into your local clone:
+            </p>
+            <pre><code class="language-bash">git checkout main
+git pull</code></pre>
+            <p>
+                Within the directory into which you have cloned the repo, you can now compile the source code using Maven by executing the following command.
+            </p>
+            <pre><code class="language-bash">mvn clean package</code></pre>
+            <p>
+                Assuming the build finishes successfully, you can run the programs by using the scripts in the <code>./bin/</code> (or <code>.\bat\</code>) subdirectory and add the scripts to the <code>PATH</code> variable, exactly <a href="#use-release">as described above</a>.
+            </p>
+
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>

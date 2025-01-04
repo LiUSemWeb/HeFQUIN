@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Querying a Federation via the Command-Line Program</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Querying a Federation via the HeFQUIN Command-Line Program</h1>
+        <p>
+            HeFQUIN comes with <a href="programs.html">several command-line programs</a>, including one to run queries over a federation directly from the command line. This page focuses on that program.
+        </p>
+        <p>
+            You can use the program as follows, assuming the file <code>MyFedConf.ttl</code> contains the <a href="federation_description.html">description of your federation</a> and the file <code>ExampleQuery.rq</code> contains the <a href="queries.html">query that you want to run</a> over this federation, and assuming that you have <a href="programs.html">added the HeFQUIN programs to your <code>PATH</code></a> (otherwise, enter the directory in which you have unpacked the HeFQUIN release and replace <code>hefquin</code> by <code>bin/hefquin</code>).
+        </p>
+        <pre><code class="language-bash">hefquin --federationDescription=MyFedConf.ttl --query=ExampleQuery.rq</code></pre>
+        <p>
+            Further arguments can be passed to the program, which are described in detail below. You can also have the list of supported arguments printed by executing the program with the argument <code>--help</code>.
+        </p>
+        <pre><code class="language-bash">hefquin --help</code></pre>
+
+        <section id="arguments">
+            <h2>Query-Related Arguments of the Program</h2>
+            <p id="--federationDescription" style="font-weight:bold">
+                --federationDescription=&lt;<em>file</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Refers to a file that contains an RDF-based description of the federation to be queried. The file can be in any RDF serialization format (e.g., Turtle, N-Triples, JSON-LD) and it must use the <a href="federation_description.html">HeFQUIN Federation Vocabulary</a>. Every instance of type <code>fd:FederationMember</code> described by this document will be considered as a member of the federation to be queried.
+            </p>
+            <p id="--query" style="font-weight:bold">
+                --query=&lt;<em>file</em>>
+                <em style="padding-left:1em">(mandatory argument)</em>
+            </p>
+            <p style="padding-left:2em">
+                Refers to a file that contains the <a href="queries.html">query to be executed</a> over the federation.
+            </p>
+            <p id="--base" style="font-weight:bold">
+                --base=&lt;<em>uri</em>>
+            </p>
+            <p style="padding-left:2em">
+                This argument can be used to provide a base URI for the query.
+            </p>
+            <p id="--skipExecution" style="font-weight:bold">
+                --skipExecution
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want HeFQUIN to create the query execution plan for the given query, but without actually executing this plan. This argument would typically be used in combination with arguments for printing the plan in its various stages (<a href="#--printSourceAssignment">--printSourceAssignment</a>, <a href="#--printLogicalPlan">--printLogicalPlan</a>, and <a href="#--printPhysicalPlan">--printPhysicalPlan</a>).
+            </p>
+        </section>
+
+        <section>
+            <h2>Result-Related Arguments of the Program</h2>
+            <p id="--results" style="font-weight:bold">
+                --results=&lt;<em>format</em>>
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to specify the format in which you would like the query result to be printed. The possible values for this argument depend on the type of query.
+                For SELECT queries, the possible values are the following (with TEXT being the default in case the argument is omitted).
+                <ul style="margin-left:2em">
+                    <li>TEXT - Simple text output in table form (<b>default</b>).</li>
+                    <li>JSON - <a href="https://www.w3.org/TR/sparql11-results-json/">Standard JSON format</a>.</li>
+                    <li>XML - <a href="https://www.w3.org/TR/rdf-sparql-XMLres/">Standard XML format</a>.</li>
+                    <li>CSV - <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/#csv">Standard CSV format</a>.</li>
+                    <li>TSV - <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/#tsv">Standard TSV format</a>.</li>
+                    <li>TTL - RDF representation, serialized using the <a href="https://www.w3.org/TR/turtle/">RDF Turtle</a> format.</li>
+                    <li>NTRIPLES - RDF representation, serialized using the <a href="https://www.w3.org/TR/n-triples/">N-Triples</a> format.</li>
+                    <li>JSONLD - RDF representation, serialized using the <a href="https://www.w3.org/TR/json-ld/">JSON-LD</a> format.</li>
+                    <li>RDF/XML - RDF representation, serialized using the <a href="https://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML</a> format.<br/>(all RDF representations use the <a href="http://www.w3.org/2001/sw/DataAccess/tests/result-set#">result set vocabulary</a>).</li>
+                </ul>
+            </p>
+            <p style="padding-left:2em">
+                For CONSTRUCT queries, the possible values are the following (with TTL being the default).
+                <ul style="margin-left:2em">
+                    <li>TTL - <a href="https://www.w3.org/TR/turtle/">RDF Turtle</a> format (<b>default</b>).</li>
+                    <li>NTRIPLES - <a href="https://www.w3.org/TR/n-triples/">N-Triples</a> format.</li>
+                    <li>JSONLD - <a href="https://www.w3.org/TR/json-ld/">JSON-LD</a> format.</li>
+                    <li>RDF/XML - <a href="https://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML</a> format.</li>
+                </ul>
+            </p>
+            <p style="font-weight:bold">
+                --suppressResultPrintout
+            </p>
+            <p style="padding-left:2em">
+                Use this argument if you want HeFQUIN to execute the query without printing the query result. This argument would typically be used in combination with arguments for measuring query processing times (<a href="#--time">--time</a>, <a href="#--printQueryProcMeasurements">--printQueryProcMeasurements</a>, and <a href="#--printQueryProcStats">--printQueryProcStats</a>), for which the actual printing of the query result is irrelevant and, in case of the <a href="#--time">--time</a> argument, may even affect the measurements.
+            </p>
+        </section>
+
+        <section>
+            <h2>Planning-Related Arguments of the Program</h2>
+            <p id="--printSourceAssignment" style="font-weight:bold">
+                --printSourceAssignment
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the query planning component of HeFQUIN to print the initial logical plan that is the output of the source selection &amp; query decomposition process; i.e., this is the logical plan that is passed as input to the logical query optimizer. If you are interested only in seeing the plan, without executing it, use this argument in combination with the <a href="#--skipExecution">--skipExecution</a> argument.
+            </p>
+            <p id="--printLogicalPlan" style="font-weight:bold">
+                --printLogicalPlan
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the query planning component of HeFQUIN to print the logical plan that is the output of the logical query optimizer; i.e., this is the logical plan that is passed as input to the physical query optimizer. If you are interested only in seeing the plan, without executing it, use this argument in combination with the <a href="#--skipExecution">--skipExecution</a> argument.
+            </p>
+            <p id="--printPhysicalPlan" style="font-weight:bold">
+                --printPhysicalPlan
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the query planning component of HeFQUIN to print the physical plan that is the output of the physical query optimizer; i.e., this is the physical plan that is used to execute the query. If you are interested only in seeing the plan, without executing it, use this argument in combination with the <a href="#--skipExecution">--skipExecution</a> argument.
+            </p>
+        </section>
+
+        <section>
+            <h2>Experiments-Related Arguments of the Program</h2>
+            <p id="--printQueryProcMeasurements" style="font-weight:bold">
+                --printQueryProcMeasurements
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the HeFQUIN engine to print one line of comma-separated measurement values for each query. These values are:
+                <ol style="margin-left:1em">
+                    <li>the overall query processing time (in ms), which is the sum of the following three measurements;</li>
+                    <li>the query planning time (in ms), which includes source planning, logical optimization, and physical optimization;</li>
+                    <li>the compilation time (in ms), which is about translating the final physical plan into a so-called executable plan that is set up and ready for execution;</li>
+                    <li>the query execution time (in ms), which is the total time from starting the executable plan until completion of the executable plan.</li>
+                </ol>
+            </p>
+            <p style="padding-left:2em">
+                Note that these measurements are purely related to processing that takes place within the HeFQUIN engine; any pre-processing and post-processing performed by the Jena query processing machinery that HeFQUIN uses is not considered for these measurements.
+            </p>
+            <p style="padding-left:2em">
+                Since these measurements are printed as a single line in which the different values are separated by commas, this argument can be used to produce a CSV file of measurements for multiple queries (or for multiple executions of the same query). For this use case, you may want to use this argument in combination with the <a href="#--suppressResultPrintout">--suppressResultPrintout</a> argument.
+            </p>
+            <p id="--printQueryProcStats" style="font-weight:bold">
+                --printQueryProcStats
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the HeFQUIN engine to print detailed statistics about the query planning and the query execution processes, as collected by the different components involved in these processes (including the operators that have been part of the query execution plan).
+            </p>
+            <p id="--printFedAccessStats" style="font-weight:bold">
+                --printFedAccessStats
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to instruct the HeFQUIN engine to print detailed statistics collected by the federation access component of HeFQUIN.
+            </p>
+            <p id="--time" style="font-weight:bold">
+                --time
+            </p>
+            <p style="padding-left:2em">
+                Use this argument to print the overall query processing time (in sec), which includes not only the processing within the HeFQUIN engine but also the pre-processing and post-processing performed by the Jena query processing machinery that HeFQUIN uses. To obtain a more detailed breakdown of the times required for the processing stages within the HeFQUIN engine, use the <a href="#--printQueryProcMeasurements">--printQueryProcMeasurements</a> argument instead.
+            </p>
+            <p style="padding-left:2em">
+                Notice that the time reported when using this argument may be affected by the time required for printing the query result, while the times reported when using the <a href="#--printQueryProcMeasurements">--printQueryProcMeasurements</a> argument are unaffected because query result printing is part of the post-processing. As the mere printing time is irrelevant from the actual query processing perspective, you may want to disable the printing when using this argument, which can be done by adding the <a href="#--suppressResultPrintout">--suppressResultPrintout</a> argument.
+            </p>
+        </section>
+
+        <section>
+            <h2>Other Arguments of the Program</h2>
+            <p id="--confDescr" style="font-weight:bold">
+                --confDescr=&lt;<em>file</em>>
+            </p>
+            <p style="padding-left:2em">
+                Refers to a file that contains an RDF-based description of the configuration to be used for the HeFQUIN engine and its components. The file can be in any RDF serialization format (e.g., Turtle, N-Triples, JSON-LD), it must use the <a href="http://w3id.org/hefquin/engineconf/latest/">HeFQUIN Configuration Vocabulary</a>, and contain exactly one instance of type <code><a href="http://w3id.org/hefquin/engineconf#HeFQUINEngineConfiguration">ec:HeFQUINEngineConfiguration</a></code>.
+                This argument is relevant primarily during development and for conducting experiments with different internal components.
+            </p>
+            <p id="--help" style="font-weight:bold">
+                --help
+            </p>
+            <p style="padding-left:2em">
+                If this argument is given, the program prints a list of all supported arguments and terminates (i.e., all other given arguments are ignored).
+            </p>
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
