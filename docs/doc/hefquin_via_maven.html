@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Add HeFQUIN as a dependency to your Maven project</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Add HeFQUIN as a dependency to your Maven project</h1>
+        <p>
+            The HeFQUIN engine can be used directly from within your Java code. Assuming that your Java code is maintained as a Maven project, you need to add HeFQUIN as a dependency in the POM file of your Maven project, which you can do
+        </p>
+        <ul>
+            <li><a href="#use-release">for one of the available releases of HeFQUIN</a> or</li>
+            <li><a href="#use-repo">for the current developer version in the HeFQUIN source code repository</a>.</li>
+        </ul>
+        <p>
+            Thereafter, you can <a href="integrate_hefquin_code.html">write Java code that instantiates and uses the engine</a>.
+        </p>
+
+        <section id="use-release">
+            <h2>Use an Available Release</h2>
+            <p>
+                For each of the <a href="https://github.com/LiUSemWeb/HeFQUIN/releases">HeFQUIN releases</a> we publish the relevant artifacts via Maven Central. Therefore, all you need to do to add a particular release version of HeFQUIN as a dependency for your Maven project is to add the following snippet to the <code>dependencies</code> section of your POM file and change the given <code>version</code> number to the version number of the HeFQUIN release you want to use.
+            </p>
+            <pre><code class="language-xml">&lt;dependency>
+    &lt;groupId>se.liu.research.hefquin&lt;/groupId>
+    &lt;artifactId>hefquin-engine&lt;/artifactId>
+    &lt;version>0.0.1&lt;/version> &lt;!-- replace this by the version number of the HeFQUIN release to be used -->
+&lt;/dependency></code></pre>
+            <p>
+                Now you may run the following command in your Maven project to compile the project with the new dependency (or you refresh/reimport your Maven project in the IDE that you are using).
+            </p>
+            <pre><code class="language-bash">mvn clean compile</code></pre>
+        </section>
+
+        <section id="use-repo">
+            <h2>Use a Version of the Source Code</h2>
+            <p>
+                If you want to use the current developer version of HeFQUIN instead, you need a local clone of the <a href="https://github.com/LiUSemWeb/HeFQUIN">GitHub repository of HeFQUIN</a>.
+            </p>
+            <p>
+                If you have not cloned the repository already, you can clone it either by using the SSH URL:
+                <pre><code class="language-bash">git clone git@github.com:LiUSemWeb/HeFQUIN.git</code></pre>
+                or by using the HTTP URL:
+                <pre><code class="language-bash">git clone https://github.com/LiUSemWeb/HeFQUIN.git</code></pre>
+            </p>
+            <p>
+                If you have cloned the repository earlier, make sure that you pull the latest version of the source code into your local clone:
+            </p>
+            <pre><code class="language-bash">git checkout main
+git pull</code></pre>
+            <p>
+                Within the directory into which you have cloned the repo, you can now run the following command to compile the HeFQUIN source code using Maven and publish the relevant artifacts to your local maven repository. 
+            </p>
+            <pre><code class="language-bash">mvn clean install</code></pre>
+            <p>
+                Assuming the build finishes successfully, you can now add the developer version of HeFQUIN as a dependency for your own Maven project, for which you need to add the following snippet to the <code>dependencies</code> section of the POM file of your Maven project and change the given <code>version</code> number to the version number of the HeFQUIN artifacts that you have just built.
+            </p>
+            <pre><code class="language-xml">&lt;dependency>
+    &lt;groupId>se.liu.research.hefquin&lt;/groupId>
+    &lt;artifactId>hefquin-engine&lt;/artifactId>
+    &lt;version>0.0.1-SNAPSHOT&lt;/version> &lt;!-- replace this by the version number currently used by the HeFQUIN source code -->
+&lt;/dependency></code></pre>
+            <p>
+                Now you may run the following command in your Maven project to compile your project with the new dependency (or you refresh/reimport your Maven project in the IDE that you are using).
+            </p>
+            <pre><code class="language-bash">mvn clean compile</code></pre>
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
