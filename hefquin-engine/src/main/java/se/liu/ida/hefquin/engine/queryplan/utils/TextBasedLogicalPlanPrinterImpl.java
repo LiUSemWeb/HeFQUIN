@@ -1,6 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.Map;
+
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -86,7 +91,17 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpBind op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + singleBase + "  - expression (" + op.getBindExpressions().toString() +  ") " );
+
+			final VarExprList bindExpressions = op.getBindExpressions();
+			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
+				final Var var = e.getKey();
+				final Expr expr = e.getValue();
+				out.append( indentLevelStringForOpDetail + singleBase + "  - " + var.toString() + " <-- " + expr.toString() );
+				out.append( System.lineSeparator() );
+			}
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
@@ -95,13 +110,19 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			out.append( System.lineSeparator() );
 			out.append( indentLevelStringForOpDetail + singleBase + "  - expression (" + op.getFilterExpressions().toString() +  ") " );
 			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final LogicalOpGlobalToLocal op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 
@@ -135,7 +156,10 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpLocalToGlobal op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + op.getVocabularyMapping().hashCode() +  ") " );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 

@@ -120,9 +120,7 @@ public class LogicalToPhysicalOpConverter
 	}
 
 	public static UnaryPhysicalOp convert( final LogicalOpBind lop ) {
-		// TODO: see issue #309 (https://github.com/LiUSemWeb/HeFQUIN/issues/309)
-		throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
-//		return new PhysicalOpBind(lop);
+		return new PhysicalOpBind(lop);
 	}
 
 	public static UnaryPhysicalOp convert( final LogicalOpLocalToGlobal lop ) {
