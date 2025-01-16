@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequest
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
@@ -38,9 +39,7 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	 */
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
-		if (inputPlan.getRootOperator() instanceof LogicalOpRequest) {
-			final LogicalOpRequest<?,?> requestOp = (LogicalOpRequest<?,?>) inputPlan.getRootOperator();
-
+		if ( inputPlan.getRootOperator() instanceof LogicalOpRequest requestOp ) {
 			final VocabularyMapping vm = requestOp.getFederationMember().getVocabularyMapping();
 			if ( vm != null) { // If fm has a vocabulary mapping vm
 				final LogicalPlan newInputPlan = rewriteToUseLocalVocabulary(inputPlan);
@@ -69,14 +68,20 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 			} else {
 				return inputPlan;
 			}
-		} else if (inputPlan.getRootOperator() instanceof LogicalOpFilter){
-            final LogicalOpFilter filterOp = (LogicalOpFilter) inputPlan.getRootOperator();
-			final LogicalPlan rw = apply( inputPlan.getSubPlan(0) );
-            // TODO: the expressions of 'filterOp' should be rewritten too
-            return new LogicalPlanWithUnaryRootImpl(filterOp,rw);
-        } else {
-            throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
-        }
+		}
+		else if ( inputPlan.getRootOperator() instanceof LogicalOpFilter filterOp ) {
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			// TODO: the expressions of 'filterOp' should be rewritten too
+			return new LogicalPlanWithUnaryRootImpl(filterOp, rewrittenSubPlan);
+		}
+		else if ( inputPlan.getRootOperator() instanceof LogicalOpBind bindOp ) {
+			final LogicalPlan rewrittenSubPlan = apply( inputPlan.getSubPlan(0) );
+			// TODO: the expressions of 'bindOp' should be rewritten too
+			return new LogicalPlanWithUnaryRootImpl(bindOp, rewrittenSubPlan);
+		}
+		else {
+			throw new IllegalArgumentException("The given logical plan is not supported by this function because it has a root operator of type: " + inputPlan.getRootOperator().getClass().getName() );
+		}
 	}
 
 	/**

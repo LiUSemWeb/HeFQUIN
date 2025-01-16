@@ -25,6 +25,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpMultiwayUnion op );
 
 	void visit( PhysicalOpFilter op );
+	void visit( PhysicalOpBind op );
 	void visit( PhysicalOpLocalToGlobal op );
 	void visit( PhysicalOpGlobalToLocal op );
 }

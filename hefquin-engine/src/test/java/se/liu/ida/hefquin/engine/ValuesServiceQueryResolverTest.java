@@ -207,6 +207,8 @@ public class ValuesServiceQueryResolverTest
 				  "SELECT * WHERE {"
 				+ " SERVICE <http://example1.org> { ?x a ?y }"
 				+ " SERVICE <http://example2.org> { ?x a ?y }"
+				+ " BIND( <http://example1.org> AS ?s1 )"
+				+ " BIND( <http://example2.org> AS ?s2 )"
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
 
@@ -228,6 +230,8 @@ public class ValuesServiceQueryResolverTest
 				  "SELECT * WHERE {"
 				+ " SERVICE <http://example1.org> { ?x a ?y }"
 				+ " SERVICE <http://example1.org> { ?x a ?y }"
+				+ " BIND( <http://example1.org> AS ?s1 )"
+				+ " BIND( <http://example2.org> AS ?s2 )"   // needs to be added even if not used
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
 
@@ -250,9 +254,13 @@ public class ValuesServiceQueryResolverTest
 				+ " {"
 				+ "   SERVICE <http://example1.org> { ?x a ?y }"
 				+ "   SERVICE <http://example2.org> { ?z a ?y }"
+				+ "   BIND( <http://example1.org> AS ?s1 )"
+				+ "   BIND( <http://example2.org> AS ?s2 )"
 				+ " } UNION {"
 				+ "   SERVICE <http://example3.org> { ?x a ?y }"
 				+ "   SERVICE <http://example4.org> { ?z a ?y }"
+				+ "   BIND( <http://example3.org> AS ?s1 )"
+				+ "   BIND( <http://example4.org> AS ?s2 )"
 				+ " }"
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
@@ -277,8 +285,10 @@ public class ValuesServiceQueryResolverTest
 				  "SELECT * WHERE {"
 				+ " {"
 				+ "   SERVICE <http://example1.org> { ?x a ?y }"
+				+ "   BIND( <http://example1.org> AS ?s )"
 				+ " } UNION {"
 				+ "   SERVICE <http://example2.org> { ?x a ?y }"
+				+ "   BIND( <http://example2.org> AS ?s )"
 				+ " }"
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
@@ -303,11 +313,40 @@ public class ValuesServiceQueryResolverTest
 		final String expectedQueryString =
 				  "SELECT * WHERE {"
 				+ " SERVICE <http://example1.org> { ?x1 a ?y }"
-				+ " { }"
+				+ " BIND( <http://example1.org> AS ?s1 )"
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
 
 		assertTrue( q.getQueryPattern().equals(expectedPattern) );
+	}
+
+	@Test
+	public void testExpandValuesPlusServicePattern7() {
+		final String qStr =
+				  "SELECT * WHERE {"
+				+ " VALUES (?s1 ?s2) { (<http://example1.org> UNDEF) (UNDEF <http://example4.org>) }"
+				+ " SERVICE ?s1 { ?x a ?y }"
+				+ " SERVICE ?s2 { ?z a ?y }"
+				+ "}";
+		final Query q = QueryFactory.create(qStr);
+		ValuesServiceQueryResolver.expandValuesPlusServicePattern(q);
+
+		final String expectedQueryString =
+				  "SELECT * WHERE {"
+				+ " {"
+				+ "   SERVICE <http://example1.org> { ?x a ?y }"
+				+ "   BIND( <http://example1.org> AS ?s1 )"
+				+ " } UNION {"
+				+ "   SERVICE <http://example4.org> { ?z a ?y }"
+				+ "   BIND( <http://example4.org> AS ?s2 )"
+				+ " }"
+				+ "}";
+		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
+
+		final ElementTransform t = new ElementTransformCleanGroupsOfOne();
+		final Element expectedPattern2 = ElementTransformer.transform(expectedPattern, t);
+
+		assertTrue( q.getQueryPattern().equals(expectedPattern2) );
 	}
 
 }

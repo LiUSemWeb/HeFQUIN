@@ -10,7 +10,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementBind;
 import org.apache.jena.sparql.syntax.ElementData;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementService;
@@ -47,8 +49,10 @@ import se.liu.ida.hefquin.jenaext.PatternVarsAll;
  * remove the VALUES clause. If the VALUES clause contains multiple solution
  * mappings (as in the example above), than the group of SERVICE clauses is
  * copied for each of these solution mappings, and the resulting groups are
- * combined via UNION. For instance, the result of rewriting the example query
- * above is given as follows.
+ * combined via UNION. Additionally, in any of the two cases (just one solution
+ * mapping in the VALUES clause or multiple), BIND clauses are added to still
+ * capture the bindings for the variables of the VALUES clause. For instance,
+ * the result of rewriting the example query above is given as follows.
  *
  * <pre>
  * PREFIX ex: <http://example.org/>
@@ -57,11 +61,15 @@ import se.liu.ida.hefquin.jenaext.PatternVarsAll;
  *   {
  *     SERVICE ex:endpoint1 { .. some pattern (that neither mention ?s1 nor ?2) .. }
  *     SERVICE ex:endpoint2 { .. also some pattern (that also doesn't mention ?s1 or ?2) .. }
+ *     BIND (?s1 AS ex:endpoint1)
+ *     BIND (?s2 AS ex:endpoint2)
  *   }
  *   UNION
  *   {
  *     SERVICE ex:endpoint1 { .. some pattern (that neither mention ?s1 nor ?2) .. }
  *     SERVICE ex:endpoint3 { .. also some pattern (that also doesn't mention ?s1 or ?2) .. }
+ *     BIND (?s1 AS ex:endpoint1)
+ *     BIND (?s2 AS ex:endpoint3)
  *   }
  * }
  * </pre>
@@ -172,13 +180,32 @@ public class ValuesServiceQueryResolver
 	}
 
 	protected static Element rewrite( final Iterator<Element> it, final Binding solmap ) {
+		final ElementTransform transform = new MyElementTransform(solmap);
 		final ElementGroup eg = new ElementGroup();
 		while ( it.hasNext() ) {
-			final ElementTransform transform = new MyElementTransform(solmap);
 			final Element eOld = it.next();
 			final Element eNew = ElementTransformer.transform(eOld, transform);
-			eg.addElement(eNew);
+
+			// If the new element is the empty group graph pattern, then the
+			// transformer handled the special case of a SERVICE clause whose
+			// service variable is not bound in the given solution mapping.
+			// In this case, ...
+			if ( eNew instanceof ElementGroup eNewGroup && eNewGroup.isEmpty() ) {
+				// ... we do not need to add anything to the new group graph
+				// pattern that we are populating here; i.e., we do not need
+				// to do anything here.
+			}
+			else {
+				// Otherwise, we add the new element to the new group graph pattern.
+				eg.addElement(eNew);
+			}
 		}
+
+		// add BIND clauses for all bindings in the given solution mapping
+		solmap.forEach( (var,node) -> {
+			final NodeValue nv = NodeValue.makeNode(node);
+			eg.addElement( new ElementBind(var, nv) );
+		} );
 
 		return eg;
 	}
@@ -240,7 +267,7 @@ public class ValuesServiceQueryResolver
 	}
 
 
-	protected static class MyElementTransform extends ElementTransformCopyBase{
+	protected static class MyElementTransform extends ElementTransformCopyBase {
 		protected final Binding solmap;
 
 		public MyElementTransform( final Binding solmap ) { this.solmap = solmap; }

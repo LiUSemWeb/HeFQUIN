@@ -1,6 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
+import java.util.Map;
+
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -8,6 +13,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
@@ -129,7 +135,31 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "filter (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
-			out.append( " filterExpressions (" + lop.getFilterExpressions().toString() + ")" );
+
+			out.append( indentLevelStringForOpDetail + singleBase + "  - filterExpressions: " + lop.getFilterExpressions().toString() );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBind op ) {
+			final LogicalOpBind lop = (LogicalOpBind) op.getLogicalOperator();
+
+			out.append( indentLevelString + "bind (" + op.getID() + ") " );
+			out.append( System.lineSeparator() );
+			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
+
+			final VarExprList bindExpressions = lop.getBindExpressions();
+			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
+				final Var var = e.getKey();
+				final Expr expr = e.getValue();
+				out.append( indentLevelStringForOpDetail + singleBase + "  - " + var.toString() + " <-- " + expr.toString() );
+				out.append( System.lineSeparator() );
+			}
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 
@@ -140,7 +170,11 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "g2l (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
-			out.append( "  vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
+
+			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 
@@ -173,7 +207,11 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "l2g (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
-			out.append( "  vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
+
+			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 
@@ -225,7 +263,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 	                                            final PrintStream out,
 	                                            final OpNamePrinter lopNP ) {
 		printLogicalOperatorBase( pop.getLogicalOperator(),
-		                          indentLevelString + "  - lop ",
+		                          indentLevelString + "  - lop: ",
 		                          out,
 		                          lopNP );
 		out.append( System.lineSeparator() );
