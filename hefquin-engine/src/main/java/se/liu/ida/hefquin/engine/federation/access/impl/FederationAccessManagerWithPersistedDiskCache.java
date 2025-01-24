@@ -93,7 +93,7 @@ public class FederationAccessManagerWithPersistedDiskCache implements Federation
 	@Override
 	public CompletableFuture<SolMapsResponse> issueRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
 			throws FederationAccessException 
-	{
+	{	
 		cacheRequestsSPARQL++;
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
@@ -361,6 +361,14 @@ public class FederationAccessManagerWithPersistedDiskCache implements Federation
 		stats.put("cacheHitRate", cacheHitRate);
 
 		return stats;
+	}
+
+	/**
+	 * Clears the persisted cardinality cache map.
+	 */
+	public void clearCardinalityCache(){
+		cardinalityCache.clear();
+		cardinalityCache.save();
 	}
 
 }
