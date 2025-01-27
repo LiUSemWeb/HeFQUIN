@@ -142,7 +142,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		try {
 			statsAndExceptions = e.executeQuery( query, resFmt, out );
 		} catch ( final Exception ex ) {
-			System.out.flush();
+			out.flush();
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );
 		}
