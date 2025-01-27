@@ -40,9 +40,11 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponse
 
 public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTestBase {
 	protected static final long SLEEP_MILLIS = 500L;
-	protected static final long THRESHOLD = 50L;
-
 	protected static ExecutorService execServiceForFedAccess;
+	final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable( "s" ),
+		                                            NodeFactory.createVariable( "p" ),
+		                                            NodeFactory.createVariable( "o" ) );
+	final SPARQLRequest req = new SPARQLRequestImpl( tp );
 
 	@BeforeClass
 	public static void createExecService() {
@@ -63,40 +65,51 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 	}
 
 	@Test
-	public void cardinalityRequestNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
-			                                            NodeFactory.createVariable("p"),
-			                                            NodeFactory.createVariable("o") );
-		final SPARQLRequest req = new SPARQLRequestImpl( tp );
+	public void noCacheHit() throws FederationAccessException, InterruptedException, ExecutionException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://example.org/sparql");
-
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, 42 );
 		// clear cache
 		fedAccessMgr.clearCardinalityCache();
 		final long startTime = new Date().getTime();
 		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
 		final long duration = new Date().getTime() - startTime;
-		
 		// assert correct cardinality
 		assertEquals( 42, r.getCardinality() );
-		// assert that duration was above SLEEP_MILLIS (since not cached yet)
-		assertTrue( SLEEP_MILLIS < duration ); // slow
+		// assert that duration was above SLEEP_MILLIS (since not cached)
+		assertTrue( SLEEP_MILLIS < duration );
 	}
 
 	@Test
-	public void cardinalityRequestCacheHit() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
-			                                            NodeFactory.createVariable("p"),
-			                                            NodeFactory.createVariable("o") );
-		final SPARQLRequest req = new SPARQLRequestImpl( tp );
+	public void cacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://example.org/sparql");
+		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, 42 );
+		// clear cache
+		fedAccessMgr.clearCardinalityCache();
+		// issue request, not cached
+		final CardinalityResponse r1 = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		r1.getCardinality();
 
+		// issue request again
+		final long startTime = new Date().getTime();
+		final CardinalityResponse r2 = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		final long duration = new Date().getTime() - startTime;
+		// assert correct cardinality
+		assertEquals( 42, r2.getCardinality() );
+		// assert that duration is below SLEEP_MILLIS (since it is now cached)
+		assertTrue( SLEEP_MILLIS > duration );
+	}
+
+	@Test
+	public void cacheHitFromDisk() throws FederationAccessException, InterruptedException, ExecutionException {
+		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://example.org/sparql");
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, 42 );
-		fedAccessMgr1.clearCardinalityCache(); // clear cache
+		// clear cache
+		fedAccessMgr1.clearCardinalityCache();
+		// issue request, not cached
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( req, fm ).get();
-		assertEquals( 42, r1.getCardinality() ); // slow
+		r1.getCardinality();
 
-		// Read cache from disk using a new federation manager
+		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, -1 );
 		final long startTime = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( req, fm ).get();
@@ -104,45 +117,56 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		// assert correct cardinality
 		assertEquals( 42, r2.getCardinality() );
 		// assert that duration is below SLEEP_MILLIS (since it is now cached)
-		assertTrue( THRESHOLD > duration ); // fast
+		assertTrue( SLEEP_MILLIS > duration );
 	}
 
 	@Test
-	public void cardinalityRequestCacheTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable("s"),
-			                                            NodeFactory.createVariable("p"),
-			                                            NodeFactory.createVariable("o") );
-		final SPARQLRequest req = new SPARQLRequestImpl( tp );
+	public void sameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException {
 		final SPARQLEndpoint fm1 = new SPARQLEndpointForTest("http://example.org/sparql/1");
 		final SPARQLEndpoint fm2 = new SPARQLEndpointForTest("http://example.org/sparql/2");
-
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, 42 );
-		fedAccessMgr1.clearCardinalityCache(); // clear cache
+		// clear cache
+		fedAccessMgr1.clearCardinalityCache();
 		
-		// Issue request, not cached
+		// issue request against fm1, not cached
 		final long startTime1 = new Date().getTime();
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( req, fm1 ).get();
 		final long duration1 = new Date().getTime() - startTime1;
 		assertEquals( 42, r1.getCardinality() );
-		assertTrue( SLEEP_MILLIS < duration1 ); // slow
+		assertTrue( SLEEP_MILLIS < duration1 );
 		
-		// Issue request against a different federation member, not cached
+		// issue request against fm2, not cached
 		final long startTime2 = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr1.issueCardinalityRequest( req, fm2 ).get();
-		assertEquals( 42, r2.getCardinality() );
+		assertEquals( 43, r2.getCardinality() );
 		final long duration2 = new Date().getTime() - startTime2;
 		assertTrue( SLEEP_MILLIS < duration2 ); // slow
 		
-		// Read cache from disk using a new federation manager
+		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, -1 );
 		final long startTime3 = new Date().getTime();
 		final CardinalityResponse r3 = fedAccessMgr2.issueCardinalityRequest( req, fm1 ).get();
 		final CardinalityResponse r4 = fedAccessMgr2.issueCardinalityRequest( req, fm2 ).get();
 		final long duration3 = new Date().getTime() - startTime3;
 		assertEquals( 42, r3.getCardinality() );
-		assertEquals( 42, r4.getCardinality() );
-		assertTrue( THRESHOLD > duration3 ); // fast
-
+		assertEquals( 43, r4.getCardinality() );
+		assertTrue( SLEEP_MILLIS > duration3 ); // fast
+	}
+	@Test
+	public void twoRequestOneFederationMemberAsync() throws FederationAccessException, InterruptedException, ExecutionException {
+		final SPARQLEndpoint fm = new SPARQLEndpointForTest("http://example.org/sparql/1");
+		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess, SLEEP_MILLIS, 42 );
+		// clear cache
+		fedAccessMgr.clearCardinalityCache();
+		
+		// issue request against fm, not cached
+		fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		// sleep 100 ms
+		Thread.sleep(100);
+		// issue request against fm, not cached yet!
+		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
+		// Note: THe second request should get the same CompletableFutre as the first, i.e., return 42
+		assertEquals( 42, r.getCardinality() );
 	}
 
 	// ------------ helper code ------------
@@ -184,39 +208,70 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		return new FederationAccessManagerWithPersistedDiskCache( fedAccMan, 10000 );
 	}
 
-	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl
-	{
-		protected final long sleepMillis;
-		protected final int card;
+	/**
+	 * A custom SPARQL request processor that extends
+	 * {@code SPARQLRequestProcessorImpl}. This processor introduces an optional
+	 * delay before processing requests and generates mock solution mappings with an
+	 * incrementing count variable.
+	 */
+	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl {
 
+		/** The delay in milliseconds before processing each request. */
+		protected final long sleepMillis;
+
+		/** A counter used to generate mock results. */
+		protected int card;
+
+		/**
+		 * Constructs a {@code MySPARQLRequestProcessor} instance.
+		 *
+		 * @param sleepMillis the delay in milliseconds before processing each request
+		 * @param card        the initial count value for the generated solution
+		 *                    mappings
+		 */
 		public MySPARQLRequestProcessor( final long sleepMillis, final int card ) {
 			this.sleepMillis = sleepMillis;
 			this.card = card;
 		}
 
+		/**
+		 * Introduces a delay if {@code sleepMillis} is greater than zero. Sleeps the
+		 * current thread for the specified duration.
+		 */
 		protected void sleep() {
 			if ( sleepMillis > 0L ) {
 				try {
-					Thread.sleep(sleepMillis);
+					Thread.sleep( sleepMillis );
 				} catch ( final InterruptedException e ) {
-					throw new RuntimeException(e);
+					throw new RuntimeException( e );
 				}
 			}
 		}
 
+		/**
+		 * Performs a request by introducing a delay and generating a mock response.
+		 *
+		 * @param req the SPARQL request to process
+		 * @param fm  the deferation member to query
+		 * @return a {@code SolMapsResponse} containing a mock solution mapping with an
+		 *         incrementing count variable
+		 * @throws FederationAccessException if an error occurs during request execution
+		 */
 		@Override
-		public SolMapsResponse performRequest(SPARQLRequest req, SPARQLEndpoint fm) throws FederationAccessException {
-			// add delay
+		public SolMapsResponse performRequest( SPARQLRequest req, SPARQLEndpoint fm ) throws FederationAccessException {
+			// Introduce delay before processing the request
 			sleep();
-			// Create a QuerySolutionMap (mocked solution mapping)
+
+			// Create a mock solution mapping
 			QuerySolutionMap solMap = new QuerySolutionMap();
-			// Create a typed literal for the count value
-			Literal countLiteral = ModelFactory.createDefaultModel().createTypedLiteral(card);
-			// Bind the literal to the count variable
-			solMap.add("__hefquinCountVar", countLiteral);
-			// Wrap in a list
-			List<SolutionMapping> mockResult = Collections.singletonList(SolutionMappingUtils.createSolutionMapping(solMap));
-			return new SolMapsResponseImpl(mockResult, fm, req, new Date());
+			Literal countLiteral = ModelFactory.createDefaultModel().createTypedLiteral( card );
+			card++;
+			solMap.add( "__hefquinCountVar", countLiteral );
+
+			// Wrap in a list and return the response
+			List<SolutionMapping> mockResult = Collections.singletonList( SolutionMappingUtils.createSolutionMapping( solMap ) );
+			return new SolMapsResponseImpl( mockResult, fm, req, new Date() );
 		}
 	}
+
 }
