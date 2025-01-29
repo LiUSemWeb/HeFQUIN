@@ -11,8 +11,8 @@ import se.liu.ida.hefquin.base.query.SPARQLQuery;
 public class CardinalityCacheKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final String query;
-	private final String url;
+	protected final String query;
+	protected final String url;
 
 	/**
 	 * Constructs a new CardinalityCacheKey using a SPARQL query and a URL.
