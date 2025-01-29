@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.GenericCacheImpl;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
