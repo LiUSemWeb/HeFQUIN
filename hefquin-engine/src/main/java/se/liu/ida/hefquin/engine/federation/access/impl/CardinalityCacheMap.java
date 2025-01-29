@@ -6,31 +6,32 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 
 /**
  * A thread-safe cache implementation for storing cardinality responses. This
- * cache uses a ConcurrentHashMap and supports serialization to persist data.
+ * cache uses a {@link ConcurrentHashMap} to store values and supports
+ * serialization for persistence.
  *
  * @param <K> The key type for caching cardinality responses.
  */
-public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<CardinalityResponse>> {
+public class CardinalityCacheMap<K> implements PersistableCache<K, CompletableFuture<CardinalityResponse>> {
 
 	protected final Map<K, CompletableFuture<CardinalityResponse>> map = new ConcurrentHashMap<>();
 	protected String filename = "cache/cache.dat";
 
 	/**
-	 * Constructs a new CardinalityCacheMap with the default cache file.
+	 * Constructs a new {@link CardinalityCacheMap} with the default cache file.
 	 */
 	public CardinalityCacheMap() {
 		ensureFileExists();
@@ -38,7 +39,7 @@ public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<Cardinal
 	}
 
 	/**
-	 * Constructs a new CardinalityCacheMap with a custom file path.
+	 * Constructs a new {@link CardinalityCacheMap} with a custom file path.
 	 *
 	 * @param filename Path to the cache file.
 	 */
@@ -49,7 +50,8 @@ public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<Cardinal
 	}
 
 	/**
-	 * Ensures that the cache file exists before reading or writing.
+	 * Ensures that the cache file exists before reading or writing. If the file
+	 * does not exist, it is created along with necessary directories.
 	 */
 	private void ensureFileExists() {
 		final File file = new File( filename );
@@ -65,7 +67,8 @@ public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<Cardinal
 	}
 
 	/**
-	 * Saves the current cache state to a file asynchronously.
+	 * Saves the current cache state to a file. Only completed
+	 * {@link CardinalityResponse} objects are persisted.
 	 */
 	public void save() {
 		Map<K, Integer> snapshot = new HashMap<>();
@@ -91,7 +94,8 @@ public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<Cardinal
 	}
 
 	/**
-	 * Loads the cache state from a file.
+	 * Loads the cache state from a file. The data is deserialized and stored in
+	 * memory.
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void load() {
@@ -110,70 +114,84 @@ public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<Cardinal
 		}
 	}
 
+	/**
+	 * Adds a new cardinality response to the cache, associated with the given key.
+	 * If an entry already exists for this key, it is replaced.
+	 *
+	 * @param key   The key identifying the response.
+	 * @param value The cardinality response to store.
+	 */
 	@Override
-	public int size() {
-		return map.size();
+	public void put( K key, CompletableFuture<CardinalityResponse> value ) {
+		map.put( key, value );
 	}
 
+	/**
+	 * Retrieves the cardinality response associated with the given key.
+	 *
+	 * @param key The key to look up.
+	 * @return The cached response, or {@link null} if not found.
+	 */
+	@Override
+	public CompletableFuture<CardinalityResponse> get( K key ) {
+		return map.get( key );
+	}
+
+	/**
+	 * Removes the entry associated with the given key from the cache.
+	 *
+	 * @param key The key to remove.
+	 * @return {@link true} if an entry was removed, {@link false} otherwise.
+	 */
+	@Override
+	public boolean evict( K key ) {
+		return map.remove( key ) == null;
+	}
+
+	/**
+	 * Removes the specified entry from the cache only if the current value matches.
+	 *
+	 * @param key   The key to remove.
+	 * @param value The expected value to match before removal.
+	 * @return {@link true} if the entry was removed, {@link false} otherwise.
+	 */
+	@Override
+	public boolean evict( K key, CompletableFuture<CardinalityResponse> value ) {
+		return map.remove( key, value );
+	}
+
+	/**
+	 * Checks whether the cache is currently empty.
+	 *
+	 * @return {@link true} if the cache is empty, {@link false} otherwise.
+	 */
 	@Override
 	public boolean isEmpty() {
 		return map.isEmpty();
 	}
 
-	@Override
-	public boolean containsKey( Object key ) {
-		return map.containsKey( key );
-	}
-
-	@Override
-	public boolean containsValue( Object value ) {
-		return map.containsKey( value );
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> get( Object key ) {
-		return map.get( key );
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> put( K key, CompletableFuture<CardinalityResponse> value ) {
-		return map.put( key, value );
-	}
-
-	@Override
-	public CompletableFuture<CardinalityResponse> remove( Object key ) {
-		return map.remove( key );
-	}
-
-	@Override
-	public void putAll( Map<? extends K, ? extends CompletableFuture<CardinalityResponse>> m ) {
-		map.putAll( m );
-	}
-
+	/**
+	 * Clears all entries from the cache.
+	 */
 	@Override
 	public void clear() {
 		map.clear();
 	}
 
+	/**
+	 * Adds multiple key-value pairs to the cache.
+	 *
+	 * @param map A map of keys and corresponding values to add to the cache.
+	 */
 	@Override
-	public Set<K> keySet() {
-		return map.keySet();
-	}
-
-	@Override
-	public Collection<CompletableFuture<CardinalityResponse>> values() {
-		return map.values();
-	}
-
-	@Override
-	public Set<Entry<K, CompletableFuture<CardinalityResponse>>> entrySet() {
-		return map.entrySet();
+	public void putAll( Map<K, CompletableFuture<CardinalityResponse>> map ) {
+		map.putAll( map );
 	}
 
 	/**
-	 * A simple implementation of CardinalityResponse.
+	 * A simple implementation of {@link CardinalityResponse}.
 	 */
-	private static class CachedCardinalityResponse implements CardinalityResponse {
+	private class CachedCardinalityResponse implements CardinalityResponse {
 		private final int cardinality;
 
 		/**
