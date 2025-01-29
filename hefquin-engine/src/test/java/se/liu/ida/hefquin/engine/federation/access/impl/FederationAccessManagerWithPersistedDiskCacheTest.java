@@ -263,13 +263,13 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 			sleep();
 
 			// Create a mock solution mapping
-			QuerySolutionMap solMap = new QuerySolutionMap();
-			Literal countLiteral = ModelFactory.createDefaultModel().createTypedLiteral( card );
+			final Node countLiteral = NodeFactory.createLiteralByValue(card, XSDDatatype.XSDinteger);
+			final Var var = Var.alloc("__hefquinCountVar");
+			final SolutionMapping solMap = SolutionMappingUtils.createSolutionMapping(var, countLiteral);
 			card++;
-			solMap.add( "__hefquinCountVar", countLiteral );
 
 			// Wrap in a list and return the response
-			List<SolutionMapping> mockResult = Collections.singletonList( SolutionMappingUtils.createSolutionMapping( solMap ) );
+			List<SolutionMapping> mockResult = Collections.singletonList(solMap);
 			return new SolMapsResponseImpl( mockResult, fm, req, new Date() );
 		}
 	}
