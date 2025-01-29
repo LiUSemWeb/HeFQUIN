@@ -26,8 +26,8 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
  */
 public class CardinalityCacheMap<K> implements Map<K, CompletableFuture<CardinalityResponse>> {
 
-	private final Map<K, CompletableFuture<CardinalityResponse>> map = new ConcurrentHashMap<>();
-	private String filename = "cache/cache.dat";
+	protected final Map<K, CompletableFuture<CardinalityResponse>> map = new ConcurrentHashMap<>();
+	protected String filename = "cache/cache.dat";
 
 	/**
 	 * Constructs a new CardinalityCacheMap with the default cache file.
