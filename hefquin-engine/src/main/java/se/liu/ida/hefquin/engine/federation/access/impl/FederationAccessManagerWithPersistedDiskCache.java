@@ -29,14 +29,14 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
  */
 public class FederationAccessManagerWithPersistedDiskCache extends FederationAccessManagerWithCache
 {
-	protected CardinalityCacheMap<CardinalityCacheKey> cardinalityCache;
+	protected PersistableCardinalityCacheImpl<CardinalityCacheKey> cardinalityCache;
 
 	public FederationAccessManagerWithPersistedDiskCache( final FederationAccessManager fedAccMan,
 	                                                      final int cacheCapacity,
 	                                                      final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies ) 
 	{
 		super( fedAccMan, cacheCapacity, cachePolicies );
-		cardinalityCache = new CardinalityCacheMap<>();
+		cardinalityCache = new PersistableCardinalityCacheImpl<>();
 	}
 
 	public FederationAccessManagerWithPersistedDiskCache( final FederationAccessManager fedAccMan,
