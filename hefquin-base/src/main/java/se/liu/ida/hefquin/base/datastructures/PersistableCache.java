@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.base.datastructures;
 
-import java.util.Map;
-
 /**
  * A generic interface for data structures that can be used as a persisted cache
  * for objects of a specific type. Implementations of this interface may employ
@@ -13,16 +11,21 @@ import java.util.Map;
 public interface PersistableCache<IdType, ObjectType> extends Cache<IdType, ObjectType> {
 
 	/**
-	 * Adds all entries in the incoming map to this cache, associating each object
-	 * with its corresponding ID. If an object is already associated with a given
-	 * ID, it will be replaced by the new one.
+	 * Saves the current state of the cache to persistent storage.
+	 * Implementations may choose different mechanisms for persistence, 
+	 * such as writing to a file or a database.
 	 * 
-	 * Updating the cache may also lead to the eviction of other cached objects,
-	 * depending on, whether the cache has reached its capacity. In such a case, the
-	 * object(s) that are evicted are determined based on the cache replacement
-	 * policy of this cache.
-	 * 
-	 * @param entries a map of IDs to objects to be added to the cache
+	 * This method should ensure that all cached data is synchronized with
+	 * persistent storage. Depending on the implementation, synchronization
+	 * may be automatic or explicitly controlled.
 	 */
-	void putAll( Map<IdType, ObjectType> map );
+	void save();
+
+	/**
+	 * Loads the cache state from persistent storage.
+	 * If persistent data exists, it should be restored into the cache.
+	 * Implementations should handle cases where no prior state exists
+	 * gracefully.
+	 */
+	void load();
 }
