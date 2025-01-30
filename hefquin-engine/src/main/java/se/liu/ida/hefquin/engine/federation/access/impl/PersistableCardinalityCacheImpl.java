@@ -179,16 +179,6 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 	}
 
 	/**
-	 * Adds multiple key-value pairs to the cache.
-	 *
-	 * @param map A map of keys and corresponding values to add to the cache.
-	 */
-	@Override
-	public void putAll( Map<K, CompletableFuture<CardinalityResponse>> map ) {
-		map.putAll( map );
-	}
-
-	/**
 	 * A simple implementation of {@link CardinalityResponse}.
 	 */
 	private class CachedCardinalityResponse implements CardinalityResponse {
