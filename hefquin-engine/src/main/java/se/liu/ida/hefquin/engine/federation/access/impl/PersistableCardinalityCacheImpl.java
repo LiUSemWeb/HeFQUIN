@@ -28,14 +28,14 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, CompletableFuture<CardinalityResponse>> {
 
 	protected final Map<K, CompletableFuture<CardinalityResponse>> map = new ConcurrentHashMap<>();
-	protected String filename = "cache/cache.dat";
+	protected final String filename;
+	protected final static String defaultFilename = "cache/cache.dat";
 
 	/**
 	 * Constructs a new {@link PersistableCardinalityCacheImpl} with the default cache file.
 	 */
 	public PersistableCardinalityCacheImpl() {
-		ensureFileExists();
-		load();
+		this(defaultFilename);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 	 *
 	 * @param filename Path to the cache file.
 	 */
-	public PersistableCardinalityCacheImpl( String filename ) {
+	public PersistableCardinalityCacheImpl( final String filename ) {
 		this.filename = filename;
 		ensureFileExists();
 		load();

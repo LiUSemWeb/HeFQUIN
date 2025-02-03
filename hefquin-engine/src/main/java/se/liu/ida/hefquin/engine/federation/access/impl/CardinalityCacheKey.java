@@ -17,30 +17,36 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 public class CardinalityCacheKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	protected String query;
-	protected String url;
-	protected String bindings;
+	protected final String query;
+	protected final String url;
+	protected final String bindings;
 
 	public CardinalityCacheKey( final DataRetrievalRequest req, final FederationMember fm ) {
-		// Default field values to ensure they are always initialized
-		this.query = req.toString();
-		this.url = fm.toString();
-		this.bindings = "";
-
 		if ( req instanceof SPARQLRequest sparqlRequest && fm instanceof SPARQLEndpoint sparqlEndpoint ) {
 			query = sparqlRequest.toString();
 			url = sparqlEndpoint.getInterface().getURL();
-		} else if ( req instanceof TPFRequest tpfRequest ) {
+			bindings = "";
+		}
+		else if ( req instanceof TPFRequest tpfRequest ) {
 			query = tpfRequest.toString();
+			bindings = "";
 			if ( fm instanceof TPFServer tpfServer ) {
 				url = tpfServer.getInterface().createRequestURL( tpfRequest );
-			} else if ( fm instanceof BRTPFServer brtpfServer ) {
+			}
+			else if ( fm instanceof BRTPFServer brtpfServer ) {
 				url = brtpfServer.getInterface().createRequestURL( tpfRequest );
 			}
-		} else if ( req instanceof BRTPFRequest brtpfRequest && fm instanceof BRTPFServer brtpfServer ) {
+			else {
+				throw new IllegalArgumentException( "Unexpected type of server: " + fm.getClass().getName() );
+			}
+		}
+		else if ( req instanceof BRTPFRequest brtpfRequest && fm instanceof BRTPFServer brtpfServer ) {
 			query = brtpfRequest.getTriplePattern().toString();
 			url = brtpfServer.getInterface().createRequestURL( brtpfRequest );
 			bindings = brtpfRequest.getSolutionMappings().toString();
+		}
+		else {
+			throw new IllegalArgumentException( "Unexpected request type: " + req.getClass().getName() + "(server type: " + fm.getClass().getName() + ")" );
 		}
 	}
 

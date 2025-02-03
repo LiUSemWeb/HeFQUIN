@@ -33,7 +33,7 @@ import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
  */
 public class FederationAccessManagerWithPersistedDiskCache extends FederationAccessManagerWithCache
 {
-	protected PersistableCardinalityCacheImpl<CardinalityCacheKey> cardinalityCache;
+	protected final PersistableCardinalityCacheImpl<CardinalityCacheKey> cardinalityCache;
 
 	public FederationAccessManagerWithPersistedDiskCache( final FederationAccessManager fedAccMan,
 	                                                      final int cacheCapacity,
@@ -84,7 +84,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 		final CompletableFuture<CardinalityResponse> cachedResponse = cardinalityCache.get( key );
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
@@ -102,7 +102,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 		final CompletableFuture<CardinalityResponse> cachedResponse = cardinalityCache.get( key );
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
@@ -120,7 +120,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 		final CompletableFuture<CardinalityResponse> cachedResponse = cardinalityCache.get( key );
 		if ( cachedResponse != null ) {
 			cacheHitsBRTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse;
 		}
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm) ;
 		cardinalityCache.put( key, newResponse );
