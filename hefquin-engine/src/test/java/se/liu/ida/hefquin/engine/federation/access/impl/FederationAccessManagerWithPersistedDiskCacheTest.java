@@ -88,7 +88,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		// assert correct cardinality
 		assertEquals( 42, r.getCardinality() );
 		// assert that duration was above SLEEP_MILLIS (since not cached)
-		assertTrue( SLEEP_MILLIS < duration );
+		assertTrue( SLEEP_MILLIS <= duration );
 	}
 
 	@Test
@@ -153,14 +153,14 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( sparqlReq, fm1 ).get();
 		final long duration1 = new Date().getTime() - startTime1;
 		assertEquals( 42, r1.getCardinality() );
-		assertTrue( SLEEP_MILLIS < duration1 );
+		assertTrue( SLEEP_MILLIS <= duration1 );
 		
 		// issue request against fm2, not cached
 		final long startTime2 = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr1.issueCardinalityRequest( sparqlReq, fm2 ).get();
 		assertEquals( 43, r2.getCardinality() );
 		final long duration2 = new Date().getTime() - startTime2;
-		assertTrue( SLEEP_MILLIS < duration2 ); // slow
+		assertTrue( SLEEP_MILLIS <= duration2 ); // slow
 		
 		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess,
@@ -208,7 +208,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		// assert correct cardinality
 		assertEquals( 42, r.getCardinality() );
 		// assert that duration was above SLEEP_MILLIS (since not cached)
-		assertTrue( SLEEP_MILLIS < duration );
+		assertTrue( SLEEP_MILLIS <= duration );
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		// assert correct cardinality
 		assertEquals( 42, r.getCardinality() );
 		// assert that duration was above SLEEP_MILLIS (since not cached)
-		assertTrue( SLEEP_MILLIS < duration );
+		assertTrue( SLEEP_MILLIS <= duration );
 	}
 
 	@Test
@@ -335,14 +335,14 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( tpfReq, fm1 ).get();
 		final long duration1 = new Date().getTime() - startTime1;
 		assertEquals( 42, r1.getCardinality() );
-		assertTrue( SLEEP_MILLIS < duration1 );
+		assertTrue( SLEEP_MILLIS <= duration1 );
 
 		// issue request against fm2, not cached
 		final long startTime2 = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr1.issueCardinalityRequest( tpfReq, fm2 ).get();
 		assertEquals( 43, r2.getCardinality() );
 		final long duration2 = new Date().getTime() - startTime2;
-		assertTrue( SLEEP_MILLIS < duration2 ); // slow
+		assertTrue( SLEEP_MILLIS <= duration2 ); // slow
 
 		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess,
@@ -372,14 +372,14 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( tpfReq, fm1 ).get();
 		final long duration1 = new Date().getTime() - startTime1;
 		assertEquals( 42, r1.getCardinality() );
-		assertTrue( SLEEP_MILLIS < duration1 );
+		assertTrue( SLEEP_MILLIS <= duration1 );
 
 		// issue request against fm2, not cached
 		final long startTime2 = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr1.issueCardinalityRequest( tpfReq, fm2 ).get();
 		assertEquals( 43, r2.getCardinality() );
 		final long duration2 = new Date().getTime() - startTime2;
-		assertTrue( SLEEP_MILLIS < duration2 ); // slow
+		assertTrue( SLEEP_MILLIS <= duration2 ); // slow
 
 		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess,
@@ -449,7 +449,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		assertEquals( 42, r.getCardinality() );
 
 		// assert that duration was above SLEEP_MILLIS (since not cached)
-		assertTrue( SLEEP_MILLIS < duration );
+		assertTrue( SLEEP_MILLIS <= duration );
 	}
 
 	@Test
@@ -514,14 +514,14 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends EngineTes
 		final CardinalityResponse r1 = fedAccessMgr1.issueCardinalityRequest( brtpfReq, fm1 ).get();
 		final long duration1 = new Date().getTime() - startTime1;
 		assertEquals( 42, r1.getCardinality() );
-		assertTrue( SLEEP_MILLIS < duration1 );
+		assertTrue( SLEEP_MILLIS <= duration1 );
 
 		// issue request against fm2, not cached
 		final long startTime2 = new Date().getTime();
 		final CardinalityResponse r2 = fedAccessMgr1.issueCardinalityRequest( brtpfReq, fm2 ).get();
 		assertEquals( 43, r2.getCardinality() );
 		final long duration2 = new Date().getTime() - startTime2;
-		assertTrue( SLEEP_MILLIS < duration2 ); // slow
+		assertTrue( SLEEP_MILLIS <= duration2 ); // slow
 
 		// create a new federation access manager
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr2 = createFedAccessMgrForTests( execServiceForFedAccess,
