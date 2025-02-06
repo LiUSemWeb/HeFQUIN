@@ -23,7 +23,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
 @WebServlet
 public class HeFQUINServlet extends HttpServlet {
@@ -75,12 +77,14 @@ public class HeFQUINServlet extends HttpServlet {
 		response.setCharacterEncoding( "utf-8" );
 
 		String query = null;
+		boolean printQueryProcMeasurements = false;
 		switch ( contentType ) {
 		case "application/sparql-query":
 			query = readRequestBody( request );
 			break;
 		case "application/x-www-form-urlencoded":
 			query = request.getParameter( "query" );
+			printQueryProcMeasurements = "true".equals(request.getParameter("printQueryProcMeasurements"));
 			break;
 		default:
 			response.setStatus( 415 ); // Unsupported Media Type
@@ -103,7 +107,7 @@ public class HeFQUINServlet extends HttpServlet {
 		}
 
 		try {
-			final String result = execute( query, accept );
+			final String result = execute( query, accept, printQueryProcMeasurements );
 			response.setStatus( 200 );
 			response.setHeader( "Content-Type", accept );
 			response.getWriter().println( result );
@@ -178,13 +182,33 @@ public class HeFQUINServlet extends HttpServlet {
 	}
 
 	private static String execute( final String queryString, final String mimeType )
+		throws UnsupportedEncodingException {
+			return execute( queryString, mimeType, false );
+	}
+
+	private static String execute( final String queryString, final String mimeType, boolean printQueryProcMeasurements )
 			throws UnsupportedEncodingException {
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos, true, "utf-8" );
-		engine.executeQuery( query, resultsFormat, ps );
+		final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
 		ps.close();
+		
+		// Return statistics
+		if ( printQueryProcMeasurements ) {
+			if ( statsAndExceptions != null && statsAndExceptions.object1 != null ) {
+				final long overallQueryProcessingTime = statsAndExceptions.object1.getOverallQueryProcessingTime();
+				final long planningTime = statsAndExceptions.object1.getPlanningTime();
+				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
+				final long executionTime = statsAndExceptions.object1.getExecutionTime();
+				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
+						+ ", " + executionTime;
+				System.out.println( queryProcStats );
+				return queryProcStats;
+			}
+		}
+
 		return baos.toString();
 	}
 
