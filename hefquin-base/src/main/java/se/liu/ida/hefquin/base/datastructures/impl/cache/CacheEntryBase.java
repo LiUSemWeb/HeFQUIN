@@ -1,8 +1,11 @@
 package se.liu.ida.hefquin.base.datastructures.impl.cache;
 
-public class CacheEntryBase<ObjectType> implements CacheEntry<ObjectType>
+import java.io.Serializable;
+
+public class CacheEntryBase<ObjectType> implements CacheEntry<ObjectType>, Serializable
 {
-	protected final ObjectType obj;
+	private static final long serialVersionUID = 1L;
+	protected ObjectType obj;
 
 	public CacheEntryBase( final ObjectType obj ) {
 		assert obj != null;
