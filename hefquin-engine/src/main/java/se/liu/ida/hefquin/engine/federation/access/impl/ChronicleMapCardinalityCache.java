@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.PersistableCache;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 
 /**
  * A thread-safe persistent cache implementation for storing cardinality entries. This
@@ -17,14 +19,18 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
 
+	protected final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies;
+	protected final CacheInvalidationPolicy<CardinalityCacheEntry, Integer> invalidationPolicy;
+	// protected final CacheReplacementPolicy<CardinalityCacheKey, Integer, CardinalityCacheEntry> replacementPolicy;
+
 	/**
 	 * Constructs a new {@link ChronicleMapCardinalityCache} with the default
 	 * cache file and the default capacity.
 	 * 
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache() throws IOException {
-		this( defaultCapacity, defaultFilename );
+	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies ) throws IOException {
+		this( policies, defaultCapacity, defaultFilename );
 	}
 
 	/**
@@ -34,8 +40,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param capacity Maximum cache capacity.
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache( final int capacity ) throws IOException {
-		this( capacity, defaultFilename );
+	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies, final int capacity ) throws IOException {
+		this( policies, capacity, defaultFilename );
 	}
 	
 	/**
@@ -45,7 +51,10 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param filename Path to the cache file.
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache( final int capacity, final String filename ) throws IOException {
+	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies, final int capacity, final String filename ) throws IOException {
+		this.policies = policies;
+		invalidationPolicy = policies.getInvalidationPolicy();
+
 		this.filename = filename;
 		ensureFileExists();
 
@@ -75,6 +84,18 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 
 	/**
+	 * Adds a new value to the cache, associated with the given key.
+	 * If an entry already exists for this key, it is replaced.
+	 *
+	 * @param key   The key identifying the response.
+	 * @param value The entry to store.
+	 */
+	public void put( CardinalityCacheKey key, Integer value ) {
+		final CardinalityCacheEntry entry = policies.getEntryFactory().createCacheEntry( value );
+		map.put( key, entry );
+	}
+
+	/**
 	 * Adds a new cache entry to the cache, associated with the given key.
 	 * If an entry already exists for this key, it is replaced.
 	 *
@@ -98,11 +119,13 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 		if( entry == null ){
 			return null;
 		}
+
 		// lazy evict
-		if( !entry.isValid() ){
+		if( !invalidationPolicy.isStillValid( entry )){
 			evict( key );
 			return null;
 		}
+
 		return entry;
 	}
 
