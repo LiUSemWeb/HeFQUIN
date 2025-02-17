@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
+import java.time.Instant;
+
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
 
 /**
@@ -7,9 +9,16 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
  */
 public class CardinalityCacheEntry extends CacheEntryBase<Integer> {
 	private static final long serialVersionUID = 1L;
+	private final long expirationTime;
+	private final long defaultTTL = 5 * 60 * 1000; // ms
 
 	public CardinalityCacheEntry( final Integer cardinality ){
-		super(cardinality);
+		this( cardinality, null );
+	}
+	
+	public CardinalityCacheEntry( final Integer cardinality, final Long expirationTime ){
+		super( cardinality );
+        this.expirationTime = (expirationTime != null) ? expirationTime : Instant.now().getEpochSecond() + defaultTTL;
 	}
 
 	@Override
@@ -31,4 +40,8 @@ public class CardinalityCacheEntry extends CacheEntryBase<Integer> {
 		return "CardinalityCacheEntry{cardinality='" + getObject() + "'}";
 	}
 
+
+	public boolean isValid(){
+		return expirationTime > Instant.now().toEpochMilli();
+	}
 }
