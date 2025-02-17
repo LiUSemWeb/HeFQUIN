@@ -76,7 +76,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -103,7 +103,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -130,7 +130,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -157,7 +157,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
