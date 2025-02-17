@@ -14,16 +14,28 @@ import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry> {
 	final ChronicleMap<CardinalityCacheKey, CardinalityCacheEntry> map;
 	protected final String filename;
+	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
 
 	/**
-	 * Constructs a new {@link PersistableCardinalityCacheImpl} with the default
-	 * cache file.
+	 * Constructs a new {@link ChronicleMapCardinalityCache} with the default
+	 * cache file and the default capacity.
 	 * 
 	 * @throws IOException
 	 */
 	public ChronicleMapCardinalityCache() throws IOException {
-		this( defaultFilename );
+		this( defaultCapacity, defaultFilename );
+	}
+
+	/**
+	 * Constructs a new {@link ChronicleMapCardinalityCache} with the default
+	 * cache file and a maximum capacity.
+	 *
+	 * @param capacity Maximum cache capacity.
+	 * @throws IOException
+	 */
+	public ChronicleMapCardinalityCache( final int capacity ) throws IOException {
+		this( capacity, defaultFilename );
 	}
 	
 	/**
@@ -33,16 +45,17 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param filename Path to the cache file.
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache( final String filename ) throws IOException {
+	public ChronicleMapCardinalityCache( final int capacity, final String filename ) throws IOException {
 		this.filename = filename;
 		ensureFileExists();
 
 		// ChronicleMap for persistent storage
 		map = ChronicleMap.of( CardinalityCacheKey.class, CardinalityCacheEntry.class )
-				.name( "cardinality-map" ).entries( 10_000 )
-				.averageKeySize( 512 )
-				.averageValueSize( 64 )
-				.createPersistedTo( new File( this.filename ) );
+			.name( "cardinality-map" )
+			.entries( capacity )
+			.averageKeySize( 512 )
+			.averageValueSize( 64 )
+			.createPersistedTo( new File( this.filename ) );
 	}
 	
 	/**
@@ -81,12 +94,21 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 */
 	@Override
 	public CardinalityCacheEntry get( CardinalityCacheKey key ) {
-		return map.get( key );
+		final CardinalityCacheEntry entry = map.get( key );
+		if( entry == null ){
+			return null;
+		}
+		// lazy evict
+		if( !entry.isValid() ){
+			evict( key );
+			return null;
+		}
+		return entry;
 	}
 
 
 	/**
-	 * Removes the cahce entry associated with the given key from the cache.
+	 * Removes the cache entry associated with the given key from the cache.
 	 *
 	 * @param key The key to remove.
 	 * @return {@link true} if an entry was removed, {@link false} otherwise.
