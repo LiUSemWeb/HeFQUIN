@@ -2,10 +2,12 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import java.time.Instant;
 
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
+
 /**
  * An entry used when caching cardinality requests.
  */
-public class CardinalityCacheEntryFactory  {
+public class CardinalityCacheEntryFactory implements CacheEntryFactory<CardinalityCacheEntry, Integer> {
 	private final long defaultTimeToLive = 5 * 60 * 1000; // ms
 	private final long timeToLive;
 
@@ -17,7 +19,8 @@ public class CardinalityCacheEntryFactory  {
 		this.timeToLive = timeToLive;
 	}
 
-	public CardinalityCacheEntry createEntry( int cardinality ){
+	@Override
+	public CardinalityCacheEntry createCacheEntry( final Integer cardinality ) {
 		final long expirationTime = Instant.now().toEpochMilli() + timeToLive;
 		return new CardinalityCacheEntry( cardinality, expirationTime );
 	}
