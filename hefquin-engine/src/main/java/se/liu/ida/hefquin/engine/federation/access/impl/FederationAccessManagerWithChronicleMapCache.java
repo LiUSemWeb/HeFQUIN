@@ -6,7 +6,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -25,18 +28,18 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.CachedCardinali
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache
 {
-	protected final CardinalityCacheEntryFactory cardinalityCacheEntryFactory;
+	// protected final CardinalityCacheEntryFactory cardinalityCacheEntryFactory;
 	protected final ChronicleMapCardinalityCache cardinalityCache;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
 	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies,
-	                                                     final long timeToLive )
+	                                                     final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> cardinalityCachePolicies )
 		throws IOException
 	{
 		super( fedAccMan, cacheCapacity, cachePolicies );
-		cardinalityCache = new ChronicleMapCardinalityCache( 500 );
-		cardinalityCacheEntryFactory = new CardinalityCacheEntryFactory( timeToLive );
+		cardinalityCache = new ChronicleMapCardinalityCache( cardinalityCachePolicies );
+		//cardinalityCacheEntryFactory = new CardinalityCacheEntryFactory( timeToLive );
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
@@ -44,7 +47,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	                                                     final long timeToLive )
 		throws IOException
 	{
-		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies(), timeToLive );
+		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies(), new MyDefaultCardinalityCachePolicies( timeToLive ) );
 	}
 
 	/**
@@ -52,7 +55,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final ExecutorService execService ) throws IOException
 	{
-		this( new AsyncFederationAccessManagerImpl( execService ), 1000, new MyDefaultCachePolicies(), 5 * 60 * 1000 );
+		this( new AsyncFederationAccessManagerImpl( execService ), 1000, new MyDefaultCachePolicies(), new MyDefaultCardinalityCachePolicies() );
 	}
 	
 	@Override
@@ -76,8 +79,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
-			cardinalityCache.put( key,  cacheEntry );
+			// final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
+			cardinalityCache.put( key,  value.getCardinality() );
 		});
 		return newResponse;
 	}
@@ -103,8 +106,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
-			cardinalityCache.put( key,  cacheEntry );
+			// final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
+			cardinalityCache.put( key,  value.getCardinality() );
 		});
 		return newResponse;
 	}
@@ -130,8 +133,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
-			cardinalityCache.put( key,  cacheEntry );
+			// final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
+			cardinalityCache.put( key,  value.getCardinality() );
 		});
 		return newResponse;
 	}
@@ -157,8 +160,8 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
-			cardinalityCache.put( key,  cacheEntry );
+			// final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createCacheEntry( value.getCardinality() );
+			cardinalityCache.put( key,  value.getCardinality() );
 		});
 		return newResponse;
 	}
@@ -169,4 +172,33 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	public void clearCardinalityCache(){
 		cardinalityCache.clear();
 	}
+
+	protected static class MyDefaultCardinalityCachePolicies implements CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry>
+	{
+		protected final long timeToLive;
+		protected final static long defaultTimeToLive = 5 * 60 * 1000;
+
+		public MyDefaultCardinalityCachePolicies(){
+			this( defaultTimeToLive );
+		}
+
+		public MyDefaultCardinalityCachePolicies( final long timeToLive ){
+			this.timeToLive = timeToLive;
+		}
+
+		@Override
+		public CacheEntryFactory<CardinalityCacheEntry, Integer> getEntryFactory() {
+			return new CardinalityCacheEntryFactory();
+		}
+
+		@Override
+		public CacheReplacementPolicyFactory<CardinalityCacheKey, Integer, CardinalityCacheEntry> getReplacementPolicyFactory() {
+			throw new UnsupportedOperationException("Unimplemented method 'getReplacementPolicyFactory'");
+		}
+
+		@Override
+		public CacheInvalidationPolicy<CardinalityCacheEntry, Integer> getInvalidationPolicy() {
+			return new CacheInvalidationPolicyTimeToLive<>( timeToLive );
+		}
+	} // end of MyDefaultCachePolicies
 }
