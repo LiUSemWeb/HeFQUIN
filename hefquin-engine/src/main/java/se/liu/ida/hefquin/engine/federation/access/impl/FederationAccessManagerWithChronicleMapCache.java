@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CachedCardinalityResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
 
 /**
  * A FederationAccessManager implementation that incorporates persistent disk
@@ -26,30 +25,34 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResp
  */
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache
 {
+	protected final CardinalityCacheEntryFactory cardinalityCacheEntryFactory;
 	protected final ChronicleMapCardinalityCache cardinalityCache;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-														final int cacheCapacity,
-														final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies )
+	                                                     final int cacheCapacity,
+	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies,
+	                                                     final long timeToLive )
 		throws IOException
 	{
 		super( fedAccMan, cacheCapacity, cachePolicies );
-		cardinalityCache = new ChronicleMapCardinalityCache();
+		cardinalityCache = new ChronicleMapCardinalityCache( 500 );
+		cardinalityCacheEntryFactory = new CardinalityCacheEntryFactory( timeToLive );
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
-	                                                     final int cacheCapacity )
+	                                                     final int cacheCapacity,
+	                                                     final long timeToLive )
 		throws IOException
 	{
-		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies() );
+		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies(), timeToLive );
 	}
 
 	/**
-	 * Creates a {@link FederationAccessManagerWithPersistedDiskCache} with a default configuration.
+	 * Creates a {@link FederationAccessManagerWithChronicleMapCache} with the default configuration.
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final ExecutorService execService ) throws IOException
 	{
-		this( new AsyncFederationAccessManagerImpl( execService ), 100, new MyDefaultCachePolicies() );
+		this( new AsyncFederationAccessManagerImpl( execService ), 1000, new MyDefaultCachePolicies(), 5 * 60 * 1000 );
 	}
 	
 	@Override
@@ -73,7 +76,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = new CardinalityCacheEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -100,7 +103,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = new CardinalityCacheEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -127,7 +130,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = new CardinalityCacheEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
@@ -154,7 +157,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept(value -> {
-			final CardinalityCacheEntry cacheEntry = new CardinalityCacheEntry( value.getCardinality() );
+			final CardinalityCacheEntry cacheEntry = cardinalityCacheEntryFactory.createEntry( value.getCardinality() );
 			cardinalityCache.put( key,  cacheEntry );
 		});
 		return newResponse;
