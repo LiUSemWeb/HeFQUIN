@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class CacheEntryBase<ObjectType> implements CacheEntry<ObjectType>, Serializable
 {
 	private static final long serialVersionUID = 1L;
-	protected ObjectType obj;
+	protected final ObjectType obj;
 
 	public CacheEntryBase( final ObjectType obj ) {
 		assert obj != null;
