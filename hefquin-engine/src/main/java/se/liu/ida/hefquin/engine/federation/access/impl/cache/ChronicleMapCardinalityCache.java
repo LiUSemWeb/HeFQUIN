@@ -96,7 +96,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param key   The key identifying the response.
 	 * @param value The entry to store.
 	 */
-	public void put( CardinalityCacheKey key, Integer value ) {
+	public void put( final CardinalityCacheKey key, final Integer value ) {
 		final CardinalityCacheEntry entry = entryFactory.createCacheEntry( value );
 		map.put( key, entry );
 	}
@@ -109,7 +109,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param value The entry to store.
 	 */
 	@Override
-	public void put( CardinalityCacheKey key, CardinalityCacheEntry entry ) {
+	public void put( final CardinalityCacheKey key, final CardinalityCacheEntry entry ) {
 		map.put( key, entry );
 	}
 
@@ -120,7 +120,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @return The entry, or {@link null} if not found.
 	 */
 	@Override
-	public CardinalityCacheEntry get( CardinalityCacheKey key ) {
+	public CardinalityCacheEntry get( final CardinalityCacheKey key ) {
 		final CardinalityCacheEntry entry = map.get( key );
 		if( entry == null ){
 			return null;
@@ -142,7 +142,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @return {@link true} if an entry was removed, {@link false} otherwise.
 	 */
 	@Override
-	public boolean evict( CardinalityCacheKey key ) {
+	public boolean evict( final CardinalityCacheKey key ) {
 		return map.remove( key ) != null;
 	}
 
@@ -154,7 +154,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @return {@link true} if the entry was removed, {@link false} otherwise.
 	 */
 	@Override
-	public boolean evict( CardinalityCacheKey key, CardinalityCacheEntry entry ) {
+	public boolean evict( final CardinalityCacheKey key, final CardinalityCacheEntry entry ) {
 		return map.remove( key, entry );
 	}
 
