@@ -1,7 +1,9 @@
-package se.liu.ida.hefquin.engine.federation.access.impl;
+package se.liu.ida.hefquin.engine.federation.access.impl.cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
@@ -14,7 +16,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
  * @param <K> The key type for caching cardinality responses.
  */
 public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry> {
-	final ChronicleMap<CardinalityCacheKey, CardinalityCacheEntry> map;
+	final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
 	protected final String filename;
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";

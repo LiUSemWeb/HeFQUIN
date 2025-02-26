@@ -21,6 +21,10 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheEntry;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheEntryFactory;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheKey;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.ChronicleMapCardinalityCache;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CachedCardinalityResponseImpl;
 
 /**

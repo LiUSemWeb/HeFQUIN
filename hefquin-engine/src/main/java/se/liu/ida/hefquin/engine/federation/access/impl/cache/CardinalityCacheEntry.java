@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access.impl;
+package se.liu.ida.hefquin.engine.federation.access.impl.cache;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryBase;
 
