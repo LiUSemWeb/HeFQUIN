@@ -16,7 +16,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
  * @param <K> The key type for caching cardinality responses.
  */
 public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry> {
-	final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
+	protected final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
 	protected final String filename;
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
