@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
  */
 public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry> {
 	protected final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
-	protected final String filename;
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
 
@@ -58,8 +57,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 		entryFactory = policies.getEntryFactory();
 		invalidationPolicy = policies.getInvalidationPolicy();
 
-		this.filename = filename;
-		ensureFileExists();
+		// Ensure file exists, try to create otherwise
+		ensureFileExists( filename );
 
 		// ChronicleMap for persistent storage
 		map = ChronicleMap.of( CardinalityCacheKey.class, CardinalityCacheEntry.class )
@@ -67,20 +66,25 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 			.entries( capacity )
 			.averageKeySize( 512 )
 			.averageValueSize( 64 )
-			.createPersistedTo( new File( this.filename ) );
+			.createPersistedTo( new File( filename ) );
 	}
 	
 	/**
 	 * Ensures that the cache file exists before initialization. If the file
 	 * does not exist, it is created along with necessary directories.
+	 * 
+	 * @param filename The path of the file to ensure exists
+	 * @return {@code File} object representing the ensured file
+	 * @throws RuntimeException if the file cannot be created due to an I/O error
 	 */
-	private void ensureFileExists() {
+	private static File ensureFileExists( final String filename ) {
 		final File file = new File( filename );
 		try {
 			if ( ! file.exists() ) {
 				file.getParentFile().mkdirs();
 				file.createNewFile();
 			}
+			return file;
 		} catch ( IOException e ) {
 			throw new RuntimeException( "Failed to create file: " + file.getAbsolutePath(), e );
 		}
