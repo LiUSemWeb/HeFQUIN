@@ -23,7 +23,6 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 
 	protected final CacheEntryFactory<CardinalityCacheEntry, Integer> entryFactory;
 	protected final CacheInvalidationPolicy<CardinalityCacheEntry, Integer> invalidationPolicy;
-	// protected final CacheReplacementPolicy<CardinalityCacheKey, Integer, CardinalityCacheEntry> replacementPolicy;
 
 	/**
 	 * Constructs a new {@link ChronicleMapCardinalityCache} with the default
