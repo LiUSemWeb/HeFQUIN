@@ -1,9 +1,6 @@
-package se.liu.ida.hefquin.engine.federation.access.impl;
+package se.liu.ida.hefquin.base.datastructures.impl.cache;
 
 import java.time.Instant;
-
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
-import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 
 public class CacheInvalidationPolicyTimeToLive<EntryType extends CacheEntry<ObjectType>, ObjectType>
 		implements CacheInvalidationPolicy<EntryType, ObjectType> {
@@ -18,9 +15,6 @@ public class CacheInvalidationPolicyTimeToLive<EntryType extends CacheEntry<Obje
 	 * Returns <code>true</code> if the given cache entry is not stale.
 	 */
 	public boolean isStillValid( EntryType e ) {
-		if( e instanceof CardinalityCacheEntry entry ){
-			return entry.getCacheEntryCreatedAt() + timeToLive > Instant.now().toEpochMilli();
-		}
-		return true;
+		return e.createdAt() + timeToLive > Instant.now().toEpochMilli();
 	}
 }
