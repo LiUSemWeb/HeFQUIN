@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.PersistableCache;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 
@@ -21,7 +22,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
 
-	protected final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies;
+	protected final CacheEntryFactory<CardinalityCacheEntry, Integer> entryFactory;
 	protected final CacheInvalidationPolicy<CardinalityCacheEntry, Integer> invalidationPolicy;
 	// protected final CacheReplacementPolicy<CardinalityCacheKey, Integer, CardinalityCacheEntry> replacementPolicy;
 
@@ -54,7 +55,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @throws IOException
 	 */
 	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies, final int capacity, final String filename ) throws IOException {
-		this.policies = policies;
+		entryFactory = policies.getEntryFactory();
 		invalidationPolicy = policies.getInvalidationPolicy();
 
 		this.filename = filename;
@@ -93,7 +94,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param value The entry to store.
 	 */
 	public void put( CardinalityCacheKey key, Integer value ) {
-		final CardinalityCacheEntry entry = policies.getEntryFactory().createCacheEntry( value );
+		final CardinalityCacheEntry entry = entryFactory.createCacheEntry( value );
 		map.put( key, entry );
 	}
 
@@ -123,14 +124,13 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 		}
 
 		// lazy evict
-		if( !invalidationPolicy.isStillValid( entry )){
+		if ( ! invalidationPolicy.isStillValid( entry ) ) {
 			evict( key );
 			return null;
 		}
 
 		return entry;
 	}
-
 
 	/**
 	 * Removes the cache entry associated with the given key from the cache.
@@ -194,5 +194,4 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	public void load() {
 		// Do nothing
 	}
-
 }
