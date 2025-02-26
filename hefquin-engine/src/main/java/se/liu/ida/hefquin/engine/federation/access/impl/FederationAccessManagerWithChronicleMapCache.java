@@ -34,6 +34,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.CachedCardinali
 public class FederationAccessManagerWithChronicleMapCache extends FederationAccessManagerWithCache
 {
 	protected final ChronicleMapCardinalityCache cardinalityCache;
+	protected final static int defaultCacheCapacity = 1000;
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
@@ -50,7 +51,10 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	                                                     final long timeToLive )
 			throws IOException
 	{
-		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies(), new MyDefaultCardinalityCachePolicies( timeToLive ) );
+		this( fedAccMan,
+		      cacheCapacity,
+		      new MyDefaultCachePolicies(),
+		      new MyDefaultCardinalityCachePolicies( timeToLive ) );
 	}
 
 	/**
@@ -58,7 +62,10 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	 */
 	public FederationAccessManagerWithChronicleMapCache( final ExecutorService execService ) throws IOException
 	{
-		this( new AsyncFederationAccessManagerImpl( execService ), 1000, new MyDefaultCachePolicies(), new MyDefaultCardinalityCachePolicies() );
+		this( new AsyncFederationAccessManagerImpl( execService ),
+		      defaultCacheCapacity,
+		      new MyDefaultCachePolicies(),
+		      new MyDefaultCardinalityCachePolicies() );
 	}
 	
 	@Override
