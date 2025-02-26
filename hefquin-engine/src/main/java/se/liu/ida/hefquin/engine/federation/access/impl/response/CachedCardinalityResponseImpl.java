@@ -46,7 +46,7 @@ public class CachedCardinalityResponseImpl implements CardinalityResponse
 
 	@Override
 	public Date getRetrievalEndTime() {
-		return null;
+		return requestEndTime;
 	}
 
 	@Override
