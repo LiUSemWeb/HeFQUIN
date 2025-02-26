@@ -29,4 +29,17 @@ public class CacheEntryBase<ObjectType> implements CacheEntry<ObjectType>, Seria
 		return creationTime;
 	}
 
+	@Override
+	public boolean equals( Object obj ) {
+		if ( this == obj )
+			return true;
+		if ( obj == null || getClass() != obj.getClass() )
+			return false;
+		return this.getObject() == ((CacheEntryBase<?>) obj).getObject();
+	}
+
+	@Override
+	public int hashCode() {
+		return getObject().hashCode();
+	}
 }
