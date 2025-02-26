@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.base.datastructures.impl.cache;
 import java.time.Instant;
 
 public class CacheInvalidationPolicyTimeToLive<EntryType extends CacheEntry<ObjectType>, ObjectType>
-		implements CacheInvalidationPolicy<EntryType, ObjectType> {
-
+		implements CacheInvalidationPolicy<EntryType, ObjectType>
+{
 	protected final long timeToLive;
 
 	public CacheInvalidationPolicyTimeToLive( long timeToLive ){

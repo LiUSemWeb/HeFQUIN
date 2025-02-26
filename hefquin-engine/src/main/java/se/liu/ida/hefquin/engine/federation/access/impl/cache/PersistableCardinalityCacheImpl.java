@@ -25,21 +25,23 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
  *
  * @param <K> The key type for caching cardinality responses.
  */
-public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, CompletableFuture<CardinalityResponse>> {
-
+public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, CompletableFuture<CardinalityResponse>>
+{
 	protected final Map<K, CompletableFuture<CardinalityResponse>> map = new ConcurrentHashMap<>();
 	protected final String filename;
 	protected final static String defaultFilename = "cache/cache.dat";
 
 	/**
-	 * Constructs a new {@link PersistableCardinalityCacheImpl} with the default cache file.
+	 * Constructs a new {@link PersistableCardinalityCacheImpl} with the default
+	 * cache file.
 	 */
 	public PersistableCardinalityCacheImpl() {
-		this(defaultFilename);
+		this( defaultFilename );
 	}
 
 	/**
-	 * Constructs a new {@link PersistableCardinalityCacheImpl} with a custom file path.
+	 * Constructs a new {@link PersistableCardinalityCacheImpl} with a custom file
+	 * path.
 	 *
 	 * @param filename Path to the cache file.
 	 */
@@ -181,7 +183,8 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 	/**
 	 * A simple implementation of {@link CardinalityResponse}.
 	 */
-	private class CachedCardinalityResponse implements CardinalityResponse {
+	private class CachedCardinalityResponse implements CardinalityResponse
+	{
 		private final int cardinality;
 
 		/**

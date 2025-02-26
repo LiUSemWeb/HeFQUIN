@@ -7,7 +7,8 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 /**
  * An entry used when caching cardinality requests.
  */
-public class CardinalityCacheEntryFactory implements CacheEntryFactory<CardinalityCacheEntry, Integer> {
+public class CardinalityCacheEntryFactory implements CacheEntryFactory<CardinalityCacheEntry, Integer>
+{
 
 	@Override
 	public CardinalityCacheEntry createCacheEntry( final Integer cardinality ) {

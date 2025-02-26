@@ -48,7 +48,8 @@ import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.TPFRequestProces
 import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 
-public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTestBase {
+public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTestBase
+{
 	protected static final long SLEEP_MILLIS = 100L;
 	protected static ExecutorService execServiceForFedAccess;
 	final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable( "s" ),
@@ -791,8 +792,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		}
 	}
 
-	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl {
-
+	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl
+	{
 		/** The delay in milliseconds before processing each request. */
 		protected final long sleepMillis;
 
@@ -851,8 +852,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		}
 	}
 
-	protected static class MyTPFRequestProcessor extends TPFRequestProcessorImpl {
-
+	protected static class MyTPFRequestProcessor extends TPFRequestProcessorImpl
+	{
 		protected final long sleepMillis;
 		protected int card;
 
@@ -912,8 +913,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		}
 	}
 
-	protected static class MyBRTPFRequestProcessor extends BRTPFRequestProcessorImpl {
-
+	protected static class MyBRTPFRequestProcessor extends BRTPFRequestProcessorImpl
+	{
 		protected final long sleepMillis;
 		protected int card;
 

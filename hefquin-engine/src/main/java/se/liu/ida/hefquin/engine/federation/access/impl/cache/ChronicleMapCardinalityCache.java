@@ -16,7 +16,8 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
  *
  * @param <K> The key type for caching cardinality responses.
  */
-public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry> {
+public class ChronicleMapCardinalityCache implements PersistableCache<CardinalityCacheKey, CardinalityCacheEntry>
+{
 	protected final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
@@ -41,7 +42,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param capacity Maximum cache capacity.
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies, final int capacity ) throws IOException {
+	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies,
+	                                     final int capacity ) throws IOException {
 		this( policies, capacity, defaultFilename );
 	}
 	
@@ -52,7 +54,9 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * @param filename Path to the cache file.
 	 * @throws IOException
 	 */
-	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies, final int capacity, final String filename ) throws IOException {
+	public ChronicleMapCardinalityCache( final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> policies,
+	                                     final int capacity,
+		                                 final String filename ) throws IOException {
 		entryFactory = policies.getEntryFactory();
 		invalidationPolicy = policies.getInvalidationPolicy();
 
@@ -69,8 +73,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 	
 	/**
-	 * Ensures that the cache file exists before initialization. If the file
-	 * does not exist, it is created along with necessary directories.
+	 * Ensures that the cache file exists before initialization. If the file does
+	 * not exist, it is created along with necessary directories.
 	 * 
 	 * @param filename The path of the file to ensure exists
 	 * @return {@code File} object representing the ensured file
@@ -90,8 +94,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 
 	/**
-	 * Adds a new value to the cache, associated with the given key.
-	 * If an entry already exists for this key, it is replaced.
+	 * Adds a new value to the cache, associated with the given key. If an entry
+	 * already exists for this key, it is replaced.
 	 *
 	 * @param key   The key identifying the response.
 	 * @param value The entry to store.
@@ -102,8 +106,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 
 	/**
-	 * Adds a new cache entry to the cache, associated with the given key.
-	 * If an entry already exists for this key, it is replaced.
+	 * Adds a new cache entry to the cache, associated with the given key. If an
+	 * entry already exists for this key, it is replaced.
 	 *
 	 * @param key   The key identifying the response.
 	 * @param value The entry to store.
@@ -122,7 +126,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	@Override
 	public CardinalityCacheEntry get( final CardinalityCacheKey key ) {
 		final CardinalityCacheEntry entry = map.get( key );
-		if( entry == null ){
+		if ( entry == null ) {
 			return null;
 		}
 
@@ -180,7 +184,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * No-op implementation.
 	 * 
 	 * This method is required by the interface but is not used because ChronicleMap
-	 * persists changes automatically. There is no need for an explicit save operation.
+	 * persists changes automatically. There is no need for an explicit save
+	 * operation.
 	 */
 	@Override
 	public void save() {

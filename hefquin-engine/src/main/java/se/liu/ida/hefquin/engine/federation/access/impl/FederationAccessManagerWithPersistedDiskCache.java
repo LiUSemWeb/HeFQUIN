@@ -124,7 +124,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 			cacheHitsBRTPFCardinality++;
 			return cachedResponse;
 		}
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm) ;
+		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		cardinalityCache.put( key, newResponse );
 		newResponse.thenRun( () -> cardinalityCache.save() );
 		return newResponse;

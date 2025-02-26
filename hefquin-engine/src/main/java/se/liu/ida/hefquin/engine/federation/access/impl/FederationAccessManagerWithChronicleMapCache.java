@@ -48,7 +48,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
 	                                                     final long timeToLive )
-		throws IOException
+			throws IOException
 	{
 		this( fedAccMan, cacheCapacity, new MyDefaultCachePolicies(), new MyDefaultCardinalityCachePolicies( timeToLive ) );
 	}
@@ -81,9 +81,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept(value -> {
-			cardinalityCache.put( key,  value.getCardinality() );
-		});
+		newResponse.thenAccept( value -> {
+			cardinalityCache.put( key, value.getCardinality() );
+		} );
 		return newResponse;
 	}
 
@@ -107,9 +107,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept(value -> {
-			cardinalityCache.put( key,  value.getCardinality() );
-		});
+		newResponse.thenAccept( value -> {
+			cardinalityCache.put( key, value.getCardinality() );
+		} );
 		return newResponse;
 	}
 
@@ -133,9 +133,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept(value -> {
-			cardinalityCache.put( key,  value.getCardinality() );
-		});
+		newResponse.thenAccept( value -> {
+			cardinalityCache.put( key, value.getCardinality() );
+		} );
 		return newResponse;
 	}
 
@@ -159,16 +159,16 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
-		newResponse.thenAccept(value -> {
-			cardinalityCache.put( key,  value.getCardinality() );
-		});
+		newResponse.thenAccept( value -> {
+			cardinalityCache.put( key, value.getCardinality() );
+		} );
 		return newResponse;
 	}
 
 	/**
 	 * Clears the persisted cardinality cache map.
 	 */
-	public void clearCardinalityCache(){
+	public void clearCardinalityCache() {
 		cardinalityCache.clear();
 	}
 
@@ -177,11 +177,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		protected final long timeToLive;
 		protected final static long defaultTimeToLive = 5 * 60 * 1000;
 
-		public MyDefaultCardinalityCachePolicies(){
+		public MyDefaultCardinalityCachePolicies() {
 			this( defaultTimeToLive );
 		}
 
-		public MyDefaultCardinalityCachePolicies( final long timeToLive ){
+		public MyDefaultCardinalityCachePolicies( final long timeToLive ) {
 			this.timeToLive = timeToLive;
 		}
 
@@ -192,7 +192,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		@Override
 		public CacheReplacementPolicyFactory<CardinalityCacheKey, Integer, CardinalityCacheEntry> getReplacementPolicyFactory() {
-			throw new UnsupportedOperationException("Unimplemented method 'getReplacementPolicyFactory'");
+			throw new UnsupportedOperationException( "Unimplemented method 'getReplacementPolicyFactory'" );
 		}
 
 		@Override

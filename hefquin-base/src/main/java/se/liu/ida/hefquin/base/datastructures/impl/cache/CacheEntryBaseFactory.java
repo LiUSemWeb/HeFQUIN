@@ -7,7 +7,7 @@ public class CacheEntryBaseFactory<ObjectType> implements CacheEntryFactory<Cach
 {
 	@Override
 	public CacheEntryBase<ObjectType> createCacheEntry( final ObjectType obj ) {
-		return new CacheEntryBase<>(obj);
+		return new CacheEntryBase<>( obj );
 	}
 
 }

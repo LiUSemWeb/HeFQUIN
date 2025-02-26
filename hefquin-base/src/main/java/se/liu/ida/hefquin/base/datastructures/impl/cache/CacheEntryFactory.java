@@ -8,5 +8,5 @@ public interface CacheEntryFactory<EntryType extends CacheEntry<ObjectType>, Obj
 	/**
 	 * Creates and returns a new EntryType object that wraps the given object.
 	 */
-	EntryType createCacheEntry(ObjectType obj);
+	EntryType createCacheEntry( ObjectType obj );
 }
