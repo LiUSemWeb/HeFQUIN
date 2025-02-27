@@ -51,6 +51,8 @@ import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl
 public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTestBase
 {
 	protected static final long defaultTimeToSleep = 100L;
+	protected static final long defaultTimeToLive = 30000; // 30s
+	protected static final int defaultCacheCapacity = 100;
 	protected static ExecutorService execServiceForFedAccess;
 	final TriplePattern tp = new TriplePatternImpl( NodeFactory.createVariable( "s" ),
 													NodeFactory.createVariable( "p" ),
@@ -69,10 +71,10 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public static void tearDownExecService() {
 		execServiceForFedAccess.shutdownNow();
 		try {
-			execServiceForFedAccess.awaitTermination(500L, TimeUnit.MILLISECONDS);
+			execServiceForFedAccess.awaitTermination( 500L, TimeUnit.MILLISECONDS );
 		}
 		catch ( final InterruptedException ex )  {
-			System.err.println("Terminating the thread pool was interrupted." );
+			System.err.println( "Terminating the thread pool was interrupted." );
 			ex.printStackTrace();
 		}
 	}
@@ -82,8 +84,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void sparqlNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue reuest (not cached)
@@ -100,8 +101,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void sparqlCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// make sure request is cached
@@ -129,8 +129,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 42, r1.getCardinality() );
 
 		// create a new federation access manager (cache will be loaded from disk)
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime =  Instant.now().toEpochMilli();
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( sparqlReq, fm ).get();
 		final long duration =  Instant.now().toEpochMilli() - startTime;
@@ -144,8 +143,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public void sparqlSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm1 = new SPARQLEndpointForTest( "http://example.org/sparql/1" );
 		final SPARQLEndpoint fm2 = new SPARQLEndpointForTest( "http://example.org/sparql/2" );
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm1 and fm2
@@ -155,8 +153,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 43, r2.getCardinality() );
 
 		// create a new federation access manager
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime3 = new Date().getTime();
 		// issue request against fm2 and fm1
 		final CardinalityResponse r3 = fedAccessMgr2.issueCardinalityRequest( sparqlReq, fm2 ).get();
@@ -170,8 +167,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void sparqlTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm
@@ -188,9 +184,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void sparqlCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 0,
-		                                                                                              42,
-		                                                                                              100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request
@@ -207,16 +201,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void sparqlCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 0,
-		                                                                                               42,
-		                                                                                               100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( sparqlReq, fm ).get();
 		// wait for entry to become stale
 		Thread.sleep(200);
 
 		// load federation access manager from disk
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 0, 52, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 52, 0, 100 );
 
 		// repeat request
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( sparqlReq, fm ).get();
@@ -224,14 +216,12 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 52, r2.getCardinality() );
 	}
 
-
 	// TPF request against TPF server tests
 
 	@Test
 	public void tpfNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm = new MyTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue reuest (not cached)
@@ -248,8 +238,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm = new MyTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// make sure request is cached
@@ -277,8 +266,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 42, r1.getCardinality() );
 
 		// create a new federation access manager (cache will be loaded from disk)
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime =  Instant.now().toEpochMilli();
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm ).get();
 		final long duration =  Instant.now().toEpochMilli() - startTime;
@@ -292,8 +280,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public void tpfSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm1 = new MyTPFServerForTest( "http://example.org/sparql/1" );
 		final TPFServer fm2 = new MyTPFServerForTest( "http://example.org/sparql/2" );
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm1 and fm2
@@ -303,8 +290,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 43, r2.getCardinality() );
 
 		// create a new federation access manager
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime3 = new Date().getTime();
 		// issue request against fm2 and fm1
 		final CardinalityResponse r3 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm2 ).get();
@@ -318,8 +304,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm = new MyTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm
@@ -336,7 +321,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm = new MyTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request
@@ -353,14 +338,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final TPFServer fm = new MyTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( tpfReq, fm ).get();
 		// wait for entry to become stale
 		Thread.sleep(200);
 
 		// load federation access manager from disk
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 0, 52, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 52, 0, 100 );
 
 		// repeat request
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm ).get();
@@ -373,8 +358,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfWithBrtpfServerNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue reuest (not cached)
@@ -391,8 +375,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfWithBrtpfServerCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// make sure request is cached
@@ -420,8 +403,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 42, r1.getCardinality() );
 
 		// create a new federation access manager (cache will be loaded from disk)
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime =  Instant.now().toEpochMilli();
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm ).get();
 		final long duration =  Instant.now().toEpochMilli() - startTime;
@@ -435,8 +417,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public void tpfWithBrtpfServerSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/sparql/1" );
 		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/sparql/2" );
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm1 and fm2
@@ -446,8 +427,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 43, r2.getCardinality() );
 
 		// create a new federation access manager
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime3 = new Date().getTime();
 		// issue request against fm2 and fm1
 		final CardinalityResponse r3 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm2 ).get();
@@ -461,8 +441,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfWithBrtpfServerTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm
@@ -479,7 +458,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfWithBrtpfServerCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request
@@ -496,14 +475,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void tpfWithBrtpfServerCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( tpfReq, fm ).get();
 		// wait for entry to become stale
 		Thread.sleep(200);
 
 		// load federation access manager from disk
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 0, 52, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 52, 0, 100 );
 
 		// repeat request
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( tpfReq, fm ).get();
@@ -516,8 +495,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void brtpfNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue reuest (not cached)
@@ -534,8 +512,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void brtpfCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// make sure request is cached
@@ -563,8 +540,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 42, r1.getCardinality() );
 
 		// create a new federation access manager (cache will be loaded from disk)
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime =  Instant.now().toEpochMilli();
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( brtpfReq, fm ).get();
 		final long duration =  Instant.now().toEpochMilli() - startTime;
@@ -578,8 +554,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public void brtpfSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/sparql/1" );
 		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/sparql/2" );
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm1 and fm2
@@ -589,8 +564,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		assertEquals( 43, r2.getCardinality() );
 
 		// create a new federation access manager
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                               -1 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( -1 );
 		final long startTime3 = new Date().getTime();
 		// issue request against fm2 and fm1
 		final CardinalityResponse r3 = fedAccessMgr2.issueCardinalityRequest( brtpfReq, fm2 ).get();
@@ -604,8 +578,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void brtpfTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request against fm
@@ -657,8 +630,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of( solMap2 ) );
 
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( defaultTimeToSleep,
-		                                                                                              42 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
 		final CardinalityResponse r1 = fedAccessMgr.issueCardinalityRequest( brtpfReq1, fm ).get();
@@ -679,7 +651,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void brtpfCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
 		// issue request
@@ -696,14 +668,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	@Test
 	public void brtpfCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final BRTPFServer fm = new MyBRTPFServerForTest();
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 0, 42, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( brtpfReq, fm ).get();
 		// wait for entry to become stale
 		Thread.sleep(200);
 
 		// load federation access manager from disk
-		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 0, 52, 100 );
+		final FederationAccessManagerWithChronicleMapCache fedAccessMgr2 = createFedAccessMgrForTests( 52, 0, 100 );
 
 		// repeat request
 		final CardinalityResponse r2 = fedAccessMgr2.issueCardinalityRequest( brtpfReq, fm ).get();
@@ -713,24 +685,32 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 
 	// ------------ helper code ------------
 
-	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final int card ) throws IOException {
-		return createFedAccessMgrForTests( 0, card );
+	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final int cardinality ) throws IOException {
+		return createFedAccessMgrForTests( cardinality, defaultTimeToSleep, defaultTimeToLive, defaultCacheCapacity );
 	}
 
-	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final long sleepMillis,
-	                                                                                       final int card ) throws IOException
+	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final int cardinality,
+	                                                                                       final long timeToSleep ) throws IOException
 	{
-		return createFedAccessMgrForTests( sleepMillis, card, 5 * 60 * 1000 );
+		return createFedAccessMgrForTests( cardinality, timeToSleep, defaultTimeToLive, defaultCacheCapacity );
 	}
 
-	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final long sleepMillis,
-	                                                                                       final int card,
-	                                                                                       final long timeToLive )
+	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final int cardinality,
+	                                                                                       final long timeToSleep,
+	                                                                                       final long timeToLive ) throws IOException
+	{
+		return createFedAccessMgrForTests( cardinality, timeToSleep, timeToLive, defaultCacheCapacity );
+	}
+
+	public static FederationAccessManagerWithChronicleMapCache createFedAccessMgrForTests( final int cardinality,
+	                                                                                       final long timeToSleep,
+	                                                                                       final long timeToLive,
+	                                                                                       final int cacheCapacity )
 		throws IOException
 	{
-		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor( sleepMillis, card );
-		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor( sleepMillis, card );
-		final BRTPFRequestProcessor reqProcBRTPF = new MyBRTPFRequestProcessor( sleepMillis, card );
+		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor( timeToSleep, cardinality );
+		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor( timeToSleep, cardinality );
+		final BRTPFRequestProcessor reqProcBRTPF = new MyBRTPFRequestProcessor( timeToSleep, cardinality );
 		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
 			@Override
 			public RecordsResponse performRequest( Neo4jRequest req, Neo4jServer fm ) {
@@ -743,7 +723,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 			                                                                            reqProcTPF,
 			                                                                            reqProcBRTPF,
 			                                                                            reqProcNeo4j );
-		return new FederationAccessManagerWithChronicleMapCache( fedAccMan, 100, timeToLive );
+		return new FederationAccessManagerWithChronicleMapCache( fedAccMan, cacheCapacity, timeToLive );
 	}
 
 	protected static class MyTPFServerForTest implements TPFServer
@@ -798,18 +778,18 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 		protected final long sleepMillis;
 
 		/** A counter used to generate mock results. */
-		protected int card;
+		protected int cardinality;
 
 		/**
 		 * Constructs a {@code MySPARQLRequestProcessor} instance.
 		 *
-		 * @param sleepMillis the delay in milliseconds before processing each request
-		 * @param card        the initial count value for the generated solution
-		 *                    mappings
+		 * @param sleepMillis  the delay in milliseconds before processing each request
+		 * @param cardinality  the initial count value for the generated solution
+		 *                     mappings
 		 */
-		public MySPARQLRequestProcessor( final long sleepMillis, final int card ) {
+		public MySPARQLRequestProcessor( final long sleepMillis, final int cardinality ) {
 			this.sleepMillis = sleepMillis;
-			this.card = card;
+			this.cardinality = cardinality;
 		}
 
 		/**
@@ -841,10 +821,10 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 			sleep();
 
 			// Create a mock solution mapping
-			final Node countLiteral = NodeFactory.createLiteralByValue( card, XSDDatatype.XSDinteger );
+			final Node countLiteral = NodeFactory.createLiteralByValue( cardinality, XSDDatatype.XSDinteger );
 			final Var var = Var.alloc("__hefquinCountVar");
 			final SolutionMapping solMap = SolutionMappingUtils.createSolutionMapping( var, countLiteral );
-			card++;
+			cardinality++;
 
 			// Wrap in a list and return the response
 			List<SolutionMapping> mockResult = Collections.singletonList( solMap );
@@ -855,11 +835,11 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	protected static class MyTPFRequestProcessor extends TPFRequestProcessorImpl
 	{
 		protected final long sleepMillis;
-		protected int card;
+		protected int cardinality;
 
-		public MyTPFRequestProcessor( final long sleepMillis, final int card ) {
+		public MyTPFRequestProcessor( final long sleepMillis, final int cardinality ) {
 			this.sleepMillis = sleepMillis;
-			this.card = card;
+			this.cardinality = cardinality;
 		}
 
 		protected void sleep() {
@@ -881,14 +861,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 			                                           fm,
 			                                           req,
 			                                           new Date() ) {
-				final int cardinalityEstimate = card;
+				final int cardinalityEstimate = cardinality;
 
 				@Override
 				public Integer getCardinalityEstimate() {
 					return cardinalityEstimate;
 				};
 			};
-			card++;
+			cardinality++;
 			return r;
 		}
 
@@ -901,14 +881,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 			                                           fm,
 			                                           req,
 			                                           new Date() ) {
-				final int cardinalityEstimate = card;
+				final int cardinalityEstimate = cardinality;
 
 				@Override
 				public Integer getCardinalityEstimate() {
 					return cardinalityEstimate;
 				};
 			};
-			card++;
+			cardinality++;
 			return r;
 		}
 	}
@@ -916,11 +896,11 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	protected static class MyBRTPFRequestProcessor extends BRTPFRequestProcessorImpl
 	{
 		protected final long sleepMillis;
-		protected int card;
+		protected int cardinality;
 
-		public MyBRTPFRequestProcessor( final long sleepMillis, final int card ) {
+		public MyBRTPFRequestProcessor( final long sleepMillis, final int cardinality ) {
 			this.sleepMillis = sleepMillis;
-			this.card = card;
+			this.cardinality = cardinality;
 		}
 
 		protected void sleep() {
@@ -942,14 +922,14 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 			                                           fm,
 			                                           req,
 			                                           new Date() ) {
-				final int cardinalityEstimate = card;
+				final int cardinalityEstimate = cardinality;
 
 				@Override
 				public Integer getCardinalityEstimate() {
 					return cardinalityEstimate;
 				};
 			};
-			card++;
+			cardinality++;
 			return r;
 		}
 	}
