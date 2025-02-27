@@ -35,7 +35,7 @@ public class CacheEntryBase<ObjectType> implements CacheEntry<ObjectType>, Seria
 			return true;
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
-		return this.getObject() == ((CacheEntryBase<?>) obj).getObject();
+		return this.getObject().equals(((CacheEntryBase<?>) obj).getObject());
 	}
 
 	@Override
