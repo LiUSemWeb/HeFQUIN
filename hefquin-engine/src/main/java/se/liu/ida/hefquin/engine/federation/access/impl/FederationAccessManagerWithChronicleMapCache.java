@@ -10,7 +10,9 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyTimeToLive;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
@@ -199,7 +201,12 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		@Override
 		public CacheReplacementPolicyFactory<CardinalityCacheKey, Integer, CardinalityCacheEntry> getReplacementPolicyFactory() {
-			throw new UnsupportedOperationException( "Unimplemented method 'getReplacementPolicyFactory'" );
+			return new CacheReplacementPolicyFactory<>() {
+				@Override
+				public CacheReplacementPolicy<CardinalityCacheKey, Integer, CardinalityCacheEntry> create() {
+					return new CacheReplacementPolicyLRU<>();
+				}
+			};
 		}
 
 		@Override
