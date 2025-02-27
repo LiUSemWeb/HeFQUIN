@@ -58,7 +58,7 @@ public class CardinalityCacheKey implements Serializable
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
 		final CardinalityCacheKey other = (CardinalityCacheKey) obj;
-		return query.equals( other.query ) && url.equals( other.url );
+		return query.equals( other.query ) && url.equals( other.url ) && bindings.equals( other.bindings );
 	}
 
 	@Override
