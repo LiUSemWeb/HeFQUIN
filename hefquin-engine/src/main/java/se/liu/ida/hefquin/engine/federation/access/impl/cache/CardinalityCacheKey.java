@@ -63,7 +63,7 @@ public class CardinalityCacheKey implements Serializable
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( query, url );
+		return Objects.hash( query, url, bindings.hashCode() );
 	}
 
 	@Override
