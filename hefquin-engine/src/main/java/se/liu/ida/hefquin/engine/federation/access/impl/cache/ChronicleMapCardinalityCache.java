@@ -2,17 +2,22 @@ package se.liu.ida.hefquin.engine.federation.access.impl.cache;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.openhft.chronicle.map.ChronicleMap;
 import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
+import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 
 /**
  * A thread-safe persistent cache implementation for storing cardinality entries. This
- * cache uses a {@link ChroncicleMap}.
+ * cache uses a {@link ChronicleMap}.
  *
  * @param <K> The key type for caching cardinality responses.
  */
@@ -21,9 +26,11 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	protected final Map<CardinalityCacheKey, CardinalityCacheEntry> map;
 	protected final static int defaultCapacity = 50_000;
 	protected final static String defaultFilename = "cache/chronicle-map.dat";
+	protected final int capacity;
 
 	protected final CacheEntryFactory<CardinalityCacheEntry, Integer> entryFactory;
 	protected final CacheInvalidationPolicy<CardinalityCacheEntry, Integer> invalidationPolicy;
+	protected final CacheReplacementPolicy<CardinalityCacheKey, Integer, CardinalityCacheEntry> replacementPolicy;
 
 	/**
 	 * Constructs a new {@link ChronicleMapCardinalityCache} with the default
@@ -59,17 +66,12 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 		                                 final String filename ) throws IOException {
 		entryFactory = policies.getEntryFactory();
 		invalidationPolicy = policies.getInvalidationPolicy();
+		replacementPolicy = policies.getReplacementPolicyFactory().create();
+		this.capacity = capacity;
 
-		// Ensure file exists, try to create otherwise
-		ensureFileExists( filename );
-
-		// ChronicleMap for persistent storage
-		map = ChronicleMap.of( CardinalityCacheKey.class, CardinalityCacheEntry.class )
-			.name( "cardinality-map" )
-			.entries( capacity )
-			.averageKeySize( 512 )
-			.averageValueSize( 64 )
-			.createPersistedTo( new File( filename ) );
+		map = initializeMap( filename, capacity );
+		initializeReplacementPolicy();
+		evictExcessEntries();
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 * not exist, it is created along with necessary directories.
 	 * 
 	 * @param filename The path of the file to ensure exists
-	 * @return {@code File} object representing the ensured file
+	 * @return {@link File} object representing the ensured file
 	 * @throws RuntimeException if the file cannot be created due to an I/O error
 	 */
 	private static File ensureFileExists( final String filename ) {
@@ -94,6 +96,35 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 
 	/**
+	 * Initializes and returns a persistent ChronicleMap for storing cardinality cache entries.
+	 * If the specified file does not exist, it is created before the map is initialized.
+	 *
+	 * @param filename The path to the ChronicleMap file for persistent storage.
+	 * @param capacity The maximum number of entries the cache can store.
+	 * @return A {@link ChronicleMap} instance configured for storing cardinality cache entries.
+	 * @throws IOException If an error occurs while creating or accessing the file.
+	 */
+	private static Map<CardinalityCacheKey, CardinalityCacheEntry> initializeMap(final String filename, final int capacity) throws IOException {
+		ensureFileExists( filename );
+		return ChronicleMap.of( CardinalityCacheKey.class, CardinalityCacheEntry.class )
+			.name( "cardinality-map" )
+			.entries( capacity )
+			.averageKeySize( 512 )
+			.averageValueSize( 64 )
+			.createPersistedTo( new File( filename ) );
+	}
+
+	/**
+	 * Populates the cache's replacement policy using existing entries.  Entries are sorted chronologically
+	 * by their creation timestamp before being added to the replacement policy to maintain eviction order.
+	 */
+	private void initializeReplacementPolicy() {
+		final List<Entry<CardinalityCacheKey, CardinalityCacheEntry>> entries = new ArrayList<>( map.entrySet() );
+		entries.sort( Comparator.comparingLong( e -> e.getValue().createdAt() ) );
+		entries.forEach( e -> replacementPolicy.entryWasAdded( e.getKey(), e.getValue() ) );
+	}
+
+	/**
 	 * Adds a new value to the cache, associated with the given key. If an entry
 	 * already exists for this key, it is replaced.
 	 *
@@ -102,7 +133,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 */
 	public void put( final CardinalityCacheKey key, final Integer value ) {
 		final CardinalityCacheEntry entry = entryFactory.createCacheEntry( value );
-		map.put( key, entry );
+		put( key, entry );
 	}
 
 	/**
@@ -114,6 +145,16 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 */
 	@Override
 	public void put( final CardinalityCacheKey key, final CardinalityCacheEntry entry ) {
+		if ( map.containsKey( key ) )
+			replacementPolicy.entryWasRewritten( key, entry );
+		else {
+			// Check if max capacity has been reached
+			if ( map.size() == capacity )
+				replacementPolicy.getEvictionCandidates( 1 ).forEach( this::evict );
+
+			replacementPolicy.entryWasAdded( key, entry );
+		}
+
 		map.put( key, entry );
 	}
 
@@ -126,9 +167,8 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	@Override
 	public CardinalityCacheEntry get( final CardinalityCacheKey key ) {
 		final CardinalityCacheEntry entry = map.get( key );
-		if ( entry == null ) {
+		if ( entry == null )
 			return null;
-		}
 
 		// lazy evict
 		if ( ! invalidationPolicy.isStillValid( entry ) ) {
@@ -136,6 +176,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 			return null;
 		}
 
+		replacementPolicy.entryWasRequested( key, entry );
 		return entry;
 	}
 
@@ -147,7 +188,24 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 */
 	@Override
 	public boolean evict( final CardinalityCacheKey key ) {
-		return map.remove( key ) != null;
+		final boolean removed = map.remove( key ) != null;
+
+		if ( removed )
+			replacementPolicy.entryWasEvicted( key );
+
+		return removed;
+	}
+
+	/**
+	 * Removes the specified entry from the cache only if the current value matches.
+	 *
+	 * @param key   The key to remove.
+	 * @param value The expected value to match before removal.
+	 * @return {@link true} if the entry was removed, {@link false} otherwise.
+	 */
+	public boolean evict( final CardinalityCacheKey key, final Integer value ) {
+		final CardinalityCacheEntry entry = entryFactory.createCacheEntry( value );
+		return evict( key, entry );
 	}
 
 	/**
@@ -159,7 +217,11 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	 */
 	@Override
 	public boolean evict( final CardinalityCacheKey key, final CardinalityCacheEntry entry ) {
-		return map.remove( key, entry );
+		if ( map.containsKey( key ) && map.get( key ).equals( entry ) ) {
+			evict( key );
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -178,14 +240,20 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	@Override
 	public void clear() {
 		map.clear();
+		replacementPolicy.clear();
 	}
 
 	/**
-	 * No-op implementation.
-	 * 
-	 * This method is required by the interface but is not used because ChronicleMap
-	 * persists changes automatically. There is no need for an explicit save
-	 * operation.
+	 * Shrinks the cache to match its capacity.
+	 */
+	public void evictExcessEntries(){
+		final int excess = map.size() - capacity;
+		if (excess > 0)
+			replacementPolicy.getEvictionCandidates( excess ).forEach( this::evict );
+	}
+
+	/**
+	 * No-op since ChronicleMap persists changes automatically.
 	 */
 	@Override
 	public void save() {
@@ -193,10 +261,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 	}
 
 	/**
-	 * No-op implementation.
-	 * 
-	 * This method is required by the interface but is not used because ChronicleMap
-	 * automatically loads data from the mapped file upon creation.
+	 * No-op since ChronicleMap automatically loads data.
 	 */
 	@Override
 	public void load() {
