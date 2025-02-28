@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.federation.access.impl;
+package se.liu.ida.hefquin.engine.federation.access.impl.cache;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,9 +12,11 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 
 /**
- * A key for caching cardinality requests, uniquely identified by a {@link DataRetrievalRequest} and a {@link FederationMember}.
+ * A key for caching cardinality requests, uniquely identified by a
+ * {@link DataRetrievalRequest} and a {@link FederationMember}.
  */
-public class CardinalityCacheKey implements Serializable {
+public class CardinalityCacheKey implements Serializable
+{
 	private static final long serialVersionUID = 1L;
 
 	protected final String query;
@@ -30,15 +32,13 @@ public class CardinalityCacheKey implements Serializable {
 		else if ( req instanceof TPFRequest tpfRequest ) {
 			query = tpfRequest.toString();
 			bindings = "";
-			if ( fm instanceof TPFServer tpfServer ) {
+			if ( fm instanceof TPFServer tpfServer )
 				url = tpfServer.getInterface().createRequestURL( tpfRequest );
-			}
-			else if ( fm instanceof BRTPFServer brtpfServer ) {
+			else if ( fm instanceof BRTPFServer brtpfServer )
 				url = brtpfServer.getInterface().createRequestURL( tpfRequest );
-			}
-			else {
+			else
 				throw new IllegalArgumentException( "Unexpected type of server: " + fm.getClass().getName() );
-			}
+
 		}
 		else if ( req instanceof BRTPFRequest brtpfRequest && fm instanceof BRTPFServer brtpfServer ) {
 			query = brtpfRequest.getTriplePattern().toString();
@@ -46,7 +46,8 @@ public class CardinalityCacheKey implements Serializable {
 			bindings = brtpfRequest.getSolutionMappings().toString();
 		}
 		else {
-			throw new IllegalArgumentException( "Unexpected request type: " + req.getClass().getName() + "(server type: " + fm.getClass().getName() + ")" );
+			throw new IllegalArgumentException( "Unexpected request type: " + req.getClass().getName()
+					+ "(server type: " + fm.getClass().getName() + ")" );
 		}
 	}
 
@@ -56,13 +57,13 @@ public class CardinalityCacheKey implements Serializable {
 			return true;
 		if ( obj == null || getClass() != obj.getClass() )
 			return false;
-		CardinalityCacheKey other = (CardinalityCacheKey) obj;
-		return query.equals( other.query ) && url.equals( other.url );
+		final CardinalityCacheKey other = (CardinalityCacheKey) obj;
+		return query.equals( other.query ) && url.equals( other.url ) && bindings.equals( other.bindings );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( query, url );
+		return Objects.hash( query, url, bindings.hashCode() );
 	}
 
 	@Override

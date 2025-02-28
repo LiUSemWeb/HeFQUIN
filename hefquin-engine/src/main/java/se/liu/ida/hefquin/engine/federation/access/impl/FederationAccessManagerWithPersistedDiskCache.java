@@ -15,6 +15,8 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheKey;
+import se.liu.ida.hefquin.engine.federation.access.impl.cache.PersistableCardinalityCacheImpl;
 
 /**
  * A FederationAccessManager implementation that incorporates persistent disk
@@ -122,7 +124,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 			cacheHitsBRTPFCardinality++;
 			return cachedResponse;
 		}
-		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm) ;
+		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		cardinalityCache.put( key, newResponse );
 		newResponse.thenRun( () -> cardinalityCache.save() );
 		return newResponse;
