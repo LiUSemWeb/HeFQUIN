@@ -45,7 +45,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		throws IOException
 	{
 		super( fedAccMan, cacheCapacity, cachePolicies );
-		cardinalityCache = new ChronicleMapCardinalityCache( cardinalityCachePolicies );
+		cardinalityCache = new ChronicleMapCardinalityCache( cardinalityCachePolicies, cacheCapacity );
 	}
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
@@ -184,7 +184,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 	protected static class MyDefaultCardinalityCachePolicies implements CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry>
 	{
 		protected final long timeToLive;
-		protected final static long defaultTimeToLive = 5 * 60 * 1000;
+		protected final static long defaultTimeToLive = 300_000; // 5 minutes 
 
 		public MyDefaultCardinalityCachePolicies() {
 			this( defaultTimeToLive );
