@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
  */
 public class CardinalityCacheEntryFactory implements CacheEntryFactory<CardinalityCacheEntry, Integer>
 {
-
 	@Override
 	public CardinalityCacheEntry createCacheEntry( final Integer cardinality ) {
 		return new CardinalityCacheEntry( cardinality, Instant.now().toEpochMilli() );

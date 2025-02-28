@@ -7,14 +7,15 @@ public class CacheInvalidationPolicyTimeToLive<EntryType extends CacheEntry<Obje
 {
 	protected final long timeToLive;
 
-	public CacheInvalidationPolicyTimeToLive( long timeToLive ){
+	public CacheInvalidationPolicyTimeToLive( final long timeToLive ){
 		this.timeToLive = timeToLive;
 	}
 
 	/**
-	 * Returns <code>true</code> if the given cache entry is not stale.
+	 * Returns <code>true</code> if the given cache entry has not reached
+	 * the time to live considered by this policy.
 	 */
-	public boolean isStillValid( EntryType e ) {
+	public boolean isStillValid( final EntryType e ) {
 		return e.createdAt() + timeToLive > Instant.now().toEpochMilli();
 	}
 }
