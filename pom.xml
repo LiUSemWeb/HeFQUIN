@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.liu.ida.hefquin</groupId>
   <artifactId>hefquin</artifactId>
-  <version>0.0.4</version>
+  <version>0.0.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
