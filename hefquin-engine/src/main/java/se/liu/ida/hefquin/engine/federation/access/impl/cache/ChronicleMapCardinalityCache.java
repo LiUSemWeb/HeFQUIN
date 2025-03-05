@@ -111,6 +111,7 @@ public class ChronicleMapCardinalityCache implements PersistableCache<Cardinalit
 			.entries( capacity )
 			.averageKeySize( 512 )
 			.averageValueSize( 64 )
+			.maxBloatFactor( 5.0 )
 			.createPersistedTo( new File( filename ) );
 	}
 
