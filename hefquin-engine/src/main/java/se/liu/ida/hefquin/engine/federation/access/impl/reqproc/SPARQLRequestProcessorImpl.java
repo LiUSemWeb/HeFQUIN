@@ -14,6 +14,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionRemote;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -79,7 +80,12 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", e, req, fm);
 		}
 
-		final ResultSet result = qe.execSelect();
+		final ResultSet result;
+		try {
+			result = qe.execSelect();
+		} catch( Exception e ){
+			throw new FederationAccessException( e, req, fm );
+		}
 
 		final Date requestStartTime = new Date();
 
