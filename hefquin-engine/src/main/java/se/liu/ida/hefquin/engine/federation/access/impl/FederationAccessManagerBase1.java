@@ -1,18 +1,28 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.http.QueryExceptionHTTP;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.aggregate.AggregatorFactory;
-
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
@@ -26,6 +36,8 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
@@ -51,6 +63,22 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected AtomicLong issuedCardRequestsSPARQL  = new AtomicLong(0L);
 	protected AtomicLong issuedCardRequestsTPF     = new AtomicLong(0L);
 	protected AtomicLong issuedCardRequestsBRTPF   = new AtomicLong(0L);
+
+	/**
+	 * Checks whether the given {@link Throwable} or any of its causes is an instance of the specified exception type.
+	 *
+	 * @param throwable  the exception to inspect (may be null)
+	 * @param targetType the class of the exception type to search for
+	 * @return {@code true} if any cause matches {@code targetType}
+	 */
+	public static boolean hasCause( final Throwable throwable, final Class<? extends Throwable> targetType ) {
+		for ( Throwable cause = throwable; cause != null; cause = cause.getCause() ) {
+			if ( targetType.isInstance( cause ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
@@ -82,7 +110,24 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// issue the query as a request, the response will then be processed to create
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl(countQuery) );
-		return issueRequest(reqCount, fm).thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
+
+		return issueRequest( reqCount, fm ).handle( ( result, throwable ) -> {
+			if ( throwable != null ) {
+				// if not caused by by a (possibly wrapped) FederationException, re-throw
+				if ( ! hasCause( throwable, FederationAccessException.class ) )
+					throw new CompletionException( throwable );
+
+				// otherwise use fallback
+				final Node countValueNode = NodeFactory.createLiteralByValue( -1, XSDDatatype.XSDint );
+				final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping( countVar, countValueNode );
+				final SolMapsResponse fallback = new SolMapsResponseImpl( List.of( sm ),
+				                                                          fm,
+				                                                          req,
+				                                                          new Date() );
+				return getFctToObtainCardinalityResponseFromSolMapsResponse().apply( fallback );
+			}
+			return getFctToObtainCardinalityResponseFromSolMapsResponse().apply( result );
+		} );
 	}
 
 	@Override
@@ -91,7 +136,24 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final TPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return issueRequest( req, fm ).handle( ( result, throwable ) -> {
+			if ( throwable != null ) {
+				// if not caused by by a (possibly wrapped) FederationException, re-throw
+				if ( ! hasCause( throwable, FederationAccessException.class ) )
+					throw new CompletionException( throwable );
+
+				// otherwise use fallback (i.e., Integer.MAX_VALUE)
+				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
+				                                                  Collections.emptyList(),
+				                                                  enNumberOfBRTPFCardRequestsIssued,
+				                                                  Integer.MAX_VALUE,
+				                                                  fm,
+				                                                  req,
+				                                                  new Date() );
+				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
+			}
+			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
+		} );
 	}
 
 	@Override
@@ -100,7 +162,24 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return issueRequest( req, fm ).handle( ( result, throwable ) -> {
+			if ( throwable != null ) {
+				// if not caused by by a (possibly wrapped) FederationException, re-throw
+				if ( ! hasCause( throwable, FederationAccessException.class ) )
+					throw new CompletionException( throwable );
+
+				// otherwise use fallback (i.e., Integer.MAX_VALUE)
+				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
+				                                                  Collections.emptyList(),
+				                                                  enNumberOfBRTPFCardRequestsIssued,
+				                                                  Integer.MAX_VALUE,
+				                                                  fm,
+				                                                  req,
+				                                                  new Date() );
+				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
+			}
+			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
+		} );
 	}
 
 	@Override
@@ -109,7 +188,24 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		return issueRequest( req, fm ).handle( ( result, throwable ) -> {
+			if ( throwable != null ) {
+				// if not caused by by a (possibly wrapped) FederationException, re-throw
+				if ( ! hasCause( throwable, FederationAccessException.class ) )
+					throw new CompletionException( throwable );
+
+				// otherwise use fallback (i.e., Integer.MAX_VALUE)
+				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
+				                                                  Collections.emptyList(),
+				                                                  enNumberOfBRTPFCardRequestsIssued,
+				                                                  Integer.MAX_VALUE,
+				                                                  fm,
+				                                                  req,
+				                                                  new Date() );
+				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
+			}
+			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
+		} );
 	}
 
 	@Override
