@@ -79,7 +79,12 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", e, req, fm);
 		}
 
-		final ResultSet result = qe.execSelect();
+		final ResultSet result;
+		try {
+			result = qe.execSelect();
+		} catch( Exception e ){
+			throw new FederationAccessException( e, req, fm );
+		}
 
 		final Date requestStartTime = new Date();
 
