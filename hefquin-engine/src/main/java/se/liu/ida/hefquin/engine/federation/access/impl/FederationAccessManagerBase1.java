@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+
+import org.apache.http.client.HttpResponseException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -67,12 +69,23 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	 * @return {@code true} if any cause matches {@code targetType}
 	 */
 	public static boolean hasCause( final Throwable throwable, final Class<? extends Throwable> targetType ) {
+		return getCause( throwable, targetType ) != null;
+	}
+
+	/**
+	 * Returns the underlying cause of the given {@link Throwable} that is an instance of the specified exception type,
+	 * or {@code null} if no such cause is found.
+	 *
+	 * @param throwable  the throwable to inspect
+	 * @param targetType the target exception type to search for
+	 * @return the cause of the specified type, or {@code null} if not found
+	 */
+	public static Throwable getCause( final Throwable throwable, final Class<? extends Throwable> targetType ) {
 		for ( Throwable cause = throwable; cause != null; cause = cause.getCause() ) {
-			if ( targetType.isInstance( cause ) ) {
-				return true;
-			}
+			if ( targetType.isInstance( cause ) )
+				return cause;
 		}
-		return false;
+		return null;
 	}
 
 	@Override
@@ -106,6 +119,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl(countQuery) );
 
+		// Keep track of when the request was issued in case an exception is thrown
+		final Date requestStartTime = new Date();
+
 		return issueRequest( reqCount, fm ).handle( ( result, throwable ) -> {
 			if ( throwable != null ) {
 				// if not caused by by a (possibly wrapped) FederationException, re-throw
@@ -115,10 +131,16 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				// otherwise use fallback
 				final Node countValueNode = NodeFactory.createLiteralByValue( -1, XSDDatatype.XSDint );
 				final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping( countVar, countValueNode );
+
+				// TODO: Is HttpResponseException the only relevant cause?
+				final HttpResponseException cause = (HttpResponseException) getCause( throwable, HttpResponseException.class );
+
 				final SolMapsResponse fallback = new SolMapsResponseImpl( List.of( sm ),
 				                                                          fm,
 				                                                          req,
-				                                                          new Date() );
+				                                                          requestStartTime,
+				                                                          cause != null ? cause.getStatusCode() : -1,
+				                                                          cause != null ? cause.getReasonPhrase() : throwable.getMessage() );
 				return getFctToObtainCardinalityResponseFromSolMapsResponse().apply( fallback );
 			}
 			return getFctToObtainCardinalityResponseFromSolMapsResponse().apply( result );
@@ -131,11 +153,17 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final TPFServer fm )
 					throws FederationAccessException
 	{
+		// Keep track of when the request was issued in case an exception is thrown
+		final Date requestStartTime = new Date();
+
 		return issueRequest( req, fm ).handle( ( result, throwable ) -> {
 			if ( throwable != null ) {
 				// if not caused by by a (possibly wrapped) FederationException, re-throw
 				if ( ! hasCause( throwable, FederationAccessException.class ) )
 					throw new CompletionException( throwable );
+
+				// TODO: Is HttpResponseException the only relevant cause?
+				final HttpResponseException cause = (HttpResponseException) getCause( throwable, HttpResponseException.class );
 
 				// otherwise use fallback (i.e., Integer.MAX_VALUE)
 				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
@@ -144,7 +172,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				                                                  Integer.MAX_VALUE,
 				                                                  fm,
 				                                                  req,
-				                                                  new Date() );
+				                                                  requestStartTime,
+				                                                  cause != null ? cause.getStatusCode() : -1,
+				                                                  cause != null ? cause.getReasonPhrase() : throwable.getMessage() );
 				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
 			}
 			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
@@ -157,11 +187,17 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
+		// Keep track of when the request was issued in case an exception is thrown
+		final Date requestStartTime = new Date();
+
 		return issueRequest( req, fm ).handle( ( result, throwable ) -> {
 			if ( throwable != null ) {
 				// if not caused by by a (possibly wrapped) FederationException, re-throw
 				if ( ! hasCause( throwable, FederationAccessException.class ) )
 					throw new CompletionException( throwable );
+
+				// TODO: Is HttpResponseException the only relevant cause?
+				final HttpResponseException cause = (HttpResponseException) getCause( throwable, HttpResponseException.class );
 
 				// otherwise use fallback (i.e., Integer.MAX_VALUE)
 				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
@@ -170,7 +206,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				                                                  Integer.MAX_VALUE,
 				                                                  fm,
 				                                                  req,
-				                                                  new Date() );
+				                                                  requestStartTime,
+				                                                  cause != null ? cause.getStatusCode() : -1,
+				                                                  cause != null ? cause.getReasonPhrase() : throwable.getMessage() );
 				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
 			}
 			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
@@ -189,6 +227,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				if ( ! hasCause( throwable, FederationAccessException.class ) )
 					throw new CompletionException( throwable );
 
+				// TODO: Is HttpResponseException the only relevant cause?
+				final HttpResponseException cause = (HttpResponseException) getCause( throwable, HttpResponseException.class );
+
 				// otherwise use fallback (i.e., Integer.MAX_VALUE)
 				final TPFResponse fallback = new TPFResponseImpl( Collections.emptyList(),
 				                                                  Collections.emptyList(),
@@ -196,7 +237,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				                                                  Integer.MAX_VALUE,
 				                                                  fm,
 				                                                  req,
-				                                                  new Date() );
+				                                                  new Date(),
+				                                                  cause != null ? cause.getStatusCode() : -1,
+				                                                  cause != null ? cause.getReasonPhrase() : throwable.getMessage() );
 				return getFctToObtainCardinalityResponseFromTPFResponse().apply( fallback );
 			}
 			return getFctToObtainCardinalityResponseFromTPFResponse().apply( result );
