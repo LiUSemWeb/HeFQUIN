@@ -6,7 +6,7 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 
-public class CachedCardinalityResponseImpl implements CardinalityResponse
+public class CachedCardinalityResponseImpl extends DataRetrievalResponseBase implements CardinalityResponse
 {
 	protected final FederationMember fm;
 	protected final DataRetrievalRequest request;
@@ -19,6 +19,8 @@ public class CachedCardinalityResponseImpl implements CardinalityResponse
 	                                      final int cardinality,
 	                                      final Date requestStartTime,
 	                                      final Date requestEndTime ) {
+		super( fm, request, requestStartTime, requestEndTime );
+
 		assert fm != null;
 		assert request != null;
 
