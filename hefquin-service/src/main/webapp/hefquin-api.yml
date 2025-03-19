@@ -1,0 +1,210 @@
+openapi: 3.0.3
+info:
+  title: HeFQUIN Service API
+  version: "1.0.0"
+  description: REST API for executing SPARQL queries and retrieving query processing details.
+
+paths:
+  /sparql:
+    post:
+      tags:
+        - Query Execution
+      summary: Execute a SPARQL query
+      requestBody:
+        $ref: '#/components/requestBodies/SparqlQuery'
+      responses:
+        "200":
+          $ref: '#/components/responses/SparqlResults'
+        "400":
+          description: Bad Request - SPARQL query is missing or empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Missing or empty SPARQL query"
+        "415":
+          description: Unsupported Media Type - Invalid Content-Type or Accept header
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unsupported Media Type"
+        "500":
+          description: Internal Server Error - Error during query execution
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Query execution failed due to internal error"
+    get:
+      tags:
+        - Query Execution
+      summary: Execute a SPARQL query
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: The SPARQL query string
+          schema:
+            type: string
+            example: |
+              SELECT *
+              WHERE {
+                SERVICE <http://dbpedia.org/sparql> {
+                  ?s ?p ?o
+                }
+              } LIMIT 10
+      responses:
+        "200":
+          $ref: '#/components/responses/SparqlResults'
+        "400":
+          description: Bad Request - SPARQL query is missing or empty
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Missing or empty SPARQL query"
+        "415":
+          description: Unsupported Media Type - Invalid Content-Type or Accept header
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unsupported Media Type"
+        "500":
+          description: Internal Server Error - Error during query execution
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Query execution failed due to internal error"
+components:
+  requestBodies:
+    SparqlQuery:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+                description: |
+                  A SPARQL query
+            required:
+              - query
+          example: |
+            SELECT *
+            WHERE {
+              SERVICE <http://dbpedia.org/sparql> {
+                ?s ?p ?o
+              }
+            } LIMIT 10
+        application/sparql-query:
+          schema:
+            type: string
+          example: |
+            SELECT *
+            WHERE {
+              SERVICE <http://dbpedia.org/sparql> {
+                ?s ?p ?o
+              }
+            } LIMIT 10
+
+  responses:
+    SparqlResults:
+      description: "Returns the query result with the specified MIME type (default: application/sparql-results+json)"
+      content:
+        application/sparql-results+json:
+          schema:
+            type: object
+          example:
+            { "head": {
+                "vars": [ "person" , "name" ]
+              } ,
+              "results": {
+                "bindings": [
+                  { 
+                    "person": { "type": "uri" , "value": "http://example.org/person/alice" } ,
+                    "name": { "type": "literal" , "value": "Alice" }
+                  } ,
+                  { 
+                    "person": { "type": "uri" , "value": "http://example.org/person/bob" } ,
+                    "name": { "type": "literal" , "value": "Bob" }
+                  }
+                ]
+              }
+            }
+
+        application/sparql-results+xml:
+          schema:
+            type: object
+            properties:
+              head:
+                type: object
+              results:
+                type: object
+            xml:
+              name: sparql
+          example: |
+            <?xml version="1.0"?>
+            <sparql xmlns="http://www.w3.org/2005/sparql-results#">
+              <head>
+                <variable name="person"/>
+                <variable name="name"/>
+              </head>
+              <results>
+                <result>
+                  <binding name="person">
+                    <uri>http://example.org/person/alice</uri>
+                  </binding>
+                  <binding name="name">
+                    <literal>Alice</literal>
+                  </binding>
+                </result>
+                <result>
+                  <binding name="person">
+                    <uri>http://example.org/person/bob</uri>
+                  </binding>
+                  <binding name="name">
+                    <literal>Bob</literal>
+                  </binding>
+                </result>
+              </results>
+            </sparql>
+        text/csv:
+          schema:
+            type: string
+            format: csv
+          example: |
+              person,name
+              http://example.org/person/alice,Alice
+              http://example.org/person/bob,Bob
+        text/tab-separated-values:
+          schema:
+            type: string
+          example: |
+            ?person ?name
+            <http://example.org/person/alice>	"Alice"
+            <http://example.org/person/bob>	"Bob"
+
+
+
