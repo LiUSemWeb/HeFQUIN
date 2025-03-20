@@ -35,7 +35,6 @@ public class HeFQUINServlet extends HttpServlet {
 		"application/sparql-results+json",
 		"application/sparql-results+xml",
 		"text/csv",
-		"text/tsv",
 		"text/tab-separated-values"
 	);
 
