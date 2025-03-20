@@ -8,7 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.web.TypedInputStream;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -28,7 +30,7 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 @WebServlet
 public class HeFQUINServlet extends HttpServlet {
 	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
-	private static final long serialVersionUID = 5902821543508443162L;
+	private static final long serialVersionUID = 1L;
 
 	private static HeFQUINEngine engine;
 	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList(
@@ -39,7 +41,7 @@ public class HeFQUINServlet extends HttpServlet {
 	);
 
 	@Override
-	public void init( ServletConfig config ) throws ServletException {
+	public void init( final ServletConfig config ) throws ServletException {
 		super.init( config );
 
 		final String configurationFile = System.getProperty( "hefquin.configuration", "DefaultEngineConf.ttl" );
@@ -57,11 +59,10 @@ public class HeFQUINServlet extends HttpServlet {
 		logger.info( "Engine initilized" );
 	}
 
-	public void check( String filenameOrURI ) {
-		TypedInputStream in = StreamManager.get().open(filenameOrURI);
-		if ( in == null ) {
+	public void check( final String filenameOrURI ) {
+		final TypedInputStream in = StreamManager.get().open( filenameOrURI );
+		if ( in == null )
 			throw new RuntimeException( "File not found: " + filenameOrURI );
-		}
 		in.close();
 	}
 
@@ -73,7 +74,7 @@ public class HeFQUINServlet extends HttpServlet {
 		final String contentType = getOrDefault( request.getHeader( "Content-Type" ), "" );
 		response.setCharacterEncoding( "utf-8" );
 
-		String query = null;
+		final String query;
 		switch ( contentType ) {
 		case "application/sparql-query":
 			query = readRequestBody( request );
@@ -83,21 +84,27 @@ public class HeFQUINServlet extends HttpServlet {
 			break;
 		default:
 			response.setStatus( 415 ); // Unsupported Media Type
-			response.getWriter().println( "{\"error\": \"Unsupported content type: " + contentType + " \"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", "Unsupported content type: " + contentType );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 
 		// Ensure query is not null or empty
 		if ( query == null || query.trim().isEmpty() ) {
 			response.setStatus( 400 );
-			response.getWriter().println( "{\"error\": \"SPARQL query is missing or empty\"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", "SPARQL query is missing or empty" );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 
 		// Check accept header
 		if ( accept == null ) {
 			response.setStatus( 415 ); // Unsupported Media Type
-			response.getWriter().println( "{\"error\": \"Unsupported accept type: " + accept + "\"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", "Unsupported content type: " + accept );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 
@@ -105,17 +112,19 @@ public class HeFQUINServlet extends HttpServlet {
 			final String result = execute( query, accept );
 			response.setStatus( 200 );
 			response.setHeader( "Content-Type", accept );
-			response.getWriter().println( result );
+			response.getWriter().write( result );
 			return;
 		} catch ( Exception e ) {
 			response.setStatus( 500 );
-			response.getWriter().println( "{\"error\": \"" + e.getLocalizedMessage() + "\"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", e.getLocalizedMessage() );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 	}
 
 	@Override
-	protected void doGet( HttpServletRequest request, HttpServletResponse response )
+	protected void doGet( final HttpServletRequest request, final HttpServletResponse response )
 			throws ServletException, IOException {
 		final Iterator<String> acceptHeader = request.getHeaders( "Accept" ).asIterator();
 		final String accept = findSupportedMimeType( acceptHeader );
@@ -126,15 +135,18 @@ public class HeFQUINServlet extends HttpServlet {
 		// Ensure query is not null or empty
 		if ( query == null || query.trim().isEmpty() ) {
 			response.setStatus( 400 );
-			response.getWriter().println( "{\"error\": \"SPARQL query is missing or empty\"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", "SPARQL query is missing or empty" );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 
 		// Check accept header
 		if ( accept == null ) {
 			response.setStatus( 415 ); // Unsupported Media Type
-			response.getWriter().println( "{\"error\": \"Unsupported accept type: " + accept + "\"}" );
-			response.getWriter().flush();
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", "Unsupported accept type: " + accept );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 
@@ -142,37 +154,30 @@ public class HeFQUINServlet extends HttpServlet {
 			final String result = execute( query, accept );
 			response.setStatus( 200 );
 			response.setHeader( "Content-Type", accept );
-			response.getWriter().println( result );
+
+			response.getWriter().write( result );
 		} catch ( Exception e ) {
 			response.setStatus( 500 );
-			response.getWriter().println( "{\"error\": \"" + e.getLocalizedMessage() + "\"}" );
+			final JsonObject msg = new JsonObject();
+			msg.put( "error", e.getLocalizedMessage() );
+			response.getWriter().write( msg.toString() );
 			return;
 		}
 	}
 
-	private static String findSupportedMimeType( Iterator<String> acceptHeader ) {
-		if ( acceptHeader == null || ! acceptHeader.hasNext() ) {
-			return SUPPORTED_MIME_TYPES.get( 0 );
-		}
-		// Parse the Accept header
-		String mimeType;
-		while ( acceptHeader.hasNext() ) {
-			mimeType = acceptHeader.next().trim().split( ";" )[0];
-			if ( SUPPORTED_MIME_TYPES.contains( mimeType ) ) {
+	private static String findSupportedMimeType( final Iterator<String> acceptHeader ) {
+		// Parse the accept header
+		while ( acceptHeader != null && acceptHeader.hasNext() ) {
+			final String mimeType = acceptHeader.next().trim().split( ";" )[0];
+			if ( SUPPORTED_MIME_TYPES.contains( mimeType ) )
 				return mimeType;
-			}
 		}
-		return SUPPORTED_MIME_TYPES.get( 0 );
+		return SUPPORTED_MIME_TYPES.get( 0 ); // default
 	}
 
-	public String readRequestBody( HttpServletRequest request ) throws IOException {
+	public String readRequestBody( final HttpServletRequest request ) throws IOException {
 		try ( final BufferedReader reader = request.getReader() ) {
-			final StringBuilder body = new StringBuilder();
-			String line;
-			while ( (line = reader.readLine()) != null ) {
-				body.append( line + "\n" );
-			}
-			return body.toString();
+			return reader.lines().collect( Collectors.joining( "\n" ) );
 		}
 	}
 
