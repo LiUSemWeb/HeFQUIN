@@ -52,7 +52,7 @@ public class HeFQUINServlet extends HttpServlet {
 	);
 
 	/**
-	 * Initializes the servlet and the HeFQUIN engine using system properties for configuration and federation files.
+	 * Initializes the servlet.
 	 *
 	 * @param config the servlet configuration
 	 * @throws ServletException if the engine initialization fails
@@ -62,7 +62,7 @@ public class HeFQUINServlet extends HttpServlet {
 		super.init( config );
 
 		// Initialize engine
-		engine = (HeFQUINEngine) getServletContext().getAttribute("engine");
+		engine = (HeFQUINEngine) getServletContext().getAttribute( "engine" );
 		logger.info( "Engine initialized" );
 	}
 
