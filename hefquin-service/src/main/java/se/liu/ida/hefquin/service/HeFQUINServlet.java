@@ -4,10 +4,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.atlas.json.JsonObject;
@@ -27,19 +26,41 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 
+/**
+ * Servlet for handling SPARQL queries via HTTP GET and POST requests.
+ * Supports multiple result formats and integrates with the HeFQUIN engine.
+ */
 @WebServlet
 public class HeFQUINServlet extends HttpServlet {
 	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
 	private static final long serialVersionUID = 1L;
-
 	private static HeFQUINEngine engine;
-	private static final List<String> SUPPORTED_MIME_TYPES = Arrays.asList(
-		"application/sparql-results+json",
-		"application/sparql-results+xml",
-		"text/csv",
-		"text/tab-separated-values"
+
+	// Request Content-Types
+	private static final String CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
+	private static final String CONTENT_TYPE_SPARQL_QUERY    = "application/sparql-query";
+
+	// Accept headers (Response formats for SELECT/ASK results)
+	private static final String ACCEPT_SPARQL_RESULTS_JSON   = "application/sparql-results+json";
+	private static final String ACCEPT_SPARQL_RESULTS_XML    = "application/sparql-results+xml";
+	private static final String ACCEPT_CSV                   = "text/csv";
+	private static final String ACCEPT_TSV                   = "text/tab-separated-values";
+	private static final String DEFAULT_MIME_TYPE            = ACCEPT_SPARQL_RESULTS_JSON;
+	private static final String ACCEPT_WILDCARD              = "*/*";
+
+	private static final Set<String> SUPPORTED_MIME_TYPES = Set.of(
+		ACCEPT_SPARQL_RESULTS_JSON,
+		ACCEPT_SPARQL_RESULTS_XML,
+		ACCEPT_CSV,
+		ACCEPT_TSV
 	);
 
+	/**
+	 * Initializes the servlet and the HeFQUIN engine using system properties for configuration and federation files.
+	 *
+	 * @param config the servlet configuration
+	 * @throws ServletException if the engine initialization fails
+	 */
 	@Override
 	public void init( final ServletConfig config ) throws ServletException {
 		super.init( config );
@@ -47,152 +68,175 @@ public class HeFQUINServlet extends HttpServlet {
 		final String configurationFile = System.getProperty( "hefquin.configuration", "DefaultEngineConf.ttl" );
 		final String federationFile = System.getProperty( "hefquin.federation", "DefaultFedConf.ttl" );
 
-		logger.info( "--- Settings ---" );
-		logger.info( "hefquin.configuration: " + configurationFile );
-		logger.info( "hefquin.federation:    " + federationFile );
+		logger.info( "--- Servlet Initialization ---" );
+		logger.info( "hefquin.configuration: {}", configurationFile );
+		logger.info( "hefquin.federation:    {}", federationFile );
 
 		check( configurationFile );
 		check( federationFile );
 
 		// Initialize engine
 		engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
-		logger.info( "Engine initilized" );
+		logger.info( "Engine initialized" );
 	}
 
-	public void check( final String filenameOrURI ) {
-		final TypedInputStream in = StreamManager.get().open( filenameOrURI );
-		if ( in == null )
-			throw new RuntimeException( "File not found: " + filenameOrURI );
-		in.close();
+	/**
+	 * Checks whether the given file or URI is accessible.
+	 *
+	 * @param filenameOrURI path or URI to check
+	 * @throws RuntimeException if the resource is not accessible
+	 */
+	private void check( final String filenameOrURI ) {
+		try ( TypedInputStream in = StreamManager.get().open( filenameOrURI ) ) {
+			if ( in == null ) {
+				throw new IOException( "Resource not found or cannot be opened: " + filenameOrURI );
+			}
+		} catch ( IOException e ) {
+			throw new RuntimeException( "Failed to access: " + filenameOrURI, e );
+		}
 	}
 
+	/**
+	 * Handles HTTP POST requests containing SPARQL queries. Supports both 'application/sparql-query' and
+	 * 'application/x-www-form-urlencoded'.
+	 *
+	 * @param request  the HTTP request
+	 * @param response the HTTP response
+	 * @throws IOException
+	 */
 	@Override
-	protected void doPost( final HttpServletRequest request, final HttpServletResponse response )
-			throws ServletException, IOException {
-		final Iterator<String> acceptHeader = request.getHeaders( "Accept" ).asIterator();
-		final String accept = findSupportedMimeType( acceptHeader );
-		final String contentType = getOrDefault( request.getHeader( "Content-Type" ), "" );
-		response.setCharacterEncoding( "utf-8" );
+	protected void doPost( final HttpServletRequest request, final HttpServletResponse response ) throws IOException {
+		final String contentType = request.getHeader( "Content-Type" );
 
 		final String query;
-		switch ( contentType ) {
-		case "application/sparql-query":
-			query = readRequestBody( request );
-			break;
-		case "application/x-www-form-urlencoded":
+		if ( CONTENT_TYPE_SPARQL_QUERY.equals( contentType ) ) {
+			try ( final BufferedReader reader = request.getReader() ) {
+				query = reader.lines().collect( Collectors.joining( "\n" ) );
+			}
+		}
+		else if ( CONTENT_TYPE_FORM_URLENCODED.equals( contentType ) ) {
 			query = request.getParameter( "query" );
-			break;
-		default:
-			response.setStatus( 415 ); // Unsupported Media Type
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", "Unsupported content type: " + contentType );
-			response.getWriter().write( msg.toString() );
+		}
+		else {
+			writeJsonError( response, 415, "Unsupported 'Content-Type' header." );
 			return;
 		}
-
-		// Ensure query is not null or empty
-		if ( query == null || query.trim().isEmpty() ) {
-			response.setStatus( 400 );
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", "SPARQL query is missing or empty" );
-			response.getWriter().write( msg.toString() );
-			return;
-		}
-
-		// Check accept header
-		if ( accept == null ) {
-			response.setStatus( 415 ); // Unsupported Media Type
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", "Unsupported content type: " + accept );
-			response.getWriter().write( msg.toString() );
-			return;
-		}
-
-		try {
-			final String result = execute( query, accept );
-			response.setStatus( 200 );
-			response.setHeader( "Content-Type", accept );
-			response.getWriter().write( result );
-			return;
-		} catch ( Exception e ) {
-			response.setStatus( 500 );
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", e.getLocalizedMessage() );
-			response.getWriter().write( msg.toString() );
-			return;
-		}
+		executeRequest( query, request, response );
 	}
 
+	/**
+	 * Handles HTTP GET requests containing a SPARQL query passed via the 'query' parameter.
+	 *
+	 * @param request  the HTTP request
+	 * @param response the HTTP response
+	 * @throws IOException
+	 */
 	@Override
-	protected void doGet( final HttpServletRequest request, final HttpServletResponse response )
-			throws ServletException, IOException {
-		final Iterator<String> acceptHeader = request.getHeaders( "Accept" ).asIterator();
-		final String accept = findSupportedMimeType( acceptHeader );
+	protected void doGet( final HttpServletRequest request, final HttpServletResponse response ) throws IOException {
+		final String query = request.getParameter( "query" );
+		executeRequest( query, request, response );
+	}
+
+	/**
+	 * Executes the given SPARQL query using the HeFQUIN engine and writes the result to the HTTP response. Handles
+	 * query parsing, content negotiation via the Accept header, and error reporting.
+	 *
+	 * @param query    the SPARQL query string (must not be null or empty)
+	 * @param request  the HTTP request containing headers and parameters
+	 * @param response the HTTP response used to return the query result or an error message
+	 * @throws IOException if an I/O error occurs while writing the response
+	 */
+	private void executeRequest( final String query, final HttpServletRequest request,
+			final HttpServletResponse response ) throws IOException {
 		response.setCharacterEncoding( "utf-8" );
 
-		final String query = request.getParameter( "query" );
-
 		// Ensure query is not null or empty
 		if ( query == null || query.trim().isEmpty() ) {
-			response.setStatus( 400 );
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", "SPARQL query is missing or empty" );
-			response.getWriter().write( msg.toString() );
+			writeJsonError( response, 400, "SPARQL query is missing or empty" );
 			return;
 		}
 
 		// Check accept header
-		if ( accept == null ) {
-			response.setStatus( 415 ); // Unsupported Media Type
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", "Unsupported accept type: " + accept );
-			response.getWriter().write( msg.toString() );
+		final String mimeType = findSupportedMimeType( request.getHeaders( "Accept" ) );
+		if ( mimeType == null ) {
+			writeJsonError( response, 406, "Unsupported 'Accept' header" );
 			return;
 		}
 
 		try {
-			final String result = execute( query, accept );
+			logger.debug( "Received SPARQL query: {}", query );
+			final String result = execute( query, mimeType );
 			response.setStatus( 200 );
-			response.setHeader( "Content-Type", accept );
-
+			response.setContentType( mimeType );
 			response.getWriter().write( result );
 		} catch ( Exception e ) {
-			response.setStatus( 500 );
-			final JsonObject msg = new JsonObject();
-			msg.put( "error", e.getLocalizedMessage() );
-			response.getWriter().write( msg.toString() );
+			logger.error( "Query execution failed", e );
+			writeJsonError( response, 500, "Error during query execution: " + e.getLocalizedMessage() );
 			return;
 		}
 	}
 
-	private static String findSupportedMimeType( final Iterator<String> acceptHeader ) {
-		// Parse the accept header
-		while ( acceptHeader != null && acceptHeader.hasNext() ) {
-			final String mimeType = acceptHeader.next().trim().split( ";" )[0];
-			if ( SUPPORTED_MIME_TYPES.contains( mimeType ) )
-				return mimeType;
+	/**
+	 * Finds the first supported MIME type from the provided Accept header.
+	 *
+	 * @param acceptHeaders iterator over Accept header values
+	 * @return a supported MIME type, or a default if accept header is null or all content types are supported
+	 */
+	private static String findSupportedMimeType( final Enumeration<String> acceptHeaders ) {
+		if ( acceptHeaders == null || ! acceptHeaders.hasMoreElements() ) {
+			return ACCEPT_SPARQL_RESULTS_JSON;
 		}
-		return SUPPORTED_MIME_TYPES.get( 0 ); // default
+
+		while ( acceptHeaders.hasMoreElements() ) {
+			final String headerLine = acceptHeaders.nextElement();
+			for ( final String value : headerLine.split( "," ) ) {
+				final String mediaType = value.split( ";" )[0].trim();
+				if ( SUPPORTED_MIME_TYPES.contains( mediaType ) ) {
+					return mediaType;
+				}
+
+				if ( ACCEPT_WILDCARD.equals( mediaType ) ) {
+					return DEFAULT_MIME_TYPE;
+				}
+			}
+		}
+
+		return null;
 	}
 
-	public String readRequestBody( final HttpServletRequest request ) throws IOException {
-		try ( final BufferedReader reader = request.getReader() ) {
-			return reader.lines().collect( Collectors.joining( "\n" ) );
-		}
-	}
-
-	private static String execute( final String queryString, final String mimeType )
-			throws UnsupportedEncodingException {
+	/**
+	 * Executes the given SPARQL query using the HeFQUIN engine and returns the serialized result.
+	 *
+	 * @param queryString the SPARQL query string
+	 * @param mimeType    the MIME type for the response format
+	 * @return the query result as a string in the specified format
+	 */
+	private static String execute( final String queryString, final String mimeType ) {
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final PrintStream ps = new PrintStream( baos, true, "utf-8" );
-		engine.executeQuery( query, resultsFormat, ps );
-		ps.close();
+
+		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
+			engine.executeQuery( query, resultsFormat, ps );
+		}
 		return baos.toString();
 	}
 
-	public static String getOrDefault( final String value, final String defaultValue ) {
-		return value != null ? value : defaultValue;
+	/**
+	 * Writes a JSON-formatted error response with the given HTTP status code and error message. The response body will
+	 * contain a JSON object of the form: {@code {"error": "<message>"}}.
+	 *
+	 * @param response   the HTTP response to write to
+	 * @param statusCode the HTTP status code to set (e.g., 400, 415, 500)
+	 * @param message    the error message to include in the JSON body
+	 * @throws IOException if writing the response fails
+	 */
+	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final String message )
+			throws IOException {
+		response.setStatus( statusCode );
+		response.setContentType( "application/json" );
+		final JsonObject msg = new JsonObject();
+		msg.put( "error", message );
+		response.getWriter().write( msg.toString() );
 	}
 }
