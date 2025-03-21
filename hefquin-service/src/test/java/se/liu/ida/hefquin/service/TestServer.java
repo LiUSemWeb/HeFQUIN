@@ -16,6 +16,7 @@ public class TestServer {
 		final Server server = new Server( port );
 		final ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath( "/" );
+		context.addEventListener( new SharedResourceInitializer() );
 
 		final ServletHolder servlet = new ServletHolder( new HeFQUINServlet() );
 		context.addServlet( servlet, "/" );
