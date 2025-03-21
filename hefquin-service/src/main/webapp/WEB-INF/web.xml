@@ -22,4 +22,8 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
+    <listener>
+        <listener-class>se.liu.ida.hefquin.service.SharedResourceInitializer</listener-class>
+    </listener>
+
 </web-app>
