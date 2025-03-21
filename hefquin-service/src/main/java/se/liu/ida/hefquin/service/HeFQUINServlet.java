@@ -10,17 +10,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.atlas.json.JsonObject;
-import org.apache.jena.atlas.web.TypedInputStream;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.riot.system.stream.StreamManager;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +27,6 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
  * Supports multiple result formats and integrates with the HeFQUIN engine.
  */
-@WebServlet
 public class HeFQUINServlet extends HttpServlet {
 	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
 	private static final long serialVersionUID = 1L;
@@ -65,35 +61,9 @@ public class HeFQUINServlet extends HttpServlet {
 	public void init( final ServletConfig config ) throws ServletException {
 		super.init( config );
 
-		final String configurationFile = System.getProperty( "hefquin.configuration", "DefaultEngineConf.ttl" );
-		final String federationFile = System.getProperty( "hefquin.federation", "DefaultFedConf.ttl" );
-
-		logger.info( "--- Servlet Initialization ---" );
-		logger.info( "hefquin.configuration: {}", configurationFile );
-		logger.info( "hefquin.federation:    {}", federationFile );
-
-		check( configurationFile );
-		check( federationFile );
-
 		// Initialize engine
-		engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
+		engine = (HeFQUINEngine) getServletContext().getAttribute("engine");
 		logger.info( "Engine initialized" );
-	}
-
-	/**
-	 * Checks whether the given file or URI is accessible.
-	 *
-	 * @param filenameOrURI path or URI to check
-	 * @throws RuntimeException if the resource is not accessible
-	 */
-	private void check( final String filenameOrURI ) {
-		try ( TypedInputStream in = StreamManager.get().open( filenameOrURI ) ) {
-			if ( in == null ) {
-				throw new IOException( "Resource not found or cannot be opened: " + filenameOrURI );
-			}
-		} catch ( IOException e ) {
-			throw new RuntimeException( "Failed to access: " + filenameOrURI, e );
-		}
 	}
 
 	/**
