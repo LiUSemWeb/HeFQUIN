@@ -20,6 +20,10 @@ public class TestServer {
 
 		final ServletHolder servlet = new ServletHolder( new HeFQUINServlet() );
 		context.addServlet( servlet, "/" );
+
+		final ServletHolder inspectServlet = new ServletHolder( new HeFQUINServletInspect() );
+		context.addServlet( inspectServlet, "/query-inspect" );
+
 		server.setHandler( context );
 		return server;
 	}
