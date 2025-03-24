@@ -5,7 +5,7 @@ import java.util.Date;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 
-public interface DataRetrievalResponse
+public interface DataRetrievalResponse<T>
 {
 	/**
 	 * Returns the federation member where this response comes from.
@@ -41,6 +41,12 @@ public interface DataRetrievalResponse
 	default boolean isError() {
 		return getErrorStatusCode() != null;
 	};
+
+	/**
+	 * Returns the data retrieved in response to the corresponding request, or throws
+	 * UnsupportedOperationDueToRetrievalError if an error occurred during data retrieval.
+	 */
+	T getResponseData() throws UnsupportedOperationDueToRetrievalError;
 
 	/**
 	 * Returns the HTTP status code if the response resulted in an error, or empty

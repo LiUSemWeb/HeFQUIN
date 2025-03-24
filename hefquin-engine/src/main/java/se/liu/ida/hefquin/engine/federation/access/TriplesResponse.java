@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access;
 
 import se.liu.ida.hefquin.base.data.Triple;
 
-public interface TriplesResponse extends DataRetrievalResponse
+public interface TriplesResponse extends DataRetrievalResponse<Iterable<Triple>>
 {
 	Iterable<Triple> getTriples();
 

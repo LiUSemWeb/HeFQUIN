@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 
-public interface SolMapsResponse extends DataRetrievalResponse
+public interface SolMapsResponse extends DataRetrievalResponse<Iterable<SolutionMapping>>
 {
 	Iterable<SolutionMapping> getSolutionMappings();
 

@@ -4,6 +4,6 @@ import java.util.List;
 
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 
-public interface RecordsResponse extends DataRetrievalResponse {
+public interface RecordsResponse extends DataRetrievalResponse<List<TableRecord>> {
     List<TableRecord> getResponse();
 }
