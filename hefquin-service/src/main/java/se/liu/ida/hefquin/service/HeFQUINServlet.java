@@ -60,10 +60,7 @@ public class HeFQUINServlet extends HttpServlet {
 	@Override
 	public void init( final ServletConfig config ) throws ServletException {
 		super.init( config );
-
-		// Initialize engine
 		engine = (HeFQUINEngine) getServletContext().getAttribute( "engine" );
-		logger.info( "Engine initialized" );
 	}
 
 	/**
