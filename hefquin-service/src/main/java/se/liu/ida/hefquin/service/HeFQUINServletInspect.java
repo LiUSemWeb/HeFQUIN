@@ -87,7 +87,7 @@ public class HeFQUINServletInspect extends HttpServlet
 			query = request.getParameter( "query" );
 		}
 		else {
-			writeJsonError( response, 415, "Unsupported 'Content-Type' header." );
+			writeJsonError( response, 415, new JsonString ( "Unsupported 'Content-Type' header." ) );
 			return;
 		}
 		executeRequest( query, request, response );
@@ -121,7 +121,7 @@ public class HeFQUINServletInspect extends HttpServlet
 
 		// Ensure query is not null or empty
 		if ( query == null || query.trim().isEmpty() ) {
-			writeJsonError( response, 400, "SPARQL query is missing or empty" );
+			writeJsonError( response, 400, new JsonString( "SPARQL query is missing or empty" ) );
 			return;
 		}
 
@@ -129,15 +129,14 @@ public class HeFQUINServletInspect extends HttpServlet
 
 		try {
 			logger.debug( "Received SPARQL query: {}", query );
-			final String result = execute( query, mimeType );
+			final JsonObject result = execute( query, mimeType );
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
-
-			response.getWriter().write( result );
+			response.getWriter().write( result.toString() );
 
 		} catch ( Exception e ) {
 			logger.error( "Query execution failed", e );
-			writeJsonError( response, 500, "Error during query execution: " + e.getLocalizedMessage() );
+			writeJsonError( response, 500, new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
 			return;
 		}
 	}
@@ -147,29 +146,29 @@ public class HeFQUINServletInspect extends HttpServlet
 	 *
 	 * @param queryString the SPARQL query string
 	 * @param mimeType    the MIME type for the response format
-	 * @return the serialized inspection result JSON string
+	 * @return the inspection result as a JSON object
 	 */
-	private static String execute( final String queryString, final String mimeType ) {
+	private static JsonObject execute( final String queryString, final String mimeType ) {
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		final JsonObject inspectionResults = new JsonObject();
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query, resultsFormat,
-					ps );
+			final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
 			final QueryProcStats stats = statsAndExceptions.object1;
 			final List<Exception> exceptions = statsAndExceptions.object2;
 
 			inspectionResults.put( "exceptions", ServletUtils.getExceptions( exceptions ) );
-			inspectionResults.put( "queryMetrics", StatsPrinterJSON.statsAsJson( stats ) );
-			inspectionResults.put( "logicalPlan", getLogicalPlan( stats ) );
-			inspectionResults.put( "physicalPlan", getPhysicalPlan( stats ) );
-			inspectionResults.put( "sourceAssignment", getSourceAssignment( stats ) );
-			inspectionResults.put( "federationAccessStats",
-					StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
+			if( stats != null ){
+				inspectionResults.put( "queryMetrics", StatsPrinterJSON.statsAsJson( stats ) );
+				inspectionResults.put( "logicalPlan", getLogicalPlan( stats ) );
+				inspectionResults.put( "physicalPlan", getPhysicalPlan( stats ) );
+				inspectionResults.put( "sourceAssignment", getSourceAssignment( stats ) );
+				inspectionResults.put( "federationAccessStats", StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
+			}
 		}
-		return inspectionResults.toString();
+		return inspectionResults;
 	}
 
 	/**
@@ -181,7 +180,7 @@ public class HeFQUINServletInspect extends HttpServlet
 	 * @param message    the error message to include in the JSON body
 	 * @throws IOException if writing the response fails
 	 */
-	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final String message )
+	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final JsonValue message )
 			throws IOException {
 		response.setStatus( statusCode );
 		response.setContentType( "application/json" );
