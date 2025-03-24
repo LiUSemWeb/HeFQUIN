@@ -36,14 +36,6 @@ public interface DataRetrievalResponse
 	}
 
 	/**
-	 * Indicates whether the response is based on a fallback (default) value due to
-	 * an error.
-	 */
-	default boolean isFallbackResponse() {
-		return false;
-	};
-
-	/**
 	 * Indicates whether an error occurred during data retrieval.
 	 */
 	default boolean isError() {
