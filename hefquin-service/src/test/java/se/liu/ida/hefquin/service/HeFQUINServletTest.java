@@ -390,4 +390,14 @@ public class HeFQUINServletTest {
 			assertEquals( 415, response.getStatusLine().getStatusCode() );
 		}
 	}
+
+	@Test
+	public void testMissingFederationMember() throws Exception {
+		final String invalid = "SELECT * WHERE { SERVICE <http://invalid/federation/member> { ?s ?p ?o } }";
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, invalid );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			System.err.println( EntityUtils.toString( response.getEntity() ) );
+			assertEquals( 500, response.getStatusLine().getStatusCode() );
+		}
+	}
 }
