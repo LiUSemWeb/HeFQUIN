@@ -47,11 +47,9 @@ public class StatsPrinterJSON
 	 */
 	public static JsonObject statsAsJson( final Stats s, final boolean recursive ) {
 		final JsonObject stats = new JsonObject();
-
-		if ( s.isEmpty() ) {
+		if ( s == null || s.isEmpty() ) {
 			return stats;
 		}
-
 		for ( final String entryName : s.getEntryNames() ) {
 			final Object entry = s.getEntry( entryName );
 			stats.put( entryName, asJson( entry, recursive ) );
