@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
+import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -21,7 +24,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
 /**
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
@@ -85,7 +90,7 @@ public class HeFQUINServlet extends HttpServlet {
 			query = request.getParameter( "query" );
 		}
 		else {
-			writeJsonError( response, 415, "Unsupported 'Content-Type' header." );
+			writeJsonError( response, 415, new JsonString(  "Unsupported 'Content-Type' header." ) );
 			return;
 		}
 		executeRequest( query, request, response );
@@ -113,32 +118,39 @@ public class HeFQUINServlet extends HttpServlet {
 	 * @param response the HTTP response used to return the query result or an error message
 	 * @throws IOException if an I/O error occurs while writing the response
 	 */
-	private void executeRequest( final String query, final HttpServletRequest request,
-			final HttpServletResponse response ) throws IOException {
+	private void executeRequest( final String query,
+	                             final HttpServletRequest request,
+	                             final HttpServletResponse response ) throws IOException {
 		response.setCharacterEncoding( "utf-8" );
 
 		// Ensure query is not null or empty
 		if ( query == null || query.trim().isEmpty() ) {
-			writeJsonError( response, 400, "SPARQL query is missing or empty" );
+			writeJsonError( response, 400, new JsonString( "SPARQL query is missing or empty" ) );
 			return;
 		}
 
 		// Check accept header
 		final String mimeType = findSupportedMimeType( request.getHeaders( "Accept" ) );
 		if ( mimeType == null ) {
-			writeJsonError( response, 406, "Unsupported 'Accept' header" );
+			writeJsonError( response, 406, new JsonString( "Unsupported 'Accept' header" ) );
 			return;
 		}
 
 		try {
 			logger.debug( "Received SPARQL query: {}", query );
-			final String result = execute( query, mimeType );
+
+			final JsonObject result = execute( query, mimeType );
+			if ( ! result.get( "exceptions" ).getAsArray().isEmpty() ) {
+				writeJsonError( response, 500, result.get( "exceptions" ) );
+				return;
+			}
+
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
-			response.getWriter().write( result );
+			response.getWriter().write( result.getString( "result" ) );
 		} catch ( Exception e ) {
 			logger.error( "Query execution failed", e );
-			writeJsonError( response, 500, "Error during query execution: " + e.getLocalizedMessage() );
+			writeJsonError( response, 500, new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
 			return;
 		}
 	}
@@ -176,17 +188,22 @@ public class HeFQUINServlet extends HttpServlet {
 	 *
 	 * @param queryString the SPARQL query string
 	 * @param mimeType    the MIME type for the response format
-	 * @return the query result as a string in the specified format
+	 * @return the query result and exceptions in JSON format
 	 */
-	private static String execute( final String queryString, final String mimeType ) {
+	private static JsonObject execute( final String queryString, final String mimeType ) {
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+		final Pair<QueryProcStats, List<Exception>> statsAndExceptions;
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			engine.executeQuery( query, resultsFormat, ps );
+			statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
 		}
-		return baos.toString();
+
+		final JsonObject res = new JsonObject();
+		res.put( "result", baos.toString() );
+		res.put( "exceptions", ServletUtils.getExceptions( statsAndExceptions.object2 ) );
+		return res;
 	}
 
 	/**
@@ -198,7 +215,7 @@ public class HeFQUINServlet extends HttpServlet {
 	 * @param message    the error message to include in the JSON body
 	 * @throws IOException if writing the response fails
 	 */
-	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final String message )
+	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final JsonValue message )
 			throws IOException {
 		response.setStatus( statusCode );
 		response.setContentType( "application/json" );
