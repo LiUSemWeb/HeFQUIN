@@ -3,13 +3,10 @@ package se.liu.ida.hefquin.engine.federation.access.impl.response;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.StringResponse;
-
 import java.util.Date;
 
-public class StringResponseImpl extends DataRetrievalResponseBase implements StringResponse
+public class StringResponseImpl extends DataRetrievalResponseBase<String> implements StringResponse
 {
-	protected final String response;
-
 	/**
 	 * Constructs a response with a string response, federation member, request, and request start time. The retrieval
 	 * end time is automatically set to the current time at the moment of construction. This constructor assumes no
@@ -24,10 +21,7 @@ public class StringResponseImpl extends DataRetrievalResponseBase implements Str
 	                           final FederationMember fm,
 	                           final DataRetrievalRequest request,
 	                           final Date requestStartTime ) {
-		super( fm, request, requestStartTime );
-
-		assert response != null;
-		this.response = response;
+		super( response, fm, request, requestStartTime );
 	}
 
 	/**
@@ -38,16 +32,14 @@ public class StringResponseImpl extends DataRetrievalResponseBase implements Str
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
 	 * @param request          the data retrieval request associated with this response (must not be {@code null})
 	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
+	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
 	 */
 	public StringResponseImpl( final String response,
 	                           final FederationMember fm,
 	                           final DataRetrievalRequest request,
 	                           final Date requestStartTime,
 	                           final Date retrievalEndTime ) {
-		super( fm, request, requestStartTime, retrievalEndTime );
-
-		assert response != null;
-		this.response = response;
+		super( response, fm, request, requestStartTime, retrievalEndTime );
 	}
 
 	/**
@@ -67,16 +59,12 @@ public class StringResponseImpl extends DataRetrievalResponseBase implements Str
 	                           final Date requestStartTime,
 	                           final Integer errorStatusCode,
 	                           final String errorDescription ) {
-		super( fm, request, requestStartTime, errorStatusCode, errorDescription );
-
-		assert response != null;
-		this.response = response;
+		super( response, fm, request, requestStartTime, errorStatusCode, errorDescription );
 	}
 
 	/**
-	 * Constructs a response with a string response, federation member, request, and request start time. The retrieval
-	 * end time is automatically set to the current time at the moment of construction. This constructor assumes no
-	 * error occurred.
+	 * Constructs a response with a string response, federation member, request, request start time, retrieval end time,
+	 * and error details.
 	 *
 	 * @param response         the response string (must not be {@code null})
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
@@ -93,14 +81,16 @@ public class StringResponseImpl extends DataRetrievalResponseBase implements Str
 	                           final Date retrievalEndTime,
 	                           final Integer errorStatusCode,
 	                           final String errorDescription ) {
-		super( fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
-
-		assert response != null;
-		this.response = response;
+		super( response, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
 
+	/**
+	 * Returns the response string of this response.
+	 *
+	 * @return the string containing the response data
+	 */
 	@Override
 	public String getResponse() {
-		return this.response;
+		return data;
 	}
 }
