@@ -5,13 +5,13 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 
 public class CardinalityResponseImplWithoutCardinality extends CardinalityResponseImpl
 {
-	public CardinalityResponseImplWithoutCardinality( final DataRetrievalResponse wrappedResponse,
+	public CardinalityResponseImplWithoutCardinality( final DataRetrievalResponse<?> wrappedResponse,
 	                                                  final DataRetrievalRequest request ) {
 		super( wrappedResponse, request, Integer.MAX_VALUE );
 	}
 
-	@Override
-	public boolean isFallbackResponse() {
-		return true;
-	}
+	public Integer getErrorStatusCode() {
+		return 500;
+	};
+
 }
