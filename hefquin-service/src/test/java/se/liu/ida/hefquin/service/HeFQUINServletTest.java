@@ -25,12 +25,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 public class HeFQUINServletTest {
@@ -38,6 +36,26 @@ public class HeFQUINServletTest {
 	private static int port = 4567;
 	private static String uri = "http://localhost:" + port + "/sparql";
 	private static Server server;
+
+	// Default query
+	private static final String DEFAULT_QUERY                = "SELECT (1 AS ?x) WHERE {}";
+
+	// Request Content-Types
+	private static final String CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
+	private static final String CONTENT_TYPE_SPARQL_QUERY    = "application/sparql-query";
+
+	// Accept headers (Response formats for SELECT/ASK results)
+	private static final String ACCEPT_SPARQL_RESULTS_XML    = "application/sparql-results+xml";
+	private static final String ACCEPT_SPARQL_RESULTS_JSON   = "application/sparql-results+json";
+	private static final String ACCEPT_CSV                   = "text/csv";
+	private static final String ACCEPT_TSV                   = "text/tab-separated-values";
+
+	// Accept wildcard and invalid formats
+	private static final String ACCEPT_WILDCARD              = "*/*";
+	private static final String ACCEPT_INVALID               = "application/invalid";
+
+	// Invalid or unsupported content-types (used in 415 tests)
+	private static final String CONTENT_TYPE_INVALID         = "application/unsupported";
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -56,32 +74,43 @@ public class HeFQUINServletTest {
 		server.stop();
 	}
 
-	private HttpPost getPostRequest( final String contentType, final String acceptType )
-			throws UnsupportedEncodingException {
-		return getPostRequest( contentType, acceptType, "SELECT (1 AS ?x) WHERE {}" );
-	}
-
-	private HttpPost getPostRequest( final String contentType, final String acceptType, final String query )
-			throws UnsupportedEncodingException {
-
+	private HttpPost createPostRequest( final String contentType, final String acceptHeader, final String query ) {
 		final HttpPost request = new HttpPost( uri );
-		request.addHeader( "Content-Type", contentType );
-		request.addHeader( "Accept", acceptType );
-
-		if ( contentType.equals( "application/x-www-form-urlencoded" ) ) {
-			final List<NameValuePair> list = new ArrayList<>();
-			list.add( new BasicNameValuePair( "query", query ) );
-			request.setEntity( new UrlEncodedFormEntity( list ) );
-		} else {
-			request.setEntity( new StringEntity( query ) );
+		if ( contentType != null ) {
+			request.addHeader( "Content-Type", contentType );
 		}
+
+		if ( acceptHeader != null ) {
+			request.addHeader( "Accept", acceptHeader );
+		}
+
+		if ( query != null ) {
+			if ( CONTENT_TYPE_FORM_URLENCODED.equals( contentType ) ) {
+				final List<NameValuePair> list = Collections.singletonList( new BasicNameValuePair( "query", query ) );
+				request.setEntity( new UrlEncodedFormEntity( list, StandardCharsets.UTF_8 ) );
+			}
+			else if ( CONTENT_TYPE_SPARQL_QUERY.equals( contentType ) ) {
+				request.setEntity( new StringEntity( query, StandardCharsets.UTF_8 ) );
+			}
+		}
+
 		return request;
 	}
 
-	private void validateResponse( final CloseableHttpResponse response, final String expectedContentType ) {
-		assertEquals( 200, response.getStatusLine().getStatusCode() );
-		final String contentType = response.getHeaders( "Content-Type" )[0].getValue();
-		assertTrue( contentType.startsWith( expectedContentType ) );
+	private HttpGet createGetRequest( final String acceptHeader, final String query ) {
+		final String fullUri;
+		if ( query != null ) {
+			fullUri = uri + "?query=" + URLEncoder.encode( query, StandardCharsets.UTF_8 );
+		}
+		else {
+			fullUri = uri;
+		}
+
+		final HttpGet request = new HttpGet( fullUri );
+		if ( acceptHeader != null )
+			request.addHeader( "Accept", acceptHeader );
+
+		return request;
 	}
 
 	private void validateResultSet( final ResultSet results ) {
@@ -107,276 +136,268 @@ public class HeFQUINServletTest {
 	}
 
 	@Test
-	public void postRequestWithXMLFormat1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "application/sparql-results+xml";
-		final HttpPost request = getPostRequest( contentType, acceptType );
-		try ( CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+	public void testPostUrlEncodedRequestReturnsXmlResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML,
+				DEFAULT_QUERY );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromXML( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void postRequestWithJSONFormat1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "application/sparql-results+json";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostUrlEncodedRequestReturnsJsonResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_JSON,
+				DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void postRequestWithCSVFormat1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/csv";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostUrlEncodedRequestReturnsCsvResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_CSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), false );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, false );
 		}
 	}
 
 	@Test
-	public void postRequestWithTSVFormat1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostUrlEncodedRequestReturnsTsvResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_TSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), true );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, true );
 		}
 	}
 
 	@Test
-	public void postRequestWithEmptyQuery1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType, "" );
-
+	public void testPostUrlEncodedRequestWithEmptyQueryReturns400() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_WILDCARD, "" );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 400, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithMissingQuery1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/tsv";
-		final HttpPost request = new HttpPost( uri );
-		request.addHeader( "Content-Type", contentType );
-		request.addHeader( "Accept", acceptType );
-
+	public void testPostUrlEncodedRequestWithMissingQueryReturns400() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_WILDCARD, null );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 400, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithUnsupportedFormat1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/invalid";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostUrlEncodedRequestWithUnsupportedAcceptReturns406() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_INVALID, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, "application/sparql-results+json" );
+			assertEquals( 406, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithNullQuery1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType, null );
-
-		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			assertEquals( 400, response.getStatusLine().getStatusCode() );
-		}
-	}
-
-	@Test
-	public void postRequestWithInvalidQuery1() throws Exception {
-		final String contentType = "application/x-www-form-urlencoded";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType, "SELECT id FROM person;" );
-
+	public void testPostUrlEncodedRequestWithInvalidQueryReturns500() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_WILDCARD, "Invalid query" );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithXMLFormat2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "application/sparql-results+xml";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostUrlEncodedRequestWithWildcardAcceptReturnsJsonResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_WILDCARD, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String contentType = response.getHeaders( "Content-Type" )[0].getValue().split( ";" )[0];
+			assertEquals( contentType, ACCEPT_SPARQL_RESULTS_JSON );
+			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			validateResultSet( resultSet );
+		}
+	}
+
+	@Test
+	public void testPostSparqlQueryRequestReturnsXmlResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_SPARQL_RESULTS_XML,
+				DEFAULT_QUERY );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromXML( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void postRequestWithJSONFormat2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "application/sparql-results+json";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostSparqlQueryRequestReturnsJsonResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_SPARQL_RESULTS_JSON,
+				DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void postRequestWithCSVFormat2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/csv";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostSparqlQueryRequestReturnsCsvResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_CSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), false );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, false );
 		}
 	}
 
 	@Test
-	public void postRequestWithTSVFormat2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType );
+	public void testPostSparqlQueryRequestReturnsTsvResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_TSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), true );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, true );
 		}
 	}
 
 	@Test
-	public void postRequestWithUnsupportedFormat2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/invalid";
-		final HttpPost request = getPostRequest( contentType, acceptType );
-		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, "application/sparql-results+json" );
-		}
-	}
-
-	@Test
-	public void postRequestWithEmptyQuery2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType, "" );
-
+	public void testPostSparqlQueryRequestWithEmptyQueryReturns400() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_WILDCARD, "" );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 400, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithMissingQuery2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/tsv";
-		final HttpPost request = new HttpPost( uri );
-		request.addHeader( "Content-Type", contentType );
-		request.addHeader( "Accept", acceptType );
-
-		try ( CloseableHttpResponse response = httpClient.execute( request ) ) {
+	public void testPostSparqlQueryRequestWithMissingQueryReturns400() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_WILDCARD, null );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 400, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void postRequestWithInvalidQuery2() throws Exception {
-		final String contentType = "application/sparql-query";
-		final String acceptType = "text/tsv";
-		final HttpPost request = getPostRequest( contentType, acceptType, "SELECT id FROM person;" );
+	public void testPostSparqlQueryRequestWithUnsupportedAcceptReturns406() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_INVALID, DEFAULT_QUERY );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 406, response.getStatusLine().getStatusCode() );
+		}
+	}
 
+	@Test
+	public void testPostSparqlQueryRequestWithInvalidQueryReturns500() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_WILDCARD, "Invalid query" );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void getRequestWithXMLFormat() throws Exception {
-		final String acceptType = "application/sparql-results+xml";
-		final String query = URLEncoder.encode( "SELECT (1 AS ?x) WHERE {}", "utf-8" );
-		final HttpGet request = new HttpGet( uri + "?query=" + query );
-		request.addHeader( "Accept", acceptType );
+	public void testPostUrlSparqlQueryRequestWithWildcardAcceptReturnsJsonResults() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_SPARQL_QUERY, ACCEPT_WILDCARD, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String contentType = response.getHeaders( "Content-Type" )[0].getValue().split( ";" )[0];
+			assertEquals( contentType, ACCEPT_SPARQL_RESULTS_JSON );
+			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
+			validateResultSet( resultSet );
+		}
+	}
+
+	@Test
+	public void testGetRequestReturnsXmlResults() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_SPARQL_RESULTS_XML, DEFAULT_QUERY );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromXML( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void getRequestWithJSONFormat() throws Exception {
-		final String acceptType = "application/sparql-results+json";
-		final String query = URLEncoder.encode( "SELECT (1 AS ?x) WHERE {}", "utf-8" );
-		final HttpGet request = new HttpGet( uri + "?query=" + query );
-		request.addHeader( "Accept", acceptType );
+	public void testGetRequestReturnsJsonResults() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_SPARQL_RESULTS_JSON, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			final ResultSet resultSet = ResultSetFactory.fromJSON( response.getEntity().getContent() );
 			validateResultSet( resultSet );
 		}
 	}
 
 	@Test
-	public void getRequestWithCSVFormat() throws Exception {
-		final String acceptType = "text/csv";
-		final String query = URLEncoder.encode( "SELECT (1 AS ?x) WHERE {}", "utf-8" );
-		final HttpGet request = new HttpGet( uri + "?query=" + query );
-		request.addHeader( "Accept", acceptType );
+	public void testGetRequestReturnsCsvResults() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_CSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), false );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, false );
 		}
 	}
 
 	@Test
-	public void getRequestWithTSVFormat() throws Exception {
-		final String acceptType = "text/tsv";
-		final String query = URLEncoder.encode( "SELECT (1 AS ?x) WHERE {}", "utf-8" );
-		final HttpGet request = new HttpGet( uri + "?query=" + query );
-		request.addHeader( "Accept", acceptType );
+	public void testGetRequestReturnsTsvResults() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_TSV, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			validateResponse( response, acceptType );
-			validateDelimited( EntityUtils.toString( response.getEntity() ), true );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String result = EntityUtils.toString( response.getEntity() );
+			validateDelimited( result, true );
 		}
 	}
 
 	@Test
-	public void getRequestWithInvalidQuery() throws Exception {
-		final String acceptType = "text/tsv";
-		final String query = URLEncoder.encode( "SELECT id FROM person;", "utf-8" );
-		final HttpGet request = new HttpGet( uri + "?query=" + query );
-		request.addHeader( "Accept", acceptType );
-		try ( CloseableHttpResponse response = httpClient.execute( request ) ) {
+	public void testGetRequestWithEmptyQueryReturns400() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_WILDCARD, "" );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 400, response.getStatusLine().getStatusCode() );
+		}
+	}
+
+	@Test
+	public void testGetRequestWithMissingQueryReturns400() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_WILDCARD, null );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			assertEquals( 400, response.getStatusLine().getStatusCode() );
+		}
+	}
+
+	@Test
+	public void testGetRequestWithInvalidQueryReturns500() throws Exception {
+		final HttpGet request = createGetRequest( ACCEPT_WILDCARD, "Invalid query" );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			assertEquals( 500, response.getStatusLine().getStatusCode() );
 		}
 	}
 
 	@Test
-	public void getRequestWithEmptyQuery() throws Exception {
-		final String acceptType = "text/tsv";
-		final HttpGet request = new HttpGet( uri + "?query=" );
-		request.addHeader( "Accept", acceptType );
+	public void testPostRequestWithMultipleAcceptTypesPrefersXml() throws Exception {
+		final String compositeAcceptHeader = "application/invalid;q=0.9, application/sparql-results+xml;q=0.8";
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, compositeAcceptHeader,
+				DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			assertEquals( 400, response.getStatusLine().getStatusCode() );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final String contentType = response.getHeaders( "Content-Type" )[0].getValue().split( ";" )[0];
+			assertEquals( contentType, ACCEPT_SPARQL_RESULTS_XML );
 		}
 	}
 
 	@Test
-	public void getRequestWithMissingQuery() throws Exception {
-		final String acceptType = "text/tsv";
-		final HttpGet request = new HttpGet( uri );
-		request.addHeader( "Accept", acceptType );
+	public void testPostUrlEncodedRequestWithUnsupportedContentTypeReturns415() throws Exception {
+		final HttpPost request = createPostRequest( CONTENT_TYPE_INVALID, ACCEPT_WILDCARD, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			assertEquals( 400, response.getStatusLine().getStatusCode() );
+			assertEquals( 415, response.getStatusLine().getStatusCode() );
+		}
+	}
+
+	@Test
+	public void testMissingFederationMember() throws Exception {
+		final String invalid = "SELECT * WHERE { SERVICE <http://invalid/federation/member> { ?s ?p ?o } }";
+		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, ACCEPT_SPARQL_RESULTS_XML, invalid );
+		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
+			System.err.println( EntityUtils.toString( response.getEntity() ) );
+			assertEquals( 500, response.getStatusLine().getStatusCode() );
 		}
 	}
 }
