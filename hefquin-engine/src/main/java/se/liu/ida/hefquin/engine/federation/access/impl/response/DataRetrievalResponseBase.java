@@ -5,9 +5,11 @@ import java.util.Date;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public abstract class DataRetrievalResponseBase implements DataRetrievalResponse
+public abstract class DataRetrievalResponseBase<T> implements DataRetrievalResponse<T>
 {
+	protected final T data;
 	private final FederationMember fm;
 	private final DataRetrievalRequest request;
 	private final Date requestStartTime;
@@ -16,57 +18,65 @@ public abstract class DataRetrievalResponseBase implements DataRetrievalResponse
 	protected final String errorDescription;
 
 	/**
-	 * Constructs a response with the given federation member, request, and request start time. The retrieval end time
-	 * is automatically set to the current time at the moment of construction. This constructor assumes no error
+	 * Constructs a response with the given data, federation member, request, and request start time. The retrieval end
+	 * time is automatically set to the current time at the moment of construction. This constructor assumes no error
 	 * occurred.
 	 *
+	 * @param data             the data contained in this response (must not be {@code null})
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
 	 * @param request          the request associated with this response (must not be {@code null})
 	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
 	 */
-	protected DataRetrievalResponseBase( final FederationMember fm,
+	protected DataRetrievalResponseBase( final T data,
+	                                     final FederationMember fm,
 	                                     final DataRetrievalRequest request,
 	                                     final Date requestStartTime ) {
-		this( fm, request, requestStartTime, null, null );
+		this( data, fm, request, requestStartTime, null, null );
 	}
 
 	/**
-	 * Constructs a response with the given federation member, request, request start time, and request end time. This
-	 * constructor assumes no error occurred.
+	 * Constructs a response with the given data, federation member, request, request start time, and request end time.
+	 * This constructor assumes no error occurred.
 	 *
+	 * @param data             the data contained in this response (must not be {@code null})
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
 	 * @param request          the request associated with this response (must not be {@code null})
 	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
 	 * @param retrievalEndTime the time at which the retrieval of this response was completed (must not be {@code null})
 	 */
-	protected DataRetrievalResponseBase( final FederationMember fm,
+	protected DataRetrievalResponseBase( final T data,
+	                                     final FederationMember fm,
 	                                     final DataRetrievalRequest request,
 	                                     final Date requestStartTime,
 	                                     final Date retrievalEndTime ) {
-		this( fm, request, requestStartTime, retrievalEndTime, null, null );
+		this( data, fm, request, requestStartTime, retrievalEndTime, null, null );
 	}
 
 	/**
-	 * Constructs a response with the given federation member, request, request start time, and error details. The
+	 * Constructs a response with the given data, federation member, request, request start time, and error details. The
 	 * retrieval end time is automatically set to the current time at the moment of construction.
 	 *
+	 * @param data             the data contained in this response (must not be {@code null})
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
 	 * @param request          the request associated with this response (must not be {@code null})
 	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
 	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
 	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
 	 */
-	protected DataRetrievalResponseBase( final FederationMember fm,
+	protected DataRetrievalResponseBase( final T data,
+	                                     final FederationMember fm,
 	                                     final DataRetrievalRequest request,
 	                                     final Date requestStartTime,
 	                                     final Integer errorStatusCode,
 	                                     final String errorDescription ) {
-		this( fm, request, requestStartTime, new Date(), errorStatusCode, errorDescription );
+		this( data, fm, request, requestStartTime, new Date(), errorStatusCode, errorDescription );
 	}
 
 	/**
-	 * Constructs a response with fully specified timing and error information.
+	 * Constructs a response with the given data, federation member, request, request start time, retrieval end time,
+	 * and error details.
 	 *
+	 * @param data             the data contained in this response (must not be {@code null})
 	 * @param fm               the federation member from which this response originates (must not be {@code null})
 	 * @param request          the request associated with this response (must not be {@code null})
 	 * @param requestStartTime the time at which the request was initiated (must not be {@code null})
@@ -74,17 +84,20 @@ public abstract class DataRetrievalResponseBase implements DataRetrievalResponse
 	 * @param errorStatusCode  the HTTP status code representing an error, or {@code null} if no error occurred
 	 * @param errorDescription a short description of the error, or {@code null} if no error occurred
 	 */
-	protected DataRetrievalResponseBase( final FederationMember fm,
+	protected DataRetrievalResponseBase( final T data,
+	                                     final FederationMember fm,
 	                                     final DataRetrievalRequest request,
 	                                     final Date requestStartTime,
 	                                     final Date retrievalEndTime,
 	                                     final Integer errorStatusCode,
 	                                     final String errorDescription ) {
+		assert data != null;
 		assert fm != null;
 		assert request != null;
 		assert requestStartTime != null;
 		assert retrievalEndTime != null;
 
+		this.data = data;
 		this.fm = fm;
 		this.request = request;
 		this.requestStartTime = requestStartTime;
@@ -93,33 +106,76 @@ public abstract class DataRetrievalResponseBase implements DataRetrievalResponse
 		this.errorDescription = errorDescription;
 	}
 
+	/**
+	 * Returns the federation member from which this response originates.
+	 *
+	 * @return the corresponding federation member
+	 */
 	@Override
 	public FederationMember getFederationMember() {
 		return fm;
 	}
 
+	/**
+	 * Returns the data retrieval request that led to this response.
+	 *
+	 * @return the associated data retrieval request
+	 */
 	@Override
 	public DataRetrievalRequest getRequest() {
 		return request;
 	}
 
+	/**
+	 * Returns the timestamp indicating when the data retrieval request was initiated.
+	 *
+	 * @return the request start time
+	 */
 	@Override
 	public Date getRequestStartTime() {
 		return requestStartTime;
 	}
 
+	/**
+	 * Returns the timestamp indicating when the data retrieval was completed.
+	 *
+	 * @return the retrieval end time
+	 */
 	@Override
 	public Date getRetrievalEndTime() {
 		return retrievalEndTime;
 	}
 
+	/**
+	 * Returns the HTTP status code associated with an error, if any.
+	 *
+	 * @return the error status code, or {@code null} if no error occurred
+	 */
 	@Override
 	public Integer getErrorStatusCode() {
 		return errorStatusCode;
 	}
 
+	/**
+	 * Returns a short textual description of the error, if available.
+	 *
+	 * @return the error description, or {@code null} if no error occurred
+	 */
 	@Override
 	public String getErrorDescription() {
 		return errorDescription;
+	}
+
+	/**
+	 * Returns a short textual description of the error, if available.
+	 *
+	 * @return the error description, or {@code null} if no error occurred
+	 */
+	@Override
+	public T getResponseData() throws UnsupportedOperationDueToRetrievalError {
+		if ( isError() ) {
+			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+		}
+		return data;
 	}
 }
