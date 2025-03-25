@@ -8,8 +8,9 @@ import se.liu.ida.hefquin.base.utils.ConcatenatingIterable;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFResponse
+public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>> implements TPFResponse
 {
 	protected final List<Triple> matchingTriples;
 	protected final List<Triple> metadataTriples;
@@ -34,7 +35,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final FederationMember fm,
 	                        final DataRetrievalRequest request,
 	                        final Date requestStartTime ) {
-		super( fm, request, requestStartTime );
+		super( matchingTriples, fm, request, requestStartTime );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -64,7 +65,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final DataRetrievalRequest request,
 	                        final Date requestStartTime,
 	                        final Date retrievalEndTime ) {
-		super( fm, request, requestStartTime, retrievalEndTime );
+		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -95,7 +96,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final FederationMember fm,
 	                        final DataRetrievalRequest request,
 	                        final Date requestStartTime ) {
-		super( fm, request, requestStartTime );
+		super( matchingTriples, fm, request, requestStartTime );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -128,7 +129,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final DataRetrievalRequest request,
 	                        final Date requestStartTime,
 	                        final Date retrievalEndTime ) {
-		super( fm, request, requestStartTime, retrievalEndTime );
+		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -162,7 +163,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final Date requestStartTime,
 	                        final int errorStatusCode,
 	                        final String errorDescription ) {
-		super( fm, request, requestStartTime, errorStatusCode, errorDescription );
+		super( matchingTriples, fm, request, requestStartTime, errorStatusCode, errorDescription );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -196,7 +197,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final Date retrievalEndTime,
 	                        final Integer errorStatusCode,
 	                        final String errorDescription ) {
-		super( fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
+		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -231,7 +232,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final Date requestStartTime,
 	                        final Integer errorStatusCode,
 	                        final String errorDescription ) {
-		super( fm, request, requestStartTime, errorStatusCode, errorDescription );
+		super( matchingTriples, fm, request, requestStartTime, errorStatusCode, errorDescription );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -268,7 +269,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 	                        final Date retrievalEndTime,
 	                        final Integer errorStatusCode,
 	                        final String errorDescription ) {
-		super( fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
+		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 
 		assert matchingTriples != null;
 		assert metadataTriples != null;
@@ -282,7 +283,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 
 	@Override
 	public Iterable<Triple> getTriples() {
-		return new ConcatenatingIterable<Triple>(matchingTriples, metadataTriples);
+		return new ConcatenatingIterable<Triple>( matchingTriples, metadataTriples );
 	}
 
 	@Override
@@ -312,7 +313,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 
 	@Override
 	public Boolean isLastPage() {
-		return ( nextPageURL == null );
+		return nextPageURL == null;
 	}
 
 	@Override
@@ -325,4 +326,11 @@ public class TPFResponseImpl extends DataRetrievalResponseBase implements TPFRes
 		return cardEstimate;
 	}
 
+	@Override
+	public Iterable<Triple> getResponseData() throws UnsupportedOperationDueToRetrievalError {
+		if ( isError() ) {
+			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+		}
+		return getTriples();
+	}
 }
