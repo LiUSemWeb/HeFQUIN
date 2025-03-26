@@ -30,7 +30,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 {
 	protected final FederationAccessManager fedAccMan;
 	protected final Map<TriplePattern, CompletableFuture<CardinalityResponse>> cacheMap = new HashMap<>();
-	protected final Cache<Key, CompletableFuture<? extends DataRetrievalResponse>> cache;
+	protected final Cache<Key, CompletableFuture<? extends DataRetrievalResponse<?>>> cache;
 
 	// stats
 	protected long cacheRequestsSPARQL  = 0L;
@@ -47,7 +47,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 	public FederationAccessManagerWithCache( final FederationAccessManager fedAccMan,
 	                                         final int cacheCapacity,
-	                                         final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies ) 
+	                                         final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies ) 
 	{
 		assert fedAccMan != null;
 		this.fedAccMan = fedAccMan;
@@ -79,7 +79,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	{
 		cacheRequestsSPARQL++;
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsSPARQL++;
 			return (CompletableFuture<SolMapsResponse>) cachedResponse;
@@ -97,7 +97,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	{
 		cacheRequestsTPF++;
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPF++;
 			return (CompletableFuture<TPFResponse>) cachedResponse;
@@ -115,7 +115,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	{
 		cacheRequestsTPF++;
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPF++;
 			return (CompletableFuture<TPFResponse>) cachedResponse;
@@ -133,7 +133,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	{
 		cacheRequestsBRTPF++;
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsBRTPF++;
 			return (CompletableFuture<TPFResponse>) cachedResponse;
@@ -151,7 +151,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	{
 		cacheRequestsNeo4j++;
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsNeo4j++;
 			return (CompletableFuture<RecordsResponse>) cachedResponse;
@@ -168,7 +168,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException 
 	{
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsSPARQLCardinality++;
 			return (CompletableFuture<CardinalityResponse>) cachedResponse;
@@ -185,7 +185,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException 
 	{
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
 			return (CompletableFuture<CardinalityResponse>) cachedResponse;
@@ -202,7 +202,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException 
 	{
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
 			return (CompletableFuture<CardinalityResponse>) cachedResponse;
@@ -219,7 +219,7 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 			throws FederationAccessException 
 	{
 		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse> cachedResponse = cache.get(key);
+		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsBRTPFCardinality++;
 			return (CompletableFuture<CardinalityResponse>) cachedResponse;
@@ -240,39 +240,39 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 
 	protected static class MyDefaultCachePolicies
 				implements CachePolicies<Key,
-				                         CompletableFuture<? extends DataRetrievalResponse>,
-				                         CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>>
+				                         CompletableFuture<? extends DataRetrievalResponse<?>>,
+				                         CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>>
 	{
-		final CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>,
-		                        CompletableFuture<? extends DataRetrievalResponse>
+		final CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>,
+		                        CompletableFuture<? extends DataRetrievalResponse<?>>
 		                       > cef = new CacheEntryBaseFactory<>();
 
 		final CacheReplacementPolicyFactory<Key,
-		                                    CompletableFuture<? extends DataRetrievalResponse>,
-		                                    CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>
+		                                    CompletableFuture<? extends DataRetrievalResponse<?>>,
+		                                    CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>
 		                                   > crpf = new CacheReplacementPolicyFactory<>() {
 			@Override
-			public CacheReplacementPolicy<Key, CompletableFuture<? extends DataRetrievalResponse>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>> create() {
+			public CacheReplacementPolicy<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>> create() {
 				return new CacheReplacementPolicyLRU<>();
 			}
 		};
 
-		final CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>,
-		                              CompletableFuture<? extends DataRetrievalResponse>
+		final CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>,
+		                              CompletableFuture<? extends DataRetrievalResponse<?>>
 		                             > cip = new CacheInvalidationPolicyAlwaysValid<>();
 
 		@Override
-		public CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>, CompletableFuture<? extends DataRetrievalResponse>> getEntryFactory() {
+		public CacheEntryFactory<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>, CompletableFuture<? extends DataRetrievalResponse<?>>> getEntryFactory() {
 			return cef;
 		}
 
 		@Override
-		public CacheReplacementPolicyFactory<Key, CompletableFuture<? extends DataRetrievalResponse>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>> getReplacementPolicyFactory() {
+		public CacheReplacementPolicyFactory<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>> getReplacementPolicyFactory() {
 			return crpf;
 		}
 
 		@Override
-		public CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse>>, CompletableFuture<? extends DataRetrievalResponse>> getInvalidationPolicy() {
+		public CacheInvalidationPolicy<CacheEntryBase<CompletableFuture<? extends DataRetrievalResponse<?>>>, CompletableFuture<? extends DataRetrievalResponse<?>>> getInvalidationPolicy() {
 			return cip;
 		}
 

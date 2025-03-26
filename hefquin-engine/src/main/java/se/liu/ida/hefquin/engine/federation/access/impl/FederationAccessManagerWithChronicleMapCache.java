@@ -40,7 +40,7 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 	public FederationAccessManagerWithChronicleMapCache( final FederationAccessManager fedAccMan,
 	                                                     final int cacheCapacity,
-	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies,
+	                                                     final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies,
 	                                                     final CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry> cardinalityCachePolicies )
 		throws IOException
 	{
@@ -81,9 +81,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final Date requestEndTime = new Date();
 		if ( cachedEntry != null ) {
 			cacheHitsSPARQLCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( fm,
+			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
+			                                                                  fm,
 			                                                                  req,
-			                                                                  cachedEntry.getObject(),
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -107,9 +107,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final Date requestEndTime = new Date();
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( fm,
+			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
+			                                                                  fm,
 			                                                                  req,
-			                                                                  cachedEntry.getObject(),
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -133,9 +133,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final Date requestEndTime = new Date();
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( fm,
+			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
+			                                                                  fm,
 			                                                                  req,
-			                                                                  cachedEntry.getObject(),
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
@@ -159,9 +159,9 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 		final Date requestEndTime = new Date();
 		if ( cachedEntry != null ) {
 			cacheHitsTPFCardinality++;
-			final CardinalityResponse cr = new CachedCardinalityResponseImpl( fm,
+			final CardinalityResponse cr = new CachedCardinalityResponseImpl( cachedEntry.getObject(),
+			                                                                  fm,
 			                                                                  req,
-			                                                                  cachedEntry.getObject(),
 			                                                                  requestStartTime,
 			                                                                  requestEndTime );
 			return CompletableFuture.completedFuture( cr );
