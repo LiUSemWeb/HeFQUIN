@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.smartcardio.Card;
 
 import org.apache.http.client.HttpResponseException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -93,8 +97,8 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		final SPARQLEndpoint fm = new SPARQLEndpointForTest();
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
-			final int cardinality = fedAccessMgr.issueCardinalityRequest( sparqlReq, fm ).get().getCardinality();
-			assertEquals( Integer.MAX_VALUE, cardinality );
+			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( sparqlReq, fm ).get();
+			validateErrorResponse(response);
 		}
 	}
 
@@ -112,8 +116,8 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		final TPFServer fm = new TPFServerForTest();
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
-			final int cardinality = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get().getCardinality();
-			assertEquals( Integer.MAX_VALUE, cardinality );
+			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get();
+			validateErrorResponse(response);
 		}
 	}
 
@@ -131,8 +135,8 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		final BRTPFServer fm = new BRTPFServerForTest();
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
-			final int cardinality = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get().getCardinality();
-			assertEquals( Integer.MAX_VALUE, cardinality );
+			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get();
+			validateErrorResponse(response);
 		}
 	}
 
@@ -150,12 +154,26 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		final BRTPFServer fm = new BRTPFServerForTest();
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
-			final int cardinality = fedAccessMgr.issueCardinalityRequest( brtpfReq, fm ).get().getCardinality();
-			assertEquals( Integer.MAX_VALUE, cardinality );
+			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( brtpfReq, fm ).get();
+			validateErrorResponse(response);
 		}
 	}
 
 	// ------------ helper code ------------
+
+	public static void validateErrorResponse( final CardinalityResponse response){
+		assertTrue( response.isError() );
+		try {
+			response.getResponseData();
+			fail( "Expected UnsupportedOperationDueToRetrievalError" );
+		} catch ( UnsupportedOperationDueToRetrievalError e ) {
+			// Expected exception; do nothing
+		} catch ( Exception e ) {
+			fail( "Unexpected exception type: " + e.getClass().getName() );
+		}
+		final int cardinality = response.getCardinality();
+		assertEquals( Integer.MAX_VALUE, cardinality );
+	}
 
 	public static FederationAccessManager createFedAccessMgrForTests() throws IOException {
 		return createFedAccessMgrForTests( -1 );
