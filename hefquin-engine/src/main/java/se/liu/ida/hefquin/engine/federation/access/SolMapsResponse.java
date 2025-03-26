@@ -10,16 +10,16 @@ public interface SolMapsResponse extends DataRetrievalResponse<Iterable<Solution
 	Iterable<SolutionMapping> getSolutionMappings();
 
 	/**
-	 * Returns the number of triples that are returned by {@link #getSolutionMappings()}. 
+	 * Returns the number of mappings that are returned by {@link #getSolutionMappings()}.
 	 */
-	default int getSize(){
+	default int getSize() {
 		final Iterable<SolutionMapping> mappings = getSolutionMappings();
-		if (mappings instanceof Collection) {
+		if ( mappings instanceof Collection ) {
 			return ((Collection<SolutionMapping>) mappings).size();
 		}
 		// Fallback to manual count
 		int count = 0;
-		for ( Iterator<SolutionMapping> it = mappings.iterator(); it.hasNext(); it.next() ){
+		for ( Iterator<SolutionMapping> it = mappings.iterator(); it.hasNext(); it.next() ) {
 			count++;
 		}
 		return count;
