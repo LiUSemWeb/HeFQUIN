@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.response;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
