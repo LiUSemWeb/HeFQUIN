@@ -449,6 +449,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 				@Override public DataRetrievalRequest getRequest() { return req; }
 				@Override public FederationMember getFederationMember() { return fm; }
 				@Override public int getCardinality() { return c; }
+				@Override public Integer getResponseData() { return getCardinality(); }
 			};
 
 			if ( sleepMillis > 0L ) {

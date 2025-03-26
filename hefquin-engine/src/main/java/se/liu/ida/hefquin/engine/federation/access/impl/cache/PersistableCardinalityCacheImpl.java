@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
  * A thread-safe cache implementation for storing cardinality responses. This
@@ -219,6 +220,11 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		@Override
 		public int getCardinality() {
 			return cardinality;
+		}
+
+		@Override
+		public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
+			return getCardinality();
 		}
 	}
 }
