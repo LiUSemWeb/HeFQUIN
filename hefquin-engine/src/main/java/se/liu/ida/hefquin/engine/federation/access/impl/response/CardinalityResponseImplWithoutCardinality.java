@@ -9,9 +9,4 @@ public class CardinalityResponseImplWithoutCardinality extends CardinalityRespon
 	                                                  final DataRetrievalRequest request ) {
 		super( wrappedResponse, request, Integer.MAX_VALUE );
 	}
-
-	public Integer getErrorStatusCode() {
-		return 500;
-	};
-
 }
