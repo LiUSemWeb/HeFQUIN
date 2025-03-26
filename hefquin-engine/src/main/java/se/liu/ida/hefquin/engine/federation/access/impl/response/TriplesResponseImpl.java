@@ -91,9 +91,4 @@ public class TriplesResponseImpl extends DataRetrievalResponseBase<Iterable<Trip
 	public Iterable<Triple> getTriples() {
 		return data;
 	}
-
-	@Override
-	public int getSize() {
-		return ((List<Triple>) getTriples()).size();
-	}
 }
