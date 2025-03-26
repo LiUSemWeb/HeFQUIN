@@ -14,8 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.smartcardio.Card;
-
 import org.apache.http.client.HttpResponseException;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
@@ -98,7 +96,7 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
 			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( sparqlReq, fm ).get();
-			validateErrorResponse(response);
+			validateErrorResponse( response, errorCode );
 		}
 	}
 
@@ -117,7 +115,7 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
 			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get();
-			validateErrorResponse(response);
+			validateErrorResponse( response, errorCode );
 		}
 	}
 
@@ -136,7 +134,7 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
 			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( tpfReq, fm ).get();
-			validateErrorResponse(response);
+			validateErrorResponse( response, errorCode );
 		}
 	}
 
@@ -155,14 +153,15 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 		for( final int errorCode : new int[]{ 400, 403, 404, 408, 415, 428, 500, 502, 503, 504 }){
 			final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests( errorCode );
 			final CardinalityResponse response = fedAccessMgr.issueCardinalityRequest( brtpfReq, fm ).get();
-			validateErrorResponse(response);
+			validateErrorResponse( response, errorCode );
 		}
 	}
 
 	// ------------ helper code ------------
 
-	public static void validateErrorResponse( final CardinalityResponse response){
+	public static void validateErrorResponse( final CardinalityResponse response, final Integer errorCode ){
 		assertTrue( response.isError() );
+		assertEquals( errorCode, response.getErrorStatusCode() );
 		try {
 			response.getResponseData();
 			fail( "Expected UnsupportedOperationDueToRetrievalError" );
@@ -375,7 +374,7 @@ public class FederationAccessManagerHTTPErrorTests extends EngineTestBase
 			case 404 -> e = new HttpResponseException( 404, "Not Found" );
 			case 408 -> e = new HttpResponseException( 408, "Request Timeout" );
 			case 415 -> e = new HttpResponseException( 415, "Unsupported Media Type" );
-			case 428 -> e = new HttpResponseException( 429, "Too Many Requests" );
+			case 428 -> e = new HttpResponseException( 428, "Too Many Requests" );
 			case 500 -> e = new HttpResponseException( 500, "Internal Server Error" );
 			case 502 -> e = new HttpResponseException( 502, "Bad Gateway" );
 			case 503 -> e = new HttpResponseException( 503, "Service Unavailable" );
