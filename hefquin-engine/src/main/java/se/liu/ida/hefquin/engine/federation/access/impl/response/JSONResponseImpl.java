@@ -86,9 +86,4 @@ public class JSONResponseImpl extends DataRetrievalResponseBase<JsonObject> impl
 	                         final String errorDescription ) {
 		super( jsonObject, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	@Override
-	public JsonObject getJsonObject() {
-		return data;
-	}
 }

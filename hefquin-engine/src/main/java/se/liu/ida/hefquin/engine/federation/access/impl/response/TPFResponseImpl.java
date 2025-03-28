@@ -331,6 +331,6 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 		if ( isError() ) {
 			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
 		}
-		return getTriples();
+		return new ConcatenatingIterable<Triple>( matchingTriples, metadataTriples );
 	}
 }

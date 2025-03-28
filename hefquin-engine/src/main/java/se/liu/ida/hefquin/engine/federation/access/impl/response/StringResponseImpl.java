@@ -83,14 +83,4 @@ public class StringResponseImpl extends DataRetrievalResponseBase<String> implem
 	                           final String errorDescription ) {
 		super( response, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	/**
-	 * Returns the response string of this response.
-	 *
-	 * @return the string containing the response data
-	 */
-	@Override
-	public String getResponse() {
-		return data;
-	}
 }

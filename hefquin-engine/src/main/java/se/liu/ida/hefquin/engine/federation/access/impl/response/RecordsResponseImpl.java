@@ -86,9 +86,4 @@ public class RecordsResponseImpl extends DataRetrievalResponseBase<List<TableRec
 	                            final String errorDescription ) {
 		super( records, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	@Override
-	public List<TableRecord> getResponse() {
-		return data;
-	}
 }
