@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -119,9 +120,9 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 				throw new RuntimeException("Issuing a cardinality request caused an exception.", e);
 			}
 
-			int intValue = resps[0].getCardinality();
-//			This value might end up with a negative value
-//			when the cardinality exceed the maximum possible Integer number that can be represented
+			final int intValue = computeEffectiveCardinality( resps[0] );
+			// This value might end up with a negative value
+			// when the cardinality exceed the maximum possible Integer number that can be represented
 			return ( intValue < 0 ? Integer.MAX_VALUE : intValue ) ;
 		}
 	}
@@ -175,4 +176,22 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 		}
 	}
 
+	/**
+	 * TODO: Fallback behavior? Returning Integer.MAX_VALUE for now
+	 *
+	 * Computes the cardinality from the given {@link CardinalityResponse}.
+	 *
+	 * If retrieving the cardinality fails due to an {@link UnsupportedOperationDueToRetrievalError}, this method
+	 * returns {@link Integer#MAX_VALUE} as a fallback.
+	 *
+	 * @param resp the cardinality response to extract the cardinality from
+	 * @return the cardinality, or {@code Integer.MAX_VALUE} if retrieval is unsupported
+	 */
+	private int computeEffectiveCardinality( final CardinalityResponse resp ) {
+		try {
+			return resp.getCardinality();
+		} catch ( UnsupportedOperationDueToRetrievalError e ) {
+			return Integer.MAX_VALUE;
+		}
+	}
 }

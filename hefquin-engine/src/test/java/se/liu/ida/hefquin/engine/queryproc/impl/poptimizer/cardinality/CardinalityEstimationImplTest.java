@@ -22,6 +22,7 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
@@ -448,7 +449,11 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 				@Override public Date getRequestStartTime() { return null; }
 				@Override public DataRetrievalRequest getRequest() { return req; }
 				@Override public FederationMember getFederationMember() { return fm; }
-				@Override public int getCardinality() { return c; }
+				@Override public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
+					if( isError() ){
+						throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+					}
+					return c; }
 			};
 
 			if ( sleepMillis > 0L ) {

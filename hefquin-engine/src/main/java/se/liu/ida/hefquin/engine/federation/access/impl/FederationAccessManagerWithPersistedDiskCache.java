@@ -39,7 +39,7 @@ public class FederationAccessManagerWithPersistedDiskCache extends FederationAcc
 
 	public FederationAccessManagerWithPersistedDiskCache( final FederationAccessManager fedAccMan,
 	                                                      final int cacheCapacity,
-	                                                      final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse>>> cachePolicies ) 
+	                                                      final CachePolicies<Key, CompletableFuture<? extends DataRetrievalResponse<?>>, ? extends CacheEntry<CompletableFuture<? extends DataRetrievalResponse<?>>>> cachePolicies )
 	{
 		super( fedAccMan, cacheCapacity, cachePolicies );
 		cardinalityCache = new PersistableCardinalityCacheImpl<>();

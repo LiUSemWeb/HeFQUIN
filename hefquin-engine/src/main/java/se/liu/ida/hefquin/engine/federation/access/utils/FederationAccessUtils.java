@@ -18,12 +18,12 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 
 public class FederationAccessUtils
 {
-	public static DataRetrievalResponse[] performRequest( final FederationAccessManager fedAccessMgr,
+	public static DataRetrievalResponse<?>[] performRequest( final FederationAccessManager fedAccessMgr,
 	                                                      final LogicalOpRequest<?,?>... reqOps )
 			  throws FederationAccessException
 	{
 		@SuppressWarnings("unchecked")
-		final CompletableFuture<? extends DataRetrievalResponse>[] futures = new CompletableFuture[reqOps.length];
+		final CompletableFuture<? extends DataRetrievalResponse<?>>[] futures = new CompletableFuture[reqOps.length];
 
 		for ( int i = 0; i < reqOps.length; ++i ) {
 			final DataRetrievalRequest req = reqOps[i].getRequest();

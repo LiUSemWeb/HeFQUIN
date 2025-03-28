@@ -17,7 +17,7 @@ public abstract class BaseForExecOpRequestWithPaging<
                                   ReqType extends DataRetrievalRequest,
                                   MemberType extends FederationMember,
                                   PageReqType extends DataRetrievalRequest,
-                                  PageRespType extends DataRetrievalResponse>
+                                  PageRespType extends DataRetrievalResponse<?>>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	public BaseForExecOpRequestWithPaging( final ReqType req, final MemberType fm, final boolean collectExceptions ) {

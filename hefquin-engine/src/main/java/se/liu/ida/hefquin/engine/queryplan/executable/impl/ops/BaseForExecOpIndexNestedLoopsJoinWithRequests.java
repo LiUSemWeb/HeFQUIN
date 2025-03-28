@@ -32,7 +32,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
                             QueryType extends Query,
                             MemberType extends FederationMember,
                             ReqType extends DataRetrievalRequest,
-                            RespType extends DataRetrievalResponse>
+                            RespType extends DataRetrievalResponse<?>>
              extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
