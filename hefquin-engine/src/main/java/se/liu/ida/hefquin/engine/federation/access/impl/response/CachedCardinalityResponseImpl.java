@@ -84,14 +84,4 @@ public class CachedCardinalityResponseImpl extends DataRetrievalResponseBase<Int
 	                                      final String errorDescription ) {
 		super( cardinality, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	/**
-	 * Returns the cardinality value contained in this response.
-	 *
-	 * @return the cardinality as an integer
-	 */
-	@Override
-	public int getCardinality() {
-		return data;
-	}
 }

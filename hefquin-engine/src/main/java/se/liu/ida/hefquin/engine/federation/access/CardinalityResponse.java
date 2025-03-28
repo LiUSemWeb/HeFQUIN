@@ -2,5 +2,13 @@ package se.liu.ida.hefquin.engine.federation.access;
 
 public interface CardinalityResponse extends DataRetrievalResponse<Integer>
 {
-	int getCardinality();
+	/**
+	 * Returns the cardinality value associated with this response. The cardinality represents the number of result
+	 * items obtained or estimated.
+	 *
+	 * @return the cardinality value
+	 */
+	default int getCardinality() throws UnsupportedOperationDueToRetrievalError {
+		return getResponseData();
+	}
 }

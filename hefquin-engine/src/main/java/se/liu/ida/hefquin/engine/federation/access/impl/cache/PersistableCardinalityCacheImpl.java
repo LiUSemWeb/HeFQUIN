@@ -80,7 +80,11 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 			if ( future.isDone() && ! future.isCompletedExceptionally() ) {
 				final CardinalityResponse value = future.getNow( null );
 				if ( value != null ) {
-					snapshot.put( entry.getKey(), value.getCardinality() );
+					try {
+						snapshot.put( entry.getKey(), value.getCardinality() );
+					} catch(UnsupportedOperationDueToRetrievalError e){
+						// intentionally ignored
+					}
 				}
 			}
 		}
@@ -218,13 +222,11 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		}
 
 		@Override
-		public int getCardinality() {
-			return cardinality;
-		}
-
-		@Override
 		public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
-			return getCardinality();
+			if( isError() ){
+				throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+			}
+			return cardinality;
 		}
 	}
 }

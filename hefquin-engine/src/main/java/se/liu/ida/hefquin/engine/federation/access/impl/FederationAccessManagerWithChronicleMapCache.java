@@ -23,6 +23,7 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheEntry;
 import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheEntryFactory;
 import se.liu.ida.hefquin.engine.federation.access.impl.cache.CardinalityCacheKey;
@@ -91,7 +92,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept( value -> {
-			cardinalityCache.put( key, value.getCardinality() );
+			try {
+				cardinalityCache.put( key, value.getCardinality() );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				// intentionally ignored
+			}
 		} );
 		return newResponse;
 	}
@@ -117,7 +122,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept( value -> {
-			cardinalityCache.put( key, value.getCardinality() );
+			try {
+				cardinalityCache.put( key, value.getCardinality() );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				// intentionally ignored
+			}
 		} );
 		return newResponse;
 	}
@@ -143,7 +152,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept( value -> {
-			cardinalityCache.put( key, value.getCardinality() );
+			try {
+				cardinalityCache.put( key, value.getCardinality() );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				// intentionally ignored
+			}
 		} );
 		return newResponse;
 	}
@@ -169,7 +182,11 @@ public class FederationAccessManagerWithChronicleMapCache extends FederationAcce
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest( req, fm );
 		newResponse.thenAccept( value -> {
-			cardinalityCache.put( key, value.getCardinality() );
+			try {
+				cardinalityCache.put( key, value.getCardinality() );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				// intentionally ignored
+			}
 		} );
 		return newResponse;
 	}
