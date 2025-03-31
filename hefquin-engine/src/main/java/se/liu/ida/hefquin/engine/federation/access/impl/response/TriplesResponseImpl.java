@@ -86,9 +86,4 @@ public class TriplesResponseImpl extends DataRetrievalResponseBase<Iterable<Trip
 	                            final String errorDescription ) {
 		super( triples, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	@Override
-	public Iterable<Triple> getTriples() {
-		return data;
-	}
 }

@@ -24,7 +24,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 		return new MyResponseProcessor(sm, sink) {
 			@Override
 			protected Iterable<SolutionMapping> extractSolMaps(final SolMapsResponse response) {
-				return response.getSolutionMappings();
+				return response.getResponseData();
 			}
 		};
 	}

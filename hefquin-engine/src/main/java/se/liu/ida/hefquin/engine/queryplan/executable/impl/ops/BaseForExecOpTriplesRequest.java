@@ -33,7 +33,7 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 	{
 		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
 
-		final Iterator<? extends SolutionMapping> it = convert( response.getTriples() );
+		final Iterator<? extends SolutionMapping> it = convert( response.getResponseData() );
 		while ( it.hasNext() ) {
 			sink.send( it.next() );
 		}

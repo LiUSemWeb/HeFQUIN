@@ -43,7 +43,7 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
 	{
-		for ( SolutionMapping sm : response.getSolutionMappings() ) {
+		for ( SolutionMapping sm : response.getResponseData() ) {
 			numberOfOutputMappingsProduced++;
 			sink.send( sm );
 		}

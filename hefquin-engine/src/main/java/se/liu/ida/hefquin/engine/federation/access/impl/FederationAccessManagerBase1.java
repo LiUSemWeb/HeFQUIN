@@ -169,7 +169,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		}
 
 		protected int extractCardinality( final SolMapsResponse smResp ) {
-			final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
+			final Iterator<SolutionMapping> it = smResp.getResponseData().iterator();
 			final SolutionMapping sm = it.next();
 			final Node countValueNode = sm.asJenaBinding().get(countVar);
 			final Object countValueObj = countValueNode.getLiteralValue();
