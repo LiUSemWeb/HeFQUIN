@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 public interface SolMapsResponse extends DataRetrievalResponse<Iterable<SolutionMapping>>
 {
 	/**
-	 * Returns the number of mappings that are returned by {@link #getSolutionMappings()}.
+	 * Returns the number of mappings that are returned by {@link #getResponseData()}.
 	 */
 	default int getSize() {
 		final Iterable<SolutionMapping> mappings = getResponseData();
