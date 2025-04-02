@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -30,18 +31,16 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 		final SolMapsResponse response;
 		try {
 			response = performRequest( execCxt.getFederationAccessMgr() );
+			timeAfterResponse = System.currentTimeMillis();
+			solMapsRetrieved = response.getSize();
+			process( response, sink );
+		} catch ( final FederationAccessException e ) {
+			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
 		}
-		catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException("Performing the request caused an exception.", e, this);
-		}
-
-		timeAfterResponse = System.currentTimeMillis();
-		solMapsRetrieved = response.getSize();
-
-		process(response, sink);
 	}
 
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
+		throws UnsupportedOperationDueToRetrievalError
 	{
 		for ( SolutionMapping sm : response.getResponseData() ) {
 			numberOfOutputMappingsProduced++;
