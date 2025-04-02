@@ -94,17 +94,6 @@ public class CardinalityResponseImpl implements CardinalityResponse
 	}
 
 	/**
-	 * Returns the cardinality value associated with this response. The cardinality represents the number of result
-	 * items obtained or estimated.
-	 *
-	 * @return the cardinality value
-	 */
-	@Override
-	public int getCardinality() {
-		return cardinality;
-	}
-
-	/**
 	 * Indicates whether an error occurred during data retrieval, based on the wrapped response.
 	 *
 	 * @return {@code true} if an error occurred. otherwise {@code false}
