@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -157,6 +158,8 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
 		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
 		assertTrue( r.isError() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getCardinality() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
 
 	@Test
@@ -173,6 +176,7 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
 		final SolMapsResponse r = fedAccessMgr.issueRequest( req, fm ).get();
 		assertTrue( r.isError() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
 
 	@Test
@@ -189,6 +193,8 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
 		final CardinalityResponse r = fedAccessMgr.issueCardinalityRequest( req, fm ).get();
 		assertTrue( r.isError() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getCardinality() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
 
 	@Test
@@ -205,6 +211,7 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
 		final TPFResponse r = fedAccessMgr.issueRequest( req, fm ).get();
 		assertTrue( r.isError() );
+		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
 
 	// ------------ helper code ------------
