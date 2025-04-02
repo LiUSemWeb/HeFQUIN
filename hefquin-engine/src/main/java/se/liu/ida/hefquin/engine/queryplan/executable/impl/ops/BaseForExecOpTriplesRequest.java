@@ -8,6 +8,8 @@ import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TriplesResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -29,13 +31,17 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 
 	@Override
 	protected void _execute( final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
 
-		final Iterator<? extends SolutionMapping> it = convert( response.getResponseData() );
-		while ( it.hasNext() ) {
-			sink.send( it.next() );
+		try {
+			final Iterator<? extends SolutionMapping> it = convert( response.getResponseData() );
+			while ( it.hasNext() ) {
+				sink.send( it.next() );
+			}
+		} catch ( UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( e.getMessage(), e, this );
 		}
 	}
 
