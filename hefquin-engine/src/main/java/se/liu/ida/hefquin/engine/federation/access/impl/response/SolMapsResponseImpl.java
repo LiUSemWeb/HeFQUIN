@@ -86,9 +86,4 @@ public class SolMapsResponseImpl extends DataRetrievalResponseBase<Iterable<Solu
 	                            final String errorDescription ) {
 		super( solMaps, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 	}
-
-	@Override
-	public Iterable<SolutionMapping> getSolutionMappings() {
-		return data;
-	}
 }

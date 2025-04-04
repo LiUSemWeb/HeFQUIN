@@ -282,11 +282,6 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	}
 
 	@Override
-	public Iterable<Triple> getTriples() {
-		return new ConcatenatingIterable<Triple>( matchingTriples, metadataTriples );
-	}
-
-	@Override
 	public int getSize() {
 		return matchingTriples.size() + metadataTriples.size();
 	}

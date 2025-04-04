@@ -126,7 +126,7 @@ public class SPARQLRequestProcessorImplTest extends EngineTestBase
 		assertEquals( fm, resp.getFederationMember() );
 		assertEquals( req, resp.getRequest() );
 
-		return resp.getSolutionMappings().iterator();
+		return resp.getResponseData().iterator();
 	}
 
 	protected void checkPatternResponse( final Iterator<SolutionMapping> it ) {

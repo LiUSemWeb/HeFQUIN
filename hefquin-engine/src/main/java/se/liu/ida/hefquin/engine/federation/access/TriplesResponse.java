@@ -7,21 +7,24 @@ import se.liu.ida.hefquin.base.data.Triple;
 
 public interface TriplesResponse extends DataRetrievalResponse<Iterable<Triple>>
 {
-	Iterable<Triple> getTriples();
-
 	/**
-	 * Returns the number of triples that are returned by the {@link #getTriples()}. 
+	 * Returns the number of triples that are returned by the {@link #getResponseData()}.
 	 */
-	default int getSize(){
-		final Iterable<Triple> triples = getTriples();
-		if (triples instanceof Collection) {
-			return ((Collection<Triple>) triples).size();
+	default int getSize() {
+		try {
+			final Iterable<Triple> triples = getResponseData();
+			if ( triples instanceof Collection ) {
+				return ((Collection<Triple>) triples).size();
+			}
+			// Fallback to manual count
+			int count = 0;
+			for ( Iterator<Triple> it = triples.iterator(); it.hasNext(); it.next() ) {
+				count++;
+			}
+			return count;
+		} catch ( UnsupportedOperationDueToRetrievalError e ) {
+			// intentionally do nothing
 		}
-		// Fallback to manual count
-		int count = 0;
-		for ( Iterator<Triple> it = triples.iterator(); it.hasNext(); it.next() ){
-			count++;
-		}
-		return count;
+		return -1;
 	}
 }
