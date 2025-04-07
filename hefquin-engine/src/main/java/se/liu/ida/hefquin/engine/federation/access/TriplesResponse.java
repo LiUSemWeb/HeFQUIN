@@ -13,8 +13,8 @@ public interface TriplesResponse extends DataRetrievalResponse<Iterable<Triple>>
 	default int getSize() {
 		try {
 			final Iterable<Triple> triples = getResponseData();
-			if ( triples instanceof Collection ) {
-				return ((Collection<Triple>) triples).size();
+			if ( triples instanceof Collection c ) {
+				return c.size();
 			}
 			// Fallback to manual count
 			int count = 0;
