@@ -6,7 +6,7 @@
 -source
 '17'
 -sourcepath
-'/home/runner/work/HeFQUIN/HeFQUIN/hefquin-base/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-engine/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-cli/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-graphqlconnector/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-pgconnector/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-service/src/main/java'
+'/home/runner/work/HeFQUIN/HeFQUIN/hefquin-base/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-base/target/generated-sources/annotations:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-engine/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-engine/target/generated-sources/annotations:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-cli/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-cli/target/generated-sources/annotations:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-graphqlconnector/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-graphqlconnector/target/generated-sources/annotations:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-pgconnector/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-pgconnector/target/generated-sources/annotations:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-service/src/main/java:/home/runner/work/HeFQUIN/HeFQUIN/hefquin-service/target/generated-sources/annotations'
 -author
 -bottom
 'Copyright &#169; 2025. All rights reserved.'
