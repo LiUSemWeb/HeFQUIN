@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.base.data.Triple;
 public interface TriplesResponse extends DataRetrievalResponse<Iterable<Triple>>
 {
 	/**
-	 * Returns the number of triples that are returned by the {@link #getResponseData()}.
+	 * Returns the number of triples that are returned by {@link #getResponseData()}.
 	 */
 	default int getSize() {
 		try {
