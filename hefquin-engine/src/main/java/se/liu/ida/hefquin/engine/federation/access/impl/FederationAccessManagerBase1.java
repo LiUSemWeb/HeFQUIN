@@ -178,12 +178,11 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				final Node countValueNode = sm.asJenaBinding().get( countVar );
 				final Object countValueObj = countValueNode.getLiteralValue();
 
-				if ( countValueObj instanceof Integer ) {
-					return ((Integer) countValueObj).intValue();
+				if ( countValueObj instanceof Integer value ) {
+					return value.intValue();
 				}
-				else if ( countValueObj instanceof Long ) {
-					final long l = ((Long) countValueObj).longValue();
-					return (Integer.MAX_VALUE < l) ? Integer.MAX_VALUE : (int) l;
+				else if ( countValueObj instanceof Long value ) {
+					return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
 				}
 			} catch ( UnsupportedOperationDueToRetrievalError e ) {
 				return null;

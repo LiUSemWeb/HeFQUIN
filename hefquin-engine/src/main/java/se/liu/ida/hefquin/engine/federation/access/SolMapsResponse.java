@@ -12,10 +12,9 @@ public interface SolMapsResponse extends DataRetrievalResponse<Iterable<Solution
 	 */
 	default int getSize() {
 		try {
-
 			final Iterable<SolutionMapping> mappings = getResponseData();
-			if ( mappings instanceof Collection ) {
-				return ((Collection<SolutionMapping>) mappings).size();
+			if ( mappings instanceof Collection c ) {
+				return c.size();
 			}
 			// Fallback to manual count
 			int count = 0;
