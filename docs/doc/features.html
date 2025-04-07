@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Features</title>
+
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+    <script src="../js/highlight.js"></script>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1>Features of HeFQUIN</h1>
+        <ul>
+            <li>Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union
+                graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the
+                other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)</li>
+            <li>So far, support for SPARQL endpoints, TPF, and brTPF
+                <ul>
+                    <li>Work on openCypher Property Graphs ongoing</li>
+                    <li>Work on GraphQL APIs ongoing</li>
+                </ul>
+            </li>
+            <li>Initial support for vocabulary mappings</li>
+            <li>Heuristics-based logical query optimizer</li>
+            <li>
+                Several different cost-based physical optimizers (greedy, dynamic programming, simulated annealing, randomized
+                iterative improvement)
+            </li>
+            <li>
+                Relevant physical operators, e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ),
+                several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
+            </li>
+            <li>Two execution models (push-based and pull-based)</li>
+            <li>Features for getting an understanding of the internals of the engine:
+                <ul>
+                    <li>Printing of logical and physical plans</li>
+                    <li>Programmatic access to execution statistics on the level of individual operators and data structures, as
+                        well as printing of these statistics from the CLI
+                    </li>
+                </ul>
+            </li>
+            <li>380+ unit tests</li>
+        </ul>
+
+        <section id="limitations">
+            <h2>Current Limitations</h2>
+            <p>
+                HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN need to be wrapped in SERVICE clauses. For more details, refer to the page about <a href="queries.html">queries and query features that you can use</a>.
+            </p>
+
+        </section>
+
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
