@@ -17,49 +17,29 @@
 
     <main>
         <h1>About HeFQUIN</h1>
-        HeFQUIN is a query federation engine for heterogeneous federations of graph data sources (e.g, federated
-        knowledge graphs) that is currently under development by <a
-            href="https://www.ida.liu.se/research/semanticweb/">the Semantic Web research group at Linköping
-            University</a>.
-
-        <h2>Features of HeFQUIN</h2>
+        <p>
+            HeFQUIN is a <strong>query federation engine for heterogeneous federations of graph data sources (e.g, federated knowledge graphs)</strong>
+            that is currently under development by
+            <a href="https://www.ida.liu.se/research/semanticweb/">the Semantic Web research group at Linköping University</a>.
+        </p>
+        <p>
+            On this Website you find:
+        </p>
         <ul>
-            <li>Support for all features of SPARQL 1.1 (where basic graph patterns, group graph patterns (AND), union
-                graph patterns, optional patterns, and filters are supported natively within the HeFQUIN engine, and the
-                other features of SPARQL are supported through integration of the HeFQUIN engine into Apache Jena)</li>
-            <li>So far, support for SPARQL endpoints, TPF, and brTPF
-                <ul>
-                    <li>Work on openCypher Property Graphs ongoing</li>
-                    <li>Work on GraphQL APIs ongoing</li>
-                </ul>
-            </li>
-            <li>Initial support for vocabulary mappings</li>
-            <li>Heuristics-based logical query optimizer</li>
             <li>
-                Several different cost-based physical optimizers (greedy, dynamic programming, simulated annealing, randomized
-                iterative improvement)
+                a list of the <a href="doc/features.html">features of HeFQUIN</a>,
             </li>
             <li>
-                Relevant physical operators, e.g., hash join, symmetric hash join (SHJ), request-based nested-loops join (NLJ),
-                several variations of bind joins (brTPF-based, UNION-based, FILTER-based, VALUES-based)
+                a detailed <a href="doc/">user documentation</a>,
             </li>
-            <li>Two execution models (push-based and pull-based)</li>
-            <li>Features for getting an understanding of the internals of the engine:
-                <ul>
-                    <li>Printing of logical and physical plans</li>
-                    <li>Programmatic access to execution statistics on the level of individual operators and data structures, as
-                        well as printing of these statistics from the CLI
-                    </li>
-                </ul>
+            <li>
+                a list of <a href="research/">related research publications</a>,
             </li>
-            <li>380+ unit tests</li>
+            <li>
+                information <a href="devdoc/">for contributors</a>, and more.
+            </li>
         </ul>
 
-        <h2>Current Limitations</h2>
-        <ul>
-            <li>HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN
-                need to be wrapped in SERVICE clauses.</li>
-        </ul>
     </main>
 
     <div id="footer"></div>
