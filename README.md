@@ -48,6 +48,16 @@ and more.
   * Moreover, you can read more about the [queries and query features that you can use](https://liusemweb.github.io/HeFQUIN/doc/queries.html).
 
 ### Using HeFQUIN via a Command-Line Program
-TODO - details: https://liusemweb.github.io/HeFQUIN/doc/programs.html and https://liusemweb.github.io/HeFQUIN/doc/cli.html
+* Download the ZIP package of the latest [release of HeFQUIN](https://github.com/LiUSemWeb/HeFQUIN/releases), unpack it, enter the resulting directory in a command-line terminal and, then, execute the following command (which assumes that you have a relatively recent version of Java installed).
+  ```bash
+  bin/hefquin --federationDescription=MyFedConf.ttl --query=ExampleQuery.rq
+  ```
+  where
+  * `MyFedConf.ttl` may be replaced by any file that contains an [RDF-based description of your federation](https://liusemweb.github.io/HeFQUIN/doc/federation_description.html) and
+  * `ExampleQuery.rq` is a file that contains your query (see [our documentation page about queries and query features that you can use](https://liusemweb.github.io/HeFQUIN/doc/queries.html)).
+* Our [documentation page about the HeFQUIN command-line program](https://liusemweb.github.io/HeFQUIN/doc/cli.html) describes all the possible arguments that you can use for the program.
+* Our [documentation page about setting up the HeFQUIN command-line programs](https://liusemweb.github.io/HeFQUIN/doc/programs.html#use-release) provides more details on the setup process, including a description of how to use the current developer version instead of a release.
+* Moreover, there are [additional command-line programs that come with HeFQUIN](https://liusemweb.github.io/HeFQUIN/doc/programs.html).
+
 ### Using HeFQUIN as a Java Library
 TODO - details: https://liusemweb.github.io/HeFQUIN/doc/hefquin_via_maven.html and https://liusemweb.github.io/HeFQUIN/doc/integrate_hefquin_code.html
