@@ -10,7 +10,7 @@ and more.
 
 ## Quick Guide
 ### Using HeFQUIN as a Service
-* **Setup via Docker**
+* **_Setup via Docker_**
   * Pull the image for the latest release by executing the following command:
     ```bash
     docker pull ghcr.io/LiUSemWeb/hefquin:latest
@@ -24,10 +24,29 @@ and more.
     ```
     where
     * the `-p` argument specifies the port at which the service shall listen and
-    * the `-v` argument refers to a file (e.g., `MyFedConf.ttl`) that contains the [description of your federation](https://liusemweb.github.io/HeFQUIN/doc/federation_description.html).
-  * Our [documentation page about running HeFQUIN via Docker](https://liusemweb.github.io/HeFQUIN/doc/docker.html) provides more details, including a description of how to build your own Docker image of HeFQUIN
-* **Setup via the Embedded Servlet Container**  TODO -- details: https://liusemweb.github.io/HeFQUIN/doc/embedded_servlet_container.html and https://liusemweb.github.io/HeFQUIN/doc/separate_servlet_container.html
-* **Interacting with the HeFQUIN Service**  TODO -- details: https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html
+    * the `-v` argument refers to a file (e.g., `MyFedConf.ttl`) that contains an [RDF-based description of your federation](https://liusemweb.github.io/HeFQUIN/doc/federation_description.html).
+  * Next, continue at the point "_Interacting with the HeFQUIN Service_" below.
+  * Our [documentation page about running HeFQUIN via Docker](https://liusemweb.github.io/HeFQUIN/doc/docker.html) provides more details, including a description of how to build your own Docker image of HeFQUIN.
+
+* **_Setup via the Embedded Servlet Container_**
+  * Download the ZIP package of the latest [release of HeFQUIN](https://github.com/LiUSemWeb/HeFQUIN/releases), unpack it, enter the resulting directory in a command-line terminal and, then, execute the following command (which assumes that you have a relatively recent version of Java installed).
+    ```bash
+    bin/hefquin-server --federationDescription=MyFedConf.ttl
+    ```
+    where `MyFedConf.ttl` may be replaced by any file that contains an [RDF-based description of your federation](https://liusemweb.github.io/HeFQUIN/doc/federation_description.html).
+  * Next, continue at the point "_Interacting with the HeFQUIN Service_" below.
+  * Our [documentation page about running HeFQUIN via the embedded servlet container](https://liusemweb.github.io/HeFQUIN/doc/embedded_servlet_container.html) provides more details, including a description of how to use the current developer version instead of a release.
+  * Moreover, you can also [set up a HeFQUIN service via a separate servlet container](https://liusemweb.github.io/HeFQUIN/doc/separate_servlet_container.html).
+
+* **_Interacting with the HeFQUIN Service_**
+  * After starting up the HeFQUIN service, you can first test it test by opening [`http://localhost:8080/`](http://localhost:8080/) in a Web browser (assuming that you have started the service at port 8080).
+  * You can interact with the service like with a SPARQL endpoint (the endpoint should be exposed at `http://localhost:8080/sparql`). For instance, by using the command-line tool [`curl`](https://curl.se/), you may execute the following command to issue the query in a file called `ExampleQuery.rq`.
+    ```bash
+    curl -X POST http://localhost:8080/sparql --data-binary @ExampleQuery.rq -H 'Content-Type: application/sparql-query'
+    ```
+  * Our [documentation page about interacting with a HeFQUIN service](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) provides more details.
+  * Moreover, you can read more about the [queries and query features that you can use](https://liusemweb.github.io/HeFQUIN/doc/queries.html).
+
 ### Using HeFQUIN via a Command-Line Program
 TODO - details: https://liusemweb.github.io/HeFQUIN/doc/programs.html and https://liusemweb.github.io/HeFQUIN/doc/cli.html
 ### Using HeFQUIN as a Java Library
