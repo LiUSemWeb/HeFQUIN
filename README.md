@@ -47,7 +47,7 @@ and more.
   * Our [documentation page about interacting with a HeFQUIN service](https://liusemweb.github.io/HeFQUIN/doc/hefquin_service.html) provides more details.
   * Moreover, you can read more about the [queries and query features that you can use](https://liusemweb.github.io/HeFQUIN/doc/queries.html).
 
-### Using HeFQUIN via a Command-Line Program
+### Using HeFQUIN via the Command-Line Program
 * Download the ZIP package of the latest [release of HeFQUIN](https://github.com/LiUSemWeb/HeFQUIN/releases), unpack it, enter the resulting directory in a command-line terminal and, then, execute the following command (which assumes that you have a relatively recent version of Java installed).
   ```bash
   bin/hefquin --federationDescription=MyFedConf.ttl --query=ExampleQuery.rq
@@ -60,4 +60,18 @@ and more.
 * Moreover, there are [additional command-line programs that come with HeFQUIN](https://liusemweb.github.io/HeFQUIN/doc/programs.html).
 
 ### Using HeFQUIN as a Java Library
-TODO - details: https://liusemweb.github.io/HeFQUIN/doc/hefquin_via_maven.html and https://liusemweb.github.io/HeFQUIN/doc/integrate_hefquin_code.html
+* Assuming you use Maven as the build tool for your Java project, you can specify HeFQUIN as a dependency for your project simply by adding the following snippet to the `dependencies` section of your POM file (make sure to change the given version number to the version number of the [HeFQUIN release](https://github.com/LiUSemWeb/HeFQUIN/releases) you want to use).
+  ```xml
+  <dependency>
+    <groupId>se.liu.research.hefquin</groupId>
+    <artifactId>hefquin-engine</artifactId>
+    <version>0.0.1</version> <!-- replace this by the version number of the HeFQUIN release to be used -->
+  </dependency>
+  ```
+* After changing the POM file, you can run the following command in your Maven project to compile your project with the new dependency (or you refresh/reimport your Maven project in the IDE that you are using).
+  ```bash
+  mvn clean compile
+  ```
+* Now you can use any of the Java interfaces and classes of HeFQUIN in the Java code of your project. You find information about these interfaces and classes in our [Javadoc documentation](https://liusemweb.github.io/HeFQUIN/javadoc/latest).
+* Our [documentation page about integrating HeFQUIN into your Java code](https://liusemweb.github.io/HeFQUIN/doc/integrate_hefquin_code.html) provides an overview on how to run queries over a federation from within your Java code.
+* Our [documentation page about adding HeFQUIN as a dependency to your Maven project](https://liusemweb.github.io/HeFQUIN/doc/hefquin_via_maven.html) provides more details on the setup process, including a description of how to use the current developer version instead of a release.
