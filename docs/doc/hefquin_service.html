@@ -3,24 +3,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN - Interacting with a HeFQUIN Service</title>
 
     <!-- Prism -->
-    <link href="../css/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="../css/prism-tomorrow.css" rel="stylesheet">
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet">
     <script src="../js/prism_1.29.0/prism.min.js"></script>
-    <script src="../js/prism_1.29.0/prism-python.min.js"></script>
-    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-json.min.js"></script>
     <script src="../js/prism_1.29.0/prism-bash.min.js"></script>
     <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
     <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
-    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
-    <script src="../js/highlight.js"></script>
 
     <script src="../js/mustache.min.js"></script>
     <script src="../js/script.js"></script>
     <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        // trim any preceeding or trailing whitespaces from code snippets
+        window.addEventListener('load', trimCode);
+    </script>
 </head>
 
 <body>
@@ -29,46 +31,154 @@
     <main>
         <h1>Interacting with a HeFQUIN Service</h1>
         <p>
-            After starting a HeFQUIN service (which you can do either <a href="docker.html">using Docker</a>, <a href="embedded_servlet_container.html">using a servlet container embedded in HeFQUIN</a>, or <a href="separate_servlet_container.html">using your own, separate servlet container</a>), you can first test it by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser (assuming that you have started the service at port 8080). If this works (i.e., you see a page that describes the service), you can start interacting with the service via HTTP.
+            After starting a HeFQUIN service (which you can do either <a href="docker.html">using Docker</a>, <a
+                href="embedded_servlet_container.html">using a servlet container embedded in HeFQUIN</a>, or <a
+                href="separate_servlet_container.html">using your own, separate servlet container</a>), you can first
+            test it by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser
+            (assuming that you have started the service at port 8080). If this works (i.e., you see a page that
+            describes the service), you can start interacting with the service via HTTP.
+        </p>
+        <p>
+            The HeFQUIN service API is also described using the <a href="hefquin_api.html">Open API specification</a>.
+            The API documentation is also available at the root endpoint of the service
+            <code><a href="http://localhost:8080/">http://localhost:8080/</a></code>.
         </p>
 
         <section id="issuing-queries">
             <h2>Issuing Queries</h2>
             <p>
-                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue <a href="queries.html">SPARQL queries to be executed over the federation</a> for which the service has been set up. To this end, the client may send a GET request or a POST request.
+                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a
+                    href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue <a
+                    href="queries.html">SPARQL queries to be executed over the federation</a> for which the service has
+                been set up. To this end, the client may send a GET request or a POST request.
             </p>
             <p>
-                In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code>, as introduced for <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the HeFQUIN service).
+                In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL
+                parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and
+                <code>named-graph-uri</code>, as introduced for <a
+                    href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the
+                HeFQUIN service).
             </p>
             <p>
-                In a <b>POST request</b>, the (unencoded) query may be provided directly in the request body, in which case the request header must contain a <code>Content-Type</code> field with <code>application/sparql-query</code> as value. Alternatively, the request body of the POST request may contain the <code>query</code> parameter with the URL-encoded query as value, in which case the value of the <code>Content-Type</code> field in the request header must be <code>application/x-www-form-urlencoded</code> (also for POST requests, the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code> are not supported by HeFQUIN).
+                In a <b>POST request</b>, the (unencoded) query may be provided directly in the request body, in which
+                case the request header must contain a <code>Content-Type</code> field with
+                <code>application/sparql-query</code> as value. Alternatively, the request body of the POST request may
+                contain the <code>query</code> parameter with the URL-encoded query as value, in which case the value of
+                the <code>Content-Type</code> field in the request header must be
+                <code>application/x-www-form-urlencoded</code> (also for POST requests, the URL parameters
+                <code>default-graph-uri</code> and <code>named-graph-uri</code> are not supported by HeFQUIN).
             </p>
             <p>
-                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the following command to issue the query in a file called <code>ExampleQuery.rq</code>.
+                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the
+                following command to issue the query in a file called <code>ExampleQuery.rq</code>.
             </p>
-            <pre><code class="language-bash">curl -X POST http://localhost:8080/sparql --data-binary @ExampleQuery.rq -H 'Content-Type: application/sparql-query'</code></pre>
+            <pre><code class="language-bash">
+curl -X POST http://localhost:8080/sparql \
+    --data-binary @ExampleQuery.rq \
+    -H 'Content-Type: application/sparql-query'
+            </code></pre>
             <p>
-                In any case (using GET requests or POST requests), the client may <b>specify the format</b> in which it wants to receive the query result in the response. To this end, the client may include an <code>Accept</code> field in the request header, using any of the following media types (with the first being used as the default).
+                In any case (using GET requests or POST requests), the client may <b>specify the format</b> in which it
+                wants to receive the query result in the response. To this end, the client may include an
+                <code>Accept</code> field in the request header, using any of the following media types (with the first
+                being used as the default).
             </p>
             <ul>
-                <li><a href="https://www.w3.org/TR/sparql11-results-json/"><code>application/sparql-results+json</code></a> (used as the default)</li>
-                <li><a href="https://www.w3.org/TR/rdf-sparql-XMLres/"><code>application/sparql-results+xml</code></a></li>
+                <li><a href="https://www.w3.org/TR/sparql11-results-json/">
+                        <code>application/sparql-results+json</code></a> (used as the default)
+                </li>
+                <li><a href="https://www.w3.org/TR/rdf-sparql-XMLres/"><code>application/sparql-results+xml</code></a>
+                </li>
                 <li><a href="https://www.w3.org/TR/sparql11-results-csv-tsv/"><code>text/csv</code></a></li>
-                <li><a href="https://www.w3.org/TR/sparql11-results-csv-tsv/"><code>text/tab-separated-values</code></a></li>
+                <li><a href="https://www.w3.org/TR/sparql11-results-csv-tsv/"><code>text/tab-separated-values</code></a>
+                </li>
             </ul>
             <p>
                 Responses returned by the HeFQUIN service may use any of the following HTTP status codes.
             </p>
             <ul>
-                <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the response body contains the query result, represented using the specified media type.</li>
-                <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was empty.</li>
-                <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.</li>
-                <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> value is not supported.</li>
+                <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the
+                    response body contains the query result, represented using the specified media type.</li>
+                <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was
+                    empty.</li>
+                <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.
+                </li>
+                <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> value is
+                    not supported.</li>
                 <li><code>500 Internal Server Error</code> - Returned if an error occurs during query execution.</li>
             </ul>
-
         </section>
 
+
+        <section id="inspecting-queries">
+            <h2>Inspecting Queries</h2>
+            <p>
+                The HeFQUIN service also provides a diagnostic endpoint at <a  href="http://localhost:8080/query-inspect">http://localhost:8080/query-inspect</a>,
+                which can be used to inspect internal processing details of a SPARQL query. This includes access to the logical and
+                physical query plans, execution timing, and other statistics. This functionality is intended for debugging, performance tuning, and query analysis.
+            </p>
+            <p>
+                The endpoint <code>/query-inspect</code> supports both GET and POST requests using the same content
+                types and parameters as the <code>/sparql</code> endpoint.
+            </p>
+            <p>
+                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the
+                following command inspect the query processing for the query in the file called
+                <code>ExampleQuery.rq</code>.
+            </p>
+            <pre><code class="language-bash">
+curl -X POST http://localhost:8080/query-inspect \
+    --data-binary @ExampleQuery.rq \
+    -H 'Content-Type: application/sparql-query'
+            </code></pre>
+            <p>
+                The service will return a JSON response with <code>application/json</code> as the content type.
+            </p>
+            <p>
+                Responses returned by the service may use any of the following HTTP status codes.
+            </p>
+            <ul>
+                <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the
+                    response body contains the query result, represented using the specified media type.</li>
+                <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was
+                    empty.</li>
+                <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.
+                </li>
+                <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> value is
+                    not supported.</li>
+                <li><code>500 Internal Server Error</code> - Returned if an error occurs during query execution.</li>
+            </ul>
+            <p>
+                If the request is valid, the response will include:
+            </p>
+            <ul>
+                <li>The logical plan</li>
+                <li>The physical plan</li>
+                <li>The source assignment</li>
+                <li>Timing metrics (overall, planning, compilation, execution)</li>
+                <li>Planning and execution statistics</li>
+                <li>Any exceptions encountered</li>
+            </ul>
+            <p>
+                Below follows an example of the structure of the output that can be expected:
+            </p>
+            <pre><code class="language-json">
+{
+    "queryMetrics": {
+        "overallQueryProcessingTime": 222,
+        "planningTime": 3,
+        "compilationTime": 1,
+        "executionTime": 200,
+        "queryPlanningStats": { ... },
+    	"executionStats": { ... },
+        "physicalPlan": "(physical plan representation)",
+        "logicalPlan": "(logical plan representation)",
+        "sourceAssignment": "(source assignment)",
+        "exceptions": [ ]
+    }
+}
+            </code></pre>
+        </section>
     </main>
 
     <div id="footer"></div>
