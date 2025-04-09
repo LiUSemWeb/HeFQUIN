@@ -10,21 +10,16 @@ public interface SolMapsResponse extends DataRetrievalResponse<Iterable<Solution
 	/**
 	 * Returns the number of mappings that are returned by {@link #getResponseData()}.
 	 */
-	default int getSize() {
-		try {
-			final Iterable<SolutionMapping> mappings = getResponseData();
-			if ( mappings instanceof Collection c ) {
-				return c.size();
-			}
-			// Fallback to manual count
-			int count = 0;
-			for ( Iterator<SolutionMapping> it = mappings.iterator(); it.hasNext(); it.next() ) {
-				count++;
-			}
-			return count;
-		} catch ( UnsupportedOperationDueToRetrievalError e ) {
-			// intentionally do nothing
+	default int getSize() throws UnsupportedOperationDueToRetrievalError {
+		final Iterable<SolutionMapping> mappings = getResponseData();
+		if ( mappings instanceof Collection c ) {
+			return c.size();
 		}
-		return -1;
+		// Fallback to manual count
+		int count = 0;
+		for ( Iterator<SolutionMapping> it = mappings.iterator(); it.hasNext(); it.next() ) {
+			count++;
+		}
+		return count;
 	}
 }
