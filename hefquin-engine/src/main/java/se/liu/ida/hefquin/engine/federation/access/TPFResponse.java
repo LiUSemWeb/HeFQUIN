@@ -8,24 +8,6 @@ import se.liu.ida.hefquin.base.data.Triple;
 public interface TPFResponse extends TriplesResponse
 {
 	/**
-	 * Returns the number of triples returned by {@link #getResponseData()}.
-	 *
-	 * @throws UnsupportedOperationDueToRetrievalError
-	 */
-	default int getSize() throws UnsupportedOperationDueToRetrievalError {
-		final Iterable<Triple> triples = getResponseData();
-		if ( triples instanceof Collection c ) {
-			return c.size();
-		}
-		// Fallback to manual count
-		int count = 0;
-		for ( Iterator<Triple> it = triples.iterator(); it.hasNext(); it.next() ) {
-			count++;
-		}
-		return count;
-	}
-
-	/**
 	 * While {@link #getTriples()} returns an iterator over all triples contained in the given TPF response,this method
 	 * here returns an iterator only over the matching triples that have been requested.
 	 *
