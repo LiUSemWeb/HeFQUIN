@@ -36,28 +36,24 @@
                 href="separate_servlet_container.html">using your own, separate servlet container</a>), you can first
             test it by opening <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> in a Web browser
             (assuming that you have started the service at port 8080). If this works (i.e., you see a page that
-            describes the service), you can start interacting with the service via HTTP.
+            describes the service), you can start interacting with the service via HTTP. In particular,
         </p>
+        <ul>
+            <li>you can <a href="#issuing-queries">issue queries</a> and</li>
+            <li>you can <a href="inspecting-queries">issue a request for query processing details</a>.</li>
+        </ul>
         <p>
-            The HeFQUIN service API is also described using the <a href="hefquin_api.html">Open API specification</a>.
-            The API documentation is also available at the root endpoint of the service
-            <code><a href="http://localhost:8080/">http://localhost:8080/</a></code>.
+            While the following sections describe these options in detail, we also provide an <a href="hefquin_api.html">OpenAPI documentation of the API of the HeFQUIN service</a>. This documentation is also available at the root endpoint of the service:
+            <code><a href="http://localhost:8080/">http://localhost:8080/</a></code> (assuming that you have started the service at port 8080).
         </p>
 
         <section id="issuing-queries">
             <h2>Issuing Queries</h2>
             <p>
-                At the address <code>http://localhost:8080/sparql</code> the HeFQUIN service provides a <a
-                    href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue <a
-                    href="queries.html">SPARQL queries to be executed over the federation</a> for which the service has
-                been set up. To this end, the client may send a GET request or a POST request.
+                At the address <a  href="http://localhost:8080/query">http://localhost:8080/query</a> the HeFQUIN service provides a <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoint</a> via which clients can issue <a href="queries.html">SPARQL queries to be executed over the federation</a> for which the service has been set up. To this end, the client may send a GET request or a POST request.
             </p>
             <p>
-                In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL
-                parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and
-                <code>named-graph-uri</code>, as introduced for <a
-                    href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the
-                HeFQUIN service).
+                In the case of a <b>GET request</b>, the query needs to be provided in URL-encoded form via the URL parameter <code>query</code> (the URL parameters <code>default-graph-uri</code> and <code>named-graph-uri</code>, as introduced for <a href="https://www.w3.org/TR/sparql11-protocol/">SPARQL endpoints</a>, are not supported by the HeFQUIN service).
             </p>
             <p>
                 In a <b>POST request</b>, the (unencoded) query may be provided directly in the request body, in which
@@ -111,20 +107,16 @@ curl -X POST http://localhost:8080/sparql \
 
 
         <section id="inspecting-queries">
-            <h2>Inspecting Queries</h2>
+            <h2>Inspecting Query Processing Details</h2>
             <p>
-                The HeFQUIN service also provides a diagnostic endpoint at <a  href="http://localhost:8080/query-inspect">http://localhost:8080/query-inspect</a>,
-                which can be used to inspect internal processing details of a SPARQL query. This includes access to the logical and
-                physical query plans, execution timing, and other statistics. This functionality is intended for debugging, performance tuning, and query analysis.
+                The HeFQUIN service also provides a diagnostic endpoint at <a  href="http://localhost:8080/query-inspect">http://localhost:8080/query-inspect</a>, which can be used to inspect internal processing details of a given query, including the logical and physical query plans, execution times, and other statistics. This functionality is intended for debugging, performance tuning, and query analysis.
             </p>
             <p>
                 The endpoint <code>/query-inspect</code> supports both GET and POST requests using the same content
                 types and parameters as the <code>/sparql</code> endpoint.
             </p>
             <p>
-                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the
-                following command inspect the query processing for the query in the file called
-                <code>ExampleQuery.rq</code>.
+                For instance, by using the command-line tool <a href="https://curl.se/">curl</a>, you may execute the following command to issue the query in a file called <code>ExampleQuery.rq</code> and retrieve information about the resulting query execution process.
             </p>
             <pre><code class="language-bash">
 curl -X POST http://localhost:8080/query-inspect \
@@ -132,7 +124,7 @@ curl -X POST http://localhost:8080/query-inspect \
     -H 'Content-Type: application/sparql-query'
             </code></pre>
             <p>
-                The service will return a JSON response with <code>application/json</code> as the content type.
+                The service will return a response in JSON format, with <code>application/json</code> as the content type.
             </p>
             <p>
                 Responses returned by the service may use any of the following HTTP status codes.
@@ -152,15 +144,15 @@ curl -X POST http://localhost:8080/query-inspect \
                 If the request is valid, the response will include:
             </p>
             <ul>
-                <li>The logical plan</li>
-                <li>The physical plan</li>
-                <li>The source assignment</li>
-                <li>Timing metrics (overall, planning, compilation, execution)</li>
-                <li>Planning and execution statistics</li>
-                <li>Any exceptions encountered</li>
+                <li>the source assignment that was passed to the logical optimizer,</li>
+                <li>the logical plan that was passed to the physical optimizer,</li>
+                <li>the physical plan that was selected for execution,</li>
+                <li>timing metrics (overall, planning, compilation, execution),</li>
+                <li>detailed statistics of the query planner and of the execution process, and</li>
+                <li>any exceptions collected during the execution process.</li>
             </ul>
             <p>
-                Below follows an example of the structure of the output that can be expected:
+                Below follows an example of the structure of the output that can be expected.
             </p>
             <pre><code class="language-json">
 {
