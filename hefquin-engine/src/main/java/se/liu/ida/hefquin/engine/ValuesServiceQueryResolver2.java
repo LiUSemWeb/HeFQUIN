@@ -63,7 +63,21 @@ public class ValuesServiceQueryResolver2
 			return null;
 
 		final ElementData values = (ElementData) elmts.get(posFirstValuesClause);
-		expandValuesPlusServicePattern(elmts, values, posFirstValuesClause+1);
+		final List<Element> rewrittenRemainder = expandValuesPlusServicePattern(elmts, values, posFirstValuesClause+1);
+		if ( rewrittenRemainder == null ) {
+			return null;
+		}
+		else if ( posFirstValuesClause == 0 ) {
+			return rewrittenRemainder;
+		}
+		else {
+			final List<Element> newElmts = new ArrayList<>();
+			for ( int i = 0; i < posFirstValuesClause; i++ ) {
+				newElmts.add( elmts.get(i) );
+			}
+			newElmts.addAll(rewrittenRemainder);
+			return newElmts;
+		}
 	}
 
 	/**
