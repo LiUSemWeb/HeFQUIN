@@ -162,32 +162,29 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static class FunctionToObtainCardinalityResponseFromSolMapsResponse implements Function<SolMapsResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
-			final Integer cardinality = extractCardinality( smResp );
-			if ( cardinality == null ) {
-				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
-			}
-			else {
+			try {
+				final Integer cardinality = extractCardinality( smResp );
 				return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
 			}
 		}
 
-		protected Integer extractCardinality( final SolMapsResponse smResp ) {
-			try {
-				final Iterator<SolutionMapping> it = smResp.getResponseData().iterator();
-				final SolutionMapping sm = it.next();
-				final Node countValueNode = sm.asJenaBinding().get( countVar );
-				final Object countValueObj = countValueNode.getLiteralValue();
+		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
+			final Iterator<SolutionMapping> it = smResp.getResponseData().iterator();
+			final SolutionMapping sm = it.next();
+			final Node countValueNode = sm.asJenaBinding().get( countVar );
+			final Object countValueObj = countValueNode.getLiteralValue();
 
-				if ( countValueObj instanceof Integer value ) {
-					return value.intValue();
-				}
-				else if ( countValueObj instanceof Long value ) {
-					return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
-				}
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
-				return null;
+			if ( countValueObj instanceof Integer value ) {
+				return value.intValue();
 			}
-			return null;
+			else if ( countValueObj instanceof Long value ) {
+				return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
+			}
+			else {
+				throw new UnsupportedOperationDueToRetrievalError( smResp.getRequest(), smResp.getFederationMember() );
+			}
 		}
 	}
 
