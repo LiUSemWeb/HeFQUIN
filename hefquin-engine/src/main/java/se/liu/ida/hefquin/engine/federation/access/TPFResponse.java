@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.base.data.Triple;
 public interface TPFResponse extends TriplesResponse
 {
 	/**
-	 * While {@link #getTriples()} returns an iterator over all triples contained in the given TPF response,this method
+	 * While {@link #getResponseData()} returns an iterator over all triples contained in the given TPF response,this method
 	 * here returns an iterator only over the matching triples that have been requested.
 	 *
 	 * @throws UnsupportedOperationDueToRetrievalError
