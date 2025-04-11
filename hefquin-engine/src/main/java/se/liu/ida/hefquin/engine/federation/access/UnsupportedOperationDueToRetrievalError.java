@@ -16,7 +16,7 @@ public class UnsupportedOperationDueToRetrievalError extends FederationAccessExc
 	public UnsupportedOperationDueToRetrievalError( final String message,
 	                                                final DataRetrievalRequest req,
 	                                                final FederationMember fm ) {
-		super( message, req,  fm );
+		super( message, req, fm );
 	}
 
 	public UnsupportedOperationDueToRetrievalError( final Throwable cause,

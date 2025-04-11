@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -38,29 +39,30 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	protected final void _execute( final IntermediateResultElementSink sink,
 	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		TPFResponse currentPage = null;
-		while ( currentPage == null || ! isLastPage(currentPage) ) {
-			// create the request for the next page (which is the first page if currentPage is null)
-			final PageReqType pageRequest = createPageRequest(currentPage);
+		try {
+			TPFResponse currentPage = null;
+			while ( currentPage == null || ! isLastPage( currentPage ) ) {
+				// create the request for the next page (which is the first page if currentPage is null)
+				final PageReqType pageRequest = createPageRequest( currentPage );
 
-			numberOfPageRequestsIssued++;
+				numberOfPageRequestsIssued++;
 
-			// perform the page request
-			try {
+				// perform the page request
+
 				currentPage = performPageRequest( pageRequest, execCxt.getFederationAccessMgr() );
-			}
-			catch ( final FederationAccessException e ) {
-				throw new ExecOpExecutionException("Issuing a page request caused an exception.", e, this);
-			}
+				// update stats
+				final int payloadSize = currentPage.getPayloadSize();
+				totalNumberOfMatchingTriplesRetrieved += payloadSize;
+				if ( minNumberOfMatchingTriplesPerPage > payloadSize )
+					minNumberOfMatchingTriplesPerPage = payloadSize;
+				if ( maxNumberOfMatchingTriplesPerPage < payloadSize )
+					maxNumberOfMatchingTriplesPerPage = payloadSize;
 
-			// update stats
-			final int payloadSize = currentPage.getPayloadSize();
-			totalNumberOfMatchingTriplesRetrieved += payloadSize;
-			if ( minNumberOfMatchingTriplesPerPage > payloadSize ) minNumberOfMatchingTriplesPerPage = payloadSize;
-			if ( maxNumberOfMatchingTriplesPerPage < payloadSize ) maxNumberOfMatchingTriplesPerPage = payloadSize;
-
-			// consume the matching triples retrieved via the page request
-			consumeMatchingTriples( currentPage.getPayload(), sink );
+				// consume the matching triples retrieved via the page request
+				consumeMatchingTriples( currentPage.getPayload(), sink );
+			}
+		} catch ( final FederationAccessException e ) {
+			throw new ExecOpExecutionException( "Issuing a page request caused an exception.", e, this );
 		}
 	}
 
@@ -77,7 +79,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 		return createPageRequest(nextPageURL);
 	}
 
-	protected boolean isLastPage( final TPFResponse response ) {
+	protected boolean isLastPage( final TPFResponse response ) throws UnsupportedOperationDueToRetrievalError {
 		// To check whether the given response is the last page of the TPF
 		// we simply consider the page-related metadata in the response. 
 		final Boolean isLastPage = response.isLastPage();

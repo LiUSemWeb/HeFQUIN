@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
 
 public class TPFRequestProcessorImplTest extends EngineTestBase
@@ -24,7 +25,6 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 	@Test
 	public void performRequestOnDBpedia_onePage() throws FederationAccessException {
 		if ( skipLiveWebTests ) { return; }
-
 		// setting up
 		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
 		final Node p = NodeFactory.createURI("http://dbpedia.org/property/name");
@@ -137,7 +137,9 @@ public class TPFRequestProcessorImplTest extends EngineTestBase
 		return resp;
 	}
 
-	protected void checkPayload( final TPFResponse resp, final Node s, final Node p, final Node o ) {
+	protected void checkPayload( final TPFResponse resp, final Node s, final Node p, final Node o )
+		throws UnsupportedOperationDueToRetrievalError
+	{
 		for ( final Triple t : resp.getPayload() ) {
 			final org.apache.jena.graph.Triple tt = t.asJenaTriple();
 			if ( s.isConcrete() ) { assertTrue( tt.getSubject().matches(s) ); }

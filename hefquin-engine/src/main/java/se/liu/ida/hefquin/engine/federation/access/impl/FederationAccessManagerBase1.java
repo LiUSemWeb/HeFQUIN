@@ -28,6 +28,7 @@ import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.response.CardinalityResponseImplWithoutCardinality;
@@ -161,28 +162,28 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static class FunctionToObtainCardinalityResponseFromSolMapsResponse implements Function<SolMapsResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
-			final int cardinality = extractCardinality(smResp);
-			if ( cardinality < 0 )
+			try {
+				final Integer cardinality = extractCardinality( smResp );
+				return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
+			} catch ( UnsupportedOperationDueToRetrievalError e ) {
 				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
-			else
-				return new CardinalityResponseImpl(smResp, smResp.getRequest(), cardinality);
+			}
 		}
 
-		protected int extractCardinality( final SolMapsResponse smResp ) {
-			final Iterator<SolutionMapping> it = smResp.getSolutionMappings().iterator();
+		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
+			final Iterator<SolutionMapping> it = smResp.getResponseData().iterator();
 			final SolutionMapping sm = it.next();
-			final Node countValueNode = sm.asJenaBinding().get(countVar);
+			final Node countValueNode = sm.asJenaBinding().get( countVar );
 			final Object countValueObj = countValueNode.getLiteralValue();
 
-			if ( countValueObj instanceof Integer ) {
-				return ( (Integer) countValueObj ).intValue();
+			if ( countValueObj instanceof Integer value ) {
+				return value.intValue();
 			}
-			else if ( countValueObj instanceof Long ) {
-				final long l = ( (Long) countValueObj ).longValue();
-				return ( Integer.MAX_VALUE < l ) ? Integer.MAX_VALUE : (int) l;
+			else if ( countValueObj instanceof Long value ) {
+				return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
 			}
 			else {
-				return -1;
+				throw new UnsupportedOperationDueToRetrievalError( smResp.getRequest(), smResp.getFederationMember() );
 			}
 		}
 	}
