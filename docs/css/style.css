@@ -101,8 +101,10 @@ nav {
 main {
     min-height: 100%;
     padding: 30px;
-    max-width: 800px;
-    margin: auto;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-grow: 1;
 }
 
 main a {
