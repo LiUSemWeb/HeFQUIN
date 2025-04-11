@@ -1,7 +1,7 @@
 # Compilation and build artifacts
 *.class
 target/
-docs/
+#docs/
 
 # Log file
 *.log
