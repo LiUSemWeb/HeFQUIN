@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - API</title>
+
+    <script src="../redoc/redoc.standalone.js"> </script>
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        main { max-width: unset; }
+    </style>
+
+    <script>
+        window.addEventListener('load', init);
+
+        function init() {
+            // Code for the first function
+            const options = {
+                theme: {
+                    typography: {
+                        fontSize: "16px",
+                        code: {
+                            fontSize: "14px"
+                        }
+                    },
+                    "sidebar": {
+                        "backgroundColor": "#f5faff"
+                    }
+                }
+            };
+
+            Redoc.init('hefquin-api.yml', options, document.getElementById("redoc-container"))
+        }
+    </script>
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <div id="redoc-container"></div>
+    </main>
+
+    <div id="footer"></div>
+</body>
+</html>
