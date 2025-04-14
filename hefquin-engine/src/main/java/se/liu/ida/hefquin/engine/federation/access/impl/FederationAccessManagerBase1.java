@@ -183,7 +183,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				return (Integer.MAX_VALUE < value) ? Integer.MAX_VALUE : (int) value.longValue();
 			}
 			else {
-				throw new UnsupportedOperationDueToRetrievalError( smResp.getRequest(), smResp.getFederationMember() );
+				throw new IllegalArgumentException( "Expected literal to be of type Integer or Long but was " + countValueObj.getClass() );
 			}
 		}
 	}
