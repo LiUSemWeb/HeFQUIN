@@ -83,17 +83,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 			// attach the processing of the response obtained for the request
 			final MyResponseProcessor respProc = createResponseProcessor(sm, sink);
-			futures[i] = futureResponse.thenAccept( resp -> {
-				// check if response is an error
-				if ( resp.isError() ) {
-					// wrap as CompletionException to propagate UnsupportedOperationDueToRetrievalError
-					throw new CompletionException(
-						new UnsupportedOperationDueToRetrievalError( resp.getErrorDescription(),
-						                                             resp.getRequest(),
-						                                             resp.getFederationMember() ) );
-				}
-				respProc.accept( resp );
-			} );
+			futures[i] = futureResponse.thenAccept(respProc);
 			++i;
 		}
 
