@@ -41,7 +41,7 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 				sink.send( it.next() );
 			}
 		} catch ( UnsupportedOperationDueToRetrievalError e ) {
-			throw new ExecOpExecutionException( e.getMessage(), e, this );
+			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
 		}
 	}
 
