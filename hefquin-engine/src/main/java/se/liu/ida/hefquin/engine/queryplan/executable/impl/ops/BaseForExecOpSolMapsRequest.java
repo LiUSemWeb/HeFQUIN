@@ -31,18 +31,33 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 		final SolMapsResponse response;
 		try {
 			response = performRequest( execCxt.getFederationAccessMgr() );
-			timeAfterResponse = System.currentTimeMillis();
-			solMapsRetrieved = response.getSize();
-			process( response, sink );
-		} catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
 		}
+		catch ( final FederationAccessException e ) {
+			throw new ExecOpExecutionException("Performing the request caused an exception.", e, this);
+		}
+
+		timeAfterResponse = System.currentTimeMillis();
+		try {
+			solMapsRetrieved = response.getSize();
+		} catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+
+		process(response, sink);
 	}
 
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
-		throws UnsupportedOperationDueToRetrievalError
+		throws ExecOpExecutionException
 	{
-		for ( SolutionMapping sm : response.getResponseData() ) {
+		final Iterable<SolutionMapping> solutionMappings;;
+		try {
+			solutionMappings = response.getResponseData();
+		}
+		catch ( final UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+
+		for ( SolutionMapping sm : solutionMappings ) {
 			numberOfOutputMappingsProduced++;
 			sink.send( sm );
 		}
