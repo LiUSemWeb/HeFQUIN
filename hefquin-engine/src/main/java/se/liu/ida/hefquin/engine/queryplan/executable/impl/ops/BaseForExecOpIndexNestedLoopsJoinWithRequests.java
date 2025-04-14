@@ -133,25 +133,15 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 		@Override
 		public void accept( final RespType response ) {
-			// if the response is an error, we want to create an ExecOpExecutionException
-			// and pass this exception to recordExceptionCaughtDuringExecution
-			if( response.isError() ){
-				final UnsupportedOperationDueToRetrievalError cause = new UnsupportedOperationDueToRetrievalError(
-						response.getErrorDescription(),
-						response.getRequest(),
-						response.getFederationMember() );
-				final ExecOpExecutionException e = new ExecOpExecutionException( cause, op );
-				recordExceptionCaughtDuringExecution( e );
-				return;
-			}
-
-			// if extractSolMaps still throws an UnsupportedOperationDueToRetrievalError, there must be some bug
-			// somewhere in this part of the code base, and we throw an IllegalStateException
+			// if extractSolMaps throws an UnsupportedOperationDueToRetrievalError, we want to create an
+			// ExecOpExecutionException and pass this exception to recordExceptionCaughtDuringExecution
 			final Iterable<SolutionMapping> solutionMappings;
 			try {
 				solutionMappings = extractSolMaps( response );
 			} catch( UnsupportedOperationDueToRetrievalError e ) {
-				throw new IllegalStateException( e );
+				final ExecOpExecutionException ex = new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, op );
+				recordExceptionCaughtDuringExecution( ex );
+				return;
 			}
 
 			for ( final SolutionMapping fetchedSM : solutionMappings ) {
