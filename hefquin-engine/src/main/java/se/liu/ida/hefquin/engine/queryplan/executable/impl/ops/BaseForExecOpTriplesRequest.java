@@ -34,14 +34,16 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
 		final TriplesResponse response = performRequest( execCxt.getFederationAccessMgr() );
-
+		final Iterable<Triple> triples;
 		try {
-			final Iterator<? extends SolutionMapping> it = convert( response.getResponseData() );
-			while ( it.hasNext() ) {
-				sink.send( it.next() );
-			}
+			triples = response.getResponseData();
 		} catch ( UnsupportedOperationDueToRetrievalError e ) {
 			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+
+		final Iterator<? extends SolutionMapping> it = convert( triples );
+		while ( it.hasNext() ) {
+			sink.send( it.next() );
 		}
 	}
 
