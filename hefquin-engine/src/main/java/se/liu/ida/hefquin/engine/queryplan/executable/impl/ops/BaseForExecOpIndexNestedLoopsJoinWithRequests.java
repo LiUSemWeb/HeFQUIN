@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -16,6 +15,7 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -82,7 +82,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 			}
 
 			// attach the processing of the response obtained for the request
-			final MyResponseProcessor respProc = createResponseProcessor(sm, sink);
+			final MyResponseProcessor respProc = createResponseProcessor( sm, sink, this );
 			futures[i] = futureResponse.thenAccept(respProc);
 			++i;
 		}
@@ -110,7 +110,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	protected abstract ReqType createRequest( SolutionMapping sm );
 
-	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink );
+	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink, ExecutableOperator op );
 
 	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
@@ -121,22 +121,42 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	{
 		protected final SolutionMapping sm;
 		protected final IntermediateResultElementSink sink;
+		protected final ExecutableOperator op;
 
 		public MyResponseProcessor( final SolutionMapping sm,
-		                            final IntermediateResultElementSink sink ) {
+		                            final IntermediateResultElementSink sink,
+		                            final ExecutableOperator op ) {
 			this.sm = sm;
 			this.sink = sink;
+			this.op = op;
 		}
 
 		@Override
 		public void accept( final RespType response ) {
+			// if the response is an error, we want to create an ExecOpExecutionException
+			// and pass this exception to recordExceptionCaughtDuringExecution
+			if( response.isError() ){
+				final UnsupportedOperationDueToRetrievalError cause = new UnsupportedOperationDueToRetrievalError(
+						response.getErrorDescription(),
+						response.getRequest(),
+						response.getFederationMember() );
+				final ExecOpExecutionException e = new ExecOpExecutionException( cause, op );
+				recordExceptionCaughtDuringExecution( e );
+				return;
+			}
+
+			// if extractSolMaps still throws an UnsupportedOperationDueToRetrievalError, there must be some bug
+			// somewhere in this part of the code base, and we throw an IllegalStateException
+			final Iterable<SolutionMapping> solutionMappings;
 			try {
-				for ( final SolutionMapping fetchedSM : extractSolMaps(response) ) {
-					final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
-					sink.send(out);
-				}
-			} catch (UnsupportedOperationDueToRetrievalError e) {
-				// intentionally do nothing (error should be caught before 'accept' is called)
+				solutionMappings = extractSolMaps( response );
+			} catch( UnsupportedOperationDueToRetrievalError e ) {
+				throw new IllegalStateException( e );
+			}
+
+			for ( final SolutionMapping fetchedSM : solutionMappings ) {
+				final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
+				sink.send( out );
 			}
 		}
 
