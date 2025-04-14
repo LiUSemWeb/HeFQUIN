@@ -25,15 +25,15 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 	}
 
 	@Override
-	protected final void _execute( final IntermediateResultElementSink sink,
-	                               final ExecutionContext execCxt ) throws ExecOpExecutionException
+	protected final void _execute( final IntermediateResultElementSink sink, final ExecutionContext execCxt )
+		throws ExecOpExecutionException
 	{
 		final SolMapsResponse response;
 		try {
 			response = performRequest( execCxt.getFederationAccessMgr() );
 		}
 		catch ( final FederationAccessException e ) {
-			throw new ExecOpExecutionException("Performing the request caused an exception.", e, this);
+			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
 		}
 
 		timeAfterResponse = System.currentTimeMillis();
@@ -75,10 +75,10 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "requestExecTime",  Long.valueOf(timeAtExecEnd-timeAfterResponse) );
-		s.put( "responseProcTime", Long.valueOf(timeAfterResponse-timeAtExecStart) );
-		s.put( "solMapsRetrieved", Long.valueOf(solMapsRetrieved) );
-		s.put( "numberOfOutputMappingsProduced", Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "requestExecTime",                Long.valueOf( timeAtExecEnd - timeAfterResponse ) );
+		s.put( "responseProcTime",               Long.valueOf( timeAfterResponse - timeAtExecStart ) );
+		s.put( "solMapsRetrieved",               Long.valueOf( solMapsRetrieved ) );
+		s.put( "numberOfOutputMappingsProduced", Long.valueOf( numberOfOutputMappingsProduced ) );
 		return s;
 	}
 }
