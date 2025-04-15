@@ -96,12 +96,13 @@ curl -X POST http://localhost:8080/sparql \
                 <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the
                     response body contains the query result, represented using the specified media type.</li>
                 <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was
-                    empty.</li>
+                    empty or invalid.</li>
                 <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.
                 </li>
                 <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> value is
                     not supported.</li>
                 <li><code>500 Internal Server Error</code> - Returned if an error occurs during query execution.</li>
+                <li><code>501 Not Implemented</code> - Returned if the given query uses a feature that is not supported by HeFQUIN.</li>
             </ul>
         </section>
 
@@ -133,12 +134,13 @@ curl -X POST http://localhost:8080/query-inspect \
                 <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the
                     response body contains the query processing details as a JSON object (see below).</li>
                 <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was
-                    empty.</li>
+                    empty or invalid.</li>
                 <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.
                 </li>
                 <li><code>415 Unsupported Media Type</code> - Returned if the given <code>Content-Type</code> value is
                     not supported.</li>
                 <li><code>500 Internal Server Error</code> - Returned if an error occurs during query execution.</li>
+                <li><code>501 Not Implemented</code> - Returned if the given query uses a feature that is not supported by HeFQUIN.</li>
             </ul>
             <p>
                 If the request is valid, the response will include:
