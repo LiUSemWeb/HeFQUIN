@@ -73,18 +73,12 @@ SELECT * WHERE {
                 With one exception (see below), HeFQUIN expects all <code>SERVICE</code> clauses to be of this form (rather than having a variable in place of the service IRI). The IRIs to be used as such service IRIs are the IRIs specified as a value of either the <code>endpointAddress</code> property or the <code>exampleFragmentAddress</code> property of the federation members mentioned in the <a href="federation_description.html">description of your federation</a>. If your query mentions a service IRI that is not the <code>endpointAddress</code> or the <code>exampleFragmentAddress</code> of any federation member in the federation to be queried, then the HeFQUIN query planner returns an error.
             </p>
             <p>
-                <b>Providing the service IRIs via a <code>VALUES</code> clause.</b> The only case in which the <code>SERVICE</code> clauses may have a variable in place of a service IRI is in queries in which a <code>VALUES</code> clause is used to specify the service IRIs. In particular, such a query must satisfy the following conditions:
+                <b>Providing the service IRIs via <code>VALUES</code> clauses.</b> The only case in which the <code>SERVICE</code> clauses may have a variable in place of a service IRI is in queries in which <code>VALUES</code> clauses are used to specify the service IRIs. In particular, such a query must satisfy the following conditions:
             </p>
             <ul>
-                <li>The <code>WHERE</code> clause of the query must begin with a <code>VALUES</code> clause.</li>
-                <li>None of the variables bound by this <code>VALUES</code> clause is mentioned anywhere else in the query pattern except as the variable of a <code>SERVICE</code> clause.</li>
-                <li>The <code>VALUES</code> clause must mention every variable that is a variable of a <code>SERVICE</code> clause.</li>
-                <li>The query pattern must contain at least one <code>SERVICE</code> clause with a variable.</li>
-                <li>The <code>WHERE</code> clause of the query must not contain any other <code>VALUES</code> clause.</li>
+                <li>For every <code>SERVICE</code> clause with a variable, the query pattern must contain a <code>VALUES</code> clause with that variable somewhere before the <code>SERVICE</code> clause. Moreover, if there are other <code>VALUES</code> clauses in between, these must all come directly after the <code>VALUES</code> clause with the variable of the <code>SERVICE</code> clause.</li>
+                <li>None of the variables bound by the <code>VALUES</code> clauses is mentioned anywhere else in the query pattern except as the variable of a <code>SERVICE</code> clause.</li>
             </ul>
-            <p>
-                Given such a query, HeFQUIN rewrites the query pattern of the query by applying the solution mappings of the <code>VALUES</code> clause to the <code>SERVICE</code> clauses and, then, removing the <code>VALUES</code> clause. If the <code>VALUES</code> clause contains multiple solution mappings, then the group of <code>SERVICE</code> clauses is copied for each of these solution mappings, and the resulting groups are combined via <code>UNION</code>. Additionally, in any of the two cases (just one solution mapping in the <code>VALUES</code> clause or multiple), <code>BIND</code> clauses are added to still capture the bindings for the variables of the <code>VALUES</code> clause.
-            </p>
             <p>
                 As an example, consider the following query.
             </p>
@@ -99,25 +93,30 @@ SELECT * WHERE {
   SERVICE ?s2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
 }</code></pre>
             <p>
-                This query is rewritten as follows.
+                The <code>VALUES</code> clause may also be split up in order to avoid a combinatorial blow-up of possible combinations. For instance, the previous example query may also be provided in the following form.
             </p>
             <pre><code class="language-sparql">PREFIX ex: &lt;http://example.org/>
 
 SELECT * WHERE {
-  {
-    SERVICE ex:endpoint1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
-    SERVICE ex:endpoint2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
-    BIND (?s1 AS ex:endpoint1)
-    BIND (?s2 AS ex:endpoint2)
-  }
-  UNION
-  {
-    SERVICE ex:endpoint1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
-    SERVICE ex:endpoint3 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
-    BIND (?s1 AS ex:endpoint1)
-    BIND (?s2 AS ex:endpoint3)
-  }
+  VALUES ?s1 { ex:endpoint1 }
+  VALUES ?s2 { ex:endpoint2 ex:endpoint3 }
+  SERVICE ?s1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
+  SERVICE ?s2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
 }</code></pre>
+            <p>
+                When using multiple <code>VALUES</code> clauses, it is not even necessary to place them all at the beginning of the <code>WHERE</code> clause. Instead, some of them may be moved closer to the <code>SERVICE</code> clause(s) in which the variables that they introduce are used as the service variable. For instance, the example query above may also be provided in the following form.
+            </p>
+            <pre><code class="language-sparql">PREFIX ex: &lt;http://example.org/>
+
+SELECT * WHERE {
+  VALUES ?s1 { ex:endpoint1 }
+  SERVICE ?s1 { .. some pattern (that neither mentions ?s1 nor ?s2) .. }
+  VALUES ?s2 { ex:endpoint2 ex:endpoint3 }
+  SERVICE ?s2 { .. also some pattern (that also doesn't mention ?s1 or ?s2) .. }
+}</code></pre>
+            <p>
+                However, for queries given in this form (with <code>VALUES</code> clauses in between other patterns), there is one limitation: HeFQUIN does not support <code>SERVICE</code> clauses with a variable that is not bound by the <code>VALUES</code> clause(s) that come closest before the <code>SERVICE</code> clause. For instance, for the previous example query it is not supported to add another <code>SERVICE</code> clause with variable <code>?s1</code> after the second <code>VALUES</code> clause; instead, such a <code>SERVICE</code> clause would need to be placed next to the existing <code>SERVICE</code> clause with variable <code>?s1</code>.
+            </p>
 
         </section>
 
