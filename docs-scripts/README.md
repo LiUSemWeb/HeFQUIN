@@ -1,7 +1,7 @@
 ## docs-scripts
 
-This script automates the management and documentation of RDF vocabularies for the HeFQUIN project. The vocabulary files and their corresponding documentation are published via the GitHub Pages action.
-They are accessible at the following URLs:
+This script automates the management and documentation of RDF vocabularies for the HeFQUIN project. The script is called on publish to `gh-pages` as part of the `publish_docs.yml` workflow.
+The vocabulary files and their corresponding documentation are published via the GitHub Pages action. They are accessible at the following URLs:
 
 - `https://liusemweb.github.io/HeFQUIN/vocab/<name>/<version>/` (direct access to the files)
 - `https://w3id.org/hefquin/<name>/<version>/` (persistent URIs that redirect to the files)
