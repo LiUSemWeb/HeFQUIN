@@ -25,6 +25,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
+import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.UnsupportedQueryException;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
@@ -134,7 +136,16 @@ public class HeFQUINServletInspect extends HttpServlet
 			response.setContentType( mimeType );
 			response.getWriter().write( result.toString() );
 
-		} catch ( Exception e ) {
+		}
+		catch ( final IllegalQueryException e ) {
+			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
+			return;
+		}
+		catch ( final UnsupportedQueryException e ) {
+			writeJsonError( response, 501, new JsonString( e.getMessage() ) );
+			return;
+		}
+		catch ( final Exception e ) {
 			logger.error( "Query execution failed", e );
 			writeJsonError( response, 500, new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
 			return;
@@ -148,7 +159,9 @@ public class HeFQUINServletInspect extends HttpServlet
 	 * @param mimeType    the MIME type for the response format
 	 * @return the inspection result as a JSON object
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType ) {
+	private static JsonObject execute( final String queryString, final String mimeType )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		final Query query = QueryFactory.create( queryString );
 		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();

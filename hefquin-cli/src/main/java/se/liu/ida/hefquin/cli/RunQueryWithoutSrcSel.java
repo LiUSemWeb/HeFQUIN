@@ -25,6 +25,8 @@ import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
+import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.UnsupportedQueryException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
 /**
@@ -141,7 +143,18 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		try {
 			statsAndExceptions = e.executeQuery( query, resFmt, out );
-		} catch ( final Exception ex ) {
+		}
+		catch ( final IllegalQueryException ex ) {
+			System.out.flush();
+			System.err.println( "The given query is invalid:" );
+			System.err.println( ex.getMessage() );
+		}
+		catch ( final UnsupportedQueryException ex ) {
+			System.out.flush();
+			System.err.println( "The given query is not supported by HeFQUIN:" );
+			System.err.println( ex.getMessage() );
+		}
+		catch ( final Exception ex ) {
 			System.out.flush();
 			System.err.println( ex.getMessage() );
 			ex.printStackTrace( System.err );

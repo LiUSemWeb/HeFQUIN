@@ -60,7 +60,9 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 	@Override
 	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
 	                                                           final ResultsFormat outputFormat,
-	                                                           final PrintStream output ) {
+	                                                           final PrintStream output )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		ValuesServiceQueryResolver.expandValuesPlusServicePattern(query);
 
 		final DatasetGraph dsg = DatasetGraphFactory.createGeneral();

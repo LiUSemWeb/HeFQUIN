@@ -17,17 +17,84 @@ public interface HeFQUINEngine
 	 */
 	void integrateIntoJena();
 
-	Pair<QueryProcStats, List<Exception>> executeQuery( Query query, ResultsFormat outputFormat, PrintStream output );
+	/**
+	 * Executes the given query, prints the result to the given output (in
+	 * the given format), and returns a statistics collected during the query
+	 * execution process, together with a list of exception that were caught
+	 * during query execution (if any).
+	 *
+	 * An {@link UnsupportedQueryException} is thrown if the given query uses
+	 * features that are not supported by HeFQUIN; the message of the exception
+	 * describes the specific limitation and can be passed directly to the user.
+	 *
+	 * An {@link IllegalQueryException} is thrown if the given query is
+	 * invalid; the message of the exception describes the issue and can
+	 * be passed directly to the user.
+	 */
+	Pair<QueryProcStats, List<Exception>> executeQuery( Query query,
+	                                                    ResultsFormat outputFormat,
+	                                                    PrintStream output )
+		throws UnsupportedQueryException, IllegalQueryException;
 
-	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query, ResultsFormat outputFormat ) {
+	/**
+	 * Executes the given query, prints the result to stdout (in the given
+	 * format), and returns a statistics collected during the query execution
+	 * process, together with a list of exception that were caught during
+	 * query execution (if any).
+	 *
+	 * An {@link UnsupportedQueryException} is thrown if the given query uses
+	 * features that are not supported by HeFQUIN; the message of the exception
+	 * describes the specific limitation and can be passed directly to the user.
+	 *
+	 * An {@link IllegalQueryException} is thrown if the given query is
+	 * invalid; the message of the exception describes the issue and can
+	 * be passed directly to the user.
+	 */
+	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query,
+	                                                            ResultsFormat outputFormat )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		return executeQuery(query, outputFormat, System.out);
 	}
 
-	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query, PrintStream output ) {
+	/**
+	 * Executes the given query, prints the result in text format to the given
+	 * output, and returns a statistics collected during the query execution
+	 * process, together with a list of exception that were caught during query
+	 * execution (if any).
+	 *
+	 * An {@link UnsupportedQueryException} is thrown if the given query uses
+	 * features that are not supported by HeFQUIN; the message of the exception
+	 * describes the specific limitation and can be passed directly to the user.
+	 *
+	 * An {@link IllegalQueryException} is thrown if the given query is
+	 * invalid; the message of the exception describes the issue and can
+	 * be passed directly to the user.
+	 */
+	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query,
+	                                                            PrintStream output )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		return executeQuery(query, ResultsFormat.FMT_TEXT, output);
 	}
 
-	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query ) {
+	/**
+	 * Executes the given query, prints the result in text format to stdout,
+	 * and returns a statistics collected during the query execution process,
+	 * together with a list of exception that were caught during query
+	 * execution (if any).
+	 *
+	 * An {@link UnsupportedQueryException} is thrown if the given query uses
+	 * features that are not supported by HeFQUIN; the message of the exception
+	 * describes the specific limitation and can be passed directly to the user.
+	 *
+	 * An {@link IllegalQueryException} is thrown if the given query is
+	 * invalid; the message of the exception describes the issue and can
+	 * be passed directly to the user.
+	 */
+	default Pair<QueryProcStats, List<Exception>> executeQuery( Query query )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		return executeQuery(query, ResultsFormat.FMT_TEXT);
 	}
 
