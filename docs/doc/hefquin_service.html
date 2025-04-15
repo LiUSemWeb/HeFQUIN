@@ -131,7 +131,7 @@ curl -X POST http://localhost:8080/query-inspect \
             </p>
             <ul>
                 <li><code>200 OK</code> - Returned if the query has been executed successfully. In this case, the
-                    response body contains the query result, represented using the specified media type.</li>
+                    response body contains the query processing details as a JSON object (see below).</li>
                 <li><code>400 Bad Request</code> - Returned if no query was provided in the request or the query was
                     empty.</li>
                 <li><code>406 Not Acceptable</code> - Returned if the given <code>Accept</code> value is not supported.
