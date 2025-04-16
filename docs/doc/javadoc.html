@@ -11,52 +11,99 @@
     <script src="../js/script.js"></script>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        main { max-width: unset; }
+        main {
+            max-width: unset;
+        }
     </style>
+    <script>
+        function constructJavadocUrl(page, fragment) {
+            let path = page.replace(/\./g, "/") + ".html";
+            if(fragment){
+                path += `#${fragment}`;
+            }
+            return "../javadoc/latest/" + path;
+        }
+
+        function parseJavadocUrl(url) {
+            const [path, fragment] = url.href.split('#');
+            const basePath = path.replace(/^.*\/javadoc\/latest\//, "");
+            const parts = basePath.split("/");
+            const fileName = parts.pop().split(".")[0]; // e.g., Entity.html -> Entity
+            const dotPath = parts.length === 0 ? fileName : parts.join(".") + "." + fileName;
+            return [dotPath, fragment];
+        }
+
+        function syncURLWithIframeLocation(url) {
+            const [page, fragment] = parseJavadocUrl(url);
+            const updatedUrl = new URL(window.location.href);
+            updatedUrl.searchParams.set("page", page);
+            updatedUrl.searchParams.delete("fragment");
+            if(fragment){
+                updatedUrl.searchParams.set("fragment", fragment);
+            }
+            // Update the URL in the browser without reloading the page
+            window.history.replaceState(null, "", updatedUrl);
+        }
+
+        function initializePageFromURL() {
+            const params = new URL(window.location.href).searchParams;
+            const page = params.get("page");
+            const fragment = params.get("fragment");
+            if (page) {
+                document.getElementById("javadocFrame").src = constructJavadocUrl(page, fragment);
+            }
+        }
+
+        window.addEventListener("load", initializePageFromURL);
+    </script>
 </head>
 
 <body>
     <div id="header"></div>
 
     <main>
-        <iframe id="javadocFrame" src="../javadoc/latest/index.html" width="100%" height="100%" style="border: none;"></iframe>
+        <iframe id="javadocFrame" src="../javadoc/latest/index.html" width="100%" height="100%"
+            style="border: none;"></iframe>
     </main>
 
     <div id="footer"></div>
     <script>
         const iframe = document.getElementById("javadocFrame");
-        iframe.onload = function () {
+        const page = new URL(window.location.href).searchParams.get("page");
+        const fragment = new URL(window.location.href).searchParams.get("fragment");
+
+        if (page) {
+            iframe.src = constructJavadocUrl(page, fragment);
+        }
+
+        iframe.onload = () => {
             const root = document.documentElement;
             const styles = getComputedStyle(root);
-            const primaryColor = styles.getPropertyValue('--header-bg-color').trim();
+            const primaryColor = styles.getPropertyValue("--header-bg-color").trim();
 
             const doc = iframe.contentDocument;
-            const style = doc.createElement('style');
+            const style = doc.createElement("style");
             // use same primary color as HeFQUIN website
             style.textContent = `
-            :root {
-                --navbar-background-color: ${primaryColor};
-            }
-            `;
-            doc.head.appendChild(style);
-
-            // open external links in new tabs
-            doc.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    const href = link.getAttribute('href');
-                    
-                    // Create an absolute URL for comparison
-                    const linkUrl = new URL(href, document.baseURI);
-                    const currentOrigin = window.location.origin;
-
-                    // If external link
-                    if (linkUrl.origin !== currentOrigin) {
-                        e.preventDefault();
-                        window.open(linkUrl.href, '_blank');
+                    :root {
+                        --navbar-background-color: ${primaryColor};
                     }
-                });
-            });
+                `;
+            doc.head.appendChild(style);
+            iframe.contentWindow.addEventListener("hashchange", handleIframeNavigationChange);
         };
+
+        iframe.addEventListener("load", handleIframeNavigationChange);
+        
+        function handleIframeNavigationChange(){
+            const url = new URL(iframe.contentWindow.location.href);
+            if (window.location.origin !== url.origin) {
+                window.open(url.href, "_blank");
+            } else {
+                window.parent.syncURLWithIframeLocation(url);
+            }
+        }
     </script>
 </body>
+
 </html>
