@@ -8,7 +8,8 @@ import se.liu.ida.hefquin.base.data.Triple;
 public interface TPFResponse extends TriplesResponse
 {
 	/**
-	 * Returns the number of triples contained in this response.
+	 * Returns the number of triples contained in this response,
+	 * which considers both the payload and the metadata.
 	 */
 	default int getSize() throws UnsupportedOperationDueToRetrievalError {
 		return getPayloadSize() + getMetadataSize();
