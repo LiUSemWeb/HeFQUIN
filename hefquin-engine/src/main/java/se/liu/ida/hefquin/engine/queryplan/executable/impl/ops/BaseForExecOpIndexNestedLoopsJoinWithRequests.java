@@ -13,7 +13,9 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -73,14 +75,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 			final CompletableFuture<RespType> futureResponse;
 			try {
-				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() ); 
+				futureResponse = issueRequest( req, execCxt.getFederationAccessMgr() );
 			}
 			catch ( final FederationAccessException e ) {
 				throw new ExecOpExecutionException("Issuing a request caused an exception.", e, this);
 			}
 
 			// attach the processing of the response obtained for the request
-			final MyResponseProcessor respProc = createResponseProcessor(sm, sink);
+			final MyResponseProcessor respProc = createResponseProcessor( sm, sink, this );
 			futures[i] = futureResponse.thenAccept(respProc);
 			++i;
 		}
@@ -108,7 +110,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	protected abstract ReqType createRequest( SolutionMapping sm );
 
-	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink );
+	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink, ExecutableOperator op );
 
 	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
@@ -119,22 +121,36 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	{
 		protected final SolutionMapping sm;
 		protected final IntermediateResultElementSink sink;
+		protected final ExecutableOperator op;
 
 		public MyResponseProcessor( final SolutionMapping sm,
-		                            final IntermediateResultElementSink sink ) {
+		                            final IntermediateResultElementSink sink,
+		                            final ExecutableOperator op ) {
 			this.sm = sm;
 			this.sink = sink;
+			this.op = op;
 		}
 
 		@Override
 		public void accept( final RespType response ) {
-			for ( final SolutionMapping fetchedSM : extractSolMaps(response) ) {
+			// if extractSolMaps throws an UnsupportedOperationDueToRetrievalError, we want to create an
+			// ExecOpExecutionException and pass this exception to recordExceptionCaughtDuringExecution
+			final Iterable<SolutionMapping> solutionMappings;
+			try {
+				solutionMappings = extractSolMaps( response );
+			} catch( UnsupportedOperationDueToRetrievalError e ) {
+				final ExecOpExecutionException ex = new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, op );
+				recordExceptionCaughtDuringExecution( ex );
+				return;
+			}
+
+			for ( final SolutionMapping fetchedSM : solutionMappings ) {
 				final SolutionMapping out = SolutionMappingUtils.merge( sm, fetchedSM );
-				sink.send(out);
+				sink.send( out );
 			}
 		}
 
-		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response );
+		protected abstract Iterable<SolutionMapping> extractSolMaps( RespType response ) throws UnsupportedOperationDueToRetrievalError;
 	}
 
 }

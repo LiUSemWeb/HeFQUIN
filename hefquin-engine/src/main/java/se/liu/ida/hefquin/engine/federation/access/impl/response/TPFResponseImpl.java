@@ -12,7 +12,6 @@ import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetr
 
 public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>> implements TPFResponse
 {
-	protected final List<Triple> matchingTriples;
 	protected final List<Triple> metadataTriples;
 	protected final Integer cardEstimate;
 	protected final String nextPageURL;
@@ -37,10 +36,8 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final Date requestStartTime ) {
 		super( matchingTriples, fm, request, requestStartTime );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = null;
@@ -67,10 +64,8 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final Date retrievalEndTime ) {
 		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = null;
@@ -98,11 +93,9 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final Date requestStartTime ) {
 		super( matchingTriples, fm, request, requestStartTime );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 		assert tripleCount >= 0;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = Integer.valueOf( tripleCount );
@@ -131,11 +124,9 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final Date retrievalEndTime ) {
 		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 		assert tripleCount >= 0;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = Integer.valueOf( tripleCount );
@@ -165,10 +156,8 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final String errorDescription ) {
 		super( matchingTriples, fm, request, requestStartTime, errorStatusCode, errorDescription );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = null;
@@ -199,10 +188,8 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final String errorDescription ) {
 		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = null;
@@ -234,11 +221,9 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final String errorDescription ) {
 		super( matchingTriples, fm, request, requestStartTime, errorStatusCode, errorDescription );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 		assert tripleCount >= 0;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = Integer.valueOf( tripleCount );
@@ -271,44 +256,17 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	                        final String errorDescription ) {
 		super( matchingTriples, fm, request, requestStartTime, retrievalEndTime, errorStatusCode, errorDescription );
 
-		assert matchingTriples != null;
 		assert metadataTriples != null;
 		assert tripleCount >= 0;
 
-		this.matchingTriples = matchingTriples;
 		this.metadataTriples = metadataTriples;
 		this.nextPageURL = nextPageURL; // may be null
 		this.cardEstimate = Integer.valueOf( tripleCount );
 	}
 
 	@Override
-	public Iterable<Triple> getTriples() {
-		return new ConcatenatingIterable<Triple>( matchingTriples, metadataTriples );
-	}
-
-	@Override
-	public int getSize() {
-		return matchingTriples.size() + metadataTriples.size();
-	}
-
-	@Override
-	public Iterable<Triple> getPayload() {
-		return matchingTriples;
-	}
-
-	@Override
-	public int getPayloadSize() {
-		return matchingTriples.size();
-	}
-
-	@Override
 	public Iterable<Triple> getMetadata() {
 		return metadataTriples;
-	}
-
-	@Override
-	public int getMetadataSize() {
-		return metadataTriples.size();
 	}
 
 	@Override
@@ -326,11 +284,27 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 		return cardEstimate;
 	}
 
+	/**
+	 * Returns an iterator over all triples contained in the TPF response, concatenating the payload
+	 * and metadata into a single iterable.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError
+	 */
 	@Override
 	public Iterable<Triple> getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( isError() ) {
 			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
 		}
-		return new ConcatenatingIterable<Triple>( matchingTriples, metadataTriples );
+		return new ConcatenatingIterable<Triple>( getPayload(), getMetadata() );
+	}
+
+	/**
+	 * Returns an iterator over the matched triples in the TPF response.
+	 *
+	 * @throws UnsupportedOperationDueToRetrievalError
+	 */
+	@Override
+	public Iterable<Triple> getPayload() throws UnsupportedOperationDueToRetrievalError {
+		return super.getResponseData();
 	}
 }
