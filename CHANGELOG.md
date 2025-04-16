@@ -7,10 +7,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [unreleased]
 
 ### Added
-- nothing yet
-
+- Support for multiple VALUES clauses ([#417](https://github.com/LiUSemWeb/HeFQUIN/pull/417)).
+- Additional endpoint of the HeFQUIN service to request query processing details ([#406](https://github.com/LiUSemWeb/HeFQUIN/pull/406)).
 ### Changed
-- nothing yet
+- Refactoring of DataRetrievalResponse ([#409](https://github.com/LiUSemWeb/HeFQUIN/pull/409)).
 
 
 ## [0.0.5] - 2025-03-04
