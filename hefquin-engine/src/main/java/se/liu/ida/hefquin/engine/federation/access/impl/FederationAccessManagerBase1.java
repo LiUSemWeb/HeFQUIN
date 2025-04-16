@@ -162,12 +162,15 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static class FunctionToObtainCardinalityResponseFromSolMapsResponse implements Function<SolMapsResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final SolMapsResponse smResp ) {
+			final Integer cardinality;
 			try {
-				final Integer cardinality = extractCardinality( smResp );
-				return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
-			} catch ( UnsupportedOperationDueToRetrievalError e ) {
+				cardinality = extractCardinality( smResp );
+			}
+			catch ( final UnsupportedOperationDueToRetrievalError e ) {
 				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
 			}
+
+			return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
 		}
 
 		protected Integer extractCardinality( final SolMapsResponse smResp ) throws UnsupportedOperationDueToRetrievalError {
