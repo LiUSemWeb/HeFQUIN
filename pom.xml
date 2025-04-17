@@ -128,9 +128,6 @@
             <configuration>
               <outputDirectory>target/reports/${project.version}</outputDirectory>
               <failOnError>false</failOnError>
-              <additionalOptions>
-                <additionalOption>--no-module-directories</additionalOption>
-              </additionalOptions>
             </configuration>
           </execution>
           <execution>
