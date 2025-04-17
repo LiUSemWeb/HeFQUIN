@@ -47,11 +47,9 @@
 
         function initializePageFromURL() {
             const params = new URL(window.location.href).searchParams;
-            const page = params.get("page");
+            const page = params.get("page") || "index";
             const fragment = params.get("fragment");
-            if (page) {
-                document.getElementById("javadocFrame").src = constructJavadocUrl(page, fragment);
-            }
+            document.getElementById("javadocFrame").src = constructJavadocUrl(page, fragment);
         }
 
         window.addEventListener("load", initializePageFromURL);
