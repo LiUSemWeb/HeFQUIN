@@ -11,5 +11,5 @@ public interface CacheInvalidationPolicy<EntryType extends CacheEntry<ObjectType
 	 * Returns <code>true</code> if the given cache entry is still
 	 * valid according to this cache invalidation policy.
 	 */
-	boolean isStillValid(EntryType e);
+	boolean isStillValid( EntryType e );
 }

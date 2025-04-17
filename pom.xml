@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>se.liu.ida.hefquin</groupId>
-  <artifactId>HeFQUIN</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <groupId>se.liu.research.hefquin</groupId>
+  <artifactId>hefquin</artifactId>
+  <version>0.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <modules>
     <module>hefquin-base</module>
     <module>hefquin-engine</module>
@@ -16,13 +16,45 @@
     <module>hefquin-service</module>
   </modules>
 
+  <!-- Project Meta Data -->
+  <name>HeFQUIN</name>
+  <description>HeFQUIN is a query federation engine for heterogeneous federations of graph data sources, including federations of knowledge graphs.</description>
+  <url>https://liusemweb.github.io/HeFQUIN/</url>
+
+  <!-- License -->
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <!-- Developer Information -->
+  <developers>
+    <developer>
+      <name>Olaf Hartig</name>
+      <email>olaf.hartig@liu.se</email>
+      <organization>Linköping University</organization>
+      <organizationUrl>https://liu.se/</organizationUrl>
+    </developer>
+  </developers>
+
+  <!-- SCM (Source Code Management) -->
+  <scm>
+    <connection>scm:git:git://github.com/LiUSemWeb/HeFQUIN.git</connection>
+    <developerConnection>scm:git:ssh://github.com:LiUSemWeb/HeFQUIN.git</developerConnection>
+    <url>https://github.com/LiUSemWeb/HeFQUIN</url>
+  </scm>
+
+  <!-- Properties -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <project.version>0.0.4-SNAPSHOT</project.version>
+    <gpg.skip>true</gpg.skip>
   </properties>
 
+  <!-- Dependencies -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -36,14 +68,71 @@
       <version>2.0.5</version>
     </dependency>
   </dependencies>
-  
+
+  <!-- Build -->
   <build>
     <plugins>
+      <!-- Maven Central Publishing Plugin -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.7.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+        </configuration>
+      </plugin>
+
+      <!-- GPG Signing Plugin (required for Maven Central) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.2.7</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Sources plugin (required for Maven Central) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Javadoc plugin  -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.10.0</version>
         <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/reports/${project.version}</outputDirectory>
+              <failOnError>false</failOnError>
+              <additionalOptions>
+                <additionalOption>--no-module-directories</additionalOption>
+              </additionalOptions>
+            </configuration>
+          </execution>
           <execution>
             <id>generate-javadoc</id>
             <phase>package</phase>
@@ -56,6 +145,26 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Surefire Plugin (for running tests) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M7</version>
+        <configuration>
+          <argLine>
+            --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED
+            --add-exports=java.base/sun.nio.ch=ALL-UNNAMED
+            --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED
+            --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+            --add-opens=jdk.compiler/com.sun.tools.javac=ALL-UNNAMED
+            --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens=java.base/java.io=ALL-UNNAMED
+            --add-opens=java.base/java.util=ALL-UNNAMED
+          </argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>

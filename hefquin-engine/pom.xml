@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>se.liu.ida.hefquin</groupId>
-    <artifactId>HeFQUIN</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <groupId>se.liu.research.hefquin</groupId>
+    <artifactId>hefquin</artifactId>
+    <version>0.0.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>hefquin-engine</artifactId>
@@ -13,21 +13,26 @@
   <dependencies>
     <!-- hefquin-base -->
     <dependency>
-      <groupId>se.liu.ida.hefquin</groupId>
+      <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>0.0.6-SNAPSHOT</version>
     </dependency>
     <!-- hefquin-pgconnector -->
     <dependency>
-      <groupId>se.liu.ida.hefquin</groupId>
+      <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-pgconnector</artifactId>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>0.0.6-SNAPSHOT</version>
     </dependency>
     <!-- hefquin-graphqlconnector -->
     <dependency>
-      <groupId>se.liu.ida.hefquin</groupId>
+      <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-graphqlconnector</artifactId>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>0.0.6-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>net.openhft</groupId>
+      <artifactId>chronicle-map</artifactId>
+      <version>3.27ea0</version>
     </dependency>
   </dependencies>
 </project>

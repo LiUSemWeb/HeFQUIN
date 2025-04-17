@@ -122,6 +122,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		s.put( "executionConcluded",              Boolean.valueOf(executionConcluded) );
 		s.put( "numberOfInputBlocksProcessed",    Integer.valueOf(numberOfInputBlocksProcessed) );
 		s.put( "numberOfInputMappingsProcessed",  Long.valueOf(numberOfInputMappingsProcessed) );
+		s.put( "totalProcTimeForAllInputBlocks",  Long.valueOf(sumOfProcessingTimes) );
 		s.put( "averageProcTimePerInputBlock",    Double.valueOf(avgProcTime) );
 		s.put( "minimumProcTimePerInputBlock",    Long.valueOf(minProcessingTime) );
 		s.put( "maximumProcTimePerInputBlock",    Long.valueOf(maxProcessingTime) );

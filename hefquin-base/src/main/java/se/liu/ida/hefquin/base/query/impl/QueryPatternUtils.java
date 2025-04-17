@@ -220,21 +220,20 @@ public class QueryPatternUtils
 		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getTPsInPattern( (Op2) op );
 		}
-		if ( op instanceof OpService ){
-			return getTPsInPattern( ((Op1) op).getSubOp());
+
+		if ( op instanceof OpService || op instanceof OpFilter ){
+			return getTPsInPattern( ((Op1) op).getSubOp() );
 		}
 
-		final Set<TriplePattern> tps = new HashSet<>();
-		if ( op instanceof OpBGP ) {
-			final List<Triple> triples = ((OpBGP) op).getPattern().getList();
-			for ( final Triple t: triples ) {
+		if ( op instanceof OpBGP opBGP ) {
+			final Set<TriplePattern> tps = new HashSet<>();
+			for ( final Triple t : opBGP.getPattern().getList() ) {
 				tps.add( new TriplePatternImpl(t) );
 			}
 			return tps;
 		}
-		else {
-			throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
-		}
+
+		throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
 	}
 
 	public static Set<TriplePattern> getTPsInPattern( final Op2 op ) {

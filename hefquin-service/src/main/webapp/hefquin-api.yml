@@ -1,0 +1,341 @@
+openapi: 3.0.3
+info:
+  title: HeFQUIN Service API
+  version: "1.0.0"
+  description: REST API for executing SPARQL queries and retrieving query processing details.
+
+tags:
+  - name: Query Execution
+    description: |
+      Endpoints related to the execution of SPARQL queries, providing access to query results in standard formats such as JSON, XML, and CSV. Intended for general data retrieval and application integration.
+  - name: Query Inspect
+    description: |
+      Endpoint related to the inspection of SPARQL query execution, including access to internal representations such as logical plans, physical plans, and execution timing. Useful for debugging, analysis, and performance tuning.
+paths:
+  /sparql:
+    post:
+      tags:
+        - Query Execution
+      requestBody:
+        $ref: '#/components/requestBodies/SparqlQuery'
+      responses:
+        "200":
+          $ref: '#/components/responses/SparqlResults'
+        "400":
+          $ref: '#/components/responses/400'
+        "406":
+          $ref: '#/components/responses/406'
+        "415":
+          $ref: '#/components/responses/415'
+        "500":
+          $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
+    get:
+      tags:
+        - Query Execution
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: The SPARQL query string
+          schema:
+            type: string
+            example: |
+              SELECT *
+              WHERE {
+                SERVICE <http://dbpedia.org/sparql> {
+                  ?s ?p ?o
+                }
+              } LIMIT 10
+      responses:
+        "200":
+          $ref: '#/components/responses/SparqlResults'
+        "400":
+          $ref: '#/components/responses/400'
+        "406":
+          $ref: '#/components/responses/406'
+        "500":
+          $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
+  /query-inspect:
+    post:
+      tags:
+        - Query Inspect
+      requestBody:
+        $ref: '#/components/requestBodies/SparqlQuery'
+      responses:
+        "200":
+          $ref: '#/components/responses/InspectResults'
+        "400":
+          $ref: '#/components/responses/400'
+        "500":
+          $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
+
+    get:
+      tags:
+        - Query Inspect
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: The SPARQL query string
+          schema:
+            type: string
+            example: |
+              SELECT *
+              WHERE {
+                SERVICE <http://dbpedia.org/sparql> {
+                  ?s ?p ?o
+                }
+              } LIMIT 10
+      responses:
+        "200":
+          $ref: '#/components/responses/InspectResults'
+        "400":
+          $ref: '#/components/responses/400'
+        "500":
+          $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
+
+components:
+  requestBodies:
+    SparqlQuery:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+                description: |
+                  A SPARQL query
+            required:
+              - query
+          example: |
+            SELECT *
+            WHERE {
+              SERVICE <http://dbpedia.org/sparql> {
+                ?s ?p ?o
+              }
+            } LIMIT 10
+        application/sparql-query:
+          schema:
+            type: string
+          example: |
+            SELECT *
+            WHERE {
+              SERVICE <http://dbpedia.org/sparql> {
+                ?s ?p ?o
+              }
+            } LIMIT 10
+
+  responses:
+    SparqlResults:
+      description: "Returns the query result with the specified MIME type (default: application/sparql-results+json)"
+      content:
+        application/sparql-results+json:
+          schema:
+            type: object
+            properties:
+              head:
+                type: object
+                properties:
+                  vars:
+                    type: array
+                    items:
+                      type: string
+                    description: List of variable names returned in the result set.
+              results:
+                type: object
+                properties:
+                  bindings:
+                    type: array
+                    description: List of result bindings.
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            enum: [uri, literal, bnode]
+                            description: Type of the value (e.g., URI, literal, blank node).
+                          value:
+                            type: string
+                            description: Value of the variable binding.
+          example:
+            { "head": {
+                "vars": [ "person" , "name" ]
+              } ,
+              "results": {
+                "bindings": [
+                  { 
+                    "person": { "type": "uri" , "value": "http://example.org/person/alice" } ,
+                    "name": { "type": "literal" , "value": "Alice" }
+                  } ,
+                  { 
+                    "person": { "type": "uri" , "value": "http://example.org/person/bob" } ,
+                    "name": { "type": "literal" , "value": "Bob" }
+                  }
+                ]
+              }
+            }
+        application/sparql-results+xml:
+          schema:
+            type: object
+            properties:
+              head:
+                type: object
+              results:
+                type: object
+            xml:
+              name: sparql
+          example: |
+            <?xml version="1.0"?>
+            <sparql xmlns="http://www.w3.org/2005/sparql-results#">
+              <head>
+                <variable name="person"/>
+                <variable name="name"/>
+              </head>
+              <results>
+                <result>
+                  <binding name="person">
+                    <uri>http://example.org/person/alice</uri>
+                  </binding>
+                  <binding name="name">
+                    <literal>Alice</literal>
+                  </binding>
+                </result>
+                <result>
+                  <binding name="person">
+                    <uri>http://example.org/person/bob</uri>
+                  </binding>
+                  <binding name="name">
+                    <literal>Bob</literal>
+                  </binding>
+                </result>
+              </results>
+            </sparql>
+        text/csv:
+          schema:
+            type: string
+            format: csv
+          example: |
+              person,name
+              http://example.org/person/alice,Alice
+              http://example.org/person/bob,Bob
+        text/tab-separated-values:
+          schema:
+            type: string
+          example: |
+            ?person ?name
+            <http://example.org/person/alice>	"Alice"
+            <http://example.org/person/bob>	"Bob"
+    "400":
+      description: Bad Request - SPARQL query is missing, empty, or invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Missing or empty SPARQL query"
+    "406":
+      description: Not Acceptable - Unsupported 'Accept' header
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    "415":
+      description: Unsupported Media Type - Unsupported 'Content-Type' header.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    "500":
+      description: Internal Server Error - Error during query execution
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Query execution failed due to internal error"
+    "501":
+      description: Not Implemented - The given query uses a feature that is not supported by HeFQUIN
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+    InspectResults:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              queryMetrics:
+                type: object
+                properties:
+                  overallQueryProcessingTime:
+                    type: integer
+                    description: Overall query processing time in milliseconds.
+                  planningTime:
+                    type: integer
+                    description: Time spent on planning the query in milliseconds.
+                  compilationTime:
+                    type: integer
+                    description: Time spent on compiling the query in milliseconds.
+                  executionTime:
+                    type: integer
+                    description: Time spent on executing the query in milliseconds.
+                  queryPlanningStats:
+                    type: object
+                    description: Detailed statistics related to the query planning phase.
+                    properties:
+                      overallQueryPlanningTime:
+                        type: integer
+                        description: Total time spent in query planning in milliseconds.
+                      sourcePlanningTime:
+                        type: integer
+                        description: Time spent on source planning in milliseconds.
+                    additionalProperties:
+                      type: integer
+                      description: Additional planning-related statistics.
+                  executionStats:
+                    type: object
+                    description: Additional execution-related statistics.
+                    properties:
+                      planStats:
+                        type: object
+                        additionalProperties:
+                          type: object
+                          description: Additional planning-related statistics.
+              physicalPlan:
+                type: string
+                description: Serialized physical query plan.
+              logicalPlan:
+                type: string
+                description: Serialized logical query plan.
+              sourceAssignment:
+                type: string
+                description: Serialized source assignment.
+              exceptions:
+                type: array
+                description: List of exceptions.

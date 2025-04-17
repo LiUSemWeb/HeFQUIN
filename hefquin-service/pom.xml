@@ -4,9 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <groupId>se.liu.ida.hefquin</groupId>
-    <artifactId>HeFQUIN</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <groupId>se.liu.research.hefquin</groupId>
+    <artifactId>hefquin</artifactId>
+    <version>0.0.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>hefquin-service</artifactId>
@@ -14,9 +14,9 @@
   <dependencies>
     <!-- hefquin-engine -->
     <dependency>
-      <groupId>se.liu.ida.hefquin</groupId>
+      <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-engine</artifactId>
-      <version>0.0.4-SNAPSHOT</version>
+      <version>0.0.6-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

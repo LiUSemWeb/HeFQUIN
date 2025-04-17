@@ -169,7 +169,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                 final PhysicalPlanWithStatistics planWithStatistics;
                 if ( pop instanceof PhysicalOpRequest ||
                         (pop instanceof PhysicalOpFilter && subplan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest)) {
-                    final int cardinality = resps[index].getCardinality();
+                    final int cardinality = computeEffectiveCardinality( resps[index] );
                     final FederationMember fm = reqOpsOfAllSubPlans.get(index).getFederationMember();
                     final int numOfAccess = accessNumForReq(cardinality, fm);
 
@@ -181,7 +181,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
                     int numOfAccess = 0;
                     final List<FederationMember> fms = new ArrayList<>();
                     for ( int count = 0; count < subplan.numberOfSubPlans(); count++ ) {
-                        final int cardinality = resps[index].getCardinality();
+                        final int cardinality = computeEffectiveCardinality( resps[index] );
                         aggregatedCardinality += (cardinality == Integer.MAX_VALUE) ? Integer.MAX_VALUE : cardinality;
                         if ( aggregatedCardinality < 0 ) aggregatedCardinality = Integer.MAX_VALUE;
 
@@ -325,4 +325,22 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
         }
     }
 
+	/**
+	 * TODO: Fallback behavior? Returning Integer.MAX_VALUE for now
+	 *
+	 * Computes the cardinality from the given {@link CardinalityResponse}.
+	 *
+	 * If retrieving the cardinality fails due to an {@link UnsupportedOperationDueToRetrievalError}, this method
+	 * returns {@link Integer#MAX_VALUE} as a fallback.
+	 *
+	 * @param resp the cardinality response to extract the cardinality from
+	 * @return the cardinality, or {@code Integer.MAX_VALUE} if retrieval is unsupported
+	 */
+	private int computeEffectiveCardinality( final CardinalityResponse resp ) {
+		try {
+			return resp.getCardinality();
+		} catch ( UnsupportedOperationDueToRetrievalError e ) {
+			return Integer.MAX_VALUE;
+		}
+	}
 }

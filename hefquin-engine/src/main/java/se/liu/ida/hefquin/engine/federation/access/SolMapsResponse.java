@@ -1,13 +1,25 @@
 package se.liu.ida.hefquin.engine.federation.access;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 
-public interface SolMapsResponse extends DataRetrievalResponse
+public interface SolMapsResponse extends DataRetrievalResponse<Iterable<SolutionMapping>>
 {
-	Iterable<SolutionMapping> getSolutionMappings();
-
 	/**
-	 * Returns the number of triples that are returned by {@link #getSolutionMappings()}. 
+	 * Returns the number of mappings that are returned by {@link #getResponseData()}.
 	 */
-	int getSize();
+	default int getSize() throws UnsupportedOperationDueToRetrievalError {
+		final Iterable<SolutionMapping> mappings = getResponseData();
+		if ( mappings instanceof Collection c ) {
+			return c.size();
+		}
+		// Fallback to manual count
+		int count = 0;
+		for ( Iterator<SolutionMapping> it = mappings.iterator(); it.hasNext(); it.next() ) {
+			count++;
+		}
+		return count;
+	}
 }

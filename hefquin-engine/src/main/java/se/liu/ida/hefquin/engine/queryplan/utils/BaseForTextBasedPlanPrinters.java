@@ -5,23 +5,8 @@ import java.io.PrintStream;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 
 public class BaseForTextBasedPlanPrinters
 {
@@ -113,49 +98,86 @@ public class BaseForTextBasedPlanPrinters
 		return "";
 	}
 
-	protected void printFederationMember( final FederationMember fm,
-	                                      final String indentLevelStringForOpDetail,
-	                                      final PrintStream out ) {
-		out.append( indentLevelStringForOpDetail );
+	protected static void printFederationMember( final FederationMember fm,
+	                                             final String indentString,
+	                                             final PrintStream out ) {
+		out.append( indentString );
 		out.append( "  - fm (" + fm.getInterface().getID() + ") " + fm.getInterface().toString() );
 		out.append( System.lineSeparator() );
 	}
 
-	protected void printSPARQLGraphPattern( final SPARQLGraphPattern gp,
-	                                        final String indentLevelStringForOpDetail,
-	                                        final PrintStream out ) {
-		out.append( indentLevelStringForOpDetail );
+	protected static void printSPARQLGraphPattern( final SPARQLGraphPattern gp,
+	                                               final String indentString,
+	                                               final PrintStream out ) {
+		out.append( indentString );
 		out.append( "  - pattern (" + gp.hashCode() +  ") (" + gp.toString() + ")" );
 		out.append( System.lineSeparator() );
 	}
 
-	protected void printLogicalOperatorBase( final String baseString,
-	                                         final LogicalOperator lop,
-	                                         final PrintStream out,
-	                                         final String indentLevelString ) {
-		out.append( indentLevelString + baseString + "" + nameOfLogicalOp(lop) + " (" + lop.getID()  + ")" );
+
+	protected static void printLogicalOperatorBase( final LogicalOperator lop,
+	                                                final String indentString,
+	                                                final PrintStream out,
+	                                                final OpNamePrinter np ) {
+		out.append( indentString );
+		lop.visit(np);
+		out.append( " (" + lop.getID()  + ")" );
 	}
 
-	protected String nameOfLogicalOp ( final LogicalOperator lop) {
-		if ( lop instanceof LogicalOpBGPAdd )             return "bgpAdd";
-		if ( lop instanceof LogicalOpBGPOptAdd )          return "bgpOptAdd";
-		if ( lop instanceof LogicalOpBind )               return "bind";
-		if ( lop instanceof LogicalOpFilter )             return "filter";
-		if ( lop instanceof LogicalOpGlobalToLocal )      return "g2l";
-		if ( lop instanceof LogicalOpGPAdd )              return "gpAdd";
-		if ( lop instanceof LogicalOpGPOptAdd )           return "gpOptAdd";
-		if ( lop instanceof LogicalOpJoin )               return "join";
-		if ( lop instanceof LogicalOpLocalToGlobal )      return "l2g";
-		if ( lop instanceof LogicalOpMultiwayJoin )       return "mj";
-		if ( lop instanceof LogicalOpMultiwayLeftJoin )   return "mlj";
-		if ( lop instanceof LogicalOpMultiwayUnion )      return "mu";
-		if ( lop instanceof LogicalOpUnion )              return "union";
-		if ( lop instanceof LogicalOpMultiwayUnion )      return "mu";
-		if ( lop instanceof LogicalOpRequest )            return "req";
-		if ( lop instanceof LogicalOpRightJoin )          return "rightjoin";
-		if ( lop instanceof LogicalOpTPAdd )              return "tpAdd";
-		if ( lop instanceof LogicalOpTPOptAdd )           return "tpOptAdd";
+	protected static class OpNamePrinter implements LogicalPlanVisitor {
+		protected final PrintStream out;
+		public OpNamePrinter( final PrintStream out ) { this.out = out; }
 
-		throw new IllegalArgumentException( "Unexpected logical operator type: " + lop.getClass().getName() );
+		@Override
+		public void visit( final LogicalOpRequest<?, ?> op )    { out.append("req"); }
+
+		@Override
+		public void visit( final LogicalOpTPAdd op )            { out.append("tpAdd"); }
+
+		@Override
+		public void visit( final LogicalOpBGPAdd op )           { out.append("bgpAdd"); }
+
+		@Override
+		public void visit( final LogicalOpGPAdd op )            { out.append("gpAdd"); }
+
+		@Override
+		public void visit( final LogicalOpTPOptAdd op )         { out.append("tpOptAdd"); }
+
+		@Override
+		public void visit( final LogicalOpBGPOptAdd op )        { out.append("bgpOptAdd"); }
+
+		@Override
+		public void visit( final LogicalOpGPOptAdd op )         { out.append("gpOptAdd"); }
+
+		@Override
+		public void visit( final LogicalOpJoin op )             { out.append("join"); }
+
+		@Override
+		public void visit( final LogicalOpRightJoin op )        { out.append("rightJoin"); }
+
+		@Override
+		public void visit( final LogicalOpUnion op )            { out.append("union"); }
+
+		@Override
+		public void visit( final LogicalOpMultiwayJoin op )     { out.append("mj"); }
+
+		@Override
+		public void visit( final LogicalOpMultiwayLeftJoin op ) { out.append("mlj"); }
+
+		@Override
+		public void visit( final LogicalOpMultiwayUnion op )    { out.append("mu"); }
+
+		@Override
+		public void visit( final LogicalOpFilter op )           { out.append("filter"); }
+
+		@Override
+		public void visit( final LogicalOpBind op )             { out.append("bind"); }
+
+		@Override
+		public void visit( final LogicalOpLocalToGlobal op )    { out.append("l2g"); }
+
+		@Override
+		public void visit( final LogicalOpGlobalToLocal op )    { out.append("g2l"); }
 	}
+
 }

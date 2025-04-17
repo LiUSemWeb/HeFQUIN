@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -54,13 +55,27 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 			}
 
 			// update stats
-			final int payloadSize = currentPage.getPayloadSize();
+			final int payloadSize;
+			try {
+				payloadSize = currentPage.getPayloadSize();
+			}
+			catch( UnsupportedOperationDueToRetrievalError e ) {
+				throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+			}
+
 			totalNumberOfMatchingTriplesRetrieved += payloadSize;
 			if ( minNumberOfMatchingTriplesPerPage > payloadSize ) minNumberOfMatchingTriplesPerPage = payloadSize;
 			if ( maxNumberOfMatchingTriplesPerPage < payloadSize ) maxNumberOfMatchingTriplesPerPage = payloadSize;
 
 			// consume the matching triples retrieved via the page request
-			consumeMatchingTriples( currentPage.getPayload(), sink );
+			final Iterable<Triple> triples;
+			try {
+				triples = currentPage.getPayload();
+			}
+			catch( UnsupportedOperationDueToRetrievalError e ) {
+				throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+			}
+			consumeMatchingTriples( triples, sink );
 		}
 	}
 
@@ -77,7 +92,7 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 		return createPageRequest(nextPageURL);
 	}
 
-	protected boolean isLastPage( final TPFResponse response ) {
+	protected boolean isLastPage( final TPFResponse response ) throws ExecOpExecutionException {
 		// To check whether the given response is the last page of the TPF
 		// we simply consider the page-related metadata in the response. 
 		final Boolean isLastPage = response.isLastPage();
@@ -88,7 +103,14 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 		// If there is no such page-related metadata in the response,
 		// then we decide based on the number of matching triples in
 		// the response: no triples -> last page!
-		return ( response.getPayloadSize() == 0 );
+		final int payloadSize;
+		try {
+			payloadSize = response.getPayloadSize();
+		}
+		catch( UnsupportedOperationDueToRetrievalError e ) {
+			throw new ExecOpExecutionException( "Accessing the response size caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
+		}
+		return payloadSize == 0;
 	}
 
 	protected void consumeMatchingTriples( final Iterable<Triple> itTriples, final IntermediateResultElementSink sink ) {

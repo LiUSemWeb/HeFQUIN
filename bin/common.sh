@@ -60,7 +60,7 @@ else
 fi
 
 # After determining the directory, look for the hefquin-cli JAR file in that directory, and ..
-HEFQUIN_CP=$(echo ${HEFQUIN_JAR_DIR}hefquin-cli-*.jar)
+HEFQUIN_CP=$(printf "%s\n" ${HEFQUIN_JAR_DIR}hefquin-cli-*.jar | grep -vE '(-sources|-javadoc)\.jar')
 # .. check that the JAR file is actually there
 if [ ! -f ${HEFQUIN_CP} ]; then
   echo "Cannot find the HeFQUIN JAR file in ${HEFQUIN_JAR_DIR}"

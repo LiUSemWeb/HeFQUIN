@@ -1,12 +1,9 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
-import java.util.concurrent.ExecutorService;
-
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.ExecutionContextImpl;
 
 public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 {
@@ -18,13 +15,14 @@ public abstract class QueryPlanCompilerBase implements QueryPlanCompiler
 	}
 
 	protected ExecutionContext createExecContext() {
-		return new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return ctxt.getFederationCatalog(); }
-			@Override public FederationAccessManager getFederationAccessMgr() { return ctxt.getFederationAccessMgr(); }
-			@Override public boolean isExperimentRun() { return ctxt.isExperimentRun(); }
-			@Override public boolean skipExecution() { return ctxt.skipExecution(); }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return ctxt.getExecutorServiceForPlanTasks(); }
-		};
+		if ( ctxt instanceof ExecutionContext eCtxt )
+			return eCtxt;
+		else
+			return new ExecutionContextImpl( ctxt.getFederationAccessMgr(),
+			                                 ctxt.getFederationCatalog(),
+			                                 ctxt.getExecutorServiceForPlanTasks(),
+			                                 ctxt.isExperimentRun(),
+			                                 ctxt.skipExecution() );
 	}
 
 }
