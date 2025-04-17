@@ -161,7 +161,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				cardinality = extractCardinality( smResp );
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError | IllegalArgumentException e ) {
-				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
+				return new CardinalityResponseImplWithoutCardinality( e, smResp, smResp.getRequest() );
 			}
 
 			return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
