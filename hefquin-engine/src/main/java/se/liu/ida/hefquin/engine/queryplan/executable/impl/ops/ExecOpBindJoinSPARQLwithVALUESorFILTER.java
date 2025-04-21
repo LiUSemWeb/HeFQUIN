@@ -92,7 +92,12 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "currentInstance",  currentInstance.getStats() );
+
+		if ( currentInstance == null )
+			s.put( "currentInstance", null );
+		else
+			s.put( "currentInstance", currentInstance.getStats() );
+
 		return s;
 	}
 }
