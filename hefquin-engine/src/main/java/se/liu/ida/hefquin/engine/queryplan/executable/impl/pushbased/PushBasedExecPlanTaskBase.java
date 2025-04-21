@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskBase;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -92,10 +93,20 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 		catch ( final Throwable th ) {
 			System.err.println("Unexpected exception in one of the ExecPlanTasks.");
 			System.err.println( "--> The class of the executable operator of this ExecPlanTask is:" + getExecOp().getClass().getName() );
-			System.err.println( "--> The current runtime statistics of this ExecPlanTask are:");
-			StatsPrinter.print( getStats(), System.err, true ); // true=recursive
 			System.err.println( "--> The stack trace of the exception that was caught is:");
 			th.printStackTrace( System.err );
+
+			try {
+				final ExecPlanTaskStats stats = getStats();
+				System.err.println( "--> The current runtime statistics of this ExecPlanTask are:");
+				StatsPrinter.print( stats, System.err, true ); // true=recursive
+			}
+			catch ( final Exception e ) {
+				System.err.println();
+				System.err.println( "--> Obtaining the current runtime statistics of this ExecPlanTask caused another exception:");
+				e.printStackTrace( System.err );
+			}
+
 			System.err.println();
 		}
 	}
