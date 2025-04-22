@@ -33,8 +33,8 @@ public class CardinalityResponseImplWithoutCardinality extends CardinalityRespon
 	 * @param request         the original data retrieval request
 	 */
 	public CardinalityResponseImplWithoutCardinality( final Exception exception,
-		                                              final DataRetrievalResponse<?> wrappedResponse,
-		                                              final DataRetrievalRequest request ) {
+	                                                  final DataRetrievalResponse<?> wrappedResponse,
+	                                                  final DataRetrievalRequest request ) {
 		super( wrappedResponse, request, Integer.MAX_VALUE );
 		this.exception = exception;
 	}
