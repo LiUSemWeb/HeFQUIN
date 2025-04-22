@@ -282,7 +282,7 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 
 	@Override
 	public Integer getCardinalityEstimate() throws CardinalityEstimationUnavailableError {
-		if( metadataTriples == null ){
+		if( metadataTriples == null || metadataTriples.isEmpty() ){
 			throw new CardinalityEstimationUnavailableError(
 				"Cardinality estimation is unavailable due to missing metadata triples.",
 				getRequest(),
