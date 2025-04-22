@@ -88,25 +88,28 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final TPFServer fm )
-		throws FederationAccessException
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final TPFRequest req,
+			final TPFServer fm )
+					throws FederationAccessException
 	{
 		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final TPFRequest req,
-	                                                                       final BRTPFServer fm )
-		throws FederationAccessException
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final TPFRequest req,
+			final BRTPFServer fm )
+					throws FederationAccessException
 	{
 		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final BRTPFRequest req,
-	                                                                       final BRTPFServer fm )
-		throws FederationAccessException
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final BRTPFRequest req,
+			final BRTPFServer fm )
+					throws FederationAccessException
 	{
 		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
