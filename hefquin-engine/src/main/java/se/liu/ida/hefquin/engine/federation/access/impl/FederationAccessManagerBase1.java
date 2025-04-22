@@ -54,9 +54,10 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected AtomicLong issuedCardRequestsBRTPF =  new AtomicLong( 0L );
 
 	@Override
-	public CompletableFuture<CardinalityResponse> issueCardinalityRequest( final SPARQLRequest req,
-	                                                                       final SPARQLEndpoint fm )
-		throws FederationAccessException
+	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
+			final SPARQLRequest req,
+			final SPARQLEndpoint fm )
+					throws FederationAccessException
 	{
 		// The idea of this implementation is to take the graph pattern of the
 		// given request, wrap it in a COUNT(*) query, and send that query as
