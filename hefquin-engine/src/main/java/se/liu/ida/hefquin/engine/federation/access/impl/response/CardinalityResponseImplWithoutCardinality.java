@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
  */
 public class CardinalityResponseImplWithoutCardinality extends CardinalityResponseImpl
 {
-	protected Exception exception;
+	protected final Exception exception;
 
 	/**
 	 * Constructs a {@code CardinalityResponseImplWithoutCardinality} with no specific exception.
