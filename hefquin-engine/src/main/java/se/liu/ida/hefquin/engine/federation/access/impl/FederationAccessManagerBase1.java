@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -193,17 +194,18 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	{
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
 			if ( tpfResp == null ) {
-				throw new IllegalArgumentException("The given TPFResponse is null");
+				throw new IllegalArgumentException( "The given TPFResponse is null" );
 			}
 
-			final Integer cardinality = tpfResp.getCardinalityEstimate();
-			if ( cardinality != null ) {
-				final int c = cardinality;
-				return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), c );
+			final Integer cardinality;
+			try {
+				cardinality = tpfResp.getCardinalityEstimate();
 			}
-			else {
-				return new CardinalityResponseImplWithoutCardinality( tpfResp, tpfResp.getRequest() );
+			catch ( final CardinalityEstimationUnavailableError e ) {
+				return new CardinalityResponseImplWithoutCardinality( e, tpfResp, tpfResp.getRequest() );
 			}
+
+			return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), cardinality );
 		}
 	}
 

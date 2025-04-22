@@ -4,8 +4,7 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 
 /**
- * A subclass of {@link CardinalityResponseImpl} representing a response where the cardinality is not available due to a
- * possible error.
+ * A subclass of {@link CardinalityResponseImpl} representing a response where the cardinality is not available.
  *
  * This implementation wraps a {@link DataRetrievalResponse} and a {@link DataRetrievalRequest} and captures the
  * exception that occurred, while assigning {@code Integer.MAX_VALUE} as a placeholder for the unknown cardinality.
@@ -13,17 +12,6 @@ import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
 public class CardinalityResponseImplWithoutCardinality extends CardinalityResponseImpl
 {
 	protected final Exception exception;
-
-	/**
-	 * Constructs a {@code CardinalityResponseImplWithoutCardinality} with no specific exception.
-	 *
-	 * @param wrappedResponse the original data retrieval response
-	 * @param request         the original data retrieval request
-	 */
-	public CardinalityResponseImplWithoutCardinality( final DataRetrievalResponse<?> wrappedResponse,
-	                                                  final DataRetrievalRequest request ) {
-		this( null, wrappedResponse, request );
-	}
 
 	/**
 	 * Constructs a {@code CardinalityResponseImplWithoutCardinality} with the given exception.

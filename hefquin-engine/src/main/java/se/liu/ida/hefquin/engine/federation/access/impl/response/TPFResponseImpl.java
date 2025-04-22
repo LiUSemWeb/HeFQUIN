@@ -6,6 +6,7 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.utils.ConcatenatingIterable;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
 import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
@@ -280,7 +281,14 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	}
 
 	@Override
-	public Integer getCardinalityEstimate() {
+	public Integer getCardinalityEstimate() throws CardinalityEstimationUnavailableError {
+		if( metadataTriples == null ){
+			throw new CardinalityEstimationUnavailableError(
+				"Cardinality estimation is unavailable due to missing metadata triples.",
+				getRequest(),
+				getFederationMember()
+			);
+		}
 		return cardEstimate;
 	}
 
