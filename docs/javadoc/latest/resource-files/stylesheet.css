@@ -1459,3 +1459,4 @@ pre.snippet .highlighted {
     background-color: var(--snippet-highlight-color);
     border-radius: 10%;
 }
+:root { --navbar-background-color: #4A314D; }
