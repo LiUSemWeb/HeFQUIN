@@ -50,8 +50,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static final Var countVar = Var.alloc("__hefquinCountVar");
 
 	protected AtomicLong issuedCardRequestsSPARQL = new AtomicLong( 0L );
-	protected AtomicLong issuedCardRequestsTPF =    new AtomicLong( 0L );
-	protected AtomicLong issuedCardRequestsBRTPF =  new AtomicLong( 0L );
+	protected AtomicLong issuedCardRequestsTPF    = new AtomicLong( 0L );
+	protected AtomicLong issuedCardRequestsBRTPF  = new AtomicLong( 0L );
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
