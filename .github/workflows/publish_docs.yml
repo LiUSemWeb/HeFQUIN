@@ -33,6 +33,7 @@ jobs:
           rm -rf docs/javadoc/latest 2>/dev/null
           cp -r target/reports/"$project_version"/apidocs docs/javadoc/"$project_version"
           cp -r target/reports/"$project_version"/apidocs docs/javadoc/latest
+          echo ":root { --navbar-background-color: #4A314D; }" >> docs/javadoc/latest/resource-files/stylesheet.css
       
       - name: install python packages
         run: pip install -r ./docs-scripts/requirements.txt
