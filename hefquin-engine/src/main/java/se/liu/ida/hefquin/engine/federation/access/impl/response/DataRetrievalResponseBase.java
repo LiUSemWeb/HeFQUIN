@@ -167,9 +167,11 @@ public abstract class DataRetrievalResponseBase<T> implements DataRetrievalRespo
 	}
 
 	/**
-	 * Returns a short textual description of the error, if available.
-	 *
-	 * @return the error description, or {@code null} if no error occurred
+	 * Returns the data retrieved in response to the corresponding request,
+	 * or throws UnsupportedOperationDueToRetrievalError if an error occurred
+	 * during data retrieval.
+	 * 
+	 * @return the data retrieved in this response
 	 */
 	@Override
 	public T getResponseData() throws UnsupportedOperationDueToRetrievalError {
