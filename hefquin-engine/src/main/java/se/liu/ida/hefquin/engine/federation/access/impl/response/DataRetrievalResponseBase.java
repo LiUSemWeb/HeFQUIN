@@ -176,7 +176,12 @@ public abstract class DataRetrievalResponseBase<T> implements DataRetrievalRespo
 	@Override
 	public T getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( isError() ) {
-			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+			throw new UnsupportedOperationDueToRetrievalError(
+				getErrorStatusCode(),
+				getErrorDescription(),
+				getRequest(),
+				getFederationMember()
+			);
 		}
 		return data;
 	}

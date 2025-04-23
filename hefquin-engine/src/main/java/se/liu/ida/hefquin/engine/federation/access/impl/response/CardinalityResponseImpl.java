@@ -133,7 +133,12 @@ public class CardinalityResponseImpl implements CardinalityResponse
 	@Override
 	public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( wrappedResponse.isError() ) {
-			throw new UnsupportedOperationDueToRetrievalError( request, getFederationMember() );
+			throw new UnsupportedOperationDueToRetrievalError(
+				getErrorStatusCode(),
+				getErrorDescription(),
+				getRequest(),
+				getFederationMember()
+			);
 		}
 		return cardinality;
 	}
