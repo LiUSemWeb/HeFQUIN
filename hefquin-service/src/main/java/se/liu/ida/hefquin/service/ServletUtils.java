@@ -12,15 +12,27 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader;
+import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
 import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 
+/**
+ * Utility class for servlet-based integration of the HeFQUIN query engine.
+ */
 public class ServletUtils
 {
-	public static HeFQUINEngine getEngine( final String fedConfFilename, final String engineConfFilename ) {
+	/**
+	 * Constructs a {@link HeFQUINEngineConfigReader.Context} using the given
+	 * federation configuration file. This context includes initialized executor
+	 * services and the federation catalog, with default values for optional flags.
+	 *
+	 * @param fedConfFilename the path to the federation configuration file
+	 * @return a configured {@link HeFQUINEngineConfigReader.Context} instance
+	 */
+	public static Context getCtx( final String fedConfFilename ) {
 		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents
 				.createExecutorServiceForFedAccess();
 		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents
@@ -28,8 +40,7 @@ public class ServletUtils
 		final FederationCatalog cat = FederationDescriptionReader.readFromFile( fedConfFilename );
 		final boolean isExperimentRun = false;
 		final boolean skipExecution = false;
-
-		final HeFQUINEngineConfigReader.Context ctx = new HeFQUINEngineConfigReader.Context() {
+		final Context ctx = new HeFQUINEngineConfigReader.Context() {
 			@Override
 			public ExecutorService getExecutorServiceForFederationAccess() {
 				return execServiceForFedAccess;
@@ -71,7 +82,32 @@ public class ServletUtils
 			}
 		};
 
+		return ctx;
+	}
+
+	/**
+	 * Loads the engine configuration model from the specified RDF or Turtle file.
+	 *
+	 * @param engineConfFilename the path to the engine configuration file
+	 * @return a Jena {@link Model} representing the engine configuration
+	 */
+	public static Model getConfDesc( final String engineConfFilename ) {
 		final Model confDescr = RDFDataMgr.loadModel( engineConfFilename );
+		return confDescr;
+	}
+
+	/**
+	 * Instantiates a {@link HeFQUINEngine} using the provided configuration context
+	 * and RDF model. This method initializes Apache Jena (via {@link ARQ#init()})
+	 * and integrates the HeFQUIN engine into the Jena environment.
+	 *
+	 * @param ctx       the engine configuration context, including executors and
+	 *                  federation metadata
+	 * @param confDescr the RDF model containing engine configuration
+	 * @return a fully configured and integrated {@link HeFQUINEngine} instance
+	 */
+	public static HeFQUINEngine getEngine( final HeFQUINEngineConfigReader.Context ctx,
+	                                       final Model confDescr ) {
 		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read( confDescr, ctx );
 		ARQ.init();
 		engine.integrateIntoJena();
@@ -82,19 +118,18 @@ public class ServletUtils
 	 * Converts a MIME type string into a corresponding {@link ResultsFormat}
 	 * supported by Jena's SPARQL result serialization.
 	 *
-	 * Supported MIME types include:
-	 * <ul>
-	 * <li>"application/sparql-results+json"</li>
-	 * <li>"application/sparql-results+xml"</li>
-	 * <li>"text/csv"</li>
-	 * <li>"text/tab-separated-values"</li>
-	 * </ul>
+	 * Recognized MIME types:
+	 * - application/sparql-results+json
+	 * - application/sparql-results+xml
+	 * - text/csv
+	 * - text/tab-separated-values
 	 *
 	 * If the MIME type is unrecognized or null, {@code ResultsFormat.FMT_RS_CSV} is
 	 * returned by default.
 	 *
 	 * @param mimeType the MIME type string from the HTTP Accept header or elsewhere
-	 * @return the corresponding {@link ResultsFormat}, or null if the input was null
+	 * @return the corresponding {@link ResultsFormat}, or null if the input was
+	 *         null
 	 */
 	public static ResultsFormat convert( final String mimeType ) {
 		if ( mimeType == null )
