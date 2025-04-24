@@ -31,6 +31,13 @@ public class StatsPrinter
 			return;
 		}
 
+		if ( s.isEmpty() ) {
+			addTabs(out, indentLevel);
+			out.append( "--empty--" );
+			out.append( System.lineSeparator() );
+			return;
+		}
+
 		for ( final String entryName : s.getEntryNames() ) {
 			final Object entry = s.getEntry(entryName);
 

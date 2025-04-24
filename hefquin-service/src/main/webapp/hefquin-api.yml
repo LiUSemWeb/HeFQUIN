@@ -29,6 +29,8 @@ paths:
           $ref: '#/components/responses/415'
         "500":
           $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
     get:
       tags:
         - Query Execution
@@ -55,6 +57,8 @@ paths:
           $ref: '#/components/responses/406'
         "500":
           $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
   /query-inspect:
     post:
       tags:
@@ -68,6 +72,8 @@ paths:
           $ref: '#/components/responses/400'
         "500":
           $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
 
     get:
       tags:
@@ -93,6 +99,8 @@ paths:
           $ref: '#/components/responses/400'
         "500":
           $ref: '#/components/responses/500'
+        "501":
+          $ref: '#/components/responses/501'
 
 components:
   requestBodies:
@@ -230,7 +238,7 @@ components:
             <http://example.org/person/alice>	"Alice"
             <http://example.org/person/bob>	"Bob"
     "400":
-      description: Bad Request - SPARQL query is missing or empty
+      description: Bad Request - SPARQL query is missing, empty, or invalid
       content:
         application/json:
           schema:
@@ -267,6 +275,15 @@ components:
               error:
                 type: string
                 example: "Query execution failed due to internal error"
+    "501":
+      description: Not Implemented - The given query uses a feature that is not supported by HeFQUIN
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
     InspectResults:
       content:
         application/json:

@@ -5,6 +5,8 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 
 public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<QueryType extends Query,
@@ -19,12 +21,15 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 	}
 
 	@Override
-	protected MyResponseProcessor createResponseProcessor( final SolutionMapping sm, final IntermediateResultElementSink sink )
+	protected MyResponseProcessor createResponseProcessor( final SolutionMapping sm,
+	                                                       final IntermediateResultElementSink sink,
+	                                                       final ExecutableOperator op )
 	{
-		return new MyResponseProcessor(sm, sink) {
+		return new MyResponseProcessor( sm, sink, op ) {
 			@Override
-			protected Iterable<SolutionMapping> extractSolMaps(final SolMapsResponse response) {
-				return response.getSolutionMappings();
+			protected Iterable<SolutionMapping> extractSolMaps( final SolMapsResponse response )
+					throws UnsupportedOperationDueToRetrievalError {
+				return response.getResponseData();
 			}
 		};
 	}

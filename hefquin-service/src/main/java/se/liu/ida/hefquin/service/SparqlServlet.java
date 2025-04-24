@@ -26,14 +26,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
+import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.UnsupportedQueryException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 
 /**
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
  * Supports multiple result formats and integrates with the HeFQUIN engine.
  */
-public class HeFQUINServlet extends HttpServlet {
-	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
+public class SparqlServlet extends HttpServlet {
+	private static Logger logger = LoggerFactory.getLogger( SparqlServlet.class );
 	private static final long serialVersionUID = 1L;
 	private static HeFQUINEngine engine;
 
@@ -148,7 +150,16 @@ public class HeFQUINServlet extends HttpServlet {
 			response.setStatus( 200 );
 			response.setContentType( mimeType );
 			response.getWriter().write( result.getString( "result" ) );
-		} catch ( Exception e ) {
+		}
+		catch ( final IllegalQueryException e ) {
+			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
+			return;
+		}
+		catch ( final UnsupportedQueryException e ) {
+			writeJsonError( response, 501, new JsonString( e.getMessage() ) );
+			return;
+		}
+		catch ( final Exception e ) {
 			logger.error( "Query execution failed", e );
 			writeJsonError( response, 500, new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
 			return;
@@ -190,9 +201,11 @@ public class HeFQUINServlet extends HttpServlet {
 	 * @param mimeType    the MIME type for the response format
 	 * @return the query result and exceptions in JSON format
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType ) {
+	private static JsonObject execute( final String queryString, final String mimeType )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
 		final Query query = QueryFactory.create( queryString );
-		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
+		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		final Pair<QueryProcStats, List<Exception>> statsAndExceptions;

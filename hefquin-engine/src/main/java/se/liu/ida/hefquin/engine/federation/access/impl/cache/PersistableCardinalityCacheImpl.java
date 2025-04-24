@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.datastructures.PersistableCache;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 
 /**
  * A thread-safe cache implementation for storing cardinality responses. This
@@ -79,7 +80,11 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 			if ( future.isDone() && ! future.isCompletedExceptionally() ) {
 				final CardinalityResponse value = future.getNow( null );
 				if ( value != null ) {
-					snapshot.put( entry.getKey(), value.getCardinality() );
+					try {
+						snapshot.put( entry.getKey(), value.getCardinality() );
+					} catch(UnsupportedOperationDueToRetrievalError e){
+						// intentionally ignored
+					}
 				}
 			}
 		}
@@ -217,7 +222,10 @@ public class PersistableCardinalityCacheImpl<K> implements PersistableCache<K, C
 		}
 
 		@Override
-		public int getCardinality() {
+		public Integer getResponseData() throws UnsupportedOperationDueToRetrievalError {
+			if( isError() ){
+				throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+			}
 			return cardinality;
 		}
 	}

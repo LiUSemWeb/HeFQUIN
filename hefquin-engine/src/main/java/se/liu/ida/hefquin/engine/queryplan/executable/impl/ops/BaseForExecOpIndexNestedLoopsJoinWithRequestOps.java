@@ -27,9 +27,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * For an abstract base class that issues requests directly (instead of using
  * request operators), use {@link BaseForExecOpIndexNestedLoopsJoinWithRequests}.
  */
-public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
-                                                    QueryType extends Query,
-                                                    MemberType extends FederationMember>
+public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType extends Query,
+                                                                      MemberType extends FederationMember>
               extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
 {
 	protected final boolean useOuterJoinSemantics;
@@ -43,7 +42,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
 	                                                           final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
+		super( query, fm, collectExceptions );
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
@@ -61,18 +60,18 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		final CompletableFuture<?>[] futures = initiateProcessing(input, sink, execCxt);
+		final CompletableFuture<?>[] futures = initiateProcessing( input, sink, execCxt );
 
 		// wait for all the futures to be completed
 		if ( futures.length > 0 ) {
 			try {
-				CompletableFuture.allOf(futures).get();
+				CompletableFuture.allOf( futures ).get();
 			}
 			catch ( final InterruptedException e ) {
-				throw new ExecOpExecutionException("interruption of the futures that run the executable operators", e, this);
+				throw new ExecOpExecutionException( "interruption of the futures that run the executable operators", e, this );
 			}
 			catch ( final ExecutionException e ) {
-				throw new ExecOpExecutionException("The execution of the futures that run the executable operators caused an exception.", e, this);
+				throw new ExecOpExecutionException( "The execution of the futures that run the executable operators caused an exception.", e, this );
 			}
 		}
 	}
@@ -86,7 +85,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			final CompletableFuture<?> f = initiateProcessing(sm, sink, execCxt);
+			final CompletableFuture<?> f = initiateProcessing( sm, sink, execCxt );
 			if ( f == null ) {
 				// this may happen if the current solution mapping contains
 				// a blank node for any of the variables that is used when
@@ -102,7 +101,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 			// This case may occur if we have skipped any of the
 			// iteration steps of the previous loop because any
 			// of the futures obtained in that loop was null.
-			return Arrays.copyOf(futures, i);
+			return Arrays.copyOf( futures, i );
 		}
 		else {
 			return futures;
@@ -112,9 +111,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 	protected CompletableFuture<?> initiateProcessing(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) throws ExecOpExecutionException
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
+		final NullaryExecutableOp reqOp = createExecutableRequestOperator( sm );
 
 		if ( reqOp == null ) {
 			// this may happen if the given solution mapping
@@ -123,7 +122,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 			if ( useOuterJoinSemantics ) {
 				numberOfOutputMappingsProduced++;
-				sink.send(sm);
+				sink.send( sm );
 			}
 
 			return null;
@@ -131,7 +130,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 		numberOfRequestOpsUsed++;
 
-		final Runnable processor = createProcessor(reqOp, sm, sink, execCxt);
+		final Runnable processor = createProcessor( reqOp, sm, sink, execCxt );
 		final ExecutorService execService = execCxt.getExecutorServiceForPlanTasks();
 		if ( execService != null )
 			return CompletableFuture.runAsync(processor, execService);
@@ -150,17 +149,17 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 			public void run() {
 				final MyIntermediateResultElementSink mySink;
 				if ( useOuterJoinSemantics ) {
-					mySink = new MyIntermediateResultElementSinkOuterJoin(outputSink, smFromInput);
+					mySink = new MyIntermediateResultElementSinkOuterJoin( outputSink, smFromInput );
 				}
 				else {
-					mySink = new MyIntermediateResultElementSink(outputSink, smFromInput);
+					mySink = new MyIntermediateResultElementSink( outputSink, smFromInput );
 				}
 
 				try {
-					reqOp.execute(mySink, execCxt);
+					reqOp.execute( mySink, execCxt );
 				}
 				catch ( final ExecOpExecutionException e ) {
-					throw new RuntimeException("Executing a request operator used by this index nested loops join caused an exception.", e);
+					throw new RuntimeException( "Executing a request operator used by this index nested loops join caused an exception.", e );
 				}
 
 				mySink.flush();
@@ -182,9 +181,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
-		s.put( "numberOfRequestOpsUsed",          Integer.valueOf(numberOfRequestOpsUsed) );
-		s.put( "statsOfLastReqOp",   statsOfLastReqOp );
+		s.put( "numberOfOutputMappingsProduced", Long.valueOf(numberOfOutputMappingsProduced) );
+		s.put( "numberOfRequestOpsUsed",         Integer.valueOf(numberOfRequestOpsUsed) );
+		s.put( "statsOfLastReqOp",               statsOfLastReqOp );
 		return s;
 	}
 
@@ -205,7 +204,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 		@Override
 		public void send( final SolutionMapping smFromRequest ) {
 			numberOfOutputMappingsProduced++;
-			outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+			outputSink.send( SolutionMappingUtils.merge( smFromInput, smFromRequest ) );
 		}
 
 		public void flush() { }
@@ -217,7 +216,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 
 		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
 		                                                 final SolutionMapping smFromInput ) {
-			super(outputSink, smFromInput);
+			super( outputSink, smFromInput );
 		}
 
 		@Override
@@ -229,7 +228,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<
 		public void flush() {
 			if ( ! hasJoinPartner ) {
 				numberOfOutputMappingsProduced++;
-				outputSink.send(smFromInput);
+				outputSink.send( smFromInput );
 			}
 		}
     }

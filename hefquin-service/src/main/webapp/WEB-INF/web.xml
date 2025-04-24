@@ -19,11 +19,11 @@
 
     <!-- Servlet Mapping -->
     <servlet-mapping>
-        <servlet-name>HeFQUINServlet</servlet-name>
+        <servlet-name>SparqlServlet</servlet-name>
         <url-pattern>/sparql</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>HeFQUINServletInspect</servlet-name>
+        <servlet-name>InspectServlet</servlet-name>
         <url-pattern>/query-inspect</url-pattern>
     </servlet-mapping>
 
