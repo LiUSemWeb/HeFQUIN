@@ -34,8 +34,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
  * Supports multiple result formats and integrates with the HeFQUIN engine.
  */
-public class HeFQUINServlet extends HttpServlet {
-	private static Logger logger = LoggerFactory.getLogger( HeFQUINServlet.class );
+public class SparqlServlet extends HttpServlet {
+	private static Logger logger = LoggerFactory.getLogger( SparqlServlet.class );
 	private static final long serialVersionUID = 1L;
 	private static HeFQUINEngine engine;
 
@@ -205,7 +205,7 @@ public class HeFQUINServlet extends HttpServlet {
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString );
-		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
+		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		final Pair<QueryProcStats, List<Exception>> statsAndExceptions;

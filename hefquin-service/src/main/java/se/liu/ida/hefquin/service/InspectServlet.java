@@ -36,9 +36,9 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
 /**
  * Servlet for handling SPARQL inspect queries via HTTP GET and POST requests.
  */
-public class HeFQUINServletInspect extends HttpServlet
+public class InspectServlet extends HttpServlet
 {
-	private static Logger logger = LoggerFactory.getLogger( HeFQUINServletInspect.class );
+	private static Logger logger = LoggerFactory.getLogger( InspectServlet.class );
 	private static final long serialVersionUID = 1L;
 	private static HeFQUINEngine engine;
 
@@ -163,7 +163,7 @@ public class HeFQUINServletInspect extends HttpServlet
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString );
-		final ResultsFormat resultsFormat = HeFQUINServerUtils.convert( mimeType );
+		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		final JsonObject inspectionResults = new JsonObject();

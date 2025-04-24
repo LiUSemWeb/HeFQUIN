@@ -27,7 +27,7 @@ public class SharedResourceInitializer implements ServletContextListener
 		check( configurationFile );
 		check( federationFile );
 
-		final HeFQUINEngine engine = HeFQUINServerUtils.getEngine( federationFile, configurationFile );
+		final HeFQUINEngine engine = ServletUtils.getEngine( federationFile, configurationFile );
 		servletContextEvent.getServletContext().setAttribute( "engine", engine );
 	}
 

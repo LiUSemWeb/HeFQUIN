@@ -18,10 +18,10 @@ public class TestServer {
 		context.setContextPath( "/" );
 		context.addEventListener( new SharedResourceInitializer() );
 
-		final ServletHolder servlet = new ServletHolder( new HeFQUINServlet() );
+		final ServletHolder servlet = new ServletHolder( new SparqlServlet() );
 		context.addServlet( servlet, "/" );
 
-		final ServletHolder inspectServlet = new ServletHolder( new HeFQUINServletInspect() );
+		final ServletHolder inspectServlet = new ServletHolder( new InspectServlet() );
 		context.addServlet( inspectServlet, "/query-inspect" );
 
 		server.setHandler( context );
