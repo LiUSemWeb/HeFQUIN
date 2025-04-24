@@ -7,13 +7,13 @@
 
     <!-- Servlet Configuration -->
     <servlet>
-        <servlet-name>HeFQUINServlet</servlet-name>
-        <servlet-class>se.liu.ida.hefquin.service.HeFQUINServlet</servlet-class>
+        <servlet-name>SparqlServlet</servlet-name>
+        <servlet-class>se.liu.ida.hefquin.service.SparqlServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
-        <servlet-name>HeFQUINServletInspect</servlet-name>
-        <servlet-class>se.liu.ida.hefquin.service.HeFQUINServletInspect</servlet-class>
+        <servlet-name>InspectServlet</servlet-name>
+        <servlet-class>se.liu.ida.hefquin.service.InspectServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
