@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -315,12 +314,12 @@ public class FederationDescriptionReader
 	 * Verifies that the file at the given path exists.
 	 */
 	protected boolean verifyValidVocabMappingFile( final String pathToMappingFile ) {
-		final File f = new File(pathToMappingFile);
-		if ( f.exists() && f.isFile() ){
+		// Try to load it as a resource from the classpath
+		if( getClass().getClassLoader().getResource(pathToMappingFile) != null ){
 			return true;
 		}
-		else
-			throw new IllegalArgumentException( "The following path to vocab.mapping does not exist:" + pathToMappingFile );
+
+		throw new IllegalArgumentException( "The following path to vocab.mapping does not exist: " + pathToMappingFile );
 	}
 
 	/**
