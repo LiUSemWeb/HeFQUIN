@@ -3,11 +3,19 @@ package se.liu.ida.hefquin.base.query.impl;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.BGP;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class TriplePatternImpl implements TriplePattern
 {
@@ -68,4 +76,122 @@ public class TriplePatternImpl implements TriplePattern
 	public int hashCode() {
 		return jenaObj.hashCode();
 	}
+
+	@Override
+	public Set<TriplePattern> getAllMentionedTPs() {
+		return Collections.singleton(this);
+	}
+
+	@Override
+	public Set<Var> getCertainVariables() {
+		return getAllMentionedVariables();
+	}
+
+	@Override
+	public Set<Var> getPossibleVariables() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public Set<Var> getAllMentionedVariables() {
+		final Node s = jenaObj.getSubject();
+		final Node p = jenaObj.getPredicate();
+		final Node o = jenaObj.getObject();
+
+		final Set<Var> vars = new HashSet<>();
+
+		if ( Var.isVar(s) ) { vars.add( Var.alloc(s) ); }
+		if ( Var.isVar(p) ) { vars.add( Var.alloc(p) ); }
+		if ( Var.isVar(o) ) { vars.add( Var.alloc(o) ); }
+
+		return vars;
+	}
+
+	@Override
+	public int getNumberOfVarMentions() {
+		int n = 0;
+		if ( Var.isVar(jenaObj.getSubject()) )   { n++; }
+		if ( Var.isVar(jenaObj.getPredicate()) ) { n++; }
+		if ( Var.isVar(jenaObj.getObject()) )    { n++; }
+		return n;
+	}
+
+	@Override
+	public int getNumberOfTermMentions() {
+		int n = 0;
+		if ( ! Var.isVar(jenaObj.getSubject()) )   { n++; }
+		if ( ! Var.isVar(jenaObj.getPredicate()) ) { n++; }
+		if ( ! Var.isVar(jenaObj.getObject()) )    { n++; }
+		return n;
+	}
+
+	@Override
+	public TriplePattern applySolMapToGraphPattern( final SolutionMapping sm )
+			throws VariableByBlankNodeSubstitutionException
+	{
+		final Binding b = sm.asJenaBinding();
+		boolean unchanged = true;
+
+		Node s = jenaObj.getSubject();
+		if ( Var.isVar(s) ) {
+			final Var var = Var.alloc(s);
+			if ( b.contains(var) ) {
+				s = b.get(var);
+				unchanged = false;
+				if ( s.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
+			}
+		}
+
+		Node p = jenaObj.getPredicate();
+		if ( Var.isVar(p) ) {
+			final Var var = Var.alloc(p);
+			if ( b.contains(var) ) {
+				p = b.get(var);
+				unchanged = false;
+				if ( p.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
+			}
+		}
+
+		Node o = jenaObj.getObject();
+		if ( Var.isVar(o) ) {
+			final Var var = Var.alloc(o);
+			if ( b.contains(var) ) {
+				o = b.get(var);
+				unchanged = false;
+				if ( o.isBlank() ) {
+					throw new VariableByBlankNodeSubstitutionException();
+				}
+			}
+		}
+
+		return unchanged ? this : new TriplePatternImpl(s,p,o);
+	}
+
+	@Override
+	public SPARQLGraphPattern mergeWith( final SPARQLGraphPattern other ) {
+		if ( other instanceof TriplePattern tp )
+			return mergeWith(tp);
+
+		if ( other instanceof BGP bgp ) {
+			return mergeWith(bgp);
+		}
+
+		final Element elmt = QueryPatternUtils.convertToJenaElement(other);
+		return QueryPatternUtils.merge(this, elmt);
+	}
+
+	@Override
+	public BGP mergeWith( final TriplePattern other ) {
+		return new BGPImpl( this, other );
+	}
+
+	@Override
+	public BGP mergeWith( final BGP bgp ) {
+		return new BGPImpl(this, bgp);
+	}
+
 }

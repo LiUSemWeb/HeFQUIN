@@ -1,5 +1,14 @@
 package se.liu.ida.hefquin.base.query;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
+
+/**
+ * A SPARQL union pattern represents a collection of SPARQL graph patterns
+ * for which the results are meant to be combined via union. Hence, when
+ * considering an algebraic representation of SPARQL queries, the algebraic
+ * operator that corresponds to such a union pattern is a multiway union.
+ */
 public interface SPARQLUnionPattern extends SPARQLGraphPattern
 {
 	/**
@@ -20,4 +29,8 @@ public interface SPARQLUnionPattern extends SPARQLGraphPattern
 	 * an {@link IndexOutOfBoundsException} will be thrown.
 	 */
 	SPARQLGraphPattern getSubPatterns( int i ) throws IndexOutOfBoundsException;
+
+	@Override
+	SPARQLUnionPattern applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
+
 }

@@ -830,22 +830,24 @@ public class QueryPatternUtils
 		}
 	}
 
-	public static class VariableByBlankNodeSubstitutionException extends Exception
-	{
-		private static final long serialVersionUID = 3285677866147999456L;
+	/**
+	 * Merges the given filter expressions into the given graph pattern.
+	 */
+	public static SPARQLGraphPattern merge( final ExprList exprs, final SPARQLGraphPattern p ) {
+		final Element elmt = convertToJenaElement(p);
+		return merge(exprs, elmt);
 	}
 
 	/**
 	 * Merges the given filter expressions into the given graph pattern.
 	 */
-	public static SPARQLGraphPattern merge( final ExprList exprs, final SPARQLGraphPattern p ) {
+	public static SPARQLGraphPattern merge( final ExprList exprs, final Element elmt ) {
 		// Create a new ElementGroup object, add into it the Element represented
 		// by the given graph pattern, add into it the filters, and create a new
 		// graph pattern from it.
 		final ElementGroup group = new ElementGroup();
 
 		// - convert the given graph pattern into an Element and add it to the group
-		final Element elmt = convertToJenaElement(p);
 		if ( elmt instanceof ElementGroup eg ) {
 			// If the given graph pattern was converted to an ElementGroup, instead
 			// of simply adding it into the new group, copy its sub-elements over
@@ -873,13 +875,20 @@ public class QueryPatternUtils
 	 * Merges the given BIND clause into the given graph pattern.
 	 */
 	public static SPARQLGraphPattern merge( final VarExprList exprs, final SPARQLGraphPattern p ) {
+		final Element elmt = convertToJenaElement(p);
+		return merge(exprs, elmt);
+	}
+
+	/**
+	 * Merges the given BIND clause into the given graph pattern.
+	 */
+	public static SPARQLGraphPattern merge( final VarExprList exprs, final Element elmt ) {
 		// Create a new ElementGroup object, add into it the Element represented
 		// by the given graph pattern, add into it the filters, and create a new
 		// graph pattern from it.
 		final ElementGroup group = new ElementGroup();
 
 		// - convert the given graph pattern into an Element and add it to the group
-		final Element elmt = convertToJenaElement(p);
 		if ( elmt instanceof ElementGroup eg ) {
 			// If the given graph pattern was converted to an ElementGroup, instead
 			// of simply adding it into the new group, copy its sub-elements over
@@ -949,7 +958,17 @@ public class QueryPatternUtils
 
 		// Convert the given graph pattern into a Jena Element object and continue with that.
 		final Element elmt = convertToJenaElement(p);
+		return merge(tp, elmt);
+	}
 
+	/**
+	 * Merges the given triple pattern into the given graph pattern. If the
+	 * given graph pattern is also a triple pattern or a BGP, then the resulting
+	 * graph pattern is a BGP to which the triple pattern was added. Otherwise,
+	 * the resulting graph pattern is the given graph pattern with the triple
+	 * pattern joined into it.
+	 */
+	public static SPARQLGraphPattern merge( final TriplePattern tp, final Element elmt ) {
 		// If we can still create a BGP, then we do that.
 		if ( elmt instanceof ElementTriplesBlock block ) {
 			// create the BGP and add the given triple pattern into it
@@ -1090,7 +1109,16 @@ public class QueryPatternUtils
 
 		// Convert the given graph pattern into a Jena Element object and continue with that.
 		final Element elmt = convertToJenaElement(p);
+		return merge(bgp, elmt);
+	}
 
+	/**
+	 * Merges the given BGP into the given graph pattern. If the given graph
+	 * pattern is also a BGP, then the resulting graph pattern is a BGP that
+	 * is the union of the two given BGPs. Otherwise, the resulting graph
+	 * pattern is the given graph pattern with the BGP joined into it.
+	 */
+	public static SPARQLGraphPattern merge( final BGP bgp, final Element elmt ) {
 		// If we can still create a BGP, then we do that.
 		if ( elmt instanceof ElementTriplesBlock block ) {
 			// create the BGP

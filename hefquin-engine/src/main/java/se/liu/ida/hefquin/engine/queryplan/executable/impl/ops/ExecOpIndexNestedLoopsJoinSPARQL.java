@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
