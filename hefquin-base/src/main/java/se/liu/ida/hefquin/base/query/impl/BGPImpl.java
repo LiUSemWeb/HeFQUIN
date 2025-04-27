@@ -3,8 +3,13 @@ package se.liu.ida.hefquin.base.query.impl;
 import java.util.*;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.core.PathBlock;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
@@ -47,6 +52,41 @@ public class BGPImpl implements BGP
 		tps = new HashSet<>();
 		tps.addAll( otherBGP.getTriplePatterns() );
 		tps.add(tp);
+	}
+
+	public BGPImpl( final List<Triple> tps ) {
+		this.tps = new HashSet<>();
+		for ( final Triple tp : tps ) {
+			this.tps.add( new TriplePatternImpl(tp) );
+		}
+	}
+
+	public BGPImpl( final BasicPattern pattern ) {
+		this( pattern.getList() );
+	}
+
+	/**
+	 * Assumes that the given {@link ElementPathBlock} does not contain
+	 * property path patterns (but only triple patterns). If it does,
+	 * this methods throws an {@link IllegalArgumentException}.
+	 */
+	public BGPImpl( final ElementPathBlock pattern ) {
+		this( pattern.getPattern() );
+	}
+
+	/**
+	 * Assumes that the given {@link PathBlock} does not contain property path
+	 * patterns (but only triple patterns). If it does, this methods throws an
+	 * {@link IllegalArgumentException}.
+	 */
+	public BGPImpl( final PathBlock pattern ) {
+		tps = new HashSet<>();
+		for ( final TriplePath tp : pattern.getList() ) {
+			if ( ! tp.isTriple() ) {
+				throw new IllegalArgumentException( "the given PathBlock contains a property path pattern (" + tp.toString() + ")" );
+			}
+			tps.add( new TriplePatternImpl(tp.asTriple()) );
+		}
 	}
 
 	@Override

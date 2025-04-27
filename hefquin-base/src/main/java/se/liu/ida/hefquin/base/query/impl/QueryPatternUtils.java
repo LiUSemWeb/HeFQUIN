@@ -29,42 +29,6 @@ import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 
 public class QueryPatternUtils
 {
-	public static BGP createBGP( final BasicPattern pattern ) {
-		final Set<TriplePattern> tps = new HashSet<>();
-		final Iterator<Triple> it = pattern.iterator();
-		while ( it.hasNext() ) {
-			tps.add( new TriplePatternImpl(it.next()) );
-		}
-		return new BGPImpl(tps);
-	}
-
-	/**
-	 * Assumes that the given {@link ElementPathBlock} does not contain
-	 * property path patterns (but only triple patterns). If it does,
-	 * this methods throws an {@link IllegalArgumentException}.
-	 */
-	public static BGP createBGP( final ElementPathBlock pattern ) {
-		return createBGP( pattern.getPattern() );
-	}
-
-	/**
-	 * Assumes that the given {@link PathBlock} does not contain property path
-	 * patterns (but only triple patterns). If it does, this methods throws an
-	 * {@link IllegalArgumentException}.
-	 */
-	public static BGP createBGP( final PathBlock pattern ) {
-		final Set<TriplePattern> tps = new HashSet<>();
-		final Iterator<TriplePath> it = pattern.iterator();
-		while ( it.hasNext() ) {
-			final TriplePath tp = it.next();
-			if ( ! tp.isTriple() ) {
-				throw new IllegalArgumentException( "the given PathBlock contains a property path pattern (" + tp.toString() + ")" );
-			}
-			tps.add( new TriplePatternImpl(tp.asTriple()) );
-		}
-		return new BGPImpl(tps);
-	}
-
 	/**
 	 * Returns a representation of the given graph pattern as
 	 * an object of the {@link Op} interface of the Jena API.
