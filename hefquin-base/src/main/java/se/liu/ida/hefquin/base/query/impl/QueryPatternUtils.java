@@ -130,65 +130,6 @@ public class QueryPatternUtils
 		}
 	}
 
-	public static Set<TriplePattern> getTPsInPattern( final Op op ) {
-		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
-			return getTPsInPattern( (Op2) op );
-		}
-
-		if ( op instanceof OpService || op instanceof OpFilter || op instanceof OpExtend ){
-			return getTPsInPattern( ((Op1) op).getSubOp() );
-		}
-
-		if ( op instanceof OpBGP opBGP ) {
-			final Set<TriplePattern> tps = new HashSet<>();
-			for ( final Triple t : opBGP.getPattern().getList() ) {
-				tps.add( new TriplePatternImpl(t) );
-			}
-			return tps;
-		}
-
-		throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
-	}
-
-	public static Set<TriplePattern> getTPsInPattern( final Op2 op ) {
-		final Set<TriplePattern> varLeft = getTPsInPattern( op.getLeft() );
-		final Set<TriplePattern> varRight = getTPsInPattern( op.getRight() );
-		varLeft.addAll(varRight);
-		return varLeft;
-	}
-
-	public static Set<TriplePattern> getTPsInPattern ( final Element e ) {
-		final Set<TriplePattern> tps = new HashSet<>();
-		if ( e instanceof ElementTriplesBlock b ) {
-			for ( final Triple tp : b.getPattern().getList() ) {
-				tps.add( new TriplePatternImpl(tp) );
-			}
-		}
-		else if ( e instanceof ElementPathBlock b ) {
-			for ( final TriplePath tpp : b.getPattern().getList() ) {
-				if ( ! tpp.isTriple() ) {
-					throw new IllegalArgumentException( "Property paths patterns are not supported by HeFQUIN." );
-				}
-				tps.add( new TriplePatternImpl(tpp.asTriple()) );
-			}
-		}
-		else if ( e instanceof ElementGroup eg ) {
-			for ( Element el: eg.getElements() ){
-				tps.addAll( getTPsInPattern(el) );
-			}
-		}
-		else if ( e instanceof ElementFilter ) {
-			// Do nothing
-		}
-		else if ( e instanceof ElementBind ) {
-			// Do nothing
-		}
-		else
-			throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
-
-		return tps;
-	}
-
 	public static Set<Var> getVariablesInPattern( final Triple tp ) {
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp );

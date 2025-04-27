@@ -1,13 +1,24 @@
 package se.liu.ida.hefquin.base.query.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;
 import org.apache.jena.sparql.algebra.OpVars;
+import org.apache.jena.sparql.algebra.op.Op1;
+import org.apache.jena.sparql.algebra.op.Op2;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpExtend;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.graph.NodeTransformLib;
@@ -74,7 +85,7 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 
 	@Override
 	public Set<TriplePattern> getAllMentionedTPs() {
-		return QueryPatternUtils.getTPsInPattern(jenaPatternOp);
+		return getTPsInPattern(jenaPatternOp);
 	}
 
 	@Override
@@ -130,6 +141,37 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 		// should be done by merging the respective Op objects.
 
 		return new SPARQLGroupPatternImpl(this, other);
+	}
+
+	public static Set<TriplePattern> getTPsInPattern( final Op op ) {
+		// TODO: It is better to implement this function using an OpVisitor.
+		// If done, you can remove this function and use the visitor-based code
+		// directly in getAllMentionedTPs() above.
+
+		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
+			return getTPsInPattern( (Op2) op );
+		}
+
+		if ( op instanceof OpService || op instanceof OpFilter || op instanceof OpExtend ){
+			return getTPsInPattern( ((Op1) op).getSubOp() );
+		}
+
+		if ( op instanceof OpBGP opBGP ) {
+			final Set<TriplePattern> tps = new HashSet<>();
+			for ( final Triple t : opBGP.getPattern().getList() ) {
+				tps.add( new TriplePatternImpl(t) );
+			}
+			return tps;
+		}
+
+		throw new UnsupportedOperationException("Getting the triple patterns from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
+	}
+
+	public static Set<TriplePattern> getTPsInPattern( final Op2 op ) {
+		final Set<TriplePattern> varLeft = getTPsInPattern( op.getLeft() );
+		final Set<TriplePattern> varRight = getTPsInPattern( op.getRight() );
+		varLeft.addAll(varRight);
+		return varLeft;
 	}
 
 }

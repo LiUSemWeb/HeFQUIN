@@ -1,18 +1,26 @@
 package se.liu.ida.hefquin.base.query.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpVars;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprTransformSubstitute;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementBind;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
@@ -77,7 +85,7 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 
 	@Override
 	public Set<TriplePattern> getAllMentionedTPs() {
-		return QueryPatternUtils.getTPsInPattern(jenaPatternElement);
+		return getTPsInPattern(jenaPatternElement);
 	}
 
 	@Override
@@ -142,4 +150,39 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 		return new SPARQLGroupPatternImpl(this, other);
 	}
 
+	public static Set<TriplePattern> getTPsInPattern ( final Element e ) {
+		// TODO: It is better to implement this function using an ElementVisitor.
+		// If done, you can remove this function and use the visitor-based code
+		// directly in getAllMentionedTPs() above.
+		
+		final Set<TriplePattern> tps = new HashSet<>();
+		if ( e instanceof ElementTriplesBlock b ) {
+			for ( final Triple tp : b.getPattern().getList() ) {
+				tps.add( new TriplePatternImpl(tp) );
+			}
+		}
+		else if ( e instanceof ElementPathBlock b ) {
+			for ( final TriplePath tpp : b.getPattern().getList() ) {
+				if ( ! tpp.isTriple() ) {
+					throw new IllegalArgumentException( "Property paths patterns are not supported by HeFQUIN." );
+				}
+				tps.add( new TriplePatternImpl(tpp.asTriple()) );
+			}
+		}
+		else if ( e instanceof ElementGroup eg ) {
+			for ( Element el: eg.getElements() ){
+				tps.addAll( getTPsInPattern(el) );
+			}
+		}
+		else if ( e instanceof ElementFilter ) {
+			// Do nothing
+		}
+		else if ( e instanceof ElementBind ) {
+			// Do nothing
+		}
+		else
+			throw new IllegalArgumentException( "Cannot get triple patterns of the operator (type: " + e.getClass().getName() + ")." );
+
+		return tps;
+	}
 }
