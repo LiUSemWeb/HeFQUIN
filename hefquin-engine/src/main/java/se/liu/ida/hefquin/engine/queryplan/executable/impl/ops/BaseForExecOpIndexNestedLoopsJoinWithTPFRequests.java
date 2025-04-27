@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
@@ -20,20 +19,17 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithTPFRequests<MemberTyp
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableRequestOperator( final SolutionMapping inputSolMap ) {
+	protected NullaryExecutableOp createExecutableRequestOperator( final SolutionMapping inputSolMap )
+			throws VariableByBlankNodeSubstitutionException
+	{
 		final TriplePatternRequest req = createRequest(inputSolMap);
-		return ( req == null ) ? null : createRequestOperator(req);
+		return createRequestOperator(req);
 	}
 
-	protected TriplePatternRequest createRequest( final SolutionMapping inputSolMap ) {
-		final TriplePattern tp;
-		try {
-			tp = QueryPatternUtils.applySolMapToTriplePattern(inputSolMap, query);
-		}
-		catch ( final VariableByBlankNodeSubstitutionException e ) {
-			return null;
-		}
-
+	protected TriplePatternRequest createRequest( final SolutionMapping inputSolMap )
+			throws VariableByBlankNodeSubstitutionException
+	{
+		final TriplePattern tp = query.applySolMapToGraphPattern(inputSolMap);
 		return new TriplePatternRequestImpl(tp);
 	}
 

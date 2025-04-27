@@ -2,10 +2,8 @@ package se.liu.ida.hefquin.base.query.impl;
 
 import java.util.*;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.OpVars;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpExtend;
 import org.apache.jena.sparql.algebra.op.OpFilter;
@@ -17,20 +15,10 @@ import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.core.*;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
-import org.apache.jena.sparql.expr.ExprTransformSubstitute;
-import org.apache.jena.sparql.expr.NodeValue;
-import org.apache.jena.sparql.graph.NodeTransform;
-import org.apache.jena.sparql.graph.NodeTransformLib;
 import org.apache.jena.sparql.syntax.*;
-import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
-import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
-import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
-import org.apache.jena.sparql.syntax.syntaxtransform.NodeTransformSubst;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
@@ -38,7 +26,6 @@ import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
-import se.liu.ida.hefquin.base.queryplan.utils.ExpectedVariablesUtilsCopy;
 
 public class QueryPatternUtils
 {
@@ -179,40 +166,6 @@ public class QueryPatternUtils
 		}
 	}
 
-	/**
-	 * Returns the set of all triple patterns that occur in the given graph pattern.
-	 */
-	public static Set<TriplePattern> getTPsInPattern( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 gp1 ) {
-			return getTPsInPattern( gp1.asJenaElement() );
-		}
-		if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 gp2 ) {
-			return getTPsInPattern( gp2.asJenaOp() );
-		}
-
-		final Set<TriplePattern> tps = new HashSet<>();
-		if ( queryPattern instanceof TriplePattern tp ) {
-			tps.add(tp);
-		}
-		else if ( queryPattern instanceof BGP bgp ) {
-			tps.addAll( bgp.getTriplePatterns() );
-		}
-		else if ( queryPattern instanceof SPARQLGroupPattern gp ) {
-			for ( int i = 0; i < gp.getNumberOfSubPatterns(); i++ ) {
-				tps.addAll( getTPsInPattern(gp.getSubPatterns(i)) );
-			}
-		}
-		else if ( queryPattern instanceof SPARQLUnionPattern up ) {
-			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
-				tps.addAll( getTPsInPattern( up.getSubPatterns(i) ) );
-			}
-		}
-		else {
-			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
-		}
-		return tps;
-	}
-
 	public static Set<TriplePattern> getTPsInPattern( final Op op ) {
 		if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
 			return getTPsInPattern( (Op2) op );
@@ -272,66 +225,9 @@ public class QueryPatternUtils
 		return tps;
 	}
 
-	/**
-	 * Returns the set of all variables that occur in the given graph pattern,
-	 * but ignoring variables in FILTER expressions.
-	 *
-	 * If the given pattern is a {@link TriplePattern}, this function returns
-	 * the result of {@link #getVariablesInPattern(TriplePattern)}. Similarly,
-	 * if the given pattern is a {@link BGP}, this function returns the result
-	 * of {@link #getVariablesInPattern(BGP)}.
-	 */
-	public static Set<Var> getVariablesInPattern( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern tp ) {
-			return getVariablesInPattern(tp);
-		}
-		else if ( queryPattern instanceof BGP bgp ) {
-			return getVariablesInPattern(bgp);
-		}
-		else if ( queryPattern instanceof SPARQLGroupPattern gp ) {
-			final Set<Var> vars = new HashSet<>();
-			for ( final SPARQLGraphPattern subPattern : gp.getSubPatterns() ) {
-				vars.addAll( getVariablesInPattern(subPattern) );
-			}
-
-			return vars;
-		}
-		else if ( queryPattern instanceof SPARQLUnionPattern up ) {
-			final Set<Var> vars = new HashSet<>();
-			for ( final SPARQLGraphPattern subPattern : up.getSubPatterns() ) {
-				vars.addAll( getVariablesInPattern(subPattern) );
-			}
-
-			return vars;
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 gp1 ) {
-			@SuppressWarnings("deprecation")
-			final Op jenaOp = gp1.asJenaOp();
-			return getVariablesInPattern(jenaOp);
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 gp2 ) {
-			return getVariablesInPattern( gp2.asJenaOp() );
-		}
-		else {
-			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
-		}
-	}
-
-	public static Set<Var> getVariablesInPattern( final TriplePattern tp ) {
-		return getVariablesInPattern( tp.asJenaTriple() );
-	}
-
 	public static Set<Var> getVariablesInPattern( final Triple tp ) {
 		final Set<Var> result = new HashSet<>();
 		Vars.addVarsFromTriple( result, tp );
-		return result;
-	}
-
-	public static Set<Var> getVariablesInPattern( final BGP bgp ) {
-		final Set<Var> result = new HashSet<>();
-		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
-			result.addAll( getVariablesInPattern(tp) );
-		}
 		return result;
 	}
 
@@ -377,32 +273,11 @@ public class QueryPatternUtils
 		}
 	}
 
-
-	/**
-	 * Returns the number of elements of the given triple pattern that are variables.
-	 */
-	public static int getNumberOfVarOccurrences( final TriplePattern tp ) {
-		final Triple jenaTP = tp.asJenaTriple();
-		return getNumberOfVarOccurrences(jenaTP);
-	}
-
 	public static int getNumberOfVarOccurrences( final Triple jenaTP ) {
 		int n = 0;
 		if ( jenaTP.getSubject().isVariable() )   { n += 1; }
 		if ( jenaTP.getPredicate().isVariable() ) { n += 1; }
 		if ( jenaTP.getObject().isVariable() )    { n += 1; }
-		return n;
-	}
-
-	/**
-	 * Returns the number of elements of the given triple pattern that are RDF terms.
-	 */
-	public static int getNumberOfTermOccurrences( final TriplePattern tp ) {
-		final Triple jenaTP = tp.asJenaTriple();
-		int n = 0;
-		if ( ! jenaTP.getSubject().isVariable() )   { n += 1; }
-		if ( ! jenaTP.getPredicate().isVariable() ) { n += 1; }
-		if ( ! jenaTP.getObject().isVariable() )    { n += 1; }
 		return n;
 	}
 
@@ -552,128 +427,14 @@ public class QueryPatternUtils
 		}
 	}
 
-	/**
-	 * Returns the number of occurrences of RDF terms in the given graph
-	 * pattern. If the same term occurs multiple times, each occurrence
-	 * is counted.
-	 *
-	 * If the given pattern is a {@link TriplePattern}, this function returns
-	 * the result of {@link #getNumberOfTermOccurrences(TriplePattern)}.
-	 * Similarly, if the given pattern is a {@link BGP}, this function
-	 * returns the result of {@link #getNumberOfTermOccurrences(BGP)}.
-	 */
-	public static int getNumberOfTermOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern tp ) {
-			return getNumberOfTermOccurrences(tp);
-		}
-		else if ( queryPattern instanceof BGP bgp ) {
-			return getNumberOfTermOccurrences(bgp);
-		}
-		else if ( queryPattern instanceof SPARQLGroupPattern gp ) {
-			int sum = 0;
-			for ( final SPARQLGraphPattern subPattern : gp.getSubPatterns() ) {
-				sum += getNumberOfTermOccurrences(subPattern);
-			}
-
-			return sum;
-		}
-		else if ( queryPattern instanceof SPARQLUnionPattern up ) {
-			int sum = 0;
-			for ( final SPARQLGraphPattern subPattern : up.getSubPatterns() ) {
-				sum += getNumberOfTermOccurrences(subPattern);
-			}
-
-			return sum;
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 gp1 ) {
-			@SuppressWarnings("deprecation")
-			final Op jenaOp = gp1.asJenaOp();
-			return getNumberOfTermOccurrences(jenaOp);
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 gp2 ) {
-			return getNumberOfTermOccurrences( gp2.asJenaOp() );
-		}
-		else {
-			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
-		}
-	}
-
 	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
-		if ( pattern instanceof TriplePattern tp ) {
-			return new ExpectedVariables() {
-				@Override public Set<Var> getPossibleVariables() {
-					return Collections.emptySet();
-				}
+		final Set<Var> certainVars = pattern.getCertainVariables();
+		final Set<Var> possibleVars = pattern.getPossibleVariables();
 
-				@Override public Set<Var> getCertainVariables() {
-					return getVariablesInPattern(tp);
-				}
-			};
-		}
-		else if ( pattern instanceof BGP bgp ) {
-			return new ExpectedVariables() {
-				@Override public Set<Var> getPossibleVariables() {
-					return Collections.emptySet();
-				}
-
-				@Override public Set<Var> getCertainVariables() {
-					return getVariablesInPattern(bgp);
-				}
-			};
-		}
-		else if ( pattern instanceof SPARQLGroupPattern gp ) {
-			final ExpectedVariables[] evs = new ExpectedVariables[gp.getNumberOfSubPatterns()];
-			for ( int i = 0; i < gp.getNumberOfSubPatterns(); i++ ) {
-				evs[i] = getExpectedVariablesInPattern( gp.getSubPatterns(i) );
-			}
-
-			final Set<Var> certainVars = ExpectedVariablesUtilsCopy.unionOfCertainVariables(evs);
-			final Set<Var> possibleVars = ExpectedVariablesUtilsCopy.unionOfPossibleVariables(evs);
-			possibleVars.removeAll(certainVars);
-
-			return new ExpectedVariables() {
-				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-				@Override public Set<Var> getCertainVariables() { return certainVars; }
-			};
-		}
-		else if ( pattern instanceof SPARQLUnionPattern up ) {
-			final ExpectedVariables[] evs = new ExpectedVariables[up.getNumberOfSubPatterns()];
-			for ( int i = 0; i < up.getNumberOfSubPatterns(); i++ ) {
-				evs[i] = getExpectedVariablesInPattern( up.getSubPatterns(i) );
-			}
-
-			final Set<Var> certainVars = ExpectedVariablesUtilsCopy.intersectionOfCertainVariables(evs);
-			final Set<Var> possibleVars = ExpectedVariablesUtilsCopy.unionOfAllVariables(evs);
-			possibleVars.removeAll(certainVars);
-
-			return new ExpectedVariables() {
-				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-				@Override public Set<Var> getCertainVariables() { return certainVars; }
-			};
-		}
-		else {
-			final Op jenaOp;
-			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 gp1 ) {
-				@SuppressWarnings("deprecation")
-				final Op o = gp1.asJenaOp();
-				jenaOp = o;
-			}
-			else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 gp2 ) {
-				jenaOp = gp2.asJenaOp();
-			}
-			else {
-				throw new UnsupportedOperationException( pattern.getClass().getName() );
-			}
-
-			final Set<Var> certainVars = OpVars.fixedVars(jenaOp);
-			Set<Var> possibleVars = OpVars.visibleVars(jenaOp);
-			possibleVars.removeAll(certainVars);
-
-			return new ExpectedVariables() {
-				@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-				@Override public Set<Var> getCertainVariables() { return certainVars; }
-			};
-		}
+		return new ExpectedVariables() {
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+		};
 	}
 
 	public static ExpectedVariables getExpectedVariablesInQuery( final SPARQLQuery query ) {
@@ -683,159 +444,6 @@ public class QueryPatternUtils
 			@Override public Set<Var> getPossibleVariables() { return vars; }
 			@Override public Set<Var> getCertainVariables() { return Collections.emptySet(); }
 		};
-	}
-
-	public static SPARQLGraphPattern applySolMapToGraphPattern(
-			final SolutionMapping sm,
-			final SPARQLGraphPattern pattern )
-					throws VariableByBlankNodeSubstitutionException
-	{
-		if ( pattern instanceof TriplePattern tp )
-		{
-			return applySolMapToTriplePattern(sm, tp);
-		}
-		else if ( pattern instanceof BGP bgp )
-		{
-			return applySolMapToBGP(sm, bgp);
-		}
-		else if ( pattern instanceof SPARQLUnionPattern up )
-		{
-			final SPARQLUnionPatternImpl upNew = new SPARQLUnionPatternImpl();
-			boolean unchanged = true;
-			for ( final SPARQLGraphPattern p : up.getSubPatterns() ) {
-				final SPARQLGraphPattern pNew = applySolMapToGraphPattern(sm, p);
-				upNew.addSubPattern(pNew);
-				if ( ! pNew.equals(p) ) {
-					unchanged = false;
-				}
-			}
-
-			return ( unchanged ) ? pattern : upNew;
-		}
-		else if ( pattern instanceof SPARQLGroupPattern gp )
-		{
-			final SPARQLGroupPatternImpl gpNew = new SPARQLGroupPatternImpl();
-			boolean unchanged = true;
-			for ( final SPARQLGraphPattern p : gp.getSubPatterns() ) {
-				final SPARQLGraphPattern pNew = applySolMapToGraphPattern(sm, p);
-				gpNew.addSubPattern(pNew);
-				if ( ! pNew.equals(p) ) {
-					unchanged = false;
-				}
-			}
-
-			return ( unchanged ) ? pattern : gpNew;
-		}
-		else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 gp1 )
-		{
-			final Map<Var, Node> map1 = new HashMap<>();
-			final Map<String, Expr> map2 = new HashMap<>();
-			sm.asJenaBinding().forEach( (v,n) -> { map1.put(v,n); map2.put(v.getVarName(),NodeValue.makeNode(n)); } );
-			final ElementTransform t1 = new ElementTransformSubst(map1);
-			final ExprTransformSubstitute t2 = new ExprTransformSubstitute(map2);
-
-			final Element e = gp1.asJenaElement();
-			final Element eNew = ElementTransformer.transform(e, t1, t2);
-			return ( e == eNew ) ? pattern : new GenericSPARQLGraphPatternImpl1(eNew);
-		}
-		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 gp2 )
-		{
-			final Map<Var, Node> map = new HashMap<>();
-			sm.asJenaBinding().forEach( (v,n) -> map.put(v,n) );
-			final NodeTransform t = new NodeTransformSubst(map);
-
-			final Op op = gp2.asJenaOp();
-			final Op opNew = NodeTransformLib.transform(t, op);
-			return ( op == opNew ) ? pattern : new GenericSPARQLGraphPatternImpl2(opNew);
-		}
-		else
-			throw new UnsupportedOperationException("TODO");
-	}
-
-	/**
-	 * Attention, this function throws an exception in all cases in which
-	 * one of the variables of the BGP would be replaced by a blank node.
-	 */
-	public static BGP applySolMapToBGP( final SolutionMapping sm, final BGP bgp )
-			throws VariableByBlankNodeSubstitutionException
-	{
-		final Set<TriplePattern> tps = new HashSet<>();
-		boolean unchanged = true;
-		for ( final TriplePattern tp : ((BGPImpl)bgp).getTriplePatterns() ) {
-			final TriplePattern tp2 = applySolMapToTriplePattern(sm, tp);
-			tps.add(tp2);
-			if ( tp2 != tp ) {
-				unchanged = false;
-			}
-		}
-
-		if ( unchanged ) {
-			return bgp;
-		} else {
-			return new BGPImpl(tps);
-		}
-	}
-
-	/**
-	 * Attention, this function throws an exception in all cases in which one
-	 * of the variables of the triple pattern would be replaced by a blank node.
-	 */
-	public static TriplePattern applySolMapToTriplePattern( final SolutionMapping sm,
-	                                                        final TriplePattern tp )
-			throws VariableByBlankNodeSubstitutionException
-	{
-		final Binding b = sm.asJenaBinding();
-		boolean unchanged = true;
-
-		Node s = tp.asJenaTriple().getSubject();
-		if ( Var.isVar(s) ) {
-			final Var var = Var.alloc(s);
-			if ( b.contains(var) ) {
-				s = b.get(var);
-				unchanged = false;
-				if ( s.isBlank() ) {
-					throw new VariableByBlankNodeSubstitutionException();
-				}
-			}
-		}
-
-		Node p = tp.asJenaTriple().getPredicate();
-		if ( Var.isVar(p) ) {
-			final Var var = Var.alloc(p);
-			if ( b.contains(var) ) {
-				p = b.get(var);
-				unchanged = false;
-				if ( p.isBlank() ) {
-					throw new VariableByBlankNodeSubstitutionException();
-				}
-			}
-		}
-
-		Node o = tp.asJenaTriple().getObject();
-		if ( Var.isVar(o) ) {
-			final Var var = Var.alloc(o);
-			if ( b.contains(var) ) {
-				o = b.get(var);
-				unchanged = false;
-				if ( o.isBlank() ) {
-					throw new VariableByBlankNodeSubstitutionException();
-				}
-			}
-		}
-
-		if ( unchanged ) {
-			return tp;
-		} else {
-			return new TriplePatternImpl(s,p,o);
-		}
-	}
-
-	/**
-	 * Merges the given filter expressions into the given graph pattern.
-	 */
-	public static SPARQLGraphPattern merge( final ExprList exprs, final SPARQLGraphPattern p ) {
-		final Element elmt = convertToJenaElement(p);
-		return merge(exprs, elmt);
 	}
 
 	/**
@@ -874,14 +482,6 @@ public class QueryPatternUtils
 	/**
 	 * Merges the given BIND clause into the given graph pattern.
 	 */
-	public static SPARQLGraphPattern merge( final VarExprList exprs, final SPARQLGraphPattern p ) {
-		final Element elmt = convertToJenaElement(p);
-		return merge(exprs, elmt);
-	}
-
-	/**
-	 * Merges the given BIND clause into the given graph pattern.
-	 */
 	public static SPARQLGraphPattern merge( final VarExprList exprs, final Element elmt ) {
 		// Create a new ElementGroup object, add into it the Element represented
 		// by the given graph pattern, add into it the filters, and create a new
@@ -910,55 +510,6 @@ public class QueryPatternUtils
 		}
 
 		return new GenericSPARQLGraphPatternImpl1(group);
-	}
-
-	/**
-	 * Merges the two graph patterns into a single one, using join semantics.
-	 * Returns a {@link BGP} if possible (for instance, if both of the given
-	 * patterns are BGPs or one of them is a BGP and the other one a triple
-	 * pattern).
-	 */
-	public static SPARQLGraphPattern merge( final SPARQLGraphPattern p1,
-	                                        final SPARQLGraphPattern p2 )
-	{
-		if ( p1 instanceof TriplePattern tp ) return merge(tp, p2);
-
-		if ( p2 instanceof TriplePattern tp ) return merge(tp, p1);
-
-		if ( p1 instanceof BGP bgp ) return merge(bgp, p2);
-
-		if ( p2 instanceof BGP bgp ) return merge(bgp, p1);
-
-		return new SPARQLGroupPatternImpl(p1, p2);
-	}
-
-	/**
-	 * Merges the given triple pattern into the given graph pattern. If the
-	 * given graph pattern is also a triple pattern or a BGP, then the resulting
-	 * graph pattern is a BGP to which the triple pattern was added. Otherwise,
-	 * the resulting graph pattern is the given graph pattern with the triple
-	 * pattern joined into it.
-	 */
-	public static SPARQLGraphPattern merge( final TriplePattern tp, final SPARQLGraphPattern p ) {
-		// If the given graph pattern is a triple pattern, produce and return a BGP.
-		if ( p instanceof TriplePattern tp2 ) {
-			return new BGPImpl(tp2, tp);
-		}
-
-		// If the given graph pattern is a BGP, produce and return a BGP.
-		if ( p instanceof BGP bgp ) {
-			final BGPImpl resultBGP = new BGPImpl(tp);
-
-			for ( final TriplePattern tpOfBGP : bgp.getTriplePatterns() ) {
-				resultBGP.addTriplePattern(tpOfBGP);
-			}
-
-			return resultBGP;
-		}
-
-		// Convert the given graph pattern into a Jena Element object and continue with that.
-		final Element elmt = convertToJenaElement(p);
-		return merge(tp, elmt);
 	}
 
 	/**
@@ -1072,44 +623,6 @@ public class QueryPatternUtils
 		}
 
 		return new GenericSPARQLGraphPatternImpl1(resultElmt);
-	}
-
-	/**
-	 * Merges the given BGP into the given graph pattern. If the given graph
-	 * pattern is also a BGP, then the resulting graph pattern is a BGP that
-	 * is the union of the two given BGPs. Otherwise, the resulting graph
-	 * pattern is the given graph pattern with the BGP joined into it.
-	 */
-	public static SPARQLGraphPattern merge( final BGP bgp, final SPARQLGraphPattern p ) {
-		// If the given graph pattern is a triple pattern, produce and return a BGP.
-		if ( p instanceof TriplePattern tp ) {
-			final BGPImpl resultBGP = new BGPImpl(tp);
-
-			for ( final TriplePattern tp2 : bgp.getTriplePatterns() ) {
-				resultBGP.addTriplePattern(tp2);
-			}
-
-			return resultBGP;
-		}
-
-		// If the given graph pattern is a BGP, produce and return a BGP.
-		if ( p instanceof BGP bgp2 ) {
-			final BGPImpl resultBGP = new BGPImpl();
-
-			for ( final TriplePattern tp : bgp2.getTriplePatterns() ) {
-				resultBGP.addTriplePattern(tp);
-			}
-
-			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
-				resultBGP.addTriplePattern(tp);
-			}
-
-			return resultBGP;
-		}
-
-		// Convert the given graph pattern into a Jena Element object and continue with that.
-		final Element elmt = convertToJenaElement(p);
-		return merge(bgp, elmt);
 	}
 
 	/**
