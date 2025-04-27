@@ -15,12 +15,12 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.*;
 
 import se.liu.ida.hefquin.base.query.BGP;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 
 public class QueryPatternUtils
 {

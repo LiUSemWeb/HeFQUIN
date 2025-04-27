@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTable;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnOneVar;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsHashTableBasedOnTwoVars;
 import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsIndexNoJoinVars;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.*;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;

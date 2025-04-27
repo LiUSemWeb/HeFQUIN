@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 
 public class SPARQLRequestImpl implements SPARQLRequest

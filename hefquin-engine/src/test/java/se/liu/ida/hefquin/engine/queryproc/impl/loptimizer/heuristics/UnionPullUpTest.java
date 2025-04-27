@@ -13,8 +13,8 @@ import org.apache.jena.sparql.expr.Expr;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalInterface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
