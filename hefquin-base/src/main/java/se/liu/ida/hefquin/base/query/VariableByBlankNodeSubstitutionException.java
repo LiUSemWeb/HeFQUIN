@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.base.query.impl;
+package se.liu.ida.hefquin.base.query;
 
 public class VariableByBlankNodeSubstitutionException extends Exception
 {

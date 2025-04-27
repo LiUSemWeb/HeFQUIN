@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 
 public class BGPImpl implements BGP
 {

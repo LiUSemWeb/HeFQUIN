@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.base.query;
 import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 
 /**
  * This interface represents basic graph patterns (BGPs).

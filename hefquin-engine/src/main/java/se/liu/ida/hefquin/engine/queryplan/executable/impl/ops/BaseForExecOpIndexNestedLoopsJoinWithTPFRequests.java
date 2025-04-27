@@ -2,7 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;

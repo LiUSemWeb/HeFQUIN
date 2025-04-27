@@ -9,7 +9,6 @@ import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 
 /**
  * This interface represents any kind of SPARQL query pattern.

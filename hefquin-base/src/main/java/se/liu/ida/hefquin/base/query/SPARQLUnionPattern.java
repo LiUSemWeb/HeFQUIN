@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.base.query;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 
 /**
  * A SPARQL union pattern represents a collection of SPARQL graph patterns

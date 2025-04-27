@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.base.query;
 import org.apache.jena.graph.Triple;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.query.impl.VariableByBlankNodeSubstitutionException;
 
 /**
  * This interface represents triple patterns.

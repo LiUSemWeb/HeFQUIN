@@ -18,6 +18,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 
 /**
  * This class is a generic implementation of {@link SPARQLGraphPattern}

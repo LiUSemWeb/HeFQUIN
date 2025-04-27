@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 
 public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 {
