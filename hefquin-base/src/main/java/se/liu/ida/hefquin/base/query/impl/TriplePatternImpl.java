@@ -12,9 +12,11 @@ import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -182,7 +184,7 @@ public class TriplePatternImpl implements TriplePattern
 		}
 
 		final Element elmt = QueryPatternUtils.convertToJenaElement(other);
-		return QueryPatternUtils.merge(this, elmt);
+		return merge(this, elmt);
 	}
 
 	@Override
@@ -193,6 +195,32 @@ public class TriplePatternImpl implements TriplePattern
 	@Override
 	public BGP mergeWith( final BGP bgp ) {
 		return new BGPImpl(this, bgp);
+	}
+
+	/**
+	 * Merges the given triple pattern into the given graph pattern. If the
+	 * given graph pattern is also a triple pattern or a BGP, then the resulting
+	 * graph pattern is a BGP to which the triple pattern was added. Otherwise,
+	 * the resulting graph pattern is the given graph pattern with the triple
+	 * pattern joined into it.
+	 */
+	public static SPARQLGraphPattern merge( final TriplePattern tp, final Element elmt ) {
+		// If we can still create a BGP, then we do that.
+		if ( elmt instanceof ElementTriplesBlock block ) {
+			// create the BGP and add the given triple pattern into it
+			final BGPImpl resultBGP = new BGPImpl(tp);
+
+			// add the triple patterns from the given graph pattern into the BGP as well
+			final Iterator<Triple> it = block.patternElts();
+			while ( it.hasNext() ) {
+				resultBGP.addTriplePattern( new TriplePatternImpl(it.next()) );
+			}
+
+			return resultBGP;
+		}
+
+		final Element resultElmt = ElementUtils.merge( tp.asJenaTriple(), elmt );
+		return new GenericSPARQLGraphPatternImpl1(resultElmt);
 	}
 
 }

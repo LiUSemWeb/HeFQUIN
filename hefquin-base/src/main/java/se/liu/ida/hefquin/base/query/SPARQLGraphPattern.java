@@ -8,7 +8,9 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
 
 /**
  * This interface represents any kind of SPARQL query pattern.
@@ -79,8 +81,9 @@ public interface SPARQLGraphPattern extends Query
 	 * and returns the resulting, merged pattern.
 	 */
 	default SPARQLGraphPattern mergeWith( final ExprList exprs ) {
-		final Element elmt = QueryPatternUtils.convertToJenaElement(this);
-		return QueryPatternUtils.merge(exprs, elmt);
+		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
+		final Element elmtMerged = ElementUtils.merge(exprs, elmtThis);
+		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
 	}
 
 	/**
@@ -88,7 +91,8 @@ public interface SPARQLGraphPattern extends Query
 	 * expressions and returns the resulting, merged pattern.
 	 */
 	default SPARQLGraphPattern mergeWith( final VarExprList exprs ) {
-		final Element elmt = QueryPatternUtils.convertToJenaElement(this);
-		return QueryPatternUtils.merge(exprs, elmt);
+		final Element elmtThis = QueryPatternUtils.convertToJenaElement(this);
+		final Element elmtMerged = ElementUtils.merge(exprs, elmtThis);
+		return new GenericSPARQLGraphPatternImpl1(elmtMerged);
 	}
 }
