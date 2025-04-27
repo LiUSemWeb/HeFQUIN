@@ -51,8 +51,8 @@ public interface SPARQLGraphPattern extends Query
 	/**
 	 * Returns the number of times any RDF term is mentioned in this graph
 	 * pattern (if the same term is mentioned multiple times, then each of
-	 * these mentions is counted), but ignores variable mentions in
-	 * expressions (in FILTER or in BIND).
+	 * these mentions is counted), but ignores terms mentions in expressions
+	 * (in FILTER or in BIND).
 	 */
 	int getNumberOfTermMentions();
 

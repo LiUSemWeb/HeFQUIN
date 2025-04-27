@@ -5,15 +5,9 @@ import java.util.*;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
-import org.apache.jena.sparql.algebra.op.OpExtend;
-import org.apache.jena.sparql.algebra.op.OpFilter;
 import org.apache.jena.sparql.algebra.op.OpJoin;
-import org.apache.jena.sparql.algebra.op.OpLeftJoin;
-import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpTriple;
-import org.apache.jena.sparql.algebra.op.Op1;
 import org.apache.jena.sparql.algebra.op.OpUnion;
-import org.apache.jena.sparql.algebra.op.Op2;
 import org.apache.jena.sparql.core.*;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -130,62 +124,6 @@ public class QueryPatternUtils
 		}
 	}
 
-	public static Set<Var> getVariablesInPattern( final Triple tp ) {
-		final Set<Var> result = new HashSet<>();
-		Vars.addVarsFromTriple( result, tp );
-		return result;
-	}
-
-	public static Set<Var> getVariablesInPattern( final OpBGP bgp ) {
-		final Set<Var> result = new HashSet<>();
-		for ( final Triple tp : bgp.getPattern().getList() ) {
-			result.addAll( getVariablesInPattern(tp) );
-		}
-		return result;
-	}
-
-	public static Set<Var> getVariablesInPattern( final Op2 op ) {
-		final Set<Var> varLeft = getVariablesInPattern( op.getLeft() );
-		final Set<Var> varRight = getVariablesInPattern( op.getRight() );
-		varLeft.addAll(varRight);
-		return varLeft;
-	}
-
-	/**
-	 * Ignores variables in FILTER expressions and in BIND expressions (but not
-	 * the variables assigned by a BIND).
-	 */
-	public static Set<Var> getVariablesInPattern( final Op op ) {
-		if ( op instanceof OpBGP opBGP ) {
-			return getVariablesInPattern(opBGP);
-		}
-		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
-			return getVariablesInPattern( (Op2) op );
-		}
-		else if ( op instanceof OpService opService ){
-			return getVariablesInPattern( opService.getSubOp() );
-		}
-		else if ( op instanceof OpFilter opFilter ){
-			return getVariablesInPattern( opFilter.getSubOp() );
-		}
-		else if ( op instanceof OpExtend opExtend ){
-			final Set<Var> vars = getVariablesInPattern( opExtend.getSubOp() );
-			vars.addAll( opExtend.getVarExprList().getVars() );
-			return vars;
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the variables from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
-		}
-	}
-
-	public static int getNumberOfVarOccurrences( final Triple jenaTP ) {
-		int n = 0;
-		if ( jenaTP.getSubject().isVariable() )   { n += 1; }
-		if ( jenaTP.getPredicate().isVariable() ) { n += 1; }
-		if ( jenaTP.getObject().isVariable() )    { n += 1; }
-		return n;
-	}
-
 	/**
 	 * Returns the number of elements of the given triple pattern that are blank nodes.
 	 */
@@ -198,138 +136,12 @@ public class QueryPatternUtils
 		return n;
 	}
 
-	public static int getNumberOfVarOccurrences( final BGP bgp ) {
-		int n = 0;
-		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
-			n += getNumberOfVarOccurrences(tp);
-		}
-		return n;
-	}
-
-	public static int getNumberOfVarOccurrences( final OpBGP bgp ) {
-		int n = 0;
-		for ( final Triple tp : bgp.getPattern().getList() ) {
-			n += getNumberOfVarOccurrences(tp);
-		}
-		return n;
-	}
-
-	public static int getNumberOfVarOccurrences( final Op2 op ) {
-		final int numLeft = getNumberOfVarOccurrences( op.getLeft() );
-		final int numRight = getNumberOfVarOccurrences( op.getRight() );
-
-		return numLeft+numRight;
-	}
-
-	public static int getNumberOfVarOccurrences( final Op op ) {
-		if ( op instanceof OpBGP opBGP ) {
-			return getNumberOfVarOccurrences(opBGP);
-		}
-		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
-			return getNumberOfVarOccurrences( (Op2) op );
-		}
-		else if ( op instanceof OpService opService ){
-			return getNumberOfVarOccurrences( opService.getSubOp() );
-		}
-		else if ( op instanceof OpFilter opFilter ){
-			return getNumberOfVarOccurrences( opFilter.getSubOp() );
-		}
-		else if ( op instanceof OpExtend opExtend ){
-			return getNumberOfVarOccurrences( opExtend.getSubOp() ) + opExtend.getVarExprList().getVars().size();
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the number of elements (variables) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
-		}
-	}
-
-	public static int getNumberOfTermOccurrences( final BGP bgp ) {
-		return 3 * bgp.getTriplePatterns().size() - getNumberOfVarOccurrences(bgp);
-	}
-
-	public static int getNumberOfTermOccurrences( final Op2 op ) {
-		final int numLeft = getNumberOfTermOccurrences( op.getLeft() );
-		final int numRight = getNumberOfTermOccurrences( op.getRight() );
-
-		return numLeft+numRight;
-	}
-
-	public static int getNumberOfTermOccurrences( final Op op ) {
-		if ( op instanceof OpBGP opBGP ) {
-			return getNumberOfTermOccurrences(opBGP);
-		}
-		else if ( op instanceof OpJoin || op instanceof OpLeftJoin || op instanceof OpUnion ) {
-			return getNumberOfTermOccurrences( (Op2) op );
-		}
-		else if ( op instanceof OpService opService ){
-			return getNumberOfTermOccurrences( opService.getSubOp() );
-		}
-		else if ( op instanceof OpFilter opFilter ){
-			return getNumberOfTermOccurrences( opFilter.getSubOp() );
-		}
-		else if ( op instanceof OpExtend opExtend ){
-			return getNumberOfTermOccurrences( opExtend.getSubOp() );
-		}
-		else {
-			throw new UnsupportedOperationException("Getting the number of elements (RDF terms) from arbitrary SPARQL patterns is an open TODO (type of Jena Op in the current case: " + op.getClass().getName() + ").");
-		}
-	}
-
-	public static int getNumberOfTermOccurrences( final OpBGP bgp ) {
-		return 3 * bgp.getPattern().getList().size() - getNumberOfVarOccurrences(bgp);
-	}
-
 	public static int getNumberOfBNodeOccurrences( final BGP bgp ) {
 		int n = 0;
 		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
 			n += getNumberOfBNodeOccurrences(tp);
 		}
 		return n;
-	}
-
-	/**
-	 * Returns the number of occurrences of variables in the given graph
-	 * pattern. If the same variable occurs multiple times, each occurrence
-	 * is counted.
-	 *
-	 * If the given pattern is a {@link TriplePattern}, this function returns
-	 * the result of {@link #getNumberOfVarOccurrences(TriplePattern)}.
-	 * Similarly, if the given pattern is a {@link BGP}, this function
-	 * returns the result of {@link #getNumberOfVarOccurrences(BGP)}.
-	 */
-	public static int getNumberOfVarOccurrences( final SPARQLGraphPattern queryPattern ) {
-		if ( queryPattern instanceof TriplePattern tp ) {
-			return getNumberOfVarOccurrences(tp);
-		}
-		else if ( queryPattern instanceof BGP bgp ) {
-			return getNumberOfVarOccurrences(bgp);
-		}
-		else if ( queryPattern instanceof SPARQLGroupPattern gp ) {
-			int sum = 0;
-			for ( final SPARQLGraphPattern subPattern : gp.getSubPatterns() ) {
-				sum += getNumberOfVarOccurrences(subPattern);
-			}
-
-			return sum;
-		}
-		else if ( queryPattern instanceof SPARQLUnionPattern up ) {
-			int sum = 0;
-			for ( final SPARQLGraphPattern subPattern : up.getSubPatterns() ) {
-				sum += getNumberOfVarOccurrences(subPattern);
-			}
-
-			return sum;
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl1 gp1 ) {
-			@SuppressWarnings("deprecation")
-			final Op jenaOp = gp1.asJenaOp();
-			return getNumberOfVarOccurrences(jenaOp);
-		}
-		else if ( queryPattern instanceof GenericSPARQLGraphPatternImpl2 gp2 ) {
-			return getNumberOfVarOccurrences( gp2.asJenaOp() );
-		}
-		else {
-			throw new UnsupportedOperationException( queryPattern.getClass().getName() );
-		}
 	}
 
 	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {

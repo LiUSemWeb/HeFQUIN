@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.jenaext.sparql.algebra.OpUtils;
 
 /**
  * This class is a generic implementation of {@link SPARQLGraphPattern}
@@ -103,17 +104,17 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 
 	@Override
 	public Set<Var> getAllMentionedVariables() {
-		return QueryPatternUtils.getVariablesInPattern(jenaPatternOp);
+		return OpUtils.getVariablesInPattern(jenaPatternOp);
 	}
 
 	@Override
 	public int getNumberOfVarMentions() {
-		return QueryPatternUtils.getNumberOfVarOccurrences(jenaPatternOp);
+		return OpUtils.getNumberOfVarMentions(jenaPatternOp);
 	}
 
 	@Override
 	public int getNumberOfTermMentions() {
-		return QueryPatternUtils.getNumberOfTermOccurrences(jenaPatternOp);
+		return OpUtils.getNumberOfTermMentions(jenaPatternOp);
 	}
 
 	@Override
