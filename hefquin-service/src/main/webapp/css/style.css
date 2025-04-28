@@ -1,0 +1,49 @@
+body {
+    max-width: 1200px;
+    margin: auto;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f0efec;
+    color: #084862;
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.yasgui .autocompleteWrapper {
+    max-width: unset;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+body, h1, h2 {
+    font-family: Montserrat, sans-serif;
+}
+
+img {
+    height: 100%;
+}
+
+header .logo {
+    height: 80px;
+}
+
+
+footer {
+    padding: 1em;
+    text-align: center;
+    font-size: 0.9em;
+    border-top: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    color: #084862;
+}
+
+footer a {
+    color: #084862;
+}

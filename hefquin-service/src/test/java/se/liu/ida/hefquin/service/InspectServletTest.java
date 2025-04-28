@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,7 +32,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @Ignore("Disabled since it uses live web tests")
-public class HeFQUINServletInspectTest {
+public class InspectServletTest {
 	private static CloseableHttpClient httpClient;
 	private static int port = 4567;
 	private static String uri = "http://localhost:" + port + "/query-inspect";
@@ -118,12 +119,13 @@ public class HeFQUINServletInspectTest {
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, DEFAULT_QUERY );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 
-			final JsonObject result = JsonParser.parseString( EntityUtils.toString( response.getEntity() ) )
-					.getAsJsonObject();
+			final String result = EntityUtils.toString( response.getEntity() );
+			final JsonObject o = JsonParser.parseString( result ).getAsJsonObject();
+
 			assertEquals( 200, response.getStatusLine().getStatusCode() );
 			for ( final String key : queryInspectFields ) {
-				assertTrue( result.keySet().contains( key ) );
-				assertNotNull( result.get( key ) );
+				assertTrue( o.keySet().contains( key ) );
+				assertNotNull( o.get( key ) );
 			}
 		}
 	}
@@ -243,8 +245,14 @@ public class HeFQUINServletInspectTest {
 		final String invalid = "SELECT * WHERE { SERVICE <http://invalid/federation/member> { ?s ?p ?o } }";
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, invalid );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
-			System.err.println( EntityUtils.toString( response.getEntity() ) );
-			assertEquals( 500, response.getStatusLine().getStatusCode() );
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+
+			final String result = EntityUtils.toString( response.getEntity() );
+			final JsonObject o = JsonParser.parseString( result ).getAsJsonObject();
+			assertEquals(
+				"java.util.NoSuchElementException: no federation member with URI <http://invalid/federation/member>",
+				o.getAsJsonArray( "exceptions" ).get( 0 )
+			);
 		}
 	}
 }

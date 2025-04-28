@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
-public class HeFQUINServletTest {
+public class SparqlServletTest {
 	private static CloseableHttpClient httpClient;
 	private static int port = 4567;
 	private static String uri = "http://localhost:" + port + "/sparql";
