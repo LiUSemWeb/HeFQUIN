@@ -32,7 +32,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 @Ignore("Disabled since it uses live web tests")
-public class HeFQUINServletInspectTest {
+public class InspectServletTest {
 	private static CloseableHttpClient httpClient;
 	private static int port = 4567;
 	private static String uri = "http://localhost:" + port + "/query-inspect";
