@@ -244,7 +244,13 @@ public class HeFQUINServletInspectTest {
 		final HttpPost request = createPostRequest( CONTENT_TYPE_FORM_URLENCODED, invalid );
 		try ( final CloseableHttpResponse response = httpClient.execute( request ) ) {
 			System.err.println( EntityUtils.toString( response.getEntity() ) );
-			assertEquals( 500, response.getStatusLine().getStatusCode() );
+
+			assertEquals( 200, response.getStatusLine().getStatusCode() );
+			final JsonObject result = JsonParser.parseString( EntityUtils.toString( response.getEntity() ) )
+					.getAsJsonObject();
+			assertEquals(
+				"java.util.NoSuchElementException: no federation member with URI <http://invalid/federation/member>",
+				result.getAsJsonArray( "exceptions" ).get( 0 ) );
 		}
 	}
 }
