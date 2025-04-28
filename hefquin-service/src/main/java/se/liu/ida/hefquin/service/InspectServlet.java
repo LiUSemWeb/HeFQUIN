@@ -52,7 +52,8 @@ public class InspectServlet extends HttpServlet
 	private static final LogicalPlanPrinter sourceAssignmentPrinter = new TextBasedLogicalPlanPrinterImpl();
 
 	/**
-	 * Initializes the servlet and retrieves the HeFQUIN engine from the servlet context.
+	 * Initializes the servlet and retrieves the HeFQUIN engine from the servlet
+	 * context.
 	 *
 	 * @param config the servlet configuration
 	 * @throws ServletException if the engine initialization fails
@@ -68,15 +69,18 @@ public class InspectServlet extends HttpServlet
 	}
 
 	/**
-	 * Handles HTTP POST requests containing SPARQL queries. Supports both 'application/sparql-query' and
-	 * 'application/x-www-form-urlencoded'.
+	 * Handles HTTP POST requests containing SPARQL queries. Supports both
+	 * 'application/sparql-query' and 'application/x-www-form-urlencoded'.
 	 *
 	 * @param request  the HTTP request
 	 * @param response the HTTP response
 	 * @throws IOException
 	 */
 	@Override
-	protected void doPost( final HttpServletRequest request, final HttpServletResponse response ) throws IOException {
+	protected void doPost( final HttpServletRequest request,
+	                       final HttpServletResponse response )
+			throws IOException
+	{
 		final String contentType = request.getHeader( "Content-Type" );
 
 		final String query;
@@ -103,22 +107,28 @@ public class InspectServlet extends HttpServlet
 	 * @throws IOException
 	 */
 	@Override
-	protected void doGet( final HttpServletRequest request, final HttpServletResponse response ) throws IOException {
+	protected void doGet( final HttpServletRequest request,
+	                      final HttpServletResponse response )
+		throws IOException
+	{
 		final String query = request.getParameter( "query" );
 		executeRequest( query, request, response );
 	}
 
 	/**
-	 * Executes the given SPARQL query using the HeFQUIN engine and returns the inspection results as JSON. Handles
-	 * query parsing, and error reporting.
+	 * Executes the given SPARQL query using the HeFQUIN engine and returns the
+	 * inspection results as JSON. Handles query parsing, and error reporting.
 	 *
 	 * @param query    the SPARQL query string (must not be null or empty)
 	 * @param request  the HTTP request containing headers and parameters
 	 * @param response the HTTP response used to return the query result or an error message
 	 * @throws IOException if an I/O error occurs while writing the response
 	 */
-	private void executeRequest( final String query, final HttpServletRequest request,
-			final HttpServletResponse response ) throws IOException {
+	private void executeRequest( final String query,
+	                             final HttpServletRequest request,
+	                             final HttpServletResponse response )
+			throws IOException
+	{
 		response.setCharacterEncoding( "UTF-8" );
 
 		// Ensure query is not null or empty
@@ -138,7 +148,9 @@ public class InspectServlet extends HttpServlet
 
 		}
 		catch ( final IllegalQueryException e ) {
-			writeJsonError( response, 400, new JsonString( "The given query is invalid: " + e.getMessage() ) );
+			writeJsonError( response,
+			                400,
+			                new JsonString( "The given query is invalid: " + e.getMessage() ) );
 			return;
 		}
 		catch ( final UnsupportedQueryException e ) {
@@ -147,7 +159,9 @@ public class InspectServlet extends HttpServlet
 		}
 		catch ( final Exception e ) {
 			logger.error( "Query execution failed", e );
-			writeJsonError( response, 500, new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
+			writeJsonError( response,
+			                500,
+			                new JsonString( "Error during query execution: " + e.getLocalizedMessage() ) );
 			return;
 		}
 	}
@@ -159,7 +173,8 @@ public class InspectServlet extends HttpServlet
 	 * @param mimeType    the MIME type for the response format
 	 * @return the inspection result as a JSON object
 	 */
-	private static JsonObject execute( final String queryString, final String mimeType )
+	private static JsonObject execute( final String queryString,
+	                                   final String mimeType )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		final Query query = QueryFactory.create( queryString );
@@ -168,7 +183,9 @@ public class InspectServlet extends HttpServlet
 
 		final JsonObject inspectionResults = new JsonObject();
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
+			final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query,
+			                                                                                      resultsFormat,
+			                                                                                      ps );
 			final QueryProcStats stats = statsAndExceptions.object1;
 			final List<Exception> exceptions = statsAndExceptions.object2;
 
@@ -178,23 +195,28 @@ public class InspectServlet extends HttpServlet
 				inspectionResults.put( "logicalPlan", getLogicalPlan( stats ) );
 				inspectionResults.put( "physicalPlan", getPhysicalPlan( stats ) );
 				inspectionResults.put( "sourceAssignment", getSourceAssignment( stats ) );
-				inspectionResults.put( "federationAccessStats", StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
+				inspectionResults.put( "federationAccessStats",
+				                       StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
 			}
 		}
 		return inspectionResults;
 	}
 
 	/**
-	 * Writes a JSON-formatted error response with the given HTTP status code and error message. The response body will
-	 * contain a JSON object of the form: {@code {"error": "<message>"}}.
+	 * Writes a JSON-formatted error response with the given HTTP status code and
+	 * error message. The response body will contain a JSON object of the form:
+	 * {@code {"error": "<message>"}}.
 	 *
 	 * @param response   the HTTP response to write to
 	 * @param statusCode the HTTP status code to set (e.g., 400, 415, 500)
 	 * @param message    the error message to include in the JSON body
 	 * @throws IOException if writing the response fails
 	 */
-	private static void writeJsonError( final HttpServletResponse response, final int statusCode, final JsonValue message )
-			throws IOException {
+	private static void writeJsonError( final HttpServletResponse response,
+	                                    final int statusCode,
+	                                    final JsonValue message )
+			throws IOException
+	{
 		response.setStatus( statusCode );
 		response.setContentType( "application/json" );
 		final JsonObject msg = new JsonObject();
@@ -203,7 +225,8 @@ public class InspectServlet extends HttpServlet
 	}
 
 	/**
-	 * Generates a textual representation of the logical query plan produced during query planning.
+	 * Generates a textual representation of the logical query plan produced during
+	 * query planning.
 	 *
 	 * @param stats the query processing statistics containing the logical plan
 	 * @return a JSON string containing the textual representation of the logical plan
@@ -216,7 +239,8 @@ public class InspectServlet extends HttpServlet
 	}
 
 	/**
-	 * Generates a textual representation of the physical query plan produced during query planning.
+	 * Generates a textual representation of the physical query plan produced during
+	 * query planning.
 	 *
 	 * @param stats the query processing statistics containing the physical plan
 	 * @return a JSON string containing the textual representation of the physical plan
@@ -229,8 +253,9 @@ public class InspectServlet extends HttpServlet
 	}
 
 	/**
-	 * Generates a textual representation of the logical query plan annotated with source assignments. Currently uses
-	 * the same printer as the logical plan printer; a dedicated printer is not available.
+	 * Generates a textual representation of the logical query plan annotated with
+	 * source assignments. Currently uses the same printer as the logical plan
+	 * printer; a dedicated printer is not available.
 	 *
 	 * @param stats the query processing statistics containing the logical plan
 	 * @return a JSON string containing the source assignment information
