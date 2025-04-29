@@ -41,9 +41,9 @@ public class TriplePatternImpl implements TriplePattern
 
 	@Override
 	public int numberOfVars() {
-		final String s = ( Var.isVar(jenaObj.getSubject()) ) ? jenaObj.getSubject().getName() : null;
-		final String p = ( Var.isVar(jenaObj.getPredicate()) ) ? jenaObj.getPredicate().getName() : null;
-		final String o = ( Var.isVar(jenaObj.getObject()) ) ? jenaObj.getObject().getName() : null;
+		final String s = ( jenaObj.getSubject().isVariable() ) ? jenaObj.getSubject().getName() : null;
+		final String p = ( jenaObj.getPredicate().isVariable() ) ? jenaObj.getPredicate().getName() : null;
+		final String o = ( jenaObj.getObject().isVariable() ) ? jenaObj.getObject().getName() : null;
 
 		int n = 0;
 		if ( s != null )
@@ -104,9 +104,9 @@ public class TriplePatternImpl implements TriplePattern
 
 		final Set<Var> vars = new HashSet<>();
 
-		if ( Var.isVar(s) ) { vars.add( Var.alloc(s) ); }
-		if ( Var.isVar(p) ) { vars.add( Var.alloc(p) ); }
-		if ( Var.isVar(o) ) { vars.add( Var.alloc(o) ); }
+		if ( s.isVariable() ) { vars.add( Var.alloc(s) ); }
+		if ( p.isVariable() ) { vars.add( Var.alloc(p) ); }
+		if ( o.isVariable() ) { vars.add( Var.alloc(o) ); }
 
 		return vars;
 	}
@@ -114,18 +114,18 @@ public class TriplePatternImpl implements TriplePattern
 	@Override
 	public int getNumberOfVarMentions() {
 		int n = 0;
-		if ( Var.isVar(jenaObj.getSubject()) )   { n++; }
-		if ( Var.isVar(jenaObj.getPredicate()) ) { n++; }
-		if ( Var.isVar(jenaObj.getObject()) )    { n++; }
+		if ( jenaObj.getSubject().isVariable() )   { n++; }
+		if ( jenaObj.getPredicate().isVariable() ) { n++; }
+		if ( jenaObj.getObject().isVariable() )    { n++; }
 		return n;
 	}
 
 	@Override
 	public int getNumberOfTermMentions() {
 		int n = 0;
-		if ( ! Var.isVar(jenaObj.getSubject()) )   { n++; }
-		if ( ! Var.isVar(jenaObj.getPredicate()) ) { n++; }
-		if ( ! Var.isVar(jenaObj.getObject()) )    { n++; }
+		if ( ! jenaObj.getSubject().isVariable() )   { n++; }
+		if ( ! jenaObj.getPredicate().isVariable() ) { n++; }
+		if ( ! jenaObj.getObject().isVariable() )    { n++; }
 		return n;
 	}
 
@@ -137,7 +137,7 @@ public class TriplePatternImpl implements TriplePattern
 		boolean unchanged = true;
 
 		Node s = jenaObj.getSubject();
-		if ( Var.isVar(s) ) {
+		if ( s.isVariable() ) {
 			final Var var = Var.alloc(s);
 			if ( b.contains(var) ) {
 				s = b.get(var);
@@ -149,7 +149,7 @@ public class TriplePatternImpl implements TriplePattern
 		}
 
 		Node p = jenaObj.getPredicate();
-		if ( Var.isVar(p) ) {
+		if ( p.isVariable() ) {
 			final Var var = Var.alloc(p);
 			if ( b.contains(var) ) {
 				p = b.get(var);
@@ -161,7 +161,7 @@ public class TriplePatternImpl implements TriplePattern
 		}
 
 		Node o = jenaObj.getObject();
-		if ( Var.isVar(o) ) {
+		if ( o.isVariable() ) {
 			final Var var = Var.alloc(o);
 			if ( b.contains(var) ) {
 				o = b.get(var);

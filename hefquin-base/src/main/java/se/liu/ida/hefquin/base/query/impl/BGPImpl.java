@@ -167,9 +167,9 @@ public class BGPImpl implements BGP
 			final Node p = tp.asJenaTriple().getPredicate();
 			final Node o = tp.asJenaTriple().getObject();
 
-			if ( Var.isVar(s) ) { vars.add( Var.alloc(s) ); }
-			if ( Var.isVar(p) ) { vars.add( Var.alloc(p) ); }
-			if ( Var.isVar(o) ) { vars.add( Var.alloc(o) ); }
+			if ( s.isVariable() ) { vars.add( Var.alloc(s) ); }
+			if ( p.isVariable() ) { vars.add( Var.alloc(p) ); }
+			if ( o.isVariable() ) { vars.add( Var.alloc(o) ); }
 		}
 
 		return vars;
