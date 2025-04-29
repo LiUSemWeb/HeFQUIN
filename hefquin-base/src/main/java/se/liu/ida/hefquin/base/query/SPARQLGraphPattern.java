@@ -9,7 +9,7 @@ import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
 
 /**

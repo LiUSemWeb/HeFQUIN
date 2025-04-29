@@ -6,6 +6,7 @@ import org.apache.jena.sparql.syntax.Element;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLQuery;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 
 public class SPARQLQueryImpl implements SPARQLQuery
 {

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.base.query.impl;
+package se.liu.ida.hefquin.base.query.utils;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -16,6 +16,8 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 
 public class QueryPatternUtils
 {
