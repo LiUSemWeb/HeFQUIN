@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.base.queryplan;
+package se.liu.ida.hefquin.base.query;
 
 import java.util.Set;
 
@@ -6,7 +6,8 @@ import org.apache.jena.sparql.core.Var;
 
 /**
  * Implementations of this interface represent sets of variables that can
- * be expected in the solution mappings produced by query operators.
+ * be expected in the solution mappings produced for query patterns and by
+ * query operators.
  */
 public interface ExpectedVariables
 {

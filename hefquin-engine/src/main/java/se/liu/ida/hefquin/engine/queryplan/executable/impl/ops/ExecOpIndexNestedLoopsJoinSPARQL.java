@@ -4,8 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -29,15 +28,10 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	}
 
 	@Override
-	protected SPARQLRequest createRequest( final SolutionMapping sm ) {
-		final SPARQLGraphPattern pattern;
-		try {
-			pattern = QueryPatternUtils.applySolMapToGraphPattern(sm, query);
-		}
-		catch ( final VariableByBlankNodeSubstitutionException e ) {
-			return null;
-		}
-
+	protected SPARQLRequest createRequest( final SolutionMapping sm )
+			throws VariableByBlankNodeSubstitutionException
+	{
+		final SPARQLGraphPattern pattern = query.applySolMapToGraphPattern(sm);
 		return new SPARQLRequestImpl(pattern);
 	}
 

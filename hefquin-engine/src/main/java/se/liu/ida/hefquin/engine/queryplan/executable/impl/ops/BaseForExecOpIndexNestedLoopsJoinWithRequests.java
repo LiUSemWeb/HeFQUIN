@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalResponse;
@@ -65,8 +66,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
 			// issue a request based on the current solution mapping
-			final ReqType req = createRequest(sm);
-			if ( req == null ) {
+			final ReqType req;
+			try {
+				req = createRequest(sm);
+			}
+			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// this may happen if the current solution mapping contains
 				// a blank node for any of the variables that is used when
 				// creating the request
@@ -108,7 +112,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 		}
 	}
 
-	protected abstract ReqType createRequest( SolutionMapping sm );
+	protected abstract ReqType createRequest( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
 
 	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink, ExecutableOperator op );
 

@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -85,11 +86,20 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 
 		int i = 0;
 		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			final CompletableFuture<?> f = initiateProcessing( sm, sink, execCxt );
-			if ( f == null ) {
+			final CompletableFuture<?> f;
+			try {
+				f = initiateProcessing( sm, sink, execCxt );
+			}
+			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// this may happen if the current solution mapping contains
 				// a blank node for any of the variables that is used when
 				// creating the request
+
+				if ( useOuterJoinSemantics ) {
+					numberOfOutputMappingsProduced++;
+					sink.send( sm );
+				}
+
 				continue;
 			}
 
@@ -111,22 +121,11 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected CompletableFuture<?> initiateProcessing(
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final ExecutionContext execCxt )
+					throws ExecOpExecutionException,
+					       VariableByBlankNodeSubstitutionException
 	{
-		final NullaryExecutableOp reqOp = createExecutableRequestOperator( sm );
-
-		if ( reqOp == null ) {
-			// this may happen if the given solution mapping
-			// contains a blank node for any of the variables
-			// that is used when creating the request
-
-			if ( useOuterJoinSemantics ) {
-				numberOfOutputMappingsProduced++;
-				sink.send( sm );
-			}
-
-			return null;
-		}
+		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
 
 		numberOfRequestOpsUsed++;
 
@@ -138,7 +137,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 			return CompletableFuture.runAsync(processor);
 	}
 
-	protected abstract NullaryExecutableOp createExecutableRequestOperator( SolutionMapping sm );
+	protected abstract NullaryExecutableOp createExecutableRequestOperator( SolutionMapping sm )
+			throws VariableByBlankNodeSubstitutionException;
 
 	protected Runnable createProcessor( final NullaryExecutableOp reqOp,
 	                                    final SolutionMapping smFromInput,

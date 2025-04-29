@@ -3,8 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
@@ -43,7 +42,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	                            final BRTPFServer fm,
 	                            final boolean useOuterJoinSemantics,
 	                            final boolean collectExceptions ) {
-		super(tp, fm, useOuterJoinSemantics, QueryPatternUtils.getVariablesInPattern(tp), collectExceptions );
+		super(tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), collectExceptions );
 	}
 
 	@Override
@@ -65,15 +64,13 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 			final SolutionMapping sm = restrictedSMs.iterator().next();
 			final TriplePattern restrictedTP;
 			try {
-				restrictedTP = QueryPatternUtils.applySolMapToTriplePattern(sm, query);
+				restrictedTP = query.applySolMapToGraphPattern(sm);
 			}
 			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// This exception should not happen because the set of solution
 				// mappings given to this function should not have blank nodes
 				// for the join variables.
-				e.printStackTrace();
-
-				return null;
+				throw new IllegalStateException();
 			}
 
 			final TriplePatternRequest req = new TriplePatternRequestImpl(restrictedTP);

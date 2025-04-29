@@ -1,20 +1,16 @@
-package se.liu.ida.hefquin.base.queryplan.utils;
+package se.liu.ida.hefquin.base.query.utils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 
-/**
- * This is a stripped-down copy of ExpectedVariablesUtils, which had been
- * moved to the 'hefquin-engine' module.
- * TODO: This copy should be removed eventually.
- */
-public class ExpectedVariablesUtilsCopy
+public class ExpectedVariablesUtils
 {
-
 	/**
 	 * Returns a set of all the certain variables in all the given
 	 * {@link ExpectedVariables} objects. Returns null if no such
@@ -131,6 +127,19 @@ public class ExpectedVariablesUtilsCopy
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns an array of the {@link ExpectedVariables} objects of
+	 * all graph patterns in the given list, in the order in which
+	 * the patterns are listed.
+	 */
+	public static ExpectedVariables[] getExpectedVariables( final List<SPARQLGraphPattern> patterns ) {
+		final ExpectedVariables[] e = new ExpectedVariables[patterns.size()];
+		for ( int i = 0; i < patterns.size(); ++i ) {
+			e[i] = patterns.get(i).getExpectedVariables();
+		}
+		return e;
 	}
 
 }

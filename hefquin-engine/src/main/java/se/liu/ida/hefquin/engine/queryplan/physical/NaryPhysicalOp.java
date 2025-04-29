@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 
 /**
