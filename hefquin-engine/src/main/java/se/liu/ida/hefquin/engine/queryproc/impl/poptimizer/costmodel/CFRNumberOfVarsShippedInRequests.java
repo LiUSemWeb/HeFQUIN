@@ -11,8 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class CFRNumberOfVarsShippedInRequests extends CFRBase
@@ -35,7 +35,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan(tpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqTP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqTP).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
 		}
@@ -44,7 +44,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan(bgpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
 
 			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
 				futureIntResSize = null; // irrelevant
@@ -57,7 +57,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqGP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqGP).size();
 
 			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
 				futureIntResSize = null; // irrelevant

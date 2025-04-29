@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
 
 public class BGPRequestImpl implements BGPRequest
@@ -31,7 +30,7 @@ public class BGPRequestImpl implements BGPRequest
 
 	@Override
 	public ExpectedVariables getExpectedVariables() {
-		return QueryPatternUtils.getExpectedVariablesInPattern(bgp);
+		return bgp.getExpectedVariables();
 	}
 
 	@Override

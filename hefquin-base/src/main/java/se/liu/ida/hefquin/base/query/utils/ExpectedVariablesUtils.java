@@ -1,23 +1,16 @@
-package se.liu.ida.hefquin.engine.queryplan.utils;
+package se.liu.ida.hefquin.base.query.utils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 
 public class ExpectedVariablesUtils
 {
-	/**
-	 * Returns a set of all the certain variables in all the given
-	 * plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> unionOfCertainVariables( final PhysicalPlan ... plans ) {
-		return unionOfCertainVariables( getExpectedVariables(plans) );
-	}
-
 	/**
 	 * Returns a set of all the certain variables in all the given
 	 * {@link ExpectedVariables} objects. Returns null if no such
@@ -39,14 +32,6 @@ public class ExpectedVariablesUtils
 
 	/**
 	 * Returns a set of all the possible variables in all the given
-	 * plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> unionOfPossibleVariables( final PhysicalPlan ... plans ) {
-		return unionOfPossibleVariables( getExpectedVariables(plans) );
-	}
-
-	/**
-	 * Returns a set of all the possible variables in all the given
 	 * {@link ExpectedVariables} objects. Returns null if no such
 	 * object is given.
 	 */
@@ -62,14 +47,6 @@ public class ExpectedVariablesUtils
 		}
 
 		return result;
-	}
-
-	/**
-	 * Returns a set of all the variables (certain and possible) in all
-	 * the given plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> unionOfAllVariables( final PhysicalPlan ... plans ) {
-		return unionOfAllVariables( getExpectedVariables(plans) );
 	}
 
 	/**
@@ -95,14 +72,6 @@ public class ExpectedVariablesUtils
 
 	/**
 	 * Returns an intersection of the sets of certain variables in all
-	 * the given plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> intersectionOfCertainVariables( final PhysicalPlan ... plans ) {
-		return intersectionOfCertainVariables( getExpectedVariables(plans) );
-	}
-
-	/**
-	 * Returns an intersection of the sets of certain variables in all
 	 * the given {@link ExpectedVariables} objects. Returns null if no
 	 * such object is given.
 	 */
@@ -118,14 +87,6 @@ public class ExpectedVariablesUtils
 		}
 
 		return result;
-	}
-
-	/**
-	 * Returns an intersection of the sets of possible variables in all
-	 * the given plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> intersectionOfPossibleVariables( final PhysicalPlan ... plans ) {
-		return intersectionOfPossibleVariables( getExpectedVariables(plans) );
 	}
 
 	/**
@@ -149,14 +110,6 @@ public class ExpectedVariablesUtils
 
 	/**
 	 * Returns an intersection of the sets of all variables (certain and
-	 * possible) in all the given plans. Returns null if no plan is given.
-	 */
-	public static Set<Var> intersectionOfAllVariables( final PhysicalPlan ... plans ) {
-		return intersectionOfAllVariables( getExpectedVariables(plans) );
-	}
-
-	/**
-	 * Returns an intersection of the sets of all variables (certain and
 	 * possible) in all the given {@link ExpectedVariables} objects.
 	 * Returns null if no such object is given.
 	 */
@@ -176,10 +129,15 @@ public class ExpectedVariablesUtils
 		return result;
 	}
 
-	public static ExpectedVariables[] getExpectedVariables( final PhysicalPlan ... plans ) {
-		final ExpectedVariables[] e = new ExpectedVariables[plans.length];
-		for ( int i = 0; i < plans.length; ++i ) {
-			e[i] = plans[i].getExpectedVariables();
+	/**
+	 * Returns an array of the {@link ExpectedVariables} objects of
+	 * all graph patterns in the given list, in the order in which
+	 * the patterns are listed.
+	 */
+	public static ExpectedVariables[] getExpectedVariables( final List<SPARQLGraphPattern> patterns ) {
+		final ExpectedVariables[] e = new ExpectedVariables[patterns.size()];
+		for ( int i = 0; i < patterns.size(); ++i ) {
+			e[i] = patterns.get(i).getExpectedVariables();
 		}
 		return e;
 	}

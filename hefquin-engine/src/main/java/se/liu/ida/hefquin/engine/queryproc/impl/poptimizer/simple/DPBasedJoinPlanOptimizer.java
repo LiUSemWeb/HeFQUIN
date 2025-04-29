@@ -8,8 +8,8 @@ import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
@@ -158,7 +158,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 				}
 
 				if ( ignoreCartesianProductJoins ) {
-					final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfAllVariables(optmLeft, optmRight);
+					final Set<Var> joinVars = PhysicalPlanUtils.intersectionOfAllVariables(optmLeft, optmRight);
 					if ( joinVars.isEmpty() ) {
 						// Since the current two optimal plans share no
 						// variables, the join between these two plans is

@@ -24,6 +24,12 @@ public interface SPARQLGraphPattern extends Query
 	Set<TriplePattern> getAllMentionedTPs();
 
 	/**
+	 * Returns the set of all variables mentioned in this graph pattern, except
+	 * for the variables that occur only in expressions (in FILTER or in BIND).
+	 */
+	Set<Var> getAllMentionedVariables();
+
+	/**
 	 * Returns the variables that are guaranteed to be bound in
 	 * every solution mapping produced for this graph pattern.
 	 */
@@ -37,10 +43,22 @@ public interface SPARQLGraphPattern extends Query
 	Set<Var> getPossibleVariables();
 
 	/**
-	 * Returns the set of all variables mentioned in this graph pattern, except
-	 * for the variables that occur only in expressions (in FILTER or in BIND).
+	 * Returns the sets of variables that can be expected in the
+	 * solution mappings produced for this graph pattern. It holds
+	 * that the {@link ExpectedVariables#getCertainVariables()} and
+	 * the {@link ExpectedVariables#getPossibleVariables()} methods
+	 * of the returned object return the same sets as returned by
+	 * {@link #getCertainVariables()} and {@link #getPossibleVariables()},
+	 * respectively.
 	 */
-	Set<Var> getAllMentionedVariables();
+	default ExpectedVariables getExpectedVariables() {
+		final Set<Var> c = getCertainVariables();
+		final Set<Var> p = getPossibleVariables();
+		return new ExpectedVariables() {
+			@Override public Set<Var> getPossibleVariables() { return p; }
+			@Override public Set<Var> getCertainVariables() { return c; }
+		};
+	}
 
 	/**
 	 * Returns the number of times any variable is mentioned in this graph

@@ -26,6 +26,7 @@ import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformSubst;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -102,6 +103,19 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 		final Set<Var> possibleVars = OpVars.visibleVars(jenaOp);
 		possibleVars.removeAll(certainVars);
 		return possibleVars;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		final Op jenaOp = asJenaOp();
+		final Set<Var> certainVars = OpVars.fixedVars(jenaOp);
+		final Set<Var> possibleVars = OpVars.visibleVars(jenaOp);
+		possibleVars.removeAll(certainVars);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
 	}
 
 	@Override

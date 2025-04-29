@@ -13,8 +13,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class CFRNumberOfTermsShippedInRequests extends CFRBase
@@ -47,7 +47,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan( (UnaryLogicalOp) lop );
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan, req).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan, req).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
 		}

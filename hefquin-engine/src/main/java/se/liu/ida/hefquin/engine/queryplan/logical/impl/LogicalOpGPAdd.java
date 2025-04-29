@@ -6,11 +6,10 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 public class LogicalOpGPAdd extends LogicalOperatorBase implements UnaryLogicalOp
 {
@@ -38,7 +37,7 @@ public class LogicalOpGPAdd extends LogicalOperatorBase implements UnaryLogicalO
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		final ExpectedVariables expVarsPattern = QueryPatternUtils.getExpectedVariablesInPattern(pattern);
+		final ExpectedVariables expVarsPattern = pattern.getExpectedVariables();
 		final ExpectedVariables expVarsInput = inputVars[0];
 
 		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(expVarsPattern, expVarsInput);

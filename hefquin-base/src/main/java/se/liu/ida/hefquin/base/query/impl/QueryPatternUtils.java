@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.base.query.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -11,14 +9,11 @@ import org.apache.jena.sparql.algebra.op.OpJoin;
 import org.apache.jena.sparql.algebra.op.OpTriple;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.BasicPattern;
-import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.*;
 
 import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
-import se.liu.ida.hefquin.base.query.SPARQLQuery;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 
@@ -110,25 +105,6 @@ public class QueryPatternUtils
 		else {
 			throw new IllegalArgumentException( "unexpected type of graph pattern: " + p.getClass().getName() );
 		}
-	}
-
-	public static ExpectedVariables getExpectedVariablesInPattern( final SPARQLGraphPattern pattern ) {
-		final Set<Var> certainVars = pattern.getCertainVariables();
-		final Set<Var> possibleVars = pattern.getPossibleVariables();
-
-		return new ExpectedVariables() {
-			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
-			@Override public Set<Var> getCertainVariables() { return certainVars; }
-		};
-	}
-
-	public static ExpectedVariables getExpectedVariablesInQuery( final SPARQLQuery query ) {
-		final Set<Var> vars = new HashSet<>( query.asJenaQuery().getProjectVars() );
-
-		return new ExpectedVariables() {
-			@Override public Set<Var> getPossibleVariables() { return vars; }
-			@Override public Set<Var> getCertainVariables() { return Collections.emptySet(); }
-		};
 	}
 
 }

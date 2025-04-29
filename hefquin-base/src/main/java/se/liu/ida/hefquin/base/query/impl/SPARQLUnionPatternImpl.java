@@ -10,11 +10,13 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 
 public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 {
@@ -134,6 +136,22 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 		}
 
 		return vars;
+	}
+
+	@Override
+	public ExpectedVariables getExpectedVariables() {
+		if ( subPatterns.size() == 1 )
+			return subPatterns.get(0).getExpectedVariables();
+
+		final ExpectedVariables[] array = ExpectedVariablesUtils.getExpectedVariables(subPatterns);
+		final Set<Var> certainVars = ExpectedVariablesUtils.intersectionOfCertainVariables(array);
+		final Set<Var> possibleVars = ExpectedVariablesUtils.unionOfAllVariables(array);
+		possibleVars.removeAll(certainVars);
+
+		return new ExpectedVariables() {
+			@Override public Set<Var> getCertainVariables() { return certainVars; }
+			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
+		};
 	}
 
 	@Override
