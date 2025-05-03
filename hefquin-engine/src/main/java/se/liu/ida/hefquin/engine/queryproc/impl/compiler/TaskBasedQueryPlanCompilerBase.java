@@ -59,28 +59,28 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 		                                     final int preferredOutputBlockSize,
 		                                     final ExecutionContext execCxt ) {
 			final PhysicalOperator pop = qep.getRootOperator();
-			if ( pop instanceof NullaryPhysicalOp )
+			if ( pop instanceof NullaryPhysicalOp npop )
 			{
-				final NullaryExecutableOp execOp = (NullaryExecutableOp) pop.createExecOp(true);
+				final NullaryExecutableOp execOp = npop.createExecOp(true);
 				return createTaskForNullaryExecOp(execOp, execCxt, preferredOutputBlockSize);
 			}
-			else if ( pop instanceof UnaryPhysicalOp )
+			else if ( pop instanceof UnaryPhysicalOp upop )
 			{
 				final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-				final UnaryExecutableOp execOp = (UnaryExecutableOp) pop.createExecOp( true, subPlan.getExpectedVariables() );
+				final UnaryExecutableOp execOp = upop.createExecOp( true, subPlan.getExpectedVariables() );
 
 				createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
 				final ExecPlanTask childTask = tasks.getFirst();
 
 				return createTaskForUnaryExecOp(execOp, childTask, execCxt, preferredOutputBlockSize);
 			}
-			else if ( pop instanceof BinaryPhysicalOp )
+			else if ( pop instanceof BinaryPhysicalOp bpop )
 			{
 				final PhysicalPlan subPlan1 = qep.getSubPlan(0);
 				final PhysicalPlan subPlan2 = qep.getSubPlan(1);
 
-				final BinaryExecutableOp execOp = (BinaryExecutableOp) pop.createExecOp(
+				final BinaryExecutableOp execOp = bpop.createExecOp(
 						true,
 						subPlan1.getExpectedVariables(),
 						subPlan2.getExpectedVariables() );
@@ -93,14 +93,14 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 				return createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt, preferredOutputBlockSize);
 			}
-			else if ( pop instanceof NaryPhysicalOp )
+			else if ( pop instanceof NaryPhysicalOp npop )
 			{
 				final ExpectedVariables[] expVars = new ExpectedVariables[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < expVars.length; i++ ) {
 					expVars[i] = qep.getSubPlan(i).getExpectedVariables();
 				}
 
-				final NaryExecutableOp execOp = (NaryExecutableOp) pop.createExecOp(true, expVars);
+				final NaryExecutableOp execOp = npop.createExecOp(true, expVars);
 
 				final ExecPlanTask[] childTasks = new ExecPlanTask[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < childTasks.length; i++ ) {
