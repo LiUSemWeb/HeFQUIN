@@ -70,7 +70,8 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 				final UnaryExecutableOp execOp = upop.createExecOp( true, subPlan.getExpectedVariables() );
 
-				createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
+				final int preferredInputBlockSize = 1; // TODO: remove input blocks altogether
+				createTasks(subPlan, tasks, preferredInputBlockSize, execCxt);
 				final ExecPlanTask childTask = tasks.getFirst();
 
 				return createTaskForUnaryExecOp(execOp, childTask, execCxt, preferredOutputBlockSize);

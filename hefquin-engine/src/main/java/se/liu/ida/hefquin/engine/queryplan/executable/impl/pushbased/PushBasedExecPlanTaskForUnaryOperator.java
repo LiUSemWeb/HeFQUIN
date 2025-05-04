@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -41,7 +42,8 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 		while ( ! lastInputBlockConsumed ) {
 			final IntermediateResultBlock nextInputBlock = input.getNextIntermediateResultBlock();
 			if ( nextInputBlock != null ) {
-				op.process(nextInputBlock, sink, execCxt);
+				for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() )
+					op.process(sm, sink, execCxt);
 			}
 			else {
 				op.concludeExecution(sink, execCxt);

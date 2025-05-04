@@ -18,8 +18,8 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.TestUtils;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 
 public class ExecOpFilterTest
@@ -27,7 +27,6 @@ public class ExecOpFilterTest
 	@Test
 	public void filter_Numbers() throws ExecOpExecutionException {
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
 		final Node value8 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
@@ -38,13 +37,12 @@ public class ExecOpFilterTest
 		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x, value8);
 		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(x, value9);
 		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x, value12);
-		
-		resultBlock.add(sol8);
-		resultBlock.add(sol12); // 12 is added before 9. This should not pass the filter. 9 should be after 8.
-		resultBlock.add(sol9);
-		
+
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
-		filterLessThan10.process( resultBlock, sink, TestUtils.createExecContextForTests() );
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		filterLessThan10.process(sol8, sink, ctx);
+		filterLessThan10.process(sol12, sink, ctx);  // 12 is processed before 9. This should not pass the filter. 9 should be after 8.
+		filterLessThan10.process(sol9, sink, ctx);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, 8, x);
@@ -53,7 +51,6 @@ public class ExecOpFilterTest
 	@Test
 	public void filter_Unbound() throws ExecOpExecutionException {
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr lessThan10 = ExprUtils.parse("?x < 10");
 		
 		final Node value8 = NodeFactory.createLiteral("8", XSDDatatype.XSDinteger);
@@ -63,12 +60,11 @@ public class ExecOpFilterTest
 		
 		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x, value8);
 		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(y, value9);
-		
-		resultBlock.add(sol8);
-		resultBlock.add(sol9);
-		
+
 		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
-		filterLessThan10.process( resultBlock, sink, TestUtils.createExecContextForTests() );
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		filterLessThan10.process(sol8, sink, ctx);
+		filterLessThan10.process(sol9, sink, ctx);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, 8, x);
@@ -78,7 +74,6 @@ public class ExecOpFilterTest
 	@Test
 	public void filter_Dates() throws ExecOpExecutionException {
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
-		final GenericIntermediateResultBlockImpl resultBlock = new GenericIntermediateResultBlockImpl();
 		final Expr after2019 = ExprUtils.parse("?x > \"2019-12-31\"^^xsd:date");
 
 		final Node date2020 = NodeFactory.createLiteral("2020-10-20", XSDDatatype.XSDdate);
@@ -94,14 +89,13 @@ public class ExecOpFilterTest
 		final SolutionMapping solNYE = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsEve);
 		final SolutionMapping solNYD = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsDay);
 
-		resultBlock.add(sol2020);
-		resultBlock.add(sol2019);
-		resultBlock.add(sol2021);
-		resultBlock.add(solNYE);
-		resultBlock.add(solNYD);
-
 		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019, false);
-		filterAfter2019.process( resultBlock, sink, TestUtils.createExecContextForTests() );
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+		filterAfter2019.process(sol2020, sink, ctx);
+		filterAfter2019.process(sol2019, sink, ctx);
+		filterAfter2019.process(sol2021, sink, ctx);
+		filterAfter2019.process(solNYE, sink, ctx);
+		filterAfter2019.process(solNYD, sink, ctx);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertHasNext( it, "2020-10-20", x);

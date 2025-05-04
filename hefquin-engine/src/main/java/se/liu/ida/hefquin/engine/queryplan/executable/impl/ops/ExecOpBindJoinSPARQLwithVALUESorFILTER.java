@@ -2,10 +2,11 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Collections;
 import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -19,8 +20,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * first VALUES-based request succeeds, however, then the implementation continues
  * using the VALUES-based approach for the rest of the requests. 
  */
-public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoin<SPARQLGraphPattern, SPARQLEndpoint>
+public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBaseWithBatching
 {
+	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+
+	protected final SPARQLGraphPattern query;
+	protected final SPARQLEndpoint fm;
 	protected final boolean useOuterJoinSemantics;
 
 	// will be initialized when processing the first input block of solution mappings
@@ -29,13 +34,27 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
 	                                               final SPARQLEndpoint fm,
 	                                               final boolean useOuterJoinSemantics,
+	                                               final int batchSize,
 	                                               final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
+		super(batchSize, collectExceptions);
+
+		assert query != null;
+		assert fm != null;
+
+		this.query = query;
+		this.fm = fm;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
+	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
+	                                               final SPARQLEndpoint fm,
+	                                               final boolean useOuterJoinSemantics,
+	                                               final boolean collectExceptions ) {
+		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
+	}
+
 	@Override
-	protected void _process( final IntermediateResultBlock input,
+	protected void _process( final List<SolutionMapping> batch,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		//If this is the first request
@@ -44,7 +63,7 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 			boolean valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
-				currentInstance.process(input, sink, execCxt);
+				currentInstance._process(batch, sink, execCxt);
 				if (!currentInstance.getExceptionsCaughtDuringExecution().isEmpty()) {
 					valuesBasedRequestFailed = true;
 				}	
@@ -54,19 +73,22 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 			if (valuesBasedRequestFailed == true) {
 				// Use FILTER-based bind join instead
 				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
-				currentInstance.process(input, sink, execCxt);
+				currentInstance._process(batch, sink, execCxt);
 			}
 		}
 		else {
-			currentInstance.process(input, sink, execCxt);
+			currentInstance._process(batch, sink, execCxt);
 		}
 	}
 
 	@Override
-	protected void _concludeExecution( final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	protected void _concludeExecution( final List<SolutionMapping> batch,
+	                                   final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
 		if ( currentInstance != null ) {
-			currentInstance.concludeExecution(sink, execCxt);
+			currentInstance._concludeExecution(batch, sink, execCxt);
 		}
 	}
 

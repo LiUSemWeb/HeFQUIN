@@ -18,7 +18,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 
 public class ExecOpBindTest
 {
@@ -28,9 +27,8 @@ public class ExecOpBindTest
 		final Node lit2 = NodeFactory.createLiteral( "2", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
-		input.add( SolutionMappingUtils.createSolutionMapping(v1, lit8) );
-		input.add( SolutionMappingUtils.createSolutionMapping(v1, lit2) );
+		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(v1, lit8);
+		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(v1, lit2);
 
 		final Var v2 = Var.alloc("v2");
 		final Expr addOne = ExprUtils.parse("?v1 + 1");
@@ -38,7 +36,8 @@ public class ExecOpBindTest
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		op.process(input, sink, null);
+		op.process(sm1, sink, null);
+		op.process(sm2, sink, null);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 		assertTrue( it.hasNext() );

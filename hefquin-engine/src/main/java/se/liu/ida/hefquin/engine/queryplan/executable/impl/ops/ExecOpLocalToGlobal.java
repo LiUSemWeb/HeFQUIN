@@ -1,13 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
+import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.base.data.utils.RewritingIteratorForSolMapsL2G;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithIterator
+public class ExecOpLocalToGlobal extends UnaryExecutableOpBase
 {
+	private long numberOfOutputMappingsProduced = 0L;
+
 	protected final VocabularyMapping vm;
 
 	public ExecOpLocalToGlobal( final VocabularyMapping vm, final boolean collectExceptions ) {
@@ -18,8 +22,33 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithIterator
 	}
 
 	@Override
-	protected Iterator<SolutionMapping> createInputToOutputIterator( final Iterable<SolutionMapping> input ) {
-		return new RewritingIteratorForSolMapsL2G(input, vm);
+	protected void _process( final SolutionMapping inputSolMap,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt ) {
+		final Set<SolutionMapping> output = vm.translateSolutionMapping(inputSolMap);
+		for ( final SolutionMapping sm : output ) {
+			sink.send(sm);
+			numberOfOutputMappingsProduced++;
+		}
+	}
+
+	@Override
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt ) {
+		// nothing to be done here
+	}
+
+	@Override
+	public void resetStats() {
+		super.resetStats();
+		numberOfOutputMappingsProduced = 0L;
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
+		return s;
 	}
 
 }

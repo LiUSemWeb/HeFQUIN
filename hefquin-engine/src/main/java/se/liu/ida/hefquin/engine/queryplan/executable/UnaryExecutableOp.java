@@ -1,28 +1,20 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * A specialization of the {@link ExecutableOperator} interface that
  * captures executable operators that consume a single input sequence
- * of solution mappings (which are batched into several blocks).
+ * of solution mappings.
  */
 public interface UnaryExecutableOp extends ExecutableOperator
 {
 	/**
-	 * Returns the preferred block size of input blocks
-	 * that are passed to this executable operator.
-	 *
-	 * A query planner may use this number as an optimization
-	 * hint but it does not have to use it.
+	 * Processes the given solution mapping as input to this operator and
+	 * sends the produced result elements (if any) to the given sink.
 	 */
-	int preferredInputBlockSize();
-
-	/**
-	 * Processes the given input and sends the produced
-	 * result elements (if any) to the given sink.
-	 */
-	void process( IntermediateResultBlock input,
+	void process( SolutionMapping inputSolMap,
 	              IntermediateResultElementSink sink,
 	              ExecutionContext execCxt ) throws ExecOpExecutionException;
 

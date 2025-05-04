@@ -2,7 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import java.util.List;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -66,7 +68,9 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 		@Override
 		protected void _run() throws ExecutionException {
 			while ( inputIter.hasNext() ) {
-				op.process( inputIter.next(), sink, execCxt );
+				final IntermediateResultBlock block = inputIter.next();
+				for ( final SolutionMapping sm : block.getSolutionMappings() )
+					op.process( sm, sink, execCxt );
 			}
 			op.concludeExecution(sink, execCxt);
 		}

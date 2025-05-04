@@ -48,7 +48,8 @@ public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
-			final ResultBlockIterator blockIterSubPlan = createBlockIterator( elmtIterSubPlan, execOp.preferredInputBlockSize() );
+			final int preferredInputBlockSize = 1; // TODO: remove input blocks altogether
+			final ResultBlockIterator blockIterSubPlan = createBlockIterator(elmtIterSubPlan, preferredInputBlockSize);
 			return new ResultElementIterWithUnaryExecOp(execOp, blockIterSubPlan, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 2 )

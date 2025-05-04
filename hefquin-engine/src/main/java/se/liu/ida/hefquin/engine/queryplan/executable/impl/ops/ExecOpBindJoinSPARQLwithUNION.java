@@ -33,10 +33,19 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
  */
 public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
+	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+
+	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query,
+	                                      final SPARQLEndpoint fm,
+	                                      final int batchSize,
+	                                      final boolean collectExceptions ) {
+		super(query, fm, false, batchSize, collectExceptions);
+	}
+
 	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query,
 	                                      final SPARQLEndpoint fm,
 	                                      final boolean collectExceptions ) {
-		super(query, fm, false, collectExceptions);
+		this(query, fm, DEFAULT_BATCH_SIZE, collectExceptions);
 	}
 
 	@Override

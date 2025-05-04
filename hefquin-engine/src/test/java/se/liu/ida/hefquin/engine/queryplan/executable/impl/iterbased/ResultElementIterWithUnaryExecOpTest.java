@@ -4,13 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
-
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOps;
@@ -113,15 +110,12 @@ public class ResultElementIterWithUnaryExecOpTest
 		public UnaryExecutableOp2ForTest() { super(false); }
 
 		@Override
-		public void process( final IntermediateResultBlock input,
+		public void process( final SolutionMapping inputSolMap,
 		                     final IntermediateResultElementSink sink,
 		                     final ExecutionContext execCxt )
 		{
-			final Iterator<SolutionMapping> it = input.getSolutionMappings().iterator();
-			while ( it.hasNext() ) {
-				final String token = it.next().toString() + "ok";
-				sink.send( TestUtils.createSolutionMappingForTests(token) );
-			}
+			final String token = inputSolMap.toString() + "ok";
+			sink.send( TestUtils.createSolutionMappingForTests(token) );
 		}
 
 		@Override
@@ -129,9 +123,6 @@ public class ResultElementIterWithUnaryExecOpTest
 		                               final ExecutionContext execCxt )
 		{
 		}
-
-		@Override
-		public int preferredInputBlockSize() { return 1; }
 
 		@Override
 		public void resetStats()
