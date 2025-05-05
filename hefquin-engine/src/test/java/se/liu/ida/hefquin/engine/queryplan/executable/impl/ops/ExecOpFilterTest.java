@@ -12,6 +12,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.util.ExprUtils;
 import org.junit.Test;
 
@@ -48,6 +49,7 @@ public class ExecOpFilterTest
 		assertHasNext( it, 8, x);
 		assertHasNext( it, 9, x); // See that 9 made it and 12 did not, as 9 < 10 is true whereas 12 < 10 is false.
 	}
+
 	@Test
 	public void filter_Unbound() throws ExecOpExecutionException {
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
@@ -102,7 +104,47 @@ public class ExecOpFilterTest
 		assertHasNext( it, "2021-02-01", x);
 		assertHasNext( it, "2020-01-01", x);
 	}
-	
+
+	@Test
+	public void twoFilterExpressions() throws ExecOpExecutionException {
+		final ExprList exprs = new ExprList();
+		exprs.add( ExprUtils.parse("?x < 13") );
+		exprs.add( ExprUtils.parse("?x > 8") );
+
+		final Node value8  = NodeFactory.createLiteral("8",  XSDDatatype.XSDinteger);
+		final Node value9  = NodeFactory.createLiteral("9",  XSDDatatype.XSDinteger);
+		final Node value12 = NodeFactory.createLiteral("12", XSDDatatype.XSDinteger);
+		final Node value15 = NodeFactory.createLiteral("15", XSDDatatype.XSDinteger);
+		final Var x = Var.alloc("x");
+
+		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(x, value8);
+		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping(x, value9);
+		final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(x, value12);
+		final SolutionMapping sm4 = SolutionMappingUtils.createSolutionMapping(x, value15);
+
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+
+		filterOp.process(sm1, sink, ctx);
+		filterOp.process(sm2, sink, ctx);
+		filterOp.process(sm3, sink, ctx);
+		filterOp.process(sm4, sink, ctx);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertTrue( it.hasNext() );
+		assertEquals( value9, it.next().asJenaBinding().get(x) );
+
+		assertTrue( it.hasNext() );
+		assertEquals( value12, it.next().asJenaBinding().get(x) );
+
+		assertFalse( it.hasNext() );
+	}
+
+
+
 	protected void assertHasNext( final Iterator<SolutionMapping> it,
 	                              final int expectedIntforV1,
 	                              final Var v1 )
