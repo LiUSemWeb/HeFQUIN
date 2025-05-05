@@ -197,15 +197,19 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				throw new IllegalArgumentException( "The given TPFResponse is null" );
 			}
 
-			final Integer cardinality;
-			try {
-				cardinality = tpfResp.getCardinalityEstimate();
+			final Integer cardinality = tpfResp.getCardinalityEstimate();
+			if ( cardinality != null ) {
+				final int c = cardinality;
+				return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), c );
 			}
-			catch ( final CardinalityEstimationUnavailableError e ) {
+			else {
+				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
+					"Cardinality estimation is unavailable due to missing metadata triples.",
+					tpfResp.getRequest(),
+					tpfResp.getFederationMember()
+				);
 				return new CardinalityResponseImplWithoutCardinality( e, tpfResp, tpfResp.getRequest() );
 			}
-
-			return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), cardinality );
 		}
 	}
 
