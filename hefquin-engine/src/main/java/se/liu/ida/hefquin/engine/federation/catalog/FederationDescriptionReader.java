@@ -1,7 +1,13 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -311,12 +317,37 @@ public class FederationDescriptionReader
 	}
 
 	/**
-	 * Verifies that the file at the given path exists.
+	 * Verifies that the file at the given path exists. Tries local file, classpath
+	 * resource, and URL (in that order).
+	 *
+	 * @param pathToMappingFile Path, resource name, or URL
+	 * @return true if the file exists in any of the checked locations
+	 * @throws IllegalArgumentException if the file is not found
 	 */
 	protected boolean verifyValidVocabMappingFile( final String pathToMappingFile ) {
-		// Try to load it as a resource from the classpath
-		if( getClass().getClassLoader().getResource(pathToMappingFile) != null ){
+		// 1. Try to load from locla file system
+		final File f = new File( pathToMappingFile );
+		if ( f.exists() && f.isFile() ) {
 			return true;
+		}
+
+		// 2. Try to load from classpath
+		if ( getClass().getClassLoader().getResource( pathToMappingFile ) != null ) {
+			return true;
+		}
+
+		// 3. Try to load from URL
+		try {
+			final URL url = new URL( pathToMappingFile );
+			final HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+			huc.setRequestMethod( "HEAD" );
+			huc.setConnectTimeout( 3000 );
+			huc.setReadTimeout( 3000 );
+			if ( HttpURLConnection.HTTP_OK == huc.getResponseCode() ) {
+				return true;
+			}
+		} catch ( IOException e ) {
+			// Ignore: URL check failed, will report error below
 		}
 
 		throw new IllegalArgumentException( "The following path to vocab.mapping does not exist: " + pathToMappingFile );
