@@ -78,8 +78,8 @@ public interface TPFResponse extends TriplesResponse
 
 	/**
 	 * Returns the cardinality estimate provided as metadata in the given
-	 * TPF response. Throws CardinalityEstimationUnavailableErrorn if there is
-	 * no metadata with a cardinality estimate.
+	 * TPF response. Returns <code>null</code> if there is no metadata
+	 * with a cardinality estimate.
 	 */
-	Integer getCardinalityEstimate() throws CardinalityEstimationUnavailableError;
+	Integer getCardinalityEstimate();
 }
