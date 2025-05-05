@@ -13,8 +13,6 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 {
 	protected final ExecutionContext execCxt;
 
-	protected final int preferredMinimumBlockSize;
-
 	protected enum Status {
 		/**
 		 * The task has been created but its execution has not yet been started.
@@ -63,12 +61,9 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	private Exception causeOfFailure = null;
 
 
-	protected ExecPlanTaskBase( final ExecutionContext execCxt, final int preferredMinimumBlockSize ) {
+	protected ExecPlanTaskBase( final ExecutionContext execCxt ) {
 		assert execCxt != null;
-		assert preferredMinimumBlockSize > 0;
-
 		this.execCxt = execCxt;
-		this.preferredMinimumBlockSize = preferredMinimumBlockSize;
 	}
 
 	protected abstract ExecutableOperator getExecOp();

@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
@@ -17,9 +18,8 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 
 	public PushBasedExecPlanTaskForNaryOperator( final NaryExecutableOp op,
 	                                             final ExecPlanTask[] inputs,
-	                                             final ExecutionContext execCxt,
-	                                             final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                             final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert inputs != null;
@@ -56,7 +56,9 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 			while ( ! inputConsumed ) {
 				final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromXthChild(i, nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromXthChild(i, sm, sink, execCxt);
+					}
 				}
 				else {
 					op.wrapUpForXthChild(i, sink, execCxt);
@@ -91,7 +93,9 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 					// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
 					final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
 					if ( nextInputBlock != null ) {
-						op.processBlockFromXthChild(i, nextInputBlock, sink, execCxt);
+						for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+							op.processInputFromXthChild(i, sm, sink, execCxt);
+						}
 					}
 
 					blockConsumed = true;
@@ -117,7 +121,9 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 				// cause this thread to wait.
 				final IntermediateResultBlock nextInputBlock = inputs[indexOfNextInputToWaitFor].getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromXthChild(indexOfNextInputToWaitFor, nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromXthChild(indexOfNextInputToWaitFor, sm, sink, execCxt);
+					}
 				}
 				else {
 					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, execCxt);

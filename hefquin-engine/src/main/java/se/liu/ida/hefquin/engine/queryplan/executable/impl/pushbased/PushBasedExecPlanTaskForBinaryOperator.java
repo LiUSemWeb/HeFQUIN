@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
@@ -19,9 +20,8 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	public PushBasedExecPlanTaskForBinaryOperator( final BinaryExecutableOp op,
 	                                               final ExecPlanTask input1,
 	                                               final ExecPlanTask input2,
-	                                               final ExecutionContext execCxt,
-	                                               final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                               final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input1 != null;
@@ -58,7 +58,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 		while ( ! input1Consumed ) {
 			final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
 			if ( nextInputBlock != null ) {
-				op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+				for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+					op.processInputFromChild1(sm, sink, execCxt);
+				}
 			}
 			else {
 				op.wrapUpForChild1(sink, execCxt);
@@ -70,7 +72,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 		while ( ! input2Consumed ) {
 			final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
 			if ( nextInputBlock != null ) {
-				op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+				for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+					op.processInputFromChild2(sm, sink, execCxt);
+				}
 			}
 			else {
 				op.wrapUpForChild2(sink, execCxt);
@@ -100,7 +104,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 				// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
 				final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromChild1(sm, sink, execCxt);
+					}
 				}
 
 				blockConsumed = true;
@@ -111,7 +117,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 				// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
 				final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromChild2(sm, sink, execCxt);
+					}
 				}
 
 				blockConsumed = true;
@@ -132,7 +140,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 					// calling 'getNextIntermediateResultBlock()' may cause this thread to wait
 					final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
 					if ( nextInputBlock != null ) {
-						op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+						for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+							op.processInputFromChild1(sm, sink, execCxt);
+						}
 					}
 					else {
 						op.wrapUpForChild1(sink, execCxt);
@@ -143,7 +153,9 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 					// calling 'getNextIntermediateResultBlock()' may cause this thread to wait
 					final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
 					if ( nextInputBlock != null ) {
-						op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+						for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+							op.processInputFromChild2(sm, sink, execCxt);
+						}
 					}
 					else {
 						op.wrapUpForChild2(sink, execCxt);

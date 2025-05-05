@@ -35,22 +35,19 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
 
 
-	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt, final int preferredMinimumBlockSize ) {
-		super(execCxt, preferredMinimumBlockSize);
+	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt ) {
+		super(execCxt);
 
-		if ( preferredMinimumBlockSize == 1 )
-			outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
-		else
-			outputBlockSize = preferredMinimumBlockSize;
+		outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
 	}
 
 	@Override
-	public ExecPlanTask addConnectorForAdditionalConsumer( final int preferredMinimumBlockSize ) {
+	public ExecPlanTask addConnectorForAdditionalConsumer() {
 		if ( extraConnectors == null ) {
 			extraConnectors = new ArrayList<>();
 		}
 
-		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt, preferredMinimumBlockSize);
+		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt);
 		extraConnectors.add(c);
 		return c;
 	}

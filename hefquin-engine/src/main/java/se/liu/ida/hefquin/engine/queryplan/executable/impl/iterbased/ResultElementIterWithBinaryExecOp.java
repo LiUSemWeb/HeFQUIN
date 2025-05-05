@@ -2,8 +2,10 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import java.util.List;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
+import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
@@ -83,12 +85,18 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 			// input two.
 
 			while ( inputIter1.hasNext() ) {
-				op.processBlockFromChild1( inputIter1.next(), sink, execCxt );
+				final IntermediateResultBlock block = inputIter1.next();
+				for ( final SolutionMapping sm : block.getSolutionMappings() ) {
+					op.processInputFromChild1( sm, sink, execCxt );
+				}
 			}
 			op.wrapUpForChild1(sink, execCxt);
 
 			while ( inputIter2.hasNext() ) {
-				op.processBlockFromChild2( inputIter2.next(), sink, execCxt );
+				final IntermediateResultBlock block = inputIter2.next();
+				for ( final SolutionMapping sm : block.getSolutionMappings() ) {
+					op.processInputFromChild2( sm, sink, execCxt );
+				}
 			}
 			op.wrapUpForChild2(sink, execCxt);
 		}

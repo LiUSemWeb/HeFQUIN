@@ -19,33 +19,29 @@ public class PullBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 
 	@Override
 	protected ExecPlanTask createTaskForNullaryExecOp( final NullaryExecutableOp op,
-	                                                   final ExecutionContext execCxt,
-	                                                   final int preferredOutputBlockSize ) {
-		return new PullBasedExecPlanTaskForNullaryOperator(op, execCxt, preferredOutputBlockSize);
+	                                                   final ExecutionContext execCxt ) {
+		return new PullBasedExecPlanTaskForNullaryOperator(op, execCxt);
 	}
 
 	@Override
 	protected ExecPlanTask createTaskForUnaryExecOp( final UnaryExecutableOp op,
 	                                                 final ExecPlanTask childTask,
-	                                                 final ExecutionContext execCxt,
-	                                                 final int preferredOutputBlockSize ) {
-		return new PullBasedExecPlanTaskForUnaryOperator(op, childTask, execCxt, preferredOutputBlockSize);
+	                                                 final ExecutionContext execCxt ) {
+		return new PullBasedExecPlanTaskForUnaryOperator(op, childTask, execCxt);
 	}
 
 	@Override
 	protected ExecPlanTask createTaskForBinaryExecOp( final BinaryExecutableOp op,
 	                                                  final ExecPlanTask childTask1,
 	                                                  final ExecPlanTask childTask2,
-	                                                  final ExecutionContext execCxt,
-	                                                  final int preferredOutputBlockSize ) {
-		return new PullBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+	                                                  final ExecutionContext execCxt ) {
+		return new PullBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt);
 	}
 
 	@Override
 	protected ExecPlanTask createTaskForNaryExecOp( final NaryExecutableOp op,
 	                                                final ExecPlanTask[] childTasks,
-	                                                final ExecutionContext execCxt,
-	                                                final int preferredOutputBlockSize ) {
+	                                                final ExecutionContext execCxt ) {
 		throw new UnsupportedOperationException();
 	}
 

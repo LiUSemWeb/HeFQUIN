@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.base.datastructures.impl.*;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -84,35 +83,26 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    public int preferredInputBlockSizeFromChild1() {
-        return 1;
-    }
-
-    @Override
-    public int preferredInputBlockSizeFromChild2() {
-        return 1;
-    }
-
-    @Override
     public boolean requiresCompleteChild1InputFirst() {
         return false;
     }
 
     @Override
-    protected void _processBlockFromChild1( final IntermediateResultBlock input, final IntermediateResultElementSink sink, final ExecutionContext execCxt) {
-        for ( final SolutionMapping smL : input.getSolutionMappings() ) {
-            indexForChild1.add(smL);
+    protected void _processInputFromChild1( final SolutionMapping inputSolMap,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        indexForChild1.add(inputSolMap);
 
-            final Iterable<SolutionMapping> matchSolMapR = indexForChild2.getJoinPartners(smL);
-            for ( final SolutionMapping smR : matchSolMapR ){
-            	numberOfOutputMappingsProduced++;
-                sink.send(SolutionMappingUtils.merge(smL, smR));
-            }
+        final Iterable<SolutionMapping> matchSolMapR = indexForChild2.getJoinPartners(inputSolMap);
+        for ( final SolutionMapping smR : matchSolMapR ) {
+            numberOfOutputMappingsProduced++;
+            sink.send( SolutionMappingUtils.merge(inputSolMap, smR) );
         }
     }
 
     @Override
-    protected void _wrapUpForChild1(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
+                                     final ExecutionContext execCxt ) {
         child1InputComplete = true;
 
         if ( child2InputComplete ) {
@@ -121,20 +111,21 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    protected void _processBlockFromChild2(IntermediateResultBlock input, IntermediateResultElementSink sink, ExecutionContext execCxt) {
-        for ( final SolutionMapping smR : input.getSolutionMappings() ) {
-            indexForChild2.add(smR);
+    protected void _processInputFromChild2( final SolutionMapping inputSolMap,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        indexForChild2.add(inputSolMap);
 
-            final Iterable<SolutionMapping> matchSolMapL = indexForChild1.getJoinPartners(smR);
-            for ( final SolutionMapping smL : matchSolMapL ){
-            	numberOfOutputMappingsProduced++;
-                sink.send(SolutionMappingUtils.merge(smL, smR));
-            }
+        final Iterable<SolutionMapping> matchSolMapL = indexForChild1.getJoinPartners(inputSolMap);
+        for ( final SolutionMapping smL : matchSolMapL ){
+            numberOfOutputMappingsProduced++;
+            sink.send( SolutionMappingUtils.merge(smL, inputSolMap) );
         }
     }
 
     @Override
-    protected void _wrapUpForChild2(IntermediateResultElementSink sink, ExecutionContext execCxt) {
+    protected void _wrapUpForChild2( final IntermediateResultElementSink sink,
+                                     final ExecutionContext execCxt ) {
         child2InputComplete = true;
 
         if ( child1InputComplete ) {
@@ -151,6 +142,7 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
         indexForChild1.clear();
         indexForChild2.clear();
     }
+
 	@Override
 	public void resetStats() {
 		super.resetStats();

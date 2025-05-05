@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
@@ -23,9 +24,8 @@ public class PullBasedExecPlanTaskForBinaryOperator extends PullBasedExecPlanTas
 	public PullBasedExecPlanTaskForBinaryOperator( final BinaryExecutableOp op,
 	                               final ExecPlanTask input1,
 	                               final ExecPlanTask input2,
-	                               final ExecutionContext execCxt,
-	                               final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                               final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input1 != null;
@@ -58,12 +58,14 @@ public class PullBasedExecPlanTaskForBinaryOperator extends PullBasedExecPlanTas
 		// become clear that there won't be any more solution mappings.
 
 		boolean lastInputBlockConsumed = false;
-		while ( sink.getSizeOfCurrentResultBlock() < preferredMinimumBlockSize && ! lastInputBlockConsumed ) {
+		while ( sink.getSizeOfCurrentResultBlock() < outputBlockSize && ! lastInputBlockConsumed ) {
 			// consume next input result block from input 1 (if still needed)
 			if ( ! input1Consumed ) {
 				final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromChild1(sm, sink, execCxt);
+					}
 				}
 				else {
 					op.wrapUpForChild1(sink, execCxt);
@@ -73,7 +75,9 @@ public class PullBasedExecPlanTaskForBinaryOperator extends PullBasedExecPlanTas
 			else {
 				final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
 				if ( nextInputBlock != null ) {
-					op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+						op.processInputFromChild2(sm, sink, execCxt);
+					}
 				}
 				else {
 					op.wrapUpForChild2(sink, execCxt);

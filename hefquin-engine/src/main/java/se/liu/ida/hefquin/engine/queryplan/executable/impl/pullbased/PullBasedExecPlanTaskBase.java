@@ -19,8 +19,14 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class PullBasedExecPlanTaskBase extends ExecPlanTaskBase
 {
-	protected PullBasedExecPlanTaskBase( final ExecutionContext execCxt, final int preferredMinimumBlockSize ) {
-		super(execCxt, preferredMinimumBlockSize);
+	protected static final int DEFAULT_OUTPUT_BLOCK_SIZE = 50;
+
+	protected final int outputBlockSize;
+
+	protected PullBasedExecPlanTaskBase( final ExecutionContext execCxt ) {
+		super(execCxt);
+
+		outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
 	}
 
 	@Override
@@ -80,7 +86,7 @@ public abstract class PullBasedExecPlanTaskBase extends ExecPlanTaskBase
 
 				availableResultBlocks.add(nextBlock);
 
-				if ( nextBlock instanceof LastIntermediateResultBlock || nextBlock.size() < preferredMinimumBlockSize ) {
+				if ( nextBlock instanceof LastIntermediateResultBlock || nextBlock.size() < outputBlockSize ) {
 					setStatus(Status.COMPLETED_NOT_CONSUMED);
 					completed = true;
 				}

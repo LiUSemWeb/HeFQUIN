@@ -18,9 +18,8 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 
 	public PushBasedExecPlanTaskForUnaryOperator( final UnaryExecutableOp op,
 	                                              final ExecPlanTask input,
-	                                              final ExecutionContext execCxt,
-	                                              final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                              final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input != null;

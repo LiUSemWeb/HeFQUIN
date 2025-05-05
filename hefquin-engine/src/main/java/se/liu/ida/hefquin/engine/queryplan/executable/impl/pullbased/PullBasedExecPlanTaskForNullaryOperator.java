@@ -12,9 +12,8 @@ public class PullBasedExecPlanTaskForNullaryOperator extends PullBasedExecPlanTa
 	protected final NullaryExecutableOp op;
 
 	public PullBasedExecPlanTaskForNullaryOperator( final NullaryExecutableOp op,
-	                                final ExecutionContext execCxt,
-	                                final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		this.op = op;

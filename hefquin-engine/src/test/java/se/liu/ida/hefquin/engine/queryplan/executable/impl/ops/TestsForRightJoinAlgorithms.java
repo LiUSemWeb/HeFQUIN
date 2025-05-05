@@ -5,8 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -17,7 +19,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
@@ -35,7 +36,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -43,7 +44,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 				var1, x2,
 				var2, y2) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
 				var3, z1) );
@@ -129,7 +130,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -137,7 +138,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 				var1, x2,
 				var2, y2) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,
@@ -211,7 +212,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -219,7 +220,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 				var1, x2,
 				var2, y2) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y2,
@@ -293,11 +294,11 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
 				var3, z1) );
@@ -346,9 +347,9 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
 				var3, z1) );
@@ -381,13 +382,13 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 	{
 		final Var var1 = Var.alloc("v1");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 
 		Set<Var> varsCertain1 = new HashSet<>();
 		varsCertain1.add(var1);
@@ -414,10 +415,10 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
-		input1.add(SolutionMappingUtils.createSolutionMapping());
+		final List<SolutionMapping> input1 = new ArrayList<>();
+		input1.add( SolutionMappingUtils.createSolutionMapping() );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -453,14 +454,14 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 	{
 		final Var var1 = Var.alloc("v1");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x2")) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
-		input2.add(SolutionMappingUtils.createSolutionMapping());
+		final List<SolutionMapping> input2 = new ArrayList<>();
+		input2.add( SolutionMappingUtils.createSolutionMapping() );
 
 		Set<Var> varsCertain1 = new HashSet<>();
 		Set<Var> varsPossible1 = new HashSet<>();
@@ -504,7 +505,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node p1 = NodeFactory.createURI("http://example.org/p1");
 		final Node p2 = NodeFactory.createURI("http://example.org/p2");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var2, y1,
 				var3, z1,
@@ -516,7 +517,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 				var2, y2,
 				var3, z3) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,
@@ -608,7 +609,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 		final Node p1 = NodeFactory.createURI("http://example.org/p1");
 
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(
 				var4, p1,
 				var2, y1,
@@ -620,7 +621,7 @@ public abstract class TestsForRightJoinAlgorithms extends TestsForJoinAlgorithms
 				var2, y2,
 				var3, z3) );
 
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1,

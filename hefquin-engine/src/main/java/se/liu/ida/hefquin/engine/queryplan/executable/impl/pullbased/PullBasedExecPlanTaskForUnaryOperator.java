@@ -20,9 +20,8 @@ public class PullBasedExecPlanTaskForUnaryOperator extends PullBasedExecPlanTask
 
 	public PullBasedExecPlanTaskForUnaryOperator( final UnaryExecutableOp op,
 	                              final ExecPlanTask input,
-	                              final ExecutionContext execCxt,
-	                              final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                              final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input != null;
@@ -47,7 +46,7 @@ public class PullBasedExecPlanTaskForUnaryOperator extends PullBasedExecPlanTask
 		// become clear that there won't be any more solution mappings.
 
 		boolean lastInputBlockConsumed = false;
-		while ( sink.getSizeOfCurrentResultBlock() < preferredMinimumBlockSize && ! lastInputBlockConsumed ) {
+		while ( sink.getSizeOfCurrentResultBlock() < outputBlockSize && ! lastInputBlockConsumed ) {
 			// consume next input result block
 			final IntermediateResultBlock nextInputBlock = input.getNextIntermediateResultBlock();
 			if ( nextInputBlock != null ) {

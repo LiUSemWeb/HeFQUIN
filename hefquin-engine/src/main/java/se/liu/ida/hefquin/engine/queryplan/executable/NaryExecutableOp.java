@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -11,21 +12,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public interface NaryExecutableOp extends ExecutableOperator
 {
 	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from any of its operands.
-	 *
-	 * A query planner may use this number as an optimization hint
-	 * but it does not have to use it.
+	 * Processes the given solution mapping as input coming from the
+	 * x-th operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 */
-	int preferredInputBlockSizeFromChilden();
-
-	/**
-	 * Processes the given input coming from the x-th operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
-	 */
-	void processBlockFromXthChild( int x,
-	                               IntermediateResultBlock input,
+	void processInputFromXthChild( int x,
+	                               SolutionMapping inputSolMap,
 	                               IntermediateResultElementSink sink,
 	                               ExecutionContext execCxt ) throws ExecOpExecutionException;
 

@@ -13,9 +13,8 @@ public class PushBasedExecPlanTaskForNullaryOperator extends PushBasedExecPlanTa
 	protected final NullaryExecutableOp op;
 
 	public PushBasedExecPlanTaskForNullaryOperator( final NullaryExecutableOp op,
-	                                                final ExecutionContext execCxt,
-	                                                final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                                final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		this.op = op;

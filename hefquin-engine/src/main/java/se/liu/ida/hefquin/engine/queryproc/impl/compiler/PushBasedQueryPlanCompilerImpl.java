@@ -27,34 +27,30 @@ public class PushBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 
 	@Override
 	protected PushBasedExecPlanTask createTaskForNullaryExecOp( final NullaryExecutableOp op,
-	                                                   final ExecutionContext execCxt,
-	                                                   final int preferredOutputBlockSize ) {
-		return new PushBasedExecPlanTaskForNullaryOperator(op, execCxt, preferredOutputBlockSize);
+	                                                            final ExecutionContext execCxt ) {
+		return new PushBasedExecPlanTaskForNullaryOperator(op, execCxt);
 	}
 
 	@Override
 	protected PushBasedExecPlanTask createTaskForUnaryExecOp( final UnaryExecutableOp op,
-	                                                 final ExecPlanTask childTask,
-	                                                 final ExecutionContext execCxt,
-	                                                 final int preferredOutputBlockSize ) {
-		return new PushBasedExecPlanTaskForUnaryOperator(op, childTask, execCxt, preferredOutputBlockSize);
+	                                                          final ExecPlanTask childTask,
+	                                                          final ExecutionContext execCxt ) {
+		return new PushBasedExecPlanTaskForUnaryOperator(op, childTask, execCxt);
 	}
 
 	@Override
 	protected PushBasedExecPlanTask createTaskForBinaryExecOp( final BinaryExecutableOp op,
-	                                                  final ExecPlanTask childTask1,
-	                                                  final ExecPlanTask childTask2,
-	                                                  final ExecutionContext execCxt,
-	                                                  final int preferredOutputBlockSize ) {
-		return new PushBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+	                                                           final ExecPlanTask childTask1,
+	                                                           final ExecPlanTask childTask2,
+	                                                           final ExecutionContext execCxt ) {
+		return new PushBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt);
 	}
 
 	@Override
 	protected ExecPlanTask createTaskForNaryExecOp( final NaryExecutableOp op,
 	                                                final ExecPlanTask[] childTasks,
-	                                                final ExecutionContext execCxt,
-	                                                final int preferredOutputBlockSize ) {
-		return new PushBasedExecPlanTaskForNaryOperator(op, childTasks, execCxt, preferredOutputBlockSize);
+	                                                final ExecutionContext execCxt ) {
+		return new PushBasedExecPlanTaskForNaryOperator(op, childTasks, execCxt);
 	}
 
 	@Override
@@ -88,16 +84,15 @@ public class PushBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 		@Override
 		public void createTasks( final PhysicalPlan qep,
 		                         final LinkedList<ExecPlanTask> tasks,
-		                         final int preferredOutputBlockSize,
 		                         final ExecutionContext execCxt ) {
 			final ExecPlanTask newTask;
 			final ExecPlanTask probe = convertedSubPlans.get(qep);
 			if ( probe != null ) {
 				final PushBasedExecPlanTask t = (PushBasedExecPlanTask) probe;
-				newTask = t.addConnectorForAdditionalConsumer(preferredOutputBlockSize);
+				newTask = t.addConnectorForAdditionalConsumer();
 			}
 			else {
-				newTask = _createTasks(qep, tasks, preferredOutputBlockSize, execCxt);
+				newTask = _createTasks(qep, tasks, execCxt);
 				convertedSubPlans.put(qep, newTask);
 			}
 
