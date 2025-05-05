@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeFQUIN - Features</title>
+
+    <script src="../js/mustache.min.js"></script>
+    <script src="../js/script.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="header"></div>
+
+    <main>
+        <h1 id="overview">HeFQUIN Feature Overview</h1>
+
+        <p>
+            HeFQUIN is a modular federated query engine designed to support complex query processing
+            across heterogeneous data sources. It combines support for SPARQL 1.1 with advanced query
+            optimization techniques and extensibility towards other data models, such as property graphs.
+        </p>
+
+        <h2 id="sparql-support">Comprehensive SPARQL 1.1 Support</h2>
+        <p>
+            HeFQUIN supports all features of SPARQL 1.1. Core elements such as basic graph patterns, group patterns
+            (AND),
+            UNION, OPTIONAL, and FILTERs are handled natively by the engine. Other SPARQL features are supported through
+            integration of the HeFQUIN engine into Apache Jena.
+        </p>
+
+        <h2 id="data-source-integration">Data Source Integration</h2>
+        <p>HeFQUIN is designed for federated query processing over multiple types of RDF interfaces. It currently
+            includes
+            support for:</p>
+        <ul>
+            <li>SPARQL endpoints</li>
+            <li>Triple Pattern Fragments (TPF)</li>
+            <li>Bindings-Restricted Triple Pattern Fragments (brTPF)</li>
+        </ul>
+        <p>Additionally, ongoing development is extending support to non-RDF interfaces:</p>
+        <ul>
+            <li>openCypher for querying property graphs</li>
+            <li>GraphQL APIs</li>
+        </ul>
+
+        <h2 id="vocabulary-mappings">Vocabulary Mappings</h2>
+        <p>
+            An initial layer of vocabulary mapping is available, providing a mechanism to enable semantic
+            interoperability between data sources that use different ontologies, vocabularies, or schemas.
+            Mapped queries can be further optimized by the query planner, ensuring that rewritten subqueries
+            remain efficient and compatible with the source endpoints.
+        </p>
+
+        <h2 id="query-optimization">Advanced Query Optimization</h2>
+        <p>
+            HeFQUIN incorporates both logical and physical optimization in its framework. Logical optimization
+            relies on heuristics to guide query rewriting, while physical optimization supports multiple
+            cost-based strategies, including:
+        </p>
+        <ul>
+            <li>Greedy planning</li>
+            <li>Dynamic programming</li>
+            <li>Simulated annealing</li>
+            <li>Randomized iterative improvement</li>
+        </ul>
+        <p>These strategies are supported by a growing library of physical operators that are chosen based on the
+           execution context.</p>
+
+        <h2 id="physical-operators">Physical Operators</h2>
+        <p>
+            To enable efficient execution of complex federated queries, HeFQUIN includes a comprehensive set of physical
+            operators, such as:</p>
+        <ul>
+            <li>Hash join and symmetric hash join (SHJ) for join processing</li>
+            <li>Request-based nested-loops join (NLJ) for iterative access to remote data</li>
+            <li>Multiple variants of bind joins that optimize different access patterns (e.g., brTPF-based, UNION-based,
+                FILTER-based, VALUES-based)</li>
+        </ul>
+
+        <h2 id="execution-models">Execution Models</h2>
+        <p>
+            HeFQUIN supports both push-based and pull-based execution models to flexibly manage the flow of data between
+            query operators. This allows it to adapt to the characteristics of different data sources and query plans,
+            optimizing for performance and resource use.
+        </p>
+
+        <h2 id="introspection-and-monitoring-tools">Introspection and Monitoring Tools</h2>
+        <p>
+            To support debugging, analysis, and optimization, HeFQUIN provides detailed information about its internal
+            processes:
+        </p>
+        <ul>
+            <li>Logical and physical query plans can be printed for inspection</li>
+            <li>Execution statistics are available programmatically and via the command-line interface, on the level of
+                individual operators and data structures</li>
+        </ul>
+
+        <h2 id="service-interface">Service Interface</h2>
+        <p>
+            HeFQUIN can be run as a standalone service in Docker, as an embedded servlet container, or using a custom
+            servlet container. It exposes an HTTP interface for both query execution and introspection.
+        </p>
+
+
+        <h2 id="testing-infrastructure">Testing Infrastructure</h2>
+        <p>
+            HeFQUIN is backed by an extensive suite of over 720 unit tests, ensuring reliability and correctness across
+            its components.
+        </p>
+
+        <h2 id="known-limitations">Known Limitations</h2>
+        <p>
+            HeFQUIN does not yet have a source selection component. All subpatterns of the queries given to HeFQUIN need
+            to be wrapped in <code>SERVICE</code> clauses. For more details, refer to the page about
+            <a href="queries.html">queries and query features that you can use</a>.
+        </p>
+    </main>
+
+    <div id="footer"></div>
+</body>
+
+</html>
