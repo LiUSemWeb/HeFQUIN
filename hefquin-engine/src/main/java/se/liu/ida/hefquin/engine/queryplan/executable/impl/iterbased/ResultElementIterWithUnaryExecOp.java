@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import java.util.List;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -14,7 +12,7 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 	protected final MyOpRunnerThread opRunnerThread;
 
 	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp op,
-	                                         final ResultBlockIterator inputIter,
+	                                         final ResultElementIterator inputIter,
 	                                         final ExecutionContext execCxt )
 	{
 		super(execCxt);
@@ -47,10 +45,10 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 	protected class MyOpRunnerThread extends OpRunnerThread
 	{
 		private final UnaryExecutableOp op;
-		protected final ResultBlockIterator inputIter;
+		protected final ResultElementIterator inputIter;
 
 		public MyOpRunnerThread( final UnaryExecutableOp op,
-		                         final ResultBlockIterator inputIter )
+		                         final ResultElementIterator inputIter )
 		{
 			this.op = op;
 			this.inputIter = inputIter;
@@ -61,16 +59,14 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 			return op;
 		}
 
-		public ResultBlockIterator getInput() {
+		public ResultElementIterator getInput() {
 			return inputIter;
 		}
 
 		@Override
 		protected void _run() throws ExecutionException {
 			while ( inputIter.hasNext() ) {
-				final IntermediateResultBlock block = inputIter.next();
-				for ( final SolutionMapping sm : block.getSolutionMappings() )
-					op.process( sm, sink, execCxt );
+				op.process( inputIter.next(), sink, execCxt );
 			}
 			op.concludeExecution(sink, execCxt);
 		}

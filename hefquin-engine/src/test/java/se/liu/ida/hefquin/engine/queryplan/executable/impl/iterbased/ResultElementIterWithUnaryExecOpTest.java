@@ -20,7 +20,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		final UnaryExecutableOp1ForTest op = new UnaryExecutableOp1ForTest();
 		final ResultElementIterWithUnaryExecOp it = new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(2),
+				TestUtils.createResultElementIteratorForTests(),
 				TestUtils.createExecContextForTests() );
 
 		assertEquals( op, it.getOp() );
@@ -31,7 +31,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		final SolutionMapping sm1 = TestUtils.createSolutionMappingForTests("1");
 		final SolutionMapping sm2 = TestUtils.createSolutionMappingForTests("2");
 		final SolutionMapping sm3 = TestUtils.createSolutionMappingForTests("3");
-		final ResultElementIterator it = createIterator1ForTests( 2, sm1, sm2, sm3 );
+		final ResultElementIterator it = createIterator1ForTests( sm1, sm2, sm3 );
 
 		assertEquals( "1ok", it.next().toString() );
 		assertEquals( "2ok", it.next().toString() );
@@ -46,7 +46,7 @@ public class ResultElementIterWithUnaryExecOpTest
 		final SolutionMapping sm1 = TestUtils.createSolutionMappingForTests("1");
 		final SolutionMapping sm2 = TestUtils.createSolutionMappingForTests("2");
 		final SolutionMapping sm3 = TestUtils.createSolutionMappingForTests("3");
-		final ResultElementIterator it = createIterator1ForTests( 2, sm1, sm2, sm3 );
+		final ResultElementIterator it = createIterator1ForTests( sm1, sm2, sm3 );
 
 		assertTrue( it.hasNext() );
 		assertEquals( "1ok", it.next().toString() );
@@ -62,7 +62,7 @@ public class ResultElementIterWithUnaryExecOpTest
 
 	@Test
 	public void noElementFromInput() {
-		final ResultElementIterator it = createIterator1ForTests( 2 );
+		final ResultElementIterator it = createIterator1ForTests();
 
 		assertTrue( it.hasNext() );
 		assertEquals( "added", it.next().toString() );
@@ -72,26 +72,26 @@ public class ResultElementIterWithUnaryExecOpTest
 
 	@Test
 	public void noElementAtAll() {
-		final ResultElementIterator it = createIterator2ForTests( 2 );
+		final ResultElementIterator it = createIterator2ForTests();
 
 		assertFalse( it.hasNext() );
 	}
 
 
 
-	protected static ResultElementIterator createIterator1ForTests( final int blockSize, final SolutionMapping... elements ) {
+	protected static ResultElementIterator createIterator1ForTests( final SolutionMapping... elements ) {
 		final UnaryExecutableOp op = new UnaryExecutableOp1ForTest();
 		return new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(blockSize, elements),
+				TestUtils.createResultElementIteratorForTests(elements),
 				TestUtils.createExecContextForTests() );
 	}
 
-	protected static ResultElementIterator createIterator2ForTests( final int blockSize, final SolutionMapping... elements ) {
+	protected static ResultElementIterator createIterator2ForTests( final SolutionMapping... elements ) {
 		final UnaryExecutableOp op = new UnaryExecutableOp2ForTest();
 		return new ResultElementIterWithUnaryExecOp(
 				op,
-				TestUtils.createResultBlockIteratorForTests(blockSize, elements),
+				TestUtils.createResultElementIteratorForTests(elements),
 				TestUtils.createExecContextForTests() );
 	}
 

@@ -9,15 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
 
 public class ResultIteratorUtils
 {
-	public static ExecutablePlanStats tryGetStatsOfProducingSubPlan( final ResultBlockIterator it ) {
-		if ( it instanceof ResultBlockIterOverResultElementIter ) {
-			final ResultElementIterator eIt = ((ResultBlockIterOverResultElementIter) it).getElementIterator();
-			return tryGetStatsOfProducingSubPlan(eIt);
-		}
-
-		return null;
-	}
-
 	public static ExecutablePlanStats tryGetStatsOfProducingSubPlan( final ResultElementIterator it ) {
 		final ExecutableOperatorStats rootOpStats = ResultIteratorUtils.tryGetStatsOfProducingOperator(it);
 		if ( it instanceof ResultElementIterWithNullaryExecOp ) {
@@ -43,15 +34,6 @@ public class ResultIteratorUtils
 	public static ExecutableOperator tryGetProducingOperator( final ResultElementIterator it ) {
 		if ( it instanceof ResultElementIterBase ) {
 			return ( (ResultElementIterBase) it ).getOp();
-		}
-
-		return null;
-	}
-
-	public static List<Exception> tryGetExceptionsOfProducingSubPlan( final ResultBlockIterator it ) {
-		if ( it instanceof ResultBlockIterOverResultElementIter ) {
-			final ResultElementIterator eIt = ((ResultBlockIterOverResultElementIter) it).getElementIterator();
-			return tryGetExceptionsOfProducingSubPlan(eIt);
 		}
 
 		return null;

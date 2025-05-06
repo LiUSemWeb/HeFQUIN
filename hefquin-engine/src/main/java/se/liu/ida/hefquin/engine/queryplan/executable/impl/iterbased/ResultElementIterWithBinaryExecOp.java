@@ -2,10 +2,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased;
 
 import java.util.List;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
@@ -14,8 +12,8 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 	protected final MyOpRunnerThread opRunnerThread;
 
 	public ResultElementIterWithBinaryExecOp( final BinaryExecutableOp op,
-	                                          final ResultBlockIterator inputIter1,
-	                                          final ResultBlockIterator inputIter2,
+	                                          final ResultElementIterator inputIter1,
+	                                          final ResultElementIterator inputIter2,
 	                                          final ExecutionContext execCxt )
 	{
 		super(execCxt);
@@ -58,12 +56,12 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 	protected class MyOpRunnerThread extends OpRunnerThread
 	{
 		private final BinaryExecutableOp op;
-		protected final ResultBlockIterator inputIter1;
-		protected final ResultBlockIterator inputIter2;
+		protected final ResultElementIterator inputIter1;
+		protected final ResultElementIterator inputIter2;
 
 		public MyOpRunnerThread( final BinaryExecutableOp op,
-		                         final ResultBlockIterator inputIter1,
-		                         final ResultBlockIterator inputIter2 )
+		                         final ResultElementIterator inputIter1,
+		                         final ResultElementIterator inputIter2 )
 		{
 			this.op = op;
 			this.inputIter1 = inputIter1;
@@ -73,9 +71,9 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 		@Override
 		public BinaryExecutableOp getOp() { return op; }
 
-		public ResultBlockIterator getInput1() { return inputIter1; }
+		public ResultElementIterator getInput1() { return inputIter1; }
 
-		public ResultBlockIterator getInput2() { return inputIter2; }
+		public ResultElementIterator getInput2() { return inputIter2; }
 
 		@Override
 		protected void _run() throws ExecutionException {
@@ -85,18 +83,12 @@ public class ResultElementIterWithBinaryExecOp extends ResultElementIterBase
 			// input two.
 
 			while ( inputIter1.hasNext() ) {
-				final IntermediateResultBlock block = inputIter1.next();
-				for ( final SolutionMapping sm : block.getSolutionMappings() ) {
-					op.processInputFromChild1( sm, sink, execCxt );
-				}
+				op.processInputFromChild1( inputIter1.next(), sink, execCxt );
 			}
 			op.wrapUpForChild1(sink, execCxt);
 
 			while ( inputIter2.hasNext() ) {
-				final IntermediateResultBlock block = inputIter2.next();
-				for ( final SolutionMapping sm : block.getSolutionMappings() ) {
-					op.processInputFromChild2( sm, sink, execCxt );
-				}
+				op.processInputFromChild2( inputIter2.next(), sink, execCxt );
 			}
 			op.wrapUpForChild2(sink, execCxt);
 		}
