@@ -1,13 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -213,27 +207,33 @@ public class FederationDescriptionReader
 	}
 
 	/**
-	 * Checks whether given RDF resource (fm) representing a federation
-	 * member is associated with a vocabulary mapping in the given federation
-	 * description (fd) and, if so, parses this vocabulary mapping and returns
-	 * it. Otherwise, this function returns <code>null</code>.
+	 * Attempts to retrieve and parse the vocabulary mapping associated with the
+	 * given RDF resource {@code fm}, representing a {@link FederationMember}, in
+	 * the given federation description {@code fd}.
+	 *
+	 * The method attempts to load the vocabulary mapping from the specified path or
+	 * URL and caches the result for reuse. If no vocabulary mappings file is
+	 * present, the method returns {@code null}.
+	 *
+	 * @param fm RDF resource for the federation member
+	 * @param fd RDF model of the federation description
+	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
+	 * @throws org.apache.jena.riot.RiotNotFoundException if the mapping file cannot be loaded or parsed
 	 */
 	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
-		if( fd.contains(fm, FD.vocabularyMappingsFile) ){
-			final RDFNode pathToMappingFile = fd.getRequiredProperty(fm, FD.vocabularyMappingsFile).getObject();
-
-			final String path = pathToMappingFile.toString();
-			if ( verifyValidVocabMappingFile(path) ) {
-				VocabularyMapping vm = vocabMappingByPath.get( path );
-				if ( vm == null ) {
-					vm = new VocabularyMappingWrappingImpl(path);
-					vocabMappingByPath.put( path, vm );
-				}
-				return vm;
-			}
+		if ( ! fd.contains( fm, FD.vocabularyMappingsFile ) ) {
+			return null;
 		}
 
-		return null;
+		final RDFNode pathToMappingFile = fd.getRequiredProperty( fm, FD.vocabularyMappingsFile ).getObject();
+
+		final String path = pathToMappingFile.toString();
+		VocabularyMapping vm = vocabMappingByPath.get( path );
+		if ( vm == null ) {
+			vm = new VocabularyMappingWrappingImpl( path );
+			vocabMappingByPath.put( path, vm );
+		}
+		return vm;
 	}
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
@@ -314,43 +314,6 @@ public class FederationDescriptionReader
 			@Override public GraphQLSchema getSchema() { return schema; }
 			@Override public String toString( ) { return "GraphQL endpoint at " + uri; }
 		};
-	}
-
-	/**
-	 * Verifies that the file at the given path exists. Tries local file, classpath
-	 * resource, and URL (in that order).
-	 *
-	 * @param pathToMappingFile Path, resource name, or URL
-	 * @return true if the file exists in any of the checked locations
-	 * @throws IllegalArgumentException if the file is not found
-	 */
-	protected boolean verifyValidVocabMappingFile( final String pathToMappingFile ) {
-		// 1. Try to load from locla file system
-		final File f = new File( pathToMappingFile );
-		if ( f.exists() && f.isFile() ) {
-			return true;
-		}
-
-		// 2. Try to load from classpath
-		if ( getClass().getClassLoader().getResource( pathToMappingFile ) != null ) {
-			return true;
-		}
-
-		// 3. Try to load from URL
-		try {
-			final URL url = new URL( pathToMappingFile );
-			final HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-			huc.setRequestMethod( "HEAD" );
-			huc.setConnectTimeout( 3000 );
-			huc.setReadTimeout( 3000 );
-			if ( HttpURLConnection.HTTP_OK == huc.getResponseCode() ) {
-				return true;
-			}
-		} catch ( IOException e ) {
-			// Ignore: URL check failed, will report error below
-		}
-
-		throw new IllegalArgumentException( "The following path to vocab.mapping does not exist: " + pathToMappingFile );
 	}
 
 	/**
