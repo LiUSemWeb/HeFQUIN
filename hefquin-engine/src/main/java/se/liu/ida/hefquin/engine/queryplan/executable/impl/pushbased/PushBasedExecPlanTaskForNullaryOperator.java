@@ -4,8 +4,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class PushBasedExecPlanTaskForNullaryOperator extends PushBasedExecPlanTaskBase
@@ -27,8 +25,8 @@ public class PushBasedExecPlanTaskForNullaryOperator extends PushBasedExecPlanTa
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
+			throws ExecOpExecutionException
+	{
 		op.execute(sink, execCxt);
 	}
 

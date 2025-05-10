@@ -1,12 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public abstract class ExecPlanTaskBase implements ExecPlanTask
@@ -52,8 +51,8 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	// The different threads that call methods of this class must
 	// be synchronized via the 'availableResultBlocks' object.
 
-	// access to this object must be synchronized
-	protected final Queue<IntermediateResultBlock> availableResultBlocks = new LinkedList<>();
+	// access to this list must be synchronized
+	protected final List<SolutionMapping> availableOutput = new ArrayList<>();
 
 	// access to this object must be synchronized
 	private Status status = Status.WAITING_TO_BE_STARTED;
@@ -74,21 +73,21 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 
 	@Override
 	public boolean isRunning() {
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 			return (status == Status.RUNNING);
 		}
 	}
 
 	@Override
 	public boolean isCompleted() {
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 			return (status == Status.COMPLETED_NOT_CONSUMED || status == Status.COMPLETED_AND_CONSUMED);
 		}
 	}
 
 	@Override
 	public boolean hasFailed() {
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 			return (status == Status.FAILED);
 		}
 	}
@@ -99,9 +98,9 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	}
 
 	@Override
-	public boolean hasNextIntermediateResultBlockAvailable() {
-		synchronized (availableResultBlocks) {
-			return ! availableResultBlocks.isEmpty();
+	public boolean hasMoreOutputAvailable() {
+		synchronized (availableOutput) {
+			return ! availableOutput.isEmpty();
 		}
 	}
 
@@ -120,7 +119,7 @@ public abstract class ExecPlanTaskBase implements ExecPlanTask
 	}
 
 	protected void setStatus( final Status newStatus ) {
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 			status = newStatus;
 		}
 	}

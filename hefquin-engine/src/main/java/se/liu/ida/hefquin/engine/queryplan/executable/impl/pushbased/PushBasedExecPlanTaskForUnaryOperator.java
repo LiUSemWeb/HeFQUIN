@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
@@ -35,18 +37,19 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
-		boolean lastInputBlockConsumed = false;
-		while ( ! lastInputBlockConsumed ) {
-			final IntermediateResultBlock nextInputBlock = input.getNextIntermediateResultBlock();
-			if ( nextInputBlock != null ) {
-				for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() )
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		boolean inputConsumed = false;
+		while ( ! inputConsumed ) {
+			input.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				for ( final SolutionMapping sm : transferBuffer )
 					op.process(sm, sink, execCxt);
 			}
 			else {
 				op.concludeExecution(sink, execCxt);
-				lastInputBlockConsumed = true;
+				inputConsumed = true;
 			}
 		}
 	}

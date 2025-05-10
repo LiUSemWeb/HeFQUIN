@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
@@ -49,16 +51,16 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 	 * parallel based on any of the other inputs.
 	 */
 	protected void produceOutputByConsumingInputsOneAfterAnother( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		for ( int i = 0; i < inputs.length; i++ ) {
 			boolean inputConsumed = false;
 			while ( ! inputConsumed ) {
-				final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+				inputs[i].transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					for ( final SolutionMapping sm : transferBuffer )
 						op.processInputFromXthChild(i, sm, sink, execCxt);
-					}
 				}
 				else {
 					op.wrapUpForXthChild(i, sink, execCxt);
@@ -74,60 +76,61 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 	 * operator {@link #op}), before moving on to the (i+1)-th input.
 	 */
 	protected void produceOutputByConsumingAllInputsInParallel( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
-		final boolean[] inputConsumed = new boolean[inputs.length];
-		for ( int i = 0; i < inputs.length; i++ ) { inputConsumed[i] = false; }
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		final boolean[] inputConsumedCompletely = new boolean[inputs.length];
+		for ( int i = 0; i < inputs.length; i++ ) { inputConsumedCompletely[i] = false; }
 
 		int indexOfNextInputToWaitFor = 0;
 		int numberOfInputsConsumed = 0;
 		while ( numberOfInputsConsumed < inputs.length ) {
-			// Before blindly asking any of the inputs to give us its next
-			// IntermediateResultBlock (which may cause this thread to wait
-			// if no such block is available at the moment), let's first ask
-			// them if they currently have a block available. If so, request
-			// the next block from the input that says it has a block available.
-			boolean blockConsumed = false;
+			// Before blindly asking any of the inputs to give us the
+			// solution mappings that it has currently available as output
+			// (which may cause this thread to wait if no such output is
+			// available at the moment), let's first ask them if they do
+			// have some output readily available. If so, request this
+			// output from the input that says it has output available.
+			boolean someInputConsumed = false;
 			for ( int i = 0; i < inputs.length; i++ ) {
-				if ( ! inputConsumed[i] && inputs[i].hasNextIntermediateResultBlockAvailable() ) {
-					// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
-					final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
-					if ( nextInputBlock != null ) {
-						for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+				if ( ! inputConsumedCompletely[i] && inputs[i].hasMoreOutputAvailable() ) {
+					// calling 'transferAvailableOutput' should not cause this thread to wait
+					inputs[i].transferAvailableOutput(transferBuffer);
+					if ( ! transferBuffer.isEmpty() ) {
+						for ( final SolutionMapping sm : transferBuffer )
 							op.processInputFromXthChild(i, sm, sink, execCxt);
-						}
 					}
 
-					blockConsumed = true;
+					someInputConsumed = true;
 				}
 			}
 
-			if ( ! blockConsumed ) {
-				// If none of the inputs had a block available at the moment,
-				// we ask one of them to produce its next block, which may
-				// cause this thread to wait until that next block has been
-				// produced. To decide which of the inputs we ask (and, then,
-				// wait for) we use a round robin approach. To this end, we
-				// use the 'indexOfNextInputToWaitFor' pointer which we advance
+			if ( ! someInputConsumed ) {
+				// If none of the inputs had some output available at the
+				// moment, we ask one of them to produce its next output,
+				// which may cause this thread to wait until that next
+				// output has been produced.
+				// To decide which of the inputs we ask (and, then, wait
+				// for) we use a round robin approach. To this end, we use
+				// the 'indexOfNextInputToWaitFor' pointer which we advance
 				// each time we leave this code block here.
 
 				// First, we have to make sure that 'indexOfNextInputToWaitFor'
 				// points to an input that has not been consumed completely yet.
-				while ( inputConsumed[indexOfNextInputToWaitFor] == true ) {
+				while ( inputConsumedCompletely[indexOfNextInputToWaitFor] == true ) {
 					indexOfNextInputToWaitFor = advanceIndexOfInput(indexOfNextInputToWaitFor);
 				}
 
-				// Now we ask that input to produce its next block, which may
+				// Now we ask that input to produce its next output, which may
 				// cause this thread to wait.
-				final IntermediateResultBlock nextInputBlock = inputs[indexOfNextInputToWaitFor].getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					for ( final SolutionMapping sm : nextInputBlock.getSolutionMappings() ) {
+				inputs[indexOfNextInputToWaitFor].transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					for ( final SolutionMapping sm : transferBuffer )
 						op.processInputFromXthChild(indexOfNextInputToWaitFor, sm, sink, execCxt);
-					}
 				}
 				else {
 					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, execCxt);
-					inputConsumed[indexOfNextInputToWaitFor] = true;
+					inputConsumedCompletely[indexOfNextInputToWaitFor] = true;
 					numberOfInputsConsumed++;
 				}
 

@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlanStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
@@ -36,11 +35,11 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 			throw new ExecutionException("thread pool missing");
 		}
 
-		// start all tasks, beginning with the last ones (which are the
+		// Start all tasks, beginning with the last ones (which are the
 		// ones for the leaf node operators), and collect 'Future's to
 		// track their progress (each 'Future' has the same index in
 		// 'futures' array as its corresponding task has in the 'tasks'
-		// list)
+		// list).
 		final Iterator<ExecPlanTask> it = tasks.descendingIterator();
 		int i = tasks.size();
 		final Future<?>[] futures = new Future<?>[tasks.size()];
@@ -50,9 +49,9 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 				futures[--i] = threadPool.submit(task);
 			}
 			catch ( final RejectedExecutionException e ) {
-				// if submitting one of the tasks failed, try to
+				// If submitting one of the tasks failed, try to
 				// cancel the ones that we have already started
-				// (to free up the threads that are running them)
+				// (to free up the threads that are running them).
 				for ( int j = i+1; j < tasks.size(); j++ ) {
 					futures[j].cancel(true);
 				}
@@ -60,16 +59,17 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 			}
 		}
 
-		// consume all solution mappings from the root operator and send them to the result sink
+		// Consume all solution mappings from the root operator
+		// and send them to the result sink.
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		final ExecPlanTask rootTask = tasks.getFirst();
 		try {
-			final ExecPlanTask rootTask = tasks.getFirst();
 			boolean exhausted = false;
 			while ( ! exhausted ) {
-				final IntermediateResultBlock block = rootTask.getNextIntermediateResultBlock();
-				if ( block != null ) {
-					for ( final SolutionMapping sm : block.getSolutionMappings() ) {
+				rootTask.transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					for ( final SolutionMapping sm : transferBuffer )
 						resultSink.send(sm);
-					}
 				}
 				else {
 					exhausted = true;

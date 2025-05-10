@@ -57,20 +57,20 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	protected void _process( final List<SolutionMapping> batch,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		//If this is the first request
+		// If this is the first request.
 		if ( currentInstance == null ) {
 			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, useOuterJoinSemantics, collectExceptions);
 			boolean valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
 				currentInstance._process(batch, sink, execCxt);
-				if (!currentInstance.getExceptionsCaughtDuringExecution().isEmpty()) {
+				if ( ! currentInstance.getExceptionsCaughtDuringExecution().isEmpty() ) {
 					valuesBasedRequestFailed = true;
 				}	
 			} catch ( final ExecOpExecutionException e ) {
 				valuesBasedRequestFailed = true;
 			}
-			if (valuesBasedRequestFailed == true) {
+			if ( valuesBasedRequestFailed == true ) {
 				// Use FILTER-based bind join instead
 				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
 				currentInstance._process(batch, sink, execCxt);
@@ -87,7 +87,26 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	                                   final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		if ( currentInstance != null ) {
+		if ( currentInstance == null ) {
+			// This case may occur if _process was never called.
+			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, useOuterJoinSemantics, collectExceptions);
+			boolean valuesBasedRequestFailed = false;
+			try {
+				// Try using VALUES-based bind join
+				currentInstance._concludeExecution(batch, sink, execCxt);
+				if ( ! currentInstance.getExceptionsCaughtDuringExecution().isEmpty() ) {
+					valuesBasedRequestFailed = true;
+				}	
+			} catch ( final ExecOpExecutionException e ) {
+				valuesBasedRequestFailed = true;
+			}
+			if ( valuesBasedRequestFailed == true ) {
+				// Use FILTER-based bind join instead
+				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
+				currentInstance._concludeExecution(batch, sink, execCxt);
+			}
+		}
+		else {
 			currentInstance._concludeExecution(batch, sink, execCxt);
 		}
 	}
