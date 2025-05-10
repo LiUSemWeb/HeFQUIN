@@ -1,8 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
@@ -17,9 +20,8 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 
 	public PushBasedExecPlanTaskForUnaryOperator( final UnaryExecutableOp op,
 	                                              final ExecPlanTask input,
-	                                              final ExecutionContext execCxt,
-	                                              final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                              final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input != null;
@@ -35,17 +37,19 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
-		boolean lastInputBlockConsumed = false;
-		while ( ! lastInputBlockConsumed ) {
-			final IntermediateResultBlock nextInputBlock = input.getNextIntermediateResultBlock();
-			if ( nextInputBlock != null ) {
-				op.process(nextInputBlock, sink, execCxt);
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		boolean inputConsumed = false;
+		while ( ! inputConsumed ) {
+			input.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				for ( final SolutionMapping sm : transferBuffer )
+					op.process(sm, sink, execCxt);
 			}
 			else {
 				op.concludeExecution(sink, execCxt);
-				lastInputBlockConsumed = true;
+				inputConsumed = true;
 			}
 		}
 	}

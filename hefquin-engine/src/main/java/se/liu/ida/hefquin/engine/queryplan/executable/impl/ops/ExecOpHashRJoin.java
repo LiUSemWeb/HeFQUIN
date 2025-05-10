@@ -28,18 +28,22 @@ public class ExecOpHashRJoin extends ExecOpHashJoin {
 	}
 
 	@Override
-	protected void _processSolMapFromChild2( final SolutionMapping smR,
-	                                         final IntermediateResultElementSink sink,
-	                                         final ExecutionContext execCxt ) {
+	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		if ( child1InputComplete == false ) {
+			throw new IllegalStateException();
+		}
+
 		boolean hasJoinPartner = false;
-		final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
+		final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
 		for ( final SolutionMapping smL : matchSolMapL ){
 			hasJoinPartner = true;
-			sink.send(SolutionMappingUtils.merge(smL, smR));
+			sink.send(SolutionMappingUtils.merge(smL, inputSolMap));
 		}
 
 		if ( ! hasJoinPartner ) {
-			sink.send(smR);
+			sink.send(inputSolMap);
 		}
 	}
 }

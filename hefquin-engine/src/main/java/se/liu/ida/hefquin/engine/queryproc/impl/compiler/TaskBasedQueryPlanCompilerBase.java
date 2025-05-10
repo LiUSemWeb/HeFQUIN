@@ -34,9 +34,8 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 	protected LinkedList<ExecPlanTask> createTasks( final PhysicalPlan qep,
 	                                                final ExecutionContext execCxt ) {
-		final int preferredOutputBlockSize = 1;
 		final LinkedList<ExecPlanTask> tasks = new LinkedList<>();
-		createWorker().createTasks(qep, tasks, preferredOutputBlockSize, execCxt);
+		createWorker().createTasks(qep, tasks, execCxt);
 		return tasks;
 	}
 
@@ -48,21 +47,19 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 	{
 		public void createTasks( final PhysicalPlan qep,
 		                         final LinkedList<ExecPlanTask> tasks,
-		                         final int preferredOutputBlockSize,
 		                         final ExecutionContext execCxt ) {
-			final ExecPlanTask newTask = _createTasks(qep, tasks, preferredOutputBlockSize, execCxt);
+			final ExecPlanTask newTask = _createTasks(qep, tasks, execCxt);
 			tasks.addFirst(newTask);
 		}
 
 		protected ExecPlanTask _createTasks( final PhysicalPlan qep,
 		                                     final LinkedList<ExecPlanTask> tasks,
-		                                     final int preferredOutputBlockSize,
 		                                     final ExecutionContext execCxt ) {
 			final PhysicalOperator pop = qep.getRootOperator();
 			if ( pop instanceof NullaryPhysicalOp npop )
 			{
 				final NullaryExecutableOp execOp = npop.createExecOp(true);
-				return createTaskForNullaryExecOp(execOp, execCxt, preferredOutputBlockSize);
+				return createTaskForNullaryExecOp(execOp, execCxt);
 			}
 			else if ( pop instanceof UnaryPhysicalOp upop )
 			{
@@ -70,10 +67,10 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 				final UnaryExecutableOp execOp = upop.createExecOp( true, subPlan.getExpectedVariables() );
 
-				createTasks( subPlan, tasks, execOp.preferredInputBlockSize(), execCxt );
+				createTasks(subPlan, tasks, execCxt);
 				final ExecPlanTask childTask = tasks.getFirst();
 
-				return createTaskForUnaryExecOp(execOp, childTask, execCxt, preferredOutputBlockSize);
+				return createTaskForUnaryExecOp(execOp, childTask, execCxt);
 			}
 			else if ( pop instanceof BinaryPhysicalOp bpop )
 			{
@@ -85,13 +82,13 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 						subPlan1.getExpectedVariables(),
 						subPlan2.getExpectedVariables() );
 
-				createTasks( subPlan1, tasks, execOp.preferredInputBlockSizeFromChild1(), execCxt );
+				createTasks( subPlan1, tasks, execCxt );
 				final ExecPlanTask childTask1 = tasks.getFirst();
 
-				createTasks( subPlan2, tasks, execOp.preferredInputBlockSizeFromChild2(), execCxt );
+				createTasks( subPlan2, tasks, execCxt );
 				final ExecPlanTask childTask2 = tasks.getFirst();
 
-				return createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt, preferredOutputBlockSize);
+				return createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt);
 			}
 			else if ( pop instanceof NaryPhysicalOp npop )
 			{
@@ -104,15 +101,12 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 				final ExecPlanTask[] childTasks = new ExecPlanTask[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < childTasks.length; i++ ) {
-					createTasks( qep.getSubPlan(i),
-					             tasks,
-					             execOp.preferredInputBlockSizeFromChilden(),
-					             execCxt );
+					createTasks( qep.getSubPlan(i), tasks, execCxt );
 
 					childTasks[i] = tasks.getFirst();
 				}
 
-				return createTaskForNaryExecOp(execOp, childTasks, execCxt, preferredOutputBlockSize);
+				return createTaskForNaryExecOp(execOp, childTasks, execCxt);
 			}
 			else
 			{
@@ -123,22 +117,18 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 	} // end of helper class Worker
 
 	protected abstract ExecPlanTask createTaskForNullaryExecOp( NullaryExecutableOp op,
-	                                                            ExecutionContext execCxt,
-	                                                            int preferredOutputBlockSize );
+	                                                            ExecutionContext execCxt );
 
 	protected abstract ExecPlanTask createTaskForUnaryExecOp( UnaryExecutableOp op,
 	                                                          ExecPlanTask childTask,
-	                                                          ExecutionContext execCxt,
-	                                                          int preferredOutputBlockSize );
+	                                                          ExecutionContext execCxt );
 
 	protected abstract ExecPlanTask createTaskForBinaryExecOp( BinaryExecutableOp op,
 	                                                           ExecPlanTask childTask1,
 	                                                           ExecPlanTask childTask2,
-	                                                           ExecutionContext execCxt,
-	                                                           int preferredOutputBlockSize );
+	                                                           ExecutionContext execCxt );
 
 	protected abstract ExecPlanTask createTaskForNaryExecOp( NaryExecutableOp op,
 	                                                         ExecPlanTask[] childTasks,
-	                                                         ExecutionContext execCxt,
-	                                                         int preferredOutputBlockSize );
+	                                                         ExecutionContext execCxt );
 }

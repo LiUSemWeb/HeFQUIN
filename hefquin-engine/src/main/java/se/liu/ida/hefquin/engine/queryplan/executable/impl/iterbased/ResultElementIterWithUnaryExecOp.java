@@ -12,7 +12,7 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 	protected final MyOpRunnerThread opRunnerThread;
 
 	public ResultElementIterWithUnaryExecOp( final UnaryExecutableOp op,
-	                                         final ResultBlockIterator inputIter,
+	                                         final ResultElementIterator inputIter,
 	                                         final ExecutionContext execCxt )
 	{
 		super(execCxt);
@@ -45,10 +45,10 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 	protected class MyOpRunnerThread extends OpRunnerThread
 	{
 		private final UnaryExecutableOp op;
-		protected final ResultBlockIterator inputIter;
+		protected final ResultElementIterator inputIter;
 
 		public MyOpRunnerThread( final UnaryExecutableOp op,
-		                         final ResultBlockIterator inputIter )
+		                         final ResultElementIterator inputIter )
 		{
 			this.op = op;
 			this.inputIter = inputIter;
@@ -59,7 +59,7 @@ public class ResultElementIterWithUnaryExecOp extends ResultElementIterBase
 			return op;
 		}
 
-		public ResultBlockIterator getInput() {
+		public ResultElementIterator getInput() {
 			return inputIter;
 		}
 

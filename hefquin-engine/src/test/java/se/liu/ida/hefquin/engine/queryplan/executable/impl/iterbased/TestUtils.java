@@ -11,7 +11,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class TestUtils extends EngineTestBase
@@ -35,15 +34,8 @@ public class TestUtils extends EngineTestBase
 		return new SolutionMappingForTests(token);
 	}
 
-	public static ResultElementIterator createResultElementIteratorForTests( final SolutionMapping[] elements ) {
+	public static ResultElementIterator createResultElementIteratorForTests( final SolutionMapping... elements ) {
 		return new ResultElementIteratorForTests( elements );
-	}
-
-	public static ResultBlockIterator createResultBlockIteratorForTests( final int blockSize, final SolutionMapping... elements ) {
-		return new ResultBlockIterOverResultElementIter(
-				createResultElementIteratorForTests(elements),
-				new GenericIntermediateResultBlockBuilderImpl(),
-				blockSize );
 	}
 
 

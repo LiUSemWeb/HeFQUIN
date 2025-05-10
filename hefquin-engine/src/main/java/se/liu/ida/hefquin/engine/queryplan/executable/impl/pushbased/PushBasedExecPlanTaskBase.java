@@ -1,27 +1,26 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskBase;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * Push-based implementation of {@link ExecPlanTask}.
  * This implementation makes the following assumption:
  * - There is only one thread that consumes the output of this
- *   task (by calling {@link #getNextIntermediateResultBlock()}).
+ *   task (by calling {@link #transferAvailableOutput()}).
  */
 public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
                                                 implements PushBasedExecPlanTask, IntermediateResultElementSink
@@ -30,27 +29,21 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 
 	protected final int outputBlockSize;
 
-	private final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
-
 	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
 
+	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt ) {
+		super(execCxt);
 
-	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt, final int preferredMinimumBlockSize ) {
-		super(execCxt, preferredMinimumBlockSize);
-
-		if ( preferredMinimumBlockSize == 1 )
-			outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
-		else
-			outputBlockSize = preferredMinimumBlockSize;
+		outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
 	}
 
 	@Override
-	public ExecPlanTask addConnectorForAdditionalConsumer( final int preferredMinimumBlockSize ) {
+	public ExecPlanTask addConnectorForAdditionalConsumer() {
 		if ( extraConnectors == null ) {
 			extraConnectors = new ArrayList<>();
 		}
 
-		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt, preferredMinimumBlockSize);
+		final ConnectorForAdditionalConsumer c = new ConnectorForAdditionalConsumer(execCxt);
 		extraConnectors.add(c);
 		return c;
 	}
@@ -117,19 +110,16 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 
 	@Override
 	public void send( final SolutionMapping element ) {
-		synchronized (availableResultBlocks) {
-			blockBuilder.add(element);
-
-			// If we have collected enough solution mappings, produce the next
-			// output result block with these solution mappings and inform the
-			// consuming thread in case it is already waiting for the next block
-			if ( blockBuilder.sizeOfCurrentBlock() >= outputBlockSize ) {
-				final IntermediateResultBlock nextBlock = blockBuilder.finishCurrentBlock();
-				availableResultBlocks.add(nextBlock);
-				availableResultBlocks.notify();
-			}
+		synchronized (availableOutput) {
+			// Make the given solution mapping available for consumption and
+			// inform the consuming thread in case it is already waiting for
+			// more solution mappings.
+			availableOutput.add(element);
+			availableOutput.notify();
 		}
 
+		// Forward the given solution mapping to the extra connectors as
+		// well (if there are any).
 		if ( extraConnectors != null ) {
 			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
 				c.send(element);
@@ -137,51 +127,106 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 		}
 	}
 
+	@Override
+	public int send( final Iterable<SolutionMapping> it ) {
+		if ( ! (it instanceof Collection<?>) ) {
+			return send( it.iterator() );
+		}
+
+		final Collection<SolutionMapping> coll = (Collection<SolutionMapping>) it;
+
+		if ( coll.isEmpty() ) {
+			return 0;
+		}
+
+		synchronized (availableOutput) {
+			// Make the given solution mappings available for consumption and
+			// inform the consuming thread in case it is already waiting for
+			// more solution mappings.
+			availableOutput.addAll(coll);
+			availableOutput.notify();
+		}
+
+		// Forward the given solution mapping to the extra connectors as
+		// well (if there are any).
+		if ( extraConnectors != null ) {
+			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+				c.send(coll);
+			}
+		}
+
+		return coll.size();
+	}
+
+	@Override
+	public int send( final Iterator<SolutionMapping> it ) {
+		if ( ! it.hasNext() ) {
+			return 0;
+		}
+
+		if ( extraConnectors != null ) {
+			final List<SolutionMapping> list = new ArrayList<>();
+			while ( it.hasNext() ) {
+				list.add( it.next() );
+			}
+			return send(list);
+		}
+
+		int cnt = 0;
+
+		synchronized (availableOutput) {
+			// Make the given solution mappings available for consumption and
+			// inform the consuming thread in case it is already waiting for
+			// more solution mappings.
+			while ( it.hasNext() ) {
+				cnt++;
+				availableOutput.add( it.next() );
+			}
+			availableOutput.notify();
+		}
+
+		return cnt;
+	}
+
 	protected void wrapUp( final boolean failed, final boolean interrupted )
 	{
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 			if ( failed ) {
 				setStatus(Status.FAILED);
-				availableResultBlocks.notifyAll();
+				availableOutput.notifyAll();
 			}
 			else if ( interrupted ) {
 				setStatus(Status.INTERRUPTED);
-				availableResultBlocks.notifyAll();
+				availableOutput.notifyAll();
 			}
 			else {
-				// everything went well; let's see whether we still have some
-				// output solution mappings for a final output result block
-				if ( blockBuilder.sizeOfCurrentBlock() > 0 ) {
-					// yes we have; let's create the output result block and
-					// notify the potentially waiting consuming thread of it
-					availableResultBlocks.add( blockBuilder.finishCurrentBlock() );
+				// Everything went well. Set the completion status
+				// depending on whether there still are output solution
+				// mappings available to be consumed, and ...
+				if ( availableOutput.isEmpty() )
+					setStatus(Status.COMPLETED_AND_CONSUMED);
+				else
 					setStatus(Status.COMPLETED_NOT_CONSUMED);
-				}
-				else {
-					// no more output solution mappings; set the completion
-					// status depending on whether there still are output
-					// result blocks available to be consumed
-					if ( availableResultBlocks.isEmpty() )
-						setStatus(Status.COMPLETED_AND_CONSUMED);
-					else
-						setStatus(Status.COMPLETED_NOT_CONSUMED);
-				}
-				availableResultBlocks.notify();
+
+				// ... inform the consuming thread in case it is
+				// currently waiting for more solution mappings.
+				availableOutput.notify();
 			}
 		}
 	}
 
 
 	@Override
-	public final IntermediateResultBlock getNextIntermediateResultBlock()
-			throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException {
+	public final void transferAvailableOutput( final List<SolutionMapping> transferBuffer )
+			throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException
+	{
+		transferBuffer.clear();
 
-		synchronized (availableResultBlocks) {
+		synchronized (availableOutput) {
 
-			IntermediateResultBlock nextBlock = null;
-			while ( nextBlock == null && getStatus() != Status.COMPLETED_AND_CONSUMED ) {
-				// before trying to get the next block, make sure that
-				// we have not already reached some problematic status
+			while ( transferBuffer.isEmpty() && getStatus() != Status.COMPLETED_AND_CONSUMED ) {
+				// Before trying to transfer solution mappings, make sure that
+				// we have not already reached some problematic status.
 				final Status currentStatus = getStatus();
 				if ( currentStatus == Status.FAILED ) {
 					throw new ExecPlanTaskInputException("Execution of this task has failed with an exception (operator: " + getExecOp().toString() + ").", getCauseOfFailure() );
@@ -190,35 +235,46 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 					throw new ExecPlanTaskInputException("Execution of this task has been interrupted (operator: " + getExecOp().toString() + ").");
 				}
 				else if ( currentStatus == Status.WAITING_TO_BE_STARTED ) {
-					// this status is not actually a problem; the code in the
+					// This status is not actually a problem. The code in the
 					// remainder of this while loop will simply start waiting
-					// for the first result block to become available (which
-					// should happen after the execution of this task will
-					// get started eventually)
+					// for the first solution mappings to become available
+					// (which should happen after the execution of this task
+					// got started eventually).
 					//System.err.println("Execution of this task has not started yet (operator: " + getExecOp().toString() + ").");
 				}
 
-				// try to get the next block
-				nextBlock = availableResultBlocks.poll();
+				// Try to transfer solution mappings from the
+				// availableOutput buffer to the given list.
+				transferBuffer.addAll(availableOutput);
+				availableOutput.clear();
 
-				// Did we reach the end of all result blocks to be expected?
-				if ( currentStatus == Status.COMPLETED_NOT_CONSUMED && availableResultBlocks.isEmpty() ) {
-					setStatus(Status.COMPLETED_AND_CONSUMED); // yes, we did
+				// Did we reach the end of all output solution mappings that
+				// can be expected?
+				if ( currentStatus == Status.COMPLETED_NOT_CONSUMED ) {
+					// If yes, set the status to indicate that all solution
+					// mappings have now been transferred to the consuming
+					// thread, which happens precisely with the particular
+					// execution of this function that ends up in this if
+					// block (remember that this function is executed by
+					// the consuming thread).
+					setStatus(Status.COMPLETED_AND_CONSUMED);
 				}
 
-				if ( nextBlock == null && getStatus() != Status.COMPLETED_AND_CONSUMED ) {
-					// if no next block was available and the producing
-					// thread is still active, wait for the notification
-					// that a new block has become available
+				if ( transferBuffer.isEmpty() && getStatus() != Status.COMPLETED_AND_CONSUMED ) {
+					// If no output solution mappings have been available and
+					// the producing thread is still active, wait for the
+					// notification that a new block has become available.
+					// After being notified (i.e., when the wait finishes),
+					// the transfer buffer is still empty and, thus, the
+					// execution continues at the beginning of the while
+					// loop again.
 					try {
-						availableResultBlocks.wait();
+						availableOutput.wait();
 					} catch ( final InterruptedException e ) {
 						throw new ExecPlanTaskInterruptionException(e);
 					}
 				}
 			}
-
-			return nextBlock;
 		}
 	}
 

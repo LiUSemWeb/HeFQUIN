@@ -7,9 +7,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ConnectorForAdditionalConsumer extends PushBasedExecPlanTaskBase implements IntermediateResultElementSink
 {
-	protected ConnectorForAdditionalConsumer( final ExecutionContext execCxt,
-	                                final int preferredMinimumBlockSize ) {
-		super(execCxt, preferredMinimumBlockSize);
+	protected ConnectorForAdditionalConsumer( final ExecutionContext execCxt ) {
+		super(execCxt);
 	}
 
 	public void setStatus( final Status newStatus ) {
@@ -23,6 +22,6 @@ public class ConnectorForAdditionalConsumer extends PushBasedExecPlanTaskBase im
 	protected void produceOutput( final IntermediateResultElementSink sink ) { throw new UnsupportedOperationException(); }
 
 	@Override
-	public ExecPlanTask addConnectorForAdditionalConsumer( final int preferredMinimumBlockSize ) { throw new UnsupportedOperationException(); }
+	public ExecPlanTask addConnectorForAdditionalConsumer() { throw new UnsupportedOperationException(); }
 
 }

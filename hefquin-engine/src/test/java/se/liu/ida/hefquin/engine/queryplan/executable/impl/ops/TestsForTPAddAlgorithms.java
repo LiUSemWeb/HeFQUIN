@@ -6,8 +6,10 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -27,9 +29,7 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -54,7 +54,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 		final Node z3 = NodeFactory.createURI("http://example.org/z3");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -144,7 +144,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, x1,
 				var2, y1) );
@@ -221,7 +221,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 		final Node z2 = NodeFactory.createURI("http://example.org/z2");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, x1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, x2) );
 
@@ -272,7 +272,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node y1 = NodeFactory.createURI("http://example.org/y1");
 		final Node z1 = NodeFactory.createURI("http://example.org/z1");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 
 		final TriplePattern tp = new TriplePatternImpl(var2,p,var3);
 
@@ -305,7 +305,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node s2 = NodeFactory.createURI("http://example.org/s2");
 		final Node o1 = NodeFactory.createURI("http://example.org/o1");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping() ); // empty solution mapping
 
 		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
@@ -362,7 +362,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(
 				var1, NodeFactory.createURI("http://example.org/x1")) );
 		input.add( SolutionMappingUtils.createSolutionMapping(
@@ -430,7 +430,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node uri   = NodeFactory.createURI("http://example.org/x1");
 		final Node bnode = NodeFactory.createBlankNode();
 
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, bnode) );
 
 		final TriplePattern tp = new TriplePatternImpl(var1, p, uri);
@@ -477,7 +477,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final Node o1 = NodeFactory.createURI("http://example.org/o1");
 		final Node o2 = NodeFactory.createURI("http://example.org/o2");
 		
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, o1) );
 
@@ -509,7 +509,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 
 	protected Iterator<SolutionMapping> runTest(
-			final IntermediateResultBlock input,
+			final List<SolutionMapping> input,
 			final Graph dataForMember,
 			final TriplePattern tp,
 			final ExpectedVariables expectedVariables,
@@ -528,7 +528,10 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final MemberType fm = createFedMemberForTest(dataForMember);
 
 		final UnaryExecutableOp op = createExecOpForTest(tp, fm, expectedVariables, useOuterJoinSemantics);
-		op.process(input, sink, execCxt);
+
+		for ( final SolutionMapping sm : input ) {
+			op.process(sm, sink, execCxt);
+		}
 		op.concludeExecution(sink, execCxt);
 
 		return sink.getCollectedSolutionMappings().iterator();

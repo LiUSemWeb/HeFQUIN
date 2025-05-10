@@ -38,11 +38,21 @@ import org.apache.jena.sparql.core.Var;
  */
 public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
+	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+
+	public ExecOpBindJoinBRTPF( final TriplePattern tp,
+	                            final BRTPFServer fm,
+	                            final boolean useOuterJoinSemantics,
+	                            final int batchSize,
+	                            final boolean collectExceptions ) {
+		super( tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), batchSize, collectExceptions );
+	}
+
 	public ExecOpBindJoinBRTPF( final TriplePattern tp,
 	                            final BRTPFServer fm,
 	                            final boolean useOuterJoinSemantics,
 	                            final boolean collectExceptions ) {
-		super(tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), collectExceptions );
+		super( tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), DEFAULT_BATCH_SIZE, collectExceptions );
 	}
 
 	@Override

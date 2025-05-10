@@ -8,7 +8,7 @@ import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.*;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -289,7 +289,7 @@ public class CardinalityBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimiz
          */
         protected double determineBlockSize( final FederationMember fm ) {
             if ( (fm instanceof SPARQLEndpoint) || (fm instanceof BRTPFServer) ){
-                return BaseForExecOpBindJoin.defaultPreferredInputBlockSize;
+                return BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
             }
             else if ( fm instanceof TPFServer ){
                 return 1;

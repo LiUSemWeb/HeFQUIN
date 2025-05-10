@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -10,24 +11,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public interface BinaryExecutableOp extends ExecutableOperator
 {
-	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from the first operand.
-	 *
-	 * A query planner may use this number as an optimization
-	 * hint but it does not have to use it.
-	 */
-	int preferredInputBlockSizeFromChild1();
-
-	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from the second operand.
-	 *
-	 * A query planner may use this number as an optimization
-	 * hint but it does not have to use it.
-	 */
-	int preferredInputBlockSizeFromChild2();
-
 	/**
 	 * Returns true if this operator is implemented based on
 	 * the assumption that the COMPLETE input from the first
@@ -50,11 +33,11 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	boolean requiresCompleteChild1InputFirst();
 
 	/**
-	 * Processes the given input coming from the first operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
+	 * Processes the given solution mapping as input coming from the
+	 * first operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 */
-	void processBlockFromChild1( IntermediateResultBlock input,
+	void processInputFromChild1( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
 	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
 
@@ -71,16 +54,16 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
-	 * Processes the given input coming from the second operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
+	 * Processes the given solution mapping as input coming from the
+	 * second operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 *
 	 * May throw {@link IllegalStateException} for operators for which
 	 * {@link #requiresCompleteChild1InputFirst()} returns true and
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
 	 * has not been called yet.
 	 */
-	void processBlockFromChild2( IntermediateResultBlock input,
+	void processInputFromChild2( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
 	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
 

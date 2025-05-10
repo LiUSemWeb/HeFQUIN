@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.base.datastructures.impl.*;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -59,27 +58,15 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    public int preferredInputBlockSizeFromChild1() {
-        return 1;
-    }
-
-    @Override
-    public int preferredInputBlockSizeFromChild2() {
-        return 1;
-    }
-
-    @Override
     public boolean requiresCompleteChild1InputFirst() {
         return true;
     }
 
     @Override
-    protected void _processBlockFromChild1( final IntermediateResultBlock input,
+    protected void _processInputFromChild1( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        for ( final SolutionMapping smL : input.getSolutionMappings() ) {
-            index.add(smL);
-        }
+        index.add(inputSolMap);
     }
 
     @Override
@@ -89,23 +76,16 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    protected void _processBlockFromChild2( final IntermediateResultBlock input,
+    protected void _processInputFromChild2( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        if (child1InputComplete == false){
+        if ( child1InputComplete == false ) {
             throw new IllegalStateException();
         }
-        for ( final SolutionMapping smR : input.getSolutionMappings() ) {
-            _processSolMapFromChild2(smR, sink, execCxt);
-        }
-    }
 
-    protected void _processSolMapFromChild2( final SolutionMapping smR,
-                                             final IntermediateResultElementSink sink,
-                                             final ExecutionContext execCxt ) {
-        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
+        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
         for ( final SolutionMapping smL : matchSolMapL ){
-            sink.send( SolutionMappingUtils.merge(smL,smR) );
+            sink.send( SolutionMappingUtils.merge(smL,inputSolMap) );
         }
     }
 

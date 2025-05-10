@@ -5,8 +5,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,10 +36,8 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
@@ -115,7 +116,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z1  = NodeFactory.createURI("http://example.org/z1"); // object of triple that matches second optional triple pattern
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -169,21 +170,17 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z1  = NodeFactory.createURI("http://example.org/z1"); // object of triple that matches second optional triple pattern
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
 			@Override public Set<Var> getCertainVariables() {
-				final Set<Var> set = new HashSet<>();
-				set.add(var0);
-				return set;
+				return Collections.singleton(var0);
 			}
 
 			@Override public Set<Var> getPossibleVariables() {
-				final Set<Var> set = new HashSet<>();
-				return set;
+				return Collections.emptySet();
 			}
-
 		};
 
 		// set up everything for the first optional part
@@ -229,7 +226,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z1  = NodeFactory.createURI("http://example.org/z1"); // object of triple that matches second optional triple pattern
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -288,7 +285,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z1  = NodeFactory.createURI("http://example.org/z1"); // object of triple that matches second optional triple pattern
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -360,7 +357,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node w4  = NodeFactory.createURI("http://example.org/w4");
 		
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1, var3, w1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1, var3, w2) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1, var3, w3) );
@@ -650,7 +647,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z3  = NodeFactory.createURI("http://example.org/z3");
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -812,7 +809,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z4  = NodeFactory.createURI("http://example.org/z4");
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x2) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x3) );
@@ -1241,7 +1238,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z1  = NodeFactory.createURI("http://example.org/z1"); // object of triple that matches second optional triple pattern
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -1336,7 +1333,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final Node z3  = NodeFactory.createURI("http://example.org/z3");
 
 		// create input to the operator (as would be provided by the evaluation of the non-optional part)
-		final GenericIntermediateResultBlockImpl input = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var0, x1) );
 
 		final ExpectedVariables expectedInputVariables = new ExpectedVariables() {
@@ -1439,7 +1436,7 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 	}
 
 	protected Iterator<SolutionMapping> runTest(
-			final IntermediateResultBlock input,
+			final List<SolutionMapping> input,
 			final ExpectedVariables expectedInputVariables,
 			final Graph dataForMember1,
 			final TriplePattern tp1,
@@ -1460,7 +1457,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 		final SPARQLEndpoint fm2 = ( dataForMember2 == null ) ? null : createFedMemberForTest(dataForMember2);
 
 		final UnaryExecutableOp op = createExecOpForTest(expectedInputVariables, tp1, fm1, tp2, fm2);
-		op.process(input, sink, execCxt);
+		for ( final SolutionMapping sm : input ) {
+			op.process(sm, sink, execCxt);
+		}
 		op.concludeExecution(sink, execCxt);
 
 		return sink.getCollectedSolutionMappings().iterator();

@@ -1,9 +1,12 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
@@ -19,9 +22,8 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	public PushBasedExecPlanTaskForBinaryOperator( final BinaryExecutableOp op,
 	                                               final ExecPlanTask input1,
 	                                               final ExecPlanTask input2,
-	                                               final ExecutionContext execCxt,
-	                                               final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	                                               final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert input1 != null;
@@ -43,8 +45,8 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 		if ( op.requiresCompleteChild1InputFirst() )
 			produceOutputByConsumingInput1First(sink);
 		else
-			//produceOutputByConsumingBothInputsInParallel(sink);
-			produceOutputByConsumingInput1First(sink);
+			produceOutputByConsumingBothInputsInParallel(sink);
+			//produceOutputByConsumingInput1First(sink);
 	}
 
 	/**
@@ -52,13 +54,15 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	 * operator {@link #op}), before moving on to the input from child 2.
 	 */
 	protected void produceOutputByConsumingInput1First( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean input1Consumed = false;
 		while ( ! input1Consumed ) {
-			final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
-			if ( nextInputBlock != null ) {
-				op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+			input1.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				for ( final SolutionMapping sm : transferBuffer )
+					op.processInputFromChild1(sm, sink, execCxt);
 			}
 			else {
 				op.wrapUpForChild1(sink, execCxt);
@@ -68,9 +72,10 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 
 		boolean input2Consumed = false;
 		while ( ! input2Consumed ) {
-			final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
-			if ( nextInputBlock != null ) {
-				op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+			input2.transferAvailableOutput(transferBuffer);
+			if ( ! transferBuffer.isEmpty() ) {
+				for ( final SolutionMapping sm : transferBuffer )
+					op.processInputFromChild2(sm, sink, execCxt);
 			}
 			else {
 				op.wrapUpForChild2(sink, execCxt);
@@ -83,71 +88,77 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	 * Aims to consume both inputs in parallel.
 	 */
 	protected void produceOutputByConsumingBothInputsInParallel( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
+			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean nextWaitForInput1 = true; // flag to switch between waiting for input 1 versus input 2
-		boolean input1Consumed = false;
-		boolean input2Consumed = false;
-		while ( ! input1Consumed || ! input2Consumed ) {
-			// Before blindly asking any of the two inputs to give us its next
-			// IntermediateResultBlock (which may cause this thread to wait if
-			// no such block is available at the moment), let's first ask them
-			// if they currently have a block available. If so, request the next
-			// block from the input that says it has a block available.
-			boolean blockConsumed = false;
-			if ( ! input1Consumed && input1.hasNextIntermediateResultBlockAvailable() )
+		boolean input1ConsumedCompletely = false;
+		boolean input2ConsumedCompletely = false;
+		while ( ! input1ConsumedCompletely || ! input2ConsumedCompletely ) {
+			// Before blindly asking any of the two inputs to give us the
+			// solution mappings that it has currently available as output
+			// (which may cause this thread to wait if no such output is
+			// available at the moment), let's first ask them if they do
+			// have some output readily available. If so, request this
+			// output from the input that says it has output available.
+			boolean someInputConsumed = false;
+			if ( ! input1ConsumedCompletely && input1.hasMoreOutputAvailable() )
 			{
-				// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
-				final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+				// calling 'transferAvailableOutput' should not cause this thread to wait
+				input1.transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					for ( final SolutionMapping sm : transferBuffer )
+						op.processInputFromChild1(sm, sink, execCxt);
 				}
 
-				blockConsumed = true;
+				someInputConsumed = true;
 			}
 
-			if ( ! input2Consumed && input2.hasNextIntermediateResultBlockAvailable() )
+			if ( ! input2ConsumedCompletely && input2.hasMoreOutputAvailable() )
 			{
-				// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
-				final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+				// calling 'transferAvailableOutput' should not cause this thread to wait
+				input2.transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					for ( final SolutionMapping sm : transferBuffer )
+						op.processInputFromChild2(sm, sink, execCxt);
 				}
 
-				blockConsumed = true;
+				someInputConsumed = true;
 			}
 
-			if ( ! blockConsumed ) {
-				// If none of the two inputs had a block available at the
-				// moment, we ask one of them to produce its next block,
+			if ( ! someInputConsumed ) {
+				// If none of the two inputs had some output available at the
+				// moment, we ask one of them to produce its next output,
 				// which may cause this thread to wait until that next
-				// block has been produced. To decide which of the two
+				// output has been produced. To decide which of the two
 				// inputs we ask (and, then, wait for) we use a round
 				// robin approach (i.e., always switch between the two
 				// inputs). To this end, we use the 'nextWaitForInput1'
 				// flag: if that flag is true, we will next ask (and wait
 				// for) input 1; if that flag is false, we will next ask
 				// (and wait for) input 2.
-				if  ( nextWaitForInput1 && ! input1Consumed ) {
-					// calling 'getNextIntermediateResultBlock()' may cause this thread to wait
-					final IntermediateResultBlock nextInputBlock = input1.getNextIntermediateResultBlock();
-					if ( nextInputBlock != null ) {
-						op.processBlockFromChild1(nextInputBlock, sink, execCxt);
+				if  ( nextWaitForInput1 && ! input1ConsumedCompletely ) {
+					// calling 'transferAvailableOutput' may cause this thread to wait
+					input1.transferAvailableOutput(transferBuffer);
+					if ( ! transferBuffer.isEmpty() ) {
+						for ( final SolutionMapping sm : transferBuffer )
+							op.processInputFromChild1(sm, sink, execCxt);
 					}
 					else {
 						op.wrapUpForChild1(sink, execCxt);
-						input1Consumed = true;
+						input1ConsumedCompletely = true;
 					}
 				}
-				else if ( ! input2Consumed ) {
-					// calling 'getNextIntermediateResultBlock()' may cause this thread to wait
-					final IntermediateResultBlock nextInputBlock = input2.getNextIntermediateResultBlock();
-					if ( nextInputBlock != null ) {
-						op.processBlockFromChild2(nextInputBlock, sink, execCxt);
+				else if ( ! input2ConsumedCompletely ) {
+					// calling 'transferAvailableOutput)' may cause this thread to wait
+					input2.transferAvailableOutput(transferBuffer);
+					if ( ! transferBuffer.isEmpty() ) {
+						for ( final SolutionMapping sm : transferBuffer )
+							op.processInputFromChild2(sm, sink, execCxt);
 					}
 					else {
 						op.wrapUpForChild2(sink, execCxt);
-						input2Consumed = true;
+						input2ConsumedCompletely = true;
 					}
 				}
 				// flip the 'nextWaitForInput1' flag so that, next time we

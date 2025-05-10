@@ -1,7 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl;
 
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsProvider;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 
 public interface ExecPlanTask extends Runnable, StatsProvider
 {
@@ -34,22 +36,46 @@ public interface ExecPlanTask extends Runnable, StatsProvider
 	Exception getCauseOfFailure();
 
 	/**
-	 * Returns either the next intermediate result block produced by this task
-	 * or <code>null</code> if all these blocks have been returned already to
-	 * earlier calls of this function. If no next block is currently available
-	 * at the time when this function is called, then the call of this function
-	 * causes the calling thread to wait until the next block has been produced
-	 * (or it has become clear that no more blocks can be produced anymore).
+	 * This function first clears the given list and, then, transfers the
+	 * currently-available solution mappings produced by this task from an
+	 * internal buffer to the given list, in the order in which the solution
+	 * mappings have been produced. The internal buffer will thus be empty
+	 * at the point when this function returns (but further solution mappings
+	 * may still be produced by this task and placed into the buffer to be
+	 * available to be transferred at the next call of this function).
+	 *
+	 * If the internal buffer is empty at the time when this function is called
+	 * (i.e., no solution mappings are currently available to be transferred),
+	 * but the task is still running (see {@link #isRunning()}) and, thus, more
+	 * solution mappings may still be produced, then the call of this function
+	 * causes the calling thread to wait until either more solution mappings
+	 * have been produced or it has become clear that no more solution mappings
+	 * can be produced anymore. In the former case, the newly-produced solution
+	 * mappings are transferred to the given list and the function returns. In
+	 * the latter case, the function returns directly and, thus, the given list
+	 * remains empty. Also, in the latter case, after the function has returned,
+	 * {@link #isCompleted()} will be <code>true</code>.
+	 *
+	 * If the function is called after the task has completed or failed, then
+	 * the function returns directly after clearing the given list (i.e., the
+	 * list will be empty after the function call).
+	 *
+	 * Hence, if the given list is empty after calling this function call, then
+	 * the function does not need to be called anymore; this task is not going
+	 * to produce more solution mappings.
+	 *
+	 * This function is expected to be called by (and, thus, run in the context
+	 * of) the thread that consumes the solution mappings produced by this task.
 	 */
-	IntermediateResultBlock getNextIntermediateResultBlock() throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException;
+	void transferAvailableOutput( List<SolutionMapping> transferBuffer ) throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException;
 
 	/**
-	 * Returns true if an intermediate result block is already be available
-	 * to be requested via {@link #getNextIntermediateResultBlock()}. Hence,
-	 * in this case, calling {@link #getNextIntermediateResultBlock()} would
-	 * not cause the calling thread to wait.
+	 * Returns true if newly-produced solution mappings are available to be
+	 * obtained via {@link #transferAvailableOutput(List)}. Hence, in this
+	 * case, calling {@link #transferAvailableOutput(List)} would not cause
+	 * the calling thread to wait.
 	 */
-	boolean hasNextIntermediateResultBlockAvailable();
+	boolean hasMoreOutputAvailable();
 
 	@Override
 	ExecPlanTaskStats getStats();
