@@ -26,10 +26,8 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBase
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
 		final Set<SolutionMapping> output = vm.translateSolutionMapping(inputSolMap);
-		for ( final SolutionMapping sm : output ) {
-			sink.send(sm);
-			numberOfOutputMappingsProduced++;
-		}
+		numberOfOutputMappingsProduced += output.size();
+		sink.send(output);
 	}
 
 	@Override

@@ -87,27 +87,12 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	                                   final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		if ( currentInstance == null ) {
-			// This case may occur if _process was never called.
-			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, useOuterJoinSemantics, collectExceptions);
-			boolean valuesBasedRequestFailed = false;
-			try {
-				// Try using VALUES-based bind join
-				currentInstance._concludeExecution(batch, sink, execCxt);
-				if ( ! currentInstance.getExceptionsCaughtDuringExecution().isEmpty() ) {
-					valuesBasedRequestFailed = true;
-				}	
-			} catch ( final ExecOpExecutionException e ) {
-				valuesBasedRequestFailed = true;
-			}
-			if ( valuesBasedRequestFailed == true ) {
-				// Use FILTER-based bind join instead
-				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
-				currentInstance._concludeExecution(batch, sink, execCxt);
-			}
+		if ( batch != null && ! batch.isEmpty() ) {
+			_process(batch, sink, execCxt);
 		}
-		else {
-			currentInstance._concludeExecution(batch, sink, execCxt);
+
+		if ( currentInstance != null ) {
+			currentInstance.concludeExecution(sink, execCxt);
 		}
 	}
 

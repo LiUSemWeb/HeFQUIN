@@ -142,10 +142,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			                           joinableInputSMs );
 
 			if ( useOuterJoinSemantics ) {
-				for ( final SolutionMapping sm : unjoinableInputSMs ) {
-					numberOfOutputMappingsProduced++;
-					sink.send(sm);
-				}
+				numberOfOutputMappingsProduced += unjoinableInputSMs.size();
+				sink.send(unjoinableInputSMs);
 			}
 
 			inputSMsForJoin = joinableInputSMs;
@@ -200,9 +198,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 			final MyIntermediateResultElementSink mySink;
 			if ( useOuterJoinSemantics )
-				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, joinableInputSMs);
+				mySink = new MyIntermediateResultElementSinkOuterJoin(joinableInputSMs);
 			else
-				mySink = new MyIntermediateResultElementSink(sink, joinableInputSMs);
+				mySink = new MyIntermediateResultElementSink(joinableInputSMs);
 
 			try {
 				reqOp.execute(mySink, execCxt);
@@ -222,6 +220,12 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			}
 
 			mySink.flush();
+
+			final List<SolutionMapping> output = mySink.getSolMapsForOutput();
+			if ( ! output.isEmpty() ) {
+				numberOfOutputMappingsProduced += output.size();
+				sink.send(output);
+			}
 
 			statsOfLastReqOp = reqOp.getStats();
 			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
@@ -316,13 +320,11 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	protected class MyIntermediateResultElementSink implements IntermediateResultElementSink
 	{
-		protected final IntermediateResultElementSink outputSink;
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
+		protected final List<SolutionMapping> solMapsForOutput = new ArrayList<>();
 		private boolean inputObtained = false;
 
-		public MyIntermediateResultElementSink( final IntermediateResultElementSink outputSink,
-		                                        final Iterable<SolutionMapping> inputSolutionMappings ) {
-			this.outputSink = outputSink;
+		public MyIntermediateResultElementSink( final Iterable<SolutionMapping> inputSolutionMappings ) {
 			this.inputSolutionMappings = inputSolutionMappings;
 		}
 
@@ -333,14 +335,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 		protected void _send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of inputSolutionMappings that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+					solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 				}
 			}
 		}
@@ -349,6 +346,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 		public final boolean hasObtainedInputAlready() { return inputObtained; }
 
+		public List<SolutionMapping> getSolMapsForOutput() { return solMapsForOutput; }
+
 	} // end of helper class MyIntermediateResultElementSink
 
 
@@ -356,21 +355,15 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	{
 		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
 
-		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
-		                                                 final Iterable<SolutionMapping> inputSolutionMappings ) {
-			super(outputSink, inputSolutionMappings);
+		public MyIntermediateResultElementSinkOuterJoin( final Iterable<SolutionMapping> inputSolutionMappings ) {
+			super(inputSolutionMappings);
 		}
 
 		@Override
 		public void _send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of inputSolutionMappings that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+					solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 					inputSolutionMappingsWithJoinPartners.add(smFromInput);
 				}
 			}
@@ -384,8 +377,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		public void flush() {
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( ! inputSolutionMappingsWithJoinPartners.contains(smFromInput) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send(smFromInput);
+					solMapsForOutput.add(smFromInput);
 				}
 			}
 		}

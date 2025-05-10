@@ -160,9 +160,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	                           final IntermediateResultElementSink sink ) {
 		for( final SolutionMapping inputSolMap : inputSolMaps ) {
 			final Set<SolutionMapping> outputSolMaps = merge(inputSolMap);
-			for ( final SolutionMapping outputSolMap : outputSolMaps ) {
-				sink.send(outputSolMap);
-			}
+			sink.send(outputSolMaps);
 		}
 	}
 

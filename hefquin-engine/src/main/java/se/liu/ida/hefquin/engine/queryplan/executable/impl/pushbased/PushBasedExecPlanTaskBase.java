@@ -1,6 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -123,6 +125,67 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 				c.send(element);
 			}
 		}
+	}
+
+	@Override
+	public int send( final Iterable<SolutionMapping> it ) {
+		if ( ! (it instanceof Collection<?>) ) {
+			return send( it.iterator() );
+		}
+
+		final Collection<SolutionMapping> coll = (Collection<SolutionMapping>) it;
+
+		if ( coll.isEmpty() ) {
+			return 0;
+		}
+
+		synchronized (availableOutput) {
+			// Make the given solution mappings available for consumption and
+			// inform the consuming thread in case it is already waiting for
+			// more solution mappings.
+			availableOutput.addAll(coll);
+			availableOutput.notify();
+		}
+
+		// Forward the given solution mapping to the extra connectors as
+		// well (if there are any).
+		if ( extraConnectors != null ) {
+			for ( final ConnectorForAdditionalConsumer c : extraConnectors ) {
+				c.send(coll);
+			}
+		}
+
+		return coll.size();
+	}
+
+	@Override
+	public int send( final Iterator<SolutionMapping> it ) {
+		if ( ! it.hasNext() ) {
+			return 0;
+		}
+
+		if ( extraConnectors != null ) {
+			final List<SolutionMapping> list = new ArrayList<>();
+			while ( it.hasNext() ) {
+				list.add( it.next() );
+			}
+			return send(list);
+		}
+
+		int cnt = 0;
+
+		synchronized (availableOutput) {
+			// Make the given solution mappings available for consumption and
+			// inform the consuming thread in case it is already waiting for
+			// more solution mappings.
+			while ( it.hasNext() ) {
+				cnt++;
+				availableOutput.add( it.next() );
+			}
+			availableOutput.notify();
+		}
+
+		return cnt;
 	}
 
 	protected void wrapUp( final boolean failed, final boolean interrupted )
