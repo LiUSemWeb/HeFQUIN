@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.sparql.core.Var;
@@ -56,6 +59,39 @@ public class ExecOpBind extends UnaryExecutableOpBase
 			 throws ExecOpExecutionException {
 		sink.send( worker.extend(inputSolMap) );
 		numberOfOutputMappingsProduced++;
+	}
+
+	@Override
+	protected int _process( final Iterator<SolutionMapping> it,
+	                        final IntermediateResultElementSink sink,
+	                        final ExecutionContext execCxt )
+		 throws ExecOpExecutionException
+	{
+		if ( ! it.hasNext() ) {
+			return 0;
+		}
+
+		final SolutionMapping firstInputSolMap = it.next();
+		final SolutionMapping firstOutputSolMap = worker.extend(firstInputSolMap);
+
+		if ( ! it.hasNext() ) {
+			sink.send(firstOutputSolMap);
+			numberOfOutputMappingsProduced++;
+			return 1;
+		}
+
+		final List<SolutionMapping> output = new ArrayList<>();
+		output.add(firstOutputSolMap);
+
+		while ( it.hasNext() ) {
+			final SolutionMapping nextInputSolMap = it.next();
+			final SolutionMapping nextOutputSolMap = worker.extend(nextInputSolMap);
+			output.add(nextOutputSolMap);
+		}
+
+		sink.send(output);
+		numberOfOutputMappingsProduced += output.size();
+		return output.size();
 	}
 
 	@Override

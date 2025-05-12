@@ -72,9 +72,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> input,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	protected void _processBatch( final List<SolutionMapping> input,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
 		final CompletableFuture<?>[] futures = initiateProcessing( input, sink, execCxt );
@@ -191,7 +191,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 			throws ExecOpExecutionException
 	{
 		if ( input != null && ! input.isEmpty() ) {
-			_process(input, sink, execCxt);
+			_processBatch(input, sink, execCxt);
 		}
 	}
 

@@ -54,16 +54,16 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> batch,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	protected void _processBatch( final List<SolutionMapping> batch,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		// If this is the first request.
 		if ( currentInstance == null ) {
 			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, useOuterJoinSemantics, collectExceptions);
 			boolean valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
-				currentInstance._process(batch, sink, execCxt);
+				currentInstance._processBatch(batch, sink, execCxt);
 				if ( ! currentInstance.getExceptionsCaughtDuringExecution().isEmpty() ) {
 					valuesBasedRequestFailed = true;
 				}	
@@ -73,11 +73,11 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 			if ( valuesBasedRequestFailed == true ) {
 				// Use FILTER-based bind join instead
 				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
-				currentInstance._process(batch, sink, execCxt);
+				currentInstance._processBatch(batch, sink, execCxt);
 			}
 		}
 		else {
-			currentInstance._process(batch, sink, execCxt);
+			currentInstance._processBatch(batch, sink, execCxt);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 			throws ExecOpExecutionException
 	{
 		if ( batch != null && ! batch.isEmpty() ) {
-			_process(batch, sink, execCxt);
+			_processBatch(batch, sink, execCxt);
 		}
 
 		if ( currentInstance != null ) {

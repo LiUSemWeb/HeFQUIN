@@ -90,9 +90,9 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> input,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) throws ExecOpExecutionException {
+	protected void _processBatch( final List<SolutionMapping> input,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		final List<SolutionMapping> inputForParallelProcess = determineInputForParallelProcess(input);
 
 		if ( inputForParallelProcess.size() > 0 ) {
@@ -196,7 +196,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 			throws ExecOpExecutionException
 	{
 		if ( batch != null && ! batch.isEmpty() ) {
-			_process(batch, sink, execCxt);
+			_processBatch(batch, sink, execCxt);
 		}
 	}
 
@@ -230,7 +230,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 		@Override
 		public void run() {
 			try {
-				execOp._process(input, mySink, execCxt);
+				execOp._processBatch(input, mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);

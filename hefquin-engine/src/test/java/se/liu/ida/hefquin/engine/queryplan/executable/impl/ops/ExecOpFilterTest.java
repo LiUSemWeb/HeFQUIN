@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
@@ -106,7 +108,7 @@ public class ExecOpFilterTest
 	}
 
 	@Test
-	public void twoFilterExpressions() throws ExecOpExecutionException {
+	public void twoFilterExpressions_fourSeparateSolMaps() throws ExecOpExecutionException {
 		final ExprList exprs = new ExprList();
 		exprs.add( ExprUtils.parse("?x < 13") );
 		exprs.add( ExprUtils.parse("?x > 8") );
@@ -131,6 +133,88 @@ public class ExecOpFilterTest
 		filterOp.process(sm2, sink, ctx);
 		filterOp.process(sm3, sink, ctx);
 		filterOp.process(sm4, sink, ctx);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertTrue( it.hasNext() );
+		assertEquals( value9, it.next().asJenaBinding().get(x) );
+
+		assertTrue( it.hasNext() );
+		assertEquals( value12, it.next().asJenaBinding().get(x) );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void twoFilterExpressions_twoSetsOfSolMaps() throws ExecOpExecutionException {
+		// The input solution mappings in this test are the same as in
+		// 'twoFilterExpressions_fourSeparateSolMaps' but now they are
+		// send to the filter operator as two lists, each list with two
+		// of the solution mappings.
+		final ExprList exprs = new ExprList();
+		exprs.add( ExprUtils.parse("?x < 13") );
+		exprs.add( ExprUtils.parse("?x > 8") );
+
+		final Node value8  = NodeFactory.createLiteral("8",  XSDDatatype.XSDinteger);
+		final Node value9  = NodeFactory.createLiteral("9",  XSDDatatype.XSDinteger);
+		final Node value12 = NodeFactory.createLiteral("12", XSDDatatype.XSDinteger);
+		final Node value15 = NodeFactory.createLiteral("15", XSDDatatype.XSDinteger);
+		final Var x = Var.alloc("x");
+
+		final List<SolutionMapping> input1 = new ArrayList<>(2);
+		input1.add( SolutionMappingUtils.createSolutionMapping(x, value8) );
+		input1.add( SolutionMappingUtils.createSolutionMapping(x, value9) );
+		final List<SolutionMapping> input2 = new ArrayList<>(2);
+		input2.add( SolutionMappingUtils.createSolutionMapping(x, value12) );
+		input2.add( SolutionMappingUtils.createSolutionMapping(x, value15) );
+
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+
+		filterOp.process(input1, sink, ctx);
+		filterOp.process(input2, sink, ctx);
+
+		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
+
+		assertTrue( it.hasNext() );
+		assertEquals( value9, it.next().asJenaBinding().get(x) );
+
+		assertTrue( it.hasNext() );
+		assertEquals( value12, it.next().asJenaBinding().get(x) );
+
+		assertFalse( it.hasNext() );
+	}
+
+	@Test
+	public void twoFilterExpressions_oneSetOfSolMaps() throws ExecOpExecutionException {
+		// The input solution mappings in this test are the same as in
+		// 'twoFilterExpressions_fourSeparateSolMaps' but now they are
+		// send to the filter operator as two lists, each list with two
+		// of the solution mappings.
+		final ExprList exprs = new ExprList();
+		exprs.add( ExprUtils.parse("?x < 13") );
+		exprs.add( ExprUtils.parse("?x > 8") );
+
+		final Node value8  = NodeFactory.createLiteral("8",  XSDDatatype.XSDinteger);
+		final Node value9  = NodeFactory.createLiteral("9",  XSDDatatype.XSDinteger);
+		final Node value12 = NodeFactory.createLiteral("12", XSDDatatype.XSDinteger);
+		final Node value15 = NodeFactory.createLiteral("15", XSDDatatype.XSDinteger);
+		final Var x = Var.alloc("x");
+
+		final List<SolutionMapping> input = new ArrayList<>(2);
+		input.add( SolutionMappingUtils.createSolutionMapping(x, value8) );
+		input.add( SolutionMappingUtils.createSolutionMapping(x, value9) );
+		input.add( SolutionMappingUtils.createSolutionMapping(x, value12) );
+		input.add( SolutionMappingUtils.createSolutionMapping(x, value15) );
+
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+
+		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
+		final ExecutionContext ctx = TestUtils.createExecContextForTests();
+
+		filterOp.process(input, sink, ctx);
 
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 

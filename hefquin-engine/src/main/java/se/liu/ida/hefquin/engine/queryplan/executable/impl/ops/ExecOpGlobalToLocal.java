@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -28,6 +31,36 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBase
 		final Set<SolutionMapping> output = vm.translateSolutionMappingFromGlobal(inputSolMap);
 		numberOfOutputMappingsProduced += output.size();
 		sink.send(output);
+	}
+
+	@Override
+	protected int _process( final Iterator<SolutionMapping> it,
+	                        final IntermediateResultElementSink sink,
+	                        final ExecutionContext execCxt ) {
+		if ( ! it.hasNext() ) {
+			return 0;
+		}
+
+		final SolutionMapping firstInputSolMap = it.next();
+		final Set<SolutionMapping> output4first = vm.translateSolutionMappingFromGlobal(firstInputSolMap);
+		if ( ! it.hasNext() ) {
+			sink.send(output4first);
+			numberOfOutputMappingsProduced += output4first.size();
+			return 1;
+		}
+
+		final List<SolutionMapping> allOutput = new ArrayList<>();
+		allOutput.addAll(output4first);
+		int cnt = 1;
+		while ( it.hasNext() ) {
+			cnt++;
+			final SolutionMapping nextInputSolMap = it.next();
+			allOutput.addAll( vm.translateSolutionMappingFromGlobal(nextInputSolMap) );
+		}
+
+		sink.send(allOutput);
+		numberOfOutputMappingsProduced += allOutput.size();
+		return cnt;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import java.util.Iterator;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -17,6 +19,46 @@ public interface UnaryExecutableOp extends ExecutableOperator
 	void process( SolutionMapping inputSolMap,
 	              IntermediateResultElementSink sink,
 	              ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the solution mappings of the given iterable as input to this
+	 * operator and sends the produced result elements (if any) to the given
+	 * sink.
+	 *
+	 * The default implementation of this method simply calls
+	 * {@link #process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for every solution mapping obtained from the given iterable.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 */
+	default void process( final Iterable<SolutionMapping> it,
+	                      final IntermediateResultElementSink sink,
+	                      final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		process( it.iterator(), sink, execCxt );
+	}
+
+	/**
+	 * Processes the solution mappings of the given iterator as input to this
+	 * operator and sends the produced result elements (if any) to the given
+	 * sink.
+	 *
+	 * The default implementation of this method simply calls
+	 * {@link #process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for every solution mapping obtained from the given iterator.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 */
+	default void process( final Iterator<SolutionMapping> it,
+	                      final IntermediateResultElementSink sink,
+	                      final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		while ( it.hasNext() ) {
+			process( it.next(), sink, execCxt );
+		}
+	}
 
 	/**
 	 * Concludes the execution of this operator and sends the

@@ -32,12 +32,12 @@ public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinW
 	// Change visibility to public in order to be able to call this function
 	// directly from ExecOpBindJoinSPARQLwithVALUESorFILTER
 	@Override
-	public void _process( final List<SolutionMapping> batchOfSolMaps,
-	                      final IntermediateResultElementSink sink,
-	                      final ExecutionContext execCxt )
+	public void _processBatch( final List<SolutionMapping> batchOfSolMaps,
+	                           final IntermediateResultElementSink sink,
+	                           final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		super._process(batchOfSolMaps, sink, execCxt);
+		super._processBatch(batchOfSolMaps, sink, execCxt);
 	}
 
 }

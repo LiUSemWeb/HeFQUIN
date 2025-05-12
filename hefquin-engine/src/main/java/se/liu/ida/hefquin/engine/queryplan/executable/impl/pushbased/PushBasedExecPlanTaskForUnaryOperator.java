@@ -44,8 +44,7 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 		while ( ! inputConsumed ) {
 			input.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				for ( final SolutionMapping sm : transferBuffer )
-					op.process(sm, sink, execCxt);
+				op.process(transferBuffer, sink, execCxt);
 			}
 			else {
 				op.concludeExecution(sink, execCxt);

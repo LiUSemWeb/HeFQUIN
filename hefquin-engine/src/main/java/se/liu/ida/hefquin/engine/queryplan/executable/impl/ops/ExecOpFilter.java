@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
@@ -40,29 +44,63 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
 		// Check whether the given solution mapping satisfies each of the filter expressions
-		final Binding sm = inputSolMap.asJenaBinding();
-		for ( final Expr e : filterExpressions.getList() ) {
-			final NodeValue evaluationResult;
-			try {
-				evaluationResult = ExprUtils.eval(e, sm);
-			}
-			catch ( final VariableNotBoundException ex ) {
-				// If evaluating the filter expression based on the given
-				// solution mapping results in this error, then this solution
-				// mapping does not satisfy the filter condition.
-				return;
-			}
+		if ( checkSolutionMapping(inputSolMap) == true ) {
+			sink.send(inputSolMap);
+			numberOfOutputMappingsProduced++;
+		}
+	}
 
-			if( evaluationResult.equals(NodeValue.FALSE) ) {
-				return;
-			}
-			else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
-				throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
+	@Override
+	protected int _process( final Iterator<SolutionMapping> it,
+	                        final IntermediateResultElementSink sink,
+	                        final ExecutionContext execCxt ) {
+		// Consume the given iterator until either we find the first solution
+		// mapping that satisfies all of the filter expressions of this operator
+		// and, thus, can be passed on as an output solution mapping, or until
+		// the end of the iterator.
+		SolutionMapping firstOutput = null;
+		while ( it.hasNext() && firstOutput == null ) {
+			final SolutionMapping inputSolMap = it.next();
+			if ( checkSolutionMapping(inputSolMap) == true ) {
+				firstOutput = inputSolMap;
 			}
 		}
 
-		sink.send(inputSolMap);
-		numberOfOutputMappingsProduced++;
+		// Continue consuming the rest of the iterator (if any). If we find
+		// further solution mappings that can be passed on as output, we
+		// collect them in a list, with the earlier-found first output
+		// solution mapping as the first list element. We create the list
+		// only in this case.
+		List<SolutionMapping> allOutput = null;
+		while ( it.hasNext() ) {
+			final SolutionMapping inputSolMap = it.next();
+			if ( checkSolutionMapping(inputSolMap) == true ) {
+				// We found another output solution mapping. Check whether
+				// we have already created the list; if not, create it now
+				// and add earlier-found first output solution mapping to it.
+				if ( allOutput == null ) {
+					allOutput = new ArrayList<>();
+					allOutput.add(firstOutput);
+				}
+
+				// And add the now-found output solution mapping to the list.
+				allOutput.add(inputSolMap);
+			}
+		}
+
+		if ( allOutput != null ) {
+			sink.send(allOutput);
+			numberOfOutputMappingsProduced += allOutput.size();
+			return allOutput.size();
+		}
+		else if ( firstOutput != null ) {
+			sink.send(firstOutput);
+			numberOfOutputMappingsProduced++;
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	@Override
@@ -82,6 +120,35 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 		final ExecutableOperatorStatsImpl s = super.createStats();
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
 		return s;
+	}
+
+	/**
+	 * Returns true if the given solution mapping satisfies all of the filter
+	 * expressions of this operator and, thus, can be passed on to the output.
+	 */
+	protected boolean checkSolutionMapping( final SolutionMapping inputSolMap ) {
+		final Binding sm = inputSolMap.asJenaBinding();
+		for ( final Expr e : filterExpressions.getList() ) {
+			final NodeValue evaluationResult;
+			try {
+				evaluationResult = ExprUtils.eval(e, sm);
+			}
+			catch ( final VariableNotBoundException ex ) {
+				// If evaluating the filter expression based on the given
+				// solution mapping results in this error, then this solution
+				// mapping does not satisfy the filter condition.
+				return false;
+			}
+
+			if( evaluationResult.equals(NodeValue.FALSE) ) {
+				return false;
+			}
+			else if ( ! evaluationResult.equals(NodeValue.TRUE) ) {
+				throw new IllegalArgumentException("The result of the eval is neither TRUE nor FALSE!");
+			}
+		}
+
+		return true;
 	}
 
 }

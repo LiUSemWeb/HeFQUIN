@@ -126,9 +126,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> batchOfSolMaps,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt )
+	protected void _processBatch( final List<SolutionMapping> batchOfSolMaps,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
 		final Iterable<SolutionMapping> inputSMsForJoin;
@@ -162,7 +162,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			throws ExecOpExecutionException
 	{
 		if ( batchOfSolMaps != null && ! batchOfSolMaps.isEmpty() ) {
-			_process(batchOfSolMaps, sink, execCxt);
+			_processBatch(batchOfSolMaps, sink, execCxt);
 		}
 	}
 
@@ -212,7 +212,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 					// mapping to the sink, then we can retry to process the
 					// given list of input solution mappings with the reduced
 					// request block size.
-					_process(joinableInputSMs, mySink, execCxt);
+					_processBatch(joinableInputSMs, mySink, execCxt);
 				}
 				else {
 					throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);

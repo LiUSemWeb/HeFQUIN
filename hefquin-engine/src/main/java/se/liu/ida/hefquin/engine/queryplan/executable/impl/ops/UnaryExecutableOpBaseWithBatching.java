@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * This base class handles collecting the input solution mappings into batches.
  * Classes that extend this base class need to implement two functions:
  * <ul>
- * <li>{@link #_process(List, IntermediateResultElementSink, ExecutionContext)} and</li>
+ * <li>{@link #_processBatch(List, IntermediateResultElementSink, ExecutionContext)} and</li>
  * <li>{@link #_concludeExecution(List, IntermediateResultElementSink, ExecutionContext)}.</li>
  * </ul>
  */
@@ -52,7 +52,7 @@ public abstract class UnaryExecutableOpBaseWithBatching extends UnaryExecutableO
 		// batch, process this batch and, afterwards, remove the solution
 		// mappings of that batch from the collection.
 		if ( collectedInputSolMaps.size() == batchSize ) {
-			_process(collectedInputSolMaps, sink, execCxt);
+			_processBatch(collectedInputSolMaps, sink, execCxt);
 			collectedInputSolMaps.clear();
 			numberOfBatchesProcessed++;
 		}
@@ -79,9 +79,9 @@ public abstract class UnaryExecutableOpBaseWithBatching extends UnaryExecutableO
 	 * If an exception occurs while processing the batch, then this
 	 * exception needs to be thrown.
 	 */
-	protected abstract void _process( List<SolutionMapping> currentBatch,
-	                                  IntermediateResultElementSink sink,
-	                                  ExecutionContext execCxt )
+	protected abstract void _processBatch( List<SolutionMapping> currentBatch,
+	                                       IntermediateResultElementSink sink,
+	                                       ExecutionContext execCxt )
 			throws ExecOpExecutionException;
 
 	/**
