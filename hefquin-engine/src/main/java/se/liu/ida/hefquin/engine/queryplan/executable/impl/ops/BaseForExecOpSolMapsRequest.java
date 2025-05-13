@@ -57,10 +57,8 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
 		}
 
-		for ( SolutionMapping sm : solutionMappings ) {
-			numberOfOutputMappingsProduced++;
-			sink.send( sm );
-		}
+		final int cnt = sink.send(solutionMappings);
+		numberOfOutputMappingsProduced += cnt;
 	}
 
 	protected abstract SolMapsResponse performRequest( FederationAccessManager fedAccessMgr ) throws FederationAccessException;

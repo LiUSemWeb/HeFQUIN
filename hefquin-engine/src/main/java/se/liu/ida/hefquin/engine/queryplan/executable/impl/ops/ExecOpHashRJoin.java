@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
  * A right outer join version of the hash join algorithm implemented in
@@ -28,18 +28,18 @@ public class ExecOpHashRJoin extends ExecOpHashJoin {
 	}
 
 	@Override
-	protected void _processSolMapFromChild2( final SolutionMapping smR,
-	                                         final IntermediateResultElementSink sink,
-	                                         final ExecutionContext execCxt ) {
+	protected void produceOutput( final SolutionMapping inputSolMap,
+	                              final List<SolutionMapping> output ) {
 		boolean hasJoinPartner = false;
-		final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
+		final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
 		for ( final SolutionMapping smL : matchSolMapL ){
 			hasJoinPartner = true;
-			sink.send(SolutionMappingUtils.merge(smL, smR));
+			output.add( SolutionMappingUtils.merge(smL, inputSolMap) );
 		}
 
 		if ( ! hasJoinPartner ) {
-			sink.send(smR);
+			output.add(inputSolMap);
 		}
 	}
+
 }

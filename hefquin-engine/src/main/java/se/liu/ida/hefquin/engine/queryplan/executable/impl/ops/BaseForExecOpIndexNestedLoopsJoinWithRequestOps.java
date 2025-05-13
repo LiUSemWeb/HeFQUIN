@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -12,7 +13,6 @@ import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -30,8 +30,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType extends Query,
                                                                       MemberType extends FederationMember>
-              extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
+              extends UnaryExecutableOpBaseWithBatching
 {
+	// Since this algorithm processes the input solution mappings
+	// in parallel, we should use an input block size with which
+	// we can leverage this parallelism. However, I am not sure
+	// yet what a good value is; it probably depends on various
+	// factors, including the load on the server and the degree
+	// of parallelism in the FederationAccessManager.
+	public final static int DEFAULT_BATCH_SIZE = 30;
+
+	protected final QueryType query;
+	protected final MemberType fm;
 	protected final boolean useOuterJoinSemantics;
 
 	// statistics
@@ -42,24 +52,30 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
 	                                                           final MemberType fm,
 	                                                           final boolean useOuterJoinSemantics,
+	                                                           final int batchSize,
 	                                                           final boolean collectExceptions ) {
-		super( query, fm, collectExceptions );
+		super(batchSize, collectExceptions);
+
+		assert query != null;
+		assert fm != null;
+
+		this.query = query;
+		this.fm = fm;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 	}
 
-	@Override
-	public int preferredInputBlockSize() {
-		// Since this algorithm processes the input solution mappings
-		// sequentially (one at a time), an input block size of 1 may
-		// reduce the response time of the overall execution process.
-		return 1;
+	protected BaseForExecOpIndexNestedLoopsJoinWithRequestOps( final QueryType query,
+	                                                           final MemberType fm,
+	                                                           final boolean useOuterJoinSemantics,
+	                                                           final boolean collectExceptions ) {
+		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
 	}
 
 	@Override
-	protected void _process(
-			final IntermediateResultBlock input,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	protected void _processBatch( final List<SolutionMapping> input,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt )
+			throws ExecOpExecutionException
 	{
 		final CompletableFuture<?>[] futures = initiateProcessing( input, sink, execCxt );
 
@@ -78,14 +94,14 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	}
 
 	protected CompletableFuture<?>[] initiateProcessing(
-			final IntermediateResultBlock input,
+			final List<SolutionMapping> input,
 			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt ) throws ExecOpExecutionException
+			final ExecutionContext execCxt )
 	{
 		final CompletableFuture<?>[] futures = new CompletableFuture[input.size()];
 
 		int i = 0;
-		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+		for ( final SolutionMapping sm : input ) {
 			final CompletableFuture<?> f;
 			try {
 				f = initiateProcessing( sm, sink, execCxt );
@@ -122,8 +138,7 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 			final SolutionMapping sm,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt )
-					throws ExecOpExecutionException,
-					       VariableByBlankNodeSubstitutionException
+					throws VariableByBlankNodeSubstitutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableRequestOperator(sm);
 
@@ -169,6 +184,16 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 		};
 	}
 
+	@Override
+	protected void _concludeExecution( final List<SolutionMapping> input,
+	                                   final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		if ( input != null && ! input.isEmpty() ) {
+			_processBatch(input, sink, execCxt);
+		}
+	}
 
 	@Override
 	public void resetStats() {
@@ -181,6 +206,8 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequestOps<QueryType 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "queryAsString",      query.toString() );
+		s.put( "fedMemberAsString",  fm.toString() );
 		s.put( "numberOfOutputMappingsProduced", Long.valueOf(numberOfOutputMappingsProduced) );
 		s.put( "numberOfRequestOpsUsed",         Integer.valueOf(numberOfRequestOpsUsed) );
 		s.put( "statsOfLastReqOp",               statsOfLastReqOp );

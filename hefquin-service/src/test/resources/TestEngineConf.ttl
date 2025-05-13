@@ -19,7 +19,7 @@ PREFIX ex:     <http://example.org/>
 
 _:b1 ec:queryPlanner _:b2 ;
      ec:planCompiler [
-         ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl" ;
+         ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;
          ec:constructorArguments ( ec:value:QueryProcContext )
      ] ;
      ec:executionEngine [

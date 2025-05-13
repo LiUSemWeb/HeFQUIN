@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -10,24 +13,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public interface BinaryExecutableOp extends ExecutableOperator
 {
-	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from the first operand.
-	 *
-	 * A query planner may use this number as an optimization
-	 * hint but it does not have to use it.
-	 */
-	int preferredInputBlockSizeFromChild1();
-
-	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from the second operand.
-	 *
-	 * A query planner may use this number as an optimization
-	 * hint but it does not have to use it.
-	 */
-	int preferredInputBlockSizeFromChild2();
-
 	/**
 	 * Returns true if this operator is implemented based on
 	 * the assumption that the COMPLETE input from the first
@@ -50,13 +35,34 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	boolean requiresCompleteChild1InputFirst();
 
 	/**
-	 * Processes the given input coming from the first operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
+	 * Processes the given solution mapping as input coming from the
+	 * first operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 */
-	void processBlockFromChild1( IntermediateResultBlock input,
+	void processInputFromChild1( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
 	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the solution mappings of the given list as input coming
+	 * from the first operand and sends the produced result elements (if
+	 * any) to the given sink.
+	 *
+	 * The default implementation of this method simply calls
+	 * {@link #processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for every solution mapping of the given list
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 */
+	default void processInputFromChild1( final List<SolutionMapping> inputSolMaps,
+	                                     final IntermediateResultElementSink sink,
+	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			processInputFromChild1(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Finishes up any processing related to the input coming
@@ -71,18 +77,39 @@ public interface BinaryExecutableOp extends ExecutableOperator
 	                      ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
-	 * Processes the given input coming from the second operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
+	 * Processes the given solution mapping as input coming from the
+	 * second operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 *
 	 * May throw {@link IllegalStateException} for operators for which
 	 * {@link #requiresCompleteChild1InputFirst()} returns true and
 	 * {@link #wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
 	 * has not been called yet.
 	 */
-	void processBlockFromChild2( IntermediateResultBlock input,
+	void processInputFromChild2( SolutionMapping inputSolMap,
 	                             IntermediateResultElementSink sink,
 	                             ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the solution mappings of the given list as input coming
+	 * from the second operand and sends the produced result elements (if
+	 * any) to the given sink.
+	 *
+	 * The default implementation of this method simply calls
+	 * {@link #processInputFromChild2(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for every solution mapping obtained from the given list.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 */
+	default void processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+	                                     final IntermediateResultElementSink sink,
+	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			processInputFromChild2(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Finishes up any processing related to the input coming

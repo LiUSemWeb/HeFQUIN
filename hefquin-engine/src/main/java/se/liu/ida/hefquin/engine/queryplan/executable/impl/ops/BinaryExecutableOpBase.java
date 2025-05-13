@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -18,8 +20,8 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * needs to be provided by implementing four abstract functions in each sub-class
  * of this base class. These four functions are:
  * <ul>
- * <li>{@link #_processBlockFromChild1(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)},</li>
- * <li>{@link #_processBlockFromChild2(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)},</li>
+ * <li>{@link #_processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)},</li>
+ * <li>{@link #_processInputFromChild2(SolutionMapping, IntermediateResultElementSink, ExecutionContext)},</li>
  * <li>{@link #_wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}, and</li>
  * <li>{@link #_wrapUpForChild2(IntermediateResultElementSink, ExecutionContext)}.</li>
  * </ul>
@@ -29,14 +31,12 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	private boolean leftInputConsumed           = false;
 	private boolean rightInputConsumed          = false;
 
-	private int numberOfLeftInputBlocksProcessed    = 0;
 	private long numberOfLeftInputMappingsProcessed = 0L;
 	private long sumOfLeftProcessingTimes           = 0L;
 	private long minLeftProcessingTime              = Long.MAX_VALUE;
 	private long maxLeftProcessingTime              = 0L;
 	protected long timeAtCurrentLeftProcStart       = 0L;
 
-	private int numberOfRightInputBlocksProcessed    = 0;
 	private long numberOfRightInputMappingsProcessed = 0L;
 	private long sumOfRightProcessingTimes           = 0L;
 	private long minRightProcessingTime              = Long.MAX_VALUE;
@@ -48,8 +48,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	}
 
 	@Override
-	public final void processBlockFromChild1(
-			final IntermediateResultBlock input,
+	public final void processInputFromChild1(
+			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
@@ -57,14 +57,14 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 		if ( collectExceptions ) {
 			try {
-				_processBlockFromChild1(input, sink, execCxt);
+				_processInputFromChild1(inputSolMap, sink, execCxt);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processBlockFromChild1(input, sink, execCxt);
+			_processInputFromChild1(inputSolMap, sink, execCxt);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentLeftProcStart;
@@ -73,8 +73,28 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		if ( processingTime < minLeftProcessingTime ) { minLeftProcessingTime = processingTime; }
 		if ( processingTime > maxLeftProcessingTime ) { maxLeftProcessingTime = processingTime; }
 
-		numberOfLeftInputMappingsProcessed += input.size();
-		numberOfLeftInputBlocksProcessed++;
+		numberOfLeftInputMappingsProcessed++;
+	}
+
+	@Override
+	public final void processInputFromChild1(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		if ( collectExceptions ) {
+			try {
+				_processInputFromChild1(inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_processInputFromChild1(inputSolMaps, sink, execCxt);
+		}
+
+		numberOfLeftInputMappingsProcessed += inputSolMaps.size();
 	}
 
 	@Override
@@ -85,8 +105,8 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	}
 
 	@Override
-	public final void processBlockFromChild2(
-			final IntermediateResultBlock input,
+	public final void processInputFromChild2(
+			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException
 	{
@@ -94,14 +114,14 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 		if ( collectExceptions ) {
 			try {
-				_processBlockFromChild2(input, sink, execCxt);
+				_processInputFromChild2(inputSolMap, sink, execCxt);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_processBlockFromChild2(input, sink, execCxt);
+			_processInputFromChild2(inputSolMap, sink, execCxt);
 		}
 
 		final long processingTime = System.currentTimeMillis() - timeAtCurrentRightProcStart;
@@ -110,8 +130,28 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		if ( processingTime < minRightProcessingTime ) { minRightProcessingTime = processingTime; }
 		if ( processingTime > maxRightProcessingTime ) { maxRightProcessingTime = processingTime; }
 
-		numberOfRightInputMappingsProcessed += input.size();
-		numberOfRightInputBlocksProcessed++;
+		numberOfRightInputMappingsProcessed++;
+	}
+
+	@Override
+	public final void processInputFromChild2(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		if ( collectExceptions ) {
+			try {
+				_processInputFromChild2(inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_processInputFromChild2(inputSolMaps, sink, execCxt);
+		}
+
+		numberOfRightInputMappingsProcessed += inputSolMaps.size();
 	}
 
 	@Override
@@ -123,56 +163,104 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 
 
 	/**
-	 * Implementations of this function need to process the given input block
-	 * coming from the first operand and send the produced result elements
-	 * (if any) to the given sink.
+	 * Implementations of this function need to process the given solution
+	 * mapping as input coming from the first operand and send the produced
+	 * result elements (if any) to the given sink.
 	 *
-	 * If an exception occurs while processing the input block, this exception
-	 * needs to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * If an exception occurs while processing the solution mapping, then
+	 * this exception needs to be thrown.
 	 */
-	protected abstract void _processBlockFromChild1(
-			final IntermediateResultBlock input,
+	protected abstract void _processInputFromChild1(
+			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _processInputFromChild1(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_processInputFromChild1(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Implementations of this function need to finish up any processing
 	 * related to the input coming from the first operand and send the
 	 * remaining result elements (if any) to the given sink.
 	 *
-	 * If an exception occurs during this process, then this exception needs
-	 * to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * If an exception occurs during this process, then this exception
+	 * needs to be thrown.
 	 */
-	protected abstract void _wrapUpForChild1( final IntermediateResultElementSink sink,
-	                                          final ExecutionContext execCxt ) throws ExecOpExecutionException;
-
-	/**
-	 * Implementations of this function need to process the given input block
-	 * coming from the second operand and send the produced result elements
-	 * (if any) to the given sink.
-	 *
-	 * If an exception occurs while processing the input block, this exception
-	 * needs to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
-	 */
-	protected abstract void _processBlockFromChild2(
-			final IntermediateResultBlock input,
+	protected abstract void _wrapUpForChild1(
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Implementations of this function need to process the given solution
+	 * mapping as input coming from the second operand and send the produced
+	 * result elements (if any) to the given sink.
+	 *
+	 * If an exception occurs while processing the solution mapping, then
+	 * this exception needs to be thrown.
+	 *
+	 * May throw an {@link IllegalStateException} for operators for which
+	 * {@link #requiresCompleteChild1InputFirst()} returns true and
+	 * {@link #_wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
+	 * has not been called yet.
+	 */
+	protected abstract void _processInputFromChild2(
+			final SolutionMapping inputSolMap,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_processInputFromChild2(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _processInputFromChild2(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_processInputFromChild2(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Implementations of this function need to finish up any processing
 	 * related to the input coming from the second operand and send the
 	 * remaining result elements (if any) to the given sink.
 	 *
-	 * If an exception occurs during this process, then this exception needs
-	 * to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * If an exception occurs during this process, then this exception
+	 * needs to be thrown.
+	 *
+	 * May throw an {@link IllegalStateException} for operators for which
+	 * {@link #requiresCompleteChild1InputFirst()} returns true and
+	 * {@link #_wrapUpForChild1(IntermediateResultElementSink, ExecutionContext)}
+	 * has not been called yet.
 	 */
-	protected abstract void _wrapUpForChild2( final IntermediateResultElementSink sink,
-	                                          final ExecutionContext execCxt ) throws ExecOpExecutionException;
+	protected abstract void _wrapUpForChild2(
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 
 	@Override
@@ -180,14 +268,12 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		leftInputConsumed  = false;
 		rightInputConsumed = false;
 
-		numberOfLeftInputBlocksProcessed   = 0;
 		numberOfLeftInputMappingsProcessed = 0L;
 		sumOfLeftProcessingTimes           = 0L;
 		minLeftProcessingTime              = Long.MAX_VALUE;
 		maxLeftProcessingTime              = 0L;
 		timeAtCurrentLeftProcStart         = 0L;
 
-		numberOfRightInputBlocksProcessed   = 0;
 		numberOfRightInputMappingsProcessed = 0L;
 		sumOfRightProcessingTimes           = 0L;
 		minRightProcessingTime              = Long.MAX_VALUE;
@@ -205,19 +291,17 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 		s.put( "leftInputConsumed",              Boolean.valueOf(leftInputConsumed) );
 		s.put( "rightInputConsumed",             Boolean.valueOf(rightInputConsumed) );
 
-		final double avgProcTimeLeft = (numberOfLeftInputBlocksProcessed==0)
-				? 0 : sumOfLeftProcessingTimes/numberOfLeftInputBlocksProcessed;
+		final double avgProcTimeLeft = (numberOfLeftInputMappingsProcessed==0L)
+				? 0 : sumOfLeftProcessingTimes/numberOfLeftInputMappingsProcessed;
 
-		s.put( "numberOfLeftInputBlocksProcessed",    Integer.valueOf(numberOfLeftInputBlocksProcessed) );
 		s.put( "numberOfLeftInputMappingsProcessed",  Long.valueOf(numberOfLeftInputMappingsProcessed) );
 		s.put( "averageProcTimePerLeftInputBlock",    Double.valueOf(avgProcTimeLeft) );
 		s.put( "minimumProcTimePerLeftInputBlock",    Long.valueOf(minLeftProcessingTime) );
 		s.put( "maximumProcTimePerLeftInputBlock",    Long.valueOf(maxLeftProcessingTime) );
 
-		final double avgProcTimeRight = (numberOfRightInputBlocksProcessed==0)
-				? 0 : sumOfRightProcessingTimes/numberOfRightInputBlocksProcessed;
+		final double avgProcTimeRight = (numberOfRightInputMappingsProcessed==0L)
+				? 0 : sumOfRightProcessingTimes/numberOfRightInputMappingsProcessed;
 
-		s.put( "numberOfRightInputBlocksProcessed",    Integer.valueOf(numberOfRightInputBlocksProcessed) );
 		s.put( "numberOfRightInputMappingsProcessed",  Long.valueOf(numberOfRightInputMappingsProcessed) );
 		s.put( "averageProcTimePerRightInputBlock",    Double.valueOf(avgProcTimeRight) );
 		s.put( "minimumProcTimePerRightInputBlock",    Long.valueOf(minRightProcessingTime) );

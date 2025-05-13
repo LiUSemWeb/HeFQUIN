@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanCompiler;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
-import se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl;
+import se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
@@ -91,7 +91,7 @@ public class HeFQUINEngineDefaultComponents
 	}
 
 	public static QueryPlanCompiler createDefaultPlanCompiler( final QueryProcContext ctx ) {
-		return new PushBasedQueryPlanCompilerImpl(ctx);
+		return new QueryPlanCompilerForPushBasedExecution(ctx);
 	}
 
 	public static ExecutionEngine createDefaultExecutionEngine() {

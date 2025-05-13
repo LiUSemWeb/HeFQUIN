@@ -1,5 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable;
 
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -11,23 +14,36 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 public interface NaryExecutableOp extends ExecutableOperator
 {
 	/**
-	 * Returns the preferred block size of input blocks that are
-	 * passed to this executable operator from any of its operands.
-	 *
-	 * A query planner may use this number as an optimization hint
-	 * but it does not have to use it.
+	 * Processes the given solution mapping as input coming from the
+	 * x-th operand and sends the produced result elements (if any)
+	 * to the given sink.
 	 */
-	int preferredInputBlockSizeFromChilden();
-
-	/**
-	 * Processes the given input coming from the x-th operand
-	 * and sends the produced result elements (if any) to the
-	 * given sink.
-	 */
-	void processBlockFromXthChild( int x,
-	                               IntermediateResultBlock input,
+	void processInputFromXthChild( int x,
+	                               SolutionMapping inputSolMap,
 	                               IntermediateResultElementSink sink,
 	                               ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the solution mappings oft he given list as input coming from
+	 * the x-th operand and sends the produced result elements (if any) to the
+	 * given sink.
+	 *
+	 * The default implementation of this method simply calls
+	 * {@link #processInputFromXthChild(int, SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for every solution mapping of the given list
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 */
+	default void processInputFromXthChild( final int x,
+	                                       final List<SolutionMapping> inputSolMaps,
+	                                       final IntermediateResultElementSink sink,
+	                                       final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			processInputFromXthChild(x, sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Finishes up any processing related to the input coming

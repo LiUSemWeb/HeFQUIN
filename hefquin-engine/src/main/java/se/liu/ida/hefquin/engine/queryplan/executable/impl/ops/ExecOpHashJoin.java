@@ -9,11 +9,12 @@ import se.liu.ida.hefquin.base.datastructures.impl.*;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class ExecOpHashJoin extends BinaryExecutableOpBase
@@ -59,27 +60,15 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    public int preferredInputBlockSizeFromChild1() {
-        return 1;
-    }
-
-    @Override
-    public int preferredInputBlockSizeFromChild2() {
-        return 1;
-    }
-
-    @Override
     public boolean requiresCompleteChild1InputFirst() {
         return true;
     }
 
     @Override
-    protected void _processBlockFromChild1( final IntermediateResultBlock input,
+    protected void _processInputFromChild1( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        for ( final SolutionMapping smL : input.getSolutionMappings() ) {
-            index.add(smL);
-        }
+        index.add(inputSolMap);
     }
 
     @Override
@@ -89,24 +78,33 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
     }
 
     @Override
-    protected void _processBlockFromChild2( final IntermediateResultBlock input,
+    protected void _processInputFromChild2( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        if (child1InputComplete == false){
+        if ( child1InputComplete == false ) {
             throw new IllegalStateException();
         }
-        for ( final SolutionMapping smR : input.getSolutionMappings() ) {
-            _processSolMapFromChild2(smR, sink, execCxt);
-        }
+
+        final List<SolutionMapping> output = new ArrayList<>();
+        produceOutput(inputSolMap, output);
+
+        sink.send(output);
     }
 
-    protected void _processSolMapFromChild2( final SolutionMapping smR,
-                                             final IntermediateResultElementSink sink,
-                                             final ExecutionContext execCxt ) {
-        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(smR);
-        for ( final SolutionMapping smL : matchSolMapL ){
-            sink.send( SolutionMappingUtils.merge(smL,smR) );
+    @Override
+    protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        if ( child1InputComplete == false ) {
+            throw new IllegalStateException();
         }
+
+        final List<SolutionMapping> output = new ArrayList<>();
+        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+            produceOutput(inputSolMap, output);
+        }
+
+        sink.send(output);
     }
 
     @Override
@@ -118,6 +116,14 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
         // but make sure we keep the final stats of the index
         statsOfIndex = index.getStats();
         index.clear();
+    }
+
+    protected void produceOutput( final SolutionMapping inputSolMap,
+                                  final List<SolutionMapping> output ) {
+        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
+        for ( final SolutionMapping smL : matchSolMapL ){
+            output.add( SolutionMappingUtils.merge(smL,inputSolMap) );
+        }
     }
 
 }

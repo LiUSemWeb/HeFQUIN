@@ -1,25 +1,24 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskBase
+public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final NaryExecutableOp op;
-	protected final ExecPlanTask[] inputs;
+	protected final PushBasedPlanThread[] inputs;
 
-	public PushBasedExecPlanTaskForNaryOperator( final NaryExecutableOp op,
-	                                             final ExecPlanTask[] inputs,
-	                                             final ExecutionContext execCxt,
-	                                             final int minimumBlockSize ) {
-		super(execCxt, minimumBlockSize);
+	public PushBasedPlanThreadImplForNaryOperator( final NaryExecutableOp op,
+	                                               final PushBasedPlanThread[] inputs,
+	                                               final ExecutionContext execCxt ) {
+		super(execCxt);
 
 		assert op != null;
 		assert inputs != null;
@@ -36,7 +35,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException {
 		produceOutputByConsumingAllInputsInParallel(sink);
 		//produceOutputByConsumingInputsOneAfterAnother(sink);
 	}
@@ -49,14 +48,15 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 	 * parallel based on any of the other inputs.
 	 */
 	protected void produceOutputByConsumingInputsOneAfterAnother( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		for ( int i = 0; i < inputs.length; i++ ) {
 			boolean inputConsumed = false;
 			while ( ! inputConsumed ) {
-				final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					op.processBlockFromXthChild(i, nextInputBlock, sink, execCxt);
+				inputs[i].transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
 				}
 				else {
 					op.wrapUpForXthChild(i, sink, execCxt);
@@ -66,62 +66,64 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 		}
 	}
 
-
 	/**
 	 * Consumes the complete i-th input first (and pushes that input to the
 	 * operator {@link #op}), before moving on to the (i+1)-th input.
 	 */
 	protected void produceOutputByConsumingAllInputsInParallel( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
-
-		final boolean[] inputConsumed = new boolean[inputs.length];
-		for ( int i = 0; i < inputs.length; i++ ) { inputConsumed[i] = false; }
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
+	{
+		final List<SolutionMapping> transferBuffer = new ArrayList<>();
+		final boolean[] inputConsumedCompletely = new boolean[inputs.length];
+		for ( int i = 0; i < inputs.length; i++ ) { inputConsumedCompletely[i] = false; }
 
 		int indexOfNextInputToWaitFor = 0;
 		int numberOfInputsConsumed = 0;
 		while ( numberOfInputsConsumed < inputs.length ) {
-			// Before blindly asking any of the inputs to give us its next
-			// IntermediateResultBlock (which may cause this thread to wait
-			// if no such block is available at the moment), let's first ask
-			// them if they currently have a block available. If so, request
-			// the next block from the input that says it has a block available.
-			boolean blockConsumed = false;
+			// Before blindly asking any of the inputs to give us the
+			// solution mappings that it has currently available as output
+			// (which may cause this thread to wait if no such output is
+			// available at the moment), let's first ask them if they do
+			// have some output readily available. If so, request this
+			// output from the input that says it has output available.
+			boolean someInputConsumed = false;
 			for ( int i = 0; i < inputs.length; i++ ) {
-				if ( ! inputConsumed[i] && inputs[i].hasNextIntermediateResultBlockAvailable() ) {
-					// calling 'getNextIntermediateResultBlock()' should not cause this thread to wait
-					final IntermediateResultBlock nextInputBlock = inputs[i].getNextIntermediateResultBlock();
-					if ( nextInputBlock != null ) {
-						op.processBlockFromXthChild(i, nextInputBlock, sink, execCxt);
+				if ( ! inputConsumedCompletely[i] && inputs[i].hasMoreOutputAvailable() ) {
+					// calling 'transferAvailableOutput' should not cause this thread to wait
+					inputs[i].transferAvailableOutput(transferBuffer);
+					if ( ! transferBuffer.isEmpty() ) {
+						op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
 					}
 
-					blockConsumed = true;
+					someInputConsumed = true;
 				}
 			}
 
-			if ( ! blockConsumed ) {
-				// If none of the inputs had a block available at the moment,
-				// we ask one of them to produce its next block, which may
-				// cause this thread to wait until that next block has been
-				// produced. To decide which of the inputs we ask (and, then,
-				// wait for) we use a round robin approach. To this end, we
-				// use the 'indexOfNextInputToWaitFor' pointer which we advance
+			if ( ! someInputConsumed ) {
+				// If none of the inputs had some output available at the
+				// moment, we ask one of them to produce its next output,
+				// which may cause this thread to wait until that next
+				// output has been produced.
+				// To decide which of the inputs we ask (and, then, wait
+				// for) we use a round robin approach. To this end, we use
+				// the 'indexOfNextInputToWaitFor' pointer which we advance
 				// each time we leave this code block here.
 
 				// First, we have to make sure that 'indexOfNextInputToWaitFor'
 				// points to an input that has not been consumed completely yet.
-				while ( inputConsumed[indexOfNextInputToWaitFor] == true ) {
+				while ( inputConsumedCompletely[indexOfNextInputToWaitFor] == true ) {
 					indexOfNextInputToWaitFor = advanceIndexOfInput(indexOfNextInputToWaitFor);
 				}
 
-				// Now we ask that input to produce its next block, which may
+				// Now we ask that input to produce its next output, which may
 				// cause this thread to wait.
-				final IntermediateResultBlock nextInputBlock = inputs[indexOfNextInputToWaitFor].getNextIntermediateResultBlock();
-				if ( nextInputBlock != null ) {
-					op.processBlockFromXthChild(indexOfNextInputToWaitFor, nextInputBlock, sink, execCxt);
+				inputs[indexOfNextInputToWaitFor].transferAvailableOutput(transferBuffer);
+				if ( ! transferBuffer.isEmpty() ) {
+					op.processInputFromXthChild(indexOfNextInputToWaitFor, transferBuffer, sink, execCxt);
 				}
 				else {
 					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, execCxt);
-					inputConsumed[indexOfNextInputToWaitFor] = true;
+					inputConsumedCompletely[indexOfNextInputToWaitFor] = true;
 					numberOfInputsConsumed++;
 				}
 

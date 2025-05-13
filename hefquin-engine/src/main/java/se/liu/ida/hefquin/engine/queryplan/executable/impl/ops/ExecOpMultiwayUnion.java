@@ -1,7 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
@@ -15,22 +16,21 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	}
 
 	@Override
-	public int preferredInputBlockSizeFromChilden() {
-		// Since this algorithm processes the input solution mappings
-		// sequentially (one at a time), an input block size of 1 may
-		// reduce the response time of the overall execution process.
-		return 1;
+	protected void _processInputFromXthChild( final int x,
+	                                          final SolutionMapping inputSolMap,
+	                                          final IntermediateResultElementSink sink,
+	                                          final ExecutionContext execCxt) {
+		numberOfOutputMappingsProduced++;
+		sink.send(inputSolMap);
 	}
 
 	@Override
-	protected void _processBlockFromXthChild( final int x,
-	                                          final IntermediateResultBlock input,
+	protected void _processInputFromXthChild( final int x,
+	                                          final List<SolutionMapping> inputSolMaps,
 	                                          final IntermediateResultElementSink sink,
 	                                          final ExecutionContext execCxt) {
-		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
-			numberOfOutputMappingsProduced++;
-			sink.send(sm);
-		}
+		numberOfOutputMappingsProduced += inputSolMaps.size();
+		sink.send(inputSolMaps);
 	}
 
 	@Override

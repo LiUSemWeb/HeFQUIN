@@ -2,13 +2,9 @@ package se.liu.ida.hefquin.engine.queryproc.impl.compiler;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlockBuilder;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockBuilderImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.IteratorBasedExecutablePlanImpl;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterOverResultElementIter;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultBlockIterator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithBinaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithNullaryExecOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased.ResultElementIterWithUnaryExecOp;
@@ -18,9 +14,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
-public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
+public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompilerBase
 {
-	public IteratorBasedQueryPlanCompilerImpl( final QueryProcContext ctxt ) {
+	public QueryPlanCompilerForIteratorBasedExecution( final QueryProcContext ctxt ) {
 		super(ctxt);
 	}
 
@@ -48,8 +44,7 @@ public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 			final UnaryExecutableOp execOp = (UnaryExecutableOp) qep.getRootOperator().createExecOp( true, subPlan.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan = compile(subPlan, execCxt);
-			final ResultBlockIterator blockIterSubPlan = createBlockIterator( elmtIterSubPlan, execOp.preferredInputBlockSize() );
-			return new ResultElementIterWithUnaryExecOp(execOp, blockIterSubPlan, execCxt);
+			return new ResultElementIterWithUnaryExecOp(execOp, elmtIterSubPlan, execCxt);
 		}
 		else if ( qep.numberOfSubPlans() == 2 )
 		{
@@ -62,22 +57,13 @@ public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
 					subPlan2.getExpectedVariables() );
 
 			final ResultElementIterator elmtIterSubPlan1 = compile(subPlan1, execCxt);
-			final ResultBlockIterator blockIterSubPlan1 = createBlockIterator( elmtIterSubPlan1, execOp.preferredInputBlockSizeFromChild1() );
-
 			final ResultElementIterator elmtIterSubPlan2 = compile(subPlan2, execCxt);
-			final ResultBlockIterator blockIterSubPlan2 = createBlockIterator( elmtIterSubPlan2, execOp.preferredInputBlockSizeFromChild2() );
-
-			return new ResultElementIterWithBinaryExecOp(execOp, blockIterSubPlan1, blockIterSubPlan2, execCxt);
+			return new ResultElementIterWithBinaryExecOp(execOp, elmtIterSubPlan1, elmtIterSubPlan2, execCxt);
 		}
 		else
 		{
 			throw new IllegalArgumentException();
 		}
-	}
-
-	protected ResultBlockIterator createBlockIterator( final ResultElementIterator elmtIter, final int preferredBlockSize ) {
-		final IntermediateResultBlockBuilder blockBuilder = new GenericIntermediateResultBlockBuilderImpl();
-		return new ResultBlockIterOverResultElementIter( elmtIter, blockBuilder, preferredBlockSize );
 	}
 
 }

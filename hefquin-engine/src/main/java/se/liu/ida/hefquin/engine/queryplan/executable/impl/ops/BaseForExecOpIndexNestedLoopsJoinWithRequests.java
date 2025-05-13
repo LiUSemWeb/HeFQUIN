@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -17,8 +18,8 @@ import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -36,35 +37,48 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
                             MemberType extends FederationMember,
                             ReqType extends DataRetrievalRequest,
                             RespType extends DataRetrievalResponse<?>>
-             extends BaseForExecOpIndexNestedLoopsJoin<QueryType,MemberType>
+             extends UnaryExecutableOpBaseWithBatching
 {
+	// Since this algorithm processes the input solution mappings
+	// in parallel, we should use an input block size with which
+	// we can leverage this parallelism. However, I am not sure
+	// yet what a good value is; it probably depends on various
+	// factors, including the load on the server and the degree
+	// of parallelism in the FederationAccessManager.
+	public final static int DEFAULT_BATCH_SIZE = 30;
+
+	protected final QueryType query;
+	protected final MemberType fm;
+
+	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
+	                                                      final MemberType fm,
+	                                                      final int batchSize,
+	                                                      final boolean collectExceptions ) {
+		super(batchSize, collectExceptions);
+
+		assert query != null;
+		assert fm != null;
+
+		this.query = query;
+		this.fm = fm;
+	}
+
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
 	                                                      final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
+		this(query, fm, DEFAULT_BATCH_SIZE, collectExceptions);
 	}
 
 	@Override
-	public int preferredInputBlockSize() {
-		// Since this algorithm processes the input solution mappings
-		// in parallel, we should use an input block size with which
-		// we can leverage this parallelism. However, I am not sure
-		// yet what a good value is; it probably depends on various
-		// factors, including the load on the server and the degree
-		// of parallelism in the FederationAccessManager.
-		return 30;
-	}
-
-	@Override
-	protected void _process(
-			final IntermediateResultBlock input,
-			final IntermediateResultElementSink sink,
-			final ExecutionContext execCxt) throws ExecOpExecutionException
+	protected void _processBatch( final List<SolutionMapping> input,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt )
+			throws ExecOpExecutionException
 	{
 		final CompletableFuture<?>[] futures = new CompletableFuture[ input.size() ];
 
 		int i = 0;
-		for ( final SolutionMapping sm : input.getSolutionMappings() ) {
+		for ( final SolutionMapping sm : input ) {
 			// issue a request based on the current solution mapping
 			final ReqType req;
 			try {
@@ -117,6 +131,25 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	protected abstract MyResponseProcessor createResponseProcessor( SolutionMapping sm, IntermediateResultElementSink sink, ExecutableOperator op );
 
 	protected abstract CompletableFuture<RespType> issueRequest( ReqType req, FederationAccessManager fedAccessMgr ) throws FederationAccessException;
+
+	@Override
+	protected void _concludeExecution( final List<SolutionMapping> input,
+	                                   final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		if ( input != null && ! input.isEmpty() ) {
+			_processBatch(input, sink, execCxt);
+		}
+	}
+
+	@Override
+	protected ExecutableOperatorStatsImpl createStats() {
+		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "queryAsString",      query.toString() );
+		s.put( "fedMemberAsString",  fm.toString() );
+		return s;
+	}
 
 
 	// ---- helper classes -----

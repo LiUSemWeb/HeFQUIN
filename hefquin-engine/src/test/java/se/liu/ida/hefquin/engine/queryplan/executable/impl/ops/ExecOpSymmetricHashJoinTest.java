@@ -8,25 +8,81 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpSymmetricHashJoinTest extends TestsForInnerJoinAlgorithms
 {
-    @Test
-    public void joinWithOneJoinVariable() throws ExecutionException { _joinWithOneJoinVariable(); }
+	@Test
+	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {
+		_joinWithEmptyInput1(true);
+	}
 
-    @Test
-    public void joinWithTwoJoinVariables() throws ExecutionException { _joinWithTwoJoinVariables(); }
+	@Test
+	public void joinWithEmptyInput1_CombinedInput() throws ExecutionException {
+		_joinWithEmptyInput1(false);
+	}
 
-    @Test
-    public void joinWithTwoJoinVariables_noJoinPartner() throws ExecutionException { _joinWithTwoJoinVariables_noJoinPartner(); }
+	@Test
+	public void joinWithEmptyInput2_SeparateInput() throws ExecutionException {
+		_joinWithEmptyInput2(true);
+	}
 
-    @Test
-    public void joinWithOneJoinVariable_withPossibleVars_noOverlap() throws ExecutionException { _joinWithOneJoinVariable_withPossibleVars_noOverlap(); }
+	@Test
+	public void joinWithEmptyInput2_CombinedInput() throws ExecutionException {
+		_joinWithEmptyInput2(false);
+	}
 
-    @Test
-    public void joinWithOneJoinVariable_withPossibleVars_overlapped() throws ExecutionException { _joinWithOneJoinVariable_withPossibleVars_overlapped(); }
+	@Test
+	public void joinWithOneJoinVariable_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable(true);
+	}
 
-    @Override
-    protected BinaryExecutableOp createExecOpForTest(final ExpectedVariables... inputVars) {
-        assert inputVars.length == 2;
+	@Test
+	public void joinWithOneJoinVariable_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable(false);
+	}
 
-        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], false);
-    }
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_SeparateInput() throws ExecutionException {
+		_joinWithTwoJoinVariables(true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_CombinedInput() throws ExecutionException {
+		_joinWithTwoJoinVariables(false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(false);
+	}
+
+	@Override
+	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
+		assert inputVars.length == 2;
+
+		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], false );
+	}
+
 }
