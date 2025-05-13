@@ -187,29 +187,6 @@ public class FederationDescriptionReaderTest
 		assertNotNull( fm.getVocabularyMapping() );
 	}
 
-	@Ignore("Disabled since it uses live web test")
-	@Test
-	public void vocabularyMappingFileIsLoadedFromRemoteURL() {
-		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
-						+ "PREFIX ex:     <http://example.org/>\n"
-						+ "\n"
-						+ "ex:dbpediaSPARQL\n"
-						+ "      a            fd:FederationMember ;\n"
-						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
-						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
-						+ "                     fd:vocabularyMappingsFile \"https://raw.githubusercontent.com/LiUSemWeb/HeFQUIN/refs/heads/main/hefquin-engine/src/test/resources/dbpedia/vocabularyMappings.nt\".";
-
-		final Model fd = ModelFactory.createDefaultModel();
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
-		b.parse( fd );
-
-		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
-		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
-		assertNotNull( fm.getVocabularyMapping() );
-	}
-
 	@Test
 	public void vocabularyMappingFileIsLoadedFromLocalPath() {
 		final String turtle =
