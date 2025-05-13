@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
@@ -208,27 +208,39 @@ public class FederationDescriptionReader
 	}
 
 	/**
-	 * Checks whether given RDF resource (fm) representing a federation
-	 * member is associated with a vocabulary mapping in the given federation
-	 * description (fd) and, if so, parses this vocabulary mapping and returns
-	 * it. Otherwise, this function returns <code>null</code>.
+	 * Attempts to retrieve and parse the vocabulary mapping associated with the
+	 * given RDF resource {@code fm}, representing a {@link FederationMember}, in
+	 * the given federation description {@code fd}.
+	 *
+	 * The method attempts to load the vocabulary mapping from the specified path or
+	 * URL and caches the result for reuse. If no vocabulary mappings file is
+	 * present, the method returns {@code null}.
+	 *
+	 * @param fm RDF resource for the federation member
+	 * @param fd RDF model of the federation description
+	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
+	 * @throws IllegalArgumentException if the mapping file cannot be loaded or parsed
 	 */
 	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
-		if( fd.contains(fm, FD.vocabularyMappingsFile) ){
-			final RDFNode pathToMappingFile = fd.getRequiredProperty(fm, FD.vocabularyMappingsFile).getObject();
-
-			final String path = pathToMappingFile.toString();
-			if ( verifyValidVocabMappingFile(path) ) {
-				VocabularyMapping vm = vocabMappingByPath.get( path );
-				if ( vm == null ) {
-					vm = new VocabularyMappingWrappingImpl(path);
-					vocabMappingByPath.put( path, vm );
-				}
-				return vm;
-			}
+		if ( ! fd.contains( fm, FD.vocabularyMappingsFile ) ) {
+			return null;
 		}
 
-		return null;
+		final RDFNode pathToMappingFile = fd.getRequiredProperty( fm, FD.vocabularyMappingsFile ).getObject();
+
+		final String path = pathToMappingFile.toString();
+		VocabularyMapping vm = vocabMappingByPath.get( path );
+		if ( vm == null ) {
+			final Graph g;
+			try {
+				g = RDFDataMgr.loadGraph( path );
+			} catch ( Exception e ) {
+				throw new IllegalArgumentException( e );
+			}
+			vm = new VocabularyMappingWrappingImpl( g );
+			vocabMappingByPath.put( path, vm );
+		}
+		return vm;
 	}
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
@@ -309,18 +321,6 @@ public class FederationDescriptionReader
 			@Override public GraphQLSchema getSchema() { return schema; }
 			@Override public String toString( ) { return "GraphQL endpoint at " + uri; }
 		};
-	}
-
-	/**
-	 * Verifies that the file at the given path exists.
-	 */
-	protected boolean verifyValidVocabMappingFile( final String pathToMappingFile ) {
-		final File f = new File(pathToMappingFile);
-		if ( f.exists() && f.isFile() ){
-			return true;
-		}
-		else
-			throw new IllegalArgumentException( "The following path to vocab.mapping does not exist:" + pathToMappingFile );
 	}
 
 	/**
