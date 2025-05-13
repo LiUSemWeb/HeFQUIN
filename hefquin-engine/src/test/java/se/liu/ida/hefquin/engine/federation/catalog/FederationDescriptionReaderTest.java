@@ -226,12 +226,17 @@ public class FederationDescriptionReaderTest
 		b.lang( Lang.TURTLE );
 		b.parse( fd );
 
-		final Exception exception = assertThrows( RiotNotFoundException.class, () -> {
+		final Exception exception = assertThrows( IllegalArgumentException.class, () -> {
 			FederationDescriptionReader.readFromModel( fd );
 		} );
+
+
+		assertTrue( "Expected cause to be RiotNotFoundException, but was: " + exception.getCause(),
+			exception.getCause() instanceof RiotNotFoundException );
+
 		// Test that the error message is correct
 		final String expectedErrorMessage = "Not found: dummy/vocab.nt";
-		final String actualErrorMessage = exception.getMessage();
+		final String actualErrorMessage = exception.getCause().getMessage();
 		assertEquals( expectedErrorMessage, actualErrorMessage );
 	}
 
