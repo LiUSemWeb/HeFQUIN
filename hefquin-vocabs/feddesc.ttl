@@ -37,6 +37,11 @@ fd:TPFInterface a owl:Class ;
     rdfs:label "TPF Interface"@en ;
     rdfs:comment "An interface to access a federation member via Triple Pattern Fragments."@en .
 
+fd:brTPFInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "brTPF Interface"@en ;
+    rdfs:comment "An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments."@en .
+
 fd:BoltInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
     rdfs:label "Bolt Interface"@en ;
