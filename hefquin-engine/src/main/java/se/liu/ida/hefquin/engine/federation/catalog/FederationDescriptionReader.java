@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
@@ -218,7 +219,7 @@ public class FederationDescriptionReader
 	 * @param fm RDF resource for the federation member
 	 * @param fd RDF model of the federation description
 	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
-	 * @throws org.apache.jena.riot.RiotNotFoundException if the mapping file cannot be loaded or parsed
+	 * @throws IllegalArgumentException if the mapping file cannot be loaded or parsed
 	 */
 	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
 		if ( ! fd.contains( fm, FD.vocabularyMappingsFile ) ) {
@@ -230,7 +231,13 @@ public class FederationDescriptionReader
 		final String path = pathToMappingFile.toString();
 		VocabularyMapping vm = vocabMappingByPath.get( path );
 		if ( vm == null ) {
-			vm = new VocabularyMappingWrappingImpl( path );
+			final Graph g;
+			try {
+				g = RDFDataMgr.loadGraph( path );
+			} catch ( Exception e ) {
+				throw new IllegalArgumentException( e );
+			}
+			vm = new VocabularyMappingWrappingImpl( g );
 			vocabMappingByPath.put( path, vm );
 		}
 		return vm;
