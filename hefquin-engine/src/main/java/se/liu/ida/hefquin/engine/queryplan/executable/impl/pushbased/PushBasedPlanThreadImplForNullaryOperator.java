@@ -6,12 +6,12 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PushBasedExecPlanTaskForNullaryOperator extends PushBasedExecPlanTaskBase
+public class PushBasedPlanThreadImplForNullaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final NullaryExecutableOp op;
 
-	public PushBasedExecPlanTaskForNullaryOperator( final NullaryExecutableOp op,
-	                                                final ExecutionContext execCxt ) {
+	public PushBasedPlanThreadImplForNullaryOperator( final NullaryExecutableOp op,
+	                                                  final ExecutionContext execCxt ) {
 		super(execCxt);
 
 		assert op != null;

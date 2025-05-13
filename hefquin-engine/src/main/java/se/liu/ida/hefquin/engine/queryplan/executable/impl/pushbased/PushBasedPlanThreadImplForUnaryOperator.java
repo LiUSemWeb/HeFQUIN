@@ -10,14 +10,14 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTaskBase
+public class PushBasedPlanThreadImplForUnaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final UnaryExecutableOp op;
-	protected final ExecPlanTask input;
+	protected final PushBasedPlanThread input;
 
-	public PushBasedExecPlanTaskForUnaryOperator( final UnaryExecutableOp op,
-	                                              final ExecPlanTask input,
-	                                              final ExecutionContext execCxt ) {
+	public PushBasedPlanThreadImplForUnaryOperator( final UnaryExecutableOp op,
+	                                                final PushBasedPlanThread input,
+	                                                final ExecutionContext execCxt ) {
 		super(execCxt);
 
 		assert op != null;
@@ -34,7 +34,7 @@ public class PushBasedExecPlanTaskForUnaryOperator extends PushBasedExecPlanTask
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
 	{
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean inputConsumed = false;

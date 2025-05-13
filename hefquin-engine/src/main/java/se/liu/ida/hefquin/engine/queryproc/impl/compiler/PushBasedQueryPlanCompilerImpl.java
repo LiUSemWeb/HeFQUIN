@@ -9,12 +9,11 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.ConnectorForAdditionalConsumer;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.ExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForBinaryOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForNaryOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForNullaryOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecPlanTaskForUnaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThread;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForBinaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForNaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForNullaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForUnaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -26,41 +25,41 @@ public class PushBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 	}
 
 	@Override
-	protected PushBasedExecPlanTask createTaskForNullaryExecOp( final NullaryExecutableOp op,
+	protected PushBasedPlanThread createTaskForNullaryExecOp( final NullaryExecutableOp op,
 	                                                            final ExecutionContext execCxt ) {
-		return new PushBasedExecPlanTaskForNullaryOperator(op, execCxt);
+		return new PushBasedPlanThreadImplForNullaryOperator(op, execCxt);
 	}
 
 	@Override
-	protected PushBasedExecPlanTask createTaskForUnaryExecOp( final UnaryExecutableOp op,
-	                                                          final ExecPlanTask childTask,
+	protected PushBasedPlanThread createTaskForUnaryExecOp( final UnaryExecutableOp op,
+	                                                          final PushBasedPlanThread childTask,
 	                                                          final ExecutionContext execCxt ) {
-		return new PushBasedExecPlanTaskForUnaryOperator(op, childTask, execCxt);
+		return new PushBasedPlanThreadImplForUnaryOperator(op, childTask, execCxt);
 	}
 
 	@Override
-	protected PushBasedExecPlanTask createTaskForBinaryExecOp( final BinaryExecutableOp op,
-	                                                           final ExecPlanTask childTask1,
-	                                                           final ExecPlanTask childTask2,
+	protected PushBasedPlanThread createTaskForBinaryExecOp( final BinaryExecutableOp op,
+	                                                           final PushBasedPlanThread childTask1,
+	                                                           final PushBasedPlanThread childTask2,
 	                                                           final ExecutionContext execCxt ) {
-		return new PushBasedExecPlanTaskForBinaryOperator(op, childTask1, childTask2, execCxt);
+		return new PushBasedPlanThreadImplForBinaryOperator(op, childTask1, childTask2, execCxt);
 	}
 
 	@Override
-	protected ExecPlanTask createTaskForNaryExecOp( final NaryExecutableOp op,
-	                                                final ExecPlanTask[] childTasks,
+	protected PushBasedPlanThread createTaskForNaryExecOp( final NaryExecutableOp op,
+	                                                final PushBasedPlanThread[] childTasks,
 	                                                final ExecutionContext execCxt ) {
-		return new PushBasedExecPlanTaskForNaryOperator(op, childTasks, execCxt);
+		return new PushBasedPlanThreadImplForNaryOperator(op, childTasks, execCxt);
 	}
 
 	@Override
-	protected LinkedList<ExecPlanTask> createTasks( final PhysicalPlan qep,
+	protected LinkedList<PushBasedPlanThread> createTasks( final PhysicalPlan qep,
 	                                                final ExecutionContext execCxt ) {
-		final LinkedList<ExecPlanTask> tasks = super.createTasks(qep, execCxt);
+		final LinkedList<PushBasedPlanThread> tasks = super.createTasks(qep, execCxt);
 
 		// remove all ConnectorForAdditionalConsumer from the list
-		final LinkedList<ExecPlanTask> tasks2 = new LinkedList<>();
-		for ( final ExecPlanTask t : tasks ) {
+		final LinkedList<PushBasedPlanThread> tasks2 = new LinkedList<>();
+		for ( final PushBasedPlanThread t : tasks ) {
 			if ( ! (t instanceof ConnectorForAdditionalConsumer) ) {
 				tasks2.add(t);
 			}
@@ -79,17 +78,16 @@ public class PushBasedQueryPlanCompilerImpl extends TaskBasedQueryPlanCompilerBa
 	// its solution mappings to multiple consuming tasks
 	protected class Worker extends TaskBasedQueryPlanCompilerBase.Worker
 	{
-		protected final Map<PhysicalPlan,ExecPlanTask> convertedSubPlans = new HashMap<>();
+		protected final Map<PhysicalPlan,PushBasedPlanThread> convertedSubPlans = new HashMap<>();
 
 		@Override
 		public void createTasks( final PhysicalPlan qep,
-		                         final LinkedList<ExecPlanTask> tasks,
+		                         final LinkedList<PushBasedPlanThread> tasks,
 		                         final ExecutionContext execCxt ) {
-			final ExecPlanTask newTask;
-			final ExecPlanTask probe = convertedSubPlans.get(qep);
+			final PushBasedPlanThread newTask;
+			final PushBasedPlanThread probe = convertedSubPlans.get(qep);
 			if ( probe != null ) {
-				final PushBasedExecPlanTask t = (PushBasedExecPlanTask) probe;
-				newTask = t.addConnectorForAdditionalConsumer();
+				newTask = probe.addConnectorForAdditionalConsumer();
 			}
 			else {
 				newTask = _createTasks(qep, tasks, execCxt);

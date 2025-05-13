@@ -8,8 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.ExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.TaskBasedExecutablePlanImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThread;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecutablePlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
@@ -28,13 +28,13 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 	@Override
 	public ExecutablePlan compile( final PhysicalPlan qep ) {
 		final ExecutionContext execCtxt = createExecContext();
-		final LinkedList<ExecPlanTask> tasks = createTasks(qep, execCtxt);
-		return new TaskBasedExecutablePlanImpl(tasks, execCtxt);
+		final LinkedList<PushBasedPlanThread> tasks = createTasks(qep, execCtxt);
+		return new PushBasedExecutablePlanImpl(tasks, execCtxt);
 	}
 
-	protected LinkedList<ExecPlanTask> createTasks( final PhysicalPlan qep,
+	protected LinkedList<PushBasedPlanThread> createTasks( final PhysicalPlan qep,
 	                                                final ExecutionContext execCxt ) {
-		final LinkedList<ExecPlanTask> tasks = new LinkedList<>();
+		final LinkedList<PushBasedPlanThread> tasks = new LinkedList<>();
 		createWorker().createTasks(qep, tasks, execCxt);
 		return tasks;
 	}
@@ -46,14 +46,14 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 	protected class Worker
 	{
 		public void createTasks( final PhysicalPlan qep,
-		                         final LinkedList<ExecPlanTask> tasks,
+		                         final LinkedList<PushBasedPlanThread> tasks,
 		                         final ExecutionContext execCxt ) {
-			final ExecPlanTask newTask = _createTasks(qep, tasks, execCxt);
+			final PushBasedPlanThread newTask = _createTasks(qep, tasks, execCxt);
 			tasks.addFirst(newTask);
 		}
 
-		protected ExecPlanTask _createTasks( final PhysicalPlan qep,
-		                                     final LinkedList<ExecPlanTask> tasks,
+		protected PushBasedPlanThread _createTasks( final PhysicalPlan qep,
+		                                     final LinkedList<PushBasedPlanThread> tasks,
 		                                     final ExecutionContext execCxt ) {
 			final PhysicalOperator pop = qep.getRootOperator();
 			if ( pop instanceof NullaryPhysicalOp npop )
@@ -68,7 +68,7 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 				final UnaryExecutableOp execOp = upop.createExecOp( true, subPlan.getExpectedVariables() );
 
 				createTasks(subPlan, tasks, execCxt);
-				final ExecPlanTask childTask = tasks.getFirst();
+				final PushBasedPlanThread childTask = tasks.getFirst();
 
 				return createTaskForUnaryExecOp(execOp, childTask, execCxt);
 			}
@@ -83,10 +83,10 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 						subPlan2.getExpectedVariables() );
 
 				createTasks( subPlan1, tasks, execCxt );
-				final ExecPlanTask childTask1 = tasks.getFirst();
+				final PushBasedPlanThread childTask1 = tasks.getFirst();
 
 				createTasks( subPlan2, tasks, execCxt );
-				final ExecPlanTask childTask2 = tasks.getFirst();
+				final PushBasedPlanThread childTask2 = tasks.getFirst();
 
 				return createTaskForBinaryExecOp(execOp, childTask1, childTask2, execCxt);
 			}
@@ -99,7 +99,7 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 				final NaryExecutableOp execOp = npop.createExecOp(true, expVars);
 
-				final ExecPlanTask[] childTasks = new ExecPlanTask[ qep.numberOfSubPlans() ];
+				final PushBasedPlanThread[] childTasks = new PushBasedPlanThread[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < childTasks.length; i++ ) {
 					createTasks( qep.getSubPlan(i), tasks, execCxt );
 
@@ -116,19 +116,19 @@ public abstract class TaskBasedQueryPlanCompilerBase extends QueryPlanCompilerBa
 
 	} // end of helper class Worker
 
-	protected abstract ExecPlanTask createTaskForNullaryExecOp( NullaryExecutableOp op,
+	protected abstract PushBasedPlanThread createTaskForNullaryExecOp( NullaryExecutableOp op,
 	                                                            ExecutionContext execCxt );
 
-	protected abstract ExecPlanTask createTaskForUnaryExecOp( UnaryExecutableOp op,
-	                                                          ExecPlanTask childTask,
+	protected abstract PushBasedPlanThread createTaskForUnaryExecOp( UnaryExecutableOp op,
+	                                                          PushBasedPlanThread childTask,
 	                                                          ExecutionContext execCxt );
 
-	protected abstract ExecPlanTask createTaskForBinaryExecOp( BinaryExecutableOp op,
-	                                                           ExecPlanTask childTask1,
-	                                                           ExecPlanTask childTask2,
+	protected abstract PushBasedPlanThread createTaskForBinaryExecOp( BinaryExecutableOp op,
+	                                                           PushBasedPlanThread childTask1,
+	                                                           PushBasedPlanThread childTask2,
 	                                                           ExecutionContext execCxt );
 
-	protected abstract ExecPlanTask createTaskForNaryExecOp( NaryExecutableOp op,
-	                                                         ExecPlanTask[] childTasks,
+	protected abstract PushBasedPlanThread createTaskForNaryExecOp( NaryExecutableOp op,
+	                                                         PushBasedPlanThread[] childTasks,
 	                                                         ExecutionContext execCxt );
 }

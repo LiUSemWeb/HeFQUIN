@@ -5,8 +5,26 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsProvider;
 
-public interface ExecPlanTask extends Runnable, StatsProvider
+public interface PushBasedPlanThread extends Runnable, StatsProvider
 {
+	/**
+	 * Can be used for cases in which multiple threads consume the output
+	 * produced by this thread. While one of these threads may then consume
+	 * the output directly (by calling {@link #transferAvailableOutput(List)}),
+	 * each of the others must then consume the output via its own, separate
+	 * {@link PushBasedPlanThread} instance, as set up and returned by this
+	 * method. Hence, for each of these additional consuming threads, this
+	 * method needs to be called.
+	 *
+	 * This method should be called before starting to consume the output.
+	 *
+	 * The use case for this are query plans that are not tree-shaped (but
+	 * still DAGs), which we may have in particular for union-over-join source
+	 * assignments where some of the joins have the same request operator as
+	 * input (perhaps even with a filter operator on top of the request).
+	 */
+	PushBasedPlanThread addConnectorForAdditionalConsumer();
+
 	/**
 	 * Returns true if the execution of this task is currently running;
 	 * that is, the execution has started and has neither been interrupted
@@ -67,7 +85,8 @@ public interface ExecPlanTask extends Runnable, StatsProvider
 	 * This function is expected to be called by (and, thus, run in the context
 	 * of) the thread that consumes the solution mappings produced by this task.
 	 */
-	void transferAvailableOutput( List<SolutionMapping> transferBuffer ) throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException;
+	void transferAvailableOutput( List<SolutionMapping> transferBuffer )
+			throws ConsumingPushBasedPlanThreadException;
 
 	/**
 	 * Returns true if newly-produced solution mappings are available to be
@@ -78,5 +97,5 @@ public interface ExecPlanTask extends Runnable, StatsProvider
 	boolean hasMoreOutputAvailable();
 
 	@Override
-	ExecPlanTaskStats getStats();
+	StatsOfPushBasedPlanThread getStats();
 }

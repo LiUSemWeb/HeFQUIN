@@ -10,16 +10,16 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTaskBase
+public class PushBasedPlanThreadImplForBinaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final BinaryExecutableOp op;
-	protected final ExecPlanTask input1;
-	protected final ExecPlanTask input2;
+	protected final PushBasedPlanThread input1;
+	protected final PushBasedPlanThread input2;
 
-	public PushBasedExecPlanTaskForBinaryOperator( final BinaryExecutableOp op,
-	                                               final ExecPlanTask input1,
-	                                               final ExecPlanTask input2,
-	                                               final ExecutionContext execCxt ) {
+	public PushBasedPlanThreadImplForBinaryOperator( final BinaryExecutableOp op,
+	                                                 final PushBasedPlanThread input1,
+	                                                 final PushBasedPlanThread input2,
+	                                                 final ExecutionContext execCxt ) {
 		super(execCxt);
 
 		assert op != null;
@@ -38,12 +38,11 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException {
 		if ( op.requiresCompleteChild1InputFirst() )
 			produceOutputByConsumingInput1First(sink);
 		else
 			produceOutputByConsumingBothInputsInParallel(sink);
-			//produceOutputByConsumingInput1First(sink);
 	}
 
 	/**
@@ -51,7 +50,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	 * operator {@link #op}), before moving on to the input from child 2.
 	 */
 	protected void produceOutputByConsumingInput1First( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
 	{
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean input1Consumed = false;
@@ -83,7 +82,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 	 * Aims to consume both inputs in parallel.
 	 */
 	protected void produceOutputByConsumingBothInputsInParallel( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
 	{
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		boolean nextWaitForInput1 = true; // flag to switch between waiting for input 1 versus input 2

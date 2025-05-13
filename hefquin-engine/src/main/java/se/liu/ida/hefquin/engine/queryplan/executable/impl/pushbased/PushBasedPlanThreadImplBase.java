@@ -6,34 +6,80 @@ import java.util.Iterator;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.utils.StatsImpl;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
- * Push-based implementation of {@link ExecPlanTask}.
- * This implementation makes the following assumption:
- * - There is only one thread that consumes the output of this
- *   task (by calling {@link #transferAvailableOutput()}).
+ * Contains the core part of implementing {@link PushBasedPlanThread}.
  */
-public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
-                                                implements PushBasedExecPlanTask, IntermediateResultElementSink
+public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread,
+                                                         IntermediateResultElementSink
 {
-	protected static final int DEFAULT_OUTPUT_BLOCK_SIZE = 50;
+	// initialized via the constructor
+	protected final ExecutionContext execCxt;
 
-	protected final int outputBlockSize;
-
+	// initialized if needed (i.e., if addConnectorForAdditionalConsumer is called)
 	protected List<ConnectorForAdditionalConsumer> extraConnectors = null;
 
-	protected PushBasedExecPlanTaskBase( final ExecutionContext execCxt ) {
-		super(execCxt);
+	protected enum Status {
+		/**
+		 * The task has been created but its execution has not yet been started.
+		 */
+		WAITING_TO_BE_STARTED,
 
-		outputBlockSize = DEFAULT_OUTPUT_BLOCK_SIZE;
+		/**
+		 * The execution of the task is currently running.
+		 */
+		RUNNING,
+
+		/**
+		 * The execution of the task was completed successfully
+		 * but its results have not yet been consumed completely.
+		 */
+		COMPLETED_NOT_CONSUMED,
+
+		/**
+		 * The execution of the task was completed successfully
+		 * and its results have been consumed completely.
+		 */
+		COMPLETED_AND_CONSUMED,
+
+		/**
+		 * The execution of the task failed with an exception;
+		 * hence, the execution is not running anymore.
+		 */
+		FAILED,
+
+		/**
+		 * The execution of the task was interrupted;
+		 * hence, the execution is not running anymore.
+		 */
+		INTERRUPTED
+	};
+
+	// The different threads that call methods of this class must
+	// be synchronized via the 'availableResultBlocks' object.
+
+	// access to this list must be synchronized
+	protected final List<SolutionMapping> availableOutput = new ArrayList<>();
+
+	// access to this object must be synchronized
+	private Status status = Status.WAITING_TO_BE_STARTED;
+
+	private Exception causeOfFailure = null;
+
+
+	protected PushBasedPlanThreadImplBase( final ExecutionContext execCxt ) {
+		assert execCxt != null;
+		this.execCxt = execCxt;
 	}
 
 	@Override
-	public ExecPlanTask addConnectorForAdditionalConsumer() {
+	public PushBasedPlanThread addConnectorForAdditionalConsumer() {
 		if ( extraConnectors == null ) {
 			extraConnectors = new ArrayList<>();
 		}
@@ -42,6 +88,11 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 		extraConnectors.add(c);
 		return c;
 	}
+
+
+	///////////////////////////////////////////////////
+	/// Methods that implement the core functionality of this producing thread
+	///////////////////////////////////////////////////
 
 	@Override
 	public final void run() {
@@ -54,20 +105,18 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 				}
 			}
 
-			final IntermediateResultElementSink sink = this;
-
 			boolean failed       = false;
 			boolean interrupted  = false;
 			try {
-				produceOutput(sink);
+				produceOutput(this);
 			}
-			catch ( final ExecOpExecutionException | ExecPlanTaskInputException e ) {
-				setCauseOfFailure(e);
-				failed = true;
-			}
-			catch ( final ExecPlanTaskInterruptionException  e ) {
+			catch ( final InterruptedWaitingForPushBasedPlanThreadException e ) {
 				setCauseOfFailure(e);
 				interrupted = true;
+			}
+			catch ( final ConsumingPushBasedPlanThreadException | ExecOpExecutionException e ) {
+				setCauseOfFailure(e);
+				failed = true;
 			}
 
 			wrapUp(failed, interrupted);
@@ -85,7 +134,7 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 			th.printStackTrace( System.err );
 
 			try {
-				final ExecPlanTaskStats stats = getStats();
+				final StatsOfPushBasedPlanThread stats = getStats();
 				System.err.println( "--> The current runtime statistics of this ExecPlanTask are:");
 				StatsPrinter.print( stats, System.err, true ); // true=recursive
 			}
@@ -99,9 +148,50 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 		}
 	}
 
-	protected abstract void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException;
+	protected void setStatus( final Status newStatus ) {
+		synchronized (availableOutput) {
+			status = newStatus;
+		}
+	}
 
+	protected abstract void produceOutput( IntermediateResultElementSink sink )
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException;
+
+	protected void setCauseOfFailure( final Exception cause ) {
+		causeOfFailure = cause;
+	}
+
+	protected void wrapUp( final boolean failed, final boolean interrupted )
+	{
+		synchronized (availableOutput) {
+			if ( failed ) {
+				setStatus(Status.FAILED);
+				availableOutput.notifyAll();
+			}
+			else if ( interrupted ) {
+				setStatus(Status.INTERRUPTED);
+				availableOutput.notifyAll();
+			}
+			else {
+				// Everything went well. Set the completion status
+				// depending on whether there still are output solution
+				// mappings available to be consumed, and ...
+				if ( availableOutput.isEmpty() )
+					setStatus(Status.COMPLETED_AND_CONSUMED);
+				else
+					setStatus(Status.COMPLETED_NOT_CONSUMED);
+
+				// ... inform the consuming thread in case it is
+				// currently waiting for more solution mappings.
+				availableOutput.notify();
+			}
+		}
+	}
+
+
+	///////////////////////////////////////////////////
+	/// IntermediateResultElementSink for the producing thread
+	///////////////////////////////////////////////////
 
 	@Override
 	public void send( final SolutionMapping element ) {
@@ -183,37 +273,21 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 		return cnt;
 	}
 
-	protected void wrapUp( final boolean failed, final boolean interrupted )
-	{
-		synchronized (availableOutput) {
-			if ( failed ) {
-				setStatus(Status.FAILED);
-				availableOutput.notifyAll();
-			}
-			else if ( interrupted ) {
-				setStatus(Status.INTERRUPTED);
-				availableOutput.notifyAll();
-			}
-			else {
-				// Everything went well. Set the completion status
-				// depending on whether there still are output solution
-				// mappings available to be consumed, and ...
-				if ( availableOutput.isEmpty() )
-					setStatus(Status.COMPLETED_AND_CONSUMED);
-				else
-					setStatus(Status.COMPLETED_NOT_CONSUMED);
 
-				// ... inform the consuming thread in case it is
-				// currently waiting for more solution mappings.
-				availableOutput.notify();
-			}
+	///////////////////////////////////////////////////
+	/// Methods to be called by the consuming thread
+	///////////////////////////////////////////////////
+
+	@Override
+	public boolean hasMoreOutputAvailable() {
+		synchronized (availableOutput) {
+			return ! availableOutput.isEmpty();
 		}
 	}
 
-
 	@Override
 	public final void transferAvailableOutput( final List<SolutionMapping> transferBuffer )
-			throws ExecPlanTaskInterruptionException, ExecPlanTaskInputException
+			throws ConsumingPushBasedPlanThreadException
 	{
 		transferBuffer.clear();
 
@@ -224,10 +298,10 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 				// we have not already reached some problematic status.
 				final Status currentStatus = getStatus();
 				if ( currentStatus == Status.FAILED ) {
-					throw new ExecPlanTaskInputException("Execution of this task has failed with an exception (operator: " + getExecOp().toString() + ").", getCauseOfFailure() );
+					throw new ConsumingPushBasedPlanThreadException("Execution of this task has failed with an exception (operator: " + getExecOp().toString() + ").", getCauseOfFailure() );
 				}
 				else if ( currentStatus == Status.INTERRUPTED ) {
-					throw new ExecPlanTaskInputException("Execution of this task has been interrupted (operator: " + getExecOp().toString() + ").");
+					throw new ConsumingPushBasedPlanThreadException("Execution of this task has been interrupted (operator: " + getExecOp().toString() + ").");
 				}
 				else if ( currentStatus == Status.WAITING_TO_BE_STARTED ) {
 					// This status is not actually a problem. The code in the
@@ -266,11 +340,73 @@ public abstract class PushBasedExecPlanTaskBase extends ExecPlanTaskBase
 					try {
 						availableOutput.wait();
 					} catch ( final InterruptedException e ) {
-						throw new ExecPlanTaskInterruptionException(e);
+						throw new InterruptedWaitingForPushBasedPlanThreadException("Consuming thread was interrupted while waiting for the producing thread for operator: " + getExecOp().toString(), e);
 					}
 				}
 			}
 		}
+	}
+
+	protected Status getStatus() {
+		return status;
+	}
+
+	@Override
+	public boolean isRunning() {
+		synchronized (availableOutput) {
+			return (status == Status.RUNNING);
+		}
+	}
+
+	@Override
+	public boolean isCompleted() {
+		synchronized (availableOutput) {
+			return (status == Status.COMPLETED_NOT_CONSUMED || status == Status.COMPLETED_AND_CONSUMED);
+		}
+	}
+
+	@Override
+	public boolean hasFailed() {
+		synchronized (availableOutput) {
+			return (status == Status.FAILED);
+		}
+	}
+
+	@Override
+	public Exception getCauseOfFailure() {
+		return causeOfFailure;
+	}
+
+	public List<Exception> getExceptionsCaughtDuringExecution() {
+		return getExecOp().getExceptionsCaughtDuringExecution();
+	}
+
+	protected abstract ExecutableOperator getExecOp();
+
+
+	///////////////////////////////////////////////////
+	/// Stats-related code
+	///////////////////////////////////////////////////
+
+	@Override
+	public StatsOfPushBasedPlanThread getStats() {
+		return new MyStatsImpl( getExecOp() );
+	}
+
+	@Override
+	public void resetStats() {
+		getExecOp().resetStats();
+	}
+
+
+	protected class MyStatsImpl extends StatsImpl implements StatsOfPushBasedPlanThread
+	{
+		protected static final String enOperatorStats  = "operatorStats";
+
+		public MyStatsImpl( final ExecutableOperator op ) {
+			put( enOperatorStats, op.getStats() );
+		}
+
 	}
 
 }

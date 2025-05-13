@@ -17,12 +17,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.engine.queryproc.QueryResultSink;
 
-public class TaskBasedExecutablePlanImpl implements ExecutablePlan
+public class PushBasedExecutablePlanImpl implements ExecutablePlan
 {
-	protected final LinkedList<ExecPlanTask> tasks;
+	protected final LinkedList<PushBasedPlanThread> tasks;
 	protected ExecutorService threadPool;
 
-	public TaskBasedExecutablePlanImpl( final LinkedList<ExecPlanTask> tasks, final ExecutionContext ctx ) {
+	public PushBasedExecutablePlanImpl( final LinkedList<PushBasedPlanThread> tasks, final ExecutionContext ctx ) {
 		assert ! tasks.isEmpty();
 		this.tasks = tasks;
 
@@ -40,11 +40,11 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 		// track their progress (each 'Future' has the same index in
 		// 'futures' array as its corresponding task has in the 'tasks'
 		// list).
-		final Iterator<ExecPlanTask> it = tasks.descendingIterator();
+		final Iterator<PushBasedPlanThread> it = tasks.descendingIterator();
 		int i = tasks.size();
 		final Future<?>[] futures = new Future<?>[tasks.size()];
 		while ( it.hasNext() ) {
-			final ExecPlanTask task = it.next();
+			final PushBasedPlanThread task = it.next();
 			try {
 				futures[--i] = threadPool.submit(task);
 			}
@@ -62,7 +62,7 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 		// Consume all solution mappings from the root operator
 		// and send them to the result sink.
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
-		final ExecPlanTask rootTask = tasks.getFirst();
+		final PushBasedPlanThread rootTask = tasks.getFirst();
 		try {
 			boolean exhausted = false;
 			while ( ! exhausted ) {
@@ -97,7 +97,7 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 		// further problems in case some of the task are still active
 		// for some reason
 		for ( int j = 0; j < tasks.size(); j++ ) {
-			final ExecPlanTask task = tasks.get(j);
+			final PushBasedPlanThread task = tasks.get(j);
 			if ( ! task.isCompleted() ) {
 				if ( task.isRunning() )
 					System.err.println("Task #" + j + " seems to be still running.");
@@ -126,21 +126,21 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 
 	@Override
 	public ExecutablePlanStats getStats() {
-		final ExecPlanTaskStats[] statsOfTasks = new ExecPlanTaskStats[ tasks.size() ];
+		final StatsOfPushBasedPlanThread[] statsOfTasks = new StatsOfPushBasedPlanThread[ tasks.size() ];
 		int i = 0;
-		for ( final ExecPlanTask t : tasks ) {
+		for ( final PushBasedPlanThread t : tasks ) {
 			statsOfTasks[i] = t.getStats();
 			i++;
 		}
 
-		return new ExecutablePlanStatsOfTaskBasedPlan(statsOfTasks);
+		return new StatsOfPushBasedExecutablePlan(statsOfTasks);
 	}
 
 	@Override
 	public List<Exception> getExceptionsCaughtDuringExecution() {
 		final List<Exception> allExceptions = new ArrayList<>();
-		for ( final ExecPlanTask t : tasks ) {
-			final List<Exception> exceptionsOfTask = ( (ExecPlanTaskBase) t ).getExceptionsCaughtDuringExecution();
+		for ( final PushBasedPlanThread t : tasks ) {
+			final List<Exception> exceptionsOfTask = ( (PushBasedPlanThreadImplBase) t ).getExceptionsCaughtDuringExecution();
 			allExceptions.addAll(exceptionsOfTask);
 		}
 
@@ -149,7 +149,7 @@ public class TaskBasedExecutablePlanImpl implements ExecutablePlan
 
 	public void print( final PrintStream str ) {
 		int j = 0;
-		for ( final ExecPlanTask t : tasks ) {
+		for ( final PushBasedPlanThread t : tasks ) {
 			str.println( "Task #" + j );
 			StatsPrinter.print( t.getStats(), str, true );
 

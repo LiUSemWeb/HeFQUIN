@@ -10,14 +10,14 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskBase
+public class PushBasedPlanThreadImplForNaryOperator extends PushBasedPlanThreadImplBase
 {
 	protected final NaryExecutableOp op;
-	protected final ExecPlanTask[] inputs;
+	protected final PushBasedPlanThread[] inputs;
 
-	public PushBasedExecPlanTaskForNaryOperator( final NaryExecutableOp op,
-	                                             final ExecPlanTask[] inputs,
-	                                             final ExecutionContext execCxt ) {
+	public PushBasedPlanThreadImplForNaryOperator( final NaryExecutableOp op,
+	                                               final PushBasedPlanThread[] inputs,
+	                                               final ExecutionContext execCxt ) {
 		super(execCxt);
 
 		assert op != null;
@@ -35,7 +35,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 
 	@Override
 	protected void produceOutput( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException {
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException {
 		produceOutputByConsumingAllInputsInParallel(sink);
 		//produceOutputByConsumingInputsOneAfterAnother(sink);
 	}
@@ -48,7 +48,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 	 * parallel based on any of the other inputs.
 	 */
 	protected void produceOutputByConsumingInputsOneAfterAnother( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
 	{
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		for ( int i = 0; i < inputs.length; i++ ) {
@@ -66,13 +66,12 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 		}
 	}
 
-
 	/**
 	 * Consumes the complete i-th input first (and pushes that input to the
 	 * operator {@link #op}), before moving on to the (i+1)-th input.
 	 */
 	protected void produceOutputByConsumingAllInputsInParallel( final IntermediateResultElementSink sink )
-			throws ExecOpExecutionException, ExecPlanTaskInputException, ExecPlanTaskInterruptionException
+			throws ExecOpExecutionException, ConsumingPushBasedPlanThreadException
 	{
 		final List<SolutionMapping> transferBuffer = new ArrayList<>();
 		final boolean[] inputConsumedCompletely = new boolean[inputs.length];
