@@ -51,11 +51,30 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 	protected void _processInputFromChild2( final SolutionMapping inputSolMap,
 	                                        final IntermediateResultElementSink sink,
 	                                        final ExecutionContext execCxt ) {
+		final List<SolutionMapping> output = new ArrayList<>();
 		for ( final SolutionMapping smL : inputLHS ) {
 			if ( SolutionMappingUtils.compatible(smL,inputSolMap) ) {
-				sink.send( SolutionMappingUtils.merge(smL,inputSolMap) );
+				output.add( SolutionMappingUtils.merge(smL,inputSolMap) );
 			}
 		}
+
+		sink.send(output);
+	}
+
+	@Override
+	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		final List<SolutionMapping> output = new ArrayList<>();
+		for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+			for ( final SolutionMapping smL : inputLHS ) {
+				if ( SolutionMappingUtils.compatible(smL,inputSolMap) ) {
+					output.add( SolutionMappingUtils.merge(smL,inputSolMap) );
+				}
+			}
+		}
+
+		sink.send(output);
 	}
 
 	@Override

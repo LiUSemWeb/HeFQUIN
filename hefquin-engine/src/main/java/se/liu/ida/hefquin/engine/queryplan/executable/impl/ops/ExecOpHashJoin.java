@@ -12,7 +12,9 @@ import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class ExecOpHashJoin extends BinaryExecutableOpBase
@@ -83,10 +85,26 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
             throw new IllegalStateException();
         }
 
-        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
-        for ( final SolutionMapping smL : matchSolMapL ){
-            sink.send( SolutionMappingUtils.merge(smL,inputSolMap) );
+        final List<SolutionMapping> output = new ArrayList<>();
+        produceOutput(inputSolMap, output);
+
+        sink.send(output);
+    }
+
+    @Override
+    protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        if ( child1InputComplete == false ) {
+            throw new IllegalStateException();
         }
+
+        final List<SolutionMapping> output = new ArrayList<>();
+        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+            produceOutput(inputSolMap, output);
+        }
+
+        sink.send(output);
     }
 
     @Override
@@ -98,6 +116,14 @@ public class ExecOpHashJoin extends BinaryExecutableOpBase
         // but make sure we keep the final stats of the index
         statsOfIndex = index.getStats();
         index.clear();
+    }
+
+    protected void produceOutput( final SolutionMapping inputSolMap,
+                                  final List<SolutionMapping> output ) {
+        final Iterable<SolutionMapping> matchSolMapL = index.getJoinPartners(inputSolMap);
+        for ( final SolutionMapping smL : matchSolMapL ){
+            output.add( SolutionMappingUtils.merge(smL,inputSolMap) );
+        }
     }
 
 }

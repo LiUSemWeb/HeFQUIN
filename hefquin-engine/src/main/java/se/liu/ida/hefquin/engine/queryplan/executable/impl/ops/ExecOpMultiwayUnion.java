@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -20,6 +22,15 @@ public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 	                                          final ExecutionContext execCxt) {
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
+	}
+
+	@Override
+	protected void _processInputFromXthChild( final int x,
+	                                          final List<SolutionMapping> inputSolMaps,
+	                                          final IntermediateResultElementSink sink,
+	                                          final ExecutionContext execCxt) {
+		numberOfOutputMappingsProduced += inputSolMaps.size();
+		sink.send(inputSolMaps);
 	}
 
 	@Override

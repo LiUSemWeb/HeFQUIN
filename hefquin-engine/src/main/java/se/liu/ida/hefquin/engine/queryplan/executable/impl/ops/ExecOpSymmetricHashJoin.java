@@ -91,13 +91,25 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     protected void _processInputFromChild1( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        indexForChild1.add(inputSolMap);
+        final List<SolutionMapping> output = new ArrayList<>();
 
-        final Iterable<SolutionMapping> matchSolMapR = indexForChild2.getJoinPartners(inputSolMap);
-        for ( final SolutionMapping smR : matchSolMapR ) {
-            numberOfOutputMappingsProduced++;
-            sink.send( SolutionMappingUtils.merge(inputSolMap, smR) );
+        _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, output);
+
+        numberOfOutputMappingsProduced += output.size();
+        sink.send(output);
+    }
+
+    @Override
+    protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        final List<SolutionMapping> output = new ArrayList<>();
+        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+            _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, output);
         }
+
+        numberOfOutputMappingsProduced += output.size();
+        sink.send(output);
     }
 
     @Override
@@ -114,13 +126,24 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     protected void _processInputFromChild2( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        indexForChild2.add(inputSolMap);
+    	final List<SolutionMapping> output = new ArrayList<>();
+        _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, output);
 
-        final Iterable<SolutionMapping> matchSolMapL = indexForChild1.getJoinPartners(inputSolMap);
-        for ( final SolutionMapping smL : matchSolMapL ){
-            numberOfOutputMappingsProduced++;
-            sink.send( SolutionMappingUtils.merge(smL, inputSolMap) );
+        numberOfOutputMappingsProduced += output.size();
+        sink.send(output);
+    }
+
+    @Override
+    protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+                                            final IntermediateResultElementSink sink,
+                                            final ExecutionContext execCxt ) {
+        final List<SolutionMapping> output = new ArrayList<>();
+        for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+            _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, output);
         }
+
+        numberOfOutputMappingsProduced += output.size();
+        sink.send(output);
     }
 
     @Override
@@ -155,5 +178,17 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
 		return s;
 	}
+
+    protected static void _processInputSolMap( final SolutionMapping inputSolMap,
+                                               final SolutionMappingsIndex indexForInput,
+                                               final SolutionMappingsIndex indexForProbing,
+                                               final List<SolutionMapping> outputBuffer ) {
+        indexForInput.add(inputSolMap);
+
+        final Iterable<SolutionMapping> matchingSolMaps = indexForProbing.getJoinPartners(inputSolMap);
+        for ( final SolutionMapping matchingSolMap : matchingSolMaps ) {
+            outputBuffer.add( SolutionMappingUtils.merge(inputSolMap, matchingSolMap) );
+        }
+    }
 
 }

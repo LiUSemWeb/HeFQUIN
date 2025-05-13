@@ -59,8 +59,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 			while ( ! inputConsumed ) {
 				inputs[i].transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					for ( final SolutionMapping sm : transferBuffer )
-						op.processInputFromXthChild(i, sm, sink, execCxt);
+					op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
 				}
 				else {
 					op.wrapUpForXthChild(i, sink, execCxt);
@@ -97,8 +96,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 					// calling 'transferAvailableOutput' should not cause this thread to wait
 					inputs[i].transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						for ( final SolutionMapping sm : transferBuffer )
-							op.processInputFromXthChild(i, sm, sink, execCxt);
+						op.processInputFromXthChild(i, transferBuffer, sink, execCxt);
 					}
 
 					someInputConsumed = true;
@@ -125,8 +123,7 @@ public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskB
 				// cause this thread to wait.
 				inputs[indexOfNextInputToWaitFor].transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					for ( final SolutionMapping sm : transferBuffer )
-						op.processInputFromXthChild(indexOfNextInputToWaitFor, sm, sink, execCxt);
+					op.processInputFromXthChild(indexOfNextInputToWaitFor, transferBuffer, sink, execCxt);
 				}
 				else {
 					op.wrapUpForXthChild(indexOfNextInputToWaitFor, sink, execCxt);

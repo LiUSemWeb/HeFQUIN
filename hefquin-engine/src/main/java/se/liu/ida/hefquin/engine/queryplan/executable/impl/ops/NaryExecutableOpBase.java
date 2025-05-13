@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
@@ -84,6 +86,31 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	}
 
 	@Override
+	public final void processInputFromXthChild( final int x,
+	                                            final List<SolutionMapping> inputSolMaps,
+	                                            final IntermediateResultElementSink sink,
+	                                            final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		assert x >= 0;
+		assert x < numberOfChildren;
+
+		if ( collectExceptions ) {
+			try {
+				_processInputFromXthChild(x, inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_processInputFromXthChild(x, inputSolMaps, sink, execCxt);
+		}
+
+		numberOfMappingsFromXthInputProcessed[x] += inputSolMaps.size();
+	}
+
+	@Override
 	public final void wrapUpForXthChild( final int x,
 	                                     final IntermediateResultElementSink sink,
 	                                     final ExecutionContext execCxt )
@@ -122,6 +149,27 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 			SolutionMapping inputSolMap,
 			IntermediateResultElementSink sink,
 			ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_processInputFromXthChild(int, SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _processInputFromXthChild(
+			final int x,
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_processInputFromXthChild(x, sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Implementations of this function need to finish up any processing

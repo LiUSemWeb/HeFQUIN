@@ -39,20 +39,33 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 	protected Iterator<SolutionMapping> runTest(
 			final List<SolutionMapping> input1,
 			final List<SolutionMapping> input2,
+			final boolean sendAllSolMapsSeparately,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final BinaryExecutableOp op = createExecOpForTest(inputVars);
 
-		for ( final SolutionMapping sm : input1 ) {
-			op.processInputFromChild1(sm, sink, null);
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input1 ) {
+				op.processInputFromChild1(sm, sink, null);
+			}
 		}
+		else {
+			op.processInputFromChild1(input1, sink, null);
+		}
+
 		op.wrapUpForChild1(sink, null);
 
-		for ( final SolutionMapping sm : input2 ) {
-			op.processInputFromChild2(sm, sink, null);
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input2 ) {
+				op.processInputFromChild2(sm, sink, null);
+			}
 		}
+		else {
+			op.processInputFromChild2(input2, sink, null);
+		}
+
 		op.wrapUpForChild2(sink, null);
 
 		return sink.getCollectedSolutionMappings().iterator();

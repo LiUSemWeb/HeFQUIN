@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -27,6 +29,14 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	}
 
 	@Override
+	protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		numberOfOutputMappingsProduced += inputSolMaps.size();
+		sink.send(inputSolMaps);
+	}
+
+	@Override
 	protected void _wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                 final ExecutionContext execCxt ) {
 		// nothing to be done here
@@ -38,6 +48,14 @@ public class ExecOpBinaryUnion extends BinaryExecutableOpBase
 	                                        final ExecutionContext execCxt ) {
 		numberOfOutputMappingsProduced++;
 		sink.send(inputSolMap);
+	}
+
+	@Override
+	protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
+	                                        final IntermediateResultElementSink sink,
+	                                        final ExecutionContext execCxt ) {
+		numberOfOutputMappingsProduced += inputSolMaps.size();
+		sink.send(inputSolMaps);
 	}
 
 	@Override

@@ -61,8 +61,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 		while ( ! input1Consumed ) {
 			input1.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				for ( final SolutionMapping sm : transferBuffer )
-					op.processInputFromChild1(sm, sink, execCxt);
+				op.processInputFromChild1(transferBuffer, sink, execCxt);
 			}
 			else {
 				op.wrapUpForChild1(sink, execCxt);
@@ -74,8 +73,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 		while ( ! input2Consumed ) {
 			input2.transferAvailableOutput(transferBuffer);
 			if ( ! transferBuffer.isEmpty() ) {
-				for ( final SolutionMapping sm : transferBuffer )
-					op.processInputFromChild2(sm, sink, execCxt);
+				op.processInputFromChild2(transferBuffer, sink, execCxt);
 			}
 			else {
 				op.wrapUpForChild2(sink, execCxt);
@@ -107,8 +105,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 				// calling 'transferAvailableOutput' should not cause this thread to wait
 				input1.transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					for ( final SolutionMapping sm : transferBuffer )
-						op.processInputFromChild1(sm, sink, execCxt);
+					op.processInputFromChild1(transferBuffer, sink, execCxt);
 				}
 
 				someInputConsumed = true;
@@ -119,8 +116,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 				// calling 'transferAvailableOutput' should not cause this thread to wait
 				input2.transferAvailableOutput(transferBuffer);
 				if ( ! transferBuffer.isEmpty() ) {
-					for ( final SolutionMapping sm : transferBuffer )
-						op.processInputFromChild2(sm, sink, execCxt);
+					op.processInputFromChild2(transferBuffer, sink, execCxt);
 				}
 
 				someInputConsumed = true;
@@ -141,8 +137,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 					// calling 'transferAvailableOutput' may cause this thread to wait
 					input1.transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						for ( final SolutionMapping sm : transferBuffer )
-							op.processInputFromChild1(sm, sink, execCxt);
+						op.processInputFromChild1(transferBuffer, sink, execCxt);
 					}
 					else {
 						op.wrapUpForChild1(sink, execCxt);
@@ -153,8 +148,7 @@ public class PushBasedExecPlanTaskForBinaryOperator extends PushBasedExecPlanTas
 					// calling 'transferAvailableOutput)' may cause this thread to wait
 					input2.transferAvailableOutput(transferBuffer);
 					if ( ! transferBuffer.isEmpty() ) {
-						for ( final SolutionMapping sm : transferBuffer )
-							op.processInputFromChild2(sm, sink, execCxt);
+						op.processInputFromChild2(transferBuffer, sink, execCxt);
 					}
 					else {
 						op.wrapUpForChild2(sink, execCxt);

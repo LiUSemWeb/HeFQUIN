@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -75,6 +77,27 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	}
 
 	@Override
+	public final void processInputFromChild1(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		if ( collectExceptions ) {
+			try {
+				_processInputFromChild1(inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_processInputFromChild1(inputSolMaps, sink, execCxt);
+		}
+
+		numberOfLeftInputMappingsProcessed += inputSolMaps.size();
+	}
+
+	@Override
 	public final void wrapUpForChild1( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		leftInputConsumed = true;
@@ -111,6 +134,27 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 	}
 
 	@Override
+	public final void processInputFromChild2(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException
+	{
+		if ( collectExceptions ) {
+			try {
+				_processInputFromChild2(inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_processInputFromChild2(inputSolMaps, sink, execCxt);
+		}
+
+		numberOfRightInputMappingsProcessed += inputSolMaps.size();
+	}
+
+	@Override
 	public final void wrapUpForChild2( final IntermediateResultElementSink sink,
 	                                   final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		rightInputConsumed = true;
@@ -130,6 +174,26 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_processInputFromChild1(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _processInputFromChild1(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_processInputFromChild1(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Implementations of this function need to finish up any processing
@@ -160,6 +224,26 @@ public abstract class BinaryExecutableOpBase extends BaseForExecOps implements B
 			final SolutionMapping inputSolMap,
 			final IntermediateResultElementSink sink,
 			final ExecutionContext execCxt ) throws ExecOpExecutionException;
+
+	/**
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_processInputFromChild2(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _processInputFromChild2(
+			final List<SolutionMapping> inputSolMaps,
+			final IntermediateResultElementSink sink,
+			final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_processInputFromChild2(sm, sink, execCxt );
+		}
+	}
 
 	/**
 	 * Implementations of this function need to finish up any processing
