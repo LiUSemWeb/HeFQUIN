@@ -13,7 +13,14 @@
     <style>
         main {
             max-width: unset;
+            display: flex;
+            flex-direction: column;
         }
+        #javadocFrame {
+            flex: 1;
+            border: none;
+        }
+
     </style>
     <script>
         function constructJavadocUrl(page, fragment) {
@@ -60,7 +67,7 @@
     <div id="header"></div>
 
     <main>
-        <iframe id="javadocFrame" src="../doc/javadoc.html?page=index" width="100%" height="100%" style="border: none;"></iframe>
+        <iframe id="javadocFrame" src="../doc/javadoc.html?page=index"></iframe>
     </main>
 
     <div id="footer"></div>
