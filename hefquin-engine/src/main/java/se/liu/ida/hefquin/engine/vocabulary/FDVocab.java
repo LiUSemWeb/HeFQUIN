@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-public class FD
+public class FDVocab
 {
 	public static final String uri = "http://www.example.org/se/liu/ida/hefquin/fd#";
 
