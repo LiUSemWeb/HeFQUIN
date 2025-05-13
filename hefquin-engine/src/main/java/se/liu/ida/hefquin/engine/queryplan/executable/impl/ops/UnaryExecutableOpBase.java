@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
+import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -55,25 +55,24 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	}
 
 	@Override
-	public final void process( final Iterator<SolutionMapping> it,
+	public final void process( final List<SolutionMapping> inputSolMaps,
 	                           final IntermediateResultElementSink sink,
 	                           final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		int cnt = 0;
 		if ( collectExceptions ) {
 			try {
-				cnt = _process(it, sink, execCxt);
+				_process(inputSolMaps, sink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			cnt = _process(it, sink, execCxt);
+			_process(inputSolMaps, sink, execCxt);
 		}
 
-		numberOfInputMappingsProcessed += cnt;
+		numberOfInputMappingsProcessed += inputSolMaps.size();
 	}
 
 	@Override
@@ -107,10 +106,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	                                  final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
-	 * Processes the given input solution mappings by calling
+	 * Processes the input solution mappings of the given list by calling
 	 * {@link #_process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
-	 * for each of them and returns the number of input solution mappings
-	 * processed.
+	 * for each of them.
 	 *
 	 * Subclasses may override this behavior to send a greater number of output
 	 * solution mappings to the given sink at a time (which is useful to reduce
@@ -118,16 +116,13 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	 * If an exception occurs within the overriding implementation, then this
 	 * exception needs to be thrown.
 	 */
-	protected int _process( final Iterator<SolutionMapping> it,
-	                        final IntermediateResultElementSink sink,
-	                        final ExecutionContext execCxt )
+	protected void _process( final List<SolutionMapping> inputSolMaps,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt )
 			throws ExecOpExecutionException {
-		int cnt = 0;
-		while ( it.hasNext() ) {
-			_process( it.next(), sink, execCxt );
-			cnt++;
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_process(sm, sink, execCxt );
 		}
-		return cnt;
 	}
 
 	/**

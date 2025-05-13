@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -62,36 +61,37 @@ public class ExecOpBind extends UnaryExecutableOpBase
 	}
 
 	@Override
-	protected int _process( final Iterator<SolutionMapping> it,
-	                        final IntermediateResultElementSink sink,
-	                        final ExecutionContext execCxt )
+	protected void _process( final List<SolutionMapping> inputSolMaps,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt )
 		 throws ExecOpExecutionException
 	{
-		if ( ! it.hasNext() ) {
-			return 0;
+		if ( inputSolMaps.size() == 1 ) {
+			// If we have only a single input solution mapping,
+			// there will be only one output solution mapping.
+			// In contrast to the general case (below), we don't
+			// need to create a list to collect the output.
+			final SolutionMapping inputSolMap = inputSolMaps.get(0);
+			final SolutionMapping outputSolMap = worker.extend(inputSolMap);
+			sink.send(outputSolMap);
 		}
+		else if ( inputSolMaps.size() > 1 ) {
+			// If we have multiple input solution mappings, create
+			// a list to collect the output solution mappings.
+			final List<SolutionMapping> output = new ArrayList<>();
 
-		final SolutionMapping firstInputSolMap = it.next();
-		final SolutionMapping firstOutputSolMap = worker.extend(firstInputSolMap);
+			// Produce the output solution mappings and populate the
+			// list with them.
+			for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+				final SolutionMapping outputSolMap = worker.extend(inputSolMap);
+				output.add(outputSolMap);
+			}
 
-		if ( ! it.hasNext() ) {
-			sink.send(firstOutputSolMap);
-			numberOfOutputMappingsProduced++;
-			return 1;
+			sink.send(output);
 		}
+		// no else case here - nothing to do if inputSolMaps is empty
 
-		final List<SolutionMapping> output = new ArrayList<>();
-		output.add(firstOutputSolMap);
-
-		while ( it.hasNext() ) {
-			final SolutionMapping nextInputSolMap = it.next();
-			final SolutionMapping nextOutputSolMap = worker.extend(nextInputSolMap);
-			output.add(nextOutputSolMap);
-		}
-
-		sink.send(output);
-		numberOfOutputMappingsProduced += output.size();
-		return output.size();
+		numberOfOutputMappingsProduced += inputSolMaps.size();
 	}
 
 	@Override

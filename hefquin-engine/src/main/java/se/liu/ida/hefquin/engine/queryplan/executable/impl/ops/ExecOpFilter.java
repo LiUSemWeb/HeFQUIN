@@ -51,13 +51,14 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 	}
 
 	@Override
-	protected int _process( final Iterator<SolutionMapping> it,
-	                        final IntermediateResultElementSink sink,
-	                        final ExecutionContext execCxt ) {
-		// Consume the given iterator until either we find the first solution
+	protected void _process( final List<SolutionMapping> inputSolMaps,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt ) {
+		// Iterate over the given list until either we find the first solution
 		// mapping that satisfies all of the filter expressions of this operator
 		// and, thus, can be passed on as an output solution mapping, or until
-		// the end of the iterator.
+		// the end of the list.
+		final Iterator<SolutionMapping> it = inputSolMaps.iterator();
 		SolutionMapping firstOutput = null;
 		while ( it.hasNext() && firstOutput == null ) {
 			final SolutionMapping inputSolMap = it.next();
@@ -66,11 +67,11 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 			}
 		}
 
-		// Continue consuming the rest of the iterator (if any). If we find
+		// Continue consuming the rest of the list (if any). If we find
 		// further solution mappings that can be passed on as output, we
-		// collect them in a list, with the earlier-found first output
-		// solution mapping as the first list element. We create the list
-		// only in this case.
+		// collect them in an output list, with the earlier-found first
+		// output solution mapping as the first list element. We create
+		// the output list only in this case.
 		List<SolutionMapping> allOutput = null;
 		while ( it.hasNext() ) {
 			final SolutionMapping inputSolMap = it.next();
@@ -88,18 +89,14 @@ public class ExecOpFilter extends UnaryExecutableOpBase
 			}
 		}
 
+		// Send the produced output solution mappings to the given sink.
 		if ( allOutput != null ) {
 			sink.send(allOutput);
 			numberOfOutputMappingsProduced += allOutput.size();
-			return allOutput.size();
 		}
 		else if ( firstOutput != null ) {
 			sink.send(firstOutput);
 			numberOfOutputMappingsProduced++;
-			return 1;
-		}
-		else {
-			return 0;
 		}
 	}
 
