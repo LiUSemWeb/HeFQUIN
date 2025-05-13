@@ -14,9 +14,9 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.QueryCompilationException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
-public class IteratorBasedQueryPlanCompilerImpl extends QueryPlanCompilerBase
+public class QueryPlanCompilerForIteratorBasedExecution extends QueryPlanCompilerBase
 {
-	public IteratorBasedQueryPlanCompilerImpl( final QueryProcContext ctxt ) {
+	public QueryPlanCompilerForIteratorBasedExecution( final QueryProcContext ctxt ) {
 		super(ctxt);
 	}
 
