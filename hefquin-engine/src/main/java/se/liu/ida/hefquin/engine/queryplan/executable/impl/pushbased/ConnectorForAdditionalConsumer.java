@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ConnectorForAdditionalConsumer extends PushBasedExecPlanTaskBase implements IntermediateResultElementSink

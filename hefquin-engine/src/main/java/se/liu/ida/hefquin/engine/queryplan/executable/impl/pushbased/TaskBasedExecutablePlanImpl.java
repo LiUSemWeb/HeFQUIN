@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

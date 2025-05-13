@@ -9,11 +9,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskBase;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskStats;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**

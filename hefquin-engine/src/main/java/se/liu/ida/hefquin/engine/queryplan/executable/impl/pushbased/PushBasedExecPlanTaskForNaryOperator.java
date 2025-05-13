@@ -8,9 +8,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTask;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInputException;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecPlanTaskInterruptionException;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class PushBasedExecPlanTaskForNaryOperator extends PushBasedExecPlanTaskBase

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryplan.executable.impl;
+package se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased;
 
 import java.util.Arrays;
 import java.util.List;
