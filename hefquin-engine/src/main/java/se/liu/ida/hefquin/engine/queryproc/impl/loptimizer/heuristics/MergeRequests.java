@@ -176,17 +176,13 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 				}
 			}
 		}
-		else if ( rootOp instanceof LogicalOpBind bindOp )
+		else if ( rootOp instanceof LogicalOpBind )
 		{
-			// The BIND clause can be merged into a request operator if that request is for a SPARQL endpoint.
-			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
-			if ( childOp instanceof LogicalOpRequest reqOp ) {
-				if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-					return mergeBindIntoSPARQLEndpointRequest( bindOp,
-					                                           (SPARQLEndpoint) reqOp.getFederationMember(),
-					                                           (SPARQLRequest) reqOp.getRequest() );
-				}
-			}
+			// nothing to do here - while the BIND clause can be merged into
+			// a request operator if that request is for a SPARQL endpoint,
+			// unlike FILTER, for BIND this only increases the size of the solution
+			// mappings returned from the endpoint. The optimizer should instead
+			// retain the BIND outside the request.
 		}
 		else if (    rootOp instanceof LogicalOpLocalToGlobal
 		          || rootOp instanceof LogicalOpGlobalToLocal )
