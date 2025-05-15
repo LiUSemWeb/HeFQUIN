@@ -3,13 +3,10 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
@@ -182,25 +179,12 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 		else if ( rootOp instanceof LogicalOpBind bindOp )
 		{
 			// The BIND clause can be merged into a request operator if that request is for a SPARQL endpoint.
-			final LogicalOperator childOp = rewrittenSubPlans.get( 0 ).getRootOperator();
+			final LogicalOperator childOp = rewrittenSubPlans.get(0).getRootOperator();
 			if ( childOp instanceof LogicalOpRequest reqOp ) {
 				if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-					// vars defined by the bind operator
-					final List<Var> bindVars = bindOp.getBindExpressions().getVars();
-
-					// vars mentioned in the request operator
-					final Set<Var> varsInReqOp = new HashSet<>();
-					varsInReqOp.addAll( reqOp.getExpectedVariables().getCertainVariables() );
-					varsInReqOp.addAll( reqOp.getExpectedVariables().getPossibleVariables() );
-
-					// if the var is not used in the child operator pushing would
-					// only increase the size of the returned solutions mappings
-					if ( ! Collections.disjoint( bindVars, varsInReqOp ) ) {
-						return mergeBindIntoSPARQLEndpointRequest(
-								bindOp,
-								(SPARQLEndpoint) reqOp.getFederationMember(),
-								(SPARQLRequest) reqOp.getRequest() );
-					}
+					return mergeBindIntoSPARQLEndpointRequest( bindOp,
+					                                           (SPARQLEndpoint) reqOp.getFederationMember(),
+					                                           (SPARQLRequest) reqOp.getRequest() );
 				}
 			}
 		}
