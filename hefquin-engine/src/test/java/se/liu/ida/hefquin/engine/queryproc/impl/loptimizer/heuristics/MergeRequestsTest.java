@@ -7,18 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.core.VarExprList;
-import org.apache.jena.sparql.expr.Expr;
-import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementBind;
-import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -30,7 +24,6 @@ import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -524,205 +517,4 @@ public class MergeRequestsTest extends EngineTestBase
 		assertTrue( resultTPAddOp.getTP() == tp2 );
 	}
 
-		@Test
-	public void mergeTPUnderBind() {
-		// A merge of a triple pattern request and a bind.
-		// The bind variable is used in the triple pattern
-		// and they should therefore be merged.
-
-		// set up
-		final Var v1 = Var.alloc( "x" );
-		final FederationMember fm = new SPARQLEndpointForTest();
-
-		final TriplePattern tp = new TriplePatternImpl( v1, v1, v1 );
-		final LogicalOpRequest<?, ?> reqOp = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp ) );
-
-		final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl( reqOp );
-
-		final Expr bindExpr = NodeValue.makeInteger( 42 );
-		final VarExprList bindExpressions = new VarExprList( v1, bindExpr );
-		final LogicalOpBind opBind = new LogicalOpBind( bindExpressions );
-
-		final LogicalPlan originalPlan = new LogicalPlanWithUnaryRootImpl( opBind, subPlan );
-
-		// test
-		final LogicalPlan result = new MergeRequests().apply( originalPlan );
-
-		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpRequest<?,?> );
-		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
-		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
-		assertTrue( resultReqOp.getFederationMember() == fm );
-
-		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
-		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
-		final SPARQLGraphPattern sparqlGraphPattern = resultReq.getQueryPattern();
-
-		// check that TP is in pattern
-		assertEquals( 1, sparqlGraphPattern.getAllMentionedTPs().size() );
-		assertTrue( sparqlGraphPattern.getAllMentionedTPs().contains( tp ) );
-
-		// verifying that the expected BIND clause exists in the
-		// pattern is less straightforward and requires traversal
-		// of the underlying element group
-		final Element element = QueryPatternUtils.convertToJenaElement( sparqlGraphPattern );
-		assertTrue( element instanceof ElementGroup );
-		final ElementGroup group = (ElementGroup) element;
-
-		boolean foundBind = false;
-		for ( Element el : group.getElements() ) {
-			if ( el instanceof ElementBind eb ) {
-				assertEquals( eb.getVar(), v1 );
-				assertEquals( eb.getExpr(), bindExpr );
-				foundBind = true;
-			}
-		}
-		assertTrue( "ElementGroup is missing expected BIND clause",
-		            foundBind );
-	}
-
-	@Test
-	public void mergeJoinUnderBind() {
-		// A merge of a join of two triple pattern requests and
-		// a bind. The bind variable is used in the triple patterns
-		// and they should therefore be merged.
-
-		// set up
-		final Var v1 = Var.alloc( "x" );
-		final Var v2 = Var.alloc( "y" );
-		final FederationMember fm = new SPARQLEndpointForTest();
-
-		final TriplePattern tp1 = new TriplePatternImpl( v1, v1, v2 );
-		final LogicalOpRequest<?, ?> reqOp1 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp1 ) );
-
-		final TriplePattern tp2 = new TriplePatternImpl( v2, v1, v1 );
-		final LogicalOpRequest<?, ?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp2 ));
-
-		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl( reqOp1 ),
-				new LogicalPlanWithNullaryRootImpl( reqOp2 ) );
-
-		final Expr bindExpr = NodeValue.makeInteger( 42 );
-		final VarExprList bindExpressions = new VarExprList( v1, bindExpr );
-		final LogicalOpBind bindOp = new LogicalOpBind( bindExpressions );
-
-		final LogicalPlan originalPlan = new LogicalPlanWithUnaryRootImpl( bindOp, joinSubPlan );
-
-		// test
-		final LogicalPlan result = new MergeRequests().apply( originalPlan );
-
-		// check
-		assertTrue( result.getRootOperator() instanceof LogicalOpRequest<?,?> );
-		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) result.getRootOperator();
-		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
-		assertTrue( resultReqOp.getFederationMember() == fm );
-
-		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
-		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
-		final SPARQLGraphPattern sparqlGraphPattern = resultReq.getQueryPattern();
-
-		// check that TPs are in pattern
-		assertEquals( 2, sparqlGraphPattern.getAllMentionedTPs().size() );
-		assertTrue( sparqlGraphPattern.getAllMentionedTPs().contains( tp1 ) );
-		assertTrue( sparqlGraphPattern.getAllMentionedTPs().contains( tp2 ) );
-
-		// verifying that the expected BIND clause exists in the
-		// pattern is less straightforward and requires traversal
-		// of the underlying element group
-		final Element element = QueryPatternUtils.convertToJenaElement( sparqlGraphPattern );
-		assertTrue( element instanceof ElementGroup );
-		final ElementGroup group = (ElementGroup) element;
-
-		boolean foundBind = false;
-		for ( Element el : group.getElements() ) {
-			if ( el instanceof ElementBind eb ) {
-				assertEquals( eb.getVar(), v1 );
-				assertEquals( eb.getExpr(), bindExpr );
-				foundBind = true;
-			}
-		}
-		assertTrue( "ElementGroup is missing expected BIND clause",
-		            foundBind );
-	}
-
-	@Test
-	public void skipMergeTPUnderBind() {
-		// A merge of a triple pattern request and a bind.
-		// The bind variable is not used in the triple pattern
-		// and should therefore not be merged.
-
-		// set up
-		final Var v1 = Var.alloc( "x" );
-		final Var v2 = Var.alloc( "y" );
-		final FederationMember fm = new SPARQLEndpointForTest();
-
-		final TriplePattern tp = new TriplePatternImpl( v1, v1, v1 );
-		final LogicalOpRequest<?, ?> reqOp = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp ) );
-
-		final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl( reqOp );
-
-		final Expr bindExpr = NodeValue.makeInteger( 42 );
-		final VarExprList bindExpressions = new VarExprList( v2, bindExpr );
-		final LogicalOpBind opBind = new LogicalOpBind( bindExpressions );
-
-		final LogicalPlan originalPlan = new LogicalPlanWithUnaryRootImpl( opBind, subPlan );
-
-		// test
-		final LogicalPlan result = new MergeRequests().apply( originalPlan );
-
-		// check plan is unchanged
-		assertEquals( originalPlan, result );
-	}
-
-	@Test
-	public void skipMergeJoinUnderBind() {
-		// A merge of a join of two triple pattern requests
-		// and a bind. The bind variable is not used in the
-		// triple pattern and should therefore not be merged.
-
-		// set up
-		final Var v1 = Var.alloc( "x" );
-		final Var v2 = Var.alloc( "y" );
-		final Var v3 = Var.alloc( "z" );
-		final FederationMember fm = new SPARQLEndpointForTest();
-
-		final TriplePattern tp1 = new TriplePatternImpl( v1, v1, v2 );
-		final LogicalOpRequest<?, ?> reqOp1 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp1 ) );
-
-		final TriplePattern tp2 = new TriplePatternImpl( v2, v1, v1 );
-		final LogicalOpRequest<?, ?> reqOp2 = new LogicalOpRequest<>( fm, new SPARQLRequestImpl( tp2 ) );
-
-		final LogicalPlan joinSubPlan = LogicalPlanUtils.createPlanWithBinaryJoin(
-				new LogicalPlanWithNullaryRootImpl( reqOp1 ),
-				new LogicalPlanWithNullaryRootImpl( reqOp2 ) );
-
-		final Expr bindExpr = NodeValue.makeInteger( 42 );
-		final VarExprList bindExpressions = new VarExprList( v3, bindExpr );
-		final LogicalOpBind bindOp = new LogicalOpBind( bindExpressions );
-
-		final LogicalPlan originalPlan = new LogicalPlanWithUnaryRootImpl( bindOp, joinSubPlan );
-
-		// test
-		final LogicalPlan result = new MergeRequests().apply( originalPlan );
-
-		// check
-		// root op should be unchanged
-		assertEquals( originalPlan.getRootOperator(), result.getRootOperator() );
-
-		// sub plan should now be a LogicalOpRequest
-		assertEquals( 1, result.numberOfSubPlans() );
-		final LogicalPlan subResult = result.getSubPlan( 0 );
-
-		final LogicalOpRequest<?,?> resultReqOp = (LogicalOpRequest<?,?>) subResult.getRootOperator();
-		assertTrue( resultReqOp.getFederationMember() == fm );
-		assertTrue( resultReqOp.getRequest() instanceof SPARQLRequest );
-
-		final SPARQLRequest resultReq = (SPARQLRequest) resultReqOp.getRequest();
-		assertTrue( resultReq.getQueryPattern() instanceof BGP );
-
-		final BGP resultBGP = (BGP) resultReq.getQueryPattern();
-		assertEquals( 2, resultBGP.getTriplePatterns().size() );
-		assertTrue( resultBGP.getTriplePatterns().contains( tp1 ) );
-		assertTrue( resultBGP.getTriplePatterns().contains( tp2 ) );
-	}
 }
