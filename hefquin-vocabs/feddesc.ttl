@@ -25,12 +25,12 @@ fd:FederationMember a owl:Class ;
 
 fd:Interface a owl:Class ;
     rdfs:label "Interface"@en ;
-    rdfs:comment "An interface is the general superclass for all types of interfaces through which a federation member can be queried, including SPARQL interfaces, and fragment interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
+    rdfs:comment "An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
 fd:EndpointInterface a owl:Class ;
     rdfs:subClassOf fd:Interface ;
     rdfs:label "Endpoint Interface"@en ;
-    rdfs:comment "An endpoint interface is the general superclass for all types of interfaces through which a federation member can be queried using a single endpoint, including SPARQL interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
+    rdfs:comment "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
 fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
