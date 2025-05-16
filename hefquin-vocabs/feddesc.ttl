@@ -25,7 +25,7 @@ fd:FederationMember a owl:Class ;
 
 fd:EndpointInterface a owl:Class ;
     rdfs:label "Endpoint Interface"@en ;
-    rdfs:comment "An interface to access a federation member."@en .
+    rdfs:comment "An endpoint interface is an interface to request a dataset or fragment (i.e., a specific subset) of a dataset from a federation member. This class is the general superclass for all types of interfaces through which a federation member can be queried, including SPARQL interfaces, and fragment interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
 
 fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
