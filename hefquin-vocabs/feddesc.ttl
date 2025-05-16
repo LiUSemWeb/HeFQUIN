@@ -14,8 +14,8 @@
     dc:identifier    <http://w3id.org/hefquin/feddesc> ;
     dc:title         "Federation Description Vocabulary for HeFQUIN"@en ;
     rdfs:label       "Federation Description Vocabulary for HeFQUIN"@en ;
-    dc:description   "An RDF vocabulary for describing members of a federation and their interfaces in the HeFQUIN engine."@en ;
-    rdfs:comment     "An RDF vocabulary for describing members of a federation and their interfaces in the HeFQUIN engine."@en .
+    dc:description   "An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine."@en ;
+    rdfs:comment     "An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine."@en .
 
 ### ===== CLASS DECLARATIONS =====
 
