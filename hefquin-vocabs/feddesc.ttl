@@ -32,13 +32,18 @@ fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:label "SPARQL Endpoint Interface"@en ;
     rdfs:comment "An interface to access a federation member via the SPARQL protocol."@en .
 
-fd:TPFInterface a owl:Class ;
+fd:FragmentInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "Fragment Interface"@en ;
+    rdfs:comment "An interface to access a federation member via pattern fragments, such as Triple Pattern Fragments or Bindings-Restricted Triple Pattern Fragments."@en .
+
+fd:TPFInterface a owl:Class ;
+    rdfs:subClassOf fd:FragmentInterface ;
     rdfs:label "TPF Interface"@en ;
     rdfs:comment "An interface to access a federation member via Triple Pattern Fragments."@en .
 
 fd:brTPFInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:subClassOf fd:FragmentInterface ;
     rdfs:label "brTPF Interface"@en ;
     rdfs:comment "An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments."@en .
 
@@ -67,10 +72,10 @@ fd:endpointAddress a rdf:Property ;
     rdfs:comment "The network address (URI) of the endpoint of the federation member."@en .
 
 fd:exampleFragmentAddress a rdf:Property ;
-    rdfs:domain fd:TPFInterface ;
+    rdfs:domain fd:FragmentInterface ;
     rdfs:range  xsd:anyURI ;
     rdfs:label "example fragment address"@en ;
-    rdfs:comment "An example URL of a fragment for TPF interfaces."@en .
+    rdfs:comment "An example URL of a fragment for pattern fragment interfaces."@en .
 
 fd:vocabularyMappingsFile a rdf:Property ;
     rdfs:domain fd:FederationMember ;
