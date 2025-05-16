@@ -35,7 +35,7 @@ fd:SPARQLEndpointInterface a owl:Class ;
 fd:FragmentInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
     rdfs:label "Fragment Interface"@en ;
-    rdfs:comment "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not meant to be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+    rdfs:comment "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
 fd:TPFInterface a owl:Class ;
     rdfs:subClassOf fd:FragmentInterface ;
