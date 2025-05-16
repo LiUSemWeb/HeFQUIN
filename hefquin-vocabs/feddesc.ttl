@@ -23,9 +23,14 @@ fd:FederationMember a owl:Class ;
     rdfs:label "Federation Member"@en ;
     rdfs:comment "An entity that is part of the federation and provides data via a specific interface."@en .
 
+fd:Interface a owl:Class ;
+    rdfs:label "Interface"@en ;
+    rdfs:comment "An interface is the general superclass for all types of interfaces through which a federation member can be queried, including SPARQL interfaces, and fragment interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
+
 fd:EndpointInterface a owl:Class ;
+    rdfs:subClassOf fd:Interface ;
     rdfs:label "Endpoint Interface"@en ;
-    rdfs:comment "An endpoint interface is the general superclass for all types of interfaces through which a federation member can be queried, including SPARQL interfaces, and fragment interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
+    rdfs:comment "An endpoint interface is the general superclass for all types of interfaces through which a federation member can be queried using a single endpoint, including SPARQL interfaces. It should not be instantiated directly in federation descriptions, instead, concrete subclasses should be used to specify the type of interface."@en .
 
 fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:subClassOf fd:EndpointInterface ;
@@ -33,7 +38,7 @@ fd:SPARQLEndpointInterface a owl:Class ;
     rdfs:comment "An interface to access a federation member via the SPARQL protocol."@en .
 
 fd:FragmentInterface a owl:Class ;
-    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:subClassOf fd:Interface ;
     rdfs:label "Fragment Interface"@en ;
     rdfs:comment "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
 
@@ -61,7 +66,7 @@ fd:GraphQLEndpointInterface a owl:Class ;
 
 fd:interface a rdf:Property ;
     rdfs:domain fd:FederationMember ;
-    rdfs:range  fd:EndpointInterface ;
+    rdfs:range  fd:Interface ;
     rdfs:label "interface"@en ;
     rdfs:comment "The interface description for accessing the federation member."@en .
 
