@@ -25,7 +25,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void twoFMs() {
 		final String turtle =
-				  "PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				  "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 				+ "PREFIX ex:     <http://example.org/>\n"
 				+ "\n"
 				+ "ex:dbpediaSPARQL\n"
@@ -63,7 +63,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -73,7 +73,7 @@ public class FederationDescriptionReaderTest
 						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
 
 		final Model fd = ModelFactory.createDefaultModel();
-
+		FederationDescriptionReader.readFromModel(fd);
 		final RDFParserBuilder b = RDFParser.fromString(turtle);
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
@@ -90,7 +90,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -116,7 +116,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
@@ -142,7 +142,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
@@ -168,7 +168,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromClasspathResource() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -190,7 +190,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromLocalPath() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -212,7 +212,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void missingVocabularyMappingFileThrowsExpectedException() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
