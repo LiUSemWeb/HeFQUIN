@@ -168,7 +168,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromClasspathResource() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -190,7 +190,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void vocabularyMappingFileIsLoadedFromLocalPath() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -212,7 +212,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void missingVocabularyMappingFileThrowsExpectedException() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
