@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
@@ -46,11 +46,21 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
  */
 public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 {
+	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
+
+	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
+	                                       final SPARQLEndpoint fm,
+	                                       final boolean useOuterJoinSemantics,
+	                                       final int batchSize,
+	                                       final boolean collectExceptions ) {
+		super(query, fm, useOuterJoinSemantics, batchSize, collectExceptions);
+	}
+
 	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
 	                                       final boolean useOuterJoinSemantics,
 	                                       final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, collectExceptions);
+		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
 	}
 
 	@Override

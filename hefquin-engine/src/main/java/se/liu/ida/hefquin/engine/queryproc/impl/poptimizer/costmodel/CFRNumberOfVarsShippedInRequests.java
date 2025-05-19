@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
@@ -12,8 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 
 public class CFRNumberOfVarsShippedInRequests extends CFRBase
@@ -31,23 +30,21 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		final int numberOfJoinVars;
 		final CompletableFuture<Integer> futureIntResSize;
 
-		if ( lop instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) lop;
-			numberOfVars = QueryPatternUtils.getNumberOfVarOccurrences( tpAdd.getTP() );
+		if ( lop instanceof LogicalOpTPAdd tpAdd ) {
+			numberOfVars = tpAdd.getTP().getNumberOfVarMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan(tpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqTP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqTP).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
 		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) lop;
-			numberOfVars = QueryPatternUtils.getNumberOfVarOccurrences( bgpAdd.getBGP() );
+		else if ( lop instanceof LogicalOpBGPAdd bgpAdd ) {
+			numberOfVars = bgpAdd.getBGP().getNumberOfVarMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan(bgpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
 
 			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
 				futureIntResSize = null; // irrelevant
@@ -55,13 +52,12 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 				futureIntResSize = initiateCardinalityEstimation(subplan);
 			}
 		}
-		else if ( lop instanceof LogicalOpGPAdd ) {
-			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
-			numberOfVars = QueryPatternUtils.getNumberOfVarOccurrences( gpAdd.getPattern() );
+		else if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			numberOfVars = gpAdd.getPattern().getNumberOfVarMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
 			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
-			numberOfJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(subplan,reqGP).size();
+			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqGP).size();
 
 			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
 				futureIntResSize = null; // irrelevant
@@ -69,28 +65,23 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 				futureIntResSize = initiateCardinalityEstimation(subplan);
 			}
 		}
-		else if ( lop instanceof LogicalOpRequest ) {
-			final DataRetrievalRequest req = ((LogicalOpRequest<?, ?>) lop).getRequest();
-			if ( req instanceof TriplePatternRequest ) {
-				final TriplePatternRequest tpReq = (TriplePatternRequest) req;
-				numberOfVars = tpReq.getQueryPattern().numberOfVars();
-			}
-			else if ( req instanceof SPARQLRequest ) {
-				final SPARQLRequest sparqlReq = (SPARQLRequest) req;
-				numberOfVars = QueryPatternUtils.getNumberOfVarOccurrences( sparqlReq.getQueryPattern() );
-			}
-			else {
+		else if ( lop instanceof LogicalOpRequest reqOp ) {
+			final DataRetrievalRequest req = reqOp.getRequest();
+			if ( req instanceof TriplePatternRequest tpReq )
+				numberOfVars = tpReq.getQueryPattern().getNumberOfVarMentions();
+			else if ( req instanceof SPARQLRequest sparqlReq )
+				numberOfVars = sparqlReq.getQueryPattern().getNumberOfVarMentions();
+			else
 				throw createIllegalArgumentException(req);
-			}
+
 			numberOfJoinVars = 0;    // irrelevant for request operators
 			futureIntResSize = null; // irrelevant for request operators
 		}
-		else if ( lop instanceof LogicalOpJoin
-				|| lop instanceof LogicalOpUnion
-				|| lop instanceof LogicalOpMultiwayUnion
-				|| lop instanceof LogicalOpLocalToGlobal
-				|| lop instanceof LogicalOpGlobalToLocal
-		) {
+		else if (    lop instanceof LogicalOpJoin
+		          || lop instanceof LogicalOpUnion
+		          || lop instanceof LogicalOpMultiwayUnion
+		          || lop instanceof LogicalOpLocalToGlobal
+		          || lop instanceof LogicalOpGlobalToLocal ) {
 			numberOfVars = 0;        // irrelevant for join operators
 			numberOfJoinVars = 0;    // irrelevant for join operators
 			futureIntResSize = null; // irrelevant for join operators
@@ -102,11 +93,11 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		// cases in which the cost value depends on some intermediate
 		// result size, which needs to be fetched first
 		if (    pop instanceof PhysicalOpIndexNestedLoopsJoin
-				|| pop instanceof PhysicalOpBindJoinWithUNION ) {
+		     || pop instanceof PhysicalOpBindJoinWithUNION ) {
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
 		}
 		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-				|| pop instanceof PhysicalOpBindJoin ) {
+		          || pop instanceof PhysicalOpBindJoin ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
 		}
 
@@ -118,11 +109,11 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		else if ( pop instanceof PhysicalOpRequest ) {
 			costValue = numberOfVars;
 		}
-		else if ( pop instanceof BaseForPhysicalOpBinaryJoin
-				|| pop instanceof PhysicalOpBinaryUnion
-				|| pop instanceof PhysicalOpMultiwayUnion
-				|| pop instanceof PhysicalOpGlobalToLocal
-				|| pop instanceof PhysicalOpLocalToGlobal ) {
+		else if (    pop instanceof BaseForPhysicalOpBinaryJoin
+		          || pop instanceof PhysicalOpBinaryUnion
+		          || pop instanceof PhysicalOpMultiwayUnion
+		          || pop instanceof PhysicalOpGlobalToLocal
+		          || pop instanceof PhysicalOpLocalToGlobal ) {
 			costValue = 0;
 		}
 		else {

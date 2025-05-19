@@ -1,8 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
+import java.util.List;
+
+import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -12,86 +14,124 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * Top-level base class for all implementations of {@link UnaryExecutableOp}.
  *
  * This base class handles the collection of statistics about both the input
- * and the processing times per input block. To this end, it implements the
- * major methods of the {@link UnaryExecutableOp} interface, where the actual
- * functionality to be implemented for these methods needs to be provided by
- * implementing two abstract functions in each sub-class of this base class.
- * These two functions are:
+ * and the processing times per input solution mapping. To this end, it
+ * implements the major methods of the {@link UnaryExecutableOp} interface,
+ * where the actual functionality to be implemented for these methods needs
+ * to be provided by implementing two abstract functions in each sub-class of
+ * this base class. These two functions are:
  * <ul>
- * <li>{@link #_process(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)} and</li>
+ * <li>{@link #_processBatch(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)} and</li>
  * <li>{@link #_concludeExecution(IntermediateResultElementSink, ExecutionContext)}.</li>
  * </ul>
  */
 public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp
 {
-	private boolean executionConcluded          = false;
-	private int numberOfInputBlocksProcessed    = 0;
+	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
-	private long sumOfProcessingTimes           = 0L;
-	private long minProcessingTime              = Long.MAX_VALUE;
-	private long maxProcessingTime              = 0L;
-	protected long timeAtCurrentProcStart       = 0L;
 
 	public UnaryExecutableOpBase( final boolean collectExceptions ) {
 		super(collectExceptions);
 	}
 
 	@Override
-	public final void process( final IntermediateResultBlock input,
+	public final void process( final SolutionMapping inputSolMap,
 	                           final IntermediateResultElementSink sink,
-	                           final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		timeAtCurrentProcStart = System.currentTimeMillis();
-
+	                           final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
 		if ( collectExceptions ) {
 			try {
-				_process(input, sink, execCxt);
+				_process(inputSolMap, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_process(inputSolMap, sink, execCxt);
+		}
+
+		numberOfInputMappingsProcessed++;
+	}
+
+	@Override
+	public final void process( final List<SolutionMapping> inputSolMaps,
+	                           final IntermediateResultElementSink sink,
+	                           final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		if ( collectExceptions ) {
+			try {
+				_process(inputSolMaps, sink, execCxt);
+			}
+			catch ( final ExecOpExecutionException e ) {
+				recordExceptionCaughtDuringExecution(e);
+			}
+		}
+		else {
+			_process(inputSolMaps, sink, execCxt);
+		}
+
+		numberOfInputMappingsProcessed += inputSolMaps.size();
+	}
+
+	@Override
+	public final void concludeExecution( final IntermediateResultElementSink sink,
+	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
+		if ( collectExceptions ) {
+			try {
+				_concludeExecution(sink, execCxt);
 			}
 			catch ( ExecOpExecutionException e ) {
 				recordExceptionCaughtDuringExecution(e);
 			}
 		}
 		else {
-			_process(input, sink, execCxt);
+			_concludeExecution(sink, execCxt);
 		}
-
-		final long processingTime = System.currentTimeMillis() - timeAtCurrentProcStart;
-
-		sumOfProcessingTimes += processingTime;
-		if ( processingTime < minProcessingTime ) { minProcessingTime = processingTime; }
-		if ( processingTime > maxProcessingTime ) { maxProcessingTime = processingTime; }
-
-		numberOfInputMappingsProcessed += input.size();
-		numberOfInputBlocksProcessed++;
-	}
-
-	@Override
-	public final void concludeExecution( final IntermediateResultElementSink sink,
-	                                     final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		_concludeExecution(sink, execCxt);
 
 		executionConcluded = true;
 	}
 
 	/**
-	 * Implementations of this function need to process the given input block
-	 * and send the produced result elements (if any) to the given sink.
+	 * Implementations of this function need to process the given solution
+	 * mapping as input and send the produced result elements (if any) to
+	 * the given sink.
 	 *
-	 * If an exception occurs while processing the input block, this exception
-	 * needs to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * If an exception occurs while processing the solution mapping, then
+	 * this exception needs to be thrown.
 	 */
-	protected abstract void _process( final IntermediateResultBlock input,
+	protected abstract void _process( final SolutionMapping inputSolMap,
 	                                  final IntermediateResultElementSink sink,
 	                                  final ExecutionContext execCxt ) throws ExecOpExecutionException;
 
 	/**
-	 * Implementations of this function need to conclude the execution of
-	 * this operator and send the remaining result elements (if any) to the
-	 * given sink.
+	 * Processes the input solution mappings of the given list by calling
+	 * {@link #_process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)}
+	 * for each of them.
+	 *
+	 * Subclasses may override this behavior to send a greater number of output
+	 * solution mappings to the given sink at a time (which is useful to reduce
+	 * the communication between threads in the push-based execution model).
+	 * If an exception occurs within the overriding implementation, then this
+	 * exception needs to be thrown.
+	 */
+	protected void _process( final List<SolutionMapping> inputSolMaps,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt )
+			throws ExecOpExecutionException {
+		for ( final SolutionMapping sm : inputSolMaps ) {
+			_process(sm, sink, execCxt );
+		}
+	}
+
+	/**
+	 * Implementations of this function need to conclude the execution of this
+	 * operator and send the remaining result elements (if any) to the given
+	 * sink.
 	 *
 	 * If an exception occurs during this process, then this exception needs
-	 * to either be collected or be thrown, depending on whether {@link
-	 * BaseForExecOps#collectExceptions} is set to <code>true</code>.
+	 * to be thrown.
 	 */
 	protected abstract void _concludeExecution( final IntermediateResultElementSink sink,
 	                                            final ExecutionContext execCxt ) throws ExecOpExecutionException;
@@ -100,12 +140,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	@Override
 	public void resetStats() {
 		executionConcluded             = false;
-		numberOfInputBlocksProcessed   = 0;
 		numberOfInputMappingsProcessed = 0L;
-		sumOfProcessingTimes           = 0L;
-		minProcessingTime              = Long.MAX_VALUE;
-		maxProcessingTime              = 0L;
-		timeAtCurrentProcStart         = 0L;
 	}
 
 	@Override
@@ -115,17 +150,8 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
-
-		final double avgProcTime = (numberOfInputBlocksProcessed==0)
-				? 0 : sumOfProcessingTimes/numberOfInputBlocksProcessed;
-
-		s.put( "executionConcluded",              Boolean.valueOf(executionConcluded) );
-		s.put( "numberOfInputBlocksProcessed",    Integer.valueOf(numberOfInputBlocksProcessed) );
-		s.put( "numberOfInputMappingsProcessed",  Long.valueOf(numberOfInputMappingsProcessed) );
-		s.put( "totalProcTimeForAllInputBlocks",  Long.valueOf(sumOfProcessingTimes) );
-		s.put( "averageProcTimePerInputBlock",    Double.valueOf(avgProcTime) );
-		s.put( "minimumProcTimePerInputBlock",    Long.valueOf(minProcessingTime) );
-		s.put( "maximumProcTimePerInputBlock",    Long.valueOf(maxProcessingTime) );
+		s.put( "executionConcluded",                Boolean.valueOf(executionConcluded) );
+		s.put( "numberOfInputMappingsProcessed",    Long.valueOf(numberOfInputMappingsProcessed) );
 		return s;
 	}
 

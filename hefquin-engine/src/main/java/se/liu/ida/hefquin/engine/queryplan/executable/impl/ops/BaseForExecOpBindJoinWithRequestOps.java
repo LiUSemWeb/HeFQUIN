@@ -15,7 +15,6 @@ import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -27,34 +26,39 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  *
  * The implementation is generic in the sense that it works with any type of
  * request operator. Each concrete implementation that extends this base class
- * needs to implement the {@link #createExecutableReqOp(Iterable)}
- * function to create the request operators with the types of requests that
- * are specific to that concrete implementation.
+ * needs to implement the {@link #createExecutableReqOp(Iterable)} function to
+ * create the request operators with the types of requests that are specific
+ * to that concrete implementation.
  *
  * This implementation is capable of separating out each input solution mapping
  * that assigns a blank node to any of the join variables. Then, such solution
  * mappings are not even considered when creating the requests because they
  * cannot have any join partners in the results obtained from the federation
- * member. Of course, in case the algorithm is used under outer-join semantics
+ * member. Of course, in case the algorithm is used with outer-join semantics,
  * these solution mappings are still returned to the output (without joining
  * them with anything).
  *
  * Another capability of this implementation is that, instead of simply using
- * every input block of solution mappings to directly create a corresponding
- * bind-join request, this implementation can split the input block into
- * smaller blocks for the requests. On top of that, in case a request operator
- * fails, this implementation automatically reduces the block size for requests 
- * and, then, tries to re-process (with the reduced request block size) the
+ * every input batch of solution mappings to directly create a corresponding
+ * bind-join request, this implementation can split the input batch into
+ * smaller batch for the requests. On top of that, in case a request operator
+ * fails, this implementation automatically reduces the batch size for requests
+ * and, then, tries to re-process (with the reduced request batch size) the
  * input solution mappings for which the request operator failed.
  *
  * A potential downside of the latter capability is that, if this algorithm
- * has to execute multiple requests per input block, then these requests are
+ * has to execute multiple requests per input batch, then these requests are
  * executed sequentially.
  */
 public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
                                                           MemberType extends FederationMember>
-           extends BaseForExecOpBindJoin<QueryType,MemberType>
+           extends UnaryExecutableOpBaseWithBatching
 {
+	public final static int DEFAULT_BATCH_SIZE = 30;
+
+	protected final QueryType query;
+	protected final MemberType fm;
+
 	protected final boolean useOuterJoinSemantics;
 	protected final Set<Var> varsInPatternForFM;
 
@@ -86,59 +90,86 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 *             can filter out input solution mappings that contain blank
 	 *             nodes for the join variables and, thus, cannot be joined
 	 *             with the solution mappings obtained via the requests
+	 * @param batchSize
+	 *             this value must not be smaller than {@link #minimumRequestBlockSize}
 	 */
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
 	                                            final boolean useOuterJoinSemantics,
 	                                            final Set<Var> varsInPatternForFM,
+	                                            final int batchSize,
 	                                            final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
+		super(batchSize, collectExceptions);
+
+		assert query != null;
+		assert fm != null;
+		assert batchSize >= minimumRequestBlockSize;
+
+		this.query = query;
+		this.fm = fm;
+
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
 		this.varsInPatternForFM = varsInPatternForFM;
-		this.requestBlockSize = preferredInputBlockSize();
+		this.requestBlockSize = batchSize;
 	}
 
+	/**
+	 * @param batchSize this value must not be smaller than
+	 *                  {@link #minimumRequestBlockSize}
+	 */
 	public BaseForExecOpBindJoinWithRequestOps( final QueryType query,
 	                                            final MemberType fm,
 	                                            final boolean useOuterJoinSemantics,
+	                                            final int batchSize,
 	                                            final boolean collectExceptions ) {
-		this(query, fm, useOuterJoinSemantics, null, collectExceptions);
+		this(query, fm, useOuterJoinSemantics, null, batchSize, collectExceptions);
 	}
 
 	@Override
-	protected void _process( final IntermediateResultBlock input,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
+	protected void _processBatch( final List<SolutionMapping> batchOfSolMaps,
+	                              final IntermediateResultElementSink sink,
+	                              final ExecutionContext execCxt )
+			throws ExecOpExecutionException
 	{
 		final Iterable<SolutionMapping> inputSMsForJoin;
 		if ( varsInPatternForFM != null ) {
 			final List<SolutionMapping> unjoinableInputSMs = new ArrayList<>();
 			final List<SolutionMapping> joinableInputSMs = new ArrayList<>();
 
-			extractUnjoinableInputSMs( input.getSolutionMappings(),
+			extractUnjoinableInputSMs( batchOfSolMaps,
 			                           varsInPatternForFM,
 			                           unjoinableInputSMs,
 			                           joinableInputSMs );
 
 			if ( useOuterJoinSemantics ) {
-				for ( final SolutionMapping sm : unjoinableInputSMs ) {
-					numberOfOutputMappingsProduced++;
-					sink.send(sm);
-				}
+				numberOfOutputMappingsProduced += unjoinableInputSMs.size();
+				sink.send(unjoinableInputSMs);
 			}
 
 			inputSMsForJoin = joinableInputSMs;
 		}
 		else {
-			inputSMsForJoin = input.getSolutionMappings();
+			inputSMsForJoin = batchOfSolMaps;
 		}
 
-		_process( inputSMsForJoin, sink, execCxt );
+		_processJoinableInput( inputSMsForJoin, sink, execCxt );
 	}
 
-	protected void _process( final Iterable<SolutionMapping> joinableInputSMs,
-	                         final IntermediateResultElementSink sink,
-	                         final ExecutionContext execCxt ) throws ExecOpExecutionException
+	@Override
+	protected void _concludeExecution( final List<SolutionMapping> batchOfSolMaps,
+	                                   final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		if ( batchOfSolMaps != null && ! batchOfSolMaps.isEmpty() ) {
+			_processBatch(batchOfSolMaps, sink, execCxt);
+		}
+	}
+
+	protected void _processJoinableInput( final Iterable<SolutionMapping> joinableInputSMs,
+	                                      final IntermediateResultElementSink sink,
+	                                      final ExecutionContext execCxt )
+			throws ExecOpExecutionException
 	{
 		final Iterator<SolutionMapping> it = joinableInputSMs.iterator();
 		while ( it.hasNext() ) {
@@ -157,7 +188,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	protected void _processWithoutSplittingInputFirst( final List<SolutionMapping> joinableInputSMs,
 	                                                   final IntermediateResultElementSink sink,
-	                                                   final ExecutionContext execCxt ) throws ExecOpExecutionException
+	                                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
 	{
 		final NullaryExecutableOp reqOp = createExecutableReqOp(joinableInputSMs);
 
@@ -166,9 +198,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 			final MyIntermediateResultElementSink mySink;
 			if ( useOuterJoinSemantics )
-				mySink = new MyIntermediateResultElementSinkOuterJoin(sink, joinableInputSMs);
+				mySink = new MyIntermediateResultElementSinkOuterJoin(joinableInputSMs);
 			else
-				mySink = new MyIntermediateResultElementSink(sink, joinableInputSMs);
+				mySink = new MyIntermediateResultElementSink(joinableInputSMs);
 
 			try {
 				reqOp.execute(mySink, execCxt);
@@ -180,7 +212,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 					// mapping to the sink, then we can retry to process the
 					// given list of input solution mappings with the reduced
 					// request block size.
-					_process(joinableInputSMs, mySink, execCxt);
+					_processBatch(joinableInputSMs, mySink, execCxt);
 				}
 				else {
 					throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
@@ -188,6 +220,12 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 			}
 
 			mySink.flush();
+
+			final List<SolutionMapping> output = mySink.getSolMapsForOutput();
+			if ( ! output.isEmpty() ) {
+				numberOfOutputMappingsProduced += output.size();
+				sink.send(output);
+			}
 
 			statsOfLastReqOp = reqOp.getStats();
 			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
@@ -266,6 +304,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
+		s.put( "queryAsString",      query.toString() );
+		s.put( "fedMemberAsString",  fm.toString() );
 		s.put( "numberOfOutputMappingsProduced",  Long.valueOf(numberOfOutputMappingsProduced) );
 		s.put( "requestBlockSizeWasReduced",      Boolean.valueOf(requestBlockSizeWasReduced) );
 		s.put( "requestBlockSize",                Integer.valueOf(requestBlockSize) );
@@ -280,13 +320,11 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 	protected class MyIntermediateResultElementSink implements IntermediateResultElementSink
 	{
-		protected final IntermediateResultElementSink outputSink;
 		protected final Iterable<SolutionMapping> inputSolutionMappings;
+		protected final List<SolutionMapping> solMapsForOutput = new ArrayList<>();
 		private boolean inputObtained = false;
 
-		public MyIntermediateResultElementSink( final IntermediateResultElementSink outputSink,
-		                                        final Iterable<SolutionMapping> inputSolutionMappings ) {
-			this.outputSink = outputSink;
+		public MyIntermediateResultElementSink( final Iterable<SolutionMapping> inputSolutionMappings ) {
 			this.inputSolutionMappings = inputSolutionMappings;
 		}
 
@@ -297,14 +335,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		}
 
 		protected void _send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of inputSolutionMappings that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+					solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 				}
 			}
 		}
@@ -313,6 +346,8 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 
 		public final boolean hasObtainedInputAlready() { return inputObtained; }
 
+		public List<SolutionMapping> getSolMapsForOutput() { return solMapsForOutput; }
+
 	} // end of helper class MyIntermediateResultElementSink
 
 
@@ -320,21 +355,15 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	{
 		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
 
-		public MyIntermediateResultElementSinkOuterJoin( final IntermediateResultElementSink outputSink,
-		                                                 final Iterable<SolutionMapping> inputSolutionMappings ) {
-			super(outputSink, inputSolutionMappings);
+		public MyIntermediateResultElementSinkOuterJoin( final Iterable<SolutionMapping> inputSolutionMappings ) {
+			super(inputSolutionMappings);
 		}
 
 		@Override
 		public void _send( final SolutionMapping smFromRequest ) {
-			// TODO: this implementation is very inefficient
-			// We need an implementation of inputSolutionMappings that can
-			// be used like an index.
-			// See: https://github.com/LiUSemWeb/HeFQUIN/issues/3
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( SolutionMappingUtils.compatible(smFromInput, smFromRequest) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
+					solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput,smFromRequest) );
 					inputSolutionMappingsWithJoinPartners.add(smFromInput);
 				}
 			}
@@ -348,8 +377,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		public void flush() {
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 				if ( ! inputSolutionMappingsWithJoinPartners.contains(smFromInput) ) {
-					numberOfOutputMappingsProduced++;
-					outputSink.send(smFromInput);
+					solMapsForOutput.add(smFromInput);
 				}
 			}
 		}

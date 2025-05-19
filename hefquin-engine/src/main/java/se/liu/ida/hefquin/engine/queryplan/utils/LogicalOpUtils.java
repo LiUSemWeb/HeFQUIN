@@ -160,27 +160,21 @@ public class LogicalOpUtils
     public static Set<TriplePattern> getTriplePatternsOfReq( final LogicalOpRequest<?, ?> lop ) {
         final DataRetrievalRequest req = lop.getRequest();
 
-        if ( req instanceof TriplePatternRequest) {
-            final TriplePatternRequest tpReq = (TriplePatternRequest) lop.getRequest();
-            final Set<TriplePattern> tps = new HashSet<>();
-            tps.add( tpReq.getQueryPattern() );
-
-            return tps;
+        if ( req instanceof TriplePatternRequest tpReq ) {
+            return Collections.singleton( tpReq.getQueryPattern() );
         }
-        else if ( req instanceof BGPRequest) {
-            final BGPRequest bgpReq = (BGPRequest) lop.getRequest();
+        else if ( req instanceof BGPRequest bgpReq ) {
             final BGP bgp = bgpReq.getQueryPattern();
 
             if ( bgp.getTriplePatterns().size() == 0 ) {
                 throw new IllegalArgumentException( "the BGP is empty" );
             }
             else {
-                return new HashSet<>( bgp.getTriplePatterns() );
+                return bgp.getTriplePatterns();
             }
         }
-        else if( req instanceof SPARQLRequest ) {
-            final SPARQLGraphPattern graphPattern = ((SPARQLRequest) req).getQueryPattern();
-            return QueryPatternUtils.getTPsInPattern(graphPattern);
+        else if( req instanceof SPARQLRequest sparqlReq ) {
+            return sparqlReq.getQueryPattern().getAllMentionedTPs();
         }
         else  {
             throw new IllegalArgumentException( "Cannot get triple patterns of the given request operator (type: " + req.getClass().getName() + ")." );

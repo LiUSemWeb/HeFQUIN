@@ -10,13 +10,14 @@ import java.util.HashMap;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
+
 import java.util.List;
 
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
@@ -132,7 +133,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 			// a cartesian product.
 			for ( int i = 0; i < subplans.size(); i++ ) {
 				final PhysicalPlan subplan = subplans.get(i);
-				final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfAllVariables(currentPlan, subplan);
+				final Set<Var> joinVars = PhysicalPlanUtils.intersectionOfAllVariables(currentPlan, subplan);
 				if ( ! joinVars.isEmpty() ) {
 					nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan) );
 				}

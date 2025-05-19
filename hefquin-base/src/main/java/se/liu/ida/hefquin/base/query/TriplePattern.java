@@ -2,6 +2,11 @@ package se.liu.ida.hefquin.base.query;
 
 import org.apache.jena.graph.Triple;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+
+/**
+ * This interface represents triple patterns.
+ */
 public interface TriplePattern extends SPARQLGraphPattern
 {
 	/**
@@ -20,4 +25,20 @@ public interface TriplePattern extends SPARQLGraphPattern
 	 */
 	String toString();
 
+	@Override
+	TriplePattern applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
+
+	/**
+	 * Returns a BGP that contains this triple pattern plus all triple
+	 * patterns of the given BGP. This method is a more specific version
+	 * of {@link SPARQLGraphPattern#mergeWith(SPARQLGraphPattern)}.
+	 */
+	BGP mergeWith( TriplePattern other );
+
+	/**
+	 * Return a BGP that contains this triple pattern plus all triple
+	 * patterns of the given BGP. This method is a more specific version
+	 * of {@link SPARQLGraphPattern#mergeWith(SPARQLGraphPattern)}.
+	 */
+	BGP mergeWith( BGP bgp );
 }

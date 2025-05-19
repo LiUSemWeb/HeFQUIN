@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
 
@@ -9,6 +10,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
+import org.apache.jena.riot.RiotNotFoundException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -22,7 +25,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void twoFMs() {
 		final String turtle =
-				  "PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				  "PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 				+ "PREFIX ex:     <http://example.org/>\n"
 				+ "\n"
 				+ "ex:dbpediaSPARQL\n"
@@ -60,7 +63,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -70,7 +73,7 @@ public class FederationDescriptionReaderTest
 						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
 
 		final Model fd = ModelFactory.createDefaultModel();
-
+		FederationDescriptionReader.readFromModel(fd);
 		final RDFParserBuilder b = RDFParser.fromString(turtle);
 		b.lang( Lang.TURTLE );
 		b.parse(fd);
@@ -87,7 +90,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void sparqlFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaSPARQL\n"
@@ -113,7 +116,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithTwoEndpoints() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
@@ -139,7 +142,7 @@ public class FederationDescriptionReaderTest
 	@Test
 	public void tpfFMWithoutRequiredProperty() {
 		final String turtle =
-				"PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>\n"
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
 						+ "PREFIX ex:     <http://example.org/>\n"
 						+ "\n"
 						+ "ex:dbpediaTPF\n"
@@ -160,6 +163,81 @@ public class FederationDescriptionReaderTest
 		final String expectedErrorMessage = "TPF exampleFragmentAddress is required!";
 		final String actualErrorMessage = exception.getMessage();
 		assertEquals(expectedErrorMessage, actualErrorMessage);
+	}
+
+	@Test
+	public void vocabularyMappingFileIsLoadedFromClasspathResource() {
+		final String turtle =
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaSPARQL\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
+						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
+						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
+
+		final Model fd = ModelFactory.createDefaultModel();
+		final RDFParserBuilder b = RDFParser.fromString( turtle );
+		b.lang( Lang.TURTLE );
+		b.parse( fd );
+
+		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
+		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
+		assertNotNull( fm.getVocabularyMapping() );
+	}
+
+	@Test
+	public void vocabularyMappingFileIsLoadedFromLocalPath() {
+		final String turtle =
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaSPARQL\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
+						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
+						+ "                     fd:vocabularyMappingsFile \"src/test/resources/dbpedia/vocabularyMappings.nt\".";
+
+		final Model fd = ModelFactory.createDefaultModel();
+		final RDFParserBuilder b = RDFParser.fromString( turtle );
+		b.lang( Lang.TURTLE );
+		b.parse( fd );
+
+		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
+		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
+		assertNotNull( fm.getVocabularyMapping() );
+	}
+
+	@Test
+	public void missingVocabularyMappingFileThrowsExpectedException() {
+		final String turtle =
+				"PREFIX fd:     <http://w3id.org/hefquin/feddesc#>\n"
+						+ "PREFIX ex:     <http://example.org/>\n"
+						+ "\n"
+						+ "ex:dbpediaSPARQL\n"
+						+ "      a            fd:FederationMember ;\n"
+						+ "      fd:interface [ a                  fd:SPARQLEndpointInterface ;\n"
+						+ "                     fd:endpointAddress <http://dbpedia.org/sparql> ];\n"
+						+ "                     fd:vocabularyMappingsFile \"dummy/vocab.nt\".";
+
+		final Model fd = ModelFactory.createDefaultModel();
+		final RDFParserBuilder b = RDFParser.fromString( turtle );
+		b.lang( Lang.TURTLE );
+		b.parse( fd );
+
+		final Exception exception = assertThrows( IllegalArgumentException.class, () -> {
+			FederationDescriptionReader.readFromModel( fd );
+		} );
+
+
+		assertTrue( "Expected cause to be RiotNotFoundException, but was: " + exception.getCause(),
+			exception.getCause() instanceof RiotNotFoundException );
+
+		// Test that the error message is correct
+		final String expectedErrorMessage = "Not found: dummy/vocab.nt";
+		final String actualErrorMessage = exception.getCause().getMessage();
+		assertEquals( expectedErrorMessage, actualErrorMessage );
 	}
 
 }

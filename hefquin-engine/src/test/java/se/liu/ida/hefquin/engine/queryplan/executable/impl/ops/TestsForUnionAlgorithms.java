@@ -21,29 +21,29 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.GenericIntermediateResultBlockImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 
-	protected void _testSimpleUnion() throws ExecutionException {
+	protected void _testSimpleUnion( final boolean sendAllSolMapsSeparately )
+			throws ExecutionException
+	{
 		final Var x = Var.alloc("x");
 
 		final Node x1 = NodeFactory.createURI("http://example.org/x1");
 		final Node x2 = NodeFactory.createURI("http://example.org/x2");
 		final Node x3 = NodeFactory.createURI("http://example.org/x3");
 		
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x1) );
 		
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2) );
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x3) );
 		
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately);
 		
 		final Set<Binding> result = new HashSet<>();
 	
@@ -79,7 +79,9 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertTrue(b3Found);
 	}
 	
-	protected void _testUnboundUnion() throws ExecutionException {
+	protected void _testUnboundUnion( final boolean sendAllSolMapsSeparately )
+			throws ExecutionException
+	{
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -90,15 +92,15 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node y3 = NodeFactory.createURI("http://example.org/y3");
 		
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x1) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x3, y, y3) );
 		
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(y, y1) );
 		input2.add( SolutionMappingUtils.createSolutionMapping(y, y2, x, x2) );
 		
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately);
 		
 		final List<Binding> result = new ArrayList<>();
 	
@@ -157,7 +159,9 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertTrue(b4Found);
 	}
 	
-	protected void _testKeepUnionDuplicates() throws ExecutionException {
+	protected void _testKeepUnionDuplicates( final boolean sendAllSolMapsSeparately )
+			throws ExecutionException
+	{
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -168,15 +172,15 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node y3 = NodeFactory.createURI("http://example.org/y3");
 		
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x1, y, y1) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
 		
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x3, y, y3) );
 		
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately);
 		
 		final List<Binding> result = new ArrayList<>();
 	
@@ -221,7 +225,9 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertEquals(2, b3Found);
 	}
 	
-	protected void _testKeepUnionDuplicatesFromSameMember() throws ExecutionException {
+	protected void _testKeepUnionDuplicatesFromSameMember( final boolean sendAllSolMapsSeparately )
+			throws ExecutionException
+	{
 		final Var x = Var.alloc("x");
 		final Var y = Var.alloc("y");
 		
@@ -232,15 +238,15 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		final Node y2 = NodeFactory.createURI("http://example.org/y2");
 		final Node y3 = NodeFactory.createURI("http://example.org/y3");
 		
-		final GenericIntermediateResultBlockImpl input1 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input1 = new ArrayList<>();
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x1, y, y1) );
 		input1.add( SolutionMappingUtils.createSolutionMapping(x, x3, y, y3) );
 		
-		final GenericIntermediateResultBlockImpl input2 = new GenericIntermediateResultBlockImpl();
+		final List<SolutionMapping> input2 = new ArrayList<>();
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, x2, y, y2) );
 		
-		final Iterator<SolutionMapping> it = runTest(input1, input2);
+		final Iterator<SolutionMapping> it = runTest(input1, input2, sendAllSolMapsSeparately);
 		
 		final List<Binding> result = new ArrayList<>();
 	
@@ -285,21 +291,36 @@ public abstract class TestsForUnionAlgorithms extends ExecOpTestBase {
 		assertEquals(2, b3Found);
 	}
 
-	protected Iterator<SolutionMapping> runTest( final IntermediateResultBlock input1,
-	                                             final IntermediateResultBlock input2 )
+	protected Iterator<SolutionMapping> runTest( final List<SolutionMapping> input1,
+	                                             final List<SolutionMapping> input2,
+	                                             final boolean sendAllSolMapsSeparately )
 			 throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 		
 		final ExecutableOperator op = createExecOpForTest();
 
-		if ( op instanceof BinaryExecutableOp ) {
-			( (BinaryExecutableOp) op).processBlockFromChild1(input1, sink, null);
-			( (BinaryExecutableOp) op).processBlockFromChild2(input2, sink, null);
+		if ( op instanceof BinaryExecutableOp binOp ) {
+			if ( sendAllSolMapsSeparately ) {
+				for ( final SolutionMapping sm : input1 ) {
+					binOp.processInputFromChild1(sm, sink, null);
+				}
+				for ( final SolutionMapping sm : input2 ) {
+					binOp.processInputFromChild2(sm, sink, null);
+				}
+			}
+			else {
+				binOp.processInputFromChild1(input1, sink, null);
+				binOp.processInputFromChild2(input2, sink, null);
+			}
 		}
-		else if ( op instanceof NaryExecutableOp ) {
-			( (NaryExecutableOp) op).processBlockFromXthChild(0, input1, sink, null);
-			( (NaryExecutableOp) op).processBlockFromXthChild(1, input2, sink, null);
+		else if ( op instanceof NaryExecutableOp nOp ) {
+			for ( final SolutionMapping sm : input1 ) {
+				nOp.processInputFromXthChild(0, sm, sink, null);
+			}
+			for ( final SolutionMapping sm : input2 ) {
+				nOp.processInputFromXthChild(1, sm, sink, null);
+			}
 		}
 		else {
 			throw new IllegalArgumentException();

@@ -6,8 +6,7 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -38,7 +37,7 @@ public class LogicalOpBGPOptAdd extends LogicalOperatorBase implements UnaryLogi
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		final ExpectedVariables expVarsPattern = QueryPatternUtils.getExpectedVariablesInPattern(bgp);
+		final ExpectedVariables expVarsPattern = bgp.getExpectedVariables();
 		final ExpectedVariables expVarsInput = inputVars[0];
 
 		final Set<Var> certainVars = expVarsInput.getCertainVariables();

@@ -1,6 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical;
 
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 
 /**
  * The top-level interface for all types of logical operators of HeFQUIN.

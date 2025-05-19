@@ -4,13 +4,12 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.utils.ExpectedVariablesUtils;
 
 public class LogicalOpTPAdd extends LogicalOperatorBase implements UnaryLogicalOp
 {
@@ -38,7 +37,7 @@ public class LogicalOpTPAdd extends LogicalOperatorBase implements UnaryLogicalO
 	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		final ExpectedVariables expVarsPattern = QueryPatternUtils.getExpectedVariablesInPattern(tp);
+		final ExpectedVariables expVarsPattern = tp.getExpectedVariables();
 		final ExpectedVariables expVarsInput = inputVars[0];
 
 		final Set<Var> certainVars = ExpectedVariablesUtils.unionOfCertainVariables(expVarsPattern, expVarsInput);

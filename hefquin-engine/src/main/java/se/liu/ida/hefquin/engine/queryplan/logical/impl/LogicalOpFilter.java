@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 

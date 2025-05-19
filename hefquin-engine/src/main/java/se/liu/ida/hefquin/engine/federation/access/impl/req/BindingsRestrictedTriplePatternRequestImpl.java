@@ -8,9 +8,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest
@@ -70,7 +69,7 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 
 	@Override
 	public ExpectedVariables getExpectedVariables() {
-		return QueryPatternUtils.getExpectedVariablesInPattern(tp);
+		return tp.getExpectedVariables();
 	}
 
 	@Override

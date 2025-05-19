@@ -23,7 +23,6 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.base.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -110,20 +109,20 @@ public class VocabularyMappingUtils
 
 	public static SPARQLGraphPattern translateGraphPattern( final Op op,
 	                                                        final VocabularyMapping vm ) {
-		if ( op instanceof OpJoin ) {
-			return translateGraphPattern( (OpJoin) op, vm );
+		if ( op instanceof OpJoin join ) {
+			return translateGraphPattern( join, vm );
 		}
-		else if ( op instanceof OpUnion ) {
-			return translateGraphPattern( (OpUnion) op, vm );
+		else if ( op instanceof OpUnion union ) {
+			return translateGraphPattern( union, vm );
 		}
-		else if ( op instanceof OpFilter ) {
-			return translateGraphPattern( (OpFilter) op, vm );
+		else if ( op instanceof OpFilter filter ) {
+			return translateGraphPattern( filter, vm );
 		}
-		else if ( op instanceof OpBGP ) {
-			return translateGraphPattern( (OpBGP) op, vm );
+		else if ( op instanceof OpBGP bgp ) {
+			return translateGraphPattern( bgp, vm );
 		}
-		else if ( op instanceof OpSequence ) {
-			return translateGraphPattern( (OpSequence) op, vm );
+		else if ( op instanceof OpSequence seq ) {
+			return translateGraphPattern( seq, vm );
 		}
 		else {
 			throw new IllegalArgumentException( "Unsupported type of pattern: " + op.getClass().getName() );
@@ -166,8 +165,8 @@ public class VocabularyMappingUtils
 			final SPARQLGraphPattern p = vm.translateTriplePattern( new TriplePatternImpl(tp) ); 
 			allSubPatterns.add(p);
 
-			if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern ) {
-				tpSubPatterns.add( (TriplePattern) p );
+			if ( allSubPatternsAreTriplePatterns && p instanceof TriplePattern tp2 ) {
+				tpSubPatterns.add(tp2);
 			}
 			else {
 				allSubPatternsAreTriplePatterns = false;
@@ -197,14 +196,13 @@ public class VocabularyMappingUtils
 		final Op subOp = op.getSubOp();
 		final SPARQLGraphPattern translatedSubPlan = translateGraphPattern(subOp, vm);
 		final ExprList translatedExprs = translateExpressions( op.getExprs(), vm );
-		return QueryPatternUtils.merge(translatedExprs, translatedSubPlan);
+		return translatedSubPlan.mergeWith(translatedExprs);
 	}
 
 	public static ExprList translateExpressions( final ExprList exprs,
 	                                             final VocabularyMapping vm ) {
 		// TODO: translate the filter expressions
-
-		return exprs;
+		throw new UnsupportedOperationException("Applying vocabulary mappings into FILTER expressions is not implemented yet.");
 	}
 
 }

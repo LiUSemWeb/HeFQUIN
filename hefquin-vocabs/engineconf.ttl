@@ -240,7 +240,7 @@ ec:DefaultPhysicalOptimizer rdf:type ec:PhysicalOptimizer ;
     ) .
 
 ec:DefaultPlanCompiler rdf:type ec:PlanCompiler ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.PushBasedQueryPlanCompilerImpl" ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;
     ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
 
 ec:DefaultExecutionEngine rdf:type ec:ExecutionEngine ;

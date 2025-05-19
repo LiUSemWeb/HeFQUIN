@@ -2,38 +2,114 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import org.junit.Test;
 
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpNaiveNestedLoopJoinTest extends TestsForInnerJoinAlgorithms
 {
-    @Test
-    public void joinWithOneJoinVariable() throws ExecutionException { _joinWithOneJoinVariable(); }
+	@Test
+	public void joinWithEmptyInput1_SeparateInput() throws ExecutionException {
+		_joinWithEmptyInput1(true);
+	}
 
-    @Test
-    public void joinWithTwoJoinVariables() throws ExecutionException { _joinWithTwoJoinVariables(); }
+	@Test
+	public void joinWithEmptyInput1_CombinedInput() throws ExecutionException {
+		_joinWithEmptyInput1(false);
+	}
 
-    @Test
-    public void joinWithTwoJoinVariables_noJoinPartner() throws ExecutionException { _joinWithTwoJoinVariables_noJoinPartner(); }
+	@Test
+	public void joinWithEmptyInput2_SeparateInput() throws ExecutionException {
+		_joinWithEmptyInput2(true);
+	}
 
-    @Test
-    public void joinWithoutJoinVariable() throws ExecutionException { _joinWithoutJoinVariable(); }
+	@Test
+	public void joinWithEmptyInput2_CombinedInput() throws ExecutionException {
+		_joinWithEmptyInput2(false);
+	}
 
-    @Test
-    public void joinWithEmptyInput1() throws ExecutionException { _joinWithEmptyInput1(); }
+	@Test
+	public void joinWithEmptySolutionMapping1_SeparateInput() throws ExecutionException{
+		_joinWithEmptySolutionMapping1(true);
+	}
 
-    @Test
-    public void joinWithEmptyInput2() throws ExecutionException { _joinWithEmptyInput2(); }
+	@Test
+	public void joinWithEmptySolutionMapping1_CombinedInput() throws ExecutionException{
+		_joinWithEmptySolutionMapping1(false);
+	}
 
-    @Test
-    public void joinWithEmptySolutionMapping1() throws ExecutionException{ _joinWithEmptySolutionMapping1(); }
+	@Test
+	public void joinWithEmptySolutionMapping2_SeparateInput() throws ExecutionException {
+		_joinWithEmptySolutionMapping2(true);
+	}
 
-    @Test
-    public void joinWithEmptySolutionMapping2() throws ExecutionException { _joinWithEmptySolutionMapping2(); }
+	@Test
+	public void joinWithEmptySolutionMapping2_CombinedInput() throws ExecutionException {
+		_joinWithEmptySolutionMapping2(false);
+	}
 
-    @Override
-    protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
-        return new ExecOpNaiveNestedLoopsJoin(false);
-    }
+	@Test
+	public void joinWithOneJoinVariable_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable(true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable(false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_noOverlap_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_noOverlap(false);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_SeparateInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(true);
+	}
+
+	@Test
+	public void joinWithOneJoinVariable_withPossibleVars_overlapped_CombinedInput() throws ExecutionException {
+		_joinWithOneJoinVariable_withPossibleVars_overlapped(false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_SeparateInput() throws ExecutionException {
+		_joinWithTwoJoinVariables(true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_CombinedInput() throws ExecutionException {
+		_joinWithTwoJoinVariables(false);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_SeparateInput() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(true);
+	}
+
+	@Test
+	public void joinWithTwoJoinVariables_noJoinPartner_CombinedInput() throws ExecutionException {
+		_joinWithTwoJoinVariables_noJoinPartner(false);
+	}
+
+	@Test
+	public void joinWithoutJoinVariable_SeparateInput() throws ExecutionException {
+		_joinWithoutJoinVariable(true);
+	}
+
+	@Test
+	public void joinWithoutJoinVariable_CombinedInput() throws ExecutionException {
+		_joinWithoutJoinVariable(false);
+	}
+
+	@Override
+	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
+		return new ExecOpNaiveNestedLoopsJoin(false);
+	}
 }

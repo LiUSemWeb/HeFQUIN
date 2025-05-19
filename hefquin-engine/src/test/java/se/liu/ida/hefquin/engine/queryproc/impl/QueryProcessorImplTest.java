@@ -377,7 +377,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);
-				PushBasedQueryPlanCompilerImpl(ctxt);
+				QueryPlanCompilerForPushBasedExecution(ctxt);
 		final ExecutionEngine execEngine = new ExecutionEngineImpl();
 		final QueryProcessor qProc = new QueryProcessorImpl(planner, planCompiler, execEngine, ctxt);
 		final MaterializingQueryResultSinkImpl resultSink = new MaterializingQueryResultSinkImpl();

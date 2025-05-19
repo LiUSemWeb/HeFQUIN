@@ -41,14 +41,12 @@ public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalR
 			throw new ExecOpExecutionException( "Accessing the response caused an exception that indicates a data retrieval error (message: " + e.getMessage() + ").", e, this );
 		}
 
-		final Iterator<? extends SolutionMapping> it = convert( triples );
-		while ( it.hasNext() ) {
-			sink.send( it.next() );
-		}
+		final Iterator<SolutionMapping> it = convert(triples);
+		sink.send(it);
 	}
 
 	protected abstract TriplesResponse performRequest( final FederationAccessManager fedAccessMgr );
 
-	protected abstract Iterator<? extends SolutionMapping> convert( final Iterable<? extends Triple> itTriples );
+	protected abstract Iterator<SolutionMapping> convert( final Iterable<Triple> itTriples );
 
 }

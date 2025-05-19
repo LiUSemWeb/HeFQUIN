@@ -8,13 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.expr.Expr;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalInterface;
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
@@ -552,9 +552,8 @@ public class UnionPullUpTest
 		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 
-	protected static class DummyTriplePattern implements TriplePattern {
-		@Override public Triple asJenaTriple() { throw new UnsupportedOperationException(); }
-		@Override public int numberOfVars() { throw new UnsupportedOperationException(); }
+	protected static class DummyTriplePattern extends TriplePatternImpl {
+		public DummyTriplePattern() { super(Node.ANY, Node.ANY, Node.ANY); }
 	}
 
 }

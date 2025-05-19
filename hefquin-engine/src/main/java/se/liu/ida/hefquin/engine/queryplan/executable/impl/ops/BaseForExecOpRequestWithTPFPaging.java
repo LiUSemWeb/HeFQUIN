@@ -115,10 +115,8 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 
 	protected void consumeMatchingTriples( final Iterable<Triple> itTriples, final IntermediateResultElementSink sink ) {
 		final Iterator<SolutionMapping> itSolMaps = convert( itTriples );
-		while ( itSolMaps.hasNext() ) {
-			numberOfOutputMappingsProduced++;
-			sink.send( itSolMaps.next() );
-		}
+		final int cnt = sink.send(itSolMaps);
+		numberOfOutputMappingsProduced += cnt;
 	}
 
 

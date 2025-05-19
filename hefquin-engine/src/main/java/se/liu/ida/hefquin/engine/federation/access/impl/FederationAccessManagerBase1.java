@@ -14,12 +14,13 @@ import org.apache.jena.sparql.expr.aggregate.AggregatorFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.engine.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.engine.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
@@ -49,9 +50,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	protected static final Var countVar = Var.alloc("__hefquinCountVar");
 
-	protected AtomicLong issuedCardRequestsSPARQL  = new AtomicLong(0L);
-	protected AtomicLong issuedCardRequestsTPF     = new AtomicLong(0L);
-	protected AtomicLong issuedCardRequestsBRTPF   = new AtomicLong(0L);
+	protected AtomicLong issuedCardRequestsSPARQL = new AtomicLong( 0L );
+	protected AtomicLong issuedCardRequestsTPF    = new AtomicLong( 0L );
+	protected AtomicLong issuedCardRequestsBRTPF  = new AtomicLong( 0L );
 
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(
@@ -63,8 +64,9 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// given request, wrap it in a COUNT(*) query, and send that query as
 		// a request to the given endpoint.
 		final SPARQLGraphPattern pattern = req.getQueryPattern();
-		if ( pattern == null )
+		if ( pattern == null ) {
 			throw new IllegalArgumentException();
+		}
 
 		// set up the query as a SELECT query
 		final Query countQuery = QueryFactory.create();
@@ -72,18 +74,18 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 		// set the WHERE clause of the query based on
 		// the graph pattern of the given request
-		countQuery.setQueryPattern( QueryPatternUtils.convertToJenaElement(pattern) );
+		countQuery.setQueryPattern( QueryPatternUtils.convertToJenaElement( pattern ) );
 
 		// initialize the SELECT clause of the query
 		// (it needs to be a COUNT(*) without DISTINCT,
 		//  and we need a variable for it)
-		final Expr countExpr = countQuery.allocAggregate( AggregatorFactory.createCount(false) );
-		countQuery.addResultVar(countVar, countExpr);
+		final Expr countExpr = countQuery.allocAggregate( AggregatorFactory.createCount( false ) );
+		countQuery.addResultVar( countVar, countExpr );
 
 		// issue the query as a request, the response will then be processed to create
 		// the CardinalityResponse to be returned
-		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl(countQuery) );
-		return issueRequest(reqCount, fm).thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
+		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl( countQuery ) );
+		return issueRequest( reqCount, fm ).thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
 	}
 
 	@Override
@@ -121,24 +123,23 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		final long issuedCardRequestsTPF    = this.issuedCardRequestsTPF.get();
 		final long issuedCardRequestsBRTPF  = this.issuedCardRequestsBRTPF.get();
 
-		stats.put(enNumberOfSPARQLCardRequestsIssued, Long.valueOf(issuedCardRequestsSPARQL));
-		stats.put(enNumberOfTPFCardRequestsIssued,    Long.valueOf(issuedCardRequestsTPF));
-		stats.put(enNumberOfBRTPFCardRequestsIssued,  Long.valueOf(issuedCardRequestsBRTPF));
+		stats.put( enNumberOfSPARQLCardRequestsIssued, Long.valueOf( issuedCardRequestsSPARQL ) );
+		stats.put( enNumberOfTPFCardRequestsIssued,    Long.valueOf( issuedCardRequestsTPF ) );
+		stats.put( enNumberOfBRTPFCardRequestsIssued,  Long.valueOf( issuedCardRequestsBRTPF ) );
 
 		final long overallCardRequests = issuedCardRequestsSPARQL
 		                               + issuedCardRequestsTPF
 		                               + issuedCardRequestsBRTPF;
-		stats.put(enOverallNumberOfCardRequestsIssued, Long.valueOf(overallCardRequests));
+		stats.put( enOverallNumberOfCardRequestsIssued, Long.valueOf( overallCardRequests ) );
 
 		return stats;
 	}
 
-
 	@Override
 	public final void resetStats() {
-		issuedCardRequestsSPARQL.set(0L);
-		issuedCardRequestsTPF.set(0L);
-		issuedCardRequestsBRTPF.set(0L);
+		issuedCardRequestsSPARQL.set( 0L );
+		issuedCardRequestsTPF.set( 0L );
+		issuedCardRequestsBRTPF.set( 0L );
 
 		_resetStats();
 	}
@@ -147,7 +148,6 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 
 	protected abstract void _resetStats();
 
-
 	protected Function<SolMapsResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromSolMapsResponse() {
 		return new FunctionToObtainCardinalityResponseFromSolMapsResponse();
 	}
@@ -155,7 +155,6 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected Function<TPFResponse, CardinalityResponse> getFctToObtainCardinalityResponseFromTPFResponse() {
 		return new FunctionToObtainCardinalityResponseFromTPFResponse();
 	}
-
 
 	// ---------- HELPER CLASSES ----------
 
@@ -167,7 +166,7 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 				cardinality = extractCardinality( smResp );
 			}
 			catch ( final UnsupportedOperationDueToRetrievalError | IllegalArgumentException e ) {
-				return new CardinalityResponseImplWithoutCardinality( smResp, smResp.getRequest() );
+				return new CardinalityResponseImplWithoutCardinality( e, smResp, smResp.getRequest() );
 			}
 
 			return new CardinalityResponseImpl( smResp, smResp.getRequest(), cardinality );
@@ -194,15 +193,22 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 	protected static class FunctionToObtainCardinalityResponseFromTPFResponse implements Function<TPFResponse, CardinalityResponse>
 	{
 		public CardinalityResponse apply( final TPFResponse tpfResp ) {
-			if ( tpfResp == null ) throw new IllegalArgumentException("The given TPFResponse is null");
+			if ( tpfResp == null ) {
+				throw new IllegalArgumentException( "The given TPFResponse is null" );
+			}
 
 			final Integer cardinality = tpfResp.getCardinalityEstimate();
 			if ( cardinality != null ) {
 				final int c = cardinality;
-				return new CardinalityResponseImpl(tpfResp, tpfResp.getRequest(), c);
+				return new CardinalityResponseImpl( tpfResp, tpfResp.getRequest(), c );
 			}
 			else {
-				return new CardinalityResponseImplWithoutCardinality( tpfResp, tpfResp.getRequest() );
+				final CardinalityEstimationUnavailableError e = new CardinalityEstimationUnavailableError(
+					"Cardinality estimation is unavailable due to missing metadata triples.",
+					tpfResp.getRequest(),
+					tpfResp.getFederationMember()
+				);
+				return new CardinalityResponseImplWithoutCardinality( e, tpfResp, tpfResp.getRequest() );
 			}
 		}
 	}

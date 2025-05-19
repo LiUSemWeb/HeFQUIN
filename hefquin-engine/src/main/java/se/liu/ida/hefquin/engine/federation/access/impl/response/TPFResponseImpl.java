@@ -293,7 +293,12 @@ public class TPFResponseImpl extends DataRetrievalResponseBase<Iterable<Triple>>
 	@Override
 	public Iterable<Triple> getResponseData() throws UnsupportedOperationDueToRetrievalError {
 		if ( isError() ) {
-			throw new UnsupportedOperationDueToRetrievalError( getRequest(), getFederationMember() );
+			throw new UnsupportedOperationDueToRetrievalError(
+				getErrorStatusCode(),
+				getErrorDescription(),
+				getRequest(),
+				getFederationMember()
+			);
 		}
 		return new ConcatenatingIterable<Triple>( getPayload(), getMetadata() );
 	}

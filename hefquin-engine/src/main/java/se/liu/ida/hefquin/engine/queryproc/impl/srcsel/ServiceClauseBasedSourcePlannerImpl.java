@@ -10,8 +10,8 @@ import org.apache.jena.sparql.core.BasicPattern;
 
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.base.query.impl.QueryPatternUtils;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
@@ -227,7 +227,7 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	protected LogicalPlan createPlanForBGP( final BasicPattern pattern, final FederationMember fm ) {
-		return createPlanForBGP( QueryPatternUtils.createBGP(pattern), fm );
+		return createPlanForBGP( new BGPImpl(pattern), fm );
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {

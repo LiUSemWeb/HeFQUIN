@@ -1,12 +1,12 @@
 package se.liu.ida.hefquin.engine.federation.catalog;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
@@ -34,7 +34,7 @@ import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
-import se.liu.ida.hefquin.engine.vocabulary.FD;
+import se.liu.ida.hefquin.engine.vocabulary.FDVocab;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
@@ -64,18 +64,18 @@ public class FederationDescriptionReader
 		final Map<String, FederationMember> membersByURI = new HashMap<>();
 
 		// Iterate over all federation members mentioned in the description
-		final ResIterator fedMembers = fd.listResourcesWithProperty(RDF.type, FD.FederationMember);
+		final ResIterator fedMembers = fd.listResourcesWithProperty(RDF.type, FDVocab.FederationMember);
 		while ( fedMembers.hasNext() ) {
 			final Resource fedMember = fedMembers.next();
 			final VocabularyMapping vocabMap = parseVocabMapping(fedMember, fd);
 
-			final Resource iface = fedMember.getProperty(FD.interface_).getResource();
+			final Resource iface = fedMember.getProperty(FDVocab.interface_).getResource();
 			final RDFNode ifaceType = fd.getRequiredProperty(iface, RDF.type).getObject();
 
 			// Check the type of interface
-			if ( ifaceType.equals(FD.SPARQLEndpointInterface) )
+			if ( ifaceType.equals(FDVocab.SPARQLEndpointInterface) )
 			{
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("SPARQL endpointAddress is required!");
 
@@ -98,9 +98,9 @@ public class FederationDescriptionReader
 				final FederationMember fm = createSPARQLEndpoint(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.TPFInterface) )
+			else if ( ifaceType.equals(FDVocab.TPFInterface) )
 			{
-				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
 				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("TPF exampleFragmentAddress is required!");
 
@@ -123,9 +123,9 @@ public class FederationDescriptionReader
 				final FederationMember fm = createTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.brTPFInterface) )
+			else if ( ifaceType.equals(FDVocab.brTPFInterface) )
 			{
-				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FD.exampleFragmentAddress);
+				final StmtIterator exampleFragmentAddressesIterator = iface.listProperties(FDVocab.exampleFragmentAddress);
 				if ( ! exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("brTPF exampleFragmentAddress is required!");
 
@@ -148,9 +148,9 @@ public class FederationDescriptionReader
 				final FederationMember fm = createBRTPFServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.BoltInterface) )
+			else if ( ifaceType.equals(FDVocab.BoltInterface) )
 			{
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("Bolt endpointAddress is required!");
 
@@ -173,9 +173,9 @@ public class FederationDescriptionReader
 				final FederationMember fm = createNeo4jServer(addrStr, vocabMap);
 				membersByURI.put(addrStr, fm);
 			}
-			else if ( ifaceType.equals(FD.GraphQLEndpointInterface) )
+			else if ( ifaceType.equals(FDVocab.GraphQLEndpointInterface) )
 			{
-				final StmtIterator endpointAddressesIterator = iface.listProperties(FD.endpointAddress);
+				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
 
@@ -208,27 +208,39 @@ public class FederationDescriptionReader
 	}
 
 	/**
-	 * Checks whether given RDF resource (fm) representing a federation
-	 * member is associated with a vocabulary mapping in the given federation
-	 * description (fd) and, if so, parses this vocabulary mapping and returns
-	 * it. Otherwise, this function returns <code>null</code>.
+	 * Attempts to retrieve and parse the vocabulary mapping associated with the
+	 * given RDF resource {@code fm}, representing a {@link FederationMember}, in
+	 * the given federation description {@code fd}.
+	 *
+	 * The method attempts to load the vocabulary mapping from the specified path or
+	 * URL and caches the result for reuse. If no vocabulary mappings file is
+	 * present, the method returns {@code null}.
+	 *
+	 * @param fm RDF resource for the federation member
+	 * @param fd RDF model of the federation description
+	 * @return parsed {@link VocabularyMapping}, or {@code null} if not specified
+	 * @throws IllegalArgumentException if the mapping file cannot be loaded or parsed
 	 */
 	protected VocabularyMapping parseVocabMapping( final Resource fm, final Model fd ) {
-		if( fd.contains(fm, FD.vocabularyMappingsFile) ){
-			final RDFNode pathToMappingFile = fd.getRequiredProperty(fm, FD.vocabularyMappingsFile).getObject();
-
-			final String path = pathToMappingFile.toString();
-			if ( verifyValidVocabMappingFile(path) ) {
-				VocabularyMapping vm = vocabMappingByPath.get( path );
-				if ( vm == null ) {
-					vm = new VocabularyMappingWrappingImpl(path);
-					vocabMappingByPath.put( path, vm );
-				}
-				return vm;
-			}
+		if ( ! fd.contains( fm, FDVocab.vocabularyMappingsFile ) ) {
+			return null;
 		}
 
-		return null;
+		final RDFNode pathToMappingFile = fd.getRequiredProperty( fm, FDVocab.vocabularyMappingsFile ).getObject();
+
+		final String path = pathToMappingFile.toString();
+		VocabularyMapping vm = vocabMappingByPath.get( path );
+		if ( vm == null ) {
+			final Graph g;
+			try {
+				g = RDFDataMgr.loadGraph( path );
+			} catch ( Exception e ) {
+				throw new IllegalArgumentException( e );
+			}
+			vm = new VocabularyMappingWrappingImpl( g );
+			vocabMappingByPath.put( path, vm );
+		}
+		return vm;
 	}
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
@@ -309,18 +321,6 @@ public class FederationDescriptionReader
 			@Override public GraphQLSchema getSchema() { return schema; }
 			@Override public String toString( ) { return "GraphQL endpoint at " + uri; }
 		};
-	}
-
-	/**
-	 * Verifies that the file at the given path exists.
-	 */
-	protected boolean verifyValidVocabMappingFile( final String pathToMappingFile ) {
-		final File f = new File(pathToMappingFile);
-		if ( f.exists() && f.isFile() ){
-			return true;
-		}
-		else
-			throw new IllegalArgumentException( "The following path to vocab.mapping does not exist:" + pathToMappingFile );
 	}
 
 	/**

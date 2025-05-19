@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HefQUIN Query Editor</title>
+    <link href="yasgui/yasgui.min.css" rel="stylesheet" type="text/css" />
+    <script src="yasgui/yasgui.min.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        window.onload = () => {
+            initQueryEditor();
+            document.querySelector(".yasqe > div").style.height = "500px";
+
+        }
+    </script>
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="hefquin-logo.png" alt="HeFQUIN Logo" class="hefquin-logo" />
+        </div>
+        <h1>HeFQUIN Query & Inspect</h1>
+    </header>
+    <div id="yasgui"></div>
+</body>
+
+<footer>
+    <span>&copy; 2025 HeFQUIN</span>
+    <a href="https://github.com/LiUSemWeb/HeFQUIN" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+    </a>
+</footer>
+</html>

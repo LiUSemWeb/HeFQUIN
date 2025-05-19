@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.base.query;
 
+import se.liu.ida.hefquin.base.data.SolutionMapping;
+
 /**
  * A SPARQL group pattern represents a collection of SPARQL graph patterns
  * for which the results are meant to be joined. Hence, when considering an
@@ -26,5 +28,8 @@ public interface SPARQLGroupPattern extends SPARQLGraphPattern
 	 * an {@link IndexOutOfBoundsException} will be thrown.
 	 */
 	SPARQLGraphPattern getSubPatterns( int i ) throws IndexOutOfBoundsException;
+
+	@Override
+	SPARQLGroupPattern applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
 
 }

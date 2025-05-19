@@ -3,13 +3,13 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.queryplan.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultBlock;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,17 +37,35 @@ public abstract class TestsForJoinAlgorithms extends ExecOpTestBase
 	}
 
 	protected Iterator<SolutionMapping> runTest(
-			final IntermediateResultBlock input1,
-			final IntermediateResultBlock input2,
+			final List<SolutionMapping> input1,
+			final List<SolutionMapping> input2,
+			final boolean sendAllSolMapsSeparately,
 			final ExpectedVariables... inputVars ) throws ExecutionException
 	{
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final BinaryExecutableOp op = createExecOpForTest(inputVars);
 
-		op.processBlockFromChild1(input1, sink, null);
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input1 ) {
+				op.processInputFromChild1(sm, sink, null);
+			}
+		}
+		else {
+			op.processInputFromChild1(input1, sink, null);
+		}
+
 		op.wrapUpForChild1(sink, null);
-		op.processBlockFromChild2(input2, sink, null);
+
+		if ( sendAllSolMapsSeparately == true ) {
+			for ( final SolutionMapping sm : input2 ) {
+				op.processInputFromChild2(sm, sink, null);
+			}
+		}
+		else {
+			op.processInputFromChild2(input2, sink, null);
+		}
+
 		op.wrapUpForChild2(sink, null);
 
 		return sink.getCollectedSolutionMappings().iterator();
