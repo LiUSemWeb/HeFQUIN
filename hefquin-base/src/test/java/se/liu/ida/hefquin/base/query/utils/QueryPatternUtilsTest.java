@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.query;
+package se.liu.ida.hefquin.base.query.utils;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
