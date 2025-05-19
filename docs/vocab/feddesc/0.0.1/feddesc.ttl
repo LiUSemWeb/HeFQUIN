@@ -1,0 +1,95 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix fd:     <http://w3id.org/hefquin/feddesc#> .
+
+<http://w3id.org/hefquin/feddesc>
+    rdf:type owl:Ontology ;
+    dc:creator       "Olaf Hartig",
+                     "Robin Keskisärkkä" ;
+    dc:date          "2025-05-05" ;
+    dc:format        "RDF" ;
+    dc:identifier    <http://w3id.org/hefquin/feddesc> ;
+    dc:title         "Federation Description Vocabulary for HeFQUIN"@en ;
+    rdfs:label       "Federation Description Vocabulary for HeFQUIN"@en ;
+    dc:description   "An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine."@en ;
+    rdfs:comment     "An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine."@en .
+
+### ===== CLASS DECLARATIONS =====
+
+fd:FederationMember a owl:Class ;
+    rdfs:label "Federation Member"@en ;
+    rdfs:comment "An entity that is part of the federation and provides data via a specific interface."@en .
+
+fd:Interface a owl:Class ;
+    rdfs:label "Interface"@en ;
+    rdfs:comment "An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+
+fd:EndpointInterface a owl:Class ;
+    rdfs:subClassOf fd:Interface ;
+    rdfs:label "Endpoint Interface"@en ;
+    rdfs:comment "An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+
+fd:SPARQLEndpointInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "SPARQL Endpoint Interface"@en ;
+    rdfs:comment "An interface to access a federation member via the SPARQL protocol."@en .
+
+fd:FragmentInterface a owl:Class ;
+    rdfs:subClassOf fd:Interface ;
+    rdfs:label "Fragment Interface"@en ;
+    rdfs:comment "A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class."@en .
+
+fd:TPFInterface a owl:Class ;
+    rdfs:subClassOf fd:FragmentInterface ;
+    rdfs:label "TPF Interface"@en ;
+    rdfs:comment "An interface to access a federation member via Triple Pattern Fragments."@en .
+
+fd:brTPFInterface a owl:Class ;
+    rdfs:subClassOf fd:FragmentInterface ;
+    rdfs:label "brTPF Interface"@en ;
+    rdfs:comment "An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments."@en .
+
+fd:BoltInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "Bolt Interface"@en ;
+    rdfs:comment "An interface to access a federation member using the Bolt protocol (e.g., for Neo4j)."@en .
+
+fd:GraphQLEndpointInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "GraphQL Endpoint Interface"@en ;
+    rdfs:comment "An interface to access a federation member via a GraphQL API."@en .
+
+### ===== PROPERTY DECLARATIONS =====
+
+fd:interface a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  fd:Interface ;
+    rdfs:label "interface"@en ;
+    rdfs:comment "The interface description for accessing the federation member."@en .
+
+fd:endpointAddress a rdf:Property ;
+    rdfs:domain fd:EndpointInterface ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "endpoint address"@en ;
+    rdfs:comment "The network address (URI) of the endpoint of the federation member."@en .
+
+fd:exampleFragmentAddress a rdf:Property ;
+    rdfs:domain fd:FragmentInterface ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "example fragment address"@en ;
+    rdfs:comment "An example URL of a fragment for pattern fragment interfaces."@en .
+
+fd:vocabularyMappingsFile a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  xsd:anyURI ;
+    rdfs:label "vocabulary mappings file"@en ;
+    rdfs:comment "Path to a file with RDF mappings to align different vocabularies."@en .
+
+fd:mappingConfiguration a rdf:Property ;
+    rdfs:domain fd:FederationMember ;
+    rdfs:range  rdf:Resource ;
+    rdfs:label "mapping configuration"@en ;
+    rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."@en .

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#FragmentInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#Interface"/>
+    <rdfs:label xml:lang="en">Fragment Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">A fragment interface is an interface to request a fragment (i.e., a specific subset) of the dataset of a federation member. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#endpointAddress">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/feddesc#EndpointInterface"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label xml:lang="en">endpoint address</rdfs:label>
+    <rdfs:comment xml:lang="en">The network address (URI) of the endpoint of the federation member.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#vocabularyMappingsFile">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/feddesc#FederationMember"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label xml:lang="en">vocabulary mappings file</rdfs:label>
+    <rdfs:comment xml:lang="en">Path to a file with RDF mappings to align different vocabularies.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#GraphQLEndpointInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#EndpointInterface"/>
+    <rdfs:label xml:lang="en">GraphQL Endpoint Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface to access a federation member via a GraphQL API.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#TPFInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#FragmentInterface"/>
+    <rdfs:label xml:lang="en">TPF Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface to access a federation member via Triple Pattern Fragments.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#interface">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/feddesc#FederationMember"/>
+    <rdfs:range rdf:resource="http://w3id.org/hefquin/feddesc#Interface"/>
+    <rdfs:label xml:lang="en">interface</rdfs:label>
+    <rdfs:comment xml:lang="en">The interface description for accessing the federation member.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#mappingConfiguration">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/feddesc#FederationMember"/>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource"/>
+    <rdfs:label xml:lang="en">mapping configuration</rdfs:label>
+    <rdfs:comment xml:lang="en">Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG).</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#exampleFragmentAddress">
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="http://w3id.org/hefquin/feddesc#FragmentInterface"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+    <rdfs:label xml:lang="en">example fragment address</rdfs:label>
+    <rdfs:comment xml:lang="en">An example URL of a fragment for pattern fragment interfaces.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#Interface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface is a means to issue data retrieval requests to a federation member. This class is a superclass of any kind of interface and should not be used directly within federation descriptions. Concrete types of interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <dc:creator>Olaf Hartig</dc:creator>
+    <dc:creator>Robin Keskisärkkä</dc:creator>
+    <dc:date>2025-05-05</dc:date>
+    <dc:format>RDF</dc:format>
+    <dc:identifier rdf:resource="http://w3id.org/hefquin/feddesc"/>
+    <dc:title xml:lang="en">Federation Description Vocabulary for HeFQUIN</dc:title>
+    <rdfs:label xml:lang="en">Federation Description Vocabulary for HeFQUIN</rdfs:label>
+    <dc:description xml:lang="en">An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine.</dc:description>
+    <rdfs:comment xml:lang="en">An RDF vocabulary for describing members of a federation to be considered for querying by the HeFQUIN engine.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#SPARQLEndpointInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#EndpointInterface"/>
+    <rdfs:label xml:lang="en">SPARQL Endpoint Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface to access a federation member via the SPARQL protocol.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#FederationMember">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:label xml:lang="en">Federation Member</rdfs:label>
+    <rdfs:comment xml:lang="en">An entity that is part of the federation and provides data via a specific interface.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#EndpointInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#Interface"/>
+    <rdfs:label xml:lang="en">Endpoint Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An endpoint interface is an interface that can be accessed via a single HTTP endpoint. This class is a superclass of any kind of fragment interface and should not be used directly within federation descriptions. Concrete types of fragment interfaces, to be used in federation descriptions, are captured by the subclasses of this class.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#brTPFInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#FragmentInterface"/>
+    <rdfs:label xml:lang="en">brTPF Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface to access a federation member via Bindings-Restricted Triple Pattern Fragments.</rdfs:comment>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://w3id.org/hefquin/feddesc#BoltInterface">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://w3id.org/hefquin/feddesc#EndpointInterface"/>
+    <rdfs:label xml:lang="en">Bolt Interface</rdfs:label>
+    <rdfs:comment xml:lang="en">An interface to access a federation member using the Bolt protocol (e.g., for Neo4j).</rdfs:comment>
+  </rdf:Description>
+</rdf:RDF>
