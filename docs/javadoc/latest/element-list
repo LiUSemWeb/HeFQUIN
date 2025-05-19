@@ -8,8 +8,7 @@ se.liu.ida.hefquin.base.datastructures.impl
 se.liu.ida.hefquin.base.datastructures.impl.cache
 se.liu.ida.hefquin.base.query
 se.liu.ida.hefquin.base.query.impl
-se.liu.ida.hefquin.base.queryplan
-se.liu.ida.hefquin.base.queryplan.utils
+se.liu.ida.hefquin.base.query.utils
 se.liu.ida.hefquin.base.utils
 se.liu.ida.hefquin.cli
 se.liu.ida.hefquin.cli.modules
@@ -29,7 +28,6 @@ se.liu.ida.hefquin.engine.queryplan.executable
 se.liu.ida.hefquin.engine.queryplan.executable.impl
 se.liu.ida.hefquin.engine.queryplan.executable.impl.iterbased
 se.liu.ida.hefquin.engine.queryplan.executable.impl.ops
-se.liu.ida.hefquin.engine.queryplan.executable.impl.pullbased
 se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased
 se.liu.ida.hefquin.engine.queryplan.logical
 se.liu.ida.hefquin.engine.queryplan.logical.impl
@@ -79,6 +77,9 @@ se.liu.ida.hefquin.engine.wrappers.lpg.query.impl.match
 se.liu.ida.hefquin.engine.wrappers.lpg.utils
 se.liu.ida.hefquin.engine.wrappers.lpg.vocabulary
 se.liu.ida.hefquin.jenaext
+se.liu.ida.hefquin.jenaext.graph
+se.liu.ida.hefquin.jenaext.sparql.algebra
+se.liu.ida.hefquin.jenaext.sparql.syntax
 se.liu.ida.hefquin.jenaintegration.sparql
 se.liu.ida.hefquin.jenaintegration.sparql.engine.main
 se.liu.ida.hefquin.service
