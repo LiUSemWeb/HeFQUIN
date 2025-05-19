@@ -220,6 +220,8 @@ public class QueryPatternUtilsTest {
 		assertTrue( el instanceof ElementUnion );
 		
 		final List<Element> list = ((ElementUnion) el).getElements();
+		assertEquals( 2, list.size() );
+
 		final Element left = list.get(0);
 		final Element right = list.get(1);
 
