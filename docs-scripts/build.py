@@ -69,7 +69,8 @@ def create_documentation(name, version):
 
 def main():
     vocabs = { "engineconf" : "0.0.1",
-               "lpg2rdfconf" : "0.0.1" }
+               "lpg2rdfconf" : "0.0.1",
+               "feddesc" : "0.0.1" }
 
     for name, version in vocabs.items():
         source = f"hefquin-vocabs/{name}.ttl"
