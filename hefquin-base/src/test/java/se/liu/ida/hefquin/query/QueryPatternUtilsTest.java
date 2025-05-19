@@ -140,6 +140,7 @@ public class QueryPatternUtilsTest {
 
 		final OpBGP opBGP = (OpBGP) op;
 		final List<Triple> opTriples = opBGP.getPattern().getList();
+		assertEquals( 3, opTriples.size() );
 		assertTrue( opTriples.contains( tp1.asJenaTriple() ) );
 		assertTrue( opTriples.contains( tp2.asJenaTriple() ) );
 		assertTrue( opTriples.contains( tp3.asJenaTriple() ) );
