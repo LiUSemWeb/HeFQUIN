@@ -177,6 +177,7 @@ public class QueryPatternUtilsTest {
 
 		final ElementTriplesBlock etb = (ElementTriplesBlock) el;
 		final List<Triple> list = etb.getPattern().getList();
+		assertEquals( 1, list.size() );
 		assertTrue( list.contains( tp.asJenaTriple() ) );
 	}
 
