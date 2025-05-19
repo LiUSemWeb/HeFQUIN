@@ -9,11 +9,20 @@ from pylode.profiles.vocpub import VocPub
 # Configure root logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    level=logging.DEBUG)
 
 
 def hash_file(filename):
-    """Returns the SHA-256 hash of the file passed into it"""
+    """
+    Compute the SHA-256 hash of a file.
+
+    Parameters:
+        filename (str): Path to the file.
+
+    Returns:
+        str: Hexadecimal SHA-256 hash of the file content.
+    """
     sha256_hash = hashlib.sha256()
 
     with open(filename, 'rb') as f:
@@ -24,9 +33,16 @@ def hash_file(filename):
 
 
 def copy_vocabularies(name, version):
-    """Copy ontologies to docs/vocab."""
-    logger.info("Copy vocabularies")
-    logger.info(f"Copying {name}")
+    """
+    Copy the RDF vocabulary file to 'docs/vocab' and generate serialized
+    versions in RDF/XML and JSON-LD formats for both versioned and latest
+    targets.
+
+    Parameters:
+        name (str): Vocabulary name (without extension).
+        version (str): Vocabulary version identifier.
+    """
+    logger.info("Copying vocabulary: '%s'", name)
 
     versioned_target = f"docs/vocab/{name}/{version}/"
     latest_target = f"docs/vocab/{name}/latest/"
@@ -48,10 +64,16 @@ def copy_vocabularies(name, version):
 
 
 def create_documentation(name, version):
-    """Generate LODE documentation."""
-    logger.info(f"Generating vocabulary documentation")
+    """
+    Generate LODE-style HTML documentation for the vocabulary.
 
-    logger.info(f"Generating documentation for {name}")
+    Parameters:
+        name (str): Vocabulary name.
+        version (str): Vocabulary version identifier.
+    """
+    logger.info("Generating vocabulary documentation")
+
+    logger.info("Generating documentation for '%s'", name)
     versioned_target = f"docs/vocab/{name}/{version}/index.html"
     latest_target = f"docs/vocab/{name}/latest/index.html"
 
@@ -60,14 +82,20 @@ def create_documentation(name, version):
     od = VocPub(ontology=source)
     html = od.make_html()
 
-    with open(versioned_target, "w") as f:
+    with open(versioned_target, "w", encoding="utf8") as f:
         f.write(html)
 
-    with open(latest_target, "w") as f:
+    with open(latest_target, "w", encoding="utf8") as f:
         f.write(html)
 
 
 def main():
+    """
+    Iterates over a set of vocabularies. If they have been updated
+    ig then:
+    - Copies and serializes them
+    - Generates HTML documentation using pyLODE.
+    """
     vocabs = { "engineconf" : "0.0.1",
                "lpg2rdfconf" : "0.0.1",
                "feddesc" : "0.0.1" }
@@ -77,11 +105,12 @@ def main():
         target = f"docs/vocab/{name}/{version}/{name}.ttl"
         # Compute hashes for both files
         if os.path.isfile(target) and hash_file(source) == hash_file(target):
-            logger.info(f"No changes detected, skipping \"{name}\"")
+            logger.info("No changes detected, skipping '%s'", name)
             continue
 
-        copy_vocabularies(name, version)
+        copy_vocabularies(name, version)    
         create_documentation(name, version)
+
 
 if __name__ == "__main__":
     main()
