@@ -1,6 +1,6 @@
 ## What is HeFQUIN?
 
-HeFQUIN is a query‑federation engine for heterogeneous graph‑data sources (e.g., federated knowledge graphs).
+HeFQUIN is a query federation engine for heterogeneous graph data sources (e.g., federated knowledge graphs).
 
 Project home and documentation: https://liusemweb.github.io/HeFQUIN/
 
