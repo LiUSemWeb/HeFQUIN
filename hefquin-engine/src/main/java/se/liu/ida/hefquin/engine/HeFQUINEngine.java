@@ -99,4 +99,9 @@ public interface HeFQUINEngine
 	}
 
 	FederationAccessStats getFederationAccessStats();
+
+	/**
+	 * Shutdown engine and clean-up all thread pools (execution services).
+	 */
+	void shutdown();
 }
