@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
@@ -16,9 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 
 /**
  * Builder class that can be used to create a fully-wired instance of
- * {@link HeFQUINEngine} and its execution {@link Context}. The returned wrapper
- * is {@code AutoCloseable} so that the caller can rely on try-with-resources to
- * guarantee clean-up of thread pools and other resources.
+ * {@link HeFQUINEngine}.
  */
 public class HeFQUINEngineBuilder
 {
@@ -90,7 +87,7 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the logical plan printer to be used by the engine.
 	 *
-	 * @param ptiner a logical plan printer
+	 * @param printer a logical plan printer
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withLogicalPlanPrinter( final LogicalPlanPrinter printer ) {
@@ -101,7 +98,7 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the physical plan printer to be used by the engine.
 	 *
-	 * @param ptiner a physical plan printer
+	 * @param printer a physical plan printer
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withPhysicalPlanPrinter( final PhysicalPlanPrinter printer ) {
@@ -147,13 +144,12 @@ public class HeFQUINEngineBuilder
 	 * parameters configured via this builder.
 	 *
 	 * The federation catalog must be provided via {@code withFederationCatalog},
-	 * while deafult values will be used fro the remaining optional components
-	 * unless specified explicitly.
+	 * default values will be used for all other components unless specified explicitly.
 	 *
-	 * @return a wrapper for the initialized engine and context
+	 * @return an initialized {@link HeFQUINEngine} instance
 	 * @throws IllegalStateException if the federation catalog has not been set
 	 */
-	public HeFQUINEngineAndContext build() {		
+	public HeFQUINEngine build() {
 		assert fedCat != null;
 
 		if(execFed == null){
@@ -184,47 +180,6 @@ public class HeFQUINEngineBuilder
 		ARQ.init();
 		engine.integrateIntoJena();
 
-		return new HeFQUINEngineAndContext(engine, ctx);
-	}
-
-	// ─────────────── engine wrapper ───────────────
-
-	/**
-	 * Immutable wrapper that provides a {@link HeFQUINEngine} instance and the
-	 * {@link Context} it was configured with. Implements
-	 * {@link java.lang.AutoCloseable}.
-	 */
-	public record HeFQUINEngineAndContext( HeFQUINEngine engine, Context ctx )
-			implements AutoCloseable {
-
-		/**
-		 * Closes both executor services in the context. The method first attempts to
-		 * performs an orderly shutdown. If the tasks fail to finish within 500 ms
-		 * {@link ExecutorService#shutdownNow()} is called.
-		 */
-		@Override
-		public void close() {
-			shutdown( ctx.getExecutorServiceForFederationAccess() );
-			shutdown( ctx.getExecutorServiceForPlanTasks() );
-		}
-
-		/**
-		 * Helper method to shut down a single executor service within a bounded wait
-		 * time of 500ms.
-		 *
-		 * @param executorService the executor service to terminate
-		 */
-		private static void shutdown( final ExecutorService executorService ) {
-			executorService.shutdown();
-			try {
-				if ( ! executorService.awaitTermination( 500L, TimeUnit.MILLISECONDS ) ) {
-					executorService.shutdownNow();
-				}
-			}
-			catch ( InterruptedException ex ) {
-				Thread.currentThread().interrupt();
-				executorService.shutdownNow();
-			}
-		}
+		return engine;
 	}
 }
