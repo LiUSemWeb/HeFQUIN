@@ -12,6 +12,8 @@ import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 
 /**
  * Factory class that can be used to create a fully-wired instance of
@@ -75,6 +77,10 @@ public class HeFQUINEngineFactory
 				.createExecutorServiceForFedAccess();
 		final ExecutorService execPlan = HeFQUINEngineDefaultComponents
 				.createExecutorServiceForPlanTasks();
+		
+		final LogicalPlanPrinter srcasgPrinter = new TextBasedLogicalPlanPrinterImpl();
+		final LogicalPlanPrinter lplanPrinter = new TextBasedLogicalPlanPrinterImpl();
+		final PhysicalPlanPrinter pplanPrinter = new TextBasedPhysicalPlanPrinterImpl();
 
 		// create context
 		final Context ctx = new HeFQUINEngineConfigReader.Context() {
@@ -83,9 +89,9 @@ public class HeFQUINEngineFactory
 			public FederationCatalog getFederationCatalog() { return fedCat; }
 			public boolean isExperimentRun() { return false; }
 			public boolean skipExecution() { return false; }
-			public LogicalPlanPrinter getSourceAssignmentPrinter() { return null; }
-			public LogicalPlanPrinter getLogicalPlanPrinter() { return null; }
-			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return null; }
+			public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
+			public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
+			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
 		};
 
 		// init engine
