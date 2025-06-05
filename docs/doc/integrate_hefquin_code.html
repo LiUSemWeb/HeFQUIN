@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN - Using HeFQUIN as a Java library</title>
+   
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-java.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
 
     <script src="../js/mustache.min.js"></script>
     <script src="../js/script.js"></script>
@@ -21,12 +29,44 @@
             Once you have added <a href="hefquin_via_maven.html">HeFQUIN as a dependency for your Maven project</a>, you can use any of the Java interfaces and classes of the HeFQUIN source code in the Java code of your project. You find information about these interfaces and classes in our <a href="../doc/javadoc.html">Javadoc documentation</a>.
         </p>
         <p>
-            Most likely, you want to use an instance of the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine">HeFQUINEngine</a> class to execute queries.
+            Most likely, you'll want to use an instance of the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine">HeFQUINEngine</a> class to execute queries. To get started, use the <a href"../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngineBuilder">HeFQUINEngineBuilder</a>:
+<pre><code class="language-java">package org.example;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.resultset.ResultsFormat;
+import se.liu.ida.hefquin.engine.HeFQUINEngineFactory.HeFQUINEngineAndContext;
+
+public class Main {
+	public static void main( String[] args ) throws Exception {
+        final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
+            .withFederationCatalog("ExampleFederation.ttl");
+        
+        final HeFQUINEngine engine = builder.build();
+        final String queryString = Files.readString( Path.of("ExampleQuery.rq") );
+        final Query q = QueryFactory.create(queryString);
+        engine.executeQuery(q, ResultsFormat.FMT_TEXT, System.out);
+        engine.shutdown();
+	}
+}
+</code></pre>
         </p>
         <p>
-            ... Sorry, this page of the user documentation is still to be completed.
+            The federation catalog must be provided via <code>withFederationCatalog(...)</code>, while default values will be
+            used for all other components unless specified explicitly. The following example demonstrates how to configure all
+            available options:
+<pre><code class="language-java">final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
+    .withFederationCatalog("ExampleFederation.ttl")
+    .withEngineConfiguration("ExampleEngineConf.ttl")
+    .withLogicalPlanPrinter(new TextBasedLogicalPlanPrinterImpl())
+    .withPhysicalPlanPrinter(new TextBasedPhysicalPlanPrinterImpl())
+    .withSourceAssignmentPrinter(new TextBasedLogicalPlanPrinterImpl())
+    .withExperimentRun(false)
+    .withSkipExecution(false);
+</code></pre>
         </p>
-
     </main>
 
     <div id="footer"></div>
