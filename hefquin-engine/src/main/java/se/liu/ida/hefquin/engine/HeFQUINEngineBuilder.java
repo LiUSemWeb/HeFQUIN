@@ -1,0 +1,230 @@
+package se.liu.ida.hefquin.engine;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.jena.query.ARQ;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFParser;
+import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+
+/**
+ * Builder class that can be used to create a fully-wired instance of
+ * {@link HeFQUINEngine} and its execution {@link Context}. The returned wrapper
+ * is {@code AutoCloseable} so that the caller can rely on try-with-resources to
+ * guarantee clean-up of thread pools and other resources.
+ */
+public class HeFQUINEngineBuilder
+{
+	private FederationCatalog fedCat = null;
+	private Model engineConf = null;
+	private boolean skipExecution = false;
+	private boolean isExperimentRun = false;
+	private ExecutorService execFed = null;
+	private ExecutorService execPlan = null;
+	private LogicalPlanPrinter srcasgPrinter = null;
+	private LogicalPlanPrinter lplanPrinter = null;
+	private PhysicalPlanPrinter pplanPrinter = null;
+
+	/**
+	 * Sets the federation catalog to be used by the engine.
+	 *
+	 * @param fedCat a federation catalog
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withFederationCatalog( final FederationCatalog fedCat ) {
+		this.fedCat = fedCat;
+		return this;
+	}
+
+	/**
+	 * Sets the federation catalog to be used by the engine.
+	 *
+	 * @param fedCatFile a federation catalog file
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withFederationCatalog( final String fedCatFile ) {
+		this.fedCat = FederationDescriptionReader.readFromFile(fedCatFile);
+		return this;
+	}
+
+	/**
+	 * Sets the federation catalog to be used by the engine.
+	 *
+	 * @param fedCatModel a federation catalog model
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withFederationCatalog( final Model fedCatModel ) {
+		this.fedCat = FederationDescriptionReader.readFromModel(fedCatModel);
+		return this;
+	}
+
+	/**
+	 * Sets the engine configuration to be used by the engine.
+	 *
+	 * @param engineConf an engine configuration
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withEngineConfiguration( final Model engineConf ) {
+		this.engineConf = engineConf;
+		return this;
+	}
+
+	/**
+	 * Sets the engine configuration to be used by the engine.
+	 *
+	 * @param engineConfFile an engine configuration file
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withEngineConfiguration( final String engineConfFile ) {
+		this.engineConf = RDFDataMgr.loadModel(engineConfFile);
+		return this;
+	}
+
+	/**
+	 * Sets the logical plan printer to be used by the engine.
+	 *
+	 * @param ptiner a logical plan printer
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withLogicalPlanPrinter( final LogicalPlanPrinter printer ) {
+		this.lplanPrinter = printer;
+		return this;
+	}
+
+	/**
+	 * Sets the physical plan printer to be used by the engine.
+	 *
+	 * @param ptiner a physical plan printer
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withPhysicalPlanPrinter( final PhysicalPlanPrinter printer ) {
+		this.pplanPrinter = printer;
+		return this;
+	}
+
+	/**
+	 * Sets the source assignment printer to be used by the engine.
+	 *
+	 * @param ptiner a source assignment printer
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withSourceAssignmentPrinter( final LogicalPlanPrinter printer ) {
+		this.srcasgPrinter = printer;
+		return this;
+	}
+
+	/**
+	 * Sets whether the engine should skip execution after query planning.
+	 *
+	 * @param skip whether to skip query execution
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withSkipExecution( final boolean skip ) {
+		this.skipExecution = skip;
+		return this;
+	}
+
+	/**
+	 * Sets whether the engine should treat the current run as part of an experiment.
+	 *
+	 * @param isExperimentRun whether this is an experimental run
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withExperimentRun(final boolean isExperimentRun) {
+		this.isExperimentRun = isExperimentRun;
+		return this;
+	}
+
+	/**
+	 * Builds and initializes a {@link HeFQUINEngineAndContext} instance using the
+	 * parameters configured via this builder.
+	 *
+	 * The federation catalog must be provided via {@code withFederationCatalog},
+	 * while deafult values will be used fro the remaining optional components
+	 * unless specified explicitly.
+	 *
+	 * @return a wrapper for the initialized engine and context
+	 * @throws IllegalStateException if the federation catalog has not been set
+	 */
+	public HeFQUINEngineAndContext build() {		
+		assert fedCat != null;
+
+		if(execFed == null){
+			execFed = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
+		}
+		if(execPlan == null){
+			execPlan = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+		}
+		if(engineConf == null){
+			final String ttl = HeFQUINEngineDefaultComponents.getDefaultConfigurationDescription();
+        	engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
+		}
+
+		// create context
+		final Context ctx = new HeFQUINEngineConfigReader.Context() {
+			public ExecutorService getExecutorServiceForFederationAccess() { return execFed; }
+			public ExecutorService getExecutorServiceForPlanTasks() { return execPlan; }
+			public FederationCatalog getFederationCatalog() { return fedCat; }
+			public boolean isExperimentRun() { return isExperimentRun; }
+			public boolean skipExecution() { return skipExecution; }
+			public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
+			public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
+			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
+		};
+
+		// init engine
+		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read(engineConf, ctx);
+		ARQ.init();
+		engine.integrateIntoJena();
+
+		return new HeFQUINEngineAndContext(engine, ctx);
+	}
+
+	// ─────────────── engine wrapper ───────────────
+
+	/**
+	 * Immutable wrapper that provides a {@link HeFQUINEngine} instance and the
+	 * {@link Context} it was configured with. Implements
+	 * {@link java.lang.AutoCloseable}.
+	 */
+	public record HeFQUINEngineAndContext( HeFQUINEngine engine, Context ctx )
+			implements AutoCloseable {
+
+		/**
+		 * Closes both executor services in the context. The method first attempts to
+		 * performs an orderly shutdown. If the tasks fail to finish within 500 ms
+		 * {@link ExecutorService#shutdownNow()} is called.
+		 */
+		@Override
+		public void close() {
+			shutdown( ctx.getExecutorServiceForFederationAccess() );
+			shutdown( ctx.getExecutorServiceForPlanTasks() );
+		}
+
+		/**
+		 * Helper method to shut down a single executor service within a bounded wait
+		 * time of 500ms.
+		 *
+		 * @param executorService the executor service to terminate
+		 */
+		private static void shutdown( final ExecutorService executorService ) {
+			executorService.shutdown();
+			try {
+				if ( ! executorService.awaitTermination( 500L, TimeUnit.MILLISECONDS ) ) {
+					executorService.shutdownNow();
+				}
+			}
+			catch ( InterruptedException ex ) {
+				Thread.currentThread().interrupt();
+				executorService.shutdownNow();
+			}
+		}
+	}
+}
