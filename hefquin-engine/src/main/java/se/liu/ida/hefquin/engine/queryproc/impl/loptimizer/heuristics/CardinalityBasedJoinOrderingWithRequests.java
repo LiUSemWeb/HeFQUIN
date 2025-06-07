@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.engine.federation.access.UnsupportedOperationDueToRetr
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
@@ -154,15 +155,15 @@ public class CardinalityBasedJoinOrderingWithRequests extends CardinalityBasedJo
 	protected List<LogicalOpRequest<?,?>> extractAllRequestOps( final LogicalPlan plan ) {
 		final LogicalOperator rootOp = plan.getRootOperator();
 
-		if ( rootOp instanceof LogicalOpRequest ) {
-			return Arrays.asList( (LogicalOpRequest<?,?>) rootOp );
+		if ( rootOp instanceof LogicalOpRequest reqOp ) {
+			return Arrays.asList(reqOp);
 		}
 		else if ( rootOp instanceof LogicalOpFilter )
 		{
 			final LogicalPlan subplan = plan.getSubPlan(0);
 			final LogicalOperator subrootOp = subplan.getRootOperator();
-			if ( subrootOp instanceof LogicalOpRequest ) {
-				return Arrays.asList( (LogicalOpRequest<?,?>) subrootOp );
+			if ( subrootOp instanceof LogicalOpRequest subReqOp ) {
+				return Arrays.asList(subReqOp);
 			}
 			if ( subrootOp instanceof LogicalOpLocalToGlobal ) {
 				return extractAllRequestOps(subplan);
@@ -171,12 +172,16 @@ public class CardinalityBasedJoinOrderingWithRequests extends CardinalityBasedJo
 				throw new IllegalArgumentException("Unsupported type of subplan under filter (" + subrootOp.getClass().getName() + ")");
 			}
 		}
+		else if ( rootOp instanceof LogicalOpBind )
+		{
+			return extractAllRequestOps( plan.getSubPlan(0) );
+		}
 		else if ( rootOp instanceof LogicalOpLocalToGlobal )
 		{
 			final LogicalPlan subplan = plan.getSubPlan(0);
 			final LogicalOperator subrootOp = subplan.getRootOperator();
-			if ( subrootOp instanceof LogicalOpRequest ) {
-				return Arrays.asList( (LogicalOpRequest<?,?>) subrootOp );
+			if ( subrootOp instanceof LogicalOpRequest subReqOp ) {
+				return Arrays.asList(subReqOp);
 			}
 			if ( subrootOp instanceof LogicalOpFilter ) {
 				return extractAllRequestOps(subplan);
