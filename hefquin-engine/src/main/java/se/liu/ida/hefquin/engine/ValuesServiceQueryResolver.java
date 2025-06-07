@@ -28,6 +28,7 @@ import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 
 import se.liu.ida.hefquin.jenaext.PatternVarsAll;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
 
 /**
  * Queries with a WHERE clause of a form such as the following one need to be
@@ -357,7 +358,7 @@ public class ValuesServiceQueryResolver
 
 		// Rewrite the elements that are in scope of the given VALUES clause
 		// (by using the solution mappings of the VALUES clause as a basis).
-		final Element rewrittenValuesScope = rewrite(valClause, elmts, startPos, endOfScope );
+		final List<Element> rewrittenValuesScope = rewrite(valClause, elmts, startPos, endOfScope );
 
 		// Create the resulting list of elements, for which we need to consider
 		// two cases: either there is no next VALUES clause or there is.
@@ -366,8 +367,7 @@ public class ValuesServiceQueryResolver
 			// If there is no next VALUES clause, the result is a singleton
 			// list that contains the element obtained by rewriting the
 			// elements that are in scope of the given VALUES clause.
-			result = new ArrayList<>();
-			result.add(rewrittenValuesScope);
+			result = rewrittenValuesScope;
 		}
 		else {
 			// If there is a next VALUES clause, the result is a list whose
@@ -378,7 +378,7 @@ public class ValuesServiceQueryResolver
 			result = expandValuesPlusServicePattern( elmts,
 			                                         (ElementData) elmts.get(posNextValuesClause),
 			                                         posNextValuesClause+1 );
-			result.add(0, rewrittenValuesScope);
+			result.addAll(0, rewrittenValuesScope);
 		}
 
 		return result;
@@ -451,14 +451,14 @@ public class ValuesServiceQueryResolver
 	 * elements from the given start position until (and including) the given
 	 * end position. Assumes that none of these elements is a VALUES clause.
 	 */
-	protected static Element rewrite( final ElementData valClause,
-	                                  final List<Element> elmts,
-	                                  final int startPos,
-	                                  final int endPos ) {
+	protected static List<Element> rewrite( final ElementData valClause,
+	                                        final List<Element> elmts,
+	                                        final int startPos,
+	                                        final int endPos ) {
 		// First, rewrite the relevant list elements based on the
 		// first solution mapping of the given VALUES clause.
 		final Iterator<Binding> it = valClause.getRows().iterator();
-		final Element rewriteUsingFirstRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
+		final List<Element> rewriteUsingFirstRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
 
 		// If the given VALUES clause contains only one solution mapping,
 		// we are done and can return the result of rewriting based on
@@ -472,18 +472,20 @@ public class ValuesServiceQueryResolver
 		// based on the first solution mapping becomes the first part of this
 		// UNION pattern.
 		final ElementUnion eu = new ElementUnion();
-		eu.addElement(rewriteUsingFirstRow);
+		eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingFirstRow) );
 
 		// Iterate over the remaining solution mappings of the given VALUES
 		// clause, rewrite the relevant list elements based on each of them,
 		// and add each of the resulting rewritings as another part of the
 		// UNION clause.
 		while ( it.hasNext() ) {
-			final Element rewriteUsingNextRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
-			eu.addElement(rewriteUsingNextRow);
+			final List<Element> rewriteUsingNextRow = rewrite( it.next(), elmts, startPos, endPos, valClause.getVars() );
+			eu.addElement( ElementUtils.createElementGroupIfNeeded(rewriteUsingNextRow) );
 		}
 
-		return eu;
+		final List<Element> result = new ArrayList<>();
+		result.add(eu);
+		return result;
 	}
 
 	/**
@@ -497,16 +499,16 @@ public class ValuesServiceQueryResolver
 	 * the variable, then a BIND clause is added that assigns the variable to
 	 * the corresponding RDF term of the solution mapping.
 	 */
-	protected static Element rewrite( final Binding solmap,
-	                                  final List<Element> elmts,
-	                                  final int startPos,
-	                                  final int endPos,
-	                                  final List<Var> varsForBind ) {
+	protected static List<Element> rewrite( final Binding solmap,
+	                                        final List<Element> elmts,
+	                                        final int startPos,
+	                                        final int endPos,
+	                                        final List<Var> varsForBind ) {
 		// Initialization of the element transformer that changes the SERVICE
 		// clauses and of the group pattern into which the potentially rewritten
 		// query elements will be added.
 		final ElementTransform transform = new MyElementTransform(solmap);
-		final ElementGroup newElmts = new ElementGroup();
+		final List<Element> newElmts = new ArrayList<>();
 
 		// Iterate over the relevant elements of the given list of query elements.
 		for ( int i = startPos; i <= endPos; i++ ) {
@@ -525,7 +527,7 @@ public class ValuesServiceQueryResolver
 			}
 			else {
 				// Otherwise, we add the new element to the new group graph pattern.
-				newElmts.addElement(eNew);
+				newElmts.add(eNew);
 			}
 		}
 
@@ -534,7 +536,7 @@ public class ValuesServiceQueryResolver
 			final Node n = solmap.get(v);
 			if ( n != null ) {
 				final NodeValue nv = NodeValue.makeNode(n);
-				newElmts.addElement( new ElementBind(v, nv) );
+				newElmts.add( new ElementBind(v, nv) );
 			}
 		}
 
