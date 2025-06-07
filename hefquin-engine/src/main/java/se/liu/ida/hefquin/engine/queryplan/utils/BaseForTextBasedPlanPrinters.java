@@ -2,6 +2,10 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.io.PrintStream;
 
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.util.ExprUtils;
+
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -114,6 +118,25 @@ public class BaseForTextBasedPlanPrinters
 		out.append( System.lineSeparator() );
 	}
 
+	protected static void printExpressions( final ExprList exprs,
+	                                        final String indentString,
+	                                        final PrintStream out ) {
+		final int numberOfExprs = exprs.size();
+		if ( numberOfExprs == 1 ) {
+			final Expr expr = exprs.get(0);
+			out.append( indentString + "  - expression: " + ExprUtils.fmtSPARQL(expr) );
+			out.append( System.lineSeparator() );
+		}
+		else {
+			out.append( indentString + "  - number of expressions: " + numberOfExprs );
+			out.append( System.lineSeparator() );
+			for ( int i = 0; i < numberOfExprs; i++ ) {
+				final Expr expr = exprs.get(i);
+				out.append( indentString + "  - expression " + (i+1) + ": " + ExprUtils.fmtSPARQL(expr) );
+				out.append( System.lineSeparator() );
+			}
+		}
+	}
 
 	protected static void printLogicalOperatorBase( final LogicalOperator lop,
 	                                                final String indentString,

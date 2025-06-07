@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -96,7 +97,8 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
 				final Var var = e.getKey();
 				final Expr expr = e.getValue();
-				out.append( indentLevelStringForOpDetail + singleBase + "  - " + var.toString() + " <-- " + expr.toString() );
+				out.append( indentLevelStringForOpDetail + singleBase );
+				out.append( "  - " + var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 				out.append( System.lineSeparator() );
 			}
 
@@ -108,8 +110,10 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpFilter op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
-			out.append( indentLevelStringForOpDetail + singleBase + "  - expression (" + op.getFilterExpressions().toString() +  ") " );
-			out.append( System.lineSeparator() );
+
+			printExpressions( op.getFilterExpressions(),
+			                  indentLevelStringForOpDetail + singleBase,
+			                  out );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );

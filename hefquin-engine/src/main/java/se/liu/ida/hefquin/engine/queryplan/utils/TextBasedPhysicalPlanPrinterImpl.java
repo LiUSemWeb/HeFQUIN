@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
 import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.FederationMember;
@@ -136,8 +137,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
 
-			out.append( indentLevelStringForOpDetail + singleBase + "  - filterExpressions: " + lop.getFilterExpressions().toString() );
-			out.append( System.lineSeparator() );
+			printExpressions( lop.getFilterExpressions(),
+			                  indentLevelStringForOpDetail + singleBase,
+			                  out );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
@@ -155,7 +157,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			for ( Map.Entry<Var, Expr> e : bindExpressions.getExprs().entrySet() ) {
 				final Var var = e.getKey();
 				final Expr expr = e.getValue();
-				out.append( indentLevelStringForOpDetail + singleBase + "  - " + var.toString() + " <-- " + expr.toString() );
+				out.append( indentLevelStringForOpDetail + singleBase );
+				out.append( "  - " + var.toString() + " <-- " + ExprUtils.fmtSPARQL(expr) );
 				out.append( System.lineSeparator() );
 			}
 
