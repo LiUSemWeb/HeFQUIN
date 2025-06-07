@@ -247,6 +247,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			final DataRetrievalRequest req = lop.getRequest();
 			out.append( indentLevelStringForOpDetail + "  - pattern (" + req.hashCode() +  ") (" + req.toString() + ")" );
 			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
@@ -254,6 +257,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "SHJ (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 	}
 
