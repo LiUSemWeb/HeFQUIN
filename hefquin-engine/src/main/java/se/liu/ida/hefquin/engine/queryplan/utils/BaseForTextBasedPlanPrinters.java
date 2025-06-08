@@ -43,10 +43,7 @@ public class BaseForTextBasedPlanPrinters
 		}
 
 		if ( upperRootOpIndentString.endsWith(nonLastChildIndentBase) ) {
-			String indentLevelString = "";
-			for ( int i = 1; i < planLevel; i++ ) {
-				indentLevelString += levelIndentBase;
-			}
+			final String indentLevelString = upperRootOpIndentString.substring( 0, upperRootOpIndentString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
 
 			if ( planNumber < numberOfSiblings-1 ) {
 				return indentLevelString + nonLastChildIndentBase;
@@ -89,14 +86,8 @@ public class BaseForTextBasedPlanPrinters
 		else if ( indentLevelString.endsWith(nonLastChildIndentBase) ) {
 			return indentLevelString.substring( 0, indentLevelString.length() - nonLastChildIndentBase.length() ) + levelIndentBase;
 		}
-		else if ( indentLevelString.endsWith(lastChildIndentBase) && indentLevelString.startsWith(" ") ) {
-			return indentLevelString.replaceAll( ".", " " );
-		}
-		else if ( indentLevelString.endsWith(lastChildIndentBase) && indentLevelString.startsWith(levelIndentBase) ) {
+		else if ( indentLevelString.endsWith(lastChildIndentBase) ) {
 			return indentLevelString.substring( 0, indentLevelString.length() - lastChildIndentBase.length() ) + spaceBase;
-		}
-		else if ( indentLevelString.equals(lastChildIndentBase) ) {
-			return indentLevelString.replaceAll( ".", " " );
 		}
 
 		return "";

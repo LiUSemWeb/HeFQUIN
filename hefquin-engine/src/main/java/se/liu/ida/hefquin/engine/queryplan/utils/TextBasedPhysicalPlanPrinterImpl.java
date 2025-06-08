@@ -223,6 +223,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "multiway union (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, lopNP );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
@@ -235,6 +238,9 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		@Override
 		public void visit( final PhysicalOpParallelMultiLeftJoin op ) {
 			out.append( indentLevelString + "parallel multiway left-outer join (" + op.getID() + ") " );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 

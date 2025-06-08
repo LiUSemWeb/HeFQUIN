@@ -171,17 +171,26 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 		public void visit( final LogicalOpMultiwayJoin op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayLeftJoin op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
 			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
 		}
 
 		@Override
 		public void visit( final LogicalOpMultiwayUnion op ) {
 			printLogicalOperatorBase( op, indentLevelString, out, np );
+			out.append( System.lineSeparator() );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
 			out.append( System.lineSeparator() );
 		}
 
