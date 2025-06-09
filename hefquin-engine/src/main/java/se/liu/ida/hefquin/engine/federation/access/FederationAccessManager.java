@@ -39,4 +39,9 @@ public interface FederationAccessManager extends StatsProvider
 
 	@Override
 	FederationAccessStats getStats();
+
+	/**
+	 * Shutdown all thread pools associated with this federation access manager.
+	 */
+	void shutdown();
 }

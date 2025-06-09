@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import se.liu.ida.hefquin.base.datastructures.Cache;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
@@ -347,4 +348,11 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return stats;
 	}
 
+	/**
+	 * Shutdown all thread pools associated with this federation access manager.
+	 */
+	@Override
+	public void shutdown() {
+		fedAccMan.shutdown();
+	}
 }
