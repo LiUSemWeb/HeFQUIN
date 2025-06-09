@@ -151,7 +151,9 @@ public class HeFQUINEngineBuilder
 	 * @throws IllegalStateException if the federation catalog has not been set
 	 */
 	public HeFQUINEngine build() {
-		assert fedCat != null;
+		if( fedCat == null ){
+			throw new IllegalStateException("No federation catalog has been set");
+		}
 
 		if ( execFed == null ) {
 			execFed = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
