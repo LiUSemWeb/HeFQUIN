@@ -516,6 +516,10 @@ public abstract class EngineTestBase
 		public FederationAccessStats getStats() {
 			throw new UnsupportedOperationException();
 		}
-	}
 
+		@Override
+		public void shutdown() {
+			// do nothing
+		}
+	}
 }
