@@ -123,9 +123,6 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 		}
 	}
 
-	/**
-	 * Shutdown all thread pools associated with this engine.
-	 */
 	@Override
 	public void shutdown() {
 		fedAccessMgr.shutdown();
