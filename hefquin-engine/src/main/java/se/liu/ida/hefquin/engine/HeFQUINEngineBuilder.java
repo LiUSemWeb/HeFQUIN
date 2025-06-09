@@ -109,7 +109,7 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the source assignment printer to be used by the engine.
 	 *
-	 * @param ptiner a source assignment printer
+	 * @param printer a logical plan printer to be used when printing a source assignment that is the input to logical plan optimization
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withSourceAssignmentPrinter( final LogicalPlanPrinter printer ) {
