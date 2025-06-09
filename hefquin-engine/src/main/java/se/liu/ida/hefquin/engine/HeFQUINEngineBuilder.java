@@ -87,7 +87,8 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the logical plan printer to be used by the engine.
 	 *
-	 * @param printer a logical plan printer
+	 * @param printer a logical plan printer to be used when printing the logical
+	 *                plans after logical plan optimization
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withLogicalPlanPrinter( final LogicalPlanPrinter printer ) {
