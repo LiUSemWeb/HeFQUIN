@@ -141,7 +141,7 @@ public class HeFQUINEngineBuilder
 	}
 
 	/**
-	 * Builds and initializes a {@link HeFQUINEngineAndContext} instance using the
+	 * Returns a {@link HeFQUINEngine} instance that is created using the
 	 * parameters configured via this builder.
 	 *
 	 * The federation catalog must be provided via {@code withFederationCatalog},
