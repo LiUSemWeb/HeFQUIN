@@ -100,7 +100,7 @@ public class QueryProcessorImpl implements QueryProcessor
 		final ExecutorService threadPool = ctxt.getExecutorServiceForPlanTasks();
 		threadPool.shutdown();
 		try {
-			if ( ! threadPool.awaitTermination( 500L, TimeUnit.MILLISECONDS ) ) {
+			if ( ! threadPool.awaitTermination(500L, TimeUnit.MILLISECONDS) ) {
 				threadPool.shutdownNow();
 			}
 		} catch ( InterruptedException ex ) {
