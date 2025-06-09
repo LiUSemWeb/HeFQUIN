@@ -332,5 +332,10 @@ public class FederationAccessManagerBase1Test extends EngineTestBase
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public void shutdown() {
+			// do nothing
+		}
 	}
 }

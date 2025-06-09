@@ -347,4 +347,11 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return stats;
 	}
 
+	/**
+	 * Shuts down all thread pools associated with this federation access manager.
+	 */
+	@Override
+	public void shutdown() {
+		fedAccMan.shutdown();
+	}
 }
