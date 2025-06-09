@@ -161,7 +161,7 @@ public class HeFQUINEngineBuilder
 		}
 		if ( engineConf == null ) {
 			final String ttl = HeFQUINEngineDefaultComponents.getDefaultConfigurationDescription();
-        		engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
+			engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
 		}
 
 		// create context
