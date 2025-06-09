@@ -3,8 +3,6 @@ package se.liu.ida.hefquin.engine;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
@@ -32,22 +30,14 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 {
 	protected final FederationAccessManager fedAccessMgr;
 	protected final QueryProcessor qProc;
-	protected final ExecutorService execFed;
-	protected final ExecutorService execPlan;
 
 	public HeFQUINEngineImpl( final FederationAccessManager fedAccessMgr,
-	                          final QueryProcessor qProc,
-	                          final ExecutorService execFed,
-	                          final ExecutorService execPlan ) {
+	                          final QueryProcessor qProc ) {
 		assert fedAccessMgr != null;
 		assert qProc != null;
-		assert execFed != null;
-		assert execPlan != null;
 
 		this.fedAccessMgr = fedAccessMgr;
 		this.qProc = qProc;
-		this.execFed = execFed;
-		this.execPlan = execPlan;
 	}
 
 	@Override
@@ -130,30 +120,6 @@ public class HeFQUINEngineImpl implements HeFQUINEngine
 		}
 		catch ( final Exception e ) {
 			throw new Exception("Exception occurred when executing an ASK/DESCRIBE/CONSTRUCT query using the Jena machinery.", e);
-		}
-	}
-
-	@Override
-	public void shutdown() {
-		shutdown(execFed);
-		shutdown(execPlan);
-	}
-
-	/**
-	 * Helper method to shut down a single executor service within a bounded wait
-	 * time of 500ms.
-	 *
-	 * @param executorService the executor service to terminate
-	 */
-	private static void shutdown( final ExecutorService executorService ) {
-		executorService.shutdown();
-		try {
-			if ( ! executorService.awaitTermination(500L, TimeUnit.MILLISECONDS) ) {
-				executorService.shutdownNow();
-			}
-		} catch ( InterruptedException ex ) {
-			Thread.currentThread().interrupt();
-			executorService.shutdownNow();
 		}
 	}
 
