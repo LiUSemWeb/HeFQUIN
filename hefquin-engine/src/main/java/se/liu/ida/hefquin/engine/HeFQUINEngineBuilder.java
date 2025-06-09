@@ -109,7 +109,8 @@ public class HeFQUINEngineBuilder
 	/**
 	 * Sets the source assignment printer to be used by the engine.
 	 *
-	 * @param printer a logical plan printer to be used when printing a source assignment that is the input to logical plan optimization
+	 * @param printer a logical plan printer to be used when printing a source
+	 *                assignment that is the input to logical plan optimization
 	 * @return this builder instance for method chaining
 	 */
 	public HeFQUINEngineBuilder withSourceAssignmentPrinter( final LogicalPlanPrinter printer ) {
@@ -123,7 +124,7 @@ public class HeFQUINEngineBuilder
 	 * @param skip whether to skip query execution
 	 * @return this builder instance for method chaining
 	 */
-	public HeFQUINEngineBuilder withSkipExecution( final boolean skip ) {
+	public HeFQUINEngineBuilder setSkipExecution( final boolean skip ) {
 		this.skipExecution = skip;
 		return this;
 	}
@@ -134,7 +135,7 @@ public class HeFQUINEngineBuilder
 	 * @param isExperimentRun whether this is an experimental run
 	 * @return this builder instance for method chaining
 	 */
-	public HeFQUINEngineBuilder withExperimentRun(final boolean isExperimentRun) {
+	public HeFQUINEngineBuilder setExperimentRun(final boolean isExperimentRun) {
 		this.isExperimentRun = isExperimentRun;
 		return this;
 	}
