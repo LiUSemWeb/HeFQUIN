@@ -13,4 +13,9 @@ public interface QueryProcessor
 	QueryPlanner getPlanner();
 	QueryPlanCompiler getPlanCompiler();
 	ExecutionEngine getExecutionEngine();
+
+	/**
+	 * Shutdown all thread pools associated with this query processor.
+	 */
+	void shutdown();
 }

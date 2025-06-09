@@ -2,6 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
@@ -91,6 +93,20 @@ public class QueryProcessorImpl implements QueryProcessor
 		}
 
 		return new Pair<>(myStats, exceptionsCaughtDuringExecution);
+	}
+
+	@Override
+	public void shutdown() {
+		final ExecutorService threadPool = ctxt.getExecutorServiceForPlanTasks();
+		threadPool.shutdown();
+		try {
+			if ( ! threadPool.awaitTermination( 500L, TimeUnit.MILLISECONDS ) ) {
+				threadPool.shutdownNow();
+			}
+		} catch ( InterruptedException ex ) {
+			Thread.currentThread().interrupt();
+			threadPool.shutdownNow();
+		}
 	}
 
 }
