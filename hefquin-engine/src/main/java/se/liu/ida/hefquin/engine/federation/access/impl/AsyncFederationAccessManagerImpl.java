@@ -229,7 +229,7 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 	}
 
 	/**
-	 * Shutdown all thread pools associated with this federation access manager.
+	 * Shuts down all thread pools associated with this federation access manager.
 	 */
 	@Override
 	public void shutdown() {

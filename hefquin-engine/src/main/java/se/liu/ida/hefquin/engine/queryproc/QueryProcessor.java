@@ -15,7 +15,7 @@ public interface QueryProcessor
 	ExecutionEngine getExecutionEngine();
 
 	/**
-	 * Shutdown all thread pools associated with this query processor.
+	 * Shuts down all thread pools associated with this query processor.
 	 */
 	void shutdown();
 }
