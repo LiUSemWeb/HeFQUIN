@@ -34,23 +34,25 @@
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
-import se.liu.ida.hefquin.engine.HeFQUINEngineFactory.HeFQUINEngineAndContext;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
 
-public class Main {
-	public static void main( String[] args ) throws Exception {
+public class Main
+{
+    public static void main( String[] args ) throws Exception {
         final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
             .withFederationCatalog("ExampleFederation.ttl");
-        
+
         final HeFQUINEngine engine = builder.build();
         final String queryString = Files.readString( Path.of("ExampleQuery.rq") );
         final Query q = QueryFactory.create(queryString);
         engine.executeQuery(q, ResultsFormat.FMT_TEXT, System.out);
         engine.shutdown();
-	}
-}
+    }
 </code></pre>
         </p>
         <p>
@@ -63,8 +65,8 @@ public class Main {
     .withLogicalPlanPrinter(new TextBasedLogicalPlanPrinterImpl())
     .withPhysicalPlanPrinter(new TextBasedPhysicalPlanPrinterImpl())
     .withSourceAssignmentPrinter(new TextBasedLogicalPlanPrinterImpl())
-    .withExperimentRun(false)
-    .withSkipExecution(false);
+    .setExperimentRun(false)
+    .setSkipExecution(false);
 </code></pre>
         </p>
     </main>
