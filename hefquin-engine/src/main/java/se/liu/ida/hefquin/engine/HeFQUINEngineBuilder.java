@@ -153,15 +153,15 @@ public class HeFQUINEngineBuilder
 	public HeFQUINEngine build() {
 		assert fedCat != null;
 
-		if(execFed == null){
+		if ( execFed == null ) {
 			execFed = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
 		}
-		if(execPlan == null){
+		if ( execPlan == null ) {
 			execPlan = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
 		}
-		if(engineConf == null){
+		if ( engineConf == null ) {
 			final String ttl = HeFQUINEngineDefaultComponents.getDefaultConfigurationDescription();
-        	engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
+        		engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
 		}
 
 		// create context
