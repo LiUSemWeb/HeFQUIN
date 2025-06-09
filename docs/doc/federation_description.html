@@ -7,6 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HeFQUIN - Federation Descriptions</title>
 
+    <!-- Prism -->
+    <link href="../css/prism-tomorrow.css" rel="stylesheet" />
+    <script src="../js/prism_1.29.0/prism.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-sparql.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-toolbar.min.js"></script>
+    <script src="../js/prism_1.29.0/prism-copy-to-clipboard.min.js"></script>
+    <link href="../css/prism-toolbar.min.css" rel="stylesheet" />
+
     <script src="../js/mustache.min.js"></script>
     <script src="../js/script.js"></script>
     <link rel="stylesheet" href="../css/style.css">
@@ -16,14 +24,81 @@
     <div id="header"></div>
 
     <main>
-        <h1>Describing your Federation</h1>
-        <p>
-            Sorry, this page of the user documentation is still to be written.
-        </p>
-        <p>
-            Consult our <a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/ExampleFederation.ttl">example of a description of a federation</a> in the meantime.
+        <h1>Describing Federations</h1>
+        <p>This page explains how to describe data sources (federation members) and their access interfaces using the
+            HeFQUIN <a href="http://w3id.org/hefquin/feddesc">Federation Description Vocabulary</a>. These descriptions
+            are used by the HeFQUIN query engine to understand how to access and integrate the data sources
+            that should be made available to a given engine instance.
         </p>
 
+        <h2>1. Basic Concepts</h2>
+        <ul>
+            <li><code>fd:FederationMember</code>: Represents a federation member (data source) that can be queried.</li>
+            <li><code>fd:Interface</code>:        Represents the access mechanism used to query a federation member.</li>
+            <li><code>fd:interface</code>:        A property linking a federation member to its interface.</li>
+        </ul>
+
+        <h2>2. Interface Types</h2>
+        <p>Use one of the concrete subclasses of <code>fd:Interface</code> to describe how to query the federation
+            member:</p>
+        <ul>
+            <li><code>fd:SPARQLEndpointInterface</code>:  For federation members accessible via the SPARQL protocol</li>
+            <li><code>fd:TPFInterface</code>:             For federation members accessible via Triple Pattern Fragments (TPF)</li>
+            <li><code>fd:brTPFInterface</code>:           For federation members accessible via Bindings-Restricted TPF (brTPF)</li>
+            <li><code>fd:GraphQLEndpointInterface</code>: For federation members accessible via GraphQL APIs</li>
+            <li><code>fd:BoltInterface</code>:            For federation members accessible via the Bolt protocol (e.g., for Neo4j)</li>
+        </ul>
+
+        <h2>3. Key Properties</h2>
+        <ul>
+            <li><code>fd:endpointAddress</code>:        URI of a federation member that can be accessed via a single HTTP endpoint (e.g., SPARQL and GraphQL endpoints)</li>
+            <li><code>fd:exampleFragmentAddress</code>: Example URL of a fragment that can be used to access a specific subset of the dataset of a federation member (e.g., for TPF and brTPF interfaces)</li>
+            <li><code>fd:vocabularyMappingsFile</code>: Link to an RDF file aligning different vocabularies</li>
+            <li><code>fd:mappingConfiguration</code>:   Resource pointing to a mapping configuration for translating non-RDF data models (e.g., GraphQL, LPG) into RDF</li>
+        </ul>
+
+        <h2>4. Example Descriptions</h2>
+
+        <h3>SPARQL Endpoint</h3>
+        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
+
+ex:dbpediaSPARQL
+    a fd:FederationMember;
+    fd:interface [
+        a fd:SPARQLEndpointInterface ;
+        fd:endpointAddress &lt;http://dbpedia.org/sparql&gt;
+    ] .
+</code></pre>
+
+        <h3>TPF Interface</h3>
+        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
+
+ex:dbpediaTPF
+    a fd:FederationMember;
+    fd:interface [
+        a fd:TPFInterface ;
+        fd:exampleFragmentAddress &lt;http://fragments.dbpedia.org/2016-04/en&gt;
+    ] .
+</code></pre>
+
+        <h3>Neo4j Interface</h3>
+        <pre><code class="language-turtle">@prefix fd: &lt;http://www.example.org/se/liu/ida/hefquin/fd#&gt; .
+@prefix lpg2rdf: &lt;http://w3id.org/hefquin/lpg2rdf#&gt; .
+@prefix ex: &lt;http://example.org/&gt; .
+
+ex:neo4jTest
+    a fd:FederationMember ;
+    fd:interface [
+        a fd:BoltInterface ;
+        fd:endpointAddress <http://localhost:7474/db/neo4j/tx> ;
+        fd:mappingConfiguration [
+            a lpg2rdf:LPGToRDFConfiguration ;
+            # ...
+        ]
+    ] .
+</code></pre>
     </main>
 
     <div id="footer"></div>
