@@ -1,0 +1,10 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbpedia: <http://dbpedia.org/resource/>
+
+SELECT *
+WHERE {
+    SERVICE <http://dbpedia.org/sparql> {
+        dbpedia:Berlin rdfs:label ?label .
+    }
+    FILTER( lang(?label) = "en" )
+}
