@@ -41,7 +41,7 @@ public class ModQuery extends ModBase
 		}
 
 		if ( queryFilename == null ) {
-			cmdline.cmdError( "No query file" );
+			cmdline.cmdError( "No query file", false );
 		}
 	}
 

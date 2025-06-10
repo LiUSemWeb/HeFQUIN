@@ -2,13 +2,9 @@ package se.liu.ida.hefquin.cli;
 
 import java.io.PrintStream;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.output.NullPrintStream;
 import org.apache.jena.cmd.ArgDecl;
 import org.apache.jena.cmd.TerminationException;
-import org.apache.jena.query.ARQ;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.NotFoundException;
 import org.apache.jena.sparql.resultset.ResultsFormat;
@@ -24,7 +20,7 @@ import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
 import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
-import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
+import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
@@ -113,19 +109,18 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 	 */
 	@Override
 	protected void exec() {
-		final ExecutorService execServiceForFedAccess = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
-		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+		final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
+			.withFederationCatalog( modFederation.getFederationCatalog() )
+			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
+			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
+			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
+			.setSkipExecution( contains(argSkipExecution) );
 
-		final HeFQUINEngine e = modEngineConfig.getEngine( execServiceForFedAccess,
-		                                                   execServiceForPlanTasks,
-		                                                   modFederation.getFederationCatalog(),
-		                                                   false, // isExperimentRun
-		                                                   contains( argSkipExecution ),
-		                                                   modPlanPrinting.getSourceAssignmentPrinter(),
-		                                                   modPlanPrinting.getLogicalPlanPrinter(),
-		                                                   modPlanPrinting.getPhysicalPlanPrinter() );
-		ARQ.init();
-		e.integrateIntoJena();
+		if( contains("confDescr") ){
+			builder.withEngineConfiguration( modEngineConfig.getConfDescr() );
+		}
+
+		final HeFQUINEngine e = builder.build();
 
 		final Query query = getQuery();
 		final ResultsFormat resFmt = modResults.getResultsFormat();
@@ -187,22 +182,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			System.err.println( "Time: " + modTime.timeStr( time ) + " sec" );
 		}
 
-		execServiceForPlanTasks.shutdownNow();
-		execServiceForFedAccess.shutdownNow();
-
-		try {
-			execServiceForPlanTasks.awaitTermination( 500L, TimeUnit.MILLISECONDS );
-		} catch ( final InterruptedException ex ) {
-			System.err.println( "Terminating the thread pool for query plan tasks was interrupted." );
-			ex.printStackTrace();
-		}
-
-		try {
-			execServiceForFedAccess.awaitTermination( 500L, TimeUnit.MILLISECONDS );
-		} catch ( final InterruptedException ex ) {
-			System.err.println( "Terminating the thread pool for federation access was interrupted." );
-			ex.printStackTrace();
-		}
+		e.shutdown();
 
 		if ( statsAndExceptions != null && statsAndExceptions.object1 != null ) {
 			if ( contains( argQueryProcStats ) ) {
@@ -239,5 +219,4 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			throw new TerminationException( 1 );
 		}
 	}
-
 }
