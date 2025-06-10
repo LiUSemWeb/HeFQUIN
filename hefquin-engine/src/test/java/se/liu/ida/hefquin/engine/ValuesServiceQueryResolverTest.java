@@ -289,10 +289,8 @@ public class ValuesServiceQueryResolverTest
 
 		final String expectedQueryString =
 				  "SELECT * WHERE {"
-				+ " {"
-				+ "   SERVICE <http://example1.org> { ?x a ?y }"
-				+ "   BIND( <http://example1.org> AS ?s1 )"
-				+ " }"
+				+ " SERVICE <http://example1.org> { ?x a ?y }"
+				+ " BIND( <http://example1.org> AS ?s1 )"
 				+ " {"
 				+ "     SERVICE <http://example2.org> { ?z a ?y }"
 				+ "     BIND( <http://example2.org> AS ?s2 )"
@@ -300,6 +298,35 @@ public class ValuesServiceQueryResolverTest
 				+ "     SERVICE <http://example3.org> { ?z a ?y }"
 				+ "     BIND( <http://example3.org> AS ?s2 )"
 				+ " }"
+				+ "}";
+		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
+
+		final ElementTransform t = new ElementTransformCleanGroupsOfOne();
+		final Element expectedPattern2 = ElementTransformer.transform(expectedPattern, t);
+
+		assertTrue( q.getQueryPattern().equals(expectedPattern2) );
+	}
+
+	@Test
+	public void testTwoValuesClausesTwoScopesAndFilter() throws UnsupportedQueryException, IllegalQueryException {
+		final String qStr =
+				  "SELECT * WHERE {"
+				+ " VALUES ?s1 { <http://example1.org> }"
+				+ " SERVICE ?s1 { ?x a ?y }"
+				+ " VALUES ?s2 { <http://example2.org> }"
+				+ " SERVICE ?s2 { ?z a ?y }"
+				+ " FILTER ( ?x != ?z )"  // must be kept separate
+				+ "}";
+		final Query q = QueryFactory.create(qStr);
+		ValuesServiceQueryResolver.expandValuesPlusServicePattern(q);
+
+		final String expectedQueryString =
+				  "SELECT * WHERE {"
+				+ " SERVICE <http://example1.org> { ?x a ?y }"
+				+ " BIND( <http://example1.org> AS ?s1 )"
+				+ " SERVICE <http://example2.org> { ?z a ?y }"
+				+ " FILTER ( ?x != ?z )"
+				+ " BIND( <http://example2.org> AS ?s2 )"
 				+ "}";
 		final Element expectedPattern = QueryFactory.create(expectedQueryString).getQueryPattern();
 

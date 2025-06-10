@@ -99,4 +99,10 @@ public interface HeFQUINEngine
 	}
 
 	FederationAccessStats getFederationAccessStats();
+
+	/**
+	 * Shuts down the relevant components used by this engine, such as the
+	 * federation access manager and the query processor component.
+	 */
+	void shutdown();
 }

@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.jenaext.sparql.syntax;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.TriplePath;
@@ -198,6 +199,24 @@ public class ElementUtils
 		}
 
 		return resultElmt;
+	}
+
+	/**
+	 * If the given list contains multiple elements, this function
+	 * returns an {@link ElementGroup} containing these elements.
+	 * If the list contains a single element only, this element
+	 * is returned.
+	 */
+	public static Element createElementGroupIfNeeded( final List<Element> elmts ) {
+		if ( elmts.size() == 1 )
+			return elmts.get(0);
+
+		final ElementGroup eg = new ElementGroup();
+		for ( final Element e : elmts ) {
+			eg.addElement(e);
+		}
+
+		return eg;
 	}
 
 }

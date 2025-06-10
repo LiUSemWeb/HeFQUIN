@@ -1,4 +1,4 @@
-PREFIX fd:     <http://www.example.org/se/liu/ida/hefquin/fd#>
+PREFIX fd:     <http://w3id.org/hefquin/feddesc#>
 PREFIX ex:     <http://example.org/>
 
 ex:dbpediaSPARQL

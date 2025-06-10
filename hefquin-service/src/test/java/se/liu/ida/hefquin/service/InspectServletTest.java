@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -250,8 +249,8 @@ public class InspectServletTest {
 			final String result = EntityUtils.toString( response.getEntity() );
 			final JsonObject o = JsonParser.parseString( result ).getAsJsonObject();
 			assertEquals(
-				"java.util.NoSuchElementException: no federation member with URI <http://invalid/federation/member>",
-				o.getAsJsonArray( "exceptions" ).get( 0 )
+				"\"java.util.NoSuchElementException: no federation member with URI <http://invalid/federation/member>\"",
+				o.getAsJsonArray("exceptions").get(0).toString()
 			);
 		}
 	}

@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.federation.access.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -227,4 +228,19 @@ public class AsyncFederationAccessManagerImpl extends FederationAccessManagerBas
 		};
 	}
 
+	/**
+	 * Shuts down all thread pools associated with this federation access manager.
+	 */
+	@Override
+	public void shutdown() {
+		threadPool.shutdown();
+		try {
+			if ( ! threadPool.awaitTermination(500L, TimeUnit.MILLISECONDS) ) {
+				threadPool.shutdownNow();
+			}
+		} catch ( InterruptedException ex ) {
+			Thread.currentThread().interrupt();
+			threadPool.shutdownNow();
+		}
+	}
 }

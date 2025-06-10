@@ -92,4 +92,9 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 		                                      counterNeo4jRequests.get() );
 	}
 
+	@Override
+	public void shutdown() {
+		// do nothing
+	}
+
 }
