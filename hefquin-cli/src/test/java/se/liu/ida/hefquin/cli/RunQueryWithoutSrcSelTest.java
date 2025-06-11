@@ -35,7 +35,8 @@ public class RunQueryWithoutSrcSelTest
 			"--query=" + queryFile,
 			"--federationDescription=" + fedCatFile
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
 
 		// Check result
 		final String result = baos.toString().replaceAll("\r", "");
@@ -83,7 +84,10 @@ public class RunQueryWithoutSrcSelTest
 			"--federationDescription=" + fedCatFile,
 			"--confDescr=" + confDescrFile
 		};
-		RunQueryWithoutSrcSel.main(args);
+
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString().replace("\r", "");
 		assertEquals( "---------------\n" +
@@ -104,7 +108,9 @@ public class RunQueryWithoutSrcSelTest
 			"--federationDescription=" + fedCatFile,
 			"--suppressResultPrintout"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		assertEquals("", result);
@@ -141,7 +147,9 @@ public class RunQueryWithoutSrcSelTest
 			"--federationDescription=" + fedCatFile,
 			"--printQueryProcStats"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		assertTrue( result.contains("queryPlanningStats") );
@@ -159,7 +167,9 @@ public class RunQueryWithoutSrcSelTest
 			"--suppressResultPrintout",
 			"--printQueryProcMeasurements"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		// Match 4 comma-separated integers
@@ -198,7 +208,9 @@ public class RunQueryWithoutSrcSelTest
 			"--suppressResultPrintout",
 			"--printSourceAssignment"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		assertTrue( result.contains("--------- Source Assignment ---------") );
@@ -216,7 +228,9 @@ public class RunQueryWithoutSrcSelTest
 			"--suppressResultPrintout",
 			"--printLogicalPlan"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		System.err.println(result);
@@ -235,7 +249,9 @@ public class RunQueryWithoutSrcSelTest
 			"--suppressResultPrintout",
 			"--printPhysicalPlan"
 		};
-		RunQueryWithoutSrcSel.main(args);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
+		assertEquals(0, exitCode);
+
 		// Check result
 		final String result = baos.toString();
 		assertTrue( result.contains("--------- Physical Plan ---------") );
@@ -245,7 +261,7 @@ public class RunQueryWithoutSrcSelTest
 	public void invalidArg() {
 		// Run CLI (using mainRun)
 		final String[] args = new String[] { "--invalid" };
-		final int exitCode = new RunQueryWithoutSrcSel( args ).mainRun(true, false);
+		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
 		assertEquals(1, exitCode);
 	}
 }
