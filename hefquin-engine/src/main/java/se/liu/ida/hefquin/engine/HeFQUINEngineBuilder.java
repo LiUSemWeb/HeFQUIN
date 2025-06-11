@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
@@ -26,6 +27,9 @@ public class HeFQUINEngineBuilder
 	private LogicalPlanPrinter srcasgPrinter = null;
 	private LogicalPlanPrinter lplanPrinter = null;
 	private PhysicalPlanPrinter pplanPrinter = null;
+
+	private final int DEFAULT_THREAD_POOL_SIZE = 10;
+	private final String DEFAULT_CONF_DESCR_FILE = "DefaultConfDescr.ttl";
 
 	/**
 	 * Sets the federation catalog to be used by the engine.
@@ -153,16 +157,14 @@ public class HeFQUINEngineBuilder
 		if( fedCat == null ){
 			throw new IllegalStateException("No federation catalog has been set");
 		}
-
 		if ( execFed == null ) {
-			execFed = HeFQUINEngineDefaultComponents.createExecutorServiceForFedAccess();
+			execFed = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 		}
 		if ( execPlan == null ) {
-			execPlan = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+			execPlan = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 		}
 		if ( engineConf == null ) {
-			final String confDescrFile = "DefaultConfDescr.ttl";
-			engineConf = RDFDataMgr.loadDataset(confDescrFile).getDefaultModel();
+			engineConf = RDFDataMgr.loadDataset(DEFAULT_CONF_DESCR_FILE).getDefaultModel();
 		}
 
 		// create context
