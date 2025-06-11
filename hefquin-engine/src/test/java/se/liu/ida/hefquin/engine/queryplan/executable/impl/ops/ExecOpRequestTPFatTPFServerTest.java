@@ -25,8 +25,9 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.impl.TripleImpl;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
+import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -72,7 +73,9 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
-		final FederationAccessManager fedAccessMgr = HeFQUINEngineDefaultComponents.createDefaultFederationAccessManager(execServiceForFedAccess);
+		// Create a federation access manager
+		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execServiceForFedAccess);
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerWithCache(internalFedAccMgr, 100);
 		final ExecutionContext execCxt = new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
