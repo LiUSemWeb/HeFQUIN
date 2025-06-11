@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.graph.Graph;
@@ -22,7 +23,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.HeFQUINEngineDefaultComponents;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.TPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
@@ -353,7 +353,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	protected Iterator<SolutionMapping> processQuery( final String queryString,
 	                                                  final FederationCatalog fedCat,
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
-		final ExecutorService execServiceForPlanTasks = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
+		final ExecutorService execServiceForPlanTasks = Executors.newFixedThreadPool(10);
 		final LogicalToPhysicalPlanConverter l2pConverter = new LogicalToPhysicalPlanConverterImpl(false, false);
 
 		final QueryProcContext ctxt = new QueryProcContext() {
