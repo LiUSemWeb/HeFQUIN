@@ -116,7 +116,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
 			.setSkipExecution( contains(argSkipExecution) );
 
-		if( contains("confDescr") ){
+		if( modEngineConfig.getConfDescr() != null ){
 			builder.withEngineConfiguration( modEngineConfig.getConfDescr() );
 		}
 
