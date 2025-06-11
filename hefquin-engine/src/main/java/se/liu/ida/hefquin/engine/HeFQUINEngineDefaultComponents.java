@@ -42,22 +42,6 @@ public class HeFQUINEngineDefaultComponents
 		return Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
 	}
 
-	public static String getDefaultConfigurationDescription() {
-		return "PREFIX ec:  <http://w3id.org/hefquin/engineconf#>" + System.lineSeparator()
-		     + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + System.lineSeparator()
-		     + "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" + System.lineSeparator()
-		     + System.lineSeparator()
-		     + "[] rdf:type ec:HeFQUINEngineConfiguration ;" + System.lineSeparator()
-		     + "   ec:fedAccessMgr ec:DefaultFederationAccessManager ;" + System.lineSeparator()
-		     + "   ec:queryProcessor [" + System.lineSeparator()
-		     + "        ec:queryPlanner [" + System.lineSeparator()
-		     + "             ec:sourcePlanner      ec:DefaultSourcePlanner ;" + System.lineSeparator()
-		     + "             ec:logicalOptimizer   ec:DefaultLogicalOptimizer ;" + System.lineSeparator()
-		     + "             ec:physicalOptimizer  ec:DefaultPhysicalOptimizer ] ;" + System.lineSeparator()
-		     + "        ec:planCompiler     ec:DefaultPlanCompiler ;" + System.lineSeparator()
-		     + "        ec:executionEngine  ec:DefaultExecutionEngine ] .";
-	}
-
 	public static FederationAccessManager createDefaultFederationAccessManager( final ExecutorService execService ) {
 		final FederationAccessManager internalFedAccMgr = new AsyncFederationAccessManagerImpl(execService);
 		final int cacheCapacity = 100;

@@ -4,9 +4,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFParser;
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
@@ -163,8 +161,8 @@ public class HeFQUINEngineBuilder
 			execPlan = HeFQUINEngineDefaultComponents.createExecutorServiceForPlanTasks();
 		}
 		if ( engineConf == null ) {
-			final String ttl = HeFQUINEngineDefaultComponents.getDefaultConfigurationDescription();
-			engineConf = RDFParser.fromString(ttl).lang(Lang.TURTLE).toModel();
+			final String confDescrFile = "DefaultConfDescr.ttl";
+			engineConf = RDFDataMgr.loadDataset(confDescrFile).getDefaultModel();
 		}
 
 		// create context

@@ -1,0 +1,15 @@
+@prefix ec:  <http://w3id.org/hefquin/engineconf#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[]  a ec:HeFQUINEngineConfiguration ;
+    ec:fedAccessMgr ec:DefaultFederationAccessManager ;
+    ec:queryProcessor [
+        ec:queryPlanner [
+            ec:sourcePlanner ec:DefaultSourcePlanner ;
+            ec:logicalOptimizer ec:DefaultLogicalOptimizer ;
+            ec:physicalOptimizer ec:DefaultPhysicalOptimizer
+        ] ;
+        ec:planCompiler ec:DefaultPlanCompiler ;
+        ec:executionEngine ec:DefaultExecutionEngine
+   ] .
