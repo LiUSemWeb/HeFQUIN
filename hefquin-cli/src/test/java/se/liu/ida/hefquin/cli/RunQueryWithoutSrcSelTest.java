@@ -67,10 +67,17 @@ public class RunQueryWithoutSrcSelTest
 
 	@Test
 	public void runWissingFedCat() {
-		// Run CLI (using mainRun)
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		System.setErr( new PrintStream(baos) );
+
+		// Run CLI
 		final String[] args = new String[] { "--query=" + queryFile };
 		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(true, false);
 		assertEquals(2, exitCode);
+
+		// Check result
+		final String result = baos.toString();
+		assertTrue( result.startsWith("No federation description file") );
 	}
 
 	@Test
@@ -259,9 +266,16 @@ public class RunQueryWithoutSrcSelTest
 
 	@Test
 	public void invalidArg() {
-		// Run CLI (using mainRun)
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		System.setErr( new PrintStream(baos) );
+
+		// Run CLI
 		final String[] args = new String[] { "--invalid" };
 		final int exitCode = new RunQueryWithoutSrcSel(args).mainRun(false, false);
 		assertEquals(1, exitCode);
+
+		// Check result
+		final String result = baos.toString();
+		assertTrue( result.startsWith("Unknown argument: invalid") );
 	}
 }
