@@ -18,6 +18,12 @@ import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementUtils;
 public interface SPARQLGraphPattern extends Query
 {
 	/**
+	 * Returns a string representation of this pattern to be used for printing;
+	 * e.g., when printing query plans or debugging/logging output.
+	 */
+	String toStringForPlanPrinters();
+
+	/**
 	 * Returns a set of all triple patterns that are contained
 	 * within this graph pattern.
 	 */

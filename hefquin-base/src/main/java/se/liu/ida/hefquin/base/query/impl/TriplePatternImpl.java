@@ -6,6 +6,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.util.FmtUtils;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
@@ -222,6 +223,11 @@ public class TriplePatternImpl implements TriplePattern
 
 		final Element resultElmt = ElementUtils.merge( tp.asJenaTriple(), elmt );
 		return new GenericSPARQLGraphPatternImpl1(resultElmt);
+	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		return "(" + FmtUtils.stringForTriple(jenaObj) + ")";
 	}
 
 }

@@ -8,6 +8,7 @@ import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.core.PathBlock;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
@@ -362,6 +363,16 @@ public class BGPImpl implements BGP
 		}
 
 		return new GenericSPARQLGraphPatternImpl1(resultElmt);
+	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		final ElementTriplesBlock elmt = new ElementTriplesBlock();
+		for ( final TriplePattern tp : tps ) {
+			elmt.addTriple( tp.asJenaTriple() );
+		}
+
+		return "{ " + FormatterElement.asString(elmt) + " }";
 	}
 
 }

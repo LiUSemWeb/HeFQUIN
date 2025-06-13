@@ -15,6 +15,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprTransformSubstitute;
 import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementBind;
 import org.apache.jena.sparql.syntax.ElementFilter;
@@ -200,4 +201,10 @@ public class GenericSPARQLGraphPatternImpl1 implements SPARQLGraphPattern
 
 		return tps;
 	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		return FormatterElement.asString(jenaPatternElement);
+	}
+
 }

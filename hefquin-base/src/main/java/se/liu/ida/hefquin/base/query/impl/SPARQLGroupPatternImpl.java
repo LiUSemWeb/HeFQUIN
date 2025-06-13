@@ -219,4 +219,18 @@ public class SPARQLGroupPatternImpl implements SPARQLGroupPattern
 
 	}
 
+	@Override
+	public String toStringForPlanPrinters() {
+		final StringBuilder b = new StringBuilder();
+		for ( final SPARQLGraphPattern p : subPatterns ) {
+			b.append( "{" );
+			b.append( System.lineSeparator() );
+			b.append( p.toStringForPlanPrinters() );
+			b.append( System.lineSeparator() );
+			b.append( "}" );
+		}
+
+		return b.toString();
+	}
+
 }

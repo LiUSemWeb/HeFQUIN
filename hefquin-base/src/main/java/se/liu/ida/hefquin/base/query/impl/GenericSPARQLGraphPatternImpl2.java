@@ -22,6 +22,7 @@ import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.graph.NodeTransformLib;
+import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.syntaxtransform.NodeTransformSubst;
 
@@ -186,6 +187,11 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 		final Set<TriplePattern> varRight = getTPsInPattern( op.getRight() );
 		varLeft.addAll(varRight);
 		return varLeft;
+	}
+
+	@Override
+	public String toStringForPlanPrinters() {
+		return FormatterElement.asString( asJenaElement() );
 	}
 
 }

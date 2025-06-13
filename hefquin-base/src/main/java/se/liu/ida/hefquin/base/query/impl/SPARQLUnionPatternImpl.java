@@ -213,4 +213,22 @@ public class SPARQLUnionPatternImpl implements SPARQLUnionPattern
 		return ( unchanged ) ? this : upNew;
 	}
 
+	@Override
+	public String toStringForPlanPrinters() {
+		final StringBuilder b = new StringBuilder();
+		for ( int i = 0; i < subPatterns.size(); i++ ) {
+			if ( i > 0 ) {
+				b.append( "UNION" );
+				b.append( System.lineSeparator() );
+			}
+			b.append( "{" );
+			b.append( System.lineSeparator() );
+			b.append( subPatterns.get(i).toStringForPlanPrinters() );
+			b.append( System.lineSeparator() );
+			b.append( "}" );
+		}
+
+		return b.toString();
+	}
+
 }
