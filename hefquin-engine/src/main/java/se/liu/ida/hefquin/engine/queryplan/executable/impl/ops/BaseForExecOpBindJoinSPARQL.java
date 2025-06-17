@@ -1,15 +1,15 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jena.sparql.core.Var;
-
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -18,15 +18,13 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinWithRequestOps<SPARQLGraphPattern, SPARQLEndpoint>
 {
-	protected final List<Var> varsInSubQuery;
-
 	public BaseForExecOpBindJoinSPARQL( final SPARQLGraphPattern p,
 	                                    final SPARQLEndpoint fm,
+	                                    final ExpectedVariables inputVars,
 	                                    final boolean useOuterJoinSemantics,
 	                                    final int batchSize,
 	                                    final boolean collectExceptions ) {
-		super(p, fm, useOuterJoinSemantics, p.getAllMentionedVariables(), batchSize, collectExceptions);
-		varsInSubQuery = new ArrayList<>(varsInPatternForFM);
+		super(p, p.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
 	}
 
 	// Change visibility to public in order to be able to call this function
@@ -38,6 +36,11 @@ public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinW
 			throws ExecOpExecutionException
 	{
 		super._processBatch(batchOfSolMaps, sink, execCxt);
+	}
+
+	@Override
+	protected NullaryExecutableOp createExecutableReqOpForAll() {
+		return new ExecOpRequestSPARQL( new SPARQLRequestImpl(query), fm, false );
 	}
 
 }

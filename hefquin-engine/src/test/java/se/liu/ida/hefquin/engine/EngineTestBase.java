@@ -253,16 +253,15 @@ public abstract class EngineTestBase
 			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
 
 			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
-			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
-				final Binding b = sm.asJenaBinding();
+			for ( final Binding sm : req.getSolutionMappings() ) {
 				final Node s = ( jenaTP.getSubject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getSubject()) ) // may be null
 						: null;
 				final Node p = ( jenaTP.getPredicate().isVariable() )
-						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
 						: null;
 				final Node o = ( jenaTP.getObject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getObject()) ) // may be null
 						: null;
 				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
 			}
@@ -310,16 +309,15 @@ public abstract class EngineTestBase
 			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
 
 			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
-			for ( final SolutionMapping sm : req.getSolutionMappings() ) {
-				final Binding b = sm.asJenaBinding();
+			for ( final Binding sm : req.getSolutionMappings() ) {
 				final Node s = ( jenaTP.getSubject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getSubject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getSubject()) ) // may be null
 						: null;
 				final Node p = ( jenaTP.getPredicate().isVariable() )
-						? b.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
 						: null;
 				final Node o = ( jenaTP.getObject().isVariable() )
-						? b.get( Var.alloc(jenaTP.getObject()) ) // may be null
+						? sm.get( Var.alloc(jenaTP.getObject()) ) // may be null
 						: null;
 				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
 			}

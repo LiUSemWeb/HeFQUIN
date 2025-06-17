@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
@@ -26,13 +27,38 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 
 	protected final SPARQLGraphPattern query;
 	protected final SPARQLEndpoint fm;
+	protected final ExpectedVariables inputVars;
 	protected final boolean useOuterJoinSemantics;
 
 	// will be initialized when processing the first input block of solution mappings
 	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
 
+	/**
+	 * @param query - the graph pattern to be evaluated (in a bind-join
+	 *          manner) at the federation member given as 'fm'
+	 *
+	 * @param fm - the federation member targeted by this operator
+	 *
+	 * @param inputVars - the variables to be expected in the solution
+	 *          mappings that will be pushed as input to this operator
+	 *
+	 * @param useOuterJoinSemantics - <code>true</code> if the 'query' is to
+	 *          be evaluated under outer-join semantics; <code>false</code>
+	 *          for inner-join semantics
+	 *
+	 * @param batchSize - the number of solution mappings to be included in
+	 *          each bind-join request; this value must not be smaller than
+	 *          {@link #minimumRequestBlockSize}; as a default value for this
+	 *          parameter, use {@link #DEFAULT_BATCH_SIZE}
+	 *
+	 * @param collectExceptions - <code>true</code> if this operator has to
+	 *          collect exceptions (which is handled entirely by one of the
+	 *          super classes); <code>false</code> if the operator should
+	 *          immediately throw every {@link ExecOpExecutionException}
+	 */
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
 	                                               final SPARQLEndpoint fm,
+	                                               final ExpectedVariables inputVars,
 	                                               final boolean useOuterJoinSemantics,
 	                                               final int batchSize,
 	                                               final boolean collectExceptions ) {
@@ -40,17 +66,12 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 
 		assert query != null;
 		assert fm != null;
+		assert inputVars != null;
 
 		this.query = query;
 		this.fm = fm;
+		this.inputVars = inputVars;
 		this.useOuterJoinSemantics = useOuterJoinSemantics;
-	}
-
-	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
-	                                               final SPARQLEndpoint fm,
-	                                               final boolean useOuterJoinSemantics,
-	                                               final boolean collectExceptions ) {
-		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
 	}
 
 	@Override
@@ -59,7 +80,12 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
 		// If this is the first request.
 		if ( currentInstance == null ) {
-			currentInstance = new ExecOpBindJoinSPARQLwithVALUES(query, fm, useOuterJoinSemantics, collectExceptions);
+			currentInstance = new ExecOpBindJoinSPARQLwithVALUES( query,
+			                                                      fm,
+			                                                      inputVars,
+			                                                      useOuterJoinSemantics,
+			                                                      batchSize,
+			                                                      collectExceptions );
 			boolean valuesBasedRequestFailed = false;
 			try {
 				// Try using VALUES-based bind join
@@ -72,7 +98,12 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 			}
 			if ( valuesBasedRequestFailed == true ) {
 				// Use FILTER-based bind join instead
-				currentInstance = new ExecOpBindJoinSPARQLwithFILTER(query, fm, useOuterJoinSemantics, collectExceptions);
+				currentInstance = new ExecOpBindJoinSPARQLwithFILTER( query,
+				                                                      fm,
+				                                                      inputVars,
+				                                                      useOuterJoinSemantics,
+				                                                      batchSize,
+				                                                      collectExceptions );
 				currentInstance._processBatch(batch, sink, execCxt);
 			}
 		}

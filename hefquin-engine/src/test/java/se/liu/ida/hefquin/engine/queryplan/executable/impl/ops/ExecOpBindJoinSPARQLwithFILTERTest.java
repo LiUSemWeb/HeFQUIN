@@ -17,6 +17,7 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	public void tpWithJoinOnObject_InnerJoin() throws ExecutionException {
 		_tpWithJoinOnObject(false);
 	}
+
 	@Test
 	public void tpWithJoinOnObject_OuterJoin() throws ExecutionException {
 		_tpWithJoinOnObject(true);
@@ -82,6 +83,16 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 		_tpWithIllegalBNodeJoin(true);
 	}
 
+	@Test
+	public void tpWithSpuriousDuplicates_InnerJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(false);
+	}
+
+	@Test
+	public void tpWithSpuriousDuplicates_OuterJoin() throws ExecutionException {
+		_tpWithSpuriousDuplicates(true);
+	}
+
 
 	@Override
 	protected SPARQLEndpoint createFedMemberForTest(Graph dataForMember) {
@@ -98,7 +109,12 @@ public class ExecOpBindJoinSPARQLwithFILTERTest extends TestsForTPAddAlgorithms<
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		return new ExecOpBindJoinSPARQLwithFILTER(tp, fm, useOuterJoinSemantics, false);
+		return new ExecOpBindJoinSPARQLwithFILTER( tp,
+		                                           fm,
+		                                           expectedVariables,
+		                                           useOuterJoinSemantics,
+		                                           ExecOpBindJoinSPARQLwithFILTER.DEFAULT_BATCH_SIZE,
+		                                           false );
 	}
 
 }

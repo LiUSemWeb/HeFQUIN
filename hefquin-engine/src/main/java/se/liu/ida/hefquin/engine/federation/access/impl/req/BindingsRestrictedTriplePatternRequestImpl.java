@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -15,12 +14,12 @@ import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatte
 public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestrictedTriplePatternRequest
 {
 	protected final TriplePattern tp;
-	protected final Set<SolutionMapping> solMaps;
+	protected final Set<Binding> solMaps;
 
 	@SuppressWarnings("unused")
 	public BindingsRestrictedTriplePatternRequestImpl(
 			final TriplePattern tp,
-			final Set<SolutionMapping> solMaps ) {
+			final Set<Binding> solMaps ) {
 		assert tp != null;
 		assert solMaps != null;
 
@@ -29,11 +28,10 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 
 		if ( false ) {
 			// check that the given solution mappings do not contain any blank nodes
-			for ( final SolutionMapping sm : solMaps ) {
-				final Binding b = sm.asJenaBinding();
-				final Iterator<Var> it = b.vars();
+			for ( final Binding sm : solMaps ) {
+				final Iterator<Var> it = sm.vars();
 				while ( it.hasNext() ) {
-					assert ! b.get( it.next() ).isBlank();
+					assert ! sm.get( it.next() ).isBlank();
 				}
 			}
 		}
@@ -46,14 +44,14 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 
 		final BindingsRestrictedTriplePatternRequest oo = (BindingsRestrictedTriplePatternRequest) o;
 		return oo.getTriplePattern().equals(tp)
-				&& SolutionMappingUtils.equals(oo.getSolutionMappings(), solMaps);
+				&& SolutionMappingUtils.equalSets(oo.getSolutionMappings(), solMaps);
 	}
 
 	@Override
 	public int hashCode(){
 		int code = tp.hashCode();
-		for( SolutionMapping solm: solMaps )
-			code = code ^ solm.hashCode();
+		for( final Binding sm : solMaps )
+			code = code ^ sm.hashCode();
 		return code;
 	}
 
@@ -63,7 +61,7 @@ public class BindingsRestrictedTriplePatternRequestImpl implements BindingsRestr
 	}
 
 	@Override
-	public Set<SolutionMapping> getSolutionMappings() {
+	public Set<Binding> getSolutionMappings() {
 		return solMaps;
 	}
 

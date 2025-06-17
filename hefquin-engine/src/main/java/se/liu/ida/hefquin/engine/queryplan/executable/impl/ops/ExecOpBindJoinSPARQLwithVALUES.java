@@ -5,22 +5,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.algebra.Table;
-import org.apache.jena.sparql.algebra.op.OpSequence;
-import org.apache.jena.sparql.algebra.op.OpTable;
-import org.apache.jena.sparql.algebra.table.TableData;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementData;
+import org.apache.jena.sparql.syntax.ElementGroup;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 /**
@@ -28,77 +26,72 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
  * a VALUES clause to capture the potential join partners that are sent to the
  * federation member.
  *
- * For every batch of solution mappings from the input, the algorithm sends a
- * SPARQL request to the federation member; this request consists of the given
- * graph pattern, extended with a VALUES clause that contains the solutions of
- * the current input batch (in fact, only their projection to the join variables;
- * also, the algorithm may decide to split the input batch into smaller batches
- * for multiple requests).
- * The response to such a request is the subset of the solutions for the graph
- * pattern that are join partners for at least one of the solutions that were
- * used for creating the request.
- * After receiving such a response, the algorithm locally joins the solutions
- * from the response with the solutions in the batch used for creating the
- * request, and outputs the resulting joined solutions (if any).
- * Thereafter, the algorithm moves on to the next batch of solutions from
- * the input.
+ * For more details about the actual implementation of the algorithm, and its
+ * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
  */
 public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 {
 	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
 
+	protected final Element pattern;
+
+	/**
+	 * @param query - the graph pattern to be evaluated (in a bind-join
+	 *          manner) at the federation member given as 'fm'
+	 *
+	 * @param fm - the federation member targeted by this operator
+	 *
+	 * @param inputVars - the variables to be expected in the solution
+	 *          mappings that will be pushed as input to this operator
+	 *
+	 * @param useOuterJoinSemantics - <code>true</code> if the 'query' is to
+	 *          be evaluated under outer-join semantics; <code>false</code>
+	 *          for inner-join semantics
+	 *
+	 * @param batchSize - the number of solution mappings to be included in
+	 *          each bind-join request; this value must not be smaller than
+	 *          {@link #minimumRequestBlockSize}; as a default value for this
+	 *          parameter, use {@link #DEFAULT_BATCH_SIZE}
+	 *
+	 * @param collectExceptions - <code>true</code> if this operator has to
+	 *          collect exceptions (which is handled entirely by one of the
+	 *          super classes); <code>false</code> if the operator should
+	 *          immediately throw every {@link ExecOpExecutionException}
+	 */
 	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
+	                                       final ExpectedVariables inputVars,
 	                                       final boolean useOuterJoinSemantics,
 	                                       final int batchSize,
 	                                       final boolean collectExceptions ) {
-		super(query, fm, useOuterJoinSemantics, batchSize, collectExceptions);
-	}
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
 
-	public ExecOpBindJoinSPARQLwithVALUES( final SPARQLGraphPattern query,
-	                                       final SPARQLEndpoint fm,
-	                                       final boolean useOuterJoinSemantics,
-	                                       final boolean collectExceptions ) {
-		this(query, fm, useOuterJoinSemantics, DEFAULT_BATCH_SIZE, collectExceptions);
+		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableReqOp( final Iterable<SolutionMapping> solMaps ) {
-		final Set<Binding> bindings = new HashSet<>();
+	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		// Collect the variables bound by the given solution mappings
+		// (which are guaranteed to be all join variables).
 		final Set<Var> joinVars = new HashSet<>();
-
-		boolean noJoinVars = false;
-		for ( final SolutionMapping s : solMaps ) {
-			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInSubQuery );
-
-			// If there exists a solution mapping that does not have any variables in common with the triple pattern of this operator
-			// retrieve all matching triples of the given query
-			if ( b.isEmpty() ) {
-				noJoinVars = true;
-				break;
-			}
-
-			if ( ! SolutionMappingUtils.containsBlankNodes(b) ) {
-				bindings.add(b);
-
-				final Iterator<Var> it = b.vars();
-				while ( it.hasNext() ) {
-					joinVars.add( it.next() );
-				}
+		for ( final Binding b : solMaps ) {
+			final Iterator<Var> it = b.vars();
+			while ( it.hasNext() ) {
+				joinVars.add( it.next() );
 			}
 		}
 
-		if (noJoinVars) {
-			return new ExecOpRequestSPARQL( new SPARQLRequestImpl(query), fm, false );
-		}
+		// Create the VALUES clause.
+		final Element valuesClause = new ElementData( new ArrayList<>(joinVars),
+		                                              new ArrayList<>(solMaps) );
 
-		if ( bindings.isEmpty() ) {
-			return null;
-		}
+		// Combine the VALUES clause with the graph pattern of this operator.
+		final ElementGroup group = new ElementGroup();
+		group.addElement( valuesClause );
+		group.addElement( pattern );
 
-		final Table table = new TableData( new ArrayList<>(joinVars), new ArrayList<>(bindings) );
-		final Op op = OpSequence.create( OpTable.create(table), QueryPatternUtils.convertToJenaOp(query) );
-		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl2(op);
+		// Create the request operator using the combined pattern.
+		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(group);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm, false);
 	}

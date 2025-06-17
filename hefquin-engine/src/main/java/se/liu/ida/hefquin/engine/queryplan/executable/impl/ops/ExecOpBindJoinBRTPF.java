@@ -1,20 +1,20 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import java.util.Set;
+
+import org.apache.jena.sparql.engine.binding.Binding;
+
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.federation.BRTPFServer;
 import se.liu.ida.hefquin.engine.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jena.sparql.core.Var;
 
 /**
  * Implementation of (a batching version of) the bind join algorithm
@@ -35,46 +35,55 @@ import org.apache.jena.sparql.core.Var;
  * resulting joined solutions (if any).
  * Thereafter, the algorithm moves on to the next batch of solutions from
  * the input.
+ *
+ * For more details about the actual implementation of the algorithm, and its
+ * extra capabilities, refer to {@link BaseForExecOpBindJoinWithRequestOps}.
  */
 public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
 	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
 
+	/**
+	 * @param tp - the triple pattern to be evaluated (in a bind-join
+	 *          manner) at the federation member given as 'fm'
+	 *
+	 * @param fm - the federation member targeted by this operator
+	 *
+	 * @param inputVars - the variables to be expected in the solution
+	 *          mappings that will be pushed as input to this operator
+	 *
+	 * @param useOuterJoinSemantics - <code>true</code> if the 'query' is to
+	 *          be evaluated under outer-join semantics; <code>false</code>
+	 *          for inner-join semantics
+	 *
+	 * @param batchSize - the number of solution mappings to be included in
+	 *          each bind-join request; this value must not be smaller than
+	 *          {@link #minimumRequestBlockSize}; as a default value for this
+	 *          parameter, use {@link #DEFAULT_BATCH_SIZE}
+	 *
+	 * @param collectExceptions - <code>true</code> if this operator has to
+	 *          collect exceptions (which is handled entirely by one of the
+	 *          super classes); <code>false</code> if the operator should
+	 *          immediately throw every {@link ExecOpExecutionException}
+	 */
 	public ExecOpBindJoinBRTPF( final TriplePattern tp,
 	                            final BRTPFServer fm,
+	                            final ExpectedVariables inputVars,
 	                            final boolean useOuterJoinSemantics,
 	                            final int batchSize,
 	                            final boolean collectExceptions ) {
-		super( tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), batchSize, collectExceptions );
-	}
-
-	public ExecOpBindJoinBRTPF( final TriplePattern tp,
-	                            final BRTPFServer fm,
-	                            final boolean useOuterJoinSemantics,
-	                            final boolean collectExceptions ) {
-		super( tp, fm, useOuterJoinSemantics, tp.getAllMentionedVariables(), DEFAULT_BATCH_SIZE, collectExceptions );
+		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions );
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableReqOp( final Iterable<SolutionMapping> inputSolMaps ) {
-		final Set<SolutionMapping> restrictedSMs = restrictSolMaps(inputSolMaps, varsInPatternForFM);
-
-		if ( restrictedSMs == null ) {
-			final TriplePatternRequest req = new TriplePatternRequestImpl(query);
-			return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
-		}
-
-		if ( restrictedSMs.isEmpty() ) {
-			return null;
-		}
-
+	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		// If there is only a single solution mapping, we
 		// do a TPF request instead of a brTPF request.
-		if ( restrictedSMs.size() == 1 ) {
-			final SolutionMapping sm = restrictedSMs.iterator().next();
+		if ( solMaps.size() == 1 ) {
+			final Binding sm = solMaps.iterator().next();
 			final TriplePattern restrictedTP;
 			try {
-				restrictedTP = query.applySolMapToGraphPattern(sm);
+				restrictedTP = TriplePatternImpl.applySolMapToTriplePattern(sm, query);
 			}
 			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				// This exception should not happen because the set of solution
@@ -87,34 +96,14 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 			return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
 		}
 
-		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl( (TriplePattern) query, restrictedSMs );
+		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
 		return new ExecOpRequestBRTPF(req, fm, false);
 	}
 
-
-	// ---- helper functions ---------
-
-	/**
-	 * Returns null if at least one of the solution mappings that would
-	 * otherwise be added to the returned set of solution mappings is
-	 * the empty solution mapping (in which case this operator better
-	 * uses a TPF request rather than a brTPF request).
-	 */
-	public static Set<SolutionMapping> restrictSolMaps( final Iterable<SolutionMapping> inputSolMaps,
-	                                                    final Set<Var> joinVars ) {
-		final Set<SolutionMapping> restrictedSolMaps = new HashSet<>();
-		for ( final SolutionMapping sm : inputSolMaps ) {
-			final SolutionMapping sm2 = SolutionMappingUtils.restrict(sm, joinVars);
-
-			if ( sm2.asJenaBinding().isEmpty() ) {
-				return null;
-			}
-
-			assert ! SolutionMappingUtils.containsBlankNodes(sm2);
-			restrictedSolMaps.add(sm2);
-		}
-
-		return restrictedSolMaps;
+	@Override
+	protected NullaryExecutableOp createExecutableReqOpForAll() {
+		final TriplePatternRequest req = new TriplePatternRequestImpl(query);
+		return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
 	}
 
 }
