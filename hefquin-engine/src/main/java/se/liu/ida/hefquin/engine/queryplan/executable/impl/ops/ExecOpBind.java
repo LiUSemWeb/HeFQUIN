@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 /**
  * To be used for BIND clauses.
  */
-public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
+public class ExecOpBind extends UnaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
@@ -62,24 +61,37 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 	}
 
 	@Override
-	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
-	                         final int batchSize,
-	                         IntermediateResultElementSink sink,
+	protected void _process( final List<SolutionMapping> inputSolMaps,
+	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt )
 		 throws ExecOpExecutionException
 	{
-		final List<SolutionMapping> output = new ArrayList<>();
-
-		// Produce the output solution mappings
-		// and populate the list with them.
-		for ( int i = 0; i < batchSize; i++ ) {
-			final SolutionMapping inputSolMap = inputSolMaps.next();
+		if ( inputSolMaps.size() == 1 ) {
+			// If we have only a single input solution mapping,
+			// there will be only one output solution mapping.
+			// In contrast to the general case (below), we don't
+			// need to create a list to collect the output.
+			final SolutionMapping inputSolMap = inputSolMaps.get(0);
 			final SolutionMapping outputSolMap = worker.extend(inputSolMap);
-			output.add(outputSolMap);
+			sink.send(outputSolMap);
 		}
+		else if ( inputSolMaps.size() > 1 ) {
+			// If we have multiple input solution mappings, create
+			// a list to collect the output solution mappings.
+			final List<SolutionMapping> output = new ArrayList<>();
 
-		numberOfOutputMappingsProduced += output.size();
-		sink.send(output);
+			// Produce the output solution mappings and populate the
+			// list with them.
+			for ( final SolutionMapping inputSolMap : inputSolMaps ) {
+				final SolutionMapping outputSolMap = worker.extend(inputSolMap);
+				output.add(outputSolMap);
+			}
+
+			sink.send(output);
+		}
+		// no else case here - nothing to do if inputSolMaps is empty
+
+		numberOfOutputMappingsProduced += inputSolMaps.size();
 	}
 
 	@Override
