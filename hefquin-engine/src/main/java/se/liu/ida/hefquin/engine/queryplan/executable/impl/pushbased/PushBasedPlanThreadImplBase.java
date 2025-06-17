@@ -128,23 +128,28 @@ public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread
 			}
 		}
 		catch ( final Throwable th ) {
-			System.err.println("Unexpected exception in one of the ExecPlanTasks.");
-			System.err.println( "--> The class of the executable operator of this ExecPlanTask is:" + getExecOp().getClass().getName() );
+			System.err.println("Unexpected exception in one of the execution plan threads.");
+			System.err.println( "--> The class of the executable operator of this thread is: " + getExecOp().getClass().getName() );
 			System.err.println( "--> The stack trace of the exception that was caught is:");
 			th.printStackTrace( System.err );
 
 			try {
 				final StatsOfPushBasedPlanThread stats = getStats();
-				System.err.println( "--> The current runtime statistics of this ExecPlanTask are:");
+				System.err.println( "--> The current runtime statistics of this thread are:");
 				StatsPrinter.print( stats, System.err, true ); // true=recursive
 			}
 			catch ( final Exception e ) {
 				System.err.println();
-				System.err.println( "--> Obtaining the current runtime statistics of this ExecPlanTask caused another exception:");
+				System.err.println( "--> Obtaining the current runtime statistics of this thread caused another exception:");
 				e.printStackTrace( System.err );
 			}
 
 			System.err.println();
+
+			synchronized (availableOutput) {
+				setStatus(Status.FAILED);
+				availableOutput.notifyAll();
+			}
 		}
 	}
 
