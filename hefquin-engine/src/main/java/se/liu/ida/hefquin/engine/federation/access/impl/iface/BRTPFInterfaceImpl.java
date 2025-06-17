@@ -2,10 +2,10 @@ package se.liu.ida.hefquin.engine.federation.access.impl.iface;
 
 import java.util.Set;
 
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.exec.http.Params;
 import org.apache.jena.sparql.serializer.SerializationContext;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFInterface;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
@@ -52,7 +52,7 @@ public class BRTPFInterfaceImpl extends TPFInterfaceImpl implements BRTPFInterfa
 
 		final Params params = createParams( req.getTriplePattern().asJenaTriple() );
 
-		final Set<SolutionMapping> solmaps = req.getSolutionMappings();
+		final Set<Binding> solmaps = req.getSolutionMappings();
 		if ( solmaps != null && ! solmaps.isEmpty() ) {
 			final String values = SolutionMappingUtils.createValuesClause(solmaps, scxt);
 			params.add( httpQueryArgumentForBindings, values );

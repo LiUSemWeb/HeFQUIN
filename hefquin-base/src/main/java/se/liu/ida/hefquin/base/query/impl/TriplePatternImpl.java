@@ -134,14 +134,21 @@ public class TriplePatternImpl implements TriplePattern
 	public TriplePattern applySolMapToGraphPattern( final SolutionMapping sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
-		final Binding b = sm.asJenaBinding();
-		boolean unchanged = true;
+		return applySolMapToTriplePattern( sm.asJenaBinding(), this );
+	}
 
-		Node s = jenaObj.getSubject();
+	public static TriplePattern applySolMapToTriplePattern( final Binding sm,
+	                                                        final TriplePattern tp )
+			throws VariableByBlankNodeSubstitutionException
+	{
+		boolean unchanged = true;
+		final Triple jenaTP = tp.asJenaTriple();
+
+		Node s = jenaTP.getSubject();
 		if ( s.isVariable() ) {
 			final Var var = Var.alloc(s);
-			if ( b.contains(var) ) {
-				s = b.get(var);
+			if ( sm.contains(var) ) {
+				s = sm.get(var);
 				unchanged = false;
 				if ( s.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -149,11 +156,11 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		Node p = jenaObj.getPredicate();
+		Node p = jenaTP.getPredicate();
 		if ( p.isVariable() ) {
 			final Var var = Var.alloc(p);
-			if ( b.contains(var) ) {
-				p = b.get(var);
+			if ( sm.contains(var) ) {
+				p = sm.get(var);
 				unchanged = false;
 				if ( p.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -161,11 +168,11 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		Node o = jenaObj.getObject();
+		Node o = jenaTP.getObject();
 		if ( o.isVariable() ) {
 			final Var var = Var.alloc(o);
-			if ( b.contains(var) ) {
-				o = b.get(var);
+			if ( sm.contains(var) ) {
+				o = sm.get(var);
 				unchanged = false;
 				if ( o.isBlank() ) {
 					throw new VariableByBlankNodeSubstitutionException();
@@ -173,7 +180,7 @@ public class TriplePatternImpl implements TriplePattern
 			}
 		}
 
-		return unchanged ? this : new TriplePatternImpl(s,p,o);
+		return unchanged ? tp : new TriplePatternImpl(s,p,o);
 	}
 
 	@Override

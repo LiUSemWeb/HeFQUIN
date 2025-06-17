@@ -18,6 +18,8 @@ import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -600,13 +602,13 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 
 		final Var x1 = Var.alloc( "x" );
 		final Node v1 = NodeFactory.createURI( "http://example.org/1" );
-		final SolutionMapping solMap1 = SolutionMappingUtils.createSolutionMapping( x1, v1 );
-		final BRTPFRequest brtpfReq1 = new BRTPFRequestImpl( tp, Set.of( solMap1 ) );
+		final Binding solMap1 = BindingFactory.binding( x1, v1 );
+		final BRTPFRequest brtpfReq1 = new BRTPFRequestImpl( tp, Set.of(solMap1) );
 
 		final Var x2 = Var.alloc( "x" );
 		final Node v2 = NodeFactory.createURI( "http://example.org/2" );
-		final SolutionMapping solMap2 = SolutionMappingUtils.createSolutionMapping( x2, v2 );
-		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of( solMap2 ) );
+		final Binding solMap2 = BindingFactory.binding( x2, v2 );
+		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of(solMap2) );
 
 		// issue requests
 		final CardinalityResponse r1 = fedAccessMgr.issueCardinalityRequest( brtpfReq1, fm ).get();
@@ -621,13 +623,13 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends EngineTest
 	public void brtpfTwoRequestSameBindings() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
 		final Var x1 = Var.alloc( "x" );
 		final Node v1 = NodeFactory.createURI( "http://example.org/1" );
-		final SolutionMapping solMap1 = SolutionMappingUtils.createSolutionMapping( x1, v1 );
-		final BRTPFRequest brtpfReq1 = new BRTPFRequestImpl( tp, Set.of( solMap1 ) );
+		final Binding solMap1 = BindingFactory.binding( x1, v1 );
+		final BRTPFRequest brtpfReq1 = new BRTPFRequestImpl( tp, Set.of(solMap1) );
 
 		final Var x2 = Var.alloc( "x" );
 		final Node v2 = NodeFactory.createURI( "http://example.org/1" );
-		final SolutionMapping solMap2 = SolutionMappingUtils.createSolutionMapping( x2, v2 );
-		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of( solMap2 ) );
+		final Binding solMap2 = BindingFactory.binding( x2, v2 );
+		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of(solMap2) );
 
 		final BRTPFServer fm = new MyBRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );

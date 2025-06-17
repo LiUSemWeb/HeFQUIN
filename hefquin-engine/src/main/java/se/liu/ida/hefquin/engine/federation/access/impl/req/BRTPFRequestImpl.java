@@ -2,7 +2,8 @@ package se.liu.ida.hefquin.engine.federation.access.impl.req;
 
 import java.util.Set;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
+import org.apache.jena.sparql.engine.binding.Binding;
+
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
 
@@ -10,12 +11,12 @@ public class BRTPFRequestImpl extends BindingsRestrictedTriplePatternRequestImpl
 {
 	protected final String pageURL;
 
-	public BRTPFRequestImpl( final TriplePattern tp, final Set<SolutionMapping> solMaps, final String pageURL ) {
+	public BRTPFRequestImpl( final TriplePattern tp, final Set<Binding> solMaps, final String pageURL ) {
 		super(tp, solMaps);
 		this.pageURL = pageURL;
 	}
 
-	public BRTPFRequestImpl( final TriplePattern tp, final Set<SolutionMapping> solMaps ) {
+	public BRTPFRequestImpl( final TriplePattern tp, final Set<Binding> solMaps ) {
 		this(tp, solMaps, null);
 	}
 

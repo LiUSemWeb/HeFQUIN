@@ -9,9 +9,6 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 
 public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
@@ -111,17 +108,13 @@ public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<
 	                                                 final SPARQLEndpoint fm,
 	                                                 final ExpectedVariables expectedVariables,
 	                                                 final boolean useOuterJoinSemantics ) {
-		final PhysicalOpBindJoinWithVALUES pop;
-		if ( useOuterJoinSemantics ) {
-			final LogicalOpTPOptAdd tpAdd = new LogicalOpTPOptAdd(fm, tp);
-			pop = new PhysicalOpBindJoinWithVALUES(tpAdd);
-		}
-		else {
-			final LogicalOpTPAdd tpAdd = new LogicalOpTPAdd(fm, tp);
-			pop = new PhysicalOpBindJoinWithVALUES(tpAdd);
-		}
 
-		return pop.createExecOp(false, expectedVariables);
+		return new ExecOpBindJoinSPARQLwithVALUES( tp,
+		                                           fm,
+		                                           expectedVariables,
+		                                           useOuterJoinSemantics,
+		                                           ExecOpBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
+		                                           false );
 	}
 
 }

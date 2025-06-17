@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.junit.Test;
-
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 
 public class SolutionMappingUtilsTest
 {
@@ -18,9 +18,9 @@ public class SolutionMappingUtilsTest
 	public void createValuesClauseOneVarOneSolMap() {
 		final Var v1 = Var.alloc("v1");
 
-		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping( v1, NodeFactory.createURI("http://example.org") );
+		final Binding sm1 = BindingFactory.binding( v1, NodeFactory.createURI("http://example.org") );
 
-		final List<SolutionMapping> solmaps = new ArrayList<>();
+		final List<Binding> solmaps = new ArrayList<>();
 		solmaps.add(sm1);
 
 		final String values = SolutionMappingUtils.createValuesClause( solmaps, new SerializationContext() );
@@ -32,10 +32,10 @@ public class SolutionMappingUtilsTest
 	public void createValuesClauseOneVarTwoSolMaps() {
 		final Var v1 = Var.alloc("v1");
 
-		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping( v1, NodeFactory.createURI("http://example.org") );
-		final SolutionMapping sm2 = SolutionMappingUtils.createSolutionMapping( v1, NodeFactory.createLiteral("test","en") );
+		final Binding sm1 = BindingFactory.binding( v1, NodeFactory.createURI("http://example.org") );
+		final Binding sm2 = BindingFactory.binding( v1, NodeFactory.createLiteral("test","en") );
 
-		final List<SolutionMapping> solmaps = new ArrayList<>();
+		final List<Binding> solmaps = new ArrayList<>();
 		solmaps.add(sm1);
 		solmaps.add(sm2);
 
@@ -48,11 +48,11 @@ public class SolutionMappingUtilsTest
 		final Var v1 = Var.alloc("v1");
 		final Var v2 = Var.alloc("v2");
 
-		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(
+		final Binding sm1 = BindingFactory.binding(
 				v1, NodeFactory.createURI("http://example.org"),
 				v2, NodeFactory.createURI("http://example2.org") );
 
-		final List<SolutionMapping> solmaps = new ArrayList<>();
+		final List<Binding> solmaps = new ArrayList<>();
 		solmaps.add(sm1);
 
 		final String values = SolutionMappingUtils.createValuesClause( solmaps, new SerializationContext() );

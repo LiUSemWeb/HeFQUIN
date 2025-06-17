@@ -78,15 +78,6 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
 	                                       final ExpectedVariables... inputVars ) {
-		assert inputVars.length == 1;
-		if ( ! inputVars[0].getPossibleVariables().isEmpty() ) {
-			// The executable operator for this physical operator (i.e., ExecOpBindJoinSPARQLwithVALUES)
-			// can work correctly only in cases in which all input solution mappings are for the exact
-			// same set of variables. This can be guaranteed only if the set of possible variables from
-			// the child operator is empty.
-			throw new IllegalArgumentException("Nonempty set of possible variables.");
-		}
-
 		final SPARQLGraphPattern pt;
 		final FederationMember fm;
 		final boolean useOuterJoinSemantics;
@@ -125,15 +116,13 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 			throw new IllegalArgumentException("Unsupported type of operator: " + lop.getClass().getName() );
 		}
 
-		return createExecOp(pt, fm, useOuterJoinSemantics, collectExceptions);
-	}
-
-	protected UnaryExecutableOp createExecOp( final SPARQLGraphPattern pattern,
-	                                          final FederationMember fm,
-	                                          final boolean useOuterJoinSemantics,
-	                                          final boolean collectExceptions ) {
-		if ( fm instanceof SPARQLEndpoint )
-			return new ExecOpBindJoinSPARQLwithVALUES( pattern, (SPARQLEndpoint) fm, useOuterJoinSemantics, collectExceptions );
+		if ( fm instanceof SPARQLEndpoint sparqlEndpoint )
+			return new ExecOpBindJoinSPARQLwithVALUES( pt,
+			                                           sparqlEndpoint,
+			                                           inputVars[0],
+			                                           useOuterJoinSemantics,
+			                                           ExecOpBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
+			                                           collectExceptions );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
