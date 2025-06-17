@@ -109,7 +109,7 @@ public class BaseForTextBasedPlanPrinters
 	                                                 final String indentString,
 	                                                 final PrintStream out ) {
 		final String gpAsString = gp.toStringForPlanPrinters();
-		final String gpAsString2 = gpAsString.replace( System.lineSeparator(), " ");
+		final String gpAsString2 = gpAsString.replaceAll( "\\s+", " ");
 		final String gpAsShortString;
 		if ( gpAsString2.length() > 88 )
 			gpAsShortString = gpAsString2.substring(0, 40) + "[...]" + gpAsString2.substring( gpAsString2.length()-40 );
