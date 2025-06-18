@@ -202,7 +202,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 
 
 	protected static class Worker implements Runnable {
-		protected final UnaryExecutableOpBaseWithBatching execOp;
+		protected final UnaryExecutableOp execOp;
 		protected final IntermediateResultElementSink mySink;
 		protected final List<SolutionMapping> input;
 		protected final ExecutionContext execCxt;
@@ -217,7 +217,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 
 			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
 			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop);
-			this.execOp = (UnaryExecutableOpBaseWithBatching) addPop.createExecOp(false, inputVarsFromNonOptionalPart);
+			this.execOp = addPop.createExecOp(false, inputVarsFromNonOptionalPart);
 
 			this.mySink = new IntermediateResultElementSink() {
 				@Override
@@ -230,7 +230,8 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 		@Override
 		public void run() {
 			try {
-				execOp._processBatch(input, mySink, execCxt);
+				execOp.process(input, mySink, execCxt);
+				execOp.concludeExecution(mySink, execCxt);
 			}
 			catch ( final ExecOpExecutionException e ) {
 				throw new RuntimeException("Executing an add operator used by this parallel multi left join caused an exception.", e);

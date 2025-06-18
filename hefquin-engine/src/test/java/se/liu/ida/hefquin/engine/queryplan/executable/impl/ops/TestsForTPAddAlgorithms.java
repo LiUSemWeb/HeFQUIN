@@ -72,17 +72,10 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
 			@Override
-			public Set<Var> getCertainVariables() {
-				final Set<Var> set = new HashSet<>();
-				set.add(var1);
-				set.add(var2);
-				return set;
-			}
+			public Set<Var> getCertainVariables() { return Set.of(var1, var2); }
 
 			@Override
-			public Set<Var> getPossibleVariables() {
-				return new HashSet<>();
-			}
+			public Set<Var> getPossibleVariables() { return Set.of(); }
 		}, useOuterJoinSemantics);
 
 		// checking
