@@ -38,6 +38,16 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     protected boolean child1InputComplete = false;
     protected boolean child2InputComplete = false;
 
+    /**
+     * This list is used to collect output solution mappings within each
+     * of the various functions of this implementation. Capturing this
+     * type of intermediate buffer as a member object rather creating
+     * a new version of it over and over again within each function
+     * reduces the number of Java objects that the garbage collector
+     * has to deal with.
+     */
+    final List<SolutionMapping> buffer = new ArrayList<>();
+
     // statistics
     private long numberOfOutputMappingsProduced = 0L;
 
@@ -91,25 +101,30 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     protected void _processInputFromChild1( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        final List<SolutionMapping> output = new ArrayList<>();
+        buffer.clear();
 
-        _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, output);
+        _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
 
-        numberOfOutputMappingsProduced += output.size();
-        sink.send(output);
+        numberOfOutputMappingsProduced += buffer.size();
+        sink.send(buffer);
+
+        buffer.clear();
     }
 
     @Override
     protected void _processInputFromChild1( final List<SolutionMapping> inputSolMaps,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        final List<SolutionMapping> output = new ArrayList<>();
+        buffer.clear();
+
         for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-            _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, output);
+            _processInputSolMap(inputSolMap, indexForChild1, indexForChild2, buffer);
         }
 
-        numberOfOutputMappingsProduced += output.size();
-        sink.send(output);
+        numberOfOutputMappingsProduced += buffer.size();
+        sink.send(buffer);
+
+        buffer.clear();
     }
 
     @Override
@@ -126,24 +141,30 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
     protected void _processInputFromChild2( final SolutionMapping inputSolMap,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-    	final List<SolutionMapping> output = new ArrayList<>();
-        _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, output);
+        buffer.clear();
 
-        numberOfOutputMappingsProduced += output.size();
-        sink.send(output);
+        _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
+
+        numberOfOutputMappingsProduced += buffer.size();
+        sink.send(buffer);
+
+        buffer.clear();
     }
 
     @Override
     protected void _processInputFromChild2( final List<SolutionMapping> inputSolMaps,
                                             final IntermediateResultElementSink sink,
                                             final ExecutionContext execCxt ) {
-        final List<SolutionMapping> output = new ArrayList<>();
+        buffer.clear();
+
         for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-            _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, output);
+            _processInputSolMap(inputSolMap, indexForChild2, indexForChild1, buffer);
         }
 
-        numberOfOutputMappingsProduced += output.size();
-        sink.send(output);
+        numberOfOutputMappingsProduced += buffer.size();
+        sink.send(buffer);
+
+        buffer.clear();
     }
 
     @Override
