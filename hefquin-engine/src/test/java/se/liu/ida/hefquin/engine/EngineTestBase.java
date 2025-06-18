@@ -157,7 +157,9 @@ public abstract class EngineTestBase
 		@Override
 		public SPARQLEndpointInterface getInterface() { return iface; }
 
-		public SolMapsResponse performRequest( final SPARQLRequest req ) {
+		public SolMapsResponse performRequest( final SPARQLRequest req )
+				throws FederationAccessException
+		{
 			final List<SolutionMapping> result;
 			if ( req instanceof TriplePatternRequest ) {
 				result = getSolutions( (TriplePatternRequest) req);

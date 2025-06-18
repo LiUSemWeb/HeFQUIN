@@ -1,14 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.syntax.Element;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
@@ -21,17 +24,26 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * first VALUES-based request succeeds, however, then the implementation continues
  * using the VALUES-based approach for the rest of the requests. 
  */
-public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBaseWithBatching
+public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoinSPARQL
 {
 	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
 
-	protected final SPARQLGraphPattern query;
-	protected final SPARQLEndpoint fm;
-	protected final ExpectedVariables inputVars;
-	protected final boolean useOuterJoinSemantics;
+	protected final Element pattern;
 
-	// will be initialized when processing the first input block of solution mappings
-	protected BaseForExecOpBindJoinSPARQL currentInstance = null;
+	/**
+	 * <code>true</code> means that the FILTER-based bind-join requests will
+	 * be used, whereas <code>false</code> is for VALUES-based bind-join
+	 * requests. While this flag is initially set to <code>false</code>,
+	 * it will be flipped to <code>true</code> if the first (VALUES-based)
+	 * request fails.
+	 */
+	protected boolean useFilterBasedApproach = false;
+
+	/**
+	 * To be flipped to <code>false</code> after the first request has been
+	 * done and we know which approach to use for the rest of the requests.
+	 */
+	protected boolean trialPhase = true;
 
 	/**
 	 * @param query - the graph pattern to be evaluated (in a bind-join
@@ -62,99 +74,62 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends UnaryExecutableOpBas
 	                                               final boolean useOuterJoinSemantics,
 	                                               final int batchSize,
 	                                               final boolean collectExceptions ) {
-		super(batchSize, collectExceptions);
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
 
-		assert query != null;
-		assert fm != null;
-		assert inputVars != null;
-
-		this.query = query;
-		this.fm = fm;
-		this.inputVars = inputVars;
-		this.useOuterJoinSemantics = useOuterJoinSemantics;
+		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
 
 	@Override
-	protected void _processBatch( final List<SolutionMapping> batch,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt ) throws ExecOpExecutionException {
-		// If this is the first request.
-		if ( currentInstance == null ) {
-			currentInstance = new ExecOpBindJoinSPARQLwithVALUES( query,
-			                                                      fm,
-			                                                      inputVars,
-			                                                      useOuterJoinSemantics,
-			                                                      batchSize,
-			                                                      collectExceptions );
-			boolean valuesBasedRequestFailed = false;
-			try {
-				// Try using VALUES-based bind join
-				currentInstance._processBatch(batch, sink, execCxt);
-				if ( ! currentInstance.getExceptionsCaughtDuringExecution().isEmpty() ) {
-					valuesBasedRequestFailed = true;
-				}	
-			} catch ( final ExecOpExecutionException e ) {
-				valuesBasedRequestFailed = true;
-			}
-			if ( valuesBasedRequestFailed == true ) {
-				// Use FILTER-based bind join instead
-				currentInstance = new ExecOpBindJoinSPARQLwithFILTER( query,
-				                                                      fm,
-				                                                      inputVars,
-				                                                      useOuterJoinSemantics,
-				                                                      batchSize,
-				                                                      collectExceptions );
-				currentInstance._processBatch(batch, sink, execCxt);
-			}
+	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		if ( useFilterBasedApproach ) {
+			return ExecOpBindJoinSPARQLwithFILTER.createExecutableReqOp(solMaps, pattern, fm);
 		}
 		else {
-			currentInstance._processBatch(batch, sink, execCxt);
+			return ExecOpBindJoinSPARQLwithVALUES.createExecutableReqOp(solMaps, pattern, fm);
 		}
 	}
 
-	@Override
-	protected void _concludeExecution( final List<SolutionMapping> batch,
-	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
+	protected void performRequestAndHandleResponse( final IntermediateResultElementSink sink,
+	                                                final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		if ( batch != null && ! batch.isEmpty() ) {
-			_processBatch(batch, sink, execCxt);
+		final NullaryExecutableOp reqOp = createExecutableReqOp(currentSolMapsForRequest);
+		final MyIntermediateResultElementSink mySink = createMySink();
+
+		numberOfRequestOpsUsed++;
+
+		try {
+			reqOp.execute(mySink, execCxt);
+		}
+		catch ( final ExecOpExecutionException e ) {
+			if ( ! trialPhase ) {
+				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+			}
+
+			trialPhase = false;
+			useFilterBasedApproach = true;
+
+			statsOfLastReqOp = reqOp.getStats();
+			if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
+
+			performRequestAndHandleResponse(sink, execCxt);
+
+			return;
 		}
 
-		if ( currentInstance != null ) {
-			currentInstance.concludeExecution(sink, execCxt);
-		}
-	}
+		trialPhase = false;
 
-	@Override
-	public List<Exception> getExceptionsCaughtDuringExecution() {
-		if ( currentInstance != null ) {
-			return currentInstance.getExceptionsCaughtDuringExecution();
-		}
-		else {
-			return Collections.emptyList();
-		}
-	}
+		consumeMySink(mySink, sink);
 
-	@Override
-	public void resetStats() {
-		super.resetStats();
-
-		if ( currentInstance != null ) {
-			currentInstance.resetStats();
-		}
+		statsOfLastReqOp = reqOp.getStats();
+		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
 	}
 
 	@Override
 	protected ExecutableOperatorStatsImpl createStats() {
 		final ExecutableOperatorStatsImpl s = super.createStats();
-
-		if ( currentInstance == null )
-			s.put( "currentInstance", null );
-		else
-			s.put( "currentInstance", currentInstance.getStats() );
-
+		s.put( "switchedToFilter", useFilterBasedApproach );
 		return s;
 	}
+
 }

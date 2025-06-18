@@ -1,14 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 
@@ -36,17 +33,18 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * the request operators with the types of requests that are specific to that
  * concrete implementation.
  *
- * Then, for every batch of solution mappings from the input, the algorithm
- * creates the corresponding request (see above) and sends this request to
- * the federation member (the algorithm may even decide to split the input
- * batch into smaller batches for multiple requests; see below). The response
- * to such a request is the subset of the solutions for the query/pattern of
- * this operator that are join partners for at least one of the solutions that
- * were used for creating the request. After receiving such a response, the
- * algorithm locally joins the solutions from the response with the solutions
- * in the batch used for creating the request, and outputs the resulting
- * joined solutions (if any). Thereafter, the algorithm moves on to the next
- * batch of solutions from the input.
+ * The algorithm collects solution mappings from the input. Once enough
+ * solution mappings have arrived, the algorithm creates the corresponding
+ * request (see above) and sends this request to the federation member (the
+ * algorithm may even decide to split the input batch into smaller batches
+ * for multiple requests; see below). The response to such a request is the
+ * subset of the solutions for the query/pattern of this operator that are
+ * join partners for at least one of the solutions that were used for creating
+ * the request. After receiving such a response, the algorithm locally joins
+ * the solutions from the response with the solutions in the batch used for
+ * creating the request, and outputs the resulting joined solutions (if any).
+ * Thereafter, the algorithm moves on to collect the next solution mappings
+ * from the input, until it can do the next request, etc.
  *
  * This implementation is capable of separating out each input solution mapping
  * that assigns a blank node to any of the join variables. Then, such solution
@@ -56,19 +54,12 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * these solution mappings are still returned to the output (without joining
  * them with anything).
  *
- * Another capability of this implementation is that, instead of simply using
- * every input batch of solution mappings to directly create a corresponding
- * bind-join request, this implementation can split the input batch into
- * smaller batches for the requests. On top of that, in case a request operator
- * fails, this implementation automatically reduces the batch size for requests
- * and, then, tries to re-process (with the reduced request batch size) the
- * input solution mappings for which the request operator failed.
+ * A feature of this implementation is that, in case a request operator fails,
+ * this implementation automatically reduces the batch size for requests and,
+ * then, tries to re-process (with the reduced request batch size) the input
+ * solution mappings for which the request operator failed.
  *
- * A potential downside of the latter capability is that, if this algorithm
- * has to execute multiple requests per input batch, then these requests are
- * executed sequentially.
- *
- * Another capability of this implementation is that it can switch into a
+ * Another feature of this implementation is that it can switch into a
  * full-retrieval mode as soon as there is an input solution mapping that
  * does not have a binding for any of the join variables (which may happen
  * only in cases in which at least one of the join variables is a certain
@@ -85,7 +76,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  */
 public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Query,
                                                           MemberType extends FederationMember>
-           extends UnaryExecutableOpBaseWithBatching
+           extends UnaryExecutableOpBase
 {
 	public final static int DEFAULT_BATCH_SIZE = 30;
 
@@ -107,6 +98,40 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 * The minimum value to which {@link #requestBlockSize} can be reduced.
 	 */
 	protected static final int minimumRequestBlockSize = 5;
+
+	/**
+	 * This set is used to collect up the input solution mappings (obtained
+	 * from the child operator in the execution plan) for which the next
+	 * bind-join request will ask for possible join partners.
+	 *
+	 * Note that these are not necessarily the solution mappings to be used
+	 * for forming the next bind-join request; those are collected in parallel
+	 * in {@link #currentSolMapsForRequest}.
+	 * 
+	 * Once the response received for the next bind-join request has been
+	 * handled, this set will be cleared (and then populated again, by using
+	 * the next input solution mappings that will arrive afterwards).
+	 */
+	protected final Set<SolutionMapping> currentBatch = new HashSet<>();
+
+	/**
+	 * This set is used to collect up solution mappings that will be used
+	 * to form the next bind-join request. These solution mappings will be
+	 * created by restricting relevant input solution mappings (obtained
+	 * from the child operator in the execution plan) to the join variables;
+	 * i.e., projecting away the non-join variables, as the bindings for these
+	 * do not need to be shipped in the bind-join requests.
+	 *
+	 * The corresponding input solution mappings from which the solution
+	 * mappings in this set have been created are collected in parallel in
+	 * {@link #currentBatch}. It is possible that multiple input solution
+	 * mappings may result in the same restricted solution mapping.
+	 * 
+	 * Once the response received for the next bind-join request has been
+	 * handled, this set will be cleared (and then populated again, by using
+	 * the next input solution mappings that will arrive afterwards).
+	 */
+	protected final Set<Binding> currentSolMapsForRequest = new HashSet<>();
 
 	/**
 	 * In case that this operator had to switch to full-retrieval mode,
@@ -155,7 +180,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	                                            final boolean useOuterJoinSemantics,
 	                                            final int batchSize,
 	                                            final boolean collectExceptions ) {
-		super(batchSize, collectExceptions);
+		super(collectExceptions);
 
 		assert query != null;
 		assert fm != null;
@@ -171,6 +196,10 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		this.allJoinVarsAreCertain = areAllJoinVarsAreCertain(varsInQuery, inputVars);
 	}
 
+	/**
+	 * Returns <code>true</code> if the given set of variables does not overlap
+	 * with the possible-variables set of the given {@link ExpectedVariables}.
+	 */
 	public static boolean areAllJoinVarsAreCertain( final Set<Var> varsInQuery,
 	                                                final ExpectedVariables inputVars ) {
 		// The join variables are all certain variables if there is
@@ -189,141 +218,210 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		return true;
 	}
 
-	private final List<SolutionMapping> unjoinableInputSMs = new ArrayList<>();
-	private final List<SolutionMapping> joinableInputSMs = new ArrayList<>();
-
 	@Override
-	protected void _processBatch( final List<SolutionMapping> batchOfSolMaps,
-	                              final IntermediateResultElementSink sink,
-	                              final ExecutionContext execCxt )
-			throws ExecOpExecutionException
+	protected void _process( final SolutionMapping inputSolMap,
+	                         final IntermediateResultElementSink sink,
+	                         final ExecutionContext execCxt )
+			 throws ExecOpExecutionException
 	{
-		// If the operator had to switch into full-retrieval mode, we can
-		// now also use the retrieved (full) result for the given batch.
-// TODO: In this case, we may want to skip the batching completely and, thus,
-// override the '_process' method of the base class (UnaryExecutableOpBaseWithBatching).
-// But this should also work in combination with ExecOpBindJoinSPARQLwithVALUESorFILTER.
+		// First, check whether we had to switch into full-retrieval mode,
+		// in which case we can find the join partners for the given input
+		// solution mapping within the full result that we had to retrieve.
 		if ( fullResult != null ) {
-			joinInFullRetrievalMode(batchOfSolMaps, sink);
+			joinInFullRetrievalMode(inputSolMap, sink);
 			return;
 		}
 
-		unjoinableInputSMs.clear();
-		joinableInputSMs.clear();
+		// At this point, we know that we are in the normal bind-join mode.
+		// Let's first create a version of the input solution mapping that
+		// is restricted to the join variables; i.e., we project away all
+		// bindings for variables that are not join variables.
+		final Binding restrictedInputSolMap = SolutionMappingUtils.restrict( inputSolMap.asJenaBinding(),
+		                                                                     varsInQuery );
 
-		final boolean allHaveJoinVars = extractUnjoinableInputSMs( batchOfSolMaps,
-		                                                           varsInQuery,
-		                                                           unjoinableInputSMs,
-		                                                           joinableInputSMs );
-
-		if ( ! allHaveJoinVars ) {
+		// If the input solution mapping does not contain any of the join
+		// variables (and, thus, the restricted version of it is the empty
+		// mapping), then it is compatible (and, thus, can be joined) with
+		// every solution mapping that the federation member has for the
+		// query/pattern of this bind-join operator. In this case, we need
+		// to switch into full-retrieval mode.
+		if ( restrictedInputSolMap.isEmpty() ) {
 			switchToFullRetrievalMode(execCxt);
-			joinInFullRetrievalMode(batchOfSolMaps, sink);
+
+			joinInFullRetrievalMode(inputSolMap, sink);
+			joinInFullRetrievalMode(currentBatch, sink);
+
+			currentSolMapsForRequest.clear();
+			currentBatch.clear();
+
+			return;
 		}
-		else {
+
+		// If the input solution mapping assigns any of the join variables
+		// to a blank node, it cannot have join partners in the federation
+		// member of this operator (because blank nodes that the federation
+		// member may have are disjoint from blank nodes that we may have
+		// obtained from somewhere else). In this case, we do not need to
+		// proceed with this input solution mapping; but we have to send it
+		// to the output if we are operating under outer-join semantics.
+		if ( SolutionMappingUtils.containsBlankNodes(restrictedInputSolMap) ) {
 			if ( useOuterJoinSemantics ) {
-				numberOfOutputMappingsProduced += unjoinableInputSMs.size();
-				sink.send(unjoinableInputSMs);
+				numberOfOutputMappingsProduced++;
+				sink.send(inputSolMap);
 			}
 
-			_processJoinableInput( joinableInputSMs, sink, execCxt );
+			return;
 		}
 
-		unjoinableInputSMs.clear();
-		joinableInputSMs.clear();
+		// At this point, we know that we may retrieve join partners for
+		// the input solution mapping. Therefore, the following function
+		// makes sure that we will consider the input solution mapping in
+		// the next bind-join request that we will do.
+		_processJoinableInput(inputSolMap, restrictedInputSolMap, sink, execCxt);
 	}
 
-	@Override
-	protected void _concludeExecution( final List<SolutionMapping> batchOfSolMaps,
-	                                   final IntermediateResultElementSink sink,
-	                                   final ExecutionContext execCxt )
-			throws ExecOpExecutionException
-	{
-		if ( batchOfSolMaps != null && ! batchOfSolMaps.isEmpty() ) {
-			_processBatch(batchOfSolMaps, sink, execCxt);
-		}
-	}
-
-	private final List<SolutionMapping> nextChunkOfInput = new ArrayList<>();
-
-	protected void _processJoinableInput( final Iterable<SolutionMapping> joinableInputSMs,
+	/**
+	 * Makes sure that the given solution mapping will be considered for the
+	 * next bind-join request, and performs that request if enough solution
+	 * mappings have been accumulated.
+	 *
+	 * @param inputSolMap - the solution mapping to be considered; at this
+	 *             point, we assume that this solution mapping covers at
+	 *             least one join variable and does not assign a blank node
+	 *             to any of the join variables
+	 *
+	 * @param inputSolMapRestricted - a version of inputSolMap that is
+	 *             restricted to the join variables
+	 */
+	protected void _processJoinableInput( final SolutionMapping inputSolMap,
+	                                      final Binding inputSolMapRestricted,
 	                                      final IntermediateResultElementSink sink,
 	                                      final ExecutionContext execCxt )
-			throws ExecOpExecutionException
+			 throws ExecOpExecutionException
 	{
-		final Iterator<SolutionMapping> it = joinableInputSMs.iterator();
-		while ( it.hasNext() ) {
-			// create next chunk of input solution mappings to be processed
-			nextChunkOfInput.clear();
-			while ( nextChunkOfInput.size() < requestBlockSize && it.hasNext() ) {
-				nextChunkOfInput.add( it.next() );
+		// Add the given solution mapping to the batch of solution mappings
+		// considered by the next bind-join request.
+		currentBatch.add(inputSolMap);
+
+		// Check whether the restricted version of the given input solution
+		// mapping is already covered by the set of solution mappings from
+		// which the next bind-join request will be formed.
+		if ( ! alreadyCovered(inputSolMapRestricted) ) {
+			// If it is not covered, we need to add it to the set, but first
+			// we may have to remove solution mappings from that set.
+			if ( ! allJoinVarsAreCertain ) {
+				// Update the set of solution mappings already collected for
+				// the request by removing the solution mappings that include
+				// the given restricted solution mapping.
+				// This is okay because the potential join partners captured
+				// by these solution mappings are also captured by the given
+				// restricted solution mapping, which we will add to the set
+				// in the next step. In fact, it is even necessary to do so
+				// in order to avoid spurious duplicates in the join result.
+				currentSolMapsForRequest.removeIf( sm -> SolutionMappingUtils.includedIn(inputSolMapRestricted, sm) );
 			}
 
-			// process the created chunk of input solution mappings
-			_processWithoutSplittingInputFirst(nextChunkOfInput, sink, execCxt);
+			// Now we add it to the set.
+			currentSolMapsForRequest.add(inputSolMapRestricted);
 		}
 
-		nextChunkOfInput.clear();
+		// If we have accumulated enough solution mappings for the next
+		// bind-join request, then let's perform this request.
+		if ( currentSolMapsForRequest.size() == requestBlockSize ) {
+			performRequestAndHandleResponse(sink, execCxt);
+
+			// After performing the request (and handling its response), we can
+			// forget about the solution mappings considered for the request.
+			currentSolMapsForRequest.clear();
+			currentBatch.clear();
+		}
 	}
 
-	protected void _processWithoutSplittingInputFirst( final List<SolutionMapping> joinableInputSMs,
-	                                                   final IntermediateResultElementSink sink,
-	                                                   final ExecutionContext execCxt )
+	protected void performRequestAndHandleResponse( final IntermediateResultElementSink sink,
+	                                                final ExecutionContext execCxt )
 			throws ExecOpExecutionException
 	{
-		// Strip the given solution mappings of all bindings for non-join
-		// variables (as we do not need to ship non-join variables in the 
-		// bind-join requests). Additionally, for uses of this operator in
-		// cases in which some join variables may be possible variables (not
-		// certain variables), we also need to make sure to exclude solution
-		// mappings that are covered by other solution mappings to be shipped
-		// (otherwise, we may end up with spurious duplicates in the result
-		// of this operator).
-		final Set<Binding> solMapsForRequest;
-		if ( allJoinVarsAreCertain )
-			solMapsForRequest = removeNonJoinVars(joinableInputSMs);
-		else
-			solMapsForRequest = removeNonJoinVarsAndExcludeCoveredSolMaps(joinableInputSMs);
+		final NullaryExecutableOp reqOp = createExecutableReqOp(currentSolMapsForRequest);
 
-		assert ! solMapsForRequest.isEmpty();
-
-		final NullaryExecutableOp reqOp = createExecutableReqOp(solMapsForRequest);
+		// This sink will collect the solution mappings obtained by the
+		// bind-join request and immediately join them with the input
+		// solution mappings that we have accumulated in 'currentBatch'.
+		// Once the request has been executed, we will send the resulting
+		// joined solution mappings from 'mySink' to 'sink' (see below).
+		final MyIntermediateResultElementSink mySink = createMySink();
 
 		numberOfRequestOpsUsed++;
-
-		final MyIntermediateResultElementSink mySink;
-		if ( useOuterJoinSemantics )
-			mySink = new MyIntermediateResultElementSinkOuterJoin(joinableInputSMs);
-		else
-			mySink = new MyIntermediateResultElementSink(joinableInputSMs);
 
 		try {
 			reqOp.execute(mySink, execCxt);
 		}
 		catch ( final ExecOpExecutionException e ) {
-			final boolean requestBlockSizeReduced = reduceRequestBlockSize();
-			if ( requestBlockSizeReduced && ! mySink.hasObtainedInputAlready() ) {
-				// If the request operator did not yet sent any solution
-				// mapping to the sink, then we can retry to process the
-				// given list of input solution mappings with the reduced
-				// request block size.
-				_processBatch(joinableInputSMs, mySink, execCxt);
-			}
-			else {
+// TODO: How to (re)implement this part now?
+//			final boolean requestBlockSizeReduced = reduceRequestBlockSize();
+//			if ( requestBlockSizeReduced && ! mySink.hasObtainedInputAlready() ) {
+//				// If the request operator did not yet sent any solution
+//				// mapping to the sink, then we can retry to process the
+//				// given list of input solution mappings with the reduced
+//				// request block size.
+//				_processBatch(joinableInputSMs, mySink, execCxt);
+//			}
+//			else {
 				throw new ExecOpExecutionException("Executing a request operator used by this bind join caused an exception.", e, this);
+//			}
+		}
+
+		// Now we send the complete set of resulting joined solution mappings
+		// from 'mySink' to 'sink'. Sending them as a single chunk is useful
+		// because it reduces communication between the threads that run this
+		// and the next operator of the query plan.
+		consumeMySink(mySink, sink);
+
+		statsOfLastReqOp = reqOp.getStats();
+		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
+	}
+
+	protected boolean alreadyCovered( final Binding inputSolMapRestricted ) {
+		if ( currentSolMapsForRequest.contains(inputSolMapRestricted) ) {
+			return true;
+		}
+
+		if ( ! allJoinVarsAreCertain ) {
+			for ( final Binding sm : currentSolMapsForRequest ) {
+				if ( SolutionMappingUtils.includedIn(sm, inputSolMapRestricted) ) {
+					return true;
+				}
 			}
 		}
 
+		return false;
+	}
+
+	protected MyIntermediateResultElementSink createMySink() {
+		if ( useOuterJoinSemantics )
+			return new MyIntermediateResultElementSinkOuterJoin(currentBatch);
+		else
+			return new MyIntermediateResultElementSink(currentBatch);
+	}
+
+	protected void consumeMySink( final MyIntermediateResultElementSink mySink,
+	                              final IntermediateResultElementSink outputSink ) {
 		mySink.flush();
 
 		final List<SolutionMapping> output = mySink.getSolMapsForOutput();
 		if ( ! output.isEmpty() ) {
 			numberOfOutputMappingsProduced += output.size();
-			sink.send(output);
+			outputSink.send(output);
 		}
+	}
 
-		statsOfLastReqOp = reqOp.getStats();
-		if ( statsOfFirstReqOp == null ) statsOfFirstReqOp = statsOfLastReqOp;
+	@Override
+	protected void _concludeExecution( final IntermediateResultElementSink sink,
+	                                   final ExecutionContext execCxt )
+			throws ExecOpExecutionException
+	{
+		if ( fullResult == null && ! currentSolMapsForRequest.isEmpty() ) {
+			performRequestAndHandleResponse(sink, execCxt);
+		}
 	}
 
 	/**
@@ -361,212 +459,6 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 */
 	protected abstract NullaryExecutableOp createExecutableReqOp( Set<Binding> solMaps );
 
-	/**
-	 * Splits the given collection of solution mappings into two such that the
-	 * first list contains all the solution mappings that are guaranteed not to
-	 * have any join partner and the second list contains the rest of the given
-	 * input solution mappings (which may have join partners). Typically, the
-	 * solution mappings that are guaranteed not to have join partners are the
-	 * ones that have a blank node for one of the join variables.
-	 *
-	 * Returns <code>true</code> if each of the given solution mappings
-	 * has a binding for at least one of the join variables. As soon as
-	 * this function comes across a solution mapping for which this is
-	 * not the case (i.e., a solution mapping that doesn't cover any of
-	 * the join variables), the function terminates immediately and
-	 * returns <code>false</code> (i.e., in this case, the two lists
-	 * to be populated by this function may be incomplete).
-	 */
-	protected boolean extractUnjoinableInputSMs( final Iterable<SolutionMapping> solMaps,
-	                                             final Iterable<Var> potentialJoinVars,
-	                                             final List<SolutionMapping> unjoinable,
-	                                             final List<SolutionMapping> joinable ) {
-		for ( final SolutionMapping sm : solMaps ) {
-			boolean isJoinable = true;
-			boolean hasJoinVariable = false;
-			for ( final Var joinVar : potentialJoinVars ) {
-				final Node joinValue = sm.asJenaBinding().get(joinVar);
-
-				if ( joinValue != null ) {
-					hasJoinVariable = true;
-				}
-
-				if ( joinValue != null && joinValue.isBlank() ) {
-					isJoinable = false;
-					break;
-				}
-			}
-
-			if ( hasJoinVariable == false ) {
-				return false;
-			}
-
-			if ( isJoinable )
-				joinable.add(sm);
-			else
-				unjoinable.add(sm);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Returns a set of versions of the given solution mappings in which
-	 * bindings for non-join variables are removed. While projecting away
-	 * the non-join variables may result in solution mappings that are
-	 * duplicates of one another, such duplicates are not contained in
-	 * the returned set.
-	 *
-	 * Assumes that all of the given solution mappings have a binding for
-	 * at least one join variable and that none of them binds a blank node
-	 * to any of the join variables.
-	 */
-	protected Set<Binding> removeNonJoinVars( final Iterable<SolutionMapping> joinableSolMaps ) {
-		// We collect the restricted solution mappings as a set to avoid duplicates.
-		final Set<Binding> restrictedSolMaps = new HashSet<>();
-
-		for ( final SolutionMapping s : joinableSolMaps ) {
-			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(),
-			                                                 varsInQuery );
-
-			if ( b.isEmpty() ) {
-				// Such a solution mapping should not anymore be in the
-				// process at this point. If there was such a solution
-				// mapping, it should have been detected already while
-				// executing the extractUnjoinableInputSMs function.
-				throw new IllegalStateException("Solution mapping without join variables, which should have been detected and handled earlier (the solution mapping is: " + b.toString() + ").");
-			}
-
-			restrictedSolMaps.add(b);
-		}
-
-		return restrictedSolMaps;
-	}
-
-	/**
-	 * Returns a set of versions of the given solution mappings in which
-	 * bindings for non-join variables are removed, and none of the returned
-	 * solution mappings is covered by any other of the return solution
-	 * mappings.
-	 *
-	 * While projecting away the non-join variables may result in solution
-	 * mappings that are duplicates of one another, such duplicates are not
-	 * contained in the returned set.
-	 *
-	 * Assumes that all of the given solution mappings have a binding for
-	 * at least one join variable and that none of them binds a blank node
-	 * to any of the join variables.
-	 */
-	protected Set<Binding> removeNonJoinVarsAndExcludeCoveredSolMaps( final Iterable<SolutionMapping> joinableSolMaps ) {
-		// We first collect the restricted solution mappings into different
-		// sets, depending on the number of (join) variables that they bind.
-		// Separating them in this way will make it easier (and more efficient)
-		// to search for the ones that are covered by others.
-		// - the sets for restricted solution mappings that contain one / two /
-		//   three bindings (each of them will be created if needed); we use
-		//   these ones only to avoid having to always access the following
-		//   map for every restricted solution mapping
-		Set<Binding> restrictedSolMaps1 = null;
-		Set<Binding> restrictedSolMaps2 = null;
-		Set<Binding> restrictedSolMaps3 = null;
-		// - the sets for restricted solution mappings hashed by the number
-		//   of bindings, including each of the previous three (if created)
-		final Map<Integer,Set<Binding>> mapOfSolMapSets = new HashMap<>();
-
-		for ( final SolutionMapping s : joinableSolMaps ) {
-			final Binding b = SolutionMappingUtils.restrict( s.asJenaBinding(), varsInQuery );
-
-			if ( b.isEmpty() ) {
-				// Such a solution mapping should not anymore be in the
-				// process at this point. If there was such a solution
-				// mapping, it should have been detected already while
-				// executing the extractUnjoinableInputSMs function.
-				throw new IllegalStateException("Solution mapping without join variables, which should have been detected and handled earlier (the solution mapping is: " + b.toString() + ").");
-			}
-
-			if ( b.size() == 1 ) {
-				if ( restrictedSolMaps1 == null ) {
-					restrictedSolMaps1 = new HashSet<>();
-					mapOfSolMapSets.put(1, restrictedSolMaps1);
-				}
-
-				restrictedSolMaps1.add(b);
-			}
-			else if ( b.size() == 2 ) {
-				if ( restrictedSolMaps2 == null ) {
-					restrictedSolMaps2 = new HashSet<>();
-					mapOfSolMapSets.put(2, restrictedSolMaps2);
-				}
-
-				restrictedSolMaps2.add(b);
-			}
-			else if ( b.size() == 3 ) {
-				if ( restrictedSolMaps3 == null ) {
-					restrictedSolMaps3 = new HashSet<>();
-					mapOfSolMapSets.put(3, restrictedSolMaps3);
-				}
-
-				restrictedSolMaps3.add(b);
-			}
-			else { 
-				if ( ! mapOfSolMapSets.containsKey(b.size()) )
-					mapOfSolMapSets.put( b.size(), new HashSet<>() );
-
-				mapOfSolMapSets.get( b.size() ).add(b);
-			}
-		}
-
-		assert ! mapOfSolMapSets.isEmpty();
-
-		// The remainder of this function removes solution mappings
-		// that are covered by other solution mappings.
-
-		// First, find the first nonempty set.
-		int numberOfCurrentSet = 1;
-		while ( ! mapOfSolMapSets.containsKey(numberOfCurrentSet) ) {
-			numberOfCurrentSet++;
-		}
-
-		// The solution mappings in the first nonempty set are certainly not
-		// covered by any of the solution mappings. Hence, these can be carried
-		// over to the output without checking.
-		final Set<Binding> resultingSolMaps = mapOfSolMapSets.remove(numberOfCurrentSet);
-
-		// Now, for each of the remaining nonempty sets, iterate over the
-		// solution mappings in the set. For each such solution mapping,
-		// carry it over to the output if there is no solution mapping
-		// carried over from the previous sets that covers it.
-		while ( ! mapOfSolMapSets.isEmpty() ) {
-			numberOfCurrentSet++;
-			final Set<Binding> currentSet = mapOfSolMapSets.remove(numberOfCurrentSet);
-
-			if ( currentSet != null ) {
-				// Collect the solution mappings from the current set that are
-				// not covered by any of the solution mappings that are already
-				// carried over to the output.
-				final Set<Binding> nonCovered = new HashSet<>();
-				for ( final Binding candidate : currentSet ) {
-					final Iterator<Binding> itOutput = resultingSolMaps.iterator();
-					boolean isCovered = false;
-					while ( ! isCovered && itOutput.hasNext() ) {
-						isCovered = SolutionMappingUtils.covers( itOutput.next(),
-						                                         candidate );
-					}
-
-					if ( isCovered == false ) {
-						nonCovered.add(candidate);
-					}
-				}
-
-				// Carry the collected solution mappings over to the output.
-				resultingSolMaps.addAll(nonCovered);
-				currentSet.clear();
-			}
-		}
-
-		return resultingSolMaps;
-	}
-
 
 	// ------- functionality for Stats ------
 
@@ -590,8 +482,15 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		s.put( "requestBlockSizeWasReduced",      Boolean.valueOf(requestBlockSizeWasReduced) );
 		s.put( "requestBlockSize",                Integer.valueOf(requestBlockSize) );
 		s.put( "numberOfRequestOpsUsed",          Integer.valueOf(numberOfRequestOpsUsed) );
-		s.put( "statsOfFirstReqOp",  statsOfFirstReqOp );
-		s.put( "statsOfLastReqOp",   statsOfLastReqOp );
+
+		if ( statsOfFirstReqOp == statsOfLastReqOp ) {
+			s.put( "statsOfReqOp",  statsOfFirstReqOp );
+		}
+		else {
+			s.put( "statsOfFirstReqOp",  statsOfFirstReqOp );
+			s.put( "statsOfLastReqOp",   statsOfLastReqOp );
+		}
+
 		return s;
 	}
 
@@ -692,22 +591,29 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 		fullResult = mySink.getCollectedSolutionMappings();
 	}
 
-	protected void joinInFullRetrievalMode( final List<SolutionMapping> batchOfSolMaps,
+	protected void joinInFullRetrievalMode( final Iterable<SolutionMapping> batchOfSolMaps,
 	                                        final IntermediateResultElementSink sink )
 	{
 		for ( final SolutionMapping inputSM : batchOfSolMaps ) {
-			boolean hasJoinPartners = false;
-			for ( final SolutionMapping retrievedSM : fullResult ) {
-				if ( SolutionMappingUtils.compatible(retrievedSM, inputSM) ) {
-					hasJoinPartners = true;
-					numberOfOutputMappingsProduced++;
-					sink.send( SolutionMappingUtils.merge(retrievedSM, inputSM) );
-				}
-			}
+			joinInFullRetrievalMode(inputSM, sink);
+		}
+	}
 
-			if ( useOuterJoinSemantics && ! hasJoinPartners ) {
-				sink.send(inputSM);
+	protected void joinInFullRetrievalMode( final SolutionMapping inputSolMap,
+	                                        final IntermediateResultElementSink sink )
+	{
+		boolean hasJoinPartners = false;
+		for ( final SolutionMapping retrievedSM : fullResult ) {
+			if ( SolutionMappingUtils.compatible(retrievedSM, inputSolMap) ) {
+				hasJoinPartners = true;
+				numberOfOutputMappingsProduced++;
+				sink.send( SolutionMappingUtils.merge(retrievedSM, inputSolMap) );
 			}
+		}
+
+		if ( useOuterJoinSemantics && ! hasJoinPartners ) {
+			numberOfOutputMappingsProduced++;
+			sink.send(inputSolMap);
 		}
 	}
 

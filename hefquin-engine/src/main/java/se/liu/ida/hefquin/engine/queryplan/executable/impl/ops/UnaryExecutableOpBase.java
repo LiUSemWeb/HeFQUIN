@@ -17,11 +17,15 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
  * and the processing times per input solution mapping. To this end, it
  * implements the major methods of the {@link UnaryExecutableOp} interface,
  * where the actual functionality to be implemented for these methods needs
- * to be provided by implementing two abstract functions in each sub-class of
+ * to be provided by implementing two abstract functions in each subclass of
  * this base class. These two functions are:
  * <ul>
- * <li>{@link #_processBatch(IntermediateResultBlock, IntermediateResultElementSink, ExecutionContext)} and</li>
+ * <li>{@link #_process(SolutionMapping, IntermediateResultElementSink, ExecutionContext)} and</li>
  * <li>{@link #_concludeExecution(IntermediateResultElementSink, ExecutionContext)}.</li>
+ * </ul>
+ * Additionally, subclasses may override the following function:
+ * <ul>
+ * <li>{@link #_process(List, IntermediateResultElementSink, ExecutionContext)}.</li>
  * </ul>
  */
 public abstract class UnaryExecutableOpBase extends BaseForExecOps implements UnaryExecutableOp

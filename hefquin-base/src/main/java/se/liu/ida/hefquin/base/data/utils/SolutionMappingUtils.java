@@ -143,15 +143,18 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Returns <code>true</code> if the first solution mapping (b1) covers
-	 * the second solution mapping (b2), which is the case if the variables
-	 * in b1 are a proper subset of the variables in b2 and the two solution
-	 * mappings are compatible. In other words, b1 and b2 are the same for the
-	 * subset of variables for which they both have bindings and, additionally,
-	 * b2 has bindings for additional variables.
+	 * Returns <code>true</code> if the first solution mapping, b1, is
+	 * included in the second solution mapping, b2, where we say that
+	 * 'b1 is included in b2' if the variables in b1 are a proper subset
+	 * of the variables in b2 and the two solution mappings are compatible.
+	 * In other words, b1 and b2 are the same for the subset of variables
+	 * for which they both have bindings and, additionally, b2 has bindings
+	 * for additional variables.
 	 */
-	public static boolean covers( final Binding b1, final Binding b2 ) {
-		// First check: b1 can cover b2 only if b1 has fewer variables than b2.
+	public static boolean includedIn( final Binding b1, final Binding b2 ) {
+		// First check: b1 can be included in b2 only if b1 has fewer
+		// variables than b2. If that is not the case, we can immediately
+		// conclude that b1 is not included in b2.
 		if ( b1.size() >= b2.size() ) return false;
 
 		// Now the main check: We iterate over the variables bound in b1 and,
@@ -274,11 +277,12 @@ public class SolutionMappingUtils
 	}
 
 	/**
-	 * Restricts the given Jena binding to the given set of variables.
-	 * Hence, the returned binding will be compatible to the solution
-	 * mapping given as input, but it will be defined only for the variables
-	 * that are in the intersection of the given set of variables and the
-	 * set of variables for which the given binding is defined.
+	 * Restricts the given solution mapping to the given set of variables.
+	 * Hence, the returned solution mapping will be compatible with the
+	 * solution mapping given as input, but it will be defined only for
+	 * the variables that are in the intersection of the given set of
+	 * variables and the set of variables for which the given solution
+	 * mapping is defined.
 	 */
 	public static Binding restrict( final Binding input, final Collection<Var> vars ) {
 		final Iterator<Var> it = input.vars();
@@ -295,10 +299,11 @@ public class SolutionMappingUtils
 	
 	/**
 	 * Restricts the given solution mapping to the given set of variables.
-	 * Hence, the returned solution mapping will be compatible to the solution
-	 * mapping given as input, but it will be defined only for the variables
-	 * that are in the intersection of the given set of variables and the
-	 * set of variables for which the given solution mapping is defined.
+	 * Hence, the returned solution mapping will be compatible with the
+	 * solution mapping given as input, but it will be defined only for
+	 * the variables that are in the intersection of the given set of
+	 * variables and the set of variables for which the given solution
+	 * mapping is defined.
 	 */
 	public static SolutionMapping restrict( final SolutionMapping sm, final Collection<Var> vars ) {
 		return new SolutionMappingImpl(restrict(sm.asJenaBinding(), vars));

@@ -19,6 +19,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
@@ -264,6 +265,78 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertFalse( it.hasNext() );
 	}
 
+	protected void _tpWithAndWithoutJoinVariable( final boolean useOuterJoinSemantics ) throws ExecutionException {
+		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
+
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node x1 = NodeFactory.createURI("http://example.org/x1");
+		final Node x2 = NodeFactory.createURI("http://example.org/x2");
+		final Node y2 = NodeFactory.createURI("http://example.org/y2");
+		final Node z1 = NodeFactory.createURI("http://example.org/z1");
+		final Node z2 = NodeFactory.createURI("http://example.org/z2");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, x1) ); // join variable
+		input.add( SolutionMappingUtils.createSolutionMapping(var2, x2) ); // no join variable
+
+		final TriplePattern tp = new TriplePatternImpl(var1,p,var3);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(x1,p,z1) );
+		dataForMember.add( Triple.create(y2,p,z2) );
+
+		final Iterator<SolutionMapping> it = runTest(input, dataForMember, tp, new ExpectedVariables() {
+			@Override
+			public Set<Var> getCertainVariables() { return Set.of(); }
+
+			@Override
+			public Set<Var> getPossibleVariables() { return Set.of(var1, var2); }
+		}, useOuterJoinSemantics);
+
+		final Binding expected1 = BindingFactory.binding(var1, x1, var3, z1);
+		final Binding expected2 = BindingFactory.binding(var1, x1, var3, z1, var2, x2);
+		final Binding expected3 = BindingFactory.binding(var1, y2, var3, z2, var2, x2);
+
+		boolean expected1Found = false;
+		boolean expected2Found = false;
+		boolean expected3Found = false;
+
+		assertTrue( it.hasNext() );
+		final Binding b1 = it.next().asJenaBinding();
+		assertTrue(    b1.equals(expected1)
+		            || b1.equals(expected2)
+		            || b1.equals(expected3) );
+		if ( b1.equals(expected1) ) expected1Found = true;
+		if ( b1.equals(expected2) ) expected2Found = true;
+		if ( b1.equals(expected3) ) expected3Found = true;
+
+		assertTrue( it.hasNext() );
+		final Binding b2 = it.next().asJenaBinding();
+		assertTrue(    b2.equals(expected1)
+		            || b2.equals(expected2)
+		            || b2.equals(expected3) );
+		if ( b2.equals(expected1) ) expected1Found = true;
+		if ( b2.equals(expected2) ) expected2Found = true;
+		if ( b2.equals(expected3) ) expected3Found = true;
+
+		assertTrue( it.hasNext() );
+		final Binding b3 = it.next().asJenaBinding();
+		assertTrue(    b3.equals(expected1)
+		            || b3.equals(expected2)
+		            || b3.equals(expected3) );
+		if ( b3.equals(expected1) ) expected1Found = true;
+		if ( b3.equals(expected2) ) expected2Found = true;
+		if ( b3.equals(expected3) ) expected3Found = true;
+
+		assertFalse( it.hasNext() );
+
+		assertTrue( expected1Found );
+		assertTrue( expected2Found );
+		assertTrue( expected3Found );
+	}
+
 	protected void _tpWithEmptyInput( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var2 = Var.alloc("v2");
 		final Var var3 = Var.alloc("v3");
@@ -426,8 +499,8 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 
-		final Node p     = NodeFactory.createURI("http://example.org/p");
-		final Node uri   = NodeFactory.createURI("http://example.org/x1");
+		final Node p      = NodeFactory.createURI("http://example.org/p");
+		final Node uri    = NodeFactory.createURI("http://example.org/x1");
 		final Node bnode1 = NodeFactory.createBlankNode();
 		final Node bnode2 = NodeFactory.createBlankNode();
 
@@ -457,7 +530,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 			assertFalse( it.hasNext() );
 		}
-		else { // useOuterJoinSemantics  == null
+		else { // useOuterJoinSemantics == false
 			assertFalse( it.hasNext() );
 		}
 	}

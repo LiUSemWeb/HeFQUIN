@@ -44,6 +44,16 @@ public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<
 	}
 
 	@Test
+	public void tpWithAndWithoutJoinVariable_InnerJoin() throws ExecutionException {
+		_tpWithAndWithoutJoinVariable(false);
+	}
+
+	@Test
+	public void tpWithAndWithoutJoinVariable_OuterJoin() throws ExecutionException {
+		_tpWithAndWithoutJoinVariable(true);
+	}
+
+	@Test
 	public void tpWithEmptyInput_InnerJoin() throws ExecutionException {
 		_tpWithEmptyInput(false);
 	}

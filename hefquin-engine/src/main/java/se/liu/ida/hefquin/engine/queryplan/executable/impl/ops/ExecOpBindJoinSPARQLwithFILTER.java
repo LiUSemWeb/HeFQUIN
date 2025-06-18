@@ -12,6 +12,7 @@ import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -76,21 +77,27 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		return createExecutableReqOp(solMaps, pattern, fm);
+	}
+
+
+	// ---- helper functions ---------
+
+	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
+	                                                         final Element pattern,
+	                                                         final SPARQLEndpoint fm ) {
 		final Expr expr = createFilterExpression(solMaps);
 
 		final ElementGroup group = new ElementGroup();
 		group.addElement( pattern );
 		group.addElement( new ElementFilter(expr) );
 
-		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
+		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
+		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
 		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
-
-	// ---- helper functions ---------
-
-	public Expr createFilterExpression( final Iterable<Binding> solMaps ) {
+	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {
 		Expr disjunction = null;
 		for ( final Binding sm : solMaps ) {
 			Expr conjunction = null;

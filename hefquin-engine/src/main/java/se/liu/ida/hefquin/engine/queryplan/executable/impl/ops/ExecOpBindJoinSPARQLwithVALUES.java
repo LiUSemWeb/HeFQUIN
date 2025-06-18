@@ -71,6 +71,27 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+		return createExecutableReqOp(solMaps, pattern, fm);
+	}
+
+	public static NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps,
+	                                                         final Element pattern,
+	                                                         final SPARQLEndpoint fm ) {
+		// Create the VALUES clause.
+		final Element valuesClause = createValuesClause(solMaps);
+
+		// Combine the VALUES clause with the graph pattern of this operator.
+		final ElementGroup group = new ElementGroup();
+		group.addElement( valuesClause );
+		group.addElement( pattern );
+
+		// Create the request operator using the combined pattern.
+		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
+		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
+		return new ExecOpRequestSPARQL(request, fm, false);
+	}
+
+	public static Element createValuesClause( final Set<Binding> solMaps ) {
 		// Collect the variables bound by the given solution mappings
 		// (which are guaranteed to be all join variables).
 		final Set<Var> joinVars = new HashSet<>();
@@ -82,18 +103,7 @@ public class ExecOpBindJoinSPARQLwithVALUES extends BaseForExecOpBindJoinSPARQL
 		}
 
 		// Create the VALUES clause.
-		final Element valuesClause = new ElementData( new ArrayList<>(joinVars),
-		                                              new ArrayList<>(solMaps) );
-
-		// Combine the VALUES clause with the graph pattern of this operator.
-		final ElementGroup group = new ElementGroup();
-		group.addElement( valuesClause );
-		group.addElement( pattern );
-
-		// Create the request operator using the combined pattern.
-		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(group);
-		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm, false);
+		return new ElementData( new ArrayList<>(joinVars), new ArrayList<>(solMaps) );
 	}
 
 }
