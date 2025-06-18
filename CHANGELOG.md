@@ -14,7 +14,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Improving the text-based plan printers to make the printed plans easier to look at ([d83c8c2](https://github.com/LiUSemWeb/HeFQUIN/commit/d83c8c227dae2805af8835cf10f412008604c463), [21020c5](https://github.com/LiUSemWeb/HeFQUIN/commit/21020c58f57e26f084ced610917d6ec716f33ac2), [80189b7](https://github.com/LiUSemWeb/HeFQUIN/commit/80189b757b1ee59d3e0c3d647b55ac0a126f5d52), [66d8124](https://github.com/LiUSemWeb/HeFQUIN/commit/66d81248c963d3b790aca57998218b6b77c4625a), [#442](https://github.com/LiUSemWeb/HeFQUIN/pull/442))
 - The MergeRequests heuristic does not anymore push BIND operators into requests ([#433](https://github.com/LiUSemWeb/HeFQUIN/pull/433)).
-- Fixing and streamlining the various bind join implementations ([#443](https://github.com/LiUSemWeb/HeFQUIN/pull/443)).
+- Fixing and streamlining the various bind join implementations ([#443](https://github.com/LiUSemWeb/HeFQUIN/pull/443) and [e7ae6a9](https://github.com/LiUSemWeb/HeFQUIN/commit/e7ae6a94b68f0553e89a2cedefaf28c7338619c8)).
 - Removing the explicit notion of default components from the vocabulary for describing a HeFQUINEngine configuration ([#441](https://github.com/LiUSemWeb/HeFQUIN/pull/441)).
 - Replacing the implicit definition of the vocabulary for describing federations by an explicit one ([#432](https://github.com/LiUSemWeb/HeFQUIN/pull/432)).
 - Refactoring of DataRetrievalResponse ([#409](https://github.com/LiUSemWeb/HeFQUIN/pull/409)).
