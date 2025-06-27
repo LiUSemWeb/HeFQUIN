@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
-public class ExecOpGlobalToLocal extends UnaryExecutableOpBase
+public class ExecOpGlobalToLocal extends UnaryExecutableOpBaseWithoutBlocking
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
@@ -33,34 +34,23 @@ public class ExecOpGlobalToLocal extends UnaryExecutableOpBase
 	}
 
 	@Override
-	protected void _process( final List<SolutionMapping> inputSolMaps,
+	protected void _process( final Iterator<SolutionMapping> inputSolMaps,
+	                         final int maxBatchSize,
 	                         final IntermediateResultElementSink sink,
 	                         final ExecutionContext execCxt ) {
-		if ( inputSolMaps.size() == 1 ) {
-			// If we have only a single input solution mapping, there will
-			// be only a single set of output solution mappings. In contrast
-			// to the general case (below), we don't need to create a list to
-			// collect the output.
-			final SolutionMapping inputSolMap = inputSolMaps.get(0);
-			final Set<SolutionMapping> output = vm.translateSolutionMappingFromGlobal(inputSolMap);
-			sink.send(output);
-			numberOfOutputMappingsProduced += output.size();
-		}
-		else if ( inputSolMaps.size() > 1 ) {
-			// If we have multiple input solution mappings, create
-			// a list to collect the output solution mappings.
-			final List<SolutionMapping> output = new ArrayList<>();
+		final List<SolutionMapping> output = new ArrayList<>();
 
-			// Produce the output solution mappings and populate the
-			// list with them.
-			for ( final SolutionMapping inputSolMap : inputSolMaps ) {
-				output.addAll( vm.translateSolutionMappingFromGlobal(inputSolMap) );
-			}
-
-			sink.send(output);
-			numberOfOutputMappingsProduced += output.size();
+		// Produce the output solution mappings
+		// and populate the list with them.
+		int cnt = 0;
+		while ( cnt < maxBatchSize && inputSolMaps.hasNext() ) {
+			cnt++;
+			final SolutionMapping inputSolMap = inputSolMaps.next();
+			output.addAll( vm.translateSolutionMappingFromGlobal(inputSolMap) );
 		}
-		// no else case here - nothing to do if inputSolMaps is empty
+
+		numberOfOutputMappingsProduced += output.size();
+		sink.send(output);
 	}
 
 	@Override
