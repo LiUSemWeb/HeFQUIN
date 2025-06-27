@@ -58,7 +58,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	protected Var renamedVar;
 	// Mapping from a renamed var to an index in solMapsList
 	protected final Map<Var, Integer> renamedVars = new HashMap<>();
-	
+
 	/**
 	 * @param query - the graph pattern to be evaluated (in a bind-join
 	 *          manner) at the federation member given as 'fm'
@@ -83,11 +83,11 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	 *          immediately throw every {@link ExecOpExecutionException}
 	 */
 	public ExecOpBindJoinSPARQLwithBoundJoin( final SPARQLGraphPattern query,
-											  final SPARQLEndpoint fm,
-											  final ExpectedVariables inputVars,
-											  final boolean useOuterJoinSemantics,
-											  final int batchSize,
-											  final boolean collectExceptions ) {
+	                                          final SPARQLEndpoint fm,
+	                                          final ExpectedVariables inputVars,
+	                                          final boolean useOuterJoinSemantics,
+	                                          final int batchSize,
+	                                          final boolean collectExceptions ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
@@ -177,25 +177,28 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		}
 
 		protected void _send( final SolutionMapping smFromRequest ) {
-			// To merge smFromRequest with the input solution mappings, we need to:
-			// 1. Find and merge smFromRequest with the correct solution mapping from solMapList
-			// 2. Restore the renamed variable
-			// 3. Merge the updated solution mapping with the comaptible input solution mappings
+			// Merge smFromRequest into the input solution mappings:
+			// 1. For each renamed variable, check if the request binding contains it.
+			// 2. Rename that variable and merge with the corresponding solMapList entry.
+			// 3. For each compatible input mapping, merge and collect the results.
 			for( final Entry<Var, Integer> entry : renamedVars.entrySet() ){
 				final Var v = entry.getKey();
 				final int i = entry.getValue();
 				final Binding b = smFromRequest.asJenaBinding();
-				if( b.contains(v) && b.get(v) != null ){
-					// Rename var and merge with input mapping
-					final Binding b2 = BindingLib.merge( renameVar(b, v, renamedVar),
-					                                               solMapsList.get(i) );
-					final SolutionMapping smFromRequest2 = new SolutionMappingImpl(b2);
 
-					// Merge with inputSolutionMappings
-					for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-						if ( SolutionMappingUtils.compatible( smFromInput, smFromRequest2 ) ) {
-							solMapsForOutput.add( SolutionMappingUtils.merge( smFromInput, smFromRequest2 ) );
-						}
+				if ( ! b.contains(v) ) {
+					continue;
+				}
+
+				// Rename var and merge with input mapping
+				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
+				                                                             solMapsList.get(i) );
+				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
+
+				// Merge with inputSolutionMappings
+				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
+						solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput, updatedRequest) );
 					}
 				}
 			}
@@ -212,26 +215,29 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		}
 
 		protected void _send( final SolutionMapping smFromRequest ) {
-			// To merge smFromRequest with the input solution mappings, we need to:
-			// 1. Find and merge smFromRequest with the correct solution mapping from solMapList
-			// 2. Restore the renamed variable
-			// 3. Merge the updated solution mapping with the comaptible input solution mappings
+			// Merge smFromRequest into the input solution mappings:
+			// 1. For each renamed variable, check if the request binding contains it.
+			// 2. Rename that variable and merge with the corresponding solMapList entry.
+			// 3. For each compatible input mapping, merge and collect the results.
 			for( final Entry<Var, Integer> entry : renamedVars.entrySet() ){
 				final Var v = entry.getKey();
 				final int i = entry.getValue();
 				final Binding b = smFromRequest.asJenaBinding();
-				if( b.contains(v) && b.get(v) != null ){
-					// Rename var and merge with input mapping
-					final Binding b2 = BindingLib.merge( renameVar(b, v, renamedVar),
-					                                               solMapsList.get(i) );
-					final SolutionMapping smFromRequest2 = new SolutionMappingImpl(b2);
 
-					// Merge with inputSolutionMappings
-					for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-						if ( SolutionMappingUtils.compatible( smFromInput, smFromRequest2 ) ) {
-							solMapsForOutput.add( SolutionMappingUtils.merge( smFromInput, smFromRequest2 ) );
-							inputSolutionMappingsWithJoinPartners.add(smFromInput);
-						}
+				if ( ! b.contains(v) ) {
+					continue;
+				}
+
+				// Rename var and merge with input mapping
+				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
+				                                                             solMapsList.get(i) );
+				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
+
+				// Merge with inputSolutionMappings
+				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
+						solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput, updatedRequest) );
+						inputSolutionMappingsWithJoinPartners.add(smFromInput);
 					}
 				}
 			}
