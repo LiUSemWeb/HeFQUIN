@@ -55,7 +55,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	// Represents a list of input solution mappings (ordered)
 	protected final List<Binding> solMapsList = new ArrayList<>();
 	// Var used for renaming
-	protected Var renamedVar;
+	protected Var renamedVar = null;
 	// Mapping from a renamed var to an index in solMapsList
 	protected final Map<Var, Integer> renamedVars = new HashMap<>();
 
@@ -93,14 +93,18 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
+	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps )
+			throws ExecOpExecutionException
+	{
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
-	protected Element createUnion( final Iterable<Binding> solMaps ) {
+	protected Element createUnion( final Iterable<Binding> solMaps )
+			throws ExecOpExecutionException
+	{
 		// Populate the ordered list of solution mappings (used for restoring renamed
 		// vars and restoring the join partner vars)
 		solMaps.forEach(solMapsList::add);
@@ -118,7 +122,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			}
 		}
 
-		// Get first (certain?) non-join variable for renaming
+		// Get first non-join variable for renaming
 		for( final Var v : varsInQuery ){
 			if( ! joinVars.contains(v) && query.getCertainVariables().contains(v)){
 				renamedVar = v; // first certain non-join
@@ -126,33 +130,35 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			}
 		}
 
+		if ( renamedVar == null ) {
+			throw new ExecOpExecutionException("No non-join variable found for renaming", this);
+		}
+
 		// Generate the UNION pattern by iterating over all input solution mappings
 		// and replacing the renamed variable
-		int index = 0;
+		int i = 0;
 		for ( final Binding solMap : solMaps ) {
 			// Create a new pattern in which we replace the variables
 			// with values based on the incoming solution mapping
-			SPARQLGraphPattern pattern2;
+			SPARQLGraphPattern patternWithBindings;
 			try {
-				pattern2 = query.applySolMapToGraphPattern( new SolutionMappingImpl(solMap) );
+				patternWithBindings = query.applySolMapToGraphPattern( new SolutionMappingImpl(solMap) );
 			} catch ( VariableByBlankNodeSubstitutionException e ) {
-				// TODO: How do we properly handle exceptions?
-				e.printStackTrace();
-				return null;
+				throw new ExecOpExecutionException(e, this);
 			}
 			
 			// Create new variable 
-			final Var v = Var.alloc( renamedVar.getVarName() + "_" + index );
+			final Var v = Var.alloc( renamedVar.getVarName() + "_" + i );
 			
 			// Rename the variable in the pattern
-			final Element elt2 = renameVar(pattern2, renamedVar, v);
+			final Element elt2 = renameVar(patternWithBindings, renamedVar, v);
 			union.addElement(elt2);
 			
 			// Add the solution mapping to the list of solution mappings
 			solMapsList.add(solMap);
 			// Map the renamed var to the index of the corresponding solution mapping
-			renamedVars.put(v, index);
-			index++;
+			renamedVars.put(v, i);
+			i++;
 		}
 		return union;
 	}
