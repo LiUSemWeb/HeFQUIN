@@ -6,11 +6,19 @@ import java.util.concurrent.Executors;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.engine.ExecutionContext;
+import org.apache.jena.sparql.engine.main.OpExecutor;
+import org.apache.jena.sparql.engine.main.OpExecutorFactory;
+import org.apache.jena.sparql.engine.main.QC;
+
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
+import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.federation.catalog.FederationDescriptionReader;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 /**
  * Builder class that can be used to create a fully-wired instance of
@@ -180,10 +188,32 @@ public class HeFQUINEngineBuilder
 		};
 
 		// init engine
-		final HeFQUINEngine engine = new HeFQUINEngineConfigReader().read(engineConf, ctx);
-		ARQ.init();
-		engine.integrateIntoJena();
+		final HeFQUINEngineConfigReader confReader = new HeFQUINEngineConfigReader();
+		final FederationAccessManager fedAccessMgr = confReader.readFederationAccessManager(engineConf, ctx);
+		final QueryProcessor qProc = confReader.readQueryProcessor(engineConf, ctx, fedAccessMgr);
+
+		final HeFQUINEngine engine = new HeFQUINEngine(fedAccessMgr, qProc);
+
+		// integrate the engine into the Jena/ARQ machinery
+		integrateEngineIntoJena(qProc);
 
 		return engine;
 	}
+
+	/**
+	 * This method integrates the given processor of the HeFQUIN
+	 * engine into the query processing machinery of Jena ARQ.
+	 */
+	protected void integrateEngineIntoJena( final QueryProcessor qProc ) {
+		final OpExecutorFactory factory = new OpExecutorFactory() {
+			@Override
+			public OpExecutor create( final ExecutionContext execCxt ) {
+				return new OpExecutorHeFQUIN(qProc, execCxt);
+			}
+		};
+
+		ARQ.init();
+		QC.setFactory( ARQ.getContext(), factory );
+	}
+
 }
