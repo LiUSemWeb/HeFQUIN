@@ -1,8 +1,6 @@
 package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -13,11 +11,11 @@ import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 import org.apache.jena.sparql.util.QueryExecUtils;
 
-import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
+import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 /**
@@ -53,7 +51,7 @@ public class HeFQUINEngine
 	 * invalid; the message of the exception describes the issue and can
 	 * be passed directly to the user.
 	 */
-	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query )
+	public QueryProcessingStatsAndExceptions executeQuery( final Query query )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		return executeQuery(query, ResultsFormat.FMT_TEXT);
@@ -73,8 +71,8 @@ public class HeFQUINEngine
 	 * invalid; the message of the exception describes the issue and can
 	 * be passed directly to the user.
 	 */
-	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
-	                                                           final ResultsFormat outputFormat )
+	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
+	                                                       final ResultsFormat outputFormat )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		return executeQuery(query, outputFormat, System.out);
@@ -94,8 +92,8 @@ public class HeFQUINEngine
 	 * invalid; the message of the exception describes the issue and can
 	 * be passed directly to the user.
 	 */
-	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
-	                                                           final PrintStream output )
+	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
+	                                                       final PrintStream output )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
 		return executeQuery(query, ResultsFormat.FMT_TEXT, output);
@@ -115,9 +113,9 @@ public class HeFQUINEngine
 	 * invalid; the message of the exception describes the issue and can
 	 * be passed directly to the user.
 	 */
-	public Pair<QueryProcStats, List<Exception>> executeQuery( final Query query,
-	                                                           final ResultsFormat outputFormat,
-	                                                           final PrintStream output )
+	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
+	                                                       final ResultsFormat outputFormat,
+	                                                       final PrintStream output )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
 		return _exec(query, outputFormat, output);
@@ -139,9 +137,9 @@ public class HeFQUINEngine
 
 	// ------------------- main implementation ----------------
 
-	protected Pair<QueryProcStats, List<Exception>> _exec( final Query query,
-	                                                       final ResultsFormat outputFormat,
-	                                                       final PrintStream output )
+	protected QueryProcessingStatsAndExceptions  _exec( final Query query,
+	                                                    final ResultsFormat outputFormat,
+	                                                    final PrintStream output )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
 		ValuesServiceQueryResolver.expandValuesPlusServicePattern(query);
@@ -160,18 +158,12 @@ public class HeFQUINEngine
 			ex = e;
 		}
 
-		final QueryProcStats stats = (QueryProcStats) qe.getContext().get(HeFQUINConstants.sysQueryProcStats);
+		final QueryProcessingStatsAndExceptions stats = (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINConstants.sysQProcStatsAndExceptions);
 
-		@SuppressWarnings("unchecked")
-		List<Exception> exceptions = (List<Exception>) qe.getContext().get(HeFQUINConstants.sysQueryProcExceptions);
-		if ( ex != null ) {
-			if ( exceptions == null ) {
-				exceptions = new ArrayList<>();
-			}
-			exceptions.add(ex);
-		}
-
-		return new Pair<>(stats, exceptions);
+		if ( ex == null )
+			return stats;
+		else
+			return new QueryProcessingStatsAndExceptionsImpl(stats, ex);
 	}
 
 	protected void executeSelectQuery( final QueryExecution qe,
