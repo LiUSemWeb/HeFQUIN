@@ -213,7 +213,7 @@ public class SparqlServlet extends HttpServlet {
 
 		final JsonObject res = new JsonObject();
 		res.put( "result", baos.toString() );
-		res.put( "exceptions", ServletUtils.getExceptions( statsAndExceptions.getExceptions() ) );
+		res.put( "exceptions", ServletUtils.getExceptions(statsAndExceptions) );
 		return res;
 	}
 
