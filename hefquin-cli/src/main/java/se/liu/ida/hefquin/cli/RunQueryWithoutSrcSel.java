@@ -136,7 +136,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 
 		try {
-			statsAndExceptions = e.executeQuery( query, resFmt, out );
+			statsAndExceptions = e.executeQueryAndPrintResult(query, resFmt, out);
 		}
 		catch ( final IllegalQueryException ex ) {
 			System.out.flush();

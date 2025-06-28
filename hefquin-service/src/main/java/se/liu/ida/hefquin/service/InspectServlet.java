@@ -181,9 +181,10 @@ public class InspectServlet extends HttpServlet
 
 		final JsonObject inspectionResults = new JsonObject();
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			final QueryProcessingStatsAndExceptions statsAndExceptions = engine.executeQuery( query,
-			                                                                                  resultsFormat,
-			                                                                                  ps );
+			final QueryProcessingStatsAndExceptions statsAndExceptions =
+					engine.executeQueryAndPrintResult( query,
+					                                   resultsFormat,
+					                                   ps );
 
 			inspectionResults.put( "exceptions",
 			                       ServletUtils.getExceptions(statsAndExceptions.getExceptions()) );

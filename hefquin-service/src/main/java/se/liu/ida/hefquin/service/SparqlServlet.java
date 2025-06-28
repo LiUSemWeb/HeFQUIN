@@ -208,7 +208,7 @@ public class SparqlServlet extends HttpServlet {
 
 		final QueryProcessingStatsAndExceptions statsAndExceptions;
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			statsAndExceptions = engine.executeQuery( query, resultsFormat, ps );
+			statsAndExceptions = engine.executeQueryAndPrintResult(query, resultsFormat, ps);
 		}
 
 		final JsonObject res = new JsonObject();
