@@ -12,7 +12,6 @@ import org.apache.jena.sparql.resultset.ResultsFormat;
 import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
-import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
@@ -23,7 +22,7 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 
 /**
  * A command-line tool that executes SPARQL queries using the HeFQUIN federation
@@ -134,10 +133,10 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			out = System.out;
 		}
 
-		Pair<QueryProcStats, List<Exception>> statsAndExceptions = null;
+		QueryProcessingStatsAndExceptions statsAndExceptions = null;
 
 		try {
-			statsAndExceptions = e.executeQuery( query, resFmt, out );
+			statsAndExceptions = e.executeQueryAndPrintResult(query, resFmt, out);
 		}
 		catch ( final IllegalQueryException ex ) {
 			System.out.flush();
@@ -155,10 +154,9 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			ex.printStackTrace( System.err );
 		}
 
-		if (    statsAndExceptions != null
-		     && statsAndExceptions.object2 != null
-		     && ! statsAndExceptions.object2.isEmpty() ) {
-			final int numberOfExceptions = statsAndExceptions.object2.size();
+		if ( statsAndExceptions != null && statsAndExceptions.containsExceptions() ) {
+			final List<Exception> exceptions = statsAndExceptions.getExceptions();
+			final int numberOfExceptions = exceptions.size();
 			if ( numberOfExceptions > 1 ) {
 				System.err.println( "Attention: The query result may be incomplete because the following "
 						+ numberOfExceptions + " exceptions were caught when executing the query plan." );
@@ -169,7 +167,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 			System.err.println();
 			for ( int i = 0; i < numberOfExceptions; i++ ) {
-				final Exception ex = statsAndExceptions.object2.get( i );
+				final Exception ex = exceptions.get(i);
 				final Throwable rc = getRootCause( ex );
 				System.err.println( (i + 1) + " " + rc.getClass().getName() + ": " + rc.getMessage() );
 				System.err.println( "StackTrace:" );
@@ -185,22 +183,22 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		e.shutdown();
 
-		if ( statsAndExceptions != null && statsAndExceptions.object1 != null ) {
-			if ( contains( argQueryProcStats ) ) {
-				StatsPrinter.print( statsAndExceptions.object1, System.err, true );
+		if ( statsAndExceptions != null ) {
+			if ( contains(argQueryProcStats) ) {
+				StatsPrinter.print( statsAndExceptions, System.err, true );
 			}
-			if ( contains( argOnelineTimeStats ) ) {
-				final long overallQueryProcessingTime = statsAndExceptions.object1.getOverallQueryProcessingTime();
-				final long planningTime = statsAndExceptions.object1.getPlanningTime();
-				final long compilationTime = statsAndExceptions.object1.getCompilationTime();
-				final long executionTime = statsAndExceptions.object1.getExecutionTime();
+			if ( contains(argOnelineTimeStats) ) {
+				final long overallQueryProcessingTime = statsAndExceptions.getOverallQueryProcessingTime();
+				final long planningTime = statsAndExceptions.getPlanningTime();
+				final long compilationTime = statsAndExceptions.getCompilationTime();
+				final long executionTime = statsAndExceptions.getExecutionTime();
 				final String queryProcStats = overallQueryProcessingTime + ", " + planningTime + ", " + compilationTime
 						+ ", " + executionTime;
 				System.out.println( queryProcStats );
 			}
 		}
 
-		if ( contains( argFedAccessStats ) ) {
+		if ( contains(argFedAccessStats) ) {
 			final Stats fedAccessStats = e.getFederationAccessStats();
 			StatsPrinter.print( fedAccessStats, System.err, true );
 		}

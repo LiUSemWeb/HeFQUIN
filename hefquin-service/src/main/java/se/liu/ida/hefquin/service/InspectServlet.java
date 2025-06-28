@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.atlas.json.JsonObject;
@@ -22,7 +21,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
@@ -31,7 +29,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 
 /**
  * Servlet for handling SPARQL inspect queries via HTTP GET and POST requests.
@@ -183,18 +181,19 @@ public class InspectServlet extends HttpServlet
 
 		final JsonObject inspectionResults = new JsonObject();
 		try ( PrintStream ps = new PrintStream( baos, true, StandardCharsets.UTF_8 ) ) {
-			final Pair<QueryProcStats, List<Exception>> statsAndExceptions = engine.executeQuery( query,
-			                                                                                      resultsFormat,
-			                                                                                      ps );
-			final QueryProcStats stats = statsAndExceptions.object1;
-			final List<Exception> exceptions = statsAndExceptions.object2;
+			final QueryProcessingStatsAndExceptions statsAndExceptions =
+					engine.executeQueryAndPrintResult( query,
+					                                   resultsFormat,
+					                                   ps );
 
-			inspectionResults.put( "exceptions", ServletUtils.getExceptions( exceptions ) );
-			if( stats != null ){
-				inspectionResults.put( "queryMetrics", StatsPrinterJSON.statsAsJson( stats ) );
-				inspectionResults.put( "logicalPlan", getLogicalPlan( stats ) );
-				inspectionResults.put( "physicalPlan", getPhysicalPlan( stats ) );
-				inspectionResults.put( "sourceAssignment", getSourceAssignment( stats ) );
+			inspectionResults.put( "exceptions",
+			                       ServletUtils.getExceptions(statsAndExceptions) );
+
+			if( statsAndExceptions != null ){
+				inspectionResults.put( "queryMetrics", StatsPrinterJSON.statsAsJson(statsAndExceptions) );
+				inspectionResults.put( "logicalPlan", getLogicalPlan(statsAndExceptions) );
+				inspectionResults.put( "physicalPlan", getPhysicalPlan(statsAndExceptions) );
+				inspectionResults.put( "sourceAssignment", getSourceAssignment(statsAndExceptions) );
 				inspectionResults.put( "federationAccessStats",
 				                       StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
 			}
@@ -231,7 +230,7 @@ public class InspectServlet extends HttpServlet
 	 * @param stats the query processing statistics containing the logical plan
 	 * @return a JSON string containing the textual representation of the logical plan
 	 */
-	private static JsonValue getLogicalPlan( final QueryProcStats stats ) {
+	private static JsonValue getLogicalPlan( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
 		logicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );
@@ -245,7 +244,7 @@ public class InspectServlet extends HttpServlet
 	 * @param stats the query processing statistics containing the physical plan
 	 * @return a JSON string containing the textual representation of the physical plan
 	 */
-	private static JsonValue getPhysicalPlan( final QueryProcStats stats ) {
+	private static JsonValue getPhysicalPlan( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
 		physicalPlanPrinter.print( stats.getQueryPlanningStats().getResultingPhysicalPlan(), ps );
@@ -260,7 +259,7 @@ public class InspectServlet extends HttpServlet
 	 * @param stats the query processing statistics containing the logical plan
 	 * @return a JSON string containing the source assignment information
 	 */
-	private static JsonValue getSourceAssignment( final QueryProcStats stats ) {
+	private static JsonValue getSourceAssignment( final QueryProcessingStatsAndExceptions stats ) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream ps = new PrintStream( baos );
 		sourceAssignmentPrinter.print( stats.getQueryPlanningStats().getResultingLogicalPlan(), ps );

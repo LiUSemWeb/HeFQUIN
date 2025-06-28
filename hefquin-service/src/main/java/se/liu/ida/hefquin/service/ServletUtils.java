@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
+import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
+
 /**
  * Utility class for servlet-based integration of the HeFQUIN query engine.
  */
@@ -50,6 +52,22 @@ public class ServletUtils
 			break;
 		}
 		return resultsFormat;
+	}
+
+	/**
+	 * Converts the exceptions of the given object into a JSON array, including
+	 * class name, message, and full stack trace for each exception.
+	 *
+	 * @param statsAndExcs object that contain a list of exceptions;
+	 *                   may be null or empty
+	 * @return a JSON array where each entry is a string representation of an
+	 *         exception and its stack trace
+	 */
+	public static JsonArray getExceptions( final QueryProcessingStatsAndExceptions statsAndExcs ) {
+		if ( statsAndExcs == null || ! statsAndExcs.containsExceptions() )
+			return new JsonArray();
+		else
+			return getExceptions( statsAndExcs.getExceptions() );
 	}
 
 	/**
