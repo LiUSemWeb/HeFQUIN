@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionStatsImpl;
 
-public class QueryProcStatsImplTest
+public class QueryProcessingStatsAndExceptionsImplTest
 {
 	@Test
 	public void test() {
@@ -17,7 +17,7 @@ public class QueryProcStatsImplTest
 		final ExecutablePlanStats planStats = null;
 		final ExecutionStats es = new ExecutionStatsImpl(planStats);
 
-		final QueryProcStatsImpl s = new QueryProcStatsImpl(4L, 1L, 1L, 2L, ps, es);
+		final QueryProcessingStatsAndExceptionsImpl s = new QueryProcessingStatsAndExceptionsImpl(4L, 1L, 1L, 2L, ps, es);
 		s.put( "additionalEntry", Integer.valueOf(42) );
 
 		// check that the entries are in the correct order
