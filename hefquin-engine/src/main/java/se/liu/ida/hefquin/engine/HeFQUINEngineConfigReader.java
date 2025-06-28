@@ -94,7 +94,7 @@ public class HeFQUINEngineConfigReader
 		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
 		final QueryProcessor qproc = readQueryProcessor(confRsrc, ctxx);
 
-		return new HeFQUINEngineImpl(fedAccessMgr, qproc);
+		return new HeFQUINEngine(fedAccessMgr, qproc);
 	}
 
 	public interface Context {
