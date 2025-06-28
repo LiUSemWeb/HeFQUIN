@@ -19,9 +19,31 @@ import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndException
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 
 /**
- * Cannot be created directly (via the constructor) but needs to be created
- * via a {@link HeFQUINEngineBuilder}.
- * Need to call {@link #shutdown()} in the end.
+ * An object of this class can be used in two ways to process queries over
+ * the federation for which the engine has been set up:
+ * <ol>
+ * <li>On the other hand, it can be used to process arbitrary queries
+ *   and have the result written directly to stdout or to any other
+ *   {@link PrintStream}, in a format that can be specified. This
+ *   functionality is provided via the following functions.
+ *   <ul>
+ *   <li>{@link #executeQueryAndPrintResult(Query)}</li>
+ *   <li>{@link #executeQueryAndPrintResult(Query, PrintStream)}</li>
+ *   <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat)}</li>
+ *   <li>{@link #executeQueryAndPrintResult(Query, ResultsFormat, PrintStream)}</li>
+ *   </ul>
+ *   </li>
+ * <li>On the one hand, it can be used to process SELECT queries and
+ *   obtain the query result as a {@link ResultSet} object, which can
+ *   then be consumed in whatever way you like. This functionality is
+ *   provided by via {@link #executeSelectQuery(Query)}.</li>
+ * </ol>
+ *
+ * To create a {@link HeFQUINEngine} object used {@link HeFQUINEngineBuilder}.
+ * Once you do not need it anymore, make sure to call {@link #shutdown()}.
+ * <p>
+ * Technically, this is a wrapper around the Jena/ARQ query processing
+ * machinery into which the query processor of this engine is integrated.
  */
 public class HeFQUINEngine
 {
@@ -38,89 +60,162 @@ public class HeFQUINEngine
 	}
 
 	/**
-	 * Executes the given query, prints the result in text format to stdout,
-	 * and returns a statistics collected during the query execution process,
-	 * together with a list of exception that were caught during query
-	 * execution (if any).
+	 * Executes the given query and prints the result in text format to stdout.
 	 *
-	 * An {@link UnsupportedQueryException} is thrown if the given query uses
-	 * features that are not supported by HeFQUIN; the message of the exception
-	 * describes the specific limitation and can be passed directly to the user.
+	 * @param query - the query to be executed
 	 *
-	 * An {@link IllegalQueryException} is thrown if the given query is
-	 * invalid; the message of the exception describes the issue and can
-	 * be passed directly to the user.
-	 */
-	public QueryProcessingStatsAndExceptions executeQuery( final Query query )
-			throws UnsupportedQueryException, IllegalQueryException
-	{
-		return executeQuery(query, ResultsFormat.FMT_TEXT);
-	}
-
-	/**
-	 * Executes the given query, prints the result to stdout (in the given
-	 * format), and returns a statistics collected during the query execution
-	 * process, together with a list of exception that were caught during
-	 * query execution (if any).
-	 *
-	 * An {@link UnsupportedQueryException} is thrown if the given query uses
-	 * features that are not supported by HeFQUIN; the message of the exception
-	 * describes the specific limitation and can be passed directly to the user.
-	 *
-	 * An {@link IllegalQueryException} is thrown if the given query is
-	 * invalid; the message of the exception describes the issue and can
-	 * be passed directly to the user.
-	 */
-	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
-	                                                       final ResultsFormat outputFormat )
-			throws UnsupportedQueryException, IllegalQueryException
-	{
-		return executeQuery(query, outputFormat, System.out);
-	}
-
-	/**
-	 * Executes the given query, prints the result in text format to the given
-	 * output, and returns a statistics collected during the query execution
-	 * process, together with a list of exception that were caught during query
-	 * execution (if any).
-	 *
-	 * An {@link UnsupportedQueryException} is thrown if the given query uses
-	 * features that are not supported by HeFQUIN; the message of the exception
-	 * describes the specific limitation and can be passed directly to the user.
-	 *
-	 * An {@link IllegalQueryException} is thrown if the given query is
-	 * invalid; the message of the exception describes the issue and can
-	 * be passed directly to the user.
-	 */
-	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
-	                                                       final PrintStream output )
-			throws UnsupportedQueryException, IllegalQueryException
-	{
-		return executeQuery(query, ResultsFormat.FMT_TEXT, output);
-	}
-
-	/**
-	 * Executes the given query, prints the result to the given output (in
-	 * the given format), and returns a statistics collected during the query
-	 * execution process, together with a list of exception that were caught
+	 * @returns An object that captures statistics collected during the query
+	 * execution process, together with a list of exceptions that were caught
 	 * during query execution (if any).
 	 *
-	 * An {@link UnsupportedQueryException} is thrown if the given query uses
-	 * features that are not supported by HeFQUIN; the message of the exception
-	 * describes the specific limitation and can be passed directly to the user.
-	 *
-	 * An {@link IllegalQueryException} is thrown if the given query is
-	 * invalid; the message of the exception describes the issue and can
-	 * be passed directly to the user.
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
 	 */
-	public QueryProcessingStatsAndExceptions executeQuery( final Query query,
-	                                                       final ResultsFormat outputFormat,
-	                                                       final PrintStream output )
-		throws UnsupportedQueryException, IllegalQueryException
+	public QueryProcessingStatsAndExceptions executeQueryAndPrintResult( final Query query )
+			throws UnsupportedQueryException, IllegalQueryException
 	{
-		return _exec(query, outputFormat, output);
+		return executeQueryAndPrintResult(query, ResultsFormat.FMT_TEXT);
 	}
 
+	/**
+	 * Executes the given query and prints the result to stdout, in the given
+	 * format.
+	 *
+	 * @param query - the query to be executed
+	 * @param outputFormat - the format to be used for writing the result
+	 *
+	 * @returns An object that captures statistics collected during the query
+	 * execution process, together with a list of exceptions that were caught
+	 * during query execution (if any).
+	 *
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
+	 */
+	public QueryProcessingStatsAndExceptions executeQueryAndPrintResult( final Query query,
+	                                                                     final ResultsFormat outputFormat )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
+		return executeQueryAndPrintResult(query, outputFormat, System.out);
+	}
+
+	/**
+	 * Executes the given query and prints the result in text format to the
+	 * given output.
+	 *
+	 * @param query - the query to be executed
+	 * @param output - the output stream to which the result shall written
+	 *
+	 * @returns An object that captures statistics collected during the query
+	 * execution process, together with a list of exceptions that were caught
+	 * during query execution (if any).
+	 *
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
+	 */
+	public QueryProcessingStatsAndExceptions executeQueryAndPrintResult( final Query query,
+	                                                                     final PrintStream output )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
+		return executeQueryAndPrintResult(query, ResultsFormat.FMT_TEXT, output);
+	}
+
+	/**
+	 * Executes the given query and prints the result to the given output, in
+	 * the given format.
+	 *
+	 * @returns An object that captures statistics collected during the query
+	 * execution process, together with a list of exceptions that were caught
+	 * during query execution (if any).
+	 *
+	 * @param query - the query to be executed
+	 * @param outputFormat - the format to be used for writing the result
+	 * @param output - the output stream to which the result shall written
+	 *
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
+	 */
+	public QueryProcessingStatsAndExceptions executeQueryAndPrintResult( final Query query,
+	                                                                     final ResultsFormat outputFormat,
+	                                                                     final PrintStream output )
+		throws UnsupportedQueryException, IllegalQueryException
+	{
+		return _execAndPrint(query, outputFormat, output);
+	}
+
+	/**
+	 * Assuming the given query is a SELECT query, this function executes
+	 * that query and returns an output object from which the query result
+	 * can be obtained as a {@link ResultSet}.
+	 *
+	 * @param query - the query to be executed; it needs to be a SELECT query
+	 *
+	 * @throws UnsupportedQueryException
+	 *              thrown if the given query uses features that are not
+	 *              supported by HeFQUIN; the message of the exception
+	 *              describes the specific limitation and can be passed
+	 *              directly to the user.
+	 * @throws IllegalQueryException
+	 *              thrown if the given query is invalid; the message of
+	 *              the exception describes the issue and can be passed
+	 *              directly to the user.
+	 */
+	public QueryProcessingOutput executeSelectQuery( final Query query )
+		throws UnsupportedQueryException, IllegalQueryException
+	{
+		if ( ! query.isSelectType() )
+			throw new IllegalQueryException(query, "The given query is not a SELECT query.");
+
+		final QueryExecution qe = _prepareExecution(query);
+		final ResultSet rs = qe.execSelect();
+
+		return new QueryProcessingOutput() {
+			@Override
+			public ResultSet getResultSet() {
+				return rs;
+			}
+
+			@Override
+			public QueryProcessingStatsAndExceptions getStatsAndExceptions() {
+				return (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINConstants.sysQProcStatsAndExceptions);
+			}
+		};
+	}
+
+	/**
+	 * Returns a current version of the statistics collected by the
+	 * {@link FederationAccessManager} that this engine uses.
+	 * <p>
+	 * This function simply calls {@link FederationAccessManager#getStats()}
+	 * and forwards the returns stats.
+	 */
 	public FederationAccessStats getFederationAccessStats() {
 		return fedAccessMgr.getStats();
 	}
@@ -137,22 +232,19 @@ public class HeFQUINEngine
 
 	// ------------------- main implementation ----------------
 
-	protected QueryProcessingStatsAndExceptions  _exec( final Query query,
-	                                                    final ResultsFormat outputFormat,
-	                                                    final PrintStream output )
+	protected QueryProcessingStatsAndExceptions _execAndPrint( final Query query,
+	                                                           final ResultsFormat outputFormat,
+	                                                           final PrintStream output )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
-		ValuesServiceQueryResolver.expandValuesPlusServicePattern(query);
-
-		final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
-		final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
+		final QueryExecution qe = _prepareExecution(query);
 
 		Exception ex = null;
 		try {
 			if ( query.isSelectType() )
-				executeSelectQuery(qe, outputFormat, output);
+				_execSelectQuery(qe, outputFormat, output);
 			else
-				executeNonSelectQuery(qe, outputFormat, output);
+				_execNonSelectQuery(qe, outputFormat, output);
 		}
 		catch ( final Exception e ) {
 			ex = e;
@@ -166,9 +258,20 @@ public class HeFQUINEngine
 			return new QueryProcessingStatsAndExceptionsImpl(stats, ex);
 	}
 
-	protected void executeSelectQuery( final QueryExecution qe,
-	                                   final ResultsFormat outputFormat,
-	                                   final PrintStream output ) throws Exception {
+	protected QueryExecution _prepareExecution( final Query query )
+			throws UnsupportedQueryException, IllegalQueryException
+	{
+		ValuesServiceQueryResolver.expandValuesPlusServicePattern(query);
+
+		final DatasetGraph dsg = DatasetGraphFactory.createGeneral();
+		final QueryExecution qe = QueryExecutionFactory.create(query, dsg);
+
+		return qe;
+	}
+
+	protected void _execSelectQuery( final QueryExecution qe,
+	                                 final ResultsFormat outputFormat,
+	                                 final PrintStream output ) throws Exception {
 		final ResultSet rs;
 		try {
 			rs = qe.execSelect();
@@ -185,9 +288,9 @@ public class HeFQUINEngine
 		}
 	}
 
-	protected void executeNonSelectQuery( final QueryExecution qe,
-	                                      final ResultsFormat outputFormat,
-	                                      final PrintStream output ) throws Exception {
+	protected void _execNonSelectQuery( final QueryExecution qe,
+	                                    final ResultsFormat outputFormat,
+	                                    final PrintStream output ) throws Exception {
 		try {
 			QueryExecUtils.executeQuery( qe.getQuery().getPrologue(),
 			                             qe,
