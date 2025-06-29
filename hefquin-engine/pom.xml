@@ -17,6 +17,12 @@
       <artifactId>hefquin-base</artifactId>
       <version>0.0.6-SNAPSHOT</version>
     </dependency>
+    <!-- hefquin-vocabs -->
+    <dependency>
+      <groupId>se.liu.research.hefquin</groupId>
+      <artifactId>hefquin-vocabs</artifactId>
+      <version>0.0.6-SNAPSHOT</version>
+    </dependency>
     <!-- hefquin-pgconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>

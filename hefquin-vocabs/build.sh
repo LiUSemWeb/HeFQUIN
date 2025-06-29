@@ -60,7 +60,7 @@ function procECVocab
          ECVocab \
          "http://w3id.org/hefquin/engineconf#" \
          "se.liu.ida.hefquin.vocabulary" \
-         ../hefquin-engine/src/main/java/se/liu/ida/hefquin/vocabulary/
+         ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
 }
 
 function procFDVocab
@@ -70,7 +70,7 @@ function procFDVocab
          FDVocab \
          "http://w3id.org/hefquin/feddesc#" \
          "se.liu.ida.hefquin.vocabulary" \
-         ../hefquin-engine/src/main/java/se/liu/ida/hefquin/vocabulary/
+         ../hefquin-vocabs/src/main/java/se/liu/ida/hefquin/vocabulary/
 }
 
 ### Below, uncomment the line for which you want to run the script.
