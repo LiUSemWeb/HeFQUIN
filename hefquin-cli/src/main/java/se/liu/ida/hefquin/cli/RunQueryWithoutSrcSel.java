@@ -21,8 +21,8 @@ import se.liu.ida.hefquin.cli.modules.ModQuery;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.HeFQUINEngineBuilder;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 
 /**
  * A command-line tool that executes SPARQL queries using the HeFQUIN federation

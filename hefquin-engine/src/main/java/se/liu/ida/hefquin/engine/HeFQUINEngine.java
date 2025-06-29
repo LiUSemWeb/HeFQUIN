@@ -13,7 +13,6 @@ import org.apache.jena.sparql.util.QueryExecUtils;
 
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.federation.access.FederationAccessStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessingStatsAndExceptionsImpl;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;

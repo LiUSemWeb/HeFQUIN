@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryproc;
 
 import se.liu.ida.hefquin.base.query.Query;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 
 public interface QueryProcessor
 {
