@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.vocabulary;
+package se.liu.ida.hefquin.vocabulary;
 
 /* CVS $Id: $ */
  
