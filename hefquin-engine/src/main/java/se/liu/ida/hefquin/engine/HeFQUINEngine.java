@@ -49,6 +49,8 @@ public class HeFQUINEngine
 	protected final FederationAccessManager fedAccessMgr;
 	protected final QueryProcessor qProc;
 
+	protected boolean wasShutDown = false;
+
 	protected HeFQUINEngine( final FederationAccessManager fedAccessMgr,
 	                         final QueryProcessor qProc ) {
 		assert fedAccessMgr != null;
@@ -189,6 +191,9 @@ public class HeFQUINEngine
 	public QueryProcessingOutput executeSelectQuery( final Query query )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
+		if ( wasShutDown == true )
+			throw new IllegalStateException("This HeFQUINEngine instance has been shut down already.");
+
 		if ( ! query.isSelectType() )
 			throw new IllegalQueryException(query, "The given query is not a SELECT query.");
 
@@ -224,6 +229,10 @@ public class HeFQUINEngine
 	 * federation access manager and the query processor component.
 	 */
 	public void shutdown() {
+		if ( wasShutDown == true )
+			return;
+
+		wasShutDown = true;
 		fedAccessMgr.shutdown();
 		qProc.shutdown();
 	}
@@ -236,6 +245,9 @@ public class HeFQUINEngine
 	                                                           final PrintStream output )
 		throws UnsupportedQueryException, IllegalQueryException
 	{
+		if ( wasShutDown == true )
+			throw new IllegalStateException("This HeFQUINEngine instance has been shut down already.");
+
 		final QueryExecution qe = _prepareExecution(query);
 
 		Exception ex = null;
