@@ -29,46 +29,117 @@
             Once you have added <a href="hefquin_via_maven.html">HeFQUIN as a dependency for your Maven project</a>, you can use any of the Java interfaces and classes of the HeFQUIN source code in the Java code of your project. You find information about these interfaces and classes in our <a href="../doc/javadoc.html">Javadoc documentation</a>.
         </p>
         <p>
-            Most likely, you'll want to use an instance of the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine">HeFQUINEngine</a> class to execute queries. To get started, use the <a href"../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngineBuilder">HeFQUINEngineBuilder</a>:
-<pre><code class="language-java">package org.example;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.resultset.ResultsFormat;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedLogicalPlanPrinterImpl;
-import se.liu.ida.hefquin.engine.queryplan.utils.TextBasedPhysicalPlanPrinterImpl;
-
-public class Main
-{
-    public static void main( String[] args ) throws Exception {
-        final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
-            .withFederationCatalog("ExampleFederation.ttl");
-
-        final HeFQUINEngine engine = builder.build();
-        final String queryString = Files.readString( Path.of("ExampleQuery.rq") );
-        final Query q = QueryFactory.create(queryString);
-        engine.executeQuery(q, ResultsFormat.FMT_TEXT, System.out);
-        engine.shutdown();
-    }
-</code></pre>
+            Most likely, you'll want to use an instance of the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> class to execute queries. There are two ways in which you can use it: one is to have it execute a given query with the result written directly to stdout or any other output stream and the other way is to have it return the query result as a Jena <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/ResultSet.html"><code class="language-java">ResultSet</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> object.
+            The remainder of this page introduces the Java code that you have to write for both cases, step by step.
         </p>
         <p>
-            The federation catalog must be provided via <code>withFederationCatalog(...)</code>, while default values will be
-            used for all other components unless specified explicitly. The following example demonstrates how to configure all
-            available options:
-<pre><code class="language-java">final HeFQUINEngineBuilder builder = new HeFQUINEngineBuilder()
-    .withFederationCatalog("ExampleFederation.ttl")
-    .withEngineConfiguration("ExampleEngineConf.ttl")
-    .withLogicalPlanPrinter(new TextBasedLogicalPlanPrinterImpl())
-    .withPhysicalPlanPrinter(new TextBasedPhysicalPlanPrinterImpl())
-    .withSourceAssignmentPrinter(new TextBasedLogicalPlanPrinterImpl())
-    .setExperimentRun(false)
-    .setSkipExecution(false);
-</code></pre>
+            If you are simply looking for <strong>a complete snippet of code that you can copy</strong> to get started, look at <a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/hefquin-cli/src/main/java/se/liu/ida/hefquin/cli/ExternalIntegrationDemo.java">ExternalIntegrationDemo.java</a> in our GitHub repo. In particular, <a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/hefquin-cli/src/main/java/se/liu/ida/hefquin/cli/ExternalIntegrationDemo.java#L71-L99">lines 71-99</a> present the first of the aforementioned two ways of using <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine">HeFQUINEngine</a> and <a href="https://github.com/LiUSemWeb/HeFQUIN/blob/main/hefquin-cli/src/main/java/se/liu/ida/hefquin/cli/ExternalIntegrationDemo.java#L109-L146">lines 109-146</a> present the second one.
         </p>
+
+        <section id="create-a-hefquinengine-instance">
+            <h2>Create a HeFQUINEngine Instance</h2>
+            <p>
+                In both cases, you first need to create an instance of the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> class, for which you can use the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngineBuilder"><code class="language-java">HeFQUINEngineBuilder</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> as follows.
+            </p>
+            <pre><code class="language-java">final String fedDescrFile = "..."; // filename of RDF description of your federation
+final HeFQUINEngine hefquin = new HeFQUINEngineBuilder()
+				.withFederationCatalog(fedDescrFile)
+				.build();
+</code></pre>
+            <p>
+                As you can see, you need to provide the name of an RDF file that contains a <a href="federation_description.html">description of your federation</a>. This file may be in Turtle format or in any other typical RDF serialization format.
+            </p>
+            <p>
+                As an alternative to providing such a file, you may construct a <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog"><code class="language-java">FederationCatalog</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> object in your program and pass that object to the <code class="language-java">withFederationCatalog(...)</code> method.
+            </p>
+            <p>
+                In addition to the <code class="language-java">withFederationCatalog(...)</code> method, <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngineBuilder"><code class="language-java">HeFQUINEngineBuilder</code></a> provides several other methods to set specific components for the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> to be created. While <code class="language-java">withFederationCatalog(...)</code> is mandatory, these other methods are optional and <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngineBuilder"><code class="language-java">HeFQUINEngineBuilder</code></a> uses default components if they are not provided.
+            </p>
+        </section>
+
+        <section id="query-execution-with-result-writing">
+            <h2>Query Execution With Result Writing</h2>
+            <p>
+                Once you have a <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> object, you can use it to execute any <a href="queries.html">supported SPARQL query</a> with the result being printed directly to stdout. The query needs to be provided in the form of a Jena <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/Query.html"><code class="language-java">Query</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> object, which may be created using the <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/QueryFactory.html"><code class="language-java">QueryFactory</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a>, as illustrated at the beginning of the following example.
+            </p>
+            <pre><code class="language-java">final Query query = QueryFactory.create("..."); // a Jena Query object
+
+QueryProcessingStatsAndExceptions statsAndExcs = null;
+try {
+	statsAndExcs = hefquin.executeQueryAndPrintResult(query);
+}
+catch ( final IllegalQueryException ex ) {
+	System.err.println( "The given query is invalid: " + ex.getMessage() );
+}
+catch ( final UnsupportedQueryException ex ) {
+	System.err.println( "The given query is not supported by HeFQUIN: " + ex.getMessage() );
+}
+</code></pre>
+            <p>
+                While the <code class="language-java">executeQueryAndPrintResult(...)</code> method used in the example is given only the query to be executed, <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> also provides variations of this method with which you can specify a particular output stream to which the query result shall be written, and a particular format.
+            </p>
+            <p>
+                If you want to execute multiple queries, simply reuse the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> object and call <code class="language-java">executeQueryAndPrintResult(...)</code> multiple times. Once the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> object is not needed anymore, do not forget to <a href="#shut-down-the-hefquinengine-instance">shut it down</a>.
+            </p>
+            <p>
+                The <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions"><code class="language-java">QueryProcessingStatsAndExceptions</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> object returned by these methods can be used to check whether exceptions have occurred during the execution of the query.
+            </p>
+            <pre><code class="language-java">if ( statsAndExcs != null && statsAndExcs.containsExceptions() ) {
+	final int numbOfExcs = statsAndExcs.getExceptions().size();
+	System.err.println( numbOfExcs + " exceptions occurred during query execution" );
+}
+</code></pre>
+        </section>
+
+        <section id="accessing-the-query-result">
+            <h2>Accessing the Result</h2>
+            <p>
+                If you do not simply want the query result printed but want to access it directly for further use in your Java program, you can use the <code class="language-java">executeSelectQuery(...)</code> method of <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a>, which returns an object from which you can obtain the query result in the form of a Jena <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/ResultSet.html"><code class="language-java">ResultSet</code></a>.
+            </p>
+            <pre><code class="language-java">final Query query = QueryFactory.create("..."); // a Jena Query object
+
+QueryProcessingOutput qProcOutput = null;
+try {
+	qProcOutput = hefquin.executeSelectQuery(query);
+}
+catch ( final IllegalQueryException ex ) {
+	System.err.println( "The given query is invalid: " + ex.getMessage() );
+	System.exit(-1);
+}
+catch ( final UnsupportedQueryException ex ) {
+	System.err.println( "The given query is not supported by HeFQUIN: " + ex.getMessage() );
+	System.exit(-1);
+}
+
+final ResultSet rs = qProcOutput.getResultSet();
+</code></pre>
+            <p>
+                The returned <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/ResultSet.html"><code class="language-java">ResultSet</code></a> can then be used to iterate over the individual solution mappings that are part of the query result (and that are represented as Jena <a href="https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/QuerySolution.html"><code class="language-java">QuerySolution</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> objects).
+            </p>
+            <p>
+                If you want to execute multiple queries, you can use the <code class="language-java">executeSelectQuery(...)</code> method multiple times. Once the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> object is not needed anymore, do not forget to <a href="#shut-down-the-hefquinengine-instance">shut it down</a>.
+            </p>
+            <p>
+                The <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.QueryProcessingOutput"><code class="language-java">QueryProcessingOutput</code>&nbsp;<img src="../images/JavaDoc.png" alt="(JavaDoc link)" class="JavaDocLink"/></a> object returned by this method also provides access to a <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions"><code class="language-java">QueryProcessingStatsAndExceptions</code></a> object which can be used to check whether exceptions have occurred during the execution of the query.
+            </p>
+            <pre><code class="language-java">final QueryProcessingStatsAndExceptions statsAndExcs = qProcOutput.getStatsAndExceptions();
+if ( statsAndExcs != null && statsAndExcs.containsExceptions() ) {
+	final int numbOfExcs = statsAndExcs.getExceptions().size();
+	System.err.println( numbOfExcs + " exceptions occurred during query execution" );
+}
+</code></pre>
+        </section>
+
+        <section id="shut-down-the-hefquinengine-instance">
+            <h2>Shut Down the HeFQUINEngine Instance</h2>
+            <p>
+                Once the <a href="../doc/javadoc.html?page=se.liu.ida.hefquin.engine.HeFQUINEngine"><code class="language-java">HeFQUINEngine</code></a> object is not needed anymore, you should shut it down in order to have it release resources and stop the thread pools that it is using.
+            </p>
+            <pre><code class="language-java">hefquin.shutdown();
+</code></pre>
+        </section>
+                
+
     </main>
 
     <div id="footer"></div>

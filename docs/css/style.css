@@ -171,6 +171,11 @@ li {
     }
 }
 
+img.JavaDocLink {
+    height: 1em;
+    vertical-align: middle;
+}
+
 /* Make prism code boxes more compact */
 pre[class*="language-"] {
     padding: 0.5em !important;
