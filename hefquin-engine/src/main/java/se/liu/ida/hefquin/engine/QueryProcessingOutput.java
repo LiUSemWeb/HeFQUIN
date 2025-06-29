@@ -3,8 +3,6 @@ package se.liu.ida.hefquin.engine;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 
-import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
-
 /**
  * Base class functions should be used only after the query result has been consumed.
  */

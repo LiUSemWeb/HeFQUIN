@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.sparql.resultset.ResultsFormat;
 
-import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 
 /**
  * Utility class for servlet-based integration of the HeFQUIN query engine.

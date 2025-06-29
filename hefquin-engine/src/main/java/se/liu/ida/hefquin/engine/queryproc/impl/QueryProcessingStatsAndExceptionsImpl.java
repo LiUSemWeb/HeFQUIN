@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.utils.StatsImpl;
+import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcessingStatsAndExceptions;
 
 public class QueryProcessingStatsAndExceptionsImpl extends StatsImpl implements QueryProcessingStatsAndExceptions
 {

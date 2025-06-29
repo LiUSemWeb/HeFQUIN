@@ -1,8 +1,10 @@
-package se.liu.ida.hefquin.engine.queryproc;
+package se.liu.ida.hefquin.engine;
 
 import java.util.List;
 
 import se.liu.ida.hefquin.base.utils.Stats;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
 
 public interface QueryProcessingStatsAndExceptions extends Stats
 {
