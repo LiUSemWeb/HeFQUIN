@@ -34,11 +34,11 @@ import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceUtils;
 import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
-import se.liu.ida.hefquin.engine.vocabulary.FDVocab;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
+import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 public class FederationDescriptionReader
 {

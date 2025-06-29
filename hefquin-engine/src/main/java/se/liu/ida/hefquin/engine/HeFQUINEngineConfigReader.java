@@ -34,8 +34,8 @@ import se.liu.ida.hefquin.engine.queryproc.impl.ExecutionContextImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.QueryProcessorImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
-import se.liu.ida.hefquin.engine.vocabulary.ECVocab;
 import se.liu.ida.hefquin.jenaext.ModelUtils;
+import se.liu.ida.hefquin.vocabulary.ECVocab;
 
 /**
  * Reads an RDF description of a configuration for the HeFQUIN engine and
