@@ -457,7 +457,7 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	 * The operator created by this function should throw exceptions instead
 	 * of collecting them.
 	 */
-	protected abstract NullaryExecutableOp createExecutableReqOp( Set<Binding> solMaps );
+	protected abstract NullaryExecutableOp createExecutableReqOp( Set<Binding> solMaps ) throws ExecOpExecutionException;
 
 
 	// ------- functionality for Stats ------
