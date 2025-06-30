@@ -11,7 +11,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.RiotNotFoundException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -19,8 +18,6 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
 import se.liu.ida.hefquin.federation.access.TPFInterface;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
 
 public class FederationDescriptionReaderTest
 {

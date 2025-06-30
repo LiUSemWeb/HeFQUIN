@@ -35,8 +35,6 @@ import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
-import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithChronicleMapCache;
 import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;

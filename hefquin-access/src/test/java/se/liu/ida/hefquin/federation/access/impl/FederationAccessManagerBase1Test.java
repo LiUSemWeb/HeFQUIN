@@ -26,8 +26,6 @@ import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerBase1;
-import se.liu.ida.hefquin.federation.access.impl.FederationAccessStatsImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;

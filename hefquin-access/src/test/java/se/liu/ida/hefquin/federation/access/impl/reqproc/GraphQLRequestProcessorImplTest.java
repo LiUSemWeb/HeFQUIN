@@ -27,8 +27,6 @@ import se.liu.ida.hefquin.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.GraphQLRequestProcessorImpl;
 
 public class GraphQLRequestProcessorImplTest extends FederationTestBase {
 

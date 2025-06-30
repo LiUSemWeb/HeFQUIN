@@ -19,7 +19,6 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 
 public class FederationAccessManagerWithCacheTest extends FederationTestBase
