@@ -28,8 +28,6 @@ import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 
 public class SPARQLRequestProcessorImplTest extends FederationTestBase
 {

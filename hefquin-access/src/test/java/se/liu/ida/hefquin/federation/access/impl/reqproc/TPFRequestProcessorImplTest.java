@@ -19,8 +19,6 @@ import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
-import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessorImpl;
 
 public class TPFRequestProcessorImplTest extends FederationTestBase
 {
