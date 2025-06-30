@@ -7,9 +7,9 @@ import org.apache.jena.sparql.core.Var;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 public class LogicalOpBGPAdd extends LogicalOperatorBase implements UnaryLogicalOp
 {
