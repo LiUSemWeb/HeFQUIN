@@ -10,6 +10,36 @@
 
   <artifactId>hefquin-graphqlconnector</artifactId>
 
+  <!-- Project Meta Data -->
+  <name>HeFQUIN</name>
+  <description>HeFQUIN is a query federation engine for heterogeneous federations of graph data sources, including federations of knowledge graphs.</description>
+  <url>https://liusemweb.github.io/HeFQUIN/</url>
+
+  <!-- License -->
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <!-- Developer Information -->
+  <developers>
+    <developer>
+      <name>Olaf Hartig</name>
+      <email>olaf.hartig@liu.se</email>
+      <organization>Linköping University</organization>
+      <organizationUrl>https://liu.se/</organizationUrl>
+    </developer>
+  </developers>
+
+  <!-- SCM (Source Code Management) -->
+  <scm>
+    <connection>scm:git:git://github.com/LiUSemWeb/HeFQUIN.git</connection>
+    <developerConnection>scm:git:ssh://github.com:LiUSemWeb/HeFQUIN.git</developerConnection>
+    <url>https://github.com/LiUSemWeb/HeFQUIN</url>
+  </scm>
+
   <dependencies>
     <!-- hefquin-base -->
     <dependency>
