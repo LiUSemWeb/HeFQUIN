@@ -20,6 +20,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Replacing the implicit definition of the vocabulary for describing federations by an explicit one ([#432](https://github.com/LiUSemWeb/HeFQUIN/pull/432)).
 - Refactoring of DataRetrievalResponse ([#409](https://github.com/LiUSemWeb/HeFQUIN/pull/409)).
 - Refactoring of QueryPatternUtils ([#428](https://github.com/LiUSemWeb/HeFQUIN/pull/428)).
+- Moving the code for federation access into a separate Maven module called hefquin-access ([#450](https://github.com/LiUSemWeb/HeFQUIN/pull/450)).
+- Moving the code generated from the vocabularies into hefquin-vocabs, making that an actual Maven module ([#450](https://github.com/LiUSemWeb/HeFQUIN/pull/450)).
 
 
 ## [0.0.5] - 2025-03-04
