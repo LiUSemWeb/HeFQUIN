@@ -9,6 +9,8 @@
 
   <modules>
     <module>hefquin-base</module>
+    <module>hefquin-vocabs</module>
+    <module>hefquin-access</module>
     <module>hefquin-engine</module>
     <module>hefquin-cli</module>
     <module>hefquin-graphqlconnector</module>

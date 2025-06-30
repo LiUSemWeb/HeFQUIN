@@ -2,8 +2,8 @@ package se.liu.ida.hefquin.engine.queryproc;
 
 import java.util.concurrent.ExecutorService;
 
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public interface QueryProcContext
 {

@@ -25,14 +25,14 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.impl.TripleImpl;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
+import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache;
+import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 {

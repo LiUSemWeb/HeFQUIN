@@ -28,6 +28,9 @@ hs_err_pid*
 /.classpath
 /.project
 /dependency-reduced-pom.xml
+hefquin-access/.classpath
+hefquin-access/.project
+hefquin-access/.settings/
 hefquin-base/.classpath
 hefquin-base/.project
 hefquin-base/.settings/
@@ -48,6 +51,9 @@ hefquin-service/.classpath
 hefquin-service/.project
 hefquin-service/.settings/
 hefquin-service/dependency-reduced-pom.xml
+hefquin-vocabs/.classpath
+hefquin-vocabs/.project
+hefquin-vocabs/.settings/
 
 *.iml
 /.idea

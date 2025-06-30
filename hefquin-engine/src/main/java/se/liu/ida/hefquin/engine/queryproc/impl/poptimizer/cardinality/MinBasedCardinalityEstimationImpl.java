@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality;
 
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
@@ -11,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimationException;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CardinalityEstimationUtils;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;

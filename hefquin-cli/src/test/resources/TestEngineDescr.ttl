@@ -16,10 +16,10 @@
    ] .
 
 ec:MyFederationAccessManager rdf:type ec:FederationAccessManager ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.FederationAccessManagerWithCache" ;
+    ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCache" ;
     ec:constructorArguments (
-        [ ec:argumentTypeName "se.liu.ida.hefquin.engine.federation.access.FederationAccessManager" ;
-          ec:javaClassName "se.liu.ida.hefquin.engine.federation.access.impl.AsyncFederationAccessManagerImpl" ;
+        [ ec:argumentTypeName "se.liu.ida.hefquin.federation.access.FederationAccessManager" ;
+          ec:javaClassName "se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl" ;
           ec:constructorArguments ( ec:value:ExecServiceForFedAccess ) ]
         100  # cacheCapacity
     ) .
