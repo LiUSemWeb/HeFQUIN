@@ -28,7 +28,6 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
 import se.liu.ida.hefquin.federation.*;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.Neo4jInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
@@ -43,17 +42,6 @@ public abstract class EngineTestBase
 	 * unit tests that access servers on the actual Web.
 	 */
 	public static boolean skipLiveWebTests = true;
-
-	/**
-	 * If this flag is true, tests that make requests to local neo4j
-	 * instances will be skipped.
-	 */
-	public static boolean skipLocalNeo4jTests = true;
-
-	/**
-	 * If true, skip tests to local GraphQL endpoint
-	 */
-	public static boolean skipLocalGraphQLTests = true;
 
 
 	protected TPFServer getDBpediaTPFServer() {
@@ -76,6 +64,9 @@ public abstract class EngineTestBase
 		public FederationMemberBaseForTest( final Graph data ) {
 			this.data = data;
 		}
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() { return null; }
 
 		protected List<Triple> getMatchingTriples( final TriplePatternRequest req ) {
 			return getMatchingTriples( req.getQueryPattern() );
@@ -113,7 +104,7 @@ public abstract class EngineTestBase
 			}
 			return result;
 		}
-		
+
 		protected List<SolutionMapping> getSolutions( final SPARQLGraphPattern pattern ) {
 			final Op jenaOp;
 			if ( pattern instanceof GenericSPARQLGraphPatternImpl1 ) {
@@ -136,7 +127,6 @@ public abstract class EngineTestBase
 			}
 			return results;	
 		}
-		
 	}
 
 	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
@@ -171,46 +161,20 @@ public abstract class EngineTestBase
 			}
 			return new SolMapsResponseImpl( result, this, req, new Date() );
 		}
-		
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
 
 	}
 
-	protected static class SPARQLEndpointWithVocabularyMappingForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	protected static class SPARQLEndpointWithVocabularyMappingForTest extends SPARQLEndpointForTest
 	{
-		final SPARQLEndpointInterface iface;
-		final VocabularyMapping vocabularyMapping;
+		final VocabularyMapping vm;
 
 		public SPARQLEndpointWithVocabularyMappingForTest( final String ifaceURL, final Graph data , final VocabularyMapping vm) {
-			super(data);
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
-			vocabularyMapping = vm;
+			super(ifaceURL, data);
+			this.vm = vm;
 		}
 
 		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
-
-		public SolMapsResponse performRequest( final SPARQLRequest req ) {
-			final List<SolutionMapping> result;
-			if ( req instanceof TriplePatternRequest ) {
-				result = getSolutions( (TriplePatternRequest) req);
-			}
-			else if (req.getQueryPattern() instanceof TriplePattern) {
-				result = getSolutions( (TriplePattern) req.getQueryPattern() );
-			} else {
-				result = getSolutions(req.getQueryPattern());
-			}
-			return new SolMapsResponseImpl( result, this, req, new Date() );
-		}
-		
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return vocabularyMapping;
-		}
-
+		public VocabularyMapping getVocabularyMapping() { return vm; }
 	}
 
 	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
@@ -226,10 +190,6 @@ public abstract class EngineTestBase
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
 			return new TPFResponseForTest(result, this, req);
-		}
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
 		}
 	}
 
@@ -281,81 +241,19 @@ public abstract class EngineTestBase
 			}
 			return new TPFResponseForTest(result, this, req);
 		}
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
 	}
-	
-	protected static class BRTPFServerWithVocabularyMappingForTest extends FederationMemberBaseForTest implements BRTPFServer
+
+	protected static class BRTPFServerWithVocabularyMappingForTest extends BRTPFServerForTest
 	{
 		final VocabularyMapping vm;
-		
+
 		public BRTPFServerWithVocabularyMappingForTest(Graph data, VocabularyMapping vocabularyMapping) {
 			super(data);
 			vm = vocabularyMapping;
 		}
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
 
 		@Override
-		public BRTPFInterface getInterface() { return iface; }
-
-		public TPFResponse performRequest( final TPFRequest req ) {
-			final List<Triple> result = getMatchingTriples(req);
-			return new TPFResponseForTest(result, this, req);
-		}
-		
-		public TPFResponse performRequest( final BindingsRestrictedTriplePatternRequest req ) {
-			// The implementation in this method is not particularly efficient,
-			// but it is sufficient for the purpose of unit tests.
-			final org.apache.jena.graph.Triple jenaTP = req.getTriplePattern().asJenaTriple();
-
-			final List<org.apache.jena.graph.Triple> patternsForTest = new ArrayList<>();
-			for ( final Binding sm : req.getSolutionMappings() ) {
-				final Node s = ( jenaTP.getSubject().isVariable() )
-						? sm.get( Var.alloc(jenaTP.getSubject()) ) // may be null
-						: null;
-				final Node p = ( jenaTP.getPredicate().isVariable() )
-						? sm.get( Var.alloc(jenaTP.getPredicate()) ) // may be null
-						: null;
-				final Node o = ( jenaTP.getObject().isVariable() )
-						? sm.get( Var.alloc(jenaTP.getObject()) ) // may be null
-						: null;
-				patternsForTest.add( org.apache.jena.graph.Triple.createMatch(s,p,o) );
-			}
-
-			final Iterator<org.apache.jena.graph.Triple> it = data.find(jenaTP);
-			final List<Triple> result = new ArrayList<>();
-			while ( it.hasNext() ) {
-				final org.apache.jena.graph.Triple t = it.next();
-				for ( final org.apache.jena.graph.Triple patternForTest : patternsForTest ) {
-					if ( patternForTest.matches(t) ) {
-						result.add( new TripleImpl(t) );
-						break;
-					}
-				}
-			}
-			return new TPFResponseForTest(result, this, req);
-		}
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return vm;
-		}
-	}
-
-	protected static class Neo4jServerImpl4Test implements Neo4jServer {
-
-		public Neo4jServerImpl4Test() {}
-
-		@Override
-		public Neo4jInterface getInterface() {
-			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
+		public VocabularyMapping getVocabularyMapping() { return vm; }
 	}
 
 	protected static class TPFResponseForTest extends TPFResponseImpl
@@ -508,18 +406,13 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public void resetStats() {
-			throw new UnsupportedOperationException();
-		}
+		public void resetStats() { throw new UnsupportedOperationException(); }
 
 		@Override
-		public FederationAccessStats getStats() {
-			throw new UnsupportedOperationException();
-		}
+		public FederationAccessStats getStats() { throw new UnsupportedOperationException(); }
 
 		@Override
-		public void shutdown() {
-			// do nothing
-		}
+		public void shutdown() { } // do nothing
 	}
+
 }
