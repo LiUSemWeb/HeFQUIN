@@ -5,7 +5,7 @@
   <parent>
     <groupId>se.liu.research.hefquin</groupId>
     <artifactId>hefquin</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.6</version>
   </parent>
 
   <artifactId>hefquin-engine</artifactId>
@@ -15,31 +15,31 @@
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-base</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
     </dependency>
     <!-- hefquin-vocabs -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-vocabs</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
     </dependency>
     <!-- hefquin-access -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-access</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
     </dependency>
     <!-- hefquin-pgconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-pgconnector</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
     </dependency>
     <!-- hefquin-graphqlconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-graphqlconnector</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
+      <version>0.0.6</version>
     </dependency>
   </dependencies>
 </project>
