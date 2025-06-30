@@ -5,10 +5,10 @@ import java.util.Iterator;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.engine.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 
 /**
  * Base class for implementations of request operators with triple

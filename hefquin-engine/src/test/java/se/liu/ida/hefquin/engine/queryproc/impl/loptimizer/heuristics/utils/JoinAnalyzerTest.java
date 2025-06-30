@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.utils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Var;
 import org.junit.Test;
+
 import se.liu.ida.hefquin.engine.EngineTestBase;
 
 import java.util.*;

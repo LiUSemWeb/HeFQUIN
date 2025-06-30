@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
@@ -11,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalOpUtils;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 public class RuleMergeTPAddOfBGPAddIntoBGPAdd extends AbstractRewritingRuleImpl{
 

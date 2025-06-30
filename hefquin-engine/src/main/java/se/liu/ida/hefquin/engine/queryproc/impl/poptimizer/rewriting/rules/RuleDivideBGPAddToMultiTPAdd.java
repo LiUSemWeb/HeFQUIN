@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.rules;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.engine.federation.FederationMember;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
@@ -9,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleApplication;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 import java.util.HashSet;
 import java.util.Iterator;

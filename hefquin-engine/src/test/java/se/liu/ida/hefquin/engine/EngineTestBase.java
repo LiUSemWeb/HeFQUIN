@@ -25,16 +25,16 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.federation.*;
-import se.liu.ida.hefquin.engine.federation.access.*;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.iface.TPFInterfaceImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessor;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.SolMapsResponseImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.*;
+import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
+import se.liu.ida.hefquin.federation.access.impl.iface.Neo4jInterfaceImpl;
+import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
+import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 
 public abstract class EngineTestBase
 {

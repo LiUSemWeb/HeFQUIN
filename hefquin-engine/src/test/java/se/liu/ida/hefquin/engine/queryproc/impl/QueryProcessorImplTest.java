@@ -23,16 +23,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
-import se.liu.ida.hefquin.engine.federation.BRTPFServer;
-import se.liu.ida.hefquin.engine.federation.TPFServer;
-import se.liu.ida.hefquin.engine.federation.access.BRTPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.engine.federation.access.TPFRequest;
-import se.liu.ida.hefquin.engine.federation.access.TPFResponse;
-import se.liu.ida.hefquin.engine.federation.access.impl.BlockingFederationAccessManagerImpl;
-import se.liu.ida.hefquin.engine.federation.access.impl.reqproc.*;
-import se.liu.ida.hefquin.engine.federation.catalog.FederationCatalog;
-import se.liu.ida.hefquin.engine.federation.catalog.impl.FederationCatalogImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
@@ -50,6 +40,16 @@ import se.liu.ida.hefquin.engine.queryproc.impl.execution.ExecutionEngineImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.planning.QueryPlannerImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization;
 import se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl;
+import se.liu.ida.hefquin.federation.BRTPFServer;
+import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.access.impl.BlockingFederationAccessManagerImpl;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.*;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
 
 public class QueryProcessorImplTest extends EngineTestBase
 {

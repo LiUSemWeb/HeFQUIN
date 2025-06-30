@@ -3,10 +3,10 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 import java.util.Arrays;
 import java.util.List;
 
-import se.liu.ida.hefquin.engine.federation.access.BGPRequest;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.engine.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
+import se.liu.ida.hefquin.federation.access.BGPRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
 public class LogicalPlanUtils
 {

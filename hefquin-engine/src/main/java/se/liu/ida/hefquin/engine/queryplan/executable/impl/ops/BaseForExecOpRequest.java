@@ -1,8 +1,8 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import se.liu.ida.hefquin.engine.federation.FederationMember;
-import se.liu.ida.hefquin.engine.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
 /**
  * Base class for implementations of request operators.
