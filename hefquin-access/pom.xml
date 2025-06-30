@@ -8,7 +8,7 @@
     <version>0.0.6-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hefquin-engine</artifactId>
+  <artifactId>hefquin-access</artifactId>
 
   <dependencies>
     <!-- hefquin-base -->
@@ -23,12 +23,6 @@
       <artifactId>hefquin-vocabs</artifactId>
       <version>0.0.6-SNAPSHOT</version>
     </dependency>
-    <!-- hefquin-access -->
-    <dependency>
-      <groupId>se.liu.research.hefquin</groupId>
-      <artifactId>hefquin-access</artifactId>
-      <version>0.0.6-SNAPSHOT</version>
-    </dependency>
     <!-- hefquin-pgconnector -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
@@ -40,6 +34,11 @@
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-graphqlconnector</artifactId>
       <version>0.0.6-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>net.openhft</groupId>
+      <artifactId>chronicle-map</artifactId>
+      <version>3.27ea0</version>
     </dependency>
   </dependencies>
 </project>
