@@ -1,11 +1,12 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
-import se.liu.ida.hefquin.base.query.BGP;
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
-import se.liu.ida.hefquin.base.query.TriplePattern;
+import org.apache.jena.sparql.core.BasicPattern;
+import org.apache.jena.sparql.syntax.*;
+
+import se.liu.ida.hefquin.base.query.*;
+import se.liu.ida.hefquin.base.query.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
@@ -25,6 +26,134 @@ import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 
 public class LogicalOpUtils
 {
+	/**
+     * Creates a BGP by merging two sets of triple patterns,
+     * which are extracted from two given Requests.
+     */
+    public static BGP createNewBGP( final LogicalOpRequest<?, ?> lop1, final LogicalOpRequest<?, ?> lop2 ) {
+        final Set<TriplePattern> tps = getTriplePatternsOfReq(lop1);
+        tps.addAll( getTriplePatternsOfReq(lop2) );
+
+        return new BGPImpl(tps);
+    }
+
+    /**
+     * Creates a BGP by adding a triple pattern to a set of triple patterns,
+     * where the triple pattern is extracted from a given tpAdd operator,
+     * and the set of triple patterns are extracted from the given Request.
+     */
+    public static BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
+        final TriplePattern tp = lopTPAdd.getTP();
+
+        final Set<TriplePattern> tps = getTriplePatternsOfReq(lopReq);
+        tps.add(tp);
+
+        return new BGPImpl(tps);
+    }
+
+    /**
+     * Creates a BGP by merging two sets of triple patterns,
+     * where one of them is extracted from a given bgpAdd operator,
+     * and another one is extracted from a given Request.
+     */
+    public static BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?, ?> lopReq ) {
+        final Set<TriplePattern> tps = new HashSet<>( lopBGPAdd.getBGP().getTriplePatterns() );
+
+        tps.addAll( getTriplePatternsOfReq(lopReq) );
+
+        return new BGPImpl(tps);
+    }
+
+    /**
+     * Creates a BGP by merging two sets of triple patterns,
+     * which are extracted from two given bgpAdd operators.
+     */
+    public static BGP createNewBGP( final LogicalOpBGPAdd lopBGPAdd1, final LogicalOpBGPAdd lopBGPAdd2 ) {
+        final Set<TriplePattern> tps = new HashSet<>( lopBGPAdd1.getBGP().getTriplePatterns() );
+
+        tps.addAll( lopBGPAdd2.getBGP().getTriplePatterns() );
+
+        return new BGPImpl(tps);
+    }
+
+    /**
+     * Creates a BGP by adding a triple pattern to a set of triple patterns,
+     * where the triple pattern is extracted from a given tpAdd operator,
+     * and the set of triple patterns are extracted from a given bgpAdd operator.
+     */
+    public static BGP createNewBGP( final LogicalOpTPAdd lopTPAdd, final LogicalOpBGPAdd lopBGPAdd ) {
+        final TriplePattern tp = lopTPAdd.getTP();
+
+        final Set<TriplePattern> tps = new HashSet<>(lopBGPAdd.getBGP().getTriplePatterns());
+        tps.add(tp);
+
+        return new BGPImpl(tps);
+    }
+
+    /**
+     * Creates a new graph pattern by adding a triple pattern to the graph pattern of a given SPARQLRequest,
+     * where the triple pattern is extracted from a given tpAdd operator.
+     */
+    public static SPARQLGraphPattern createNewGraphPatternWithAND(final LogicalOpTPAdd lopTPAdd, final LogicalOpRequest<?, ?> lopReq ) {
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( getPatternOfRequest(lopReq) );
+        elementGroup.addTriplePattern( lopTPAdd.getTP().asJenaTriple() );
+
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
+    }
+
+    /**
+     * Creates a new graph pattern by adding a BGP to the graph pattern of a given SPARQLRequest,
+     * where the BGP is extracted from a given bgpAdd operator.
+     */
+    public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpBGPAdd lopBGPAdd, final LogicalOpRequest<?,?> lopReq ) {
+        final BasicPattern bgp = new BasicPattern();
+        for ( TriplePattern tp: lopBGPAdd.getBGP().getTriplePatterns() ){
+            bgp.add( tp.asJenaTriple() );
+        }
+
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( new ElementTriplesBlock( bgp ) );
+        elementGroup.addElement( getPatternOfRequest(lopReq) );
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
+    }
+
+    /**
+     * Creates a new graph pattern using a conjunction of two graph patterns,
+     * which are extracted from two given SPARQLRequests.
+     */
+    public static SPARQLGraphPattern createNewGraphPatternWithAND( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
+        final ElementGroup elementGroup = new ElementGroup();
+        elementGroup.addElement( getPatternOfRequest(lopReq1) );
+        elementGroup.addElement( getPatternOfRequest(lopReq2) );
+
+        return new GenericSPARQLGraphPatternImpl1(elementGroup);
+    }
+
+    /**
+     * Creates a new graph pattern using a union of two graph patterns,
+     * which are extracted from two given SPARQLRequests.
+     */
+    public static SPARQLGraphPattern createNewGraphPatternWithUnion( final LogicalOpRequest<?, ?> lopReq1, final LogicalOpRequest<?, ?> lopReq2 ) {
+        final ElementUnion elementUnion = new ElementUnion();
+        elementUnion.addElement( getPatternOfRequest(lopReq1) );
+        elementUnion.addElement( getPatternOfRequest(lopReq2) );
+
+        return new GenericSPARQLGraphPatternImpl1(elementUnion);
+    }
+
+    public static Element getPatternOfRequest( final LogicalOpRequest<?, ?> lopReq ){
+        final DataRetrievalRequest req = lopReq.getRequest();
+        if ( req instanceof SPARQLRequest ) {
+            final SPARQLQuery graphPattern = ((SPARQLRequest) req).getQuery();
+            return graphPattern.asJenaQuery().getQueryPattern();
+        }
+        else  {
+            throw new IllegalArgumentException( "Unsupported type of request: " + req.getClass().getName() );
+        }
+
+    }
+
     /**
      * Return a set of triple patterns, which are extracted from a given Request (support TriplePatternRequest and BGPRequest)
      */
