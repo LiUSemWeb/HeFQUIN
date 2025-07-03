@@ -88,28 +88,8 @@ public class RemoveUnnecessaryL2gAndG2l implements HeuristicForLogicalOptimizati
 			}
 			return triplePatterns;
 		}
-		else if ( rootOp instanceof LogicalOpTPAdd tpAdd ) {
-			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
-			triplePatterns.add( tpAdd.getTP() );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpBGPAdd bgpAdd ) {
-			final Set<TriplePattern> triplePatterns = bgpAdd.getBGP().getTriplePatterns();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
 		else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
 			final Set<TriplePattern> triplePatterns = gpAdd.getPattern().getAllMentionedTPs();
-			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpTPOptAdd tpOptAdd ) {
-			final Set<TriplePattern> triplePatterns = extractTPs( plan.getSubPlan(0) );
-			triplePatterns.add( tpOptAdd.getTP() );
-			return triplePatterns;
-		}
-		else if ( rootOp instanceof LogicalOpBGPOptAdd bgpOptAdd ) {
-			final Set<TriplePattern> triplePatterns = bgpOptAdd.getBGP().getTriplePatterns();
 			triplePatterns.addAll( extractTPs( plan.getSubPlan(0) ) );
 			return triplePatterns;
 		}

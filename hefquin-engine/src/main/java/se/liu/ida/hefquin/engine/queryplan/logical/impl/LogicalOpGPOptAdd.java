@@ -7,6 +7,8 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -16,10 +18,13 @@ public class LogicalOpGPOptAdd extends LogicalOperatorBase implements UnaryLogic
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
 
+	// will be initialized on demand 
+	protected TriplePattern tp = null;
+	protected boolean tpCheckDone = false;
+
 	public LogicalOpGPOptAdd( final FederationMember fm, final SPARQLGraphPattern pattern ) {
 		assert fm != null;
 		assert pattern != null;
-		assert fm.getInterface().supportsSPARQLPatternRequests();
 
 		this.fm = fm;
 		this.pattern = pattern;
@@ -27,10 +32,43 @@ public class LogicalOpGPOptAdd extends LogicalOperatorBase implements UnaryLogic
 
 	public FederationMember getFederationMember() {
 		return fm;
-	} 
+	}
 
 	public SPARQLGraphPattern getPattern() {
-		return pattern;
+		if ( tp != null )
+			return tp;
+		else
+			return pattern;
+	}
+
+	/**
+	 * Returns <code>true</code> if the graph pattern
+	 * of this operator is only a triple pattern.
+	 */
+	public boolean containsTriplePatternOnly() {
+		if ( ! tpCheckDone ) {
+			tpCheckDone = true;
+			tp = QueryPatternUtils.getAsTriplePattern(pattern);
+		}
+
+		return ( tp != null );
+	}
+
+	/**
+	 * Returns the graph pattern of this operator as a triple pattern if this
+	 * pattern is only a triple pattern.
+	 * <p>
+	 * Before calling this function, use {@link #containsTriplePatternOnly()}
+	 * to check whether the pattern is indeed only a triple pattern.
+	 * <p>
+	 * If it is not, this method throws an {@link UnsupportedOperationException}.
+	 */
+	public TriplePattern getTP() {
+		if ( ! containsTriplePatternOnly() ) {
+			throw new UnsupportedOperationException("This graph pattern is not a triple pattern");
+		}
+
+		return tp;
 	}
 
 	@Override

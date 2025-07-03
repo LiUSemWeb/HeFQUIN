@@ -98,11 +98,7 @@ public class UnionPullUp implements HeuristicForLogicalOptimization
 
 		// Next, apply the heuristic to the root of the plan if possible.
 		final LogicalOperator rootOp = inputPlan.getRootOperator();
-		if (    rootOp instanceof LogicalOpTPAdd
-		     || rootOp instanceof LogicalOpTPOptAdd
-		     || rootOp instanceof LogicalOpBGPAdd
-		     || rootOp instanceof LogicalOpBGPOptAdd
-		     || rootOp instanceof LogicalOpGPAdd
+		if (    rootOp instanceof LogicalOpGPAdd
 		     || rootOp instanceof LogicalOpGPOptAdd
 		     || rootOp instanceof LogicalOpFilter
 		     || rootOp instanceof LogicalOpLocalToGlobal

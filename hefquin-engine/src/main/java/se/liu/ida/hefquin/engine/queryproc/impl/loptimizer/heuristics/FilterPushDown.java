@@ -104,11 +104,7 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 			                                         subPlanUnderFilter.getSubPlan(0),
 			                                         inputPlan );
 		}
-		else if (    childOpUnderFilter instanceof LogicalOpTPAdd
-		          || childOpUnderFilter instanceof LogicalOpTPOptAdd
-		          || childOpUnderFilter instanceof LogicalOpBGPAdd
-		          || childOpUnderFilter instanceof LogicalOpBGPOptAdd
-		          || childOpUnderFilter instanceof LogicalOpGPAdd
+		else if (    childOpUnderFilter instanceof LogicalOpGPAdd
 		          || childOpUnderFilter instanceof LogicalOpGPOptAdd )
 		{
 			return createPlanForAddOpUnderFilter( filterOp,

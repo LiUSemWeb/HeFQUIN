@@ -14,9 +14,9 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
@@ -298,7 +298,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
-		final PhysicalPlan plan = createTPAddPlan(42, 13);
+		final PhysicalPlan plan = createGPAddPlan(42, 13);
 
 		final long startTime = new Date().getTime();
 
@@ -316,7 +316,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
-		final PhysicalPlan plan = createTPAddPlan(42, Integer.MAX_VALUE+1);
+		final PhysicalPlan plan = createGPAddPlan(42, Integer.MAX_VALUE+1);
 
 		final long startTime = new Date().getTime();
 
@@ -334,8 +334,8 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		final FederationAccessManager fedAccessMgr = new MyFederationAccessManagerForTests(SLEEP_MILLIES);
 		final CardinalityEstimation cardEstimator = new CardinalityEstimationImpl(fedAccessMgr);
 
-		final PhysicalPlan subplan = createTPAddPlan(42, 13);
-		final PhysicalPlan plan = createTPAddPlan(subplan, 22);
+		final PhysicalPlan subplan = createGPAddPlan(42, 13);
+		final PhysicalPlan plan = createGPAddPlan(subplan, 22);
 
 		final long startTime = new Date().getTime();
 
@@ -406,21 +406,21 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 		return PhysicalPlanFactory.createPlan(unionOp, subplan1, subplan2);
 	}
 
-	protected PhysicalPlan createTPAddPlan( final int card1, final int card2 ) {
-		return createTPAddPlan( createRequestPlan(card1), card2 );
+	protected PhysicalPlan createGPAddPlan( final int card1, final int card2 ) {
+		return createGPAddPlan( createRequestPlan(card1), card2 );
 	}
 
-	protected PhysicalPlan createTPAddPlan( final PhysicalPlan subplan,
+	protected PhysicalPlan createGPAddPlan( final PhysicalPlan subplan,
 	                                        final int card2 ) {
 		final TriplePattern tp = createTriplePattern(card2);
-		return createTPAddPlan(subplan, tp);
+		return createGPAddPlan(subplan, tp);
 	}
 
-	protected PhysicalPlan createTPAddPlan( final PhysicalPlan subplan,
+	protected PhysicalPlan createGPAddPlan( final PhysicalPlan subplan,
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
-		final LogicalOpTPAdd tpAdd = new LogicalOpTPAdd(fm, tp);
-		return PhysicalPlanFactory.createPlan(tpAdd, subplan);
+		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp);
+		return PhysicalPlanFactory.createPlan(gpAdd, subplan);
 	}
 
 

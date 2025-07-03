@@ -30,10 +30,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -144,9 +144,9 @@ public class FilterPushDownTest extends EngineTestBase
 	}
 
 	@Test
-	public void pushFilterOverFilterUnderTPOptAdd() {
-		// a filter on top of another filter on top of a tpOptAdd operator,
-		// where (only) the top filter cannot be pushed under the tpOptAdd;
+	public void pushFilterOverFilterUnderGPOptAdd() {
+		// a filter on top of another filter on top of a gpOptAdd operator,
+		// where (only) the top filter can be pushed under the gpOptAdd;
 		// hence, the second filter becomes the root
 
 		// set up
@@ -159,12 +159,12 @@ public class FilterPushDownTest extends EngineTestBase
 		final LogicalPlan reqSubPlan = new LogicalPlanWithNullaryRootImpl(reqOp);
 
 		final TriplePattern tp2 = new TriplePatternImpl(v1 ,v2, v2);
-		final LogicalOpTPOptAdd tpOptAdd = new LogicalOpTPOptAdd(fm, tp2);
-		final LogicalPlan tpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(tpOptAdd, reqSubPlan );
+		final LogicalOpGPOptAdd gpOptAdd = new LogicalOpGPOptAdd(fm, tp2);
+		final LogicalPlan gpOptAddSubPlan = new LogicalPlanWithUnaryRootImpl(gpOptAdd, reqSubPlan);
 
 		final Expr e1 = new E_LogicalNot( new E_Bound(new ExprVar(v2)) );
 		final LogicalOpFilter filterOp1 = new LogicalOpFilter(e1);
-		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, tpOptAddSubPlan);
+		final LogicalPlan filterSubPlan = new LogicalPlanWithUnaryRootImpl(filterOp1, gpOptAddSubPlan);
 
 		final Expr e2 = new E_IsIRI( new ExprVar(v1) );
 		final LogicalOpFilter rootOp = new LogicalOpFilter(e2);
@@ -181,8 +181,8 @@ public class FilterPushDownTest extends EngineTestBase
 		assertEquals( e1, resultFilterOp.getFilterExpressions().get(0) );
 
 		final LogicalPlan subResult = result.getSubPlan(0);
-		assertTrue( subResult.getRootOperator() instanceof LogicalOpTPOptAdd );
-		assertTrue( subResult.getRootOperator().equals(tpOptAdd) );
+		assertTrue( subResult.getRootOperator() instanceof LogicalOpGPOptAdd );
+		assertTrue( subResult.getRootOperator().equals(gpOptAdd) );
 
 		final LogicalPlan subsubResult = subResult.getSubPlan(0);
 		assertTrue( subsubResult.getRootOperator() instanceof LogicalOpFilter );

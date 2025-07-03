@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.base.query.utils;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.algebra.op.OpJoin;
@@ -18,6 +19,7 @@ import se.liu.ida.hefquin.base.query.SPARQLUnionPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 
 public class QueryPatternUtils
 {
@@ -107,6 +109,59 @@ public class QueryPatternUtils
 		else {
 			throw new IllegalArgumentException( "unexpected type of graph pattern: " + p.getClass().getName() );
 		}
+	}
+
+	/**
+	 * If the given graph pattern is actually a single triple pattern only,
+	 * then this triple pattern is returned. Otherwise, <code>null</code>
+	 * is returned.
+	 */
+	public static TriplePattern getAsTriplePattern( final SPARQLGraphPattern pattern ) {
+		if ( pattern instanceof TriplePattern ) {
+			return (TriplePattern) pattern;
+		}
+		else if ( pattern instanceof BGP bgp ) {
+			final Set<TriplePattern> tps = bgp.getTriplePatterns();
+			if ( tps.size() == 1 ) {
+				return tps.iterator().next();
+			}
+		}
+		else if ( pattern instanceof SPARQLGroupPattern gp ) {
+			if ( gp.getNumberOfSubPatterns() == 1 ) {
+				return getAsTriplePattern( gp.getSubPatterns(0) );
+			}
+		}
+		else if ( pattern instanceof SPARQLUnionPattern up ) {
+			if ( up.getNumberOfSubPatterns() == 1 ) {
+				return getAsTriplePattern( up.getSubPatterns(0) );
+			}
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl1 gp ) {
+			final Element elt = gp.asJenaElement();
+			if ( elt instanceof ElementTriplesBlock bgp ) {
+				if ( bgp.getPattern().size() == 1 ) {
+					final Triple tp = bgp.getPattern().get(0);
+					return new TriplePatternImpl(tp);
+				}
+			}
+		}
+		else if ( pattern instanceof GenericSPARQLGraphPatternImpl2 gp ) {
+			final Op op = gp.asJenaOp();
+			if ( op instanceof OpBGP bgp ) {
+				if ( bgp.getPattern().size() == 1 ) {
+					final Triple tp = bgp.getPattern().get(0);
+					return new TriplePatternImpl(tp);
+				}
+			}
+			if ( op instanceof OpTriple tp ) {
+				return new TriplePatternImpl( tp.getTriple() );
+			}
+		}
+		else {
+			throw new IllegalArgumentException( "unexpected type of graph pattern: " + pattern.getClass().getName() );
+		}
+
+		return null;
 	}
 
 }

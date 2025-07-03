@@ -2,9 +2,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.costmodel;
 
 import java.util.concurrent.CompletableFuture;
 
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
@@ -32,21 +30,11 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		final int numberOfJoinVars;
 		final CompletableFuture<Integer> futureIntResSize;
 
-		if ( lop instanceof LogicalOpTPAdd || lop instanceof LogicalOpBGPAdd || lop instanceof LogicalOpGPAdd  ) {
-			final SPARQLGraphPattern pattern;
-			if ( lop instanceof LogicalOpTPAdd tpAdd )
-				pattern = tpAdd.getTP();
-			else if ( lop instanceof LogicalOpBGPAdd bgpAdd )
-				pattern = bgpAdd.getBGP();
-			else if ( lop instanceof LogicalOpGPAdd gpAdd )
-				pattern = gpAdd.getPattern();
-			else
-				throw createIllegalArgumentException(lop);
-
-			numberOfTerms = pattern.getNumberOfTermMentions();
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+			numberOfTerms = gpAdd.getPattern().getNumberOfTermMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan( (UnaryLogicalOp) lop );
+			final PhysicalPlan req = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
 			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan, req).size();
 
 			futureIntResSize = initiateCardinalityEstimation(subplan);
