@@ -6,12 +6,7 @@ public interface LogicalPlanVisitor
 {
 	void visit( final LogicalOpRequest<?,?> op );
 
-	void visit( final LogicalOpTPAdd op );
-	void visit( final LogicalOpBGPAdd op );
 	void visit( final LogicalOpGPAdd op );
-
-	void visit( final LogicalOpTPOptAdd op );
-	void visit( final LogicalOpBGPOptAdd op );
 	void visit( final LogicalOpGPOptAdd op );
 
 	void visit( final LogicalOpJoin op );

@@ -30,29 +30,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 		final int numberOfJoinVars;
 		final CompletableFuture<Integer> futureIntResSize;
 
-		if ( lop instanceof LogicalOpTPAdd tpAdd ) {
-			numberOfVars = tpAdd.getTP().getNumberOfVarMentions();
-
-			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan(tpAdd);
-			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqTP).size();
-
-			futureIntResSize = initiateCardinalityEstimation(subplan);
-		}
-		else if ( lop instanceof LogicalOpBGPAdd bgpAdd ) {
-			numberOfVars = bgpAdd.getBGP().getNumberOfVarMentions();
-
-			final PhysicalPlan subplan = plan.getSubPlan(0);
-			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan(bgpAdd);
-			numberOfJoinVars = PhysicalPlanUtils.intersectionOfCertainVariables(subplan,reqBGP).size();
-
-			if ( pop instanceof PhysicalOpBindJoinWithVALUES ) {
-				futureIntResSize = null; // irrelevant
-			} else {
-				futureIntResSize = initiateCardinalityEstimation(subplan);
-			}
-		}
-		else if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
 			numberOfVars = gpAdd.getPattern().getNumberOfVarMentions();
 
 			final PhysicalPlan subplan = plan.getSubPlan(0);

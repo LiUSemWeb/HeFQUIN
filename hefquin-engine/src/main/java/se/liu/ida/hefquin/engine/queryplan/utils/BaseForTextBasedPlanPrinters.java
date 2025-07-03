@@ -160,19 +160,7 @@ public class BaseForTextBasedPlanPrinters
 		public void visit( final LogicalOpRequest<?, ?> op )    { out.append("req"); }
 
 		@Override
-		public void visit( final LogicalOpTPAdd op )            { out.append("tpAdd"); }
-
-		@Override
-		public void visit( final LogicalOpBGPAdd op )           { out.append("bgpAdd"); }
-
-		@Override
 		public void visit( final LogicalOpGPAdd op )            { out.append("gpAdd"); }
-
-		@Override
-		public void visit( final LogicalOpTPOptAdd op )         { out.append("tpOptAdd"); }
-
-		@Override
-		public void visit( final LogicalOpBGPOptAdd op )        { out.append("bgpOptAdd"); }
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op )         { out.append("gpOptAdd"); }

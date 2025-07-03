@@ -21,11 +21,11 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
@@ -396,7 +396,7 @@ public class UnionPullUpTest
 	}
 
 	@Test
-	public void apply_TPAddOverTPAddOverUnion() {
+	public void apply_GPAddOverGPAddOverUnion() {
 		final LogicalPlan lp1 = new DummyLogicalPlan();
 		final LogicalPlan lp2 = new DummyLogicalPlan();
 
@@ -405,13 +405,13 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpTPAdd tpAdd1 = new LogicalOpTPAdd( new DummyFederationMember(), new DummyTriplePattern() );
-		final LogicalPlan tpAddPlan1 = new LogicalPlanWithUnaryRootImpl(tpAdd1, unionPlan);
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpTPAdd tpAdd2 = new LogicalOpTPAdd( new DummyFederationMember(), new DummyTriplePattern() );
-		final LogicalPlan tpAddPlan2 = new LogicalPlanWithUnaryRootImpl(tpAdd2, tpAddPlan1);
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
-		final LogicalPlan resultPlan = new UnionPullUp().apply(tpAddPlan2);
+		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
 
 		final LogicalOperator rootOfResultPlan = resultPlan.getRootOperator();
 		assertTrue( rootOfResultPlan instanceof LogicalOpMultiwayUnion || rootOfResultPlan instanceof LogicalOpUnion );
@@ -426,8 +426,8 @@ public class UnionPullUpTest
 		final LogicalOperator rootOfChild1 = child1.getRootOperator();
 		final LogicalOperator rootOfChild2 = child2.getRootOperator();
 
-		assertTrue( rootOfChild1 == tpAdd2 );
-		assertTrue( rootOfChild2 == tpAdd2 );
+		assertTrue( rootOfChild1 == gpAdd2 );
+		assertTrue( rootOfChild2 == gpAdd2 );
 
 		final LogicalPlan grandchild1 = child1.getSubPlan(0);
 		final LogicalPlan grandchild2 = child2.getSubPlan(0);
@@ -438,8 +438,8 @@ public class UnionPullUpTest
 		final LogicalOperator rootOfGrandchild1 = grandchild1.getRootOperator();
 		final LogicalOperator rootOfGrandchild2 = grandchild2.getRootOperator();
 
-		assertTrue( rootOfGrandchild1 == tpAdd1 );
-		assertTrue( rootOfGrandchild2 == tpAdd1 );
+		assertTrue( rootOfGrandchild1 == gpAdd1 );
+		assertTrue( rootOfGrandchild2 == gpAdd1 );
 
 		final LogicalPlan grandgrandchild1 = grandchild1.getSubPlan(0);
 		final LogicalPlan grandgrandchild2 = grandchild2.getSubPlan(0);
@@ -452,7 +452,7 @@ public class UnionPullUpTest
 	}
 
 	@Test
-	public void apply_L2GOverTPAddOverTPAddOverUnion() {
+	public void apply_L2GOverGPAddOverGPAddOverUnion() {
 		final LogicalPlan lp1 = new DummyLogicalPlan();
 		final LogicalPlan lp2 = new DummyLogicalPlan();
 
@@ -461,14 +461,14 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpTPAdd tpAdd1 = new LogicalOpTPAdd( new DummyFederationMember(), new DummyTriplePattern() );
-		final LogicalPlan tpAddPlan1 = new LogicalPlanWithUnaryRootImpl(tpAdd1, unionPlan);
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpTPAdd tpAdd2 = new LogicalOpTPAdd( new DummyFederationMember(), new DummyTriplePattern() );
-		final LogicalPlan tpAddPlan2 = new LogicalPlanWithUnaryRootImpl(tpAdd2, tpAddPlan1);
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
-		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, tpAddPlan2);
+		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, gpAddPlan2);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(l2gPlan);
 
@@ -497,8 +497,8 @@ public class UnionPullUpTest
 		final LogicalOperator rootOfGrandchild1 = grandchild1.getRootOperator();
 		final LogicalOperator rootOfGrandchild2 = grandchild2.getRootOperator();
 
-		assertTrue( rootOfGrandchild1 == tpAdd2 );
-		assertTrue( rootOfGrandchild2 == tpAdd2 );
+		assertTrue( rootOfGrandchild1 == gpAdd2 );
+		assertTrue( rootOfGrandchild2 == gpAdd2 );
 
 		final LogicalPlan grandgrandchild1 = grandchild1.getSubPlan(0);
 		final LogicalPlan grandgrandchild2 = grandchild2.getSubPlan(0);
@@ -509,8 +509,8 @@ public class UnionPullUpTest
 		final LogicalOperator rootOfGrandgrandchild1 = grandgrandchild1.getRootOperator();
 		final LogicalOperator rootOfGrandgrandchild2 = grandgrandchild2.getRootOperator();
 
-		assertTrue( rootOfGrandgrandchild1 == tpAdd1 );
-		assertTrue( rootOfGrandgrandchild2 == tpAdd1 );
+		assertTrue( rootOfGrandgrandchild1 == gpAdd1 );
+		assertTrue( rootOfGrandgrandchild2 == gpAdd1 );
 
 		final LogicalPlan grandgrandgrandchild1 = grandgrandchild1.getSubPlan(0);
 		final LogicalPlan grandgrandgrandchild2 = grandgrandchild2.getSubPlan(0);

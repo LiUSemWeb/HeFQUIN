@@ -21,13 +21,12 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.impl.req.BGPRequestImpl;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
-import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 
 public class PhysicalPlanFactory
 {
@@ -74,6 +73,14 @@ public class PhysicalPlanFactory
 	}
 
 	/**
+	 * Creates a plan with a request operator as root operator.
+	 */
+	public static  PhysicalPlan createPlanWithRequest( final DataRetrievalRequest req,
+	                                                   final FederationMember fm ) {
+		return createPlanWithRequest( new LogicalOpRequest<>(fm, req) );
+	}
+
+	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
 	 * as per {@link LogicalToPhysicalOpConverter}.
@@ -96,99 +103,9 @@ public class PhysicalPlanFactory
 	/**
 	 * Creates a plan with a bind join as root operator.
 	 */
-	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpTPAdd lop,
+	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpGPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
 		final UnaryPhysicalOp pop = new PhysicalOpBindJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpTPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpTPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpTPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
-		return createPlan(pop, subplan);
-	}
-	
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpTPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpTPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with an index nested loops join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpBGPAdd lop,
-	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpIndexNestedLoopsJoin(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpBGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithFILTER(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpBGPAdd lop,
-	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithUNION(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpBGPAdd lop,
-	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUES(lop);
-		return createPlan(pop, subplan);
-	}
-
-	/**
-	 * Creates a plan with a bind join as root operator.
-	 */
-	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpBGPAdd lop,
-	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithVALUESorFILTER(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -256,32 +173,6 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final UnaryPhysicalOp rootOp,
 	                                       final PhysicalPlan subplan ) {
 		return new PhysicalPlanWithUnaryRootImpl(rootOp, subplan) {};
-	}
-
-	/**
-	 * Creates a physical plan with a bgpAdd as root operator.
-	 * The root operator uses the same physical algorithm as the given physical operator, which is usually a specific physical operator for bgpAdd.
-	 * The given subplan becomes the single child of the root operator.
-	 */
-	public static PhysicalPlan createPlanBasedOnTypeOfGivenPhysicalOp( final LogicalOpBGPAdd lop, final Class<? extends PhysicalOperator> opClass, final PhysicalPlan subplan ) {
-		if ( PhysicalOpIndexNestedLoopsJoin.class.isAssignableFrom(opClass) ) {
-			return createPlanWithIndexNLJ( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithFILTER.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinFILTER( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithUNION.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinUNION( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithVALUES.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinVALUES( lop, subplan );
-		}
-		else if ( PhysicalOpBindJoinWithVALUESorFILTER.class.isAssignableFrom(opClass) ) {
-			return createPlanWithBindJoinVALUESorFILTER( lop, subplan );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of physical operator: " + opClass.getName() + ".");
-		}
 	}
 
 	// --------- plans with binary root operators -----------
@@ -438,47 +329,27 @@ public class PhysicalPlanFactory
 
 	// --------- other special cases -----------
 
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpTPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-		final TriplePattern tp = lop.getTP();
+	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd gpAdd ) {
+		final FederationMember fm = gpAdd.getFederationMember();
 
-		final DataRetrievalRequest req;
-		if      ( fm instanceof SPARQLEndpoint ) req = new TriplePatternRequestImpl(tp);
-		else if ( fm instanceof TPFServer )      req = new TPFRequestImpl(tp);
-		else if ( fm instanceof BRTPFServer )    req = new TPFRequestImpl(tp);
-		else {
-			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
-		}
-
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpBGPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		final DataRetrievalRequest req;
-		if ( fm.getInterface().supportsBGPRequests() ) {
-			req = new BGPRequestImpl( lop.getBGP() );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
-		}
-
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
-	}
-
-	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		final DataRetrievalRequest req;
 		if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
-			req = new SPARQLRequestImpl( lop.getPattern() );
-		}
-		else {
-			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+			final SPARQLRequest req = new SPARQLRequestImpl( gpAdd.getPattern() );
+			return createPlanWithRequest(req, fm);
 		}
 
-		return createPlanWithRequest( new LogicalOpRequest<>(fm,req) );
+		if ( fm.getInterface().supportsTriplePatternRequests() ) {
+			final TriplePattern tp = gpAdd.getTP();
+
+			if ( tp == null )
+				throw new IllegalArgumentException( "The graph pattern should be a triple pattern, but it is a " + gpAdd.getPattern().getClass().getName() );
+
+			if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+				final TPFRequest req = new TPFRequestImpl(tp);
+				return createPlanWithRequest(req, fm);
+			}
+		}
+
+		throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 	}
 
 	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoin pop ) {
@@ -501,14 +372,8 @@ public class PhysicalPlanFactory
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
-	public static PhysicalPlan extractRequestAsPlan(final UnaryLogicalOp lop) {
-		if ( lop instanceof LogicalOpTPAdd ) {
-			return extractRequestAsPlan( (LogicalOpTPAdd) lop );
-		}
-		else if ( lop instanceof LogicalOpBGPAdd ) {
-			return extractRequestAsPlan( (LogicalOpBGPAdd) lop );
-		}
-		else if ( lop instanceof LogicalOpGPAdd ) {
+	public static PhysicalPlan extractRequestAsPlan( final UnaryLogicalOp lop ) {
+		if ( lop instanceof LogicalOpGPAdd ) {
 			return extractRequestAsPlan( (LogicalOpGPAdd) lop );
 		}
 		else {
@@ -522,45 +387,24 @@ public class PhysicalPlanFactory
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) req).getLogicalOperator();
 		final UnaryLogicalOp newRoot = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?,?>) lop );
 
-		if ( newRoot instanceof LogicalOpTPAdd ) {
-			final LogicalOpTPAdd tpAdd = (LogicalOpTPAdd) newRoot;
-
-			plans.add( createPlanWithIndexNLJ( tpAdd, subplan) );
-
-			if ( tpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-				plans.add( createPlanWithBindJoinFILTER(tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinUNION( tpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUES(tpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUESorFILTER(tpAdd, subplan) );
-			}
-
-			if ( tpAdd.getFederationMember() instanceof BRTPFServer ) {
-				plans.add( createPlanWithBindJoin(tpAdd, subplan) );
-			}
-		}
-		else if ( newRoot instanceof LogicalOpBGPAdd ) {
-			final LogicalOpBGPAdd bgpAdd = (LogicalOpBGPAdd) newRoot;
-
-			plans.add( createPlanWithIndexNLJ( bgpAdd, subplan) );
-
-			if ( bgpAdd.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-				plans.add( createPlanWithBindJoinFILTER(bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinUNION( bgpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUES(bgpAdd, subplan) );
-				plans.add( createPlanWithBindJoinVALUESorFILTER(bgpAdd, subplan) );
-			}
-		}
-		else if ( newRoot instanceof LogicalOpGPAdd ) {
-			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) newRoot;
-
+		if ( newRoot instanceof LogicalOpGPAdd gpAdd ) {
 			plans.add( createPlanWithIndexNLJ( gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinUNION( gpAdd, subplan) );
-			//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
-			plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
+
+			final FederationMember fm = gpAdd.getFederationMember();
+
+			if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
+				plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
+				plans.add( createPlanWithBindJoinUNION(gpAdd, subplan) );
+				//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
+			}
+
+			if ( fm instanceof BRTPFServer ) {
+				plans.add( createPlanWithBindJoin(gpAdd, subplan) );
+			}
 		}
 		else {
-			throw new UnsupportedOperationException("unsupported operator: " + newRoot.getClass().getName() );
+			throw new UnsupportedOperationException( "unsupported operator: " + newRoot.getClass().getName() );
 		}
 
 		return plans;

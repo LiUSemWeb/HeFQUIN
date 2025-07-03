@@ -19,7 +19,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -32,7 +31,7 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 	public void pushJoinUnderUnionPossible1() {
 		// a join of a SPARQL request and a union where the union contains two
 		// triple pattern requests; the two triple pattern requests should be
-		// turned into tpAdd operators with the SPARQL request as their input
+		// turned into gpAdd operators with the SPARQL request as their input
 		// and the union on top
 
 		// set up
@@ -66,17 +65,17 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 
 		final LogicalPlan subResult1 = result.getSubPlan(0);
 		final LogicalPlan subResult2 = result.getSubPlan(1);
-		assertTrue( subResult1.getRootOperator() instanceof LogicalOpTPAdd );
-		assertTrue( subResult2.getRootOperator() instanceof LogicalOpTPAdd );
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpGPAdd );
+		assertTrue( subResult2.getRootOperator() instanceof LogicalOpGPAdd );
 
-		final LogicalOpTPAdd tpAddOp1 = (LogicalOpTPAdd) subResult1.getRootOperator();
-		final LogicalOpTPAdd tpAddOp2 = (LogicalOpTPAdd) subResult2.getRootOperator();
+		final LogicalOpGPAdd gpAddOp1 = (LogicalOpGPAdd) subResult1.getRootOperator();
+		final LogicalOpGPAdd gpAddOp2 = (LogicalOpGPAdd) subResult2.getRootOperator();
 
-		assertTrue( tpAddOp1.getTP().equals(tp2) );
-		assertTrue( tpAddOp2.getTP().equals(tp2) );
-		assertTrue( tpAddOp1.getFederationMember().equals(fmB) || tpAddOp1.getFederationMember().equals(fmC) );
-		assertTrue( tpAddOp2.getFederationMember().equals(fmB) || tpAddOp2.getFederationMember().equals(fmC) );
-		assertTrue( tpAddOp1.getFederationMember() != tpAddOp2.getFederationMember() );
+		assertTrue( gpAddOp1.getTP().equals(tp2) );
+		assertTrue( gpAddOp2.getTP().equals(tp2) );
+		assertTrue( gpAddOp1.getFederationMember().equals(fmB) || gpAddOp1.getFederationMember().equals(fmC) );
+		assertTrue( gpAddOp2.getFederationMember().equals(fmB) || gpAddOp2.getFederationMember().equals(fmC) );
+		assertTrue( gpAddOp1.getFederationMember() != gpAddOp2.getFederationMember() );
 
 		final LogicalPlan subsubResult1 = subResult1.getSubPlan(0);
 		final LogicalPlan subsubResult2 = subResult2.getSubPlan(0);
@@ -167,17 +166,17 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 
 		final LogicalPlan subsubResult1 = subResult1.getSubPlan(0);
 		final LogicalPlan subsubResult2 = subResult2.getSubPlan(0);
-		assertTrue( subsubResult1.getRootOperator() instanceof LogicalOpTPAdd );
-		assertTrue( subsubResult2.getRootOperator() instanceof LogicalOpTPAdd );
+		assertTrue( subsubResult1.getRootOperator() instanceof LogicalOpGPAdd );
+		assertTrue( subsubResult2.getRootOperator() instanceof LogicalOpGPAdd );
 
-		final LogicalOpTPAdd tpAddOp1 = (LogicalOpTPAdd) subsubResult1.getRootOperator();
-		final LogicalOpTPAdd tpAddOp2 = (LogicalOpTPAdd) subsubResult2.getRootOperator();
+		final LogicalOpGPAdd gpAddOp1 = (LogicalOpGPAdd) subsubResult1.getRootOperator();
+		final LogicalOpGPAdd gpAddOp2 = (LogicalOpGPAdd) subsubResult2.getRootOperator();
 
-		assertTrue( tpAddOp1.getTP().equals(tp2) );
-		assertTrue( tpAddOp2.getTP().equals(tp2) );
-		assertTrue( tpAddOp1.getFederationMember().equals(fmB) || tpAddOp1.getFederationMember().equals(fmC) );
-		assertTrue( tpAddOp2.getFederationMember().equals(fmB) || tpAddOp2.getFederationMember().equals(fmC) );
-		assertTrue( tpAddOp1.getFederationMember() != tpAddOp2.getFederationMember() );
+		assertTrue( gpAddOp1.getTP().equals(tp2) );
+		assertTrue( gpAddOp2.getTP().equals(tp2) );
+		assertTrue( gpAddOp1.getFederationMember().equals(fmB) || gpAddOp1.getFederationMember().equals(fmC) );
+		assertTrue( gpAddOp2.getFederationMember().equals(fmB) || gpAddOp2.getFederationMember().equals(fmC) );
+		assertTrue( gpAddOp1.getFederationMember() != gpAddOp2.getFederationMember() );
 
 		final LogicalPlan sssResult1 = subsubResult1.getSubPlan(0);
 		final LogicalPlan sssResult2 = subsubResult2.getSubPlan(0);
@@ -254,7 +253,7 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 	public void pushJoinUnderUnionTwice() {
 		// a join of a SPARQL request and two unions where both unions contain
 		// two triple pattern requests each; the two pairs of triple pattern
-		// requests should be turned into pairs tpAdd operators, with the
+		// requests should be turned into pairs gpAdd operators, with the
 		// SPARQL request as the input to the first pair, a union on top,
 		// and that union input to the next pair, plus a final union on top
 
@@ -301,14 +300,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 
 		final LogicalPlan subResult1 = result.getSubPlan(0);
 		final LogicalPlan subResult2 = result.getSubPlan(1);
-		assertTrue( subResult1.getRootOperator() instanceof LogicalOpTPAdd );
-		assertTrue( subResult2.getRootOperator() instanceof LogicalOpTPAdd );
+		assertTrue( subResult1.getRootOperator() instanceof LogicalOpGPAdd );
+		assertTrue( subResult2.getRootOperator() instanceof LogicalOpGPAdd );
 
-		final LogicalOpTPAdd tpAddOp1 = (LogicalOpTPAdd) subResult1.getRootOperator();
-		final LogicalOpTPAdd tpAddOp2 = (LogicalOpTPAdd) subResult2.getRootOperator();
+		final LogicalOpGPAdd gpAddOp1 = (LogicalOpGPAdd) subResult1.getRootOperator();
+		final LogicalOpGPAdd gpAddOp2 = (LogicalOpGPAdd) subResult2.getRootOperator();
 
-		assertTrue( tpAddOp1.getTP().equals(tp3) );
-		assertTrue( tpAddOp2.getTP().equals(tp3) );
+		assertTrue( gpAddOp1.getTP().equals(tp3) );
+		assertTrue( gpAddOp2.getTP().equals(tp3) );
 
 		final LogicalPlan subsubResult = subResult1.getSubPlan(0);
 		assertTrue( subsubResult.equals( subResult2.getSubPlan(0) ) );
@@ -317,14 +316,14 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 
 		final LogicalPlan sssResult1 = subsubResult.getSubPlan(0);
 		final LogicalPlan sssResult2 = subsubResult.getSubPlan(1);
-		assertTrue( sssResult1.getRootOperator() instanceof LogicalOpTPAdd );
-		assertTrue( sssResult2.getRootOperator() instanceof LogicalOpTPAdd );
+		assertTrue( sssResult1.getRootOperator() instanceof LogicalOpGPAdd );
+		assertTrue( sssResult2.getRootOperator() instanceof LogicalOpGPAdd );
 
-		final LogicalOpTPAdd tpAddOp1_1 = (LogicalOpTPAdd) sssResult1.getRootOperator();
-		final LogicalOpTPAdd tpAddOp2_2 = (LogicalOpTPAdd) sssResult2.getRootOperator();
+		final LogicalOpGPAdd gpAddOp1_1 = (LogicalOpGPAdd) sssResult1.getRootOperator();
+		final LogicalOpGPAdd gpAddOp2_2 = (LogicalOpGPAdd) sssResult2.getRootOperator();
 
-		assertTrue( tpAddOp1_1.getTP().equals(tp2) );
-		assertTrue( tpAddOp2_2.getTP().equals(tp2) );
+		assertTrue( gpAddOp1_1.getTP().equals(tp2) );
+		assertTrue( gpAddOp2_2.getTP().equals(tp2) );
 
 		assertTrue( sssResult1.getSubPlan(0).equals(reqPlan) );
 		assertTrue( sssResult2.getSubPlan(0).equals(reqPlan) );

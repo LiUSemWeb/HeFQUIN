@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.cardinality;
 
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -45,8 +44,8 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
             // The join cardinality is the minimum cardinality of subPlans
             worker = new WorkerForJoin( this, plan.getSubPlan(0), plan.getSubPlan(1) );
         }
-        else if ( rootOp instanceof LogicalOpTPAdd || rootOp instanceof LogicalOpBGPAdd || rootOp instanceof LogicalOpGPAdd ) {
-            worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan((UnaryLogicalOp) rootOp));
+        else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
+            worker = new WorkerForJoin( this, plan.getSubPlan(0), PhysicalPlanFactory.extractRequestAsPlan(gpAdd));
         }
         else if ( rootOp instanceof LogicalOpMultiwayUnion || rootOp instanceof LogicalOpUnion ) {
             // The estimated cardinality is the sum up cardinality of subPlans
