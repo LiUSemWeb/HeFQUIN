@@ -25,42 +25,16 @@ public class CFRNumberOfTermsShippedInResponses extends CFRBase
 		final PhysicalOperator pop = plan.getRootOperator();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) pop).getLogicalOperator();
 
-		if ( lop instanceof LogicalOpTPAdd tpAdd ) {
-			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
-			final FederationMember fm = tpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint ) {
-				final int numberOfVars = tpAdd.getTP().numberOfVars();
-				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
-			}
-			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
-				return futureIntResSize.thenApply( intResSize -> 3 * intResSize );
-			}
-			else {
-				futureIntResSize.cancel(true);
-				throw createIllegalArgumentException(fm);
-			}
-		}
-		else if ( lop instanceof LogicalOpBGPAdd bgpAdd ) {
-			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
-			final FederationMember fm = bgpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint ) {
-				final int numberOfVars = bgpAdd.getBGP().getAllMentionedVariables().size();
-				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
-			}
-			else {
-				futureIntResSize.cancel(true);
-				throw createIllegalArgumentException(fm);
-			}
-		}
-		else if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
 			final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 			final FederationMember fm = gpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint ) {
 				final int numberOfVars = gpAdd.getPattern().getAllMentionedVariables().size();
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
+			}
+			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+				return futureIntResSize.thenApply( intResSize -> 3 * intResSize );
 			}
 			else {
 				futureIntResSize.cancel(true);

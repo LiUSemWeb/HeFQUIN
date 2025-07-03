@@ -25,40 +25,16 @@ public class CFRNumberOfVarsShippedInResponses extends CFRBase
 		final PhysicalOperator pop = plan.getRootOperator();
 		final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) pop).getLogicalOperator();
 
-		if ( lop instanceof LogicalOpTPAdd tpAdd ) {
-			final FederationMember fm = tpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint ) {
-				final int numberOfVars = tpAdd.getTP().numberOfVars();
-				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
-				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
-			}
-			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
-				return CompletableFuture.completedFuture(0);
-			}
-			else {
-				throw createIllegalArgumentException(fm);
-			}
-		}
-		else if ( lop instanceof LogicalOpBGPAdd bgpAdd ) {
-			final FederationMember fm = bgpAdd.getFederationMember();
-
-			if ( fm instanceof SPARQLEndpoint ) {
-				final int numberOfVars = bgpAdd.getBGP().getAllMentionedVariables().size();
-				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
-				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
-			}
-			else {
-				throw createIllegalArgumentException(fm);
-			}
-		}
-		else if ( lop instanceof LogicalOpGPAdd gpAdd ) {
+		if ( lop instanceof LogicalOpGPAdd gpAdd ) {
 			final FederationMember fm = gpAdd.getFederationMember();
 
 			if ( fm instanceof SPARQLEndpoint ) {
 				final int numberOfVars = gpAdd.getPattern().getAllMentionedVariables().size();
 				final CompletableFuture<Integer> futureIntResSize = initiateCardinalityEstimation(plan);
 				return futureIntResSize.thenApply( intResSize -> numberOfVars * intResSize );
+			}
+			else if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+				return CompletableFuture.completedFuture(0);
 			}
 			else {
 				throw createIllegalArgumentException(fm);

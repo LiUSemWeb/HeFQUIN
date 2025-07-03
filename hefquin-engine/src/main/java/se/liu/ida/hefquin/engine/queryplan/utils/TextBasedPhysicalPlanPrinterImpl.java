@@ -10,16 +10,12 @@ import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -275,23 +271,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			final LogicalOperator lop = pop.getLogicalOperator();
 			final FederationMember fm;
 			final SPARQLGraphPattern gp;
-			if ( lop instanceof LogicalOpTPAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getTP();
-			}
-			else if ( lop instanceof LogicalOpTPOptAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getTP();
-			}
-			else if ( lop instanceof LogicalOpBGPAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getBGP();
-			}
-			else if ( lop instanceof LogicalOpBGPOptAdd addOp ) {
-				fm = addOp.getFederationMember();
-				gp = addOp.getBGP();
-			}
-			else if ( lop instanceof LogicalOpGPAdd addOp ) {
+			if ( lop instanceof LogicalOpGPAdd addOp ) {
 				fm = addOp.getFederationMember();
 				gp = addOp.getPattern();
 			}

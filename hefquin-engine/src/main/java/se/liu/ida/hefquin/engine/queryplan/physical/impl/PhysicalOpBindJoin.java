@@ -4,8 +4,8 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -35,12 +35,18 @@ import se.liu.ida.hefquin.federation.FederationMember;
  */
 public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpBindJoin( final LogicalOpTPAdd lop ) {
+	public PhysicalOpBindJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
+
+		if ( ! lop.containsTriplePatternOnly() )
+			throw new IllegalArgumentException();
 	}
 
-	public PhysicalOpBindJoin( final LogicalOpTPOptAdd lop ) {
+	public PhysicalOpBindJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
+
+		if ( ! lop.containsTriplePatternOnly() )
+			throw new IllegalArgumentException();
 	}
 
 	@Override
@@ -56,14 +62,14 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		final FederationMember fm;
 		final boolean useOuterJoinSemantics;
 
-		if ( lop instanceof LogicalOpTPAdd tpAdd ) {
-			tp = tpAdd.getTP();
-			fm = tpAdd.getFederationMember();
+		if ( lop instanceof LogicalOpGPAdd gpAdd && gpAdd.containsTriplePatternOnly() ) {
+			tp = gpAdd.getTP();
+			fm = gpAdd.getFederationMember();
 			useOuterJoinSemantics = false;
 		}
-		else if ( lop instanceof LogicalOpTPOptAdd tpAdd ) {
-			tp = tpAdd.getTP();
-			fm = tpAdd.getFederationMember();
+		else if ( lop instanceof LogicalOpGPOptAdd gpAdd && gpAdd.containsTriplePatternOnly() ) {
+			tp = gpAdd.getTP();
+			fm = gpAdd.getFederationMember();
 			useOuterJoinSemantics = true;
 		}
 		else {

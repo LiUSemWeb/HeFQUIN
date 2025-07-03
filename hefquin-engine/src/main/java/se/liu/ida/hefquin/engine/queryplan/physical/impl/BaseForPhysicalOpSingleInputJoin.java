@@ -4,12 +4,8 @@ import java.util.Objects;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
 /**
@@ -22,17 +18,12 @@ public abstract class BaseForPhysicalOpSingleInputJoin extends BaseForPhysicalOp
     protected final UnaryLogicalOp lop;
 
     /**
-     * The given logical operator is expected to be of one of the following
-     * six types:
-     * {@link LogicalOpTPAdd}, {@link LogicalOpTPOptAdd},
-     * {@link LogicalOpBGPAdd}, {@link LogicalOpBGPOptAdd},
-     * {@link LogicalOpGPAdd}, or {@link LogicalOpGPOptAdd}.
+     * The given logical operator is expected to be either a
+     * {@link LogicalOpGPAdd} or a {@link LogicalOpGPOptAdd}.
      */
     protected BaseForPhysicalOpSingleInputJoin( final UnaryLogicalOp lop ) {
         assert lop != null;
-        assert (lop instanceof LogicalOpBGPAdd) || (lop instanceof LogicalOpBGPOptAdd) ||
-               (lop instanceof LogicalOpTPAdd) || (lop instanceof LogicalOpTPOptAdd) ||
-               (lop instanceof LogicalOpGPAdd) || (lop instanceof LogicalOpGPOptAdd);
+        assert (lop instanceof LogicalOpGPAdd) || (lop instanceof LogicalOpGPOptAdd);
         this.lop = lop;
     }
 

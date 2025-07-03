@@ -122,19 +122,7 @@ public class LogicalPlanUtils
 		public void visit( final LogicalOpRequest<?,?> op )  { subplanCount++; }
 
 		@Override
-		public void visit( final LogicalOpTPAdd op )         { subplanCount++; }
-
-		@Override
-		public void visit( final LogicalOpBGPAdd op )        { subplanCount++; }
-
-		@Override
 		public void visit( final LogicalOpGPAdd op )         { subplanCount++; }
-
-		@Override
-		public void visit( final LogicalOpTPOptAdd op )      { subplanCount++; }
-
-		@Override
-		public void visit( final LogicalOpBGPOptAdd op )     { subplanCount++; }
 
 		@Override
 		public void visit( final LogicalOpGPOptAdd op )      { subplanCount++; }
@@ -184,27 +172,7 @@ public class LogicalPlanUtils
 		}
 
 		@Override
-		public void visit( final LogicalOpTPAdd op ) {
-			isSourceAssignment = false;
-		}
-
-		@Override
-		public void visit( final LogicalOpBGPAdd op ) {
-			isSourceAssignment = false;
-		}
-
-		@Override
 		public void visit( final LogicalOpGPAdd op ) {
-			isSourceAssignment = false;
-		}
-
-		@Override
-		public void visit( final LogicalOpTPOptAdd op ) {
-			isSourceAssignment = false;
-		}
-
-		@Override
-		public void visit( final LogicalOpBGPOptAdd op ) {
 			isSourceAssignment = false;
 		}
 

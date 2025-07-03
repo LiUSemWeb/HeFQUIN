@@ -71,16 +71,8 @@ public class VarSpecificCardinalityEstimationImpl implements VarSpecificCardinal
 		if ( rootOp instanceof LogicalOpRequest ) {
 			return cardEstimator.initiateCardinalityEstimation(plan);
 		}
-		else if ( rootOp instanceof LogicalOpTPAdd ) {
-			final PhysicalPlan reqTP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpTPAdd) rootOp );
-			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqTP, v );
-		}
-		else if ( rootOp instanceof LogicalOpBGPAdd ) {
-			final PhysicalPlan reqBGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpBGPAdd) rootOp );
-			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqBGP, v );
-		}
-		else if ( rootOp instanceof LogicalOpGPAdd ) {
-			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan( (LogicalOpGPAdd) rootOp );
+		else if ( rootOp instanceof LogicalOpGPAdd gpAdd ) {
+			final PhysicalPlan reqGP = PhysicalPlanFactory.extractRequestAsPlan(gpAdd);
 			return _initiateJoinCardinalityEstimation( plan.getSubPlan(0), reqGP, v );
 		}
 		else if ( rootOp instanceof LogicalOpLocalToGlobal || rootOp instanceof LogicalOpGlobalToLocal ){

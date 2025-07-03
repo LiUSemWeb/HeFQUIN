@@ -20,11 +20,11 @@ import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpTPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
@@ -447,8 +447,8 @@ public class MergeRequestsTest extends EngineTestBase
 	}
 
 	@Test
-	public void mergeTPAddPossible() {
-		// a tpAdd over a triple pattern requests, both to the same fed.member;
+	public void mergeGPAddPossible() {
+		// a gpAdd over a triple pattern request, both to the same fed.member;
 		// this fed.member is a SPARQL endpoint and, thus, the whole plan can
 		// be merged into a single request operator
 
@@ -462,12 +462,12 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
-		final LogicalPlan tpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpTPAdd(fm, tp2),
+		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpGPAdd(fm, tp2),
 				new LogicalPlanWithNullaryRootImpl(reqOp) );
 
 		// test
-		final LogicalPlan result = new MergeRequests().apply(tpAddPlan);
+		final LogicalPlan result = new MergeRequests().apply(gpAddPlan);
 
 		// check
 		assertTrue( result.getRootOperator() instanceof LogicalOpRequest<?,?> );
@@ -486,8 +486,8 @@ public class MergeRequestsTest extends EngineTestBase
 	}
 
 	@Test
-	public void mergeTPAddImpossible() {
-		// like mergeTPAddPossible but with a TPF server,
+	public void mergeGPAddImpossible() {
+		// like mergeGPAddPossible but with a TPF server,
 		// for which the merge is not possible
 
 		// set up
@@ -500,21 +500,21 @@ public class MergeRequestsTest extends EngineTestBase
 
 		final TriplePattern tp2 = new TriplePatternImpl(v2 ,v2, v2);
 
-		final LogicalPlan tpAddPlan = new LogicalPlanWithUnaryRootImpl(
-				new LogicalOpTPAdd(fm, tp2),
+		final LogicalPlan gpAddPlan = new LogicalPlanWithUnaryRootImpl(
+				new LogicalOpGPAdd(fm, tp2),
 				new LogicalPlanWithNullaryRootImpl(reqOp) );
 
 		// test
-		final LogicalPlan result = new MergeRequests().apply(tpAddPlan);
+		final LogicalPlan result = new MergeRequests().apply(gpAddPlan);
 
 		// check
-		assertEquals(tpAddPlan, result); // the plan has not changed
+		assertEquals(gpAddPlan, result); // the plan has not changed
 
-		assertTrue( result.getRootOperator() instanceof LogicalOpTPAdd );
+		assertTrue( result.getRootOperator() instanceof LogicalOpGPAdd );
 
-		final LogicalOpTPAdd resultTPAddOp = (LogicalOpTPAdd) result.getRootOperator();
-		assertTrue( resultTPAddOp.getFederationMember() == fm );
-		assertTrue( resultTPAddOp.getTP() == tp2 );
+		final LogicalOpGPAdd resultGPAddOp = (LogicalOpGPAdd) result.getRootOperator();
+		assertTrue( resultGPAddOp.getFederationMember() == fm );
+		assertTrue( resultGPAddOp.getTP() == tp2 );
 	}
 
 }
