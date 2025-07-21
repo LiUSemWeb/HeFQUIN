@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -94,7 +93,9 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 
 		renamedVar = getVarForRenaming(query, inputVars);
 		if( renamedVar == null ){
-			new IllegalArgumentException("No suitable variable found for renaming");
+			// If there are no non-joining vars, we need to fall back to a non-renaming
+			// version of the bound join strategy.
+			throw new IllegalArgumentException("No suitable variable found for renaming");
 		}
 	}
 
@@ -123,20 +124,17 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	}
 
 	@Override
-	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps )
-			throws ExecOpExecutionException
-	{
+	protected NullaryExecutableOp createExecutableReqOp( final Set<Binding> solMaps ) {
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
 		return new ExecOpRequestSPARQL(request, fm, false);
 	}
 
-	protected Element createUnion( final Iterable<Binding> solMaps )
-			throws ExecOpExecutionException
-	{
+	protected Element createUnion( final Iterable<Binding> solMaps ) {
 		// Populate the ordered list of solution mappings (used for restoring renamed
 		// vars and restoring the join partner vars)
+		solMapsList.clear();
 		solMaps.forEach(solMapsList::add);
 		
 		// Union element
@@ -152,7 +150,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			try {
 				patternWithBindings = query.applySolMapToGraphPattern( new SolutionMappingImpl(solMap) );
 			} catch ( VariableByBlankNodeSubstitutionException e ) {
-				throw new ExecOpExecutionException(e, this);
+				throw new IllegalArgumentException(e);
 			}
 			
 			// Create new variable 
@@ -162,8 +160,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			final Element elt2 = renameVar(patternWithBindings, renamedVar, v);
 			union.addElement(elt2);
 			
-			// Add the solution mapping to the list of solution mappings
-			solMapsList.add(solMap);
 			// Map the renamed var to the index of the corresponding solution mapping
 			renamedVars.put(v, i);
 			i++;
