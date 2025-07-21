@@ -3,7 +3,7 @@ package se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +15,9 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
@@ -24,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -33,10 +37,14 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void twoRequests1() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(2, null, null);
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final int[] result1 = {1,2};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 1 );
+		results.put( joinPlan.getSubPlan(1), 2 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -46,10 +54,14 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void twoRequests2() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(2, null, null);
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
-		final int[] result1 = {2,1};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 2 );
+		results.put( joinPlan.getSubPlan(1), 1 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -61,13 +73,18 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void twoRequestsUnderFilter() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(2, null, null);
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
 		final LogicalOpFilter f = new LogicalOpFilter( Expr.NONE );
 		final LogicalPlan filterPlan = new LogicalPlanWithUnaryRootImpl(f, joinPlan);
 
-		final int[] result1 = {2,1};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( filterPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan, 999 );   // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 2 );
+		results.put( joinPlan.getSubPlan(1), 1 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(filterPlan);
 
@@ -79,13 +96,18 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void twoRequestsUnderL2G() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(2, null, null);
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(null, null);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
 		final LogicalPlan l2gPlan = new LogicalPlanWithUnaryRootImpl(l2g, joinPlan);
 
-		final int[] result1 = {2,1};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( l2gPlan, 999 );  // irrelevant for the test
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 2 );
+		results.put( joinPlan.getSubPlan(1), 1 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(l2gPlan);
 
@@ -97,13 +119,18 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void threeRequests1() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(3,
-				Collections.singleton(Var.alloc("x")),
-				Collections.singleton(Var.alloc("x")),
-				Collections.singleton(Var.alloc("x")) );
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(
+				Set.of( Var.alloc("x") ),
+				Set.of( Var.alloc("x") ),
+				Set.of( Var.alloc("x") ) );
 
-		final int[] result1 = {1,2,3};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 1 );
+		results.put( joinPlan.getSubPlan(1), 2 );
+		results.put( joinPlan.getSubPlan(2), 3 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -113,13 +140,18 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void threeRequests2() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(3,
-				Collections.singleton(Var.alloc("x")),
-				Collections.singleton(Var.alloc("x")),
-				Collections.singleton(Var.alloc("x")) );
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(
+				Set.of( Var.alloc("x") ),
+				Set.of( Var.alloc("x") ),
+				Set.of( Var.alloc("x") ) );
 
-		final int[] result1 = {2,1,3};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 2 );
+		results.put( joinPlan.getSubPlan(1), 1 );
+		results.put( joinPlan.getSubPlan(2), 3 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -132,13 +164,18 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	@Test
 	public void threeRequests3() throws LogicalOptimizationException {
 		@SuppressWarnings("unchecked")
-		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(3,
-				Collections.singleton(Var.alloc("y")), // attention, no join variable!
-				Collections.singleton(Var.alloc("x")),
-				Collections.singleton(Var.alloc("x")) );
+		final LogicalPlan joinPlan = createPlanWithJoinOverRequests(
+				Set.of( Var.alloc("y") ), // attention, no join variable!
+				Set.of( Var.alloc("x") ),
+				Set.of( Var.alloc("x") ) );
 
-		final int[] result1 = {2,1,3};
-		final CardinalityBasedJoinOrderingBase h = new TestImpl(result1, null);
+		final Map<LogicalPlan,Integer> results = new HashMap<>();
+		results.put( joinPlan, 999 ); // irrelevant for the test
+		results.put( joinPlan.getSubPlan(0), 2 );
+		results.put( joinPlan.getSubPlan(1), 1 );
+		results.put( joinPlan.getSubPlan(2), 3 );
+
+		final CardinalityBasedJoinOrderingBase h = new TestImpl(results);
 
 		final LogicalPlan resultPlan = h.apply(joinPlan);
 
@@ -150,12 +187,11 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 
 	// ----------- helpers ------------
 
-	protected LogicalPlanWithNaryRoot createPlanWithJoinOverRequests( final int numberOfRequestsToBeCreated,
-	                                                                  @SuppressWarnings("unchecked") final Set<Var> ... certainVars ) {
+	protected LogicalPlanWithNaryRoot createPlanWithJoinOverRequests( @SuppressWarnings("unchecked") final Set<Var> ... certainVars ) {
 		final TPFServer srv = new TPFServerForTest();
 
-		final LogicalPlan[] subPlans = new LogicalPlan[numberOfRequestsToBeCreated];
-		for ( int i = 0; i < numberOfRequestsToBeCreated; i++ ) {
+		final LogicalPlan[] subPlans = new LogicalPlan[ certainVars.length ];
+		for ( int i = 0; i < certainVars.length; i++ ) {
 			final Set<Var> cv = certainVars[i];
 			final ExpectedVariables ev = new ExpectedVariables() {
 				@Override public Set<Var> getCertainVariables() { return cv; }
@@ -174,27 +210,46 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 	}
 
 	protected class TestImpl extends CardinalityBasedJoinOrderingBase {
-		protected final int[] result1;
-		protected final Map<AnnotatedLogicalPlan,Integer> results2;
 
-		public TestImpl( final int[] result1, final Map<AnnotatedLogicalPlan,Integer> results2 ) {
-			this.result1 = result1;
-			this.results2 = results2;
+		public TestImpl( final Map<LogicalPlan,Integer> results ) {
+			super( new MockCardinalityEstimator(results) );
 		}
 
 		@Override
-		protected int[] estimateCardinalities( final LogicalPlan[] plans ) {
-			return result1;
-		}
-
-		@Override
-		protected int estimateJoinCardinality( final List<AnnotatedLogicalPlan> selectedPlans,
+		protected int estimateJoinCardinality( final List<LogicalPlan> selectedPlans,
 		                                       final int joinCardOfSelectedPlans,
-		                                       final AnnotatedLogicalPlan nextCandidate ) {
-			if ( results2 != null )
-				return results2.get(nextCandidate);
-			else
-				return nextCandidate.cardinality;
+		                                       final LogicalPlan nextCandidate ) {
+			return nextCandidate.getQueryPlanningInfo().getProperty(QueryPlanProperty.CARDINALITY).getValue();
+		}
+	}
+
+	protected class MockCardinalityEstimator implements CardinalityEstimator {
+		protected final Map<LogicalPlan,Integer> results;
+
+		public MockCardinalityEstimator( final Map<LogicalPlan,Integer> results ) {
+			this.results = results;
+		}
+
+		@Override
+		public void addCardinalities( final LogicalPlan... plans ) {
+			for ( int i = 0; i < plans.length; i++ ) {
+				final LogicalPlan plan = plans[i];
+				final Integer card = results.get(plan);
+
+				if ( card == null )
+					throw new IllegalArgumentException("The 'results' map has not been populated for all (sub)plans.");
+
+				final QueryPlanningInfo qpInfo = plan.getQueryPlanningInfo();
+				qpInfo.addProperty( QueryPlanProperty.cardinality(card, Quality.ACCURATE) );
+				qpInfo.addProperty( QueryPlanProperty.maxCardinality(card, Quality.ESTIMATE_BASED_ON_ACCURATES) );
+				qpInfo.addProperty( QueryPlanProperty.minCardinality(card, Quality.ESTIMATE_BASED_ON_ACCURATES) );
+
+				if ( plan.numberOfSubPlans() > 0 ) {
+					for ( int j = 0; j < plan.numberOfSubPlans(); j++ ) {
+						addCardinalities( plan.getSubPlan(j) );
+					}
+				}
+			}
 		}
 	}
 

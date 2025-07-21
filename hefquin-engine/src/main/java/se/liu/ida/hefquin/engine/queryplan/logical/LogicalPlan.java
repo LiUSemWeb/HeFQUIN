@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 public interface LogicalPlan
 {
@@ -32,4 +33,11 @@ public interface LogicalPlan
 	 * then a {@link NoSuchElementException} will be thrown.
 	 */
 	LogicalPlan getSubPlan( int i ) throws NoSuchElementException;
+
+	/**
+	 * Returns an object that captures query-planning-related
+	 * information about this plan. This object is meant to be
+	 * requested and populated by the query planner. 
+	 */
+	QueryPlanningInfo getQueryPlanningInfo();
 }

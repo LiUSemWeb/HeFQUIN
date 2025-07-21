@@ -15,6 +15,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -531,6 +532,7 @@ public class UnionPullUpTest
 		@Override public ExpectedVariables getExpectedVariables() { throw new UnsupportedOperationException(); }
 		@Override public int numberOfSubPlans() { return 0; }
 		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
+		@Override public QueryPlanningInfo getQueryPlanningInfo() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
