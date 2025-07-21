@@ -10,7 +10,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
-public class LogicalPlanWithNaryRootImpl implements LogicalPlanWithNaryRoot
+public class LogicalPlanWithNaryRootImpl extends BaseForLogicalPlan
+                                         implements LogicalPlanWithNaryRoot
 {
 	private final NaryLogicalOp rootOp;
 	private final List<LogicalPlan> subPlans;

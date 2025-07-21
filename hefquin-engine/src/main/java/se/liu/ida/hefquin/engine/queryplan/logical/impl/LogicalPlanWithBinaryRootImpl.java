@@ -7,7 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
 
-public class LogicalPlanWithBinaryRootImpl implements LogicalPlanWithBinaryRoot
+public class LogicalPlanWithBinaryRootImpl extends BaseForLogicalPlan
+                                           implements LogicalPlanWithBinaryRoot
 {
 	private final BinaryLogicalOp rootOp;
 	private final LogicalPlan subPlan1;

@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.util.ExprUtils;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
@@ -202,6 +205,7 @@ public class BaseForTextBasedPlanPrinters
 
 		protected String indentLevelString = null;
 		protected String indentLevelStringForOpDetail = null;
+		protected QueryPlanningInfo info = null;
 
 		protected Set<SPARQLGraphPattern> graphPatterns = new HashSet<>();
 		protected List<String> fullStringsForGraphPatterns = new ArrayList<>();
@@ -213,6 +217,41 @@ public class BaseForTextBasedPlanPrinters
 
 		public void setIndentLevelString( final String s ) { indentLevelString = s; }
 		public void setIndentLevelStringForOpDetail( final String s ) { indentLevelStringForOpDetail = s; }
+		public void setQueryPlanningInfo( final QueryPlanningInfo info ) { this.info = info; }
+
+		public void printQueryPlanningInfo( final String indentString ) {
+			out.append( indentString );
+			out.append( "  - query planning info: " );
+
+			if ( info == null || info.isEmpty() ) {
+				out.append( "none" + System.lineSeparator() );
+			}
+			else {
+				final Iterator<QueryPlanProperty> it = info.getProperties().iterator();
+				out.append( " " );
+				print( it.next() );
+				out.append( System.lineSeparator() );
+
+				while ( it.hasNext() ) {
+					out.append( indentString );
+					out.append( "                          " );
+					print( it.next() );
+					out.append( System.lineSeparator() );
+				}
+			}
+		}
+
+		protected void print( final QueryPlanProperty prop ) {
+			out.append( prop.getType().name + " = " + prop.getValue() );
+			switch ( prop.getQuality() ) {
+			case PURE_GUESS:                   out.append(" (pure guess)"); break;
+			case MIN_OR_MAX_POSSIBLE:          out.append(" (min or max possible)"); break;
+			case ESTIMATE_BASED_ON_ESTIMATES:  out.append(" (estimate based on estimates)"); break;
+			case ESTIMATE_BASED_ON_ACCURATES:  out.append(" (estimate based on accurates)"); break;
+			case DIRECT_ESTIMATE:              out.append(" (direct estimate)"); break;
+			case ACCURATE:                     out.append(" (accurate)"); break;
+			}
+		}
 
 		public void printFullStringsForGraphPatterns() {
 			if ( fullStringsForGraphPatterns.isEmpty() )

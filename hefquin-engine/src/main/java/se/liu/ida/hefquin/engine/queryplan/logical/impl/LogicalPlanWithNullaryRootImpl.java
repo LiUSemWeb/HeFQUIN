@@ -7,7 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 
-public class LogicalPlanWithNullaryRootImpl implements LogicalPlanWithNullaryRoot
+public class LogicalPlanWithNullaryRootImpl extends BaseForLogicalPlan
+                                            implements LogicalPlanWithNullaryRoot
 {
 	private final NullaryLogicalOp rootOp;
 

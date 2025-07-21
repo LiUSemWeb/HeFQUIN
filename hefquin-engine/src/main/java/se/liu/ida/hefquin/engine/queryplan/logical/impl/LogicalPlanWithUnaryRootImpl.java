@@ -7,7 +7,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalPlanWithUnaryRootImpl implements LogicalPlanWithUnaryRoot
+public class LogicalPlanWithUnaryRootImpl extends BaseForLogicalPlan
+                                          implements LogicalPlanWithUnaryRoot
 {
 	private final UnaryLogicalOp rootOp;
 	private final LogicalPlan subPlan;
