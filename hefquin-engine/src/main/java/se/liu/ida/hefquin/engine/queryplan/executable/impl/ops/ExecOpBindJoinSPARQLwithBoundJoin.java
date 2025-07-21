@@ -56,7 +56,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	// Represents a list of input solution mappings (ordered)
 	protected final List<Binding> solMapsList = new ArrayList<>();
 	// Var used for renaming
-	protected Var renamedVar = null;
+	final protected Var renamedVar;
 	// Mapping from a renamed var to an index in solMapsList
 	protected final Map<Var, Integer> renamedVars = new HashMap<>();
 
@@ -91,6 +91,35 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	                                          final boolean collectExceptions ) {
 		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
 		pattern = QueryPatternUtils.convertToJenaElement(query);
+
+		renamedVar = getVarForRenaming(query, inputVars);
+		if( renamedVar == null ){
+			new IllegalArgumentException("No suitable variable found for renaming");
+		}
+	}
+
+	/**
+	 * Finds a variable in the given query that is not present in the expected input
+	 * variables and can be used as a variable for renaming.
+	 *
+	 * The method iterates through the certain variables of the given SPARQL graph
+	 * pattern and returns the first variable that is neither listed as a certain
+	 * variable nor a possible variable among the input variables.
+	 *
+	 * @param query     the SPARQL graph pattern containing the query variables
+	 * @param inputVars the input variables
+	 * @return a {@code Var} that can be used as a variable for renaming, or
+	 *         {@code null} if no such variable is found
+	 */
+	public Var getVarForRenaming( final SPARQLGraphPattern query,
+	                              final ExpectedVariables inputVars ) {
+		for ( final Var v : query.getCertainVariables() ) {
+			if (    ! inputVars.getCertainVariables().contains(v) 
+			     && ! inputVars.getPossibleVariables().contains(v) ) {
+				return v;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -112,28 +141,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		
 		// Union element
 		final ElementUnion union = new ElementUnion();
-
-		// Collect the variables bound by the given solution mappings
-		// (which are guaranteed to include all join variables).
-		final Set<Var> joinVars = new HashSet<>();
-		for ( final Binding b : solMaps ) {
-			final Iterator<Var> it = b.vars();
-			while ( it.hasNext() ) {
-				joinVars.add( it.next() );
-			}
-		}
-
-		// Get first non-join variable for renaming
-		for( final Var v : varsInQuery ){
-			if( ! joinVars.contains(v) && query.getCertainVariables().contains(v)){
-				renamedVar = v; // first certain non-join
-				break;
-			}
-		}
-
-		if ( renamedVar == null ) {
-			throw new ExecOpExecutionException("No non-join variable found for renaming", this);
-		}
 
 		// Generate the UNION pattern by iterating over all input solution mappings
 		// and replacing the renamed variable
