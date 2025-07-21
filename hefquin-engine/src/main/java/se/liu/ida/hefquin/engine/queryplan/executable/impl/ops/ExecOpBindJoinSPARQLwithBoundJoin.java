@@ -40,7 +40,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 
 /**
  * Implementation of (a batching version of) the bound-join algorithm that
- * uses UNION clauses with variable renaming. The variable renamed can be
+ * uses UNION clauses with variable renaming (as proposed in the FedX
+ * paper by Schwarte et al. 2011). The variable that is renamed can be
  * any non-join variable.
  *
  * For more details about the actual implementation of the algorithm, and its
