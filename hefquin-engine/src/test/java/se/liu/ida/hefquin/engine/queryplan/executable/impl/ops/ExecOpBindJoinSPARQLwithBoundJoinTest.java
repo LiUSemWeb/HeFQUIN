@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -31,6 +32,46 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
 public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {
+
+	@Test
+	public void tpWithMissingNonJoinVar_InnerJoin() throws ExecutionException {
+		_tpWithMissingNonJoinVar(false);
+	}
+
+	@Test
+	public void tpWithMissingNonJoinVars_OuterJoin() throws ExecutionException {
+		_tpWithMissingNonJoinVar(true);
+	}
+
+	public void _tpWithMissingNonJoinVar( final boolean useOuterJoinSemantics )
+			throws ExecutionException
+	{
+		final Var var1 = Var.alloc("v1");
+
+		final Node s = NodeFactory.createURI("http://example.org/s");
+		final Node p = NodeFactory.createURI("http://example.org/p");
+		final Node o = NodeFactory.createURI("http://example.org/o");
+
+		final List<SolutionMapping> input = new ArrayList<>();
+		input.add( SolutionMappingUtils.createSolutionMapping(var1, s) );
+
+		final TriplePattern tp = new TriplePatternImpl(var1, p, o);
+
+		final Graph dataForMember = GraphFactory.createGraphMem();
+		dataForMember.add( Triple.create(s, p, o) );
+
+		final Exception exception = assertThrows( IllegalArgumentException.class, () -> {
+			runTest( input, dataForMember, tp, new ExpectedVariables() {
+				@Override
+				public Set<Var> getCertainVariables() { return Set.of(var1); }
+
+				@Override
+				public Set<Var> getPossibleVariables() { return Set.of(); }
+			}, useOuterJoinSemantics );
+		} );
+
+		assertEquals( exception.getMessage(), "No suitable variable found for renaming" );
+	}
 
 	@Test
 	public void tpWithJoinOnObject_InnerJoin() throws ExecutionException {
@@ -103,7 +144,9 @@ public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorith
 	}
 
 	// The original version of _tpWithIllegalBNodeJoin has no non-join variable.
-	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics ) throws ExecutionException {
+	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics )
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("p");
 
@@ -154,7 +197,9 @@ public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorith
 	}
 
 	// The original version of _tpWithSpuriousDuplicates has no non-join variable.
-	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) throws ExecutionException {
+	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics )
+			throws ExecutionException
+	{
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
 		// var3 is the non-join var
