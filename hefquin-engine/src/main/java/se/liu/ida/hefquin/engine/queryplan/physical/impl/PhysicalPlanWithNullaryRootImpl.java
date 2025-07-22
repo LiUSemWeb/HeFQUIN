@@ -8,7 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithNullaryRootImpl implements PhysicalPlanWithNullaryRoot
+public class PhysicalPlanWithNullaryRootImpl extends BaseForPhysicalPlan
+                                             implements PhysicalPlanWithNullaryRoot
 {
 	private final NullaryPhysicalOp rootOp;
 

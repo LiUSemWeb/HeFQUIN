@@ -8,7 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithUnaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithUnaryRootImpl implements PhysicalPlanWithUnaryRoot
+public class PhysicalPlanWithUnaryRootImpl extends BaseForPhysicalPlan
+                                           implements PhysicalPlanWithUnaryRoot
 {
 	private final UnaryPhysicalOp rootOp;
 	private final PhysicalPlan subPlan;

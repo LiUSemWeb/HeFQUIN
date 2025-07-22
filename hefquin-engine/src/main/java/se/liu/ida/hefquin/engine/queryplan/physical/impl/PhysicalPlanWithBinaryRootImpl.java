@@ -8,7 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithBinaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithBinaryRootImpl implements PhysicalPlanWithBinaryRoot
+public class PhysicalPlanWithBinaryRootImpl extends BaseForPhysicalPlan
+                                            implements PhysicalPlanWithBinaryRoot
 {
 	private final BinaryPhysicalOp rootOp;
 	private final PhysicalPlan subPlan1;

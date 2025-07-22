@@ -11,7 +11,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithNaryRootImpl implements PhysicalPlanWithNaryRoot
+public class PhysicalPlanWithNaryRootImpl extends BaseForPhysicalPlan
+                                          implements PhysicalPlanWithNaryRoot
 {
 	protected final NaryPhysicalOp rootOp;
 	protected final List<PhysicalPlan> subPlans;
