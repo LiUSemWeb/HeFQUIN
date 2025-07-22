@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,8 +57,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	protected final List<Binding> solMapsList = new ArrayList<>();
 	// Var used for renaming
 	final protected Var renamedVar;
-	// Mapping from a renamed var to an index in solMapsList
-	protected final Map<Var, Integer> renamedVars = new HashMap<>();
 
 	/**
 	 * @param query - the graph pattern to be evaluated (in a bind-join
@@ -94,7 +93,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		renamedVar = getVarForRenaming(query, inputVars);
 		if( renamedVar == null ){
 			// If there are no non-joining vars, we need to fall back to a non-renaming
-			// version of the bound join strategy.
+			// version of the bind join strategy.
 			throw new IllegalArgumentException("No suitable variable found for renaming");
 		}
 	}
@@ -159,9 +158,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// Rename the variable in the pattern
 			final Element elt2 = renameVar(patternWithBindings, renamedVar, v);
 			union.addElement(elt2);
-			
-			// Map the renamed var to the index of the corresponding solution mapping
-			renamedVars.put(v, i);
+
 			i++;
 		}
 		return union;
@@ -188,23 +185,26 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 
 		protected void _send( final SolutionMapping smFromRequest ) {
 			// Merge smFromRequest into the input solution mappings:
-			// 1. For each renamed variable, check if the request binding contains it.
+			// 1. Find the renamed variable and parse the integer part.
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
-			for( final Entry<Var, Integer> entry : renamedVars.entrySet() ){
-				final Var v = entry.getKey();
-				final int i = entry.getValue();
-				final Binding b = smFromRequest.asJenaBinding();
 
-				if ( ! b.contains(v) ) {
+			final String prefix = renamedVar.toString() + "_";
+			final Binding b = smFromRequest.asJenaBinding();
+			final Iterator<Var> iter = b.vars();
+			while( iter.hasNext()){
+				final Var v = iter.next();
+				if ( ! v.toString().startsWith(prefix) ) {
 					continue;
 				}
 
+				final int i = Integer.parseInt( v.getName().substring( prefix.length() - 1 ) );
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
-				                                                             solMapsList.get(i) );
+				                                                   solMapsList.get(i) );
 				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
 
+				System.err.println(v.getName().substring( prefix.length() ));
 				// Merge with inputSolutionMappings
 				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
@@ -226,21 +226,22 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 
 		protected void _send( final SolutionMapping smFromRequest ) {
 			// Merge smFromRequest into the input solution mappings:
-			// 1. For each renamed variable, check if the request binding contains it.
+			// 1. Find the renamed variable and parse the integer part.
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
-			for( final Entry<Var, Integer> entry : renamedVars.entrySet() ){
-				final Var v = entry.getKey();
-				final int i = entry.getValue();
-				final Binding b = smFromRequest.asJenaBinding();
 
-				if ( ! b.contains(v) ) {
+			final String prefix = renamedVar.toString() + "_";
+			final Binding b = smFromRequest.asJenaBinding();
+			final Iterator<Var> iter = b.vars();
+			while( iter.hasNext()){
+				final Var v = iter.next();
+				if ( ! v.toString().startsWith(prefix) ) {
 					continue;
 				}
-
+				final int i = Integer.parseInt( v.getName().substring( prefix.length() - 1 ) );
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
-				                                                             solMapsList.get(i) );
+				                                                   solMapsList.get(i) );
 				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
 
 				// Merge with inputSolutionMappings
