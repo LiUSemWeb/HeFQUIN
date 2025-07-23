@@ -201,12 +201,12 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
 				                                                   solMapsList.get(i) );
-				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
 
 				// Merge with inputSolutionMappings
 				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
-						solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput, updatedRequest) );
+					if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
+						final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
+						solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
 					}
 				}
 			}
@@ -241,12 +241,11 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
 				                                                   solMapsList.get(i) );
-				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
-
 				// Merge with inputSolutionMappings
 				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
-						solMapsForOutput.add( SolutionMappingUtils.merge(smFromInput, updatedRequest) );
+					if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
+						final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
+						solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
 						inputSolutionMappingsWithJoinPartners.add(smFromInput);
 					}
 				}
