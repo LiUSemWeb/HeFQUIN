@@ -176,7 +176,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 		else if (    rootOfSubPlan instanceof PhysicalOpBinaryUnion
 		          || rootOfSubPlan instanceof PhysicalOpMultiwayUnion ) {
 			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(rightOrTop) ) {
-				final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(leftOrChild, rightOrTop);
+				final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(leftOrChild, rightOrTop, null);
 				plans.add(planWithUnariesUnderUnion);
 			}
 		}

@@ -39,17 +39,16 @@ public class PhysicalOpParallelMultiLeftJoin extends BaseForPhysicalOps implemen
 	 * the optional parts of that multi-left-join. If not, this method returns
 	 * <code>null</code>.
 	 */
-	public static List<LogicalOpRequest<?,?>> checkApplicability( final List<PhysicalPlan> children )
+	public static List<LogicalOpRequest<?,?>> checkApplicability( final PhysicalPlan[] children )
 	{
-		final List<LogicalOpRequest<?,?>> optionalParts = new ArrayList<>( children.size()-1 );
-		final List<ExpectedVariables> expVarsOfOptionalParts = new ArrayList<>( children.size()-1 );
+		final List<LogicalOpRequest<?,?>> optionalParts = new ArrayList<>( children.length - 1 );
+		final List<ExpectedVariables> expVarsOfOptionalParts = new ArrayList<>( children.length - 1 );
 
-		final Iterator<PhysicalPlan> it = children.iterator();
-		final PhysicalPlan firstChildPlan = it.next(); // the non-optional part
+		final PhysicalPlan firstChildPlan = children[0]; // the non-optional part
 
 		// condition 1: every non-optional part is just a request operator
-		while ( it.hasNext() ) {
-			final PhysicalOperator childRootOp = it.next().getRootOperator();
+		for ( int i = 1; i < children.length; i++ ) {
+			final PhysicalOperator childRootOp = children[i].getRootOperator();
 			final LogicalOpRequest<?,?> reqOp;
 			if ( childRootOp instanceof PhysicalOpRequest<?,?> ) {
 				reqOp = ((PhysicalOpRequest<?,?>) childRootOp).getLogicalOperator();

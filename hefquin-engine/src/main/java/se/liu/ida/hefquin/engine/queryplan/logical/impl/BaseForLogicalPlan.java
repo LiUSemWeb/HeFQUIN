@@ -12,6 +12,11 @@ public abstract class BaseForLogicalPlan implements LogicalPlan
 	private QueryPlanningInfo info = null;
 
 	@Override
+	public boolean hasQueryPlanningInfo() {
+		return info != null;
+	}
+
+	@Override
 	public QueryPlanningInfo getQueryPlanningInfo() {
 		if ( info == null )
 			info = new QueryPlanningInfo();
