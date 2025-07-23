@@ -182,6 +182,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			super(inputSolutionMappings);
 		}
 
+		@Override
 		protected void _send( final SolutionMapping smFromRequest ) {
 			// Merge smFromRequest into the input solution mappings:
 			// 1. Find the renamed variable and parse the integer part.
@@ -211,15 +212,14 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	} // end of helper class MyIntermediateResultElementSink2
 
 
-	protected class MyIntermediateResultElementSinkOuterJoin2 extends MyIntermediateResultElementSink2
+	protected class MyIntermediateResultElementSinkOuterJoin2 extends MyIntermediateResultElementSinkOuterJoin
 	{
-		protected final Set<SolutionMapping> inputSolutionMappingsWithJoinPartners = new HashSet<>();
-
 		public MyIntermediateResultElementSinkOuterJoin2( final Iterable<SolutionMapping> inputSolutionMappings ) {
 			super(inputSolutionMappings);
 		}
 
-		protected void _send( final SolutionMapping smFromRequest ) {
+		@Override
+		public void _send( final SolutionMapping smFromRequest ) {
 			// Merge smFromRequest into the input solution mappings:
 			// 1. Find the renamed variable and parse the integer part.
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
@@ -243,19 +243,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 					final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
 					solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
 					inputSolutionMappingsWithJoinPartners.add(smFromInput);
-				}
-			}
-		}
-
-		/**
-		 * Sends to the output sink all input solution
-		 * mappings that did not have a join partner.
-		 */
-		@Override
-		public void flush() {
-			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-				if ( ! inputSolutionMappingsWithJoinPartners.contains(smFromInput) ) {
-					solMapsForOutput.add(smFromInput);
 				}
 			}
 		}
