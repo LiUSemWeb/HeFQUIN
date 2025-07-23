@@ -188,26 +188,23 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final Binding b = smFromRequest.asJenaBinding();
-			final Iterator<Var> iter = b.vars();
-			while( iter.hasNext()){
-				final Var v = iter.next();
-				if ( ! v.getVarName().startsWith(renamedVarPrefix) ) {
-					continue;
-				}
+			final Binding requestBinding = smFromRequest.asJenaBinding();
 
-				final int i = Integer.parseInt( v.getVarName().substring( renamedVarPrefix.length() ) );
+			// Find renamed variable
+			final Var matchedVar = findRenamedVar(requestBinding);
 
-				// Rename var and merge with input mapping
-				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
-				                                                   solMapsList.get(i) );
+			// Parse index
+			final int i = Integer.parseInt( matchedVar.getVarName().substring( renamedVarPrefix.length() ) );
 
-				// Merge with inputSolutionMappings
-				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-					if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
-						final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
-						solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
-					}
+			// Rename var and merge with input mapping
+			final Binding renamedAndMerged = BindingLib.merge( renameVar(requestBinding, matchedVar, renamedVar),
+			                                                   solMapsList.get(i) );
+
+			// Merge with inputSolutionMappings
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
+					final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
+					solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
 				}
 			}
 		}
@@ -228,26 +225,24 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final Binding b = smFromRequest.asJenaBinding();
-			final Iterator<Var> iter = b.vars();
-			while( iter.hasNext()){
-				final Var v = iter.next();
-				if ( ! v.getVarName().startsWith(renamedVarPrefix) ) {
-					continue;
-				}
+			final Binding requestBinding = smFromRequest.asJenaBinding();
 
-				final int i = Integer.parseInt( v.getVarName().substring( renamedVarPrefix.length() ) );
+			// Find renamed variable
+			final Var matchedVar = findRenamedVar(requestBinding);
 
-				// Rename var and merge with input mapping
-				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
-				                                                   solMapsList.get(i) );
-				// Merge with inputSolutionMappings
-				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
-					if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
-						final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
-						solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
-						inputSolutionMappingsWithJoinPartners.add(smFromInput);
-					}
+			// Parse index
+			final int i = Integer.parseInt( matchedVar.getVarName().substring( renamedVarPrefix.length() ) );
+
+			// Rename var and merge with input mapping
+			final Binding renamedAndMerged = BindingLib.merge( renameVar(requestBinding, matchedVar, renamedVar),
+			                                                   solMapsList.get(i) );
+
+			// Merge with inputSolutionMappings
+			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
+				if ( SolutionMappingUtils.compatible( smFromInput.asJenaBinding(), renamedAndMerged ) ) {
+					final Binding updatedBinding = BindingLib.merge( smFromInput.asJenaBinding(), renamedAndMerged );
+					solMapsForOutput.add( new SolutionMappingImpl(updatedBinding) );
+					inputSolutionMappingsWithJoinPartners.add(smFromInput);
 				}
 			}
 		}
@@ -307,5 +302,28 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		final BindingBuilder builder = BindingFactory.builder();
 		binding.forEach( (v, n) -> builder.add( v.equals(oldVar) ? newVar : v, n ) );
 		return builder.build();
+	}
+
+	/**
+	 * Finds the first variable in the given Jena {@link Binding} that matches the
+	 * prefix for renamed variables. If no such variable is found, an
+	 * {@link IllegalArgumentException} is thrown.
+	 *
+	 * @param binding the Jena {@link Binding} to search for a renamed variable
+	 * @return the first {@link Var} whose name begins with {@code renamedVarPrefix}
+	 * @throws IllegalArgumentException if the binding contains no variable whose
+	 *                                  name starts with {@code renamedVarPrefix}
+	 */
+	public Var findRenamedVar( final Binding binding ) {
+		final Iterator<Var> it = binding.vars();
+		while ( it.hasNext() ) {
+			final Var v = it.next();
+			if ( v.getVarName().startsWith(renamedVarPrefix) ) {
+				return v;
+			}
+		}
+		throw new IllegalArgumentException( String.format( "No variable with prefix '%s' found in binding %s",
+		                                                   renamedVarPrefix,
+		                                                   binding ) );
 	}
 }
