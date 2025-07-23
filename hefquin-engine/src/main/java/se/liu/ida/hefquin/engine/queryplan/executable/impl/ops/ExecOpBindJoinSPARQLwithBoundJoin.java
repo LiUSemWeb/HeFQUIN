@@ -2,12 +2,10 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
@@ -204,7 +202,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 				                                                   solMapsList.get(i) );
 				final SolutionMapping updatedRequest = new SolutionMappingImpl(renamedAndMerged);
 
-				System.err.println(v.getName().substring( prefix.length() ));
 				// Merge with inputSolutionMappings
 				for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
 					if ( SolutionMappingUtils.compatible(smFromInput, updatedRequest ) ) {
