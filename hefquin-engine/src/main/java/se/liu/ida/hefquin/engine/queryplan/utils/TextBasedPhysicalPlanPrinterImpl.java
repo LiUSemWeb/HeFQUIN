@@ -59,6 +59,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		final String indentLevelStringForOpDetail = getIndentLevelStringForDetail(planNumber, planLevel, numberOfSiblings, plan.numberOfSubPlans(), indentLevelString);
 		opPrinter.setIndentLevelStringForOpDetail(indentLevelStringForOpDetail);
 
+		opPrinter.setExpectedVariables( plan.getExpectedVariables() );
 		opPrinter.setQueryPlanningInfo( plan.getQueryPlanningInfo() );
 		plan.getRootOperator().visit(opPrinter);
 
@@ -78,6 +79,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "binary union (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 		}
 
@@ -87,6 +90,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -99,6 +104,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -111,6 +118,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -123,6 +132,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -135,6 +146,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -153,6 +166,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			                  indentLevelStringForOpDetail + singleBase,
 			                  out );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -176,6 +190,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 				out.append( System.lineSeparator() );
 			}
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -193,6 +208,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
 			out.append( System.lineSeparator() );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -204,6 +220,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "hash join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 		}
 
@@ -212,6 +230,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "right-outer hash join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 		}
 
@@ -221,6 +241,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -238,6 +260,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelStringForOpDetail + singleBase + "  - vocab.mapping (" + lop.getVocabularyMapping().hashCode() + ")" );
 			out.append( System.lineSeparator() );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -250,6 +273,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -261,6 +285,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "naive NLJ (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 		}
 
@@ -269,6 +295,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( indentLevelString + "parallel multiway left-outer join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );
@@ -293,6 +320,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 				out.append( System.lineSeparator() );
 			}
 
+			printExpectedVariables( indentLevelStringForOpDetail );
 			printQueryPlanningInfo( indentLevelStringForOpDetail );
 
 			out.append( indentLevelStringForOpDetail );
@@ -305,6 +333,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 
 			out.append( indentLevelStringForOpDetail + singleBase );

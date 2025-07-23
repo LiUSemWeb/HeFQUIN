@@ -7,10 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.util.ExprUtils;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -205,7 +207,8 @@ public class BaseForTextBasedPlanPrinters
 
 		protected String indentLevelString = null;
 		protected String indentLevelStringForOpDetail = null;
-		protected QueryPlanningInfo info = null;
+		protected ExpectedVariables expVars = null;
+		protected QueryPlanningInfo qpInfo = null;
 
 		protected Set<SPARQLGraphPattern> graphPatterns = new HashSet<>();
 		protected List<String> fullStringsForGraphPatterns = new ArrayList<>();
@@ -217,17 +220,45 @@ public class BaseForTextBasedPlanPrinters
 
 		public void setIndentLevelString( final String s ) { indentLevelString = s; }
 		public void setIndentLevelStringForOpDetail( final String s ) { indentLevelStringForOpDetail = s; }
-		public void setQueryPlanningInfo( final QueryPlanningInfo info ) { this.info = info; }
+		public void setExpectedVariables( final ExpectedVariables expVars ) { this.expVars = expVars; }
+		public void setQueryPlanningInfo( final QueryPlanningInfo qpInfo ) { this.qpInfo = qpInfo; }
+
+		public void printExpectedVariables( final String indentString ) {
+			if ( expVars == null ) {
+				out.append( indentString );
+				out.append( "  - expected variables: ?" );
+				out.append( System.lineSeparator() );
+				return;
+			}
+
+			String certainVarsStr = "  - certain variables: ";
+			final Iterator<Var> itC = expVars.getCertainVariables().iterator();
+			certainVarsStr += itC.hasNext() ? itC.next().toString() : "none";
+			while ( itC.hasNext() ) {
+				certainVarsStr += ", " + itC.next().toString();
+			}
+
+			out.append( indentString + certainVarsStr + System.lineSeparator() );
+
+			String possibleVarsStr = "  - possible variables: ";
+			final Iterator<Var> itP = expVars.getPossibleVariables().iterator();
+			possibleVarsStr += itP.hasNext() ? itP.next().toString() : "none";
+			while ( itP.hasNext() ) {
+				possibleVarsStr += ", " + itP.next().toString();
+			}
+
+			out.append( indentString + possibleVarsStr + System.lineSeparator() );
+		}
 
 		public void printQueryPlanningInfo( final String indentString ) {
 			out.append( indentString );
 			out.append( "  - query planning info: " );
 
-			if ( info == null || info.isEmpty() ) {
+			if ( qpInfo == null || qpInfo.isEmpty() ) {
 				out.append( "none" + System.lineSeparator() );
 			}
 			else {
-				final Iterator<QueryPlanProperty> it = info.getProperties().iterator();
+				final Iterator<QueryPlanProperty> it = qpInfo.getProperties().iterator();
 				out.append( " " );
 				print( it.next() );
 				out.append( System.lineSeparator() );
