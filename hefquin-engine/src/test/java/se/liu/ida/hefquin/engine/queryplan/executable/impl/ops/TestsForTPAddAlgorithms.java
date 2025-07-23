@@ -491,6 +491,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 
 	protected void _tpWithIllegalBNodeJoin( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
+		final Var var2 = Var.alloc("p");
 
 		final Node p      = NodeFactory.createURI("http://example.org/p");
 		final Node uri    = NodeFactory.createURI("http://example.org/x1");
@@ -500,7 +501,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		final List<SolutionMapping> input = new ArrayList<>();
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, bnode1) );
 
-		final TriplePattern tp = new TriplePatternImpl(var1, p, uri);
+		final TriplePattern tp = new TriplePatternImpl(var1, var2, uri);
 
 		final Graph dataForMember = GraphFactory.createGraphMem();
 		dataForMember.add( Triple.create(bnode2, p, uri) );
@@ -531,6 +532,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 	protected void _tpWithSpuriousDuplicates( final boolean useOuterJoinSemantics ) throws ExecutionException {
 		final Var var1 = Var.alloc("v1");
 		final Var var2 = Var.alloc("v2");
+		final Var var3 = Var.alloc("v3");
 
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Node s1 = NodeFactory.createURI("http://example.org/s1");
@@ -542,7 +544,7 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1) );
 		input.add( SolutionMappingUtils.createSolutionMapping(var1, s1, var2, o1) );
 
-		final TriplePattern tp = new TriplePatternImpl(var1,p,var2);
+		final TriplePattern tp = new TriplePatternImpl(var1,var3,var2);
 
 		final Graph dataForMember = GraphFactory.createGraphMem();
 		dataForMember.add( Triple.create(s1,p,o1) );
@@ -564,14 +566,14 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 		assertTrue( it.hasNext() );
 
 		final Binding b1 = it.next().asJenaBinding();
-		assertEquals( 2, b1.size() );
+		assertEquals( 3, b1.size() );
 		assertEquals( s1, b1.get(var1) );
 		assertEquals( o1, b1.get(var2) );
 
 		assertTrue( it.hasNext() );
 
 		final Binding b2 = it.next().asJenaBinding();
-		assertEquals( 2, b2.size() );
+		assertEquals( 3, b2.size() );
 		assertEquals( s1, b2.get(var1) );
 		assertEquals( o1, b2.get(var2) );
 
