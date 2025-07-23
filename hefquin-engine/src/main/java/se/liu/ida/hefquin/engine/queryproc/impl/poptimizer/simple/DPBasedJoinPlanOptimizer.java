@@ -179,7 +179,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 				else if (    rightRootOp instanceof PhysicalOpBinaryUnion
 				          || rightRootOp instanceof PhysicalOpMultiwayUnion ) {
 					if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(optmRight) ) {
-						final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(optmLeft, optmRight);
+						final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(optmLeft, optmRight, null);
 						candidatePlans.add(planWithUnariesUnderUnion);
 					}
 				}

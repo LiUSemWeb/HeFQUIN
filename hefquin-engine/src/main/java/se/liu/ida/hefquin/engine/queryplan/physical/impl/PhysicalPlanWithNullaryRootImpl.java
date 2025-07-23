@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
@@ -18,6 +19,24 @@ public class PhysicalPlanWithNullaryRootImpl extends BaseForPhysicalPlan
 	 * this constructor, use {@link PhysicalPlanFactory}.
 	 */
 	protected PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp ) {
+		assert rootOp != null;
+		this.rootOp = rootOp;
+	}
+
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 * <p>
+	 * This constructor should be used only if the plan is meant to be
+	 * constructed with an already existing {@link QueryPlanningInfo}
+	 * object. Since this object may later be extended with additional
+	 * properties for this plan, it is important not to create multiple
+	 * plans with the same {@link QueryPlanningInfo} object.
+	 */
+	protected PhysicalPlanWithNullaryRootImpl( final NullaryPhysicalOp rootOp,
+	                                           final QueryPlanningInfo qpInfo ) {
+		super(qpInfo);
+
 		assert rootOp != null;
 		this.rootOp = rootOp;
 	}

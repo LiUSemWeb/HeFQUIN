@@ -533,6 +533,7 @@ public class UnionPullUpTest
 		@Override public int numberOfSubPlans() { return 0; }
 		@Override public LogicalPlan getSubPlan(int i) { throw new UnsupportedOperationException(); }
 		@Override public QueryPlanningInfo getQueryPlanningInfo() { throw new UnsupportedOperationException(); }
+		@Override public boolean hasQueryPlanningInfo() { throw new UnsupportedOperationException(); }
 	}
 
 	protected static class DummyLogicalOp implements NullaryLogicalOp {

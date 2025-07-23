@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNaryRoot;
@@ -29,9 +30,48 @@ public class PhysicalPlanWithNaryRootImpl extends BaseForPhysicalPlan
 	/**
 	 * Instead of creating such a plan directly using
 	 * this constructor, use {@link PhysicalPlanFactory}.
+	 * <p>
+	 * This constructor should be used only if the plan is meant to be
+	 * constructed with an already existing {@link QueryPlanningInfo}
+	 * object. Since this object may later be extended with additional
+	 * properties for this plan, it is important not to create multiple
+	 * plans with the same {@link QueryPlanningInfo} object.
+	 */
+	protected PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
+	                                        final QueryPlanningInfo qpInfo,
+	                                        final PhysicalPlan... subPlans ) {
+		this( rootOp, qpInfo, Arrays.asList(subPlans) );
+	}
+
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
 	 */
 	protected PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
 	                                        final List<PhysicalPlan> subPlans ) {
+		assert rootOp != null;
+		assert subPlans != null;
+		assert ! subPlans.isEmpty();
+
+		this.rootOp = rootOp;
+		this.subPlans = subPlans;
+	}
+
+	/**
+	 * Instead of creating such a plan directly using
+	 * this constructor, use {@link PhysicalPlanFactory}.
+	 * <p>
+	 * This constructor should be used only if the plan is meant to be
+	 * constructed with an already existing {@link QueryPlanningInfo}
+	 * object. Since this object may later be extended with additional
+	 * properties for this plan, it is important not to create multiple
+	 * plans with the same {@link QueryPlanningInfo} object.
+	 */
+	protected PhysicalPlanWithNaryRootImpl( final NaryPhysicalOp rootOp,
+	                                        final QueryPlanningInfo qpInfo,
+	                                        final List<PhysicalPlan> subPlans ) {
+		super(qpInfo);
+
 		assert rootOp != null;
 		assert subPlans != null;
 		assert ! subPlans.isEmpty();
