@@ -175,8 +175,6 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 
 	protected class MyIntermediateResultElementSink2 extends MyIntermediateResultElementSink
 	{
-		protected final Set<SolutionMapping> inputSolutionMappingsWithoutJoinPartners = new HashSet<>();
-
 		public MyIntermediateResultElementSink2( final Iterable<SolutionMapping> inputSolutionMappings ) {
 			super(inputSolutionMappings);
 		}
