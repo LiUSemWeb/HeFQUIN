@@ -55,6 +55,8 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	protected final List<Binding> solMapsList = new ArrayList<>();
 	// Var used for renaming
 	final protected Var renamedVar;
+	// Prefix for renamed vars
+	final protected String renamedVarPrefix;
 
 	/**
 	 * @param query - the graph pattern to be evaluated (in a bind-join
@@ -94,6 +96,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// version of the bind join strategy.
 			throw new IllegalArgumentException("No suitable variable found for renaming");
 		}
+		renamedVarPrefix = renamedVar.getVarName() + "_";
 	}
 
 	/**
@@ -151,7 +154,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			}
 			
 			// Create new variable 
-			final Var v = Var.alloc( renamedVar.getVarName() + "_" + i );
+			final Var v = Var.alloc( renamedVarPrefix + i );
 			
 			// Rename the variable in the pattern
 			final Element elt2 = renameVar(patternWithBindings, renamedVar, v);
@@ -185,16 +188,16 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final String prefix = renamedVar.toString() + "_";
 			final Binding b = smFromRequest.asJenaBinding();
 			final Iterator<Var> iter = b.vars();
 			while( iter.hasNext()){
 				final Var v = iter.next();
-				if ( ! v.toString().startsWith(prefix) ) {
+				if ( ! v.getVarName().startsWith(renamedVarPrefix) ) {
 					continue;
 				}
 
-				final int i = Integer.parseInt( v.getName().substring( prefix.length() - 1 ) );
+				final int i = Integer.parseInt( v.getVarName().substring( renamedVarPrefix.length() ) );
+
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
 				                                                   solMapsList.get(i) );
@@ -225,15 +228,16 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final String prefix = renamedVar.toString() + "_";
 			final Binding b = smFromRequest.asJenaBinding();
 			final Iterator<Var> iter = b.vars();
 			while( iter.hasNext()){
 				final Var v = iter.next();
-				if ( ! v.toString().startsWith(prefix) ) {
+				if ( ! v.getVarName().startsWith(renamedVarPrefix) ) {
 					continue;
 				}
-				final int i = Integer.parseInt( v.getName().substring( prefix.length() - 1 ) );
+
+				final int i = Integer.parseInt( v.getVarName().substring( renamedVarPrefix.length() ) );
+
 				// Rename var and merge with input mapping
 				final Binding renamedAndMerged = BindingLib.merge( renameVar(b, v, renamedVar),
 				                                                   solMapsList.get(i) );
