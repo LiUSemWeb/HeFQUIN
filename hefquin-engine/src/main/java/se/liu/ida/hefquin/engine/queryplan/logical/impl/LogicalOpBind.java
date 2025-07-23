@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.Expr;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
@@ -27,23 +28,42 @@ public class LogicalOpBind extends LogicalOperatorBase implements UnaryLogicalOp
 
 		final ExpectedVariables expVarsInput = inputVars[0];
 
-		final Set<Var> certainVars = expVarsInput.getCertainVariables();
-
-		// The variable in a BIND clause is only possible, not certain,
-		// because the evaluating the expression of the BIND clause may
-		// result in an error, in which case the BIND variable remains
-		// unbound.
+		final Set<Var> certainVars = new HashSet<>( expVarsInput.getCertainVariables() );
 		final Set<Var> possibleVars = new HashSet<>( expVarsInput.getPossibleVariables() );
+
+		// In general, the variable in a BIND clause is only possible,
+		// not certain, because evaluating the expression of the BIND
+		// clause may result in an error, in which case the BIND variable
+		// remains unbound. Yet, for some expressions we can be sure that
+		// their evaluation does not result in an error (e.g., constants);
+		// hence, we check for such cases and add their BIND variable as
+		// a certain one, rather than only a possible one.
 		for ( final Var bindVar : bindExpressions.getVars() ) {
-			if ( ! certainVars.contains(bindVar) ) {
+			final Expr expr = bindExpressions.getExpr(bindVar);
+			if ( mightProduceError(expr, certainVars) )
 				possibleVars.add(bindVar);
-			}
+			else
+				certainVars.add(bindVar);
 		}
 
 		return new ExpectedVariables() {
 			@Override public Set<Var> getCertainVariables() { return certainVars; }
 			@Override public Set<Var> getPossibleVariables() { return possibleVars; }
 		};
+	}
+
+	/**
+	 * Returns <code>true</code> if it is <em>not</em> guaranteed that
+	 * evaluating the given expression may result in an error.
+	 */
+	protected boolean mightProduceError( final Expr expr, final Set<Var> certainVars ) {
+		if ( expr.isConstant() )
+			return false;
+
+		if ( expr.isVariable() && certainVars.contains(expr.asVar()) )
+			return false;
+
+		return true;
 	}
 
 	@Override
