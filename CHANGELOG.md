@@ -8,6 +8,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Basis for proper management of query-planning-related information ([#455](https://github.com/LiUSemWeb/HeFQUIN/pull/455), [#456](https://github.com/LiUSemWeb/HeFQUIN/pull/456)).
+- Extending the text-based plan printers to include information about expected variables at each level of the plan ([#457](https://github.com/LiUSemWeb/HeFQUIN/pull/457))
 ### Changed
 - Merging the logical operators tpAdd, bgpAdd, and gpAdd into just one: gpAdd; likewise for tpOptAdd, bgpOptAdd, and gpOptAdd ([#454](https://github.com/LiUSemWeb/HeFQUIN/pull/454)).
 
