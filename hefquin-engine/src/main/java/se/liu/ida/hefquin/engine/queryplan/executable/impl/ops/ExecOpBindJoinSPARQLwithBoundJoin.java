@@ -189,17 +189,8 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final Binding requestBinding = smFromRequest.asJenaBinding();
-
-			// Find renamed variable
-			final Var matchedVar = findRenamedVar(requestBinding);
-
-			// Parse index
-			final int i = Integer.parseInt( matchedVar.getVarName().substring( renamedVarPrefix.length() ) );
-
-			// Rename var and merge with input mapping
-			final Binding renamedAndMerged = BindingLib.merge( renameVar(requestBinding, matchedVar, renamedVar),
-			                                                   solMapsList.get(i) );
+			// Resolve renamed var and merge with smFromRequest
+			final Binding renamedAndMerged = resolveRenamedVarAndMerge(smFromRequest);
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -225,17 +216,8 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 2. Rename that variable and merge with the corresponding solMapList entry.
 			// 3. For each compatible input mapping, merge and collect the results.
 
-			final Binding requestBinding = smFromRequest.asJenaBinding();
-
-			// Find renamed variable
-			final Var matchedVar = findRenamedVar(requestBinding);
-
-			// Parse index
-			final int i = Integer.parseInt( matchedVar.getVarName().substring( renamedVarPrefix.length() ) );
-
-			// Rename var and merge with input mapping
-			final Binding renamedAndMerged = BindingLib.merge( renameVar(requestBinding, matchedVar, renamedVar),
-			                                                   solMapsList.get(i) );
+			// Resolve renamed var and merge with smFromRequest
+			final Binding renamedAndMerged = resolveRenamedVarAndMerge(smFromRequest);
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -292,25 +274,40 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	}
 
 	/**
-	 * Finds the first variable in the given Jena {@link Binding} that matches the
-	 * prefix for renamed variables. If no such variable is found, an
-	 * {@link IllegalArgumentException} is thrown.
+	 * Finds the renamed variable in the given solution mapping, parses its
+	 * numerical suffix as an index, renames that variable, and merges the result
+	 * with the corresponding entry in solMapsList.
 	 *
-	 * @param binding the Jena {@link Binding} to search for a renamed variable
-	 * @return the first {@link Var} whose name begins with {@code renamedVarPrefix}
-	 * @throws IllegalArgumentException if the binding contains no variable whose
-	 *                                  name starts with {@code renamedVarPrefix}
+	 * @param sm the incoming SolutionMapping
+	 * @return a new Binding that has been renamed and merged
+	 * @throws IllegalArgumentException if no renamed variable is found
 	 */
-	public Var findRenamedVar( final Binding binding ) {
-		final Iterator<Var> it = binding.vars();
-		while ( it.hasNext() ) {
-			final Var v = it.next();
-			if ( v.getVarName().startsWith(renamedVarPrefix) ) {
-				return v;
+	public Binding resolveRenamedVarAndMerge( final SolutionMapping sm ){
+			final Binding binding = sm.asJenaBinding();
+
+			// Find the renamed variable
+			Var matchedVar = null;
+			final Iterator<Var> it = binding.vars();
+			while ( it.hasNext() ) {
+				final Var v = it.next();
+				if ( v.getVarName().startsWith(renamedVarPrefix) ) {
+					matchedVar = v;
+					break;
+				}
 			}
-		}
-		throw new IllegalArgumentException( String.format( "No variable with prefix '%s' found in binding %s",
-		                                                   renamedVarPrefix,
-		                                                   binding ) );
+
+			// Fail if no variable was found
+			if ( matchedVar == null ) {
+				throw new IllegalArgumentException( String.format( "No variable with prefix '%s' found in binding %s",
+				                                                   renamedVarPrefix,
+				                                                   binding ) );
+			}
+
+			// Parse index, rename, and merge
+			final int i = Integer.parseInt(
+				matchedVar.getVarName().substring( renamedVarPrefix.length() )
+			);
+			return BindingLib.merge( renameVar(binding, matchedVar, renamedVar),
+			                         solMapsList.get(i) );
 	}
 }
