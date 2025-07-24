@@ -8,7 +8,6 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.util.FmtUtils;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
@@ -131,10 +130,10 @@ public class TriplePatternImpl implements TriplePattern
 	}
 
 	@Override
-	public TriplePattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public TriplePattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
-		return applySolMapToTriplePattern( sm.asJenaBinding(), this );
+		return applySolMapToTriplePattern( sm, this );
 	}
 
 	public static TriplePattern applySolMapToTriplePattern( final Binding sm,

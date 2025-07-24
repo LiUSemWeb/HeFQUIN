@@ -22,6 +22,7 @@ import org.apache.jena.sparql.algebra.op.OpLeftJoin;
 import org.apache.jena.sparql.algebra.op.OpService;
 import org.apache.jena.sparql.algebra.op.OpUnion;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.graph.NodeTransform;
 import org.apache.jena.sparql.graph.NodeTransformLib;
 import org.apache.jena.sparql.serializer.FormatterElement;
@@ -29,7 +30,6 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.syntaxtransform.NodeTransformSubst;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
@@ -135,11 +135,11 @@ public class GenericSPARQLGraphPatternImpl2 implements SPARQLGraphPattern
 	}
 
 	@Override
-	public SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm )
+	public SPARQLGraphPattern applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
 		final Map<Var, Node> map = new HashMap<>();
-		sm.asJenaBinding().forEach( (v,n) -> map.put(v,n) );
+		sm.forEach( (v,n) -> map.put(v,n) );
 		final NodeTransform t = new NodeTransformSubst(map);
 
 		final Op opNew = NodeTransformLib.transform(t, jenaPatternOp);

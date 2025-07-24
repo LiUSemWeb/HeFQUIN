@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +53,9 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	// Represents a list of input solution mappings (ordered)
 	protected final List<Binding> solMapsList = new ArrayList<>();
 	// Var used for renaming
-	final protected Var renamedVar;
+	protected final Var renamedVar;
 	// Prefix for renamed vars
-	final protected String renamedVarPrefix;
+	protected final String renamedVarPrefix;
 
 	/**
 	 * @param query - the graph pattern to be evaluated (in a bind-join
@@ -136,7 +135,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		// vars and restoring the join partner vars)
 		solMapsList.clear();
 		solMaps.forEach(solMapsList::add);
-		
+
 		// Union element
 		final ElementUnion union = new ElementUnion();
 
@@ -148,14 +147,15 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// with values based on the incoming solution mapping
 			SPARQLGraphPattern patternWithBindings;
 			try {
-				patternWithBindings = query.applySolMapToGraphPattern( new SolutionMappingImpl(solMap) );
-			} catch ( VariableByBlankNodeSubstitutionException e ) {
+				patternWithBindings = query.applySolMapToGraphPattern(solMap);
+			}
+			catch ( final VariableByBlankNodeSubstitutionException e ) {
 				throw new IllegalArgumentException(e);
 			}
-			
+
 			// Create new variable 
 			final Var v = Var.alloc( renamedVarPrefix + i );
-			
+
 			// Rename the variable in the pattern
 			final Element elt2 = renameVar(patternWithBindings, renamedVar, v);
 			union.addElement(elt2);
@@ -190,7 +190,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 3. For each compatible input mapping, merge and collect the results.
 
 			// Resolve renamed var and merge with smFromRequest
-			final Binding renamedAndMerged = resolveRenamedVarAndMerge(smFromRequest);
+			final Binding renamedAndMerged = resolveRenamedVarAndMerge( smFromRequest.asJenaBinding() );
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -217,7 +217,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			// 3. For each compatible input mapping, merge and collect the results.
 
 			// Resolve renamed var and merge with smFromRequest
-			final Binding renamedAndMerged = resolveRenamedVarAndMerge(smFromRequest);
+			final Binding renamedAndMerged = resolveRenamedVarAndMerge( smFromRequest.asJenaBinding() );
 
 			// Merge with inputSolutionMappings
 			for ( final SolutionMapping smFromInput : inputSolutionMappings ) {
@@ -229,7 +229,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 			}
 		}
 	} // end of helper class MyIntermediateResultElementSinkOuterJoin2
-	
+
 
 	// ------- helper functions ------
 
@@ -278,36 +278,32 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 	 * numerical suffix as an index, renames that variable, and merges the result
 	 * with the corresponding entry in solMapsList.
 	 *
-	 * @param sm the incoming SolutionMapping
-	 * @return a new Binding that has been renamed and merged
+	 * @param sm the incoming solution mapping
+	 * @return a new solution mapping that has been renamed and merged
 	 * @throws IllegalArgumentException if no renamed variable is found
 	 */
-	public Binding resolveRenamedVarAndMerge( final SolutionMapping sm ){
-			final Binding binding = sm.asJenaBinding();
-
-			// Find the renamed variable
-			Var matchedVar = null;
-			final Iterator<Var> it = binding.vars();
-			while ( it.hasNext() ) {
-				final Var v = it.next();
-				if ( v.getVarName().startsWith(renamedVarPrefix) ) {
-					matchedVar = v;
-					break;
-				}
+	public Binding resolveRenamedVarAndMerge( final Binding sm ) {
+		// Find the renamed variable
+		Var matchedVar = null;
+		final Iterator<Var> it = sm.vars();
+		while ( matchedVar == null && it.hasNext() ) {
+			final Var v = it.next();
+			if ( v.getVarName().startsWith(renamedVarPrefix) ) {
+				matchedVar = v;
 			}
+		}
 
-			// Fail if no variable was found
-			if ( matchedVar == null ) {
-				throw new IllegalArgumentException( String.format( "No variable with prefix '%s' found in binding %s",
-				                                                   renamedVarPrefix,
-				                                                   binding ) );
-			}
+		// Fail if no variable was found
+		if ( matchedVar == null ) {
+			throw new IllegalArgumentException( String.format("No variable with prefix '%s' found in binding %s",
+			                                                  renamedVarPrefix,
+			                                                  sm) );
+		}
 
-			// Parse index, rename, and merge
-			final int i = Integer.parseInt(
-				matchedVar.getVarName().substring( renamedVarPrefix.length() )
-			);
-			return BindingLib.merge( renameVar(binding, matchedVar, renamedVar),
-			                         solMapsList.get(i) );
+		// Parse index, rename, and merge
+		final String idxPart = matchedVar.getVarName().substring( renamedVarPrefix.length() );
+		final int i = Integer.parseInt(idxPart);
+		final Binding smRenamed = renameVar(sm, matchedVar, renamedVar);
+		return BindingLib.merge( smRenamed, solMapsList.get(i) );
 	}
 }

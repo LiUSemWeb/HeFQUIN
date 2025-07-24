@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.syntax.Element;
 
@@ -92,7 +93,22 @@ public interface SPARQLGraphPattern extends Query
 	 *                                                  would be replaced by a
 	 *                                                  blank node
 	 */
-	SPARQLGraphPattern applySolMapToGraphPattern( SolutionMapping sm ) throws VariableByBlankNodeSubstitutionException;
+	SPARQLGraphPattern applySolMapToGraphPattern( Binding sm ) throws VariableByBlankNodeSubstitutionException;
+
+	/**
+	 * Applies the given solution mapping to this graph pattern and returns
+	 * the resulting graph pattern in which all occurrences of the variables
+	 * bound by the given solution mapping are replaced by the RDF terms that
+	 * the solution mappings assigns to these variables.
+	 *
+	 * @throws VariableByBlankNodeSubstitutionException if one of the variables
+	 *                                                  would be replaced by a
+	 *                                                  blank node
+	 */
+	default SPARQLGraphPattern applySolMapToGraphPattern( final SolutionMapping sm )
+			throws VariableByBlankNodeSubstitutionException {
+		return applySolMapToGraphPattern( sm.asJenaBinding() );
+	}
 
 	/**
 	 * Merges this graph pattern with the given graph pattern, using join
