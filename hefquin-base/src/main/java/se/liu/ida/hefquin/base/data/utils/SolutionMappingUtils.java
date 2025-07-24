@@ -131,7 +131,13 @@ public class SolutionMappingUtils
 	public static boolean compatible( final SolutionMapping m1, final SolutionMapping m2 ) {
 		final Binding b1 = m1.asJenaBinding();
 		final Binding b2 = m2.asJenaBinding();
+		return compatible(b1, b2);
+	}
 
+	/**
+	 * Returns true if the given bindings are compatible.
+	 */
+	public static boolean compatible( final Binding b1, final Binding b2 ) {
 		final Iterator<Var> it = b1.vars();
 		while ( it.hasNext() ) {
 			final Var v = it.next();
