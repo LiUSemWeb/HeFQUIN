@@ -168,6 +168,47 @@
           </argLine>
         </configuration>
       </plugin>
+
+      <!-- Add config/ to classpath -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <!-- For main resources -->
+          <execution>
+            <id>add-resource</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${project.parent.basedir}/config</directory>
+                  <targetPath>config</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <!-- For test resources -->
+          <execution>
+            <id>add-test-resource</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>add-test-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>${project.parent.basedir}/config</directory>
+                  <targetPath>config</targetPath>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

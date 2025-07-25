@@ -18,8 +18,8 @@ public class SharedResourceInitializer implements ServletContextListener
 
 	@Override
 	public void contextInitialized( ServletContextEvent servletContextEvent ) {
-		final String confDescr = System.getProperty( "hefquin.configuration", "DefaultEngineConf.ttl" );
-		final String fedCat = System.getProperty( "hefquin.federation", "DefaultFedConf.ttl" );
+		final String confDescr = System.getProperty("hefquin.configuration", "config/DefaultConfDescr.ttl");
+		final String fedCat = System.getProperty("hefquin.federation", "config/DefaultFedConf.ttl");
 
 		logger.info( "--- Initialize engine ---" );
 		logger.info( "hefquin.configuration: {}", confDescr );

@@ -59,8 +59,8 @@ public class SparqlServletTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		System.setProperty( "hefquin.configuration", "TestEngineConf.ttl" );
-		System.setProperty( "hefquin.federation", "TestFedConf.ttl" );
+		System.clearProperty("hefquin.configuration");
+		System.clearProperty("hefquin.federation");
 		server = TestServer.run( port );
 		httpClient = HttpClients.createDefault();
 		server.start();
