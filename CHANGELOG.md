@@ -12,6 +12,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Adding the bound join algorithm from the FedX paper ([#458](https://github.com/LiUSemWeb/HeFQUIN/pull/458)).
 ### Changed
 - Merging the logical operators tpAdd, bgpAdd, and gpAdd into just one: gpAdd; likewise for tpOptAdd, bgpOptAdd, and gpOptAdd ([#454](https://github.com/LiUSemWeb/HeFQUIN/pull/454)).
+- Removing the old StatsPrinter in favor of the new JSON-based one ([#460](https://github.com/LiUSemWeb/HeFQUIN/pull/460)).
 
 
 ## [0.0.6] - 2025-06-30
