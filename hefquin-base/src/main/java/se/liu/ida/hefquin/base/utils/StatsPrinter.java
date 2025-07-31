@@ -4,109 +4,151 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonBoolean;
+import org.apache.jena.atlas.json.JsonNull;
+import org.apache.jena.atlas.json.JsonNumber;
+import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonString;
+import org.apache.jena.atlas.json.JsonValue;
 
+/**
+ * A utility class for converting {@link Stats} objects into JSON format
+ * and printing them.
+ */
 public class StatsPrinter
 {
 	/**
-	 * Prints the given stats to the given print stream.
-	 * 
-	 * Every entry that is a {@link Stats} object itself is
-	 * printed as well if the 'recursive' flag is 'true'.
+	 * Converts the given {@link Stats} object into a JSON object and, then,
+	 * prints that JSON object to the specified {@link PrintStream}.
+	 *
+	 * @param s         - the {@link Stats} object to print
+	 * @param out       - the output stream to print to
+	 * @param recursive - {@code true} if nested {@link Stats} entries
+	 *                    should be printed recursively
 	 */
-	public static void print( final Stats s, final PrintStream out, final boolean recursive ) {
-		print(s, out, recursive, 0);
+	public static void print( final Stats s,
+	                          final PrintStream out,
+	                          final boolean recursive ) {
+		final JsonObject stats = statsAsJson(s, recursive);
+		out.print( stats.toString() );
 	}
 
 	/**
-	 * Prints the given stats to the given print stream at the given indentation level.
-	 * 
-	 * Every entry that is a {@link Stats} object itself is
-	 * printed as well if the 'recursive' flag is 'true'.
+	 * Converts the given {@link Stats} object into a JSON object.
+	 * Nested {@link Stats} entries are converted recursively.
+	 *
+	 * @param s - the {@link Stats} object to convert
 	 */
-	public static void print( final Stats s, final PrintStream out, final boolean recursive, final int indentLevel ) {
-		if ( s == null ) {
-			addTabs(out, indentLevel);
-			out.append( "null" );
-			out.append( System.lineSeparator() );
-			return;
-		}
+	public static JsonObject statsAsJson( final Stats s ) {
+		return statsAsJson(s, true);
+	}
 
-		if ( s.isEmpty() ) {
-			addTabs(out, indentLevel);
-			out.append( "--empty--" );
-			out.append( System.lineSeparator() );
-			return;
+	/**
+	 * Converts the given {@link Stats} object into a JSON object.
+	 *
+	 * @param s        - the {@link Stats} object to convert
+	 *@param recursive - {@code true} if nested {@link Stats} entries
+	 *                   should be printed recursively
+	 * @return a JSON object representation of the {@link Stats} object
+	 */
+	public static JsonObject statsAsJson( final Stats s, final boolean recursive ) {
+		final JsonObject stats = new JsonObject();
+
+		if ( s == null || s.isEmpty() ) {
+			return stats;
 		}
 
 		for ( final String entryName : s.getEntryNames() ) {
 			final Object entry = s.getEntry(entryName);
-
-			addTabs(out, indentLevel);
-			out.append(entryName + " : ");
-
-			if ( entry == null ) {
-				out.append( "null" );
-			}
-			else if ( entry instanceof Stats )
-			{
-				final Stats ss = (Stats) entry;
-				if ( ss.isEmpty() ) {
-					out.append( "{ }" );
-				}
-				else if ( ! recursive ) {
-					out.append( "{ ... }" );
-				}
-				else {
-					out.append( "{" + System.lineSeparator() );
-					print(ss, out, recursive, indentLevel+1);
-					addTabs(out, indentLevel);
-					out.append( "}" );
-				}
-			}
-			else if ( entry instanceof List<?> )
-			{
-				final List<?> list = (List<?>) entry;
-				if ( list.isEmpty() ) {
-					out.append( "[ ]" );
-				}
-				else if ( list.get(0) instanceof Stats ) {
-					if ( ! recursive ) {
-						out.append( "[ ... ]" );
-					}
-					else {
-						out.append( "[" + System.lineSeparator() );
-						for ( final Object o : list ) {
-							addTabs(out, indentLevel+1);
-							out.append( "{" + System.lineSeparator() );
-
-							print( (Stats) o, out, recursive, indentLevel+2 );
-
-							addTabs(out, indentLevel+1);
-							out.append( "}" + System.lineSeparator() );
-						}
-						addTabs(out, indentLevel);
-						out.append( "]" );
-					}
-				}
-				else {
-					out.append( list.toString() );
-				}
-			}
-			else if ( entry.getClass().isArray() )
-			{
-				out.append( "[ " + ArrayUtils.toString(entry) + " ]" );
-			}
-			else {
-				out.append( entry.toString() );
-			}
-			out.append( System.lineSeparator() );	
+			stats.put( entryName, asJson(entry, recursive) );
 		}
+
+		return stats;
 	}
 
+	/**
+	 * Converts the given object into a JSON value.
+	 *
+	 * @param s         - the {@link Stats} object to convert
+	 * @param recursive - {@code true} if nested {@link Stats} entries
+	 *                    should be printed recursively
+	 * @return a JSON representation of the given object
+	 */
+	protected static JsonValue asJson( final Object entry, final boolean recursive ) {
+		if ( entry == null ) {
+			return JsonNull.instance;
+		}
 
-    protected static void addTabs( final PrintStream out, final int indentLevel ) {
-        for (int i = 0; i < indentLevel; i++)
-            out.append("  ");
-    }
+		if ( entry instanceof Stats stats ) {
+			if ( recursive )
+				return statsAsJson(stats, recursive);
+			else
+				return new JsonString("...");
+		}
 
+		// List of objects
+		if ( entry instanceof List<?> list ) {
+			final JsonArray jsonArray = new JsonArray();
+			for ( final Object o : list ) {
+				jsonArray.add( asJson(o, recursive) );
+			}
+
+			return jsonArray;
+		}
+
+		// Array of objects
+		if ( entry instanceof Object[] array ) {
+			final JsonArray jsonArray = new JsonArray();
+			for ( final Object o : array ) {
+				jsonArray.add( asJson(o, recursive) );
+			}
+			return jsonArray;
+		}
+
+		// Array of primitives
+		if ( entry instanceof int[] a ) {
+			return asJson( ArrayUtils.toObject(a), recursive );
+		}
+		if ( entry instanceof long[] a ) {
+			return asJson( ArrayUtils.toObject(a), recursive );
+		}
+		if ( entry instanceof double[] a ) {
+			return asJson( ArrayUtils.toObject(a), recursive );
+		}
+		if ( entry instanceof float[] a ) {
+			return asJson( ArrayUtils.toObject(a), recursive );
+		}
+		if ( entry instanceof boolean[] a ) {
+			return asJson( ArrayUtils.toObject(a), recursive );
+		}
+
+		// JSON primitives
+		if ( entry instanceof Boolean b ) {
+			return new JsonBoolean(b);
+		}
+
+		if ( entry instanceof Integer i ) {
+			return JsonNumber.value(i);
+		}
+
+		if ( entry instanceof Long i ) {
+			return JsonNumber.value(i);
+		}
+
+		if ( entry instanceof Number num ) {
+			
+			if ( num instanceof Double d && (Double.isNaN(d) || Double.isInfinite(d)) ) {
+				return new JsonString( d.toString() );
+			}
+			if ( num instanceof Float f && (Float.isNaN(f) || Float.isInfinite(f)) ) {
+				return new JsonString( f.toString() );
+			}
+
+			return JsonNumber.value( num.doubleValue() );
+		}
+
+		// default to string
+		return new JsonString( entry.toString() );
+	}
 }

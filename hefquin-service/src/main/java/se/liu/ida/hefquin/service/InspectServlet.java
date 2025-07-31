@@ -21,7 +21,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
@@ -190,12 +190,12 @@ public class InspectServlet extends HttpServlet
 			                       ServletUtils.getExceptions(statsAndExceptions) );
 
 			if( statsAndExceptions != null ){
-				inspectionResults.put( "queryMetrics", StatsPrinterJSON.statsAsJson(statsAndExceptions) );
+				inspectionResults.put( "queryMetrics", StatsPrinter.statsAsJson(statsAndExceptions) );
 				inspectionResults.put( "logicalPlan", getLogicalPlan(statsAndExceptions) );
 				inspectionResults.put( "physicalPlan", getPhysicalPlan(statsAndExceptions) );
 				inspectionResults.put( "sourceAssignment", getSourceAssignment(statsAndExceptions) );
 				inspectionResults.put( "federationAccessStats",
-				                       StatsPrinterJSON.statsAsJson( engine.getFederationAccessStats() ) );
+				                       StatsPrinter.statsAsJson( engine.getFederationAccessStats() ) );
 			}
 		}
 		return inspectionResults;

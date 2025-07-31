@@ -186,6 +186,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		if ( statsAndExceptions != null ) {
 			if ( contains(argQueryProcStats) ) {
 				StatsPrinter.print( statsAndExceptions, System.err, true );
+				System.err.println();
 			}
 			if ( contains(argOnelineTimeStats) ) {
 				final long overallQueryProcessingTime = statsAndExceptions.getOverallQueryProcessingTime();
@@ -201,6 +202,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 		if ( contains(argFedAccessStats) ) {
 			final Stats fedAccessStats = e.getFederationAccessStats();
 			StatsPrinter.print( fedAccessStats, System.err, true );
+			System.err.println();
 		}
 	}
 
