@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.base.utils.Pair;
-import se.liu.ida.hefquin.base.utils.StatsPrinter;
+import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutablePlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -89,7 +89,7 @@ public class QueryProcessorImpl implements QueryProcessor
 		final QueryProcessingStatsAndExceptions s = new QueryProcessingStatsAndExceptionsImpl( t4-t1, t2-t1, t3-t2, t4-t3, qepAndStats.object2, execStats, exceptionsCaughtDuringExecution );
 
 		if ( ctxt.isExperimentRun() ) {
-			StatsPrinter.print( s, System.out, true );
+			StatsPrinterJSON.print( s, System.out, true );
 		}
 
 		return s;

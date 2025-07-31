@@ -7,7 +7,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.utils.StatsImpl;
-import se.liu.ida.hefquin.base.utils.StatsPrinter;
+import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
@@ -136,7 +136,7 @@ public abstract class PushBasedPlanThreadImplBase implements PushBasedPlanThread
 			try {
 				final StatsOfPushBasedPlanThread stats = getStats();
 				System.err.println( "--> The current runtime statistics of this thread are:");
-				StatsPrinter.print( stats, System.err, true ); // true=recursive
+				StatsPrinterJSON.print( stats, System.err, true ); // true=recursive
 			}
 			catch ( final Exception e ) {
 				System.err.println();
