@@ -15,7 +15,7 @@ import org.apache.jena.atlas.json.JsonNull;
 /**
  * A utility class for converting and printing {@link Stats} objects in JSON format.
  */
-public class StatsPrinterJSON
+public class StatsPrinter
 {
 	/**
 	 * Converts and prints the given {@link Stats} object as JSON to the specified {@link PrintStream}.

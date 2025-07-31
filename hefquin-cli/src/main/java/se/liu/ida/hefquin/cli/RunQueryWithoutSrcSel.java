@@ -13,7 +13,7 @@ import arq.cmdline.CmdARQ;
 import arq.cmdline.ModResultsOut;
 import arq.cmdline.ModTime;
 import se.liu.ida.hefquin.base.utils.Stats;
-import se.liu.ida.hefquin.base.utils.StatsPrinterJSON;
+import se.liu.ida.hefquin.base.utils.StatsPrinter;
 import se.liu.ida.hefquin.cli.modules.ModEngineConfig;
 import se.liu.ida.hefquin.cli.modules.ModFederation;
 import se.liu.ida.hefquin.cli.modules.ModPlanPrinting;
@@ -185,7 +185,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		if ( statsAndExceptions != null ) {
 			if ( contains(argQueryProcStats) ) {
-				StatsPrinterJSON.print( statsAndExceptions, System.err, true );
+				StatsPrinter.print( statsAndExceptions, System.err, true );
 				System.err.println();
 			}
 			if ( contains(argOnelineTimeStats) ) {
@@ -201,7 +201,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 
 		if ( contains(argFedAccessStats) ) {
 			final Stats fedAccessStats = e.getFederationAccessStats();
-			StatsPrinterJSON.print( fedAccessStats, System.err, true );
+			StatsPrinter.print( fedAccessStats, System.err, true );
 			System.err.println();
 		}
 	}
