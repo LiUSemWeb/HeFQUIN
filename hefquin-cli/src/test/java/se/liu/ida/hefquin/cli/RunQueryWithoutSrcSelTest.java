@@ -23,7 +23,7 @@ public class RunQueryWithoutSrcSelTest
 {
 	private static final String queryFile = "TestQuery.rq";
 	private static final String fedCatFile = "TestFedCat.ttl";
-	private static final String confDescrFile = "config/DefaultConfDescrExtended.ttl";
+	private static final String confDescrFile = "config/DefaultConfDescr.ttl";
 
 	@Test
 	public void runWithValidArgs() {
