@@ -37,7 +37,7 @@ public class HeFQUINEngineBuilder
 	private PhysicalPlanPrinter pplanPrinter = null;
 
 	private final int DEFAULT_THREAD_POOL_SIZE = 10;
-	private final String DEFAULT_CONF_DESCR_FILE = "DefaultConfDescr.ttl";
+	private final String DEFAULT_CONF_DESCR_FILE = "config/DefaultConfDescr.ttl";
 
 	/**
 	 * Sets the federation catalog to be used by the engine.

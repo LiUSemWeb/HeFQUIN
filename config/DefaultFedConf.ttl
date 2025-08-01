@@ -1,0 +1,24 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix fd:     <http://w3id.org/hefquin/feddesc#> .
+@prefix ex:     <http://example.org/> .
+
+ex:dbpediaSPARQL
+      a            fd:FederationMember ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <http://dbpedia.org/sparql> ] .
+
+ex:dbpediaTPF
+      a            fd:FederationMember ;
+      fd:interface [ a                         fd:TPFInterface ;
+                     fd:exampleFragmentAddress <http://fragments.dbpedia.org/2016-04/en> ] .
+
+ex:wikidataSPARQL
+      a            fd:FederationMember ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <https://query.wikidata.org/sparql> ] .
+
+ex:europaSPARQL
+      a            fd:FederationMember ;
+      fd:interface [ a                  fd:SPARQLEndpointInterface ;
+                     fd:endpointAddress <https://data.europa.eu/sparql> ] .

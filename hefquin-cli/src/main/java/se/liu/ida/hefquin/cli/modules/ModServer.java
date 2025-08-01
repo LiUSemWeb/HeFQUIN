@@ -24,9 +24,9 @@ public class ModServer extends ModBase
 
 		cmdLine.add( argPort, "--port", "Server port (default: 8080)" );
 		cmdLine.add( argConfDescr, "--confDescr",
-				"File with an RDF description of the configuration (default: DefaultEngineConf.ttl)" );
+				"File with an RDF description of the configuration (default: config/DefaultConfDescr.ttl)" );
 		cmdLine.add( argFedDescr, "--federationDescription",
-				"File with an RDF description of the federation (default: DefaultFederation.ttl)" );
+				"File with an RDF description of the federation (default: config/DefaultFedConf.ttl)" );
 	}
 
 	@Override
@@ -39,12 +39,12 @@ public class ModServer extends ModBase
 		if ( cmdLine.contains( argConfDescr ) ) {
 			confDescr = cmdLine.getValue( argConfDescr );
 		} else {
-			confDescr = "DefaultEngineConf.ttl";
+			confDescr = "config/DefaultConfDescr.ttl";
 		}
 		if ( cmdLine.contains( argFedDescr ) ) {
 			fedDescr = cmdLine.getValue( argFedDescr );
 		} else {
-			fedDescr = "DefaultFedConf.ttl";
+			fedDescr = "config/DefaultFedConf.ttl";
 		}
 	}
 

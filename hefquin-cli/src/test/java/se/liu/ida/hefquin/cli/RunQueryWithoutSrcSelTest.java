@@ -18,12 +18,12 @@ import org.junit.Test;
  * paths, rather than asserting full result correctness.
  */
 
-@Ignore("Disabled since it uses live web tests")
+//@Ignore("Disabled since it uses live web tests")
 public class RunQueryWithoutSrcSelTest
 {
 	private static final String queryFile = "TestQuery.rq";
 	private static final String fedCatFile = "TestFedCat.ttl";
-	private static final String confDescrFile = "TestEngineDescr.ttl";
+	private static final String confDescrFile = "config/DefaultConfDescr.ttl";
 
 	@Test
 	public void runWithValidArgs() {
