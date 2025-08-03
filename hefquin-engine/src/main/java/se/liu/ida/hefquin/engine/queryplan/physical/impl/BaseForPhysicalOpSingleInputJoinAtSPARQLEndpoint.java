@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -25,6 +26,7 @@ public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
 		final SPARQLGraphPattern gp;
 		final FederationMember fm;
@@ -45,7 +47,7 @@ public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 		}
 
 		if ( fm instanceof SPARQLEndpoint ep )
-			return createExecOp(gp, ep, useOuterJoin, collectExceptions, inputVars);
+			return createExecOp(gp, ep, useOuterJoin, collectExceptions, qpInfo, inputVars);
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}
@@ -54,5 +56,6 @@ public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 	                                                   SPARQLEndpoint sparqlEndpoint,
 	                                                   boolean useOuterJoinSemantics,
 	                                                   boolean collectExceptions,
+	                                                   QueryPlanningInfo qpInfo,
 	        	                                       ExpectedVariables... inputVars );
 }

@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
@@ -67,14 +68,20 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTER extends BaseForExecOpBindJoi
 	 *          collect exceptions (which is handled entirely by one of the
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
+	 *
+	 * @param qpInfo - the {@link QueryPlanningInfo} object that was
+	 *          populated for a physical plan whose root operator was
+	 *          the physical operator for which this executable operator
+	 *          was created
 	 */
 	public ExecOpBindJoinSPARQLwithVALUESorFILTER( final SPARQLGraphPattern query,
 	                                               final SPARQLEndpoint fm,
 	                                               final ExpectedVariables inputVars,
 	                                               final boolean useOuterJoinSemantics,
 	                                               final int batchSize,
-	                                               final boolean collectExceptions ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
+	                                               final boolean collectExceptions,
+	                                               final QueryPlanningInfo qpInfo ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}

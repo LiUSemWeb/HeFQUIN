@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpParallelMultiwayLeftJoin;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -126,10 +127,11 @@ public class PhysicalOpParallelMultiLeftJoin extends BaseForPhysicalOps implemen
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 1;
 
-		return new ExecOpParallelMultiwayLeftJoin( collectExceptions, inputVars[0], optionalParts );
+		return new ExecOpParallelMultiwayLeftJoin( collectExceptions, qpInfo, inputVars[0], optionalParts );
 	}
 
 	@Override

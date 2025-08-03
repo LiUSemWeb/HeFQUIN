@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -38,8 +39,9 @@ public class PhysicalOpGlobalToLocal extends BaseForPhysicalOps
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
-		return new ExecOpGlobalToLocal( lop.getVocabularyMapping(), collectExceptions );
+		return new ExecOpGlobalToLocal( lop.getVocabularyMapping(), collectExceptions, qpInfo );
 	}
 
 	@Override

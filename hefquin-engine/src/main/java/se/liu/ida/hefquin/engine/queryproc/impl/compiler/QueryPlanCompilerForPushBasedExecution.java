@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPl
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForNaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForNullaryOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedPlanThreadImplForUnaryOperator;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.ConnectorForAdditionalConsumer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.pushbased.PushBasedExecutablePlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
@@ -91,19 +92,25 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 		}
 
 		protected PushBasedPlanThread _createThreads( final PhysicalPlan qep,
-		                                     final LinkedList<PushBasedPlanThread> tasks,
-		                                     final ExecutionContext execCxt ) {
+		                                              final LinkedList<PushBasedPlanThread> tasks,
+		                                              final ExecutionContext execCxt ) {
+			final QueryPlanningInfo qpInfo;
+			if ( qep.hasQueryPlanningInfo() )
+				qpInfo = qep.getQueryPlanningInfo();
+			else
+				qpInfo = null;
+
 			final PhysicalOperator pop = qep.getRootOperator();
 			if ( pop instanceof NullaryPhysicalOp npop )
 			{
-				final NullaryExecutableOp execOp = npop.createExecOp(true);
+				final NullaryExecutableOp execOp = npop.createExecOp(true, qpInfo);
 				return createThread(execOp, execCxt);
 			}
 			else if ( pop instanceof UnaryPhysicalOp upop )
 			{
 				final PhysicalPlan subPlan = qep.getSubPlan(0);
 
-				final UnaryExecutableOp execOp = upop.createExecOp( true, subPlan.getExpectedVariables() );
+				final UnaryExecutableOp execOp = upop.createExecOp( true, qpInfo, subPlan.getExpectedVariables() );
 
 				createThreads(subPlan, tasks, execCxt);
 				final PushBasedPlanThread childTask = tasks.getFirst();
@@ -117,6 +124,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 
 				final BinaryExecutableOp execOp = bpop.createExecOp(
 						true,
+						qpInfo,
 						subPlan1.getExpectedVariables(),
 						subPlan2.getExpectedVariables() );
 
@@ -135,7 +143,7 @@ public class QueryPlanCompilerForPushBasedExecution extends QueryPlanCompilerBas
 					expVars[i] = qep.getSubPlan(i).getExpectedVariables();
 				}
 
-				final NaryExecutableOp execOp = npop.createExecOp(true, expVars);
+				final NaryExecutableOp execOp = npop.createExecOp(true, qpInfo, expVars);
 
 				final PushBasedPlanThread[] childTasks = new PushBasedPlanThread[ qep.numberOfSubPlans() ];
 				for ( int i = 0; i < childTasks.length; i++ ) {

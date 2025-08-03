@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
@@ -13,8 +14,11 @@ public abstract class BaseForExecOpRequest<ReqType extends DataRetrievalRequest,
 	protected final ReqType req;
 	protected final MemberType fm;
 
-	public BaseForExecOpRequest( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public BaseForExecOpRequest( final ReqType req,
+	                             final MemberType fm,
+	                             final boolean collectExceptions,
+	                             final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert req != null;
 		assert fm != null;

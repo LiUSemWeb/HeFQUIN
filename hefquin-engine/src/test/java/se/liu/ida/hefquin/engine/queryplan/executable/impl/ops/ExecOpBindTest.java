@@ -37,7 +37,7 @@ public class ExecOpBindTest
 
 		final Var v2 = Var.alloc("v2");
 		final Expr addOne = ExprUtils.parse("?v1 + 1");
-		final ExecOpBind op = new ExecOpBind(v2, addOne, false);
+		final ExecOpBind op = new ExecOpBind(v2, addOne, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -69,7 +69,7 @@ public class ExecOpBindTest
 
 		final Var v2 = Var.alloc("v2");
 		final Expr addOne = ExprUtils.parse("?v1 + 1");
-		final ExecOpBind op = new ExecOpBind(v2, addOne, false);
+		final ExecOpBind op = new ExecOpBind(v2, addOne, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -99,7 +99,7 @@ public class ExecOpBindTest
 
 		final Var v2 = Var.alloc("v2");
 		final Expr addOne = ExprUtils.parse("?v1 + 1"); //should fail for the URI
-		final ExecOpBind op = new ExecOpBind(v2, addOne, false);
+		final ExecOpBind op = new ExecOpBind(v2, addOne, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -130,7 +130,7 @@ public class ExecOpBindTest
 
 		final Var v2 = Var.alloc("v2");
 		final Expr addOne = ExprUtils.parse("?v1 + 1"); //should fail for the URI
-		final ExecOpBind op = new ExecOpBind(v2, addOne, false);
+		final ExecOpBind op = new ExecOpBind(v2, addOne, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -156,7 +156,7 @@ public class ExecOpBindTest
 		final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(v1, lit8);
 
 		final Expr addOne = ExprUtils.parse("?v1 + 1");
-		final ExecOpBind op = new ExecOpBind(v1, addOne, false);
+		final ExecOpBind op = new ExecOpBind(v1, addOne, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -178,7 +178,7 @@ public class ExecOpBindTest
 		veList.add( v2, ExprUtils.parse("?v1 + 1") );
 		veList.add( v3, ExprUtils.parse("?v1 - 1") );
 
-		final ExecOpBind op = new ExecOpBind(veList, false);
+		final ExecOpBind op = new ExecOpBind(veList, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -220,7 +220,7 @@ public class ExecOpBindTest
 		veList.add( v2, ExprUtils.parse("?v1 + 1") );
 		veList.add( v3, ExprUtils.parse("?v1 - 1") );
 
-		final ExecOpBind op = new ExecOpBind(veList, false);
+		final ExecOpBind op = new ExecOpBind(veList, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 

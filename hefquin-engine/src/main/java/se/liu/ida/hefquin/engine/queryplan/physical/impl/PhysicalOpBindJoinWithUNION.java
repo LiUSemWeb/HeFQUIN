@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithUNION;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -46,13 +47,15 @@ public class PhysicalOpBindJoinWithUNION extends BaseForPhysicalOpSingleInputJoi
 	                                       final SPARQLEndpoint sparqlEndpoint,
 	                                       final boolean useOuterJoinSemantics,
 	                                       final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
 		return new ExecOpBindJoinSPARQLwithUNION( pattern,
 		                                          sparqlEndpoint,
 		                                          inputVars[0],
 		                                          useOuterJoinSemantics,
 		                                          ExecOpBindJoinSPARQLwithUNION.DEFAULT_BATCH_SIZE,
-		                                          collectExceptions );
+		                                          collectExceptions,
+		                                          qpInfo );
 	}
 
 	@Override

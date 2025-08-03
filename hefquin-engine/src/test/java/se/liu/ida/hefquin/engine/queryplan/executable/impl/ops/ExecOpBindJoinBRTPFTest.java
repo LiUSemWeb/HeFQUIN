@@ -124,6 +124,7 @@ public class ExecOpBindJoinBRTPFTest extends TestsForTPAddAlgorithms<BRTPFServer
 		                                expectedVariables,
 		                                useOuterJoinSemantics,
 		                                ExecOpBindJoinBRTPF.DEFAULT_BATCH_SIZE,
-		                                false );
+		                                false,
+		                                null);
 	}
 }

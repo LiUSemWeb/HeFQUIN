@@ -5,14 +5,17 @@ import java.util.List;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpMultiwayUnion extends NaryExecutableOpBase
 {
 	private long numberOfOutputMappingsProduced = 0L;
 
-	public ExecOpMultiwayUnion( final int numberOfChildren, final boolean collectExceptions ) {
-		super(numberOfChildren, collectExceptions);
+	public ExecOpMultiwayUnion( final int numberOfChildren,
+	                            final boolean collectExceptions,
+	                            final QueryPlanningInfo qpInfo ) {
+		super(numberOfChildren, collectExceptions, qpInfo);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -19,8 +20,9 @@ public abstract class BaseForExecOpTriplePatternRequestWithTPF<MemberType extend
 {
 	public BaseForExecOpTriplePatternRequestWithTPF( final TriplePatternRequest req,
 	                                                 final MemberType fm,
-	                                                 final boolean collectExceptions ) {
-		super( req, fm, collectExceptions );
+	                                                 final boolean collectExceptions,
+	                                                 final QueryPlanningInfo qpInfo ) {
+		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

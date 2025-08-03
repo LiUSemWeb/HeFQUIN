@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
@@ -29,8 +30,9 @@ public class PhysicalOpMultiwayUnion extends BaseForPhysicalOps
 
 	@Override
 	public NaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                      final QueryPlanningInfo qpInfo,
 	                                      final ExpectedVariables... inputVars) {
-		return new ExecOpMultiwayUnion( inputVars.length, collectExceptions );
+		return new ExecOpMultiwayUnion( inputVars.length, collectExceptions, qpInfo );
 	}
 
 	@Override

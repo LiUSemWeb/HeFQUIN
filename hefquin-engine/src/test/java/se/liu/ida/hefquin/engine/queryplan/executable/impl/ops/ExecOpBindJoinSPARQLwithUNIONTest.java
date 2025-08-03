@@ -123,7 +123,8 @@ public class ExecOpBindJoinSPARQLwithUNIONTest extends TestsForTPAddAlgorithms<S
 		                                          expectedVariables,
 		                                          useOuterJoinSemantics,
 		                                          ExecOpBindJoinSPARQLwithUNION.DEFAULT_BATCH_SIZE,
-		                                          false );
+		                                          false,
+		                                          null );
 	}
 
 }

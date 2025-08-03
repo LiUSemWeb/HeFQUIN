@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.base.data.impl.SolutionMappingImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -30,8 +31,10 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 
 	protected final Worker worker;
 
-	public ExecOpBind( final VarExprList bindExpressions, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpBind( final VarExprList bindExpressions,
+	                   final boolean collectExceptions,
+	                   final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		if ( bindExpressions.size() == 1 ) {
 			final Var var = bindExpressions.getVars().get(0);
@@ -43,8 +46,11 @@ public class ExecOpBind extends UnaryExecutableOpBaseWithoutBlocking
 		}
 	}
 
-	public ExecOpBind( final Var var, final Expr expr, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpBind( final Var var,
+	                   final Expr expr,
+	                   final boolean collectExceptions,
+	                   final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert var != null;
 		assert expr != null;

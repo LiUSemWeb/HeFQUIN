@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -73,6 +74,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars )
 	{
 		final SPARQLGraphPattern gp;
@@ -111,11 +113,11 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 		}
 
 		if ( fm instanceof TPFServer tpf )
-			return new ExecOpIndexNestedLoopsJoinTPF( tp, tpf, useOuterJoin, collectExceptions );
+			return new ExecOpIndexNestedLoopsJoinTPF(tp, tpf, useOuterJoin, collectExceptions, qpInfo);
 		else if ( fm instanceof BRTPFServer brtpf )
-			return new ExecOpIndexNestedLoopsJoinBRTPF( tp, brtpf, useOuterJoin, collectExceptions );
+			return new ExecOpIndexNestedLoopsJoinBRTPF(tp, brtpf, useOuterJoin, collectExceptions, qpInfo);
 		else if ( fm instanceof SPARQLEndpoint ep )
-			return new ExecOpIndexNestedLoopsJoinSPARQL( gp, ep, useOuterJoin, collectExceptions );
+			return new ExecOpIndexNestedLoopsJoinSPARQL(gp, ep, useOuterJoin, collectExceptions, qpInfo);
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

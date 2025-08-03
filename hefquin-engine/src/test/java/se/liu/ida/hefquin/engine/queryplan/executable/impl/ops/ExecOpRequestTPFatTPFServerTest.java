@@ -69,7 +69,8 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				getDBpediaTPFServer(),
-				false );
+				false,
+				null );
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
@@ -99,7 +100,8 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest(),
-				false );
+				false,
+				null );
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		op.execute( sink, createExecContextForTests() );

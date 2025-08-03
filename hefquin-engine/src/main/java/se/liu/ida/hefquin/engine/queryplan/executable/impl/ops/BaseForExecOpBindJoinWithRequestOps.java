@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementS
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 
@@ -179,8 +180,9 @@ public abstract class BaseForExecOpBindJoinWithRequestOps<QueryType extends Quer
 	                                            final ExpectedVariables inputVars,
 	                                            final boolean useOuterJoinSemantics,
 	                                            final int batchSize,
-	                                            final boolean collectExceptions ) {
-		super(collectExceptions);
+	                                            final boolean collectExceptions,
+	                                            final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;

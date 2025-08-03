@@ -82,7 +82,7 @@ public class ExecOpHashJoinTest extends TestsForInnerJoinAlgorithms
 	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashJoin( inputVars[0], inputVars[1], false );
+		return new ExecOpHashJoin( inputVars[0], inputVars[1], false, null );
 	}
 
 }

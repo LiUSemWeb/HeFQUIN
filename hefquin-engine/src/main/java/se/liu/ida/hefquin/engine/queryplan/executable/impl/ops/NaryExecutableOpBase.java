@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -37,8 +38,9 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 	protected long[] timeAtCurrentProcStartXthInput;
 
 	public NaryExecutableOpBase( final int numberOfChildren,
-	                             final boolean collectExceptions ) {
-		super(collectExceptions);
+	                             final boolean collectExceptions,
+	                             final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		this.numberOfChildren = numberOfChildren;
 
@@ -193,6 +195,7 @@ public abstract class NaryExecutableOpBase extends BaseForExecOps implements Nar
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
 		s.put( "xthInputConsumed", xthInputConsumed );
 		s.put( "numberOfMappingsFromXthInputProcessed",  numberOfMappingsFromXthInputProcessed );
+		s.put( "queryPlanningInfo", qpInfo );
 		return s;
 	}
 

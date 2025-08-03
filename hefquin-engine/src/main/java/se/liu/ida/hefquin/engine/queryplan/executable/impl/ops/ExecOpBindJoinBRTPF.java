@@ -10,6 +10,7 @@ import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
@@ -65,14 +66,20 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	 *          collect exceptions (which is handled entirely by one of the
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
+	 *
+	 * @param qpInfo - the {@link QueryPlanningInfo} object that was
+	 *          populated for a physical plan whose root operator was
+	 *          the physical operator for which this executable operator
+	 *          was created
 	 */
 	public ExecOpBindJoinBRTPF( final TriplePattern tp,
 	                            final BRTPFServer fm,
 	                            final ExpectedVariables inputVars,
 	                            final boolean useOuterJoinSemantics,
 	                            final int batchSize,
-	                            final boolean collectExceptions ) {
-		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions );
+	                            final boolean collectExceptions,
+	                            final QueryPlanningInfo qpInfo ) {
+		super( tp, tp.getAllMentionedVariables(), fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo );
 	}
 
 	@Override
@@ -93,17 +100,17 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 			}
 
 			final TriplePatternRequest req = new TriplePatternRequestImpl(restrictedTP);
-			return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
+			return new ExecOpRequestTPFatBRTPFServer(req, fm, false, null);
 		}
 
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
-		return new ExecOpRequestBRTPF(req, fm, false);
+		return new ExecOpRequestBRTPF(req, fm, false, null);
 	}
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		final TriplePatternRequest req = new TriplePatternRequestImpl(query);
-		return new ExecOpRequestTPFatBRTPFServer(req, fm, false);
+		return new ExecOpRequestTPFatBRTPFServer(req, fm, false, null);
 	}
 
 }

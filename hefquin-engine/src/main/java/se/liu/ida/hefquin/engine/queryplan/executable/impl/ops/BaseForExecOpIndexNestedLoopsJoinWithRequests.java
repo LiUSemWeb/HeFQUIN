@@ -14,6 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
@@ -53,8 +54,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
 	                                                      final int batchSize,
-	                                                      final boolean collectExceptions ) {
-		super(batchSize, collectExceptions);
+	                                                      final boolean collectExceptions,
+	                                                      final QueryPlanningInfo qpInfo) {
+		super(batchSize, collectExceptions, qpInfo);
 
 		assert query != null;
 		assert fm != null;
@@ -65,8 +67,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithRequests<
 
 	public BaseForExecOpIndexNestedLoopsJoinWithRequests( final QueryType query,
 	                                                      final MemberType fm,
-	                                                      final boolean collectExceptions ) {
-		this(query, fm, DEFAULT_BATCH_SIZE, collectExceptions);
+	                                                      final boolean collectExceptions,
+	                                                      final QueryPlanningInfo qpInfo ) {
+		this(query, fm, DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
 	}
 
 	@Override

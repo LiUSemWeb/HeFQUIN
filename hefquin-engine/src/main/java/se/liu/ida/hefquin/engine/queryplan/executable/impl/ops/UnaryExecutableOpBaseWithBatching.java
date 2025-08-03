@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -30,8 +31,9 @@ public abstract class UnaryExecutableOpBaseWithBatching extends UnaryExecutableO
 	protected final List<SolutionMapping> collectedInputSolMaps;
 
 	public UnaryExecutableOpBaseWithBatching( final int batchSize,
-	                                          final boolean collectExceptions ) {
-		super(collectExceptions);
+	                                          final boolean collectExceptions,
+	                                          final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert batchSize > 0;
 
