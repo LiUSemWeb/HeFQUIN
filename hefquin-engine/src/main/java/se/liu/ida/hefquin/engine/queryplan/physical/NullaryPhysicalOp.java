@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
 /**
  * An interface for any type of {@link PhysicalOperator} whose algorithm
@@ -11,5 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 public interface NullaryPhysicalOp extends PhysicalOperator
 {
 	@Override
-	NullaryExecutableOp createExecOp( boolean collectExceptions, ExpectedVariables ... inputVars );
+	NullaryExecutableOp createExecOp( boolean collectExceptions,
+	                                  QueryPlanningInfo qpInfo,
+	                                  ExpectedVariables ... inputVars );
 }

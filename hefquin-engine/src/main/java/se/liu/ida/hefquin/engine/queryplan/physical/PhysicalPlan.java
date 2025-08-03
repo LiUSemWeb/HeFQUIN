@@ -37,7 +37,17 @@ public interface PhysicalPlan
 	/**
 	 * Returns an object that captures query-planning-related
 	 * information about this plan. This object is meant to be
-	 * requested and populated by the query planner. 
+	 * requested and populated by the query planner.
+	 * <p>
+	 * If this plan does not yet have a {@link QueryPlanningInfo}
+	 * object associated with it, then this function creates a new
+	 * (empty) one and returns that.
 	 */
 	QueryPlanningInfo getQueryPlanningInfo();
+
+	/**
+	 * Returns <code>true</code> if this plan already has a
+	 * {@link QueryPlanningInfo} object associated with it.
+	 */
+	boolean hasQueryPlanningInfo();
 }

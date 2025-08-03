@@ -14,6 +14,7 @@ import org.apache.jena.sparql.util.ExprUtils;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
@@ -22,8 +23,10 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 
 	protected final ExprList filterExpressions;
 
-	public ExecOpFilter( final ExprList filterExpressions, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpFilter( final ExprList filterExpressions,
+	                     final boolean collectExceptions,
+	                     final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert filterExpressions != null;
 		assert ! filterExpressions.isEmpty();
@@ -31,8 +34,10 @@ public class ExecOpFilter extends UnaryExecutableOpBaseWithoutBlocking
 		this.filterExpressions = filterExpressions;
 	}
 
-	public ExecOpFilter( final Expr filterExpression, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpFilter( final Expr filterExpression,
+	                     final boolean collectExceptions,
+	                     final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert filterExpression != null;
 

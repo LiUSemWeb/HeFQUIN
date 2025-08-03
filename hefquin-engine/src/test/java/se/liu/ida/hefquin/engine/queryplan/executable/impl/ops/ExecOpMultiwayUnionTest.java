@@ -49,8 +49,7 @@ public class ExecOpMultiwayUnionTest extends TestsForUnionAlgorithms
 
 	@Override
 	protected NaryExecutableOp createExecOpForTest() {
-		// TODO Auto-generated method stub
-		return new ExecOpMultiwayUnion(2, false);
+		return new ExecOpMultiwayUnion(2, false, null);
 	}
 
 }

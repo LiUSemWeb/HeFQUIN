@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.Query;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
@@ -16,8 +17,9 @@ public abstract class BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<Query
 {
 	public BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests( final QueryType query,
 	                                                             final MemberType fm,
-	                                                             final boolean collectExceptions ) {
-		super(query, fm, collectExceptions);
+	                                                             final boolean collectExceptions,
+	                                                             final QueryPlanningInfo qpInfo ) {
+		super(query, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.base.utils.Stats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.*;
@@ -53,8 +54,9 @@ public class ExecOpSymmetricHashJoin extends BinaryExecutableOpBase
 
     public ExecOpSymmetricHashJoin( final ExpectedVariables inputVars1,
                                     final ExpectedVariables inputVars2,
-                                    final boolean collectExceptions ) {
-        super(collectExceptions);
+                                    final boolean collectExceptions,
+                                    final QueryPlanningInfo qpInfo ) {
+        super(collectExceptions, qpInfo);
 
         // determine the certain join variables
         final Set<Var> certainJoinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars1, inputVars2);

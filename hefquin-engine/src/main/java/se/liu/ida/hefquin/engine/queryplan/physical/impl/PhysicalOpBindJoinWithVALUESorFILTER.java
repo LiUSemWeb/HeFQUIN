@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUESorFILTER;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -37,13 +38,15 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 	                                       final SPARQLEndpoint sparqlEndpoint,
 	                                       final boolean useOuterJoinSemantics,
 	                                       final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables... inputVars ) {
 		return new ExecOpBindJoinSPARQLwithVALUESorFILTER( pattern,
 		                                                   sparqlEndpoint,
 		                                                   inputVars[0],
 		                                                   useOuterJoinSemantics,
 		                                                   ExecOpBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
-		                                                   collectExceptions );
+		                                                   collectExceptions,
+		                                                   qpInfo );
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -33,8 +34,9 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 	private boolean executionConcluded = false;
 	private long numberOfInputMappingsProcessed = 0L;
 
-	public UnaryExecutableOpBase( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public UnaryExecutableOpBase( final boolean collectExceptions,
+	                              final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -156,6 +158,7 @@ public abstract class UnaryExecutableOpBase extends BaseForExecOps implements Un
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
 		s.put( "executionConcluded",                Boolean.valueOf(executionConcluded) );
 		s.put( "numberOfInputMappingsProcessed",    Long.valueOf(numberOfInputMappingsProcessed) );
+		s.put( "queryPlanningInfo",                 qpInfo );
 		return s;
 	}
 

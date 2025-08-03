@@ -82,7 +82,7 @@ public class ExecOpHashRJoinTest extends TestsForRightJoinAlgorithms
 	protected BinaryExecutableOp createExecOpForTest( final ExpectedVariables... inputVars ) {
 		assert inputVars.length == 2;
 
-		return new ExecOpHashRJoin( inputVars[0], inputVars[1], false );
+		return new ExecOpHashRJoin( inputVars[0], inputVars[1], false, null );
 	}
 
 }

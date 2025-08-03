@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -17,8 +18,9 @@ public class ExecOpRequestTPFatBRTPFServer extends BaseForExecOpTriplePatternReq
 {
 	public ExecOpRequestTPFatBRTPFServer( final TriplePatternRequest req,
 	                                      final BRTPFServer fm,
-	                                      final boolean collectExceptions ) {
-		super( req, fm, collectExceptions );
+	                                      final boolean collectExceptions,
+	                                      final QueryPlanningInfo qpInfo ) {
+		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

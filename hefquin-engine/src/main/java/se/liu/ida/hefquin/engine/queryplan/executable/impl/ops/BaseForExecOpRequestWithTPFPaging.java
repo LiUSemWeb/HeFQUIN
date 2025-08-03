@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
@@ -31,8 +32,11 @@ public abstract class BaseForExecOpRequestWithTPFPaging<
 	private int maxNumberOfMatchingTriplesPerPage = 0;
 	private int numberOfOutputMappingsProduced = 0;
 
-	public BaseForExecOpRequestWithTPFPaging( final ReqType req, final MemberType fm, final boolean collectExceptions ) {
-		super( req, fm, collectExceptions );
+	public BaseForExecOpRequestWithTPFPaging( final ReqType req,
+	                                          final MemberType fm,
+	                                          final boolean collectExceptions,
+	                                          final QueryPlanningInfo qpInfo ) {
+		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

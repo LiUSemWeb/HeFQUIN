@@ -243,7 +243,8 @@ public class ExecOpBindJoinSPARQLwithVALUESorFILTERTest extends TestsForTPAddAlg
 		                                                   expectedVariables,
 		                                                   useOuterJoinSemantics,
 		                                                   ExecOpBindJoinSPARQLwithVALUESorFILTER.DEFAULT_BATCH_SIZE,
-		                                                   false );
+		                                                   false,
+		                                                   null );
 	}
 
 }

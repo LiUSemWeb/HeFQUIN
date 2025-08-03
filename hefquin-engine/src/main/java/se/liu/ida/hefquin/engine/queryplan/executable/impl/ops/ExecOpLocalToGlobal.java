@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
@@ -17,8 +18,10 @@ public class ExecOpLocalToGlobal extends UnaryExecutableOpBaseWithoutBlocking
 
 	protected final VocabularyMapping vm;
 
-	public ExecOpLocalToGlobal( final VocabularyMapping vm, final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpLocalToGlobal( final VocabularyMapping vm,
+	                            final boolean collectExceptions,
+	                            final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 
 		assert vm != null;
 		this.vm = vm;

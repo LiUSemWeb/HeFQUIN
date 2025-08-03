@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
@@ -17,8 +18,9 @@ public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLo
 	public ExecOpIndexNestedLoopsJoinSPARQL( final SPARQLGraphPattern query,
 	                                         final SPARQLEndpoint fm,
 	                                         final boolean useOuterJoinSemantics,
-	                                         final boolean collectExceptions ) {
-		super( query, fm, collectExceptions );
+	                                         final boolean collectExceptions,
+	                                         final QueryPlanningInfo qpInfo ) {
+		super(query, fm, collectExceptions, qpInfo);
 
 		// TODO extend this implementation to support outer join semantics similar
 		// to how it is implemented in ExecOpGenericIndexNestedLoopsJoinWithRequestOps

@@ -28,6 +28,11 @@ public abstract class BaseForPhysicalPlan implements PhysicalPlan
 	}
 
 	@Override
+	public boolean hasQueryPlanningInfo() {
+		return info != null;
+	}
+
+	@Override
 	public QueryPlanningInfo getQueryPlanningInfo() {
 		if ( info == null )
 			info = new QueryPlanningInfo();

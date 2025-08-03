@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 import java.util.ArrayList;
@@ -25,8 +26,9 @@ public class ExecOpNaiveNestedLoopsJoin extends BinaryExecutableOpBase
 {
 	protected final List<SolutionMapping> inputLHS = new ArrayList<>();
 
-	public ExecOpNaiveNestedLoopsJoin( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public ExecOpNaiveNestedLoopsJoin( final boolean collectExceptions,
+	                                   final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override

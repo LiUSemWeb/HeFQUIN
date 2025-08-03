@@ -4,6 +4,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -56,6 +57,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 
 	@Override
 	public UnaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables ... inputVars )
 	{
 		final TriplePattern tp;
@@ -82,7 +84,8 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 			                                inputVars[0],
 			                                useOuterJoinSemantics,
 			                                ExecOpBindJoinBRTPF.DEFAULT_BATCH_SIZE,
-			                                collectExceptions );
+			                                collectExceptions,
+			                                qpInfo );
 		else
 			throw new IllegalArgumentException("Unsupported type of federation member: " + fm.getClass().getName() );
 	}

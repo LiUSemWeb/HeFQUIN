@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperatorStats;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 
 /**
@@ -26,8 +27,9 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 	protected long timeAtExecStart  = 0L;
 	protected long timeAtExecEnd    = 0L;
 
-	public NullaryExecutableOpBase( final boolean collectExceptions ) {
-		super(collectExceptions);
+	public NullaryExecutableOpBase( final boolean collectExceptions,
+	                                final QueryPlanningInfo qpInfo ) {
+		super(collectExceptions, qpInfo);
 	}
 
 	@Override
@@ -79,6 +81,7 @@ public abstract class NullaryExecutableOpBase extends BaseForExecOps implements 
 		final ExecutableOperatorStatsImpl s = new ExecutableOperatorStatsImpl(this);
 		s.put( "numberOfInvocations",  Integer.valueOf(numberOfInvocations) );
 		s.put( "overallExecTime",      Long.valueOf(timeAtExecEnd-timeAtExecStart) );
+		s.put( "queryPlanningInfo",    qpInfo );
 		return s;
 	}
 

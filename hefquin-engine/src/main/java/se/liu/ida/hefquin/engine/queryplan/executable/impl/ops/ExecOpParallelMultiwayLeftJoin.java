@@ -17,6 +17,7 @@ import se.liu.ida.hefquin.base.datastructures.impl.SolutionMappingsIndexNoJoinVa
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.*;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
@@ -39,15 +40,17 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 	protected final Set<List<Node>> bindingsForJoinVariable = new HashSet<>();
 
 	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final LogicalOpRequest<?,?> ... optionalParts ) {
-		this( collectExceptions, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
+		this( collectExceptions, qpInfo, inputVarsFromNonOptionalPart, Arrays.asList(optionalParts) );
 	}
 
 	public ExecOpParallelMultiwayLeftJoin( final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo,
 	                                       final ExpectedVariables inputVarsFromNonOptionalPart,
 	                                       final List<LogicalOpRequest<?,?>> optionalParts ) {
-		super(DEFAULT_BATCH_SIZE, collectExceptions);
+		super(DEFAULT_BATCH_SIZE, collectExceptions, qpInfo);
 
 		assert ! optionalParts.isEmpty();
 
@@ -217,7 +220,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 
 			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
 			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop);
-			this.execOp = addPop.createExecOp(false, inputVarsFromNonOptionalPart);
+			this.execOp = addPop.createExecOp(false, null, inputVarsFromNonOptionalPart);
 
 			this.mySink = new IntermediateResultElementSink() {
 				@Override

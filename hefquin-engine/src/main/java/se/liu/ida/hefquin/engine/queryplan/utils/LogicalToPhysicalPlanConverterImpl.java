@@ -162,7 +162,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			if ( keepMultiwayJoins ) {
 				final NaryPhysicalOp pop = new BaseForPhysicalOpMultiwayJoin(lop) {
 					@Override public void visit(PhysicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
-					@Override public NaryExecutableOp createExecOp(boolean collectExceptions, ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
+					@Override public NaryExecutableOp createExecOp(boolean collectExceptions, QueryPlanningInfo qpInfo, ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
 				};
 				return PhysicalPlanFactory.createPlan(pop, qpInfo, children);
 			}

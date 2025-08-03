@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -18,8 +19,9 @@ public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<Bindin
 {
 	public ExecOpRequestBRTPF( final BindingsRestrictedTriplePatternRequest req,
 	                           final BRTPFServer fm,
-	                           final boolean collectExceptions ) {
-		super( req, fm, collectExceptions );
+	                           final boolean collectExceptions,
+	                           final QueryPlanningInfo qpInfo ) {
+		super(req, fm, collectExceptions, qpInfo);
 	}
 
 	@Override

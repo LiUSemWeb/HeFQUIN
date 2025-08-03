@@ -12,7 +12,6 @@ import org.apache.jena.sparql.expr.E_LogicalOr;
 import org.apache.jena.sparql.expr.Expr;
 import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
-import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -23,6 +22,7 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
@@ -63,14 +63,20 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 	 *          collect exceptions (which is handled entirely by one of the
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
+	 *
+	 * @param qpInfo - the {@link QueryPlanningInfo} object that was
+	 *          populated for a physical plan whose root operator was
+	 *          the physical operator for which this executable operator
+	 *          was created
 	 */
 	public ExecOpBindJoinSPARQLwithFILTER( final SPARQLGraphPattern query,
 	                                       final SPARQLEndpoint fm,
 	                                       final ExpectedVariables inputVars,
 	                                       final boolean useOuterJoinSemantics,
 	                                       final int batchSize,
-	                                       final boolean collectExceptions ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
+	                                       final boolean collectExceptions,
+	                                       final QueryPlanningInfo qpInfo ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
@@ -94,7 +100,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
 		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestSPARQL(request, fm, false);
+		return new ExecOpRequestSPARQL(request, fm, false, null);
 	}
 
 	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {

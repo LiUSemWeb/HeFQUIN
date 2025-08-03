@@ -21,6 +21,7 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
@@ -60,14 +61,20 @@ public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 	 *          collect exceptions (which is handled entirely by one of the
 	 *          super classes); <code>false</code> if the operator should
 	 *          immediately throw every {@link ExecOpExecutionException}
+	 *
+	 * @param qpInfo - the {@link QueryPlanningInfo} object that was
+	 *          populated for a physical plan whose root operator was
+	 *          the physical operator for which this executable operator
+	 *          was created
 	 */
 	public ExecOpBindJoinSPARQLwithUNION( final SPARQLGraphPattern query,
 	                                      final SPARQLEndpoint fm,
 	                                      final ExpectedVariables inputVars,
 	                                      final boolean useOuterJoinSemantics,
 	                                      final int batchSize,
-	                                      final boolean collectExceptions ) {
-		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions);
+	                                      final boolean collectExceptions,
+	                                      final QueryPlanningInfo qpInfo ) {
+		super(query, fm, inputVars, useOuterJoinSemantics, batchSize, collectExceptions, qpInfo);
 
 		pattern = QueryPatternUtils.convertToJenaElement(query);
 	}
@@ -77,7 +84,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm, false);
+		return new ExecOpRequestSPARQL(request, fm, false, null);
 	}
 
 	protected Element createUnion( final Iterable<Binding> solMaps ) {

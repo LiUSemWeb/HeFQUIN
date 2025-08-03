@@ -107,7 +107,7 @@ public class ResultElementIterWithUnaryExecOpTest
 
 	protected static class UnaryExecutableOp2ForTest extends BaseForExecOps implements UnaryExecutableOp
 	{
-		public UnaryExecutableOp2ForTest() { super(false); }
+		public UnaryExecutableOp2ForTest() { super(false, null); }
 
 		@Override
 		public void process( final SolutionMapping inputSolMap,

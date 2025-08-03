@@ -41,7 +41,7 @@ public class ExecOpFilterTest
 		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(x, value9);
 		final SolutionMapping sol12 = SolutionMappingUtils.createSolutionMapping(x, value12);
 
-		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
+		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false, null);
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();
 		filterLessThan10.process(sol8, sink, ctx);
 		filterLessThan10.process(sol12, sink, ctx);  // 12 is processed before 9. This should not pass the filter. 9 should be after 8.
@@ -65,7 +65,7 @@ public class ExecOpFilterTest
 		final SolutionMapping sol8 = SolutionMappingUtils.createSolutionMapping(x, value8);
 		final SolutionMapping sol9 = SolutionMappingUtils.createSolutionMapping(y, value9);
 
-		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false);
+		final ExecOpFilter filterLessThan10 = new ExecOpFilter(lessThan10, false, null);
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();
 		filterLessThan10.process(sol8, sink, ctx);
 		filterLessThan10.process(sol9, sink, ctx);
@@ -93,7 +93,7 @@ public class ExecOpFilterTest
 		final SolutionMapping solNYE = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsEve);
 		final SolutionMapping solNYD = SolutionMappingUtils.createSolutionMapping(x, dateNewYearsDay);
 
-		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019, false);
+		final ExecOpFilter filterAfter2019 = new ExecOpFilter(after2019, false, null);
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();
 		filterAfter2019.process(sol2020, sink, ctx);
 		filterAfter2019.process(sol2019, sink, ctx);
@@ -124,7 +124,7 @@ public class ExecOpFilterTest
 		final SolutionMapping sm3 = SolutionMappingUtils.createSolutionMapping(x, value12);
 		final SolutionMapping sm4 = SolutionMappingUtils.createSolutionMapping(x, value15);
 
-		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();
@@ -168,7 +168,7 @@ public class ExecOpFilterTest
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, value12) );
 		input2.add( SolutionMappingUtils.createSolutionMapping(x, value15) );
 
-		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();
@@ -209,7 +209,7 @@ public class ExecOpFilterTest
 		input.add( SolutionMappingUtils.createSolutionMapping(x, value12) );
 		input.add( SolutionMappingUtils.createSolutionMapping(x, value15) );
 
-		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false);
+		final ExecOpFilter filterOp = new ExecOpFilter(exprs, false, null);
 
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();		
 		final ExecutionContext ctx = TestUtils.createExecContextForTests();

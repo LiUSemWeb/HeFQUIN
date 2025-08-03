@@ -124,7 +124,8 @@ public class ExecOpBindJoinSPARQLwithVALUESTest extends TestsForTPAddAlgorithms<
 		                                           expectedVariables,
 		                                           useOuterJoinSemantics,
 		                                           ExecOpBindJoinSPARQLwithVALUES.DEFAULT_BATCH_SIZE,
-		                                           false );
+		                                           false,
+		                                           null );
 	}
 
 }
