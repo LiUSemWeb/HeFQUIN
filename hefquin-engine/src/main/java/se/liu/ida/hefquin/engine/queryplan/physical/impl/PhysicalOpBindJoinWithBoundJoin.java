@@ -16,8 +16,16 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  * the FedX paper by Schwarte et al. 2011). The variable that is renamed can
  * be any non-join variable.
  *
+ *
  * <p>
- * <b>Semantics:</b> TODO
+ * <b>Semantics:</b> This operator implements the logical operators gpAdd
+ * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
+ * That is, for a given graph pattern, a federation  member, and an input
+ * sequence of solution mappings (produced by the sub-plan under this
+ * operator), the operator produces the solutions resulting from the join
+ * (inner or left outer) between the input solutions and the solutions of
+ * evaluating the given graph pattern over the data of the federation
+ * member.
  * </p>
  *
  * <p>
