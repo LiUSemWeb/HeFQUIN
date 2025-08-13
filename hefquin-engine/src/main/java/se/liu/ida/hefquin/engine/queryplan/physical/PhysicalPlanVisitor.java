@@ -11,6 +11,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpBindJoinWithUNION op );
 	void visit( PhysicalOpBindJoinWithFILTER op );
 	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
+    void visit( PhysicalOpBindJoinWithBoundJoin op );
 	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
 

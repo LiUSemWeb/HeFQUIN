@@ -155,6 +155,20 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
+		public void visit( final PhysicalOpBindJoinWithBoundJoin op ) {
+			out.append( indentLevelString + "bound join-based bind join (" + op.getID() + ") " );
+			out.append( System.lineSeparator() );
+			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
+			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
+		}
+
+		@Override
 		public void visit( final PhysicalOpFilter op ) {
 			final LogicalOpFilter lop = (LogicalOpFilter) op.getLogicalOperator();
 

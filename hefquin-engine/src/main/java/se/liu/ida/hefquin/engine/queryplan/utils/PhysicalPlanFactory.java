@@ -221,6 +221,15 @@ public class PhysicalPlanFactory
 	}
 
 	/**
+	 * Creates a plan with a bound join-based bind join.
+	 */
+	public static PhysicalPlan createPlanWithBindJoinBoundJoin( final LogicalOpGPAdd lop,
+	                                                            final PhysicalPlan subplan ) {
+		final UnaryPhysicalOp pop = new PhysicalOpBindJoinWithBoundJoin(lop);
+		return createPlan(pop, subplan);
+	}
+
+	/**
 	 * Creates a physical plan in which the root operator is the
 	 * default physical operator for the given logical operator,
 	 * as per {@link LogicalToPhysicalOpConverter}. The given
@@ -576,6 +585,7 @@ public class PhysicalPlanFactory
 				plans.add( createPlanWithBindJoinUNION(gpAdd, subplan) );
 				//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
 				plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
+				plans.add( createPlanWithBindJoinBoundJoin(gpAdd, subplan) );
 			}
 
 			if ( fm instanceof BRTPFServer ) {
