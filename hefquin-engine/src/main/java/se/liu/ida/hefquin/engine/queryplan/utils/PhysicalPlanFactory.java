@@ -584,7 +584,7 @@ public class PhysicalPlanFactory
 				plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION(gpAdd, subplan) );
 				//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );
-				//plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
+				plans.add( createPlanWithBindJoinVALUESorFILTER(gpAdd, subplan) );
 				plans.add( createPlanWithBindJoinBoundJoin(gpAdd, subplan) );
 			}
 
