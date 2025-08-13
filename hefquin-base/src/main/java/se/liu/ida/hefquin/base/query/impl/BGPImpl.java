@@ -203,17 +203,17 @@ public class BGPImpl implements BGP
 	public BGP applySolMapToGraphPattern( final Binding sm )
 			throws VariableByBlankNodeSubstitutionException
 	{
-		final Set<TriplePattern> tps = new HashSet<>();
+		final Set<TriplePattern> tps2 = new HashSet<>();
 		boolean unchanged = true;
 
 		for ( final TriplePattern tp : tps ) {
 			final TriplePattern tp2 = tp.applySolMapToGraphPattern(sm);
-			tps.add(tp2);
+			tps2.add(tp2);
 
 			if ( tp != tp2 ) unchanged = false;
 		}
 
-		return unchanged ? this : new BGPImpl(tps);
+		return unchanged ? this : new BGPImpl(tps2);
 	}
 
 	@Override
