@@ -59,7 +59,7 @@ public class LogicalToPhysicalOpConverter
 		final FederationMember fm = lop.getFederationMember();
 
 		if (      fm instanceof SPARQLEndpoint ) {
-			return new PhysicalOpBindJoinWithVALUESorFILTER(lop);
+			return new PhysicalOpBindJoinWithBoundJoin(lop);
 		}
 		else if ( fm instanceof TPFServer && lop.containsTriplePatternOnly() ) {
 			return new PhysicalOpIndexNestedLoopsJoin(lop);
@@ -75,7 +75,7 @@ public class LogicalToPhysicalOpConverter
 		final FederationMember fm = lop.getFederationMember();
 
 		if (      fm instanceof SPARQLEndpoint ) {
-			return new PhysicalOpBindJoinWithVALUESorFILTER(lop);
+			return new PhysicalOpBindJoinWithBoundJoin(lop);
 		}
 		else if ( fm instanceof TPFServer && lop.containsTriplePatternOnly() ) {
 			return new PhysicalOpIndexNestedLoopsJoin(lop);
