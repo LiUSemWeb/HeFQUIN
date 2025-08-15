@@ -70,6 +70,9 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 		// If the given plan does not have any subplans, there is nothing to do.
 		if ( inputPlan.numberOfSubPlans() == 0 ) return inputPlan;
 
+		// If the given plan does not have any LogicalOpJoin or LogicalOpMultiwayJoin, no need to do anything.
+		if( ! containsJoinOp(inputPlan) ) return inputPlan;
+
 		// As a first step, we make sure that all subplans within the given
 		// plan are annotated with their respective cardinality estimates.
 		cardEst.addCardinalities(inputPlan);
@@ -299,5 +302,37 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 	protected abstract int estimateJoinCardinality( List<LogicalPlan> selectedPlans,
 	                                                int joinCardOfSelectedPlans,
 	                                                LogicalPlan nextCandidate );
+
+	/**
+	 * Recursively checks whether the given logical plan contains any join
+	 * operators (LogicalOpJoin or LogicalOpMultiwayJoin).
+	 *
+	 * <p>
+	 * This method inspects the root operator of the given plan and, if it is
+	 * neither a {@link LogicalOpJoin} nor a {@link LogicalOpMultiwayJoin}, it
+	 * traverses all subplans to perform the same check.
+	 * </p>
+	 *
+	 * @param logicalPlan the logical plan to inspect
+	 * @return {@code true} if the plan contains at least one {@link LogicalOpJoin}
+	 *         or {@link LogicalOpMultiwayJoin} operator, {@code false} otherwise
+	 */
+	protected static boolean containsJoinOp( final LogicalPlan logicalPlan ) {
+		final LogicalOperator op = logicalPlan.getRootOperator();
+
+        // Check if this op is a join
+        if ( op instanceof LogicalOpJoin || op instanceof LogicalOpMultiwayJoin ) {
+            return true;
+        }
+
+        // Recursively check subplans
+        final int numChildren = logicalPlan.numberOfSubPlans();
+		for ( int i = 0; i < numChildren; i++ ) {
+            if ( containsJoinOp( logicalPlan.getSubPlan(i) ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
