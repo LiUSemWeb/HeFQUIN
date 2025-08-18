@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.engine.queryproc.impl;
+package se.liu.ida.hefquin.engine.queryproc.impl.cardinality;
 
 import java.util.ArrayList;
 import java.util.List;
