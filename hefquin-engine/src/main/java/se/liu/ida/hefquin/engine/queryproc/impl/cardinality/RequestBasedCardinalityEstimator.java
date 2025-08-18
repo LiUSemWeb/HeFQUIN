@@ -191,23 +191,6 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 		}
 	}
 
-	/**
-	 * Assumes that all nullary subplans within the given plan are
-	 * already annotated with a cardinality estimate.
-	 */
-	protected void addCardinality( final LogicalPlan plan ) {
-		final QueryPlanningInfo qpInfo = plan.getQueryPlanningInfo();
-		if ( qpInfo.getProperty(CARDINALITY) != null ) {
-			return;
-		}
-
-		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
-			addCardinality( plan.getSubPlan(i) );
-		}
-
-		LogicalPlanVisitor v = null;
-		plan.getRootOperator().visit(v);
-	}
 
 	protected static class CardinalityEstimationWorker implements LogicalPlanVisitor {
 
