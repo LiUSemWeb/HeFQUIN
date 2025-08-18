@@ -1,12 +1,9 @@
-package se.liu.ida.hefquin.engine.queryplan.physical.impl;
+package se.liu.ida.hefquin.engine.queryplan.info.impl;
 
+import se.liu.ida.hefquin.engine.queryplan.info.GenericPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
-/**
- * A base class for implementations of {@link PhysicalPlan}.
- */
-public abstract class BaseForPhysicalPlan implements PhysicalPlan
+public abstract class GenericPlanImpl implements GenericPlan
 {
 	// to be created only when requested, or provided via the constructor
 	private QueryPlanningInfo info;
@@ -18,12 +15,12 @@ public abstract class BaseForPhysicalPlan implements PhysicalPlan
 	 * do not create multiple plans with the same {@link QueryPlanningInfo}
 	 * object; instead, make copies of such an object if needed.
 	 */
-	protected BaseForPhysicalPlan( final QueryPlanningInfo qpInfo ) {
+	protected GenericPlanImpl( final QueryPlanningInfo qpInfo ) {
 		assert qpInfo != null;
 		info = qpInfo;
 	}
 
-	protected BaseForPhysicalPlan() {
+	protected GenericPlanImpl() {
 		info = null;
 	}
 
@@ -39,4 +36,5 @@ public abstract class BaseForPhysicalPlan implements PhysicalPlan
 
 		return info;
 	}
+
 }

@@ -3,11 +3,12 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.impl.GenericPlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanWithBinaryRoot;
 
-public class LogicalPlanWithBinaryRootImpl extends BaseForLogicalPlan
+public class LogicalPlanWithBinaryRootImpl extends GenericPlanImpl
                                            implements LogicalPlanWithBinaryRoot
 {
 	private final BinaryLogicalOp rootOp;

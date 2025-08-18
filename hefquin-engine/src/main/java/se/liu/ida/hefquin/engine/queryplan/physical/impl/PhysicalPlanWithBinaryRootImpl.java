@@ -4,12 +4,13 @@ import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.info.impl.GenericPlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithBinaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithBinaryRootImpl extends BaseForPhysicalPlan
+public class PhysicalPlanWithBinaryRootImpl extends GenericPlanImpl
                                             implements PhysicalPlanWithBinaryRoot
 {
 	private final BinaryPhysicalOp rootOp;
