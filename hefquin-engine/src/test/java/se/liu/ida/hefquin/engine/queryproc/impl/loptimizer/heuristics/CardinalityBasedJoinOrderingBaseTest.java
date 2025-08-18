@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNullaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
 import se.liu.ida.hefquin.federation.TPFServer;
@@ -250,6 +251,11 @@ public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 					}
 				}
 			}
+		}
+
+		@Override
+		public void addCardinalities( final PhysicalPlan ... plans ) {
+			throw new UnsupportedOperationException();
 		}
 	}
 
