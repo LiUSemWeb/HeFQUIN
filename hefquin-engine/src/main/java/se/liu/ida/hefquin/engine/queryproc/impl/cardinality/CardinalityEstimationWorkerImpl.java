@@ -4,6 +4,7 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MAX_CARDINALITY;
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MIN_CARDINALITY;
 
+import se.liu.ida.hefquin.engine.queryplan.info.GenericPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
@@ -22,17 +23,23 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWorker,
                                                         LogicalPlanVisitor
 {
-	protected LogicalPlan currentSubPlan = null;
+	protected GenericPlan currentSubPlan = null;
 
-	/**
-	 * Assumes that all nullary subplans within the given plans are
-	 * already annotated with a cardinality estimate.
-	 */
 	public void addCardinalities( final LogicalPlan ... plans ) {
+		// Determine the cardinality estimates for the given plans
+		// recursively (bottom up).
+		for ( int i = 0; i < plans.length; i++ ) {
+			addCardinality( plans[i] );
+		}
+	}
+
+	public void addCardinalities( final PhysicalPlan ... plans ) {
 		// Determine the cardinality estimates for the given plans
 		// recursively (bottom up).
 		for ( int i = 0; i < plans.length; i++ ) {
@@ -56,6 +63,25 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 
 		currentSubPlan = plan;
 		plan.getRootOperator().visit(this);
+	}
+
+	/**
+	 * Assumes that all nullary subplans within the given plan are
+	 * already annotated with a cardinality estimate.
+	 */
+	protected void addCardinality( final PhysicalPlan plan ) {
+		final QueryPlanningInfo qpInfo = plan.getQueryPlanningInfo();
+		if ( qpInfo.getProperty(CARDINALITY) != null ) {
+			return;
+		}
+
+		for ( int i = 0; i < plan.numberOfSubPlans(); i++ ) {
+			addCardinality( plan.getSubPlan(i) );
+		}
+
+		currentSubPlan = plan;
+		final PhysicalOperatorForLogicalOperator pRoot = (PhysicalOperatorForLogicalOperator) plan.getRootOperator();
+		pRoot.getLogicalOperator().visit(this);
 	}
 
 	@Override
