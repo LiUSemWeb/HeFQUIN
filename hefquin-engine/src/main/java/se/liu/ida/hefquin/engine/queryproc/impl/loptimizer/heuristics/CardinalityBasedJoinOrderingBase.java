@@ -320,19 +320,18 @@ public abstract class CardinalityBasedJoinOrderingBase implements HeuristicForLo
 	protected static boolean containsJoinOp( final LogicalPlan logicalPlan ) {
 		final LogicalOperator op = logicalPlan.getRootOperator();
 
-        // Check if this op is a join
-        if ( op instanceof LogicalOpJoin || op instanceof LogicalOpMultiwayJoin ) {
-            return true;
-        }
+		// Check if this op is a join
+		if ( op instanceof LogicalOpJoin || op instanceof LogicalOpMultiwayJoin ) {
+			return true;
+		}
 
-        // Recursively check subplans
-        final int numChildren = logicalPlan.numberOfSubPlans();
+		// Recursively check subplans
+		final int numChildren = logicalPlan.numberOfSubPlans();
 		for ( int i = 0; i < numChildren; i++ ) {
-            if ( containsJoinOp( logicalPlan.getSubPlan(i) ) ) {
-                return true;
-            }
-        }
-        return false;
+			if ( containsJoinOp( logicalPlan.getSubPlan(i) ) ) {
+				return true;
+			}
+		}
+		return false;
     }
-
 }
