@@ -38,8 +38,6 @@ _:bListOfHeuristics
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.FilterPushDown" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.MergeRequests" ]
-        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.GreedyBasedReordering" ;
-          ec:constructorArguments (_:bFormulaForSelectivity) ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.ApplyVocabularyMappings" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.CardinalityBasedJoinOrderingWithRequests" ;
           ec:constructorArguments (ec:value:QueryProcContext) ]
@@ -50,12 +48,6 @@ _:bListOfHeuristics
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.PullUpLtgOverUnion" ]
         [ ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.RemovePairsOfG2lAndL2g" ]
     ) .
-
-_:bFormulaForSelectivity
-    ec:argumentTypeName
-        "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FormulaForComputingSelectivity" ;
-    ec:javaClassName
-        "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.JoinAwareWeightedUnboundVariableCount" .
 
 _:bPhysicalOptimizer rdf:type ec:PhysicalOptimizer ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" ;
