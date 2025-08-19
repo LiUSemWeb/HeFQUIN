@@ -2,9 +2,9 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import java.util.NoSuchElementException;
 
-import se.liu.ida.hefquin.engine.queryplan.info.GenericPlan;
+import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 
-public interface PhysicalPlan extends GenericPlan
+public interface PhysicalPlan extends QueryPlan
 {
 	/**
 	 * Returns the root operator of this plan.

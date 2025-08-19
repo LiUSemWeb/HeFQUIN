@@ -1,14 +1,22 @@
-package se.liu.ida.hefquin.engine.queryplan.info;
+package se.liu.ida.hefquin.engine.queryplan.base;
 
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 /**
- * This interface captures functionality that is common to both every
- * logical plan and every physical plan.
+ * This interface captures functionality that is common both to logical plans
+ * and to physical plans.
+ * <p>
+ * This interface serves purely an abstract purpose in the sense that it is
+ * not meant to be instantiated directly. Instead, {@link LogicalPlan} and
+ * {@link PhysicalPlan}) are the relevant specializations of this interfaces
+ * that are meant to be used throughout the code base.
  */
-public interface GenericPlan
+public interface QueryPlan
 {
 	/**
 	 * Returns the variables that can be expected in the
@@ -30,7 +38,7 @@ public interface GenericPlan
 	 * If the plan has fewer sub-plans (or no sub-plans at all),
 	 * then a {@link NoSuchElementException} will be thrown.
 	 */
-	GenericPlan getSubPlan( int i ) throws NoSuchElementException;
+	QueryPlan getSubPlan( int i ) throws NoSuchElementException;
 
 	/**
 	 * Returns an object that captures query-planning-related

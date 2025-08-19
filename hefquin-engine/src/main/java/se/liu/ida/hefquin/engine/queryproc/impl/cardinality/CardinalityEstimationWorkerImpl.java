@@ -4,7 +4,7 @@ import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINA
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MAX_CARDINALITY;
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.MIN_CARDINALITY;
 
-import se.liu.ida.hefquin.engine.queryplan.info.GenericPlan;
+import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.Quality;
@@ -29,7 +29,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWorker,
                                                         LogicalPlanVisitor
 {
-	protected GenericPlan currentSubPlan = null;
+	protected QueryPlan currentSubPlan = null;
 
 	public void addCardinalities( final LogicalPlan ... plans ) {
 		// Determine the cardinality estimates for the given plans

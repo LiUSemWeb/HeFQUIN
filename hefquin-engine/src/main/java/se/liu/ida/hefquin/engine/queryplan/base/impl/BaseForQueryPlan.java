@@ -1,9 +1,15 @@
-package se.liu.ida.hefquin.engine.queryplan.info.impl;
+package se.liu.ida.hefquin.engine.queryplan.base.impl;
 
-import se.liu.ida.hefquin.engine.queryplan.info.GenericPlan;
+import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
-public abstract class GenericPlanImpl implements GenericPlan
+/**
+ * This is an abstract base class for classes that implement concrete
+ * specializations (sub-interfaces) of the {@link QueryPlan} interface.
+ * This base class implements the {@link QueryPlanningInfo}-related methods
+ * of {@link QueryPlan}.
+ */
+public abstract class BaseForQueryPlan implements QueryPlan
 {
 	// to be created only when requested, or provided via the constructor
 	private QueryPlanningInfo info;
@@ -15,12 +21,12 @@ public abstract class GenericPlanImpl implements GenericPlan
 	 * do not create multiple plans with the same {@link QueryPlanningInfo}
 	 * object; instead, make copies of such an object if needed.
 	 */
-	protected GenericPlanImpl( final QueryPlanningInfo qpInfo ) {
+	protected BaseForQueryPlan( final QueryPlanningInfo qpInfo ) {
 		assert qpInfo != null;
 		info = qpInfo;
 	}
 
-	protected GenericPlanImpl() {
+	protected BaseForQueryPlan() {
 		info = null;
 	}
 

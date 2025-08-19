@@ -3,14 +3,14 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlan;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryplan.info.impl.GenericPlanImpl;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 
-public class PhysicalPlanWithNullaryRootImpl extends GenericPlanImpl
+public class PhysicalPlanWithNullaryRootImpl extends BaseForQueryPlan
                                              implements PhysicalPlanWithNullaryRoot
 {
 	private final NullaryPhysicalOp rootOp;
