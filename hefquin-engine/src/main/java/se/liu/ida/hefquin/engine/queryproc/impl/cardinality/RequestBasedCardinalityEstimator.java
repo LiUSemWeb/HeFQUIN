@@ -165,8 +165,9 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 				maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
 			}
 			else {
+				final int cardValueOfResponse;
 				try {
-					cardValue = resps[i].getCardinality();
+					cardValueOfResponse = resps[i].getCardinality();
 				}
 				catch ( final Exception e ) {
 					// We should not get an exception here because we are
@@ -174,17 +175,32 @@ public class RequestBasedCardinalityEstimator implements CardinalityEstimator
 					throw new IllegalStateException();
 				}
 
-				if ( reqOp.getFederationMember() instanceof SPARQLEndpoint ) {
-					cardQuality = Quality.ACCURATE;
+				// Check that the cardinality value retrieved via the
+				// request is valid, where we consider any non-negative
+				// integer a valid value.
+				if ( cardValueOfResponse < 0 ) {
+					// This is the case in which the value is invalid.
+					cardValue = Integer.MAX_VALUE;
+					cardQuality = Quality.PURE_GUESS;
+					minCardValue = 0;
+					minCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
+					maxCardValue = Integer.MAX_VALUE;
+					maxCardQuality = Quality.MIN_OR_MAX_POSSIBLE;
 				}
 				else {
-					cardQuality = Quality.DIRECT_ESTIMATE;
-				}
+					// This is the case in which the value is valid.
+					cardValue = cardValueOfResponse;
+					minCardValue = cardValueOfResponse;
+					maxCardValue = cardValueOfResponse;
 
-				minCardValue = cardValue;
-				maxCardValue = cardValue;
-				minCardQuality = cardQuality;
-				maxCardQuality = cardQuality;
+					if ( reqOp.getFederationMember() instanceof SPARQLEndpoint )
+						cardQuality = Quality.ACCURATE;
+					else
+						cardQuality = Quality.DIRECT_ESTIMATE;
+
+					minCardQuality = cardQuality;
+					maxCardQuality = cardQuality;
+				}
 			}
 
 			infoObj.addProperty( QueryPlanProperty.cardinality(cardValue,
