@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -15,7 +15,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpBinaryUnion} class.
  */
-public class PhysicalOpBinaryUnion extends BaseForPhysicalOps implements BinaryPhysicalOpForLogicalOp
+public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
+                                   implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpUnion lop;
 
@@ -35,12 +36,7 @@ public class PhysicalOpBinaryUnion extends BaseForPhysicalOps implements BinaryP
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return lop.getExpectedVariables(inputVars);
-	}
-
-	@Override
-	public void visit(final PhysicalPlanVisitor visitor) {
+	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
 	}
 
@@ -52,7 +48,7 @@ public class PhysicalOpBinaryUnion extends BaseForPhysicalOps implements BinaryP
 	}
 
 	@Override
-	public BinaryLogicalOp getLogicalOperator() {
+	public LogicalOpUnion getLogicalOperator() {
 		return lop;
 	}
 

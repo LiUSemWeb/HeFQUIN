@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
@@ -36,7 +37,8 @@ import java.util.Objects;
  * </ul>
  */
 public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember> 
-                       extends BaseForPhysicalOps implements NullaryPhysicalOpForLogicalOp
+                       extends BaseForQueryPlanOperator
+                       implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
 
@@ -80,11 +82,6 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		}
 		else
 			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
-	}
-
-	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override

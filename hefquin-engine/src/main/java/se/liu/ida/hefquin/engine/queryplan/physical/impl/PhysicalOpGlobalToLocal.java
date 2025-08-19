@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
@@ -17,18 +17,13 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
  * The actual algorithm of this operator is implemented in the
  * {@link ExecOpGlobalToLocal} class.
  */
-public class PhysicalOpGlobalToLocal extends BaseForPhysicalOps
+public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
                                      implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpGlobalToLocal lop;
 
 	public PhysicalOpGlobalToLocal( final LogicalOpGlobalToLocal lop ) {
 		this.lop = lop;
-	}
-
-	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return lop.getExpectedVariables(inputVars);
 	}
 
 	@Override
@@ -45,7 +40,7 @@ public class PhysicalOpGlobalToLocal extends BaseForPhysicalOps
 	}
 
 	@Override
-	public UnaryLogicalOp getLogicalOperator() {
+	public LogicalOpGlobalToLocal getLogicalOperator() {
 		return this.lop;
 	}
 

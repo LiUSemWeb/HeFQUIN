@@ -8,8 +8,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 
 /**
- * This interface captures functionality that is common both to logical plans
- * and to physical plans.
+ * This interface captures aspects that are common both to logical plans and
+ * to physical plans. That is, every such plan has a root operator and child
+ * plans that produce the input to the root operator. Moreover, every plan
+ * may be associated with query-planning-related information.
  * <p>
  * This interface serves purely an abstract purpose in the sense that it is
  * not meant to be instantiated directly. Instead, {@link LogicalPlan} and
@@ -19,10 +21,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 public interface QueryPlan
 {
 	/**
-	 * Returns the variables that can be expected in the
-	 * solution mappings produced by this plan.
+	 * Returns the root operator of this plan.
 	 */
-	ExpectedVariables getExpectedVariables();
+	QueryPlanOperator getRootOperator();
 
 	/**
 	 * Returns the number of sub-plans that this plan has
@@ -39,6 +40,12 @@ public interface QueryPlan
 	 * then a {@link NoSuchElementException} will be thrown.
 	 */
 	QueryPlan getSubPlan( int i ) throws NoSuchElementException;
+
+	/**
+	 * Returns the variables that can be expected in the
+	 * solution mappings produced by this plan.
+	 */
+	ExpectedVariables getExpectedVariables();
 
 	/**
 	 * Returns an object that captures query-planning-related

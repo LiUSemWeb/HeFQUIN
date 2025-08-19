@@ -6,9 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.base.QueryPlan;
 
 public interface LogicalPlan extends QueryPlan
 {
-	/**
-	 * Returns the root operator of this plan.
-	 */
+	@Override
 	LogicalOperator getRootOperator();
 
 	@Override

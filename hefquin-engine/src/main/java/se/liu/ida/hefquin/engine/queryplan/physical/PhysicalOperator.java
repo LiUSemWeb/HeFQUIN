@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.QueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
@@ -18,7 +19,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
  * in a form that can be plugged directly into the query execution framework
  * of HeFQUIN.
  */
-public interface PhysicalOperator
+public interface PhysicalOperator extends QueryPlanOperator
 {
 	/**
 	 * Creates and returns the executable operator to be used for

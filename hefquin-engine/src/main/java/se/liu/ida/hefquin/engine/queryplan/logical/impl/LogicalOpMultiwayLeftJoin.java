@@ -7,6 +7,7 @@ import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 
@@ -15,7 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
  * Hence, it is not to be confused with nested OPTIONAL clauses (which would,
  * instead, be captured as multiple nested multiway left joins).
  */
-public class LogicalOpMultiwayLeftJoin extends LogicalOperatorBase implements NaryLogicalOp
+public class LogicalOpMultiwayLeftJoin extends BaseForQueryPlanOperator implements NaryLogicalOp
 {
 	protected static LogicalOpMultiwayLeftJoin singleton = new LogicalOpMultiwayLeftJoin();
 

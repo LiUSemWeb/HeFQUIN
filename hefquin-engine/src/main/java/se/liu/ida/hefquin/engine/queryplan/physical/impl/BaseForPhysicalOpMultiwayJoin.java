@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 
@@ -9,7 +8,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
  * Base class for physical operators that implement
  * some form of a multi-way join algorithm.
  */
-public abstract class BaseForPhysicalOpMultiwayJoin extends BaseForPhysicalOps implements NaryPhysicalOpForLogicalOp
+public abstract class BaseForPhysicalOpMultiwayJoin extends BaseForQueryPlanOperator
+                                                    implements NaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpMultiwayJoin lop;
 
@@ -30,12 +30,7 @@ public abstract class BaseForPhysicalOpMultiwayJoin extends BaseForPhysicalOps i
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return lop.getExpectedVariables(inputVars);
-	}
-
-	@Override
-	public NaryLogicalOp getLogicalOperator() {
+	public LogicalOpMultiwayJoin getLogicalOperator() {
 		return lop;
 	}
 

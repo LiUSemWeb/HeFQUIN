@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
 
-public class LogicalOpUnion extends LogicalOperatorBase implements BinaryLogicalOp
+public class LogicalOpUnion extends BaseForQueryPlanOperator implements BinaryLogicalOp
 {
 	protected static LogicalOpUnion singleton = new LogicalOpUnion();
 
