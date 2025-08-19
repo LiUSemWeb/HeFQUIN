@@ -8,9 +8,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.core.BasicPattern;
 import org.apache.jena.sparql.graph.GraphFactory;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.junit.Before;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
@@ -27,303 +32,328 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.BGPImpl;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.base.query.impl.SPARQLGroupPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.SPARQLUnionPatternImpl;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 
 public class VocabularyMappingUtilsTest
 {
+	// Entities (for entity mappings)
+	final Node e    = NodeFactory.createURI("http://example.org/e");
+	final Node e_g  = NodeFactory.createURI("http://example.org/global/e");
+	final Node e_l1 = NodeFactory.createURI("http://example.org/local/e1");
+	final Node e_l2 = NodeFactory.createURI("http://example.org/local/e2");
+	// Classes (used as subjects in schema mappings)
 	final Node s    = NodeFactory.createURI("http://example.org/s");
 	final Node s_g  = NodeFactory.createURI("http://example.org/global/s");
 	final Node s_l1 = NodeFactory.createURI("http://example.org/local/s1");
 	final Node s_l2 = NodeFactory.createURI("http://example.org/local/s2");
-
+	// Predicates (properties, schema mappings)
+	final Node p    = NodeFactory.createURI("http://example.org/p");
+	final Node p_g  = NodeFactory.createURI("http://example.org/global/p");
+	final Node p_l1 = NodeFactory.createURI("http://example.org/local/p1");
+	final Node p_l2 = NodeFactory.createURI("http://example.org/local/p2");
+	// Classes (used as objects in schema mappings)
 	final Node o    = NodeFactory.createURI("http://example.org/o");
 	final Node o_g  = NodeFactory.createURI("http://example.org/global/o");
 	final Node o_l1 = NodeFactory.createURI("http://example.org/local/o1");
 	final Node o_l2 = NodeFactory.createURI("http://example.org/local/o2");
 
-	final Node p    = NodeFactory.createURI("http://example.org/p");
-	final Node p_g  = NodeFactory.createURI("http://example.org/global/p");
-	final Node p_l1 = NodeFactory.createURI("http://example.org/local/p1");
-	final Node p_l2 = NodeFactory.createURI("http://example.org/local/p2");
+	// Vocabulary mapping
+	VocabularyMapping vm;
 
-	// tp
+	@Before
+	public void setup() {
+		final String entityMapping = """
+			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+			@prefix l:    <http://example.org/local/> .
+			@prefix g:    <http://example.org/global/> .
+			l:e1 owl:sameAs g:e .
+			l:e2 owl:sameAs g:e .
+			""";
+
+		final String schemaMapping = """
+			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+			@prefix l:    <http://example.org/local/> .
+			@prefix g:    <http://example.org/global/> .
+			l:s1 owl:equivalentClass g:s .
+			l:s2 owl:equivalentClass g:s .
+			l:p1 owl:equivalentProperty g:p .
+			l:p2 owl:equivalentProperty g:p .
+			l:o1 owl:equivalentClass g:o .
+			l:o2 owl:equivalentClass g:o .
+			""";
+		final SchemaMapping sm = createSchemaMapping(schemaMapping);
+		final EntityMapping em = createEntityMapping(entityMapping);
+		vm = new VocabularyMappingWrappingImpl(em, sm);
+	}
+
+	// TriplePattern
 	@Test
-	public void tp_ChangeSubject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic1(tp);
+	public void tp_subject_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(e_g, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3);
+		assertMappingTranslation(tp1, expected);
 	}
 
 	@Test
-	public void tp_ChangeSubject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic2(tp);
+	public void tp_object_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3);
+		assertMappingTranslation(tp1, expected);
 	}
 
 	@Test
-	public void tp_ChangeObject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic1(tp);
+	public void tp_object_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3);
+		assertMappingTranslation(tp1, expected);
 	}
 
 	@Test
-	public void tp_ChangeObject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic2(tp);
+	public void tp_predicate_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p_g, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3);
+		assertMappingTranslation(tp1, expected);
+	}
+
+	// BGP
+	@Test
+	public void bgp_subject_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(e_g, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp4 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new BGPImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void tp_ChangeObject1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic1(tp);
+	public void bgp_object_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new BGPImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void tp_ChangeObject2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic2(tp);
+	public void bgp_object_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new BGPImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void tp_ChangePredicate1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic1(tp);
+	public void bgp_predicate_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p_g, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation(  new BGPImpl(tp1, tp2), expected );
+	}
+
+	// SPARQLGroupPattern
+	@Test
+	public void group_subject_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(e_g, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp4 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLGroupPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void tp_ChangePredicate2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic2(tp);
-	}
-
-	// bgp
-	@Test
-	public void bgp_ChangeSubject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic1( new BGPImpl(tp) );
+	public void group_object_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLGroupPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void bgp_ChangeSubject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic2( new BGPImpl(tp) );
+	public void group_object_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLGroupPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void bgp_ChangeObject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic1( new BGPImpl(tp) );
+	public void group_predicate_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p_g, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation(  new SPARQLGroupPatternImpl(tp1, tp2), expected );
+	}
+
+	// SPARQLUnionPattern
+	@Test
+	public void union_subject_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(e_g, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp4 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLUnionPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void bgp_ChangeObject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic2( new BGPImpl(tp) );
+	public void union_object_entity() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLUnionPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void bgp_ChangeObject1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic1( new BGPImpl(tp) );
+	public void union_object_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_g);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation( new SPARQLUnionPatternImpl(tp1, tp2), expected );
 	}
 
 	@Test
-	public void bgp_ChangeObject2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic2( new BGPImpl(tp) );
+	public void union_predicate_schema() {
+		final TriplePattern tp1 = new TriplePatternImpl(s, p_g, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp4 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp2, tp3, tp4);
+		assertMappingTranslation(  new SPARQLUnionPatternImpl(tp1, tp2), expected );
+	}
+
+	// GenericSPARQLGraphPatternImpl1
+	@Test
+	public void generic1_subject_entity() {
+		final ElementTriplesBlock el = new ElementTriplesBlock();
+        el.addTriple(Triple.create(e_g, p, o));
+        el.addTriple(Triple.create(e, p, o));
+		final TriplePattern tp1 = new TriplePatternImpl(e, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl1(el), expected );
 	}
 
 	@Test
-	public void bgp_ChangePredicate1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic1( new BGPImpl(tp) );
+	public void generic1_object_entity() {
+		final ElementTriplesBlock el = new ElementTriplesBlock();
+        el.addTriple(Triple.create(s, p, e_g));
+        el.addTriple(Triple.create(s, p, e));
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl1(el), expected );
 	}
 
 	@Test
-	public void bgp_ChangePredicate2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic2( new BGPImpl(tp) );
-	}
-
-	// union
-	@Test
-	public void union_ChangeSubject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic1( new SPARQLUnionPatternImpl(tp) );
-	}
-
-	@Test
-	public void union_ChangeSubject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s_g, p, o);
-		_ChangeSubject_entity_generic2( new SPARQLUnionPatternImpl(tp));
+	public void generic1_object_schema() {
+		final ElementTriplesBlock el = new ElementTriplesBlock();
+        el.addTriple(Triple.create(s, p, o_g));
+        el.addTriple(Triple.create(s, p, o));
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl1(el), expected );
 	}
 
 	@Test
-	public void union_ChangeObject_entity1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic1( new SPARQLUnionPatternImpl(tp) );
+	public void generic1_predicate_schema() {
+		final ElementTriplesBlock el = new ElementTriplesBlock();
+        el.addTriple(Triple.create(s, p_g, o));
+        el.addTriple(Triple.create(s, p, o));
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl1(el), expected );
+	}
+
+	// GenericSPARQLGraphPatternImpl2
+	@Test
+	public void generic2_subject_entity() {
+		final BasicPattern bp = new BasicPattern();
+        bp.add(Triple.create(e_g, p, o));
+        bp.add(Triple.create(e, p, o));
+		final OpBGP op = new OpBGP(bp);
+		final TriplePattern tp1 = new TriplePatternImpl(e, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(e_l1, p, o);
+		final TriplePattern tp3 = new TriplePatternImpl(e_l2, p, o);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl2(op), expected );
 	}
 
 	@Test
-	public void union_ChangeObject_entity2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_entity_generic2( new SPARQLUnionPatternImpl(tp) );
+	public void generic2_object_entity() {
+		final BasicPattern bp = new BasicPattern();
+        bp.add(Triple.create(s, p, e_g));
+        bp.add(Triple.create(s, p, e));
+		final OpBGP op = new OpBGP(bp);
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, e);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, e_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, e_l2);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl2(op), expected );
 	}
 
 	@Test
-	public void union_ChangeObject1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic1( new SPARQLUnionPatternImpl(tp) );
+	public void generic2_object_schema() {
+		final BasicPattern bp = new BasicPattern();
+        bp.add(Triple.create(s, p, o_g));
+        bp.add(Triple.create(s, p, o));
+		final OpBGP op = new OpBGP(bp);
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p, o_l1);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p, o_l2);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl2(op), expected );
 	}
 
 	@Test
-	public void union_ChangeObject2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_g);
-		_ChangeObject_generic2( new SPARQLUnionPatternImpl(tp) );
-	}
-
-	@Test
-	public void union_ChangePredicate1() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic1( new SPARQLUnionPatternImpl(tp) );
-	}
-
-	@Test
-	public void union_ChangePredicate2() {
-		final TriplePattern tp = new TriplePatternImpl(s, p_g, o);
-		_ChangePredicate_generic2( new SPARQLUnionPatternImpl(tp) );
+	public void generic2_predicate_schema() {
+		final BasicPattern bp = new BasicPattern();
+        bp.add(Triple.create(s, p_g, o));
+        bp.add(Triple.create(s, p, o));
+		final OpBGP op = new OpBGP(bp);
+		final TriplePattern tp1 = new TriplePatternImpl(s, p, o);
+		final TriplePattern tp2 = new TriplePatternImpl(s, p_l1, o);
+		final TriplePattern tp3 = new TriplePatternImpl(s, p_l2, o);
+		final Set<TriplePattern> expected = Set.of(tp1, tp2, tp3);
+		assertMappingTranslation( new GenericSPARQLGraphPatternImpl2(op), expected );
 	}
 
 	// -------------- helpers --------------
 
-	public void _ChangeSubject_entity_generic1( final SPARQLGraphPattern input ) {
-		final String entityMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:s1 owl:sameAs g:s .
-			""";
-		final TriplePattern tp = new TriplePatternImpl(s_l1, p, o);
-		final Set<TriplePattern> expected = Set.of(tp);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, "", entityMapping);
-		assertEquals(expected, results);
-	}
-
-	public void _ChangeSubject_entity_generic2( final SPARQLGraphPattern input ) {
-		final String entityMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:s1 owl:sameAs g:s .
-			l:s2 owl:sameAs g:s .
-			""";
-		final TriplePattern tp1 = new TriplePatternImpl(s_l1, p, o);
-		final TriplePattern tp2 = new TriplePatternImpl(s_l2, p, o);
-		final Set<TriplePattern> expected = Set.of(tp1, tp2);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, "", entityMapping);
-		assertEquals(expected, results);
-	}
-	
-	public void _ChangeObject_entity_generic1( final SPARQLGraphPattern input ) {
-		final String entityMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:o1 owl:sameAs g:o .
-			""";
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_l1);
-		final Set<TriplePattern> expected = Set.of(tp);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, "", entityMapping);
-		assertEquals(expected, results);
-	}
-
-	public void _ChangeObject_entity_generic2( final SPARQLGraphPattern input ) {
-		final String entityMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:o1 owl:sameAs g:o .
-			l:o2 owl:sameAs g:o .
-			""";
-		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_l1);
-		final TriplePattern tp2 = new TriplePatternImpl(s, p, o_l2);
-		final Set<TriplePattern> expected = Set.of(tp1, tp2);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, "", entityMapping);
-		assertEquals(expected, results);
-	}
-
-	public void _ChangeObject_generic1( final SPARQLGraphPattern input ) {
-		final String schemaMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:o1 owl:equivalentClass g:o .
-			""";
-		final TriplePattern tp = new TriplePatternImpl(s, p, o_l1);
-		final Set<TriplePattern> expected = Set.of(tp);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, schemaMapping, "");
-		assertEquals(expected, results);
-	}
-
-	public void _ChangeObject_generic2( final SPARQLGraphPattern input ) {
-		final String schemaMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:o1 owl:equivalentClass g:o .
-			l:o2 owl:equivalentClass g:o .
-			""";
-		final TriplePattern tp1 = new TriplePatternImpl(s, p, o_l1);
-		final TriplePattern tp2 = new TriplePatternImpl(s, p, o_l2);
-		final Set<TriplePattern> expected = Set.of(tp1, tp2);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, schemaMapping, "");
-		assertEquals(expected, results);
-	}
-	
-	public void _ChangePredicate_generic1( final SPARQLGraphPattern input ) {
-		final String schemaMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:p1 owl:equivalentProperty g:p .
-			""";
-		final TriplePattern tp = new TriplePatternImpl(s, p_l1, o);
-		final Set<TriplePattern> expected = Set.of(tp);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, schemaMapping, "");
-		assertEquals(expected, results);
-	}
-
-	public void _ChangePredicate_generic2( final SPARQLGraphPattern input ) {
-		final String schemaMapping = """
-			@prefix owl:  <http://www.w3.org/2002/07/owl#> .
-			@prefix l:    <http://example.org/local/> .
-			@prefix g:    <http://example.org/global/> .
-			l:p1 owl:equivalentProperty g:p .
-			l:p2 owl:equivalentProperty g:p .
-			""";
-		final TriplePattern tp1 = new TriplePatternImpl(s, p_l1, o);
-		final TriplePattern tp2 = new TriplePatternImpl(s, p_l2, o);
-		final Set<TriplePattern> expected = Set.of(tp1, tp2);
-		
-		final Set<TriplePattern> results = translateAndCollect(input, schemaMapping, "");
-		assertEquals(expected, results);
-	}
-
 	@SuppressWarnings("deprecation")
-	protected Set<TriplePattern> translateAndCollect( final SPARQLGraphPattern pattern,
-	                                                  final String schemaMapping,
-	                                                  final String entityMapping ) {
-		final SchemaMapping sm = createSchemaMapping(schemaMapping);
-		final EntityMapping em = createEntityMapping(entityMapping);
-		final VocabularyMapping vm = new VocabularyMappingWrappingImpl( em, sm );
-		
+	protected Set<TriplePattern> translateAndCollect( final SPARQLGraphPattern pattern ) {
 		final SPARQLGraphPattern pattern2;
 		if ( pattern instanceof TriplePattern p ) {
 			pattern2 = VocabularyMappingUtils.translateGraphPattern(p, vm);
@@ -347,16 +377,18 @@ public class VocabularyMappingUtilsTest
 			throw new IllegalArgumentException( "Unsupported type of pattern: " + pattern.getClass().getName() );
 		}
 
-		final Set<TriplePattern> results = new HashSet<>();
-		for ( final TriplePattern tp : pattern2.getAllMentionedTPs() ) {
-			results.add(tp);
-		}
-		return results;
+		return pattern2.getAllMentionedTPs();
+	}
+
+	protected void assertMappingTranslation( final SPARQLGraphPattern input,
+	                                         final Set<TriplePattern> expected ) {
+		final Set<TriplePattern> results = translateAndCollect(input);
+		assertEquals(expected, results);
 	}
 
 	protected SchemaMapping createSchemaMapping( final String mappingAsTurtle ) {
 		final Graph mapping = GraphFactory.createDefaultGraph();
-		RDFDataMgr.read( mapping, IOUtils.toInputStream( mappingAsTurtle, "UTF-8" ), Lang.TURTLE );
+		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
 
 		final Map<Node, Set<TermMapping>> g2lMap = SchemaMappingReader.read(mapping);
 		return new SchemaMappingImpl(g2lMap);
@@ -364,7 +396,7 @@ public class VocabularyMappingUtilsTest
 
 	protected EntityMapping createEntityMapping( final String mappingAsTurtle ) {
 		final Graph mapping = GraphFactory.createDefaultGraph();
-		RDFDataMgr.read( mapping, IOUtils.toInputStream( mappingAsTurtle, "UTF-8" ), Lang.TURTLE );
+		RDFDataMgr.read( mapping, IOUtils.toInputStream(mappingAsTurtle, "UTF-8"), Lang.TURTLE );
 		final Map<Node, Set<Node>> g2lMap = EntityMappingReader.read(mapping);
 		return new EntityMappingImpl(g2lMap);
 	}
