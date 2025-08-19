@@ -5,20 +5,14 @@ import static java.lang.Math.max;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
-import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
-import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty;
+import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
+import se.liu.ida.hefquin.engine.queryproc.impl.cardinality.RequestBasedCardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
-import se.liu.ida.hefquin.federation.access.CardinalityResponse;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -38,16 +32,14 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 {
 	protected final Map<PhysicalPlan, CompletableFuture<Integer>> cache = new HashMap<>();
 
-	protected final FederationAccessManager fedAccessMgr;
+	protected final RequestBasedCardinalityEstimator cardEstimator;
     protected final VarSpecificCardinalityEstimation vsCardEstimator;
 
     // The visibility of this constructor is at the package level (i.e.,
     // not public) such that it can be used in the unit tests, but not by
     // the configuration framework of HeFQUIN.
     CardinalityEstimationImpl( final FederationAccessManager fedAccessMgr ) {
-        assert fedAccessMgr != null;
-        this.fedAccessMgr = fedAccessMgr;
-
+        cardEstimator = new RequestBasedCardinalityEstimator(fedAccessMgr);
         vsCardEstimator = new VarSpecificCardinalityEstimationImpl(this);
     }
 
@@ -56,7 +48,7 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     @Override
-    public CompletableFuture<Integer> initiateCardinalityEstimation( final PhysicalPlan plan ) {
+    public final CompletableFuture<Integer> initiateCardinalityEstimation( final PhysicalPlan plan ) {
         synchronized (cache) {
             // If we already have a CompletableFuture for the
         	// given plan in the cache, return that one.
@@ -64,6 +56,8 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
             if ( cachedFuture != null ) {
                 return cachedFuture;
             }
+
+            cardEstimator.addCardinalitiesForRequests(plan);
 
             // If we don't have a cache hit, create a CompletableFuture
             // that will produce the cardinality estimate for the given
@@ -88,42 +82,29 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
     }
 
     public CompletableFuture<Integer> _initiateCardinalityEstimation( final PhysicalPlan plan ) {
-        final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
-
         final Supplier<Integer> worker;
-        if ( rootOp instanceof LogicalOpRequest ) {
-            worker = new WorkerForRequestOps( (LogicalOpRequest<?, ?>) rootOp);
-        }
-		else if ( rootOp instanceof NaryLogicalOp || rootOp instanceof BinaryLogicalOp || rootOp instanceof UnaryLogicalOp ) {
+        if ( plan instanceof PhysicalPlanWithNullaryRoot )
+            worker = new WorkerForRequestOps(plan);
+		else
 			worker = new WorkerForSubquery(plan);
-		}
-        else {
-            throw new IllegalArgumentException("The type of the root operator of the given plan is currently not supported (" + rootOp.getClass().getName() + ").");
-        }
 
         return CompletableFuture.supplyAsync(worker);
     }
 
 	protected class WorkerForRequestOps implements Supplier<Integer>
 	{
-		protected final LogicalOpRequest<?,?> reqOp;
+		protected final int extractedCardinality;
 
-		public WorkerForRequestOps( final LogicalOpRequest<?,?> reqOp ) { this.reqOp = reqOp; }
+		public WorkerForRequestOps( final PhysicalPlan plan ) {
+			final QueryPlanningInfo qpInfo = plan.getQueryPlanningInfo();
+			final QueryPlanProperty prop = qpInfo.getProperty( QueryPlanProperty.CARDINALITY );
+			assert prop != null;
+			extractedCardinality = prop.getValue();
+		}
 
 		@Override
 		public Integer get() {
-			final CardinalityResponse[] resps;
-			try {
-				resps = FederationAccessUtils.performCardinalityRequests(fedAccessMgr, reqOp);
-			}
-			catch ( final FederationAccessException e ) {
-				throw new RuntimeException("Issuing a cardinality request caused an exception.", e);
-			}
-
-			final int intValue = computeEffectiveCardinality( resps[0] );
-			// This value might end up with a negative value
-			// when the cardinality exceed the maximum possible Integer number that can be represented
-			return ( intValue < 0 ? Integer.MAX_VALUE : intValue ) ;
+			return extractedCardinality;
 		}
 	}
 
@@ -173,25 +154,6 @@ public class CardinalityEstimationImpl implements CardinalityEstimation
 			}
 
 			return cardinality;
-		}
-	}
-
-	/**
-	 * TODO: Fallback behavior? Returning Integer.MAX_VALUE for now
-	 *
-	 * Computes the cardinality from the given {@link CardinalityResponse}.
-	 *
-	 * If retrieving the cardinality fails due to an {@link UnsupportedOperationDueToRetrievalError}, this method
-	 * returns {@link Integer#MAX_VALUE} as a fallback.
-	 *
-	 * @param resp the cardinality response to extract the cardinality from
-	 * @return the cardinality, or {@code Integer.MAX_VALUE} if retrieval is unsupported
-	 */
-	private int computeEffectiveCardinality( final CardinalityResponse resp ) {
-		try {
-			return resp.getCardinality();
-		} catch ( UnsupportedOperationDueToRetrievalError e ) {
-			return Integer.MAX_VALUE;
 		}
 	}
 }

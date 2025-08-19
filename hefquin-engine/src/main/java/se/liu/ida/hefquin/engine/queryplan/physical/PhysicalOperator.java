@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.QueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecutableOperator;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 
@@ -11,14 +12,14 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
  * a result (in HeFQUIN, this would be in the form of a sequence of solution
  * mappings) by consuming such results produced by the sub-plans under the
  * current operator.
- *
- * The {@link PhysicalOperator#createExecOp(boolean, ExpectedVariables...)
+ * <p>
+ * The {@link PhysicalOperator#createExecOp(boolean, QueryPlanningInfo, ExpectedVariables...)}
  * function can be used to obtain an {@link ExecutableOperator} that provides
  * an implementation of the algorithm associated with the physical operator
  * in a form that can be plugged directly into the query execution framework
  * of HeFQUIN.
  */
-public interface PhysicalOperator
+public interface PhysicalOperator extends QueryPlanOperator
 {
 	/**
 	 * Creates and returns the executable operator to be used for
@@ -45,24 +46,6 @@ public interface PhysicalOperator
 	ExecutableOperator createExecOp( boolean collectExceptions,
 	                                 QueryPlanningInfo qpInfo,
 	                                 ExpectedVariables ... inputVars );
-
-	/**
-	 * Returns the variables that can be expected in the solution
-	 * mappings produced by this operator if the input(s) to this
-	 * operator contain solutions mappings with the given set(s) of
-	 * variables. The number of {@link ExpectedVariables} objects
-	 * passed to this method must be in line with the degree of this
-	 * operator (e.g., for a unary operator, exactly one such object
-	 * must be passed).
-	 */
-	ExpectedVariables getExpectedVariables( ExpectedVariables ... inputVars );
-
-	/**
-	 * Returns an identifier of this operator, which should be unique
-	 * for all the operators within the same plan (no matter what type
-	 * of operator they are).
-	 */
-	int getID();
 
 	void visit( PhysicalPlanVisitor visitor );
 }

@@ -1,10 +1,10 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -15,14 +15,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  * The actual algorithm of this operator is implemented
  * in the {@link ExecOpMultiwayUnion} class.
  */
-public class PhysicalOpMultiwayUnion extends BaseForPhysicalOps
+public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
                                      implements NaryPhysicalOpForLogicalOp
 {
-	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return getLogicalOperator().getExpectedVariables(inputVars);
-	}
-
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
@@ -36,7 +31,7 @@ public class PhysicalOpMultiwayUnion extends BaseForPhysicalOps
 	}
 
 	@Override
-	public NaryLogicalOp getLogicalOperator() {
+	public LogicalOpMultiwayUnion getLogicalOperator() {
 		return LogicalOpMultiwayUnion.getInstance();
 	}
 

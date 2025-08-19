@@ -1,7 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
-import se.liu.ida.hefquin.base.query.ExpectedVariables;
-import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
 
@@ -15,7 +14,7 @@ import java.util.Objects;
  * locally (i.e., within in the engine rather than by interacting with any
  * federation member).
  */
-public abstract class BaseForPhysicalOpBinaryJoin extends BaseForPhysicalOps
+public abstract class BaseForPhysicalOpBinaryJoin extends BaseForQueryPlanOperator
                                                   implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpJoin lop;
@@ -37,12 +36,7 @@ public abstract class BaseForPhysicalOpBinaryJoin extends BaseForPhysicalOps
 	}
 
 	@Override
-	public ExpectedVariables getExpectedVariables( final ExpectedVariables... inputVars ) {
-		return lop.getExpectedVariables(inputVars);
-	}
-
-	@Override
-	public BinaryLogicalOp getLogicalOperator() {
+	public LogicalOpJoin getLogicalOperator() {
 		return lop;
 	}
 

@@ -2,10 +2,11 @@ package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 
-public class LogicalOpLocalToGlobal extends LogicalOperatorBase implements UnaryLogicalOp {
+public class LogicalOpLocalToGlobal extends BaseForQueryPlanOperator implements UnaryLogicalOp {
 	
 	protected final VocabularyMapping vocabularyMapping;
 	

@@ -7,10 +7,11 @@ import java.util.Set;
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 
-public class LogicalOpRightJoin extends LogicalOperatorBase implements BinaryLogicalOp
+public class LogicalOpRightJoin extends BaseForQueryPlanOperator implements BinaryLogicalOp
 {
 	protected static LogicalOpRightJoin singleton = new LogicalOpRightJoin();
 

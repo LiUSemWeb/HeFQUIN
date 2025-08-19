@@ -15,6 +15,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
@@ -170,7 +171,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpFilter op ) {
-			final LogicalOpFilter lop = (LogicalOpFilter) op.getLogicalOperator();
+			final LogicalOpFilter lop = op.getLogicalOperator();
 
 			out.append( indentLevelString + "filter (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
@@ -189,7 +190,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpBind op ) {
-			final LogicalOpBind lop = (LogicalOpBind) op.getLogicalOperator();
+			final LogicalOpBind lop = op.getLogicalOperator();
 
 			out.append( indentLevelString + "bind (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
@@ -213,7 +214,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpGlobalToLocal op ) {
-			final LogicalOpGlobalToLocal lop = (LogicalOpGlobalToLocal)  op.getLogicalOperator();
+			final LogicalOpGlobalToLocal lop = op.getLogicalOperator();
 
 			out.append( indentLevelString + "g2l (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
@@ -265,7 +266,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 
 		@Override
 		public void visit( final PhysicalOpLocalToGlobal op ) {
-			final LogicalOpGlobalToLocal lop = (LogicalOpGlobalToLocal) op.getLogicalOperator();
+			final LogicalOpLocalToGlobal lop = op.getLogicalOperator();
 
 			out.append( indentLevelString + "l2g (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
