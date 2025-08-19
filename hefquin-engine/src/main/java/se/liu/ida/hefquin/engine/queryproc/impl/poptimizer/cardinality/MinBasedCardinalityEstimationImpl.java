@@ -38,7 +38,7 @@ public class MinBasedCardinalityEstimationImpl extends CardinalityEstimationImpl
 
         Supplier<Integer> worker;
         if ( rootOp instanceof LogicalOpRequest ) {
-            worker = new WorkerForRequestOps( (LogicalOpRequest<?, ?>) rootOp);
+            worker = new WorkerForRequestOps(plan);
         }
         else if (  rootOp instanceof LogicalOpJoin  ){
             // The join cardinality is the minimum cardinality of subPlans
