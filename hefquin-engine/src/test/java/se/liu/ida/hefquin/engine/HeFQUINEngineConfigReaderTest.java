@@ -14,6 +14,7 @@ import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.junit.Test;
 
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
@@ -308,6 +309,9 @@ public class HeFQUINEngineConfigReaderTest
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
+
+			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
 
 			@Override
@@ -372,6 +376,9 @@ public class HeFQUINEngineConfigReaderTest
 
 			@Override
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { throw new UnsupportedOperationException(); }
+
+			@Override
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { throw new UnsupportedOperationException(); }
 
 			@Override
 			public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }

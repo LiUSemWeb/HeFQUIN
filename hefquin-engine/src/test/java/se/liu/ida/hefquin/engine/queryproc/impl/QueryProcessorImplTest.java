@@ -374,7 +374,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 		};
 
 		final PhysicalOptimizer poptimizer = new PhysicalOptimizerWithoutOptimization(l2pConverter);
-		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null);
+		final QueryPlanner planner = new QueryPlannerImpl(sourcePlanner, loptimizer, poptimizer, null, null, null,  null);
 		final QueryPlanCompiler planCompiler = new
 				//IteratorBasedQueryPlanCompilerImpl(ctxt);
 				//PullBasedQueryPlanCompilerImpl(ctxt);
