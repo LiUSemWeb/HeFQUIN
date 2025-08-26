@@ -1,5 +1,9 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
+import java.util.Map;
+
+import org.apache.jena.riot.WebContent;
+
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
@@ -21,10 +25,14 @@ public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implement
 	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) throws FederationAccessException {
 		final String requestURL = fm.getInterface().createRequestURL(req);
 		final TriplePattern tp = req.getTriplePattern();
+		final Map<String, String> headers = Map.of(
+			"Accept", WebContent.defaultRDFAcceptHeader,
+			"User-Agent", getUserAgent()
+		);
 
 		final TPFResponseBuilder b;
 		try {
-			b = performRequest(requestURL, tp);
+			b = performRequest(requestURL, tp, headers);
 		}
 		catch ( final Exception ex ) {
 			throw new FederationAccessException("Performing a brTPF request caused an exception.", ex, req, fm);

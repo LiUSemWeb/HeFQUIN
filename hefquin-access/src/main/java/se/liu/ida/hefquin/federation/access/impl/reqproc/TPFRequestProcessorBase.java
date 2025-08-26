@@ -2,11 +2,11 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Map;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.http.HttpRDF;
-import org.apache.jena.riot.WebContent;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.sparql.core.Quad;
 
@@ -45,13 +45,14 @@ public abstract class TPFRequestProcessorBase
 	}
 
 	protected TPFResponseBuilder performRequest( final String requestURL,
-	                                             final TriplePattern tp ) throws HttpRequestException {
+	                                             final TriplePattern tp,
+	                                             final Map<String, String> headers ) throws HttpRequestException {
 		final StreamRDF_TPFResponseBuilder b = new StreamRDF_TPFResponseBuilder(tp);
 		b.setRequestStartTimeNow();
 
 		// execute the request
 		try {
-			HttpRDF.httpGetToStream( httpClient, requestURL, WebContent.defaultRDFAcceptHeader, b );
+			HttpRDF.httpGetToStream(httpClient, requestURL, headers, b);
 		}
 		catch ( final Exception ex ) {
 			throw new HttpRequestException("Executing an HTTP request for a TPF or brTPF server caused an exception.", ex);
