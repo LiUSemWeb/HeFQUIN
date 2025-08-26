@@ -28,7 +28,6 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 {
 	protected final HttpClient httpClient;
 	protected final long overallTimeout;
-	protected final String userAgentHeader = "HeFQUIN/0.1 (https://github.com/LiUSemWeb/HeFQUIN)";
 
 	public SPARQLRequestProcessorImpl() {
 		this(-1L, -1L);
@@ -74,7 +73,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					.httpClient( httpClient )
 					.query(      req.getQuery().asJenaQuery() )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
-					.httpHeader( "User-Agent", userAgentHeader )
+					.httpHeader( "User-Agent", getUserAgent() )
 					.build();
 		}
 		catch ( final Exception e ) {

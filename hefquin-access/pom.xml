@@ -71,4 +71,18 @@
       <version>3.27ea0</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <resources>
+      <!-- Filter resources (use substitution) -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>version.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+
 </project>
