@@ -1,7 +1,7 @@
 # HeFQUIN
 HeFQUIN is a **query federation engine for heterogeneous federations of graph data sources (e.g, federated knowledge graphs)** that is currently under development by [the Semantic Web research group at Linköping University](https://www.ida.liu.se/research/semanticweb/).
 
-For detailed information about HeFQUIN, refer to the **Website at [https://liusemweb.github.io//HeFQUIN/](https://liusemweb.github.io//HeFQUIN/)**, where you can find
+For detailed information about HeFQUIN, refer to the **Website at [https://liusemweb.github.io/HeFQUIN/](https://liusemweb.github.io/HeFQUIN/)**, where you can find
 * a list of the [features of HeFQUIN](https://liusemweb.github.io/HeFQUIN/doc/features.html),
 * a detailed [user documentation](https://liusemweb.github.io/HeFQUIN/doc/index.html),
 * a list of [related research publications](https://liusemweb.github.io/HeFQUIN/research),
