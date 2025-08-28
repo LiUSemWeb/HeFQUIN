@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.wrappers.lpg.conn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.engine.wrappers.lpg.Neo4jException;
 import se.liu.ida.hefquin.engine.wrappers.lpg.data.TableRecord;
 import se.liu.ida.hefquin.engine.wrappers.lpg.query.CypherQuery;
@@ -73,6 +74,7 @@ public class Neo4jConnectionFactory
 
 			final Builder builder = HttpRequest.newBuilder(uri)
 					.header("Accept", "application/json;charset=UTF-8")
+					.header("User-Agent", BuildInfo.getUserAgent())
 					.header("Content-Type", "application/json")
 					.POST( HttpRequest.BodyPublishers.ofString(data) );
 			if( authHeader != null ) {
