@@ -53,4 +53,17 @@
       <version>4.10.0</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <resources>
+      <!-- Filter resources (use substitution) -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>project-info.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

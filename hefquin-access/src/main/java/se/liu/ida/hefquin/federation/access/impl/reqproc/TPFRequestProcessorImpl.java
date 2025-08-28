@@ -1,6 +1,11 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
+import java.util.Map;
+
+import org.apache.jena.riot.WebContent;
+
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.TPFServer;
@@ -33,10 +38,14 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 	protected TPFResponse performRequest( final TPFRequest req, final TPFInterface iface, final FederationMember fm ) throws FederationAccessException {
 		final String requestURL = iface.createRequestURL(req);
 		final TriplePattern tp = req.getQueryPattern();
+		final Map<String, String> headers = Map.of(
+			"Accept", WebContent.defaultRDFAcceptHeader,
+			"User-Agent", BuildInfo.getUserAgent()
+		);
 
 		final TPFResponseBuilder b;
 		try {
-			b = performRequest(requestURL, tp);
+			b = performRequest(requestURL, tp, headers);
 		}
 		catch ( final Exception ex ) {
 			throw new FederationAccessException("Performing a TPF request caused an exception.", ex, req, fm);

@@ -11,6 +11,7 @@ import java.net.URL;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonParseException;
 
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 
 import org.apache.jena.atlas.json.JSON;
@@ -35,6 +36,7 @@ public class GraphQLConnection
 			con.setConnectTimeout(connectionTimeout);
 			con.setReadTimeout(readTimeout);
 			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("User-Agent", BuildInfo.getUserAgent());
 			con.setRequestProperty("Content-Type", "application/json");
 			con.setDoOutput(true);
 			con.connect();

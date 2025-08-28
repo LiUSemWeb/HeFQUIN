@@ -18,6 +18,7 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -73,6 +74,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					.httpClient( httpClient )
 					.query(      req.getQuery().asJenaQuery() )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
+					.httpHeader( "User-Agent", BuildInfo.getUserAgent() )
 					.build();
 		}
 		catch ( final Exception e ) {
