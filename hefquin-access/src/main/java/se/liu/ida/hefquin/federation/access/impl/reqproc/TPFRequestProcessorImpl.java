@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.jena.riot.WebContent;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
+import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.TPFServer;
@@ -39,7 +40,7 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 		final TriplePattern tp = req.getQueryPattern();
 		final Map<String, String> headers = Map.of(
 			"Accept", WebContent.defaultRDFAcceptHeader,
-			"User-Agent", getUserAgent()
+			"User-Agent", BuildInfo.getUserAgent()
 		);
 
 		final TPFResponseBuilder b;
