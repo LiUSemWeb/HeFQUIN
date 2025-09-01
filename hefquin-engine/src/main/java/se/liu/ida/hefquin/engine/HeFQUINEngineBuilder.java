@@ -12,6 +12,7 @@ import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 import org.apache.jena.sparql.engine.main.QC;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
+import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
@@ -35,6 +36,7 @@ public class HeFQUINEngineBuilder
 	private LogicalPlanPrinter srcasgPrinter = null;
 	private LogicalPlanPrinter lplanPrinter = null;
 	private PhysicalPlanPrinter pplanPrinter = null;
+	private ExecutablePlanPrinter eplanPrinter = null;
 
 	private final int DEFAULT_THREAD_POOL_SIZE = 10;
 	private final String DEFAULT_CONF_DESCR_FILE = "config/DefaultConfDescr.ttl";
@@ -118,6 +120,17 @@ public class HeFQUINEngineBuilder
 	}
 
 	/**
+	 * Sets the executable plan printer to be used by the engine.
+	 *
+	 * @param printer a executable plan printer
+	 * @return this builder instance for method chaining
+	 */
+	public HeFQUINEngineBuilder withExecutablePlanPrinter( final ExecutablePlanPrinter printer ) {
+		this.eplanPrinter = printer;
+		return this;
+	}
+
+	/**
 	 * Sets the source assignment printer to be used by the engine.
 	 *
 	 * @param printer a logical plan printer to be used when printing a source
@@ -185,6 +198,7 @@ public class HeFQUINEngineBuilder
 			public LogicalPlanPrinter getSourceAssignmentPrinter() { return srcasgPrinter; }
 			public LogicalPlanPrinter getLogicalPlanPrinter() { return lplanPrinter; }
 			public PhysicalPlanPrinter getPhysicalPlanPrinter() { return pplanPrinter; }
+			public ExecutablePlanPrinter getExecutablePlanPrinter() { return eplanPrinter; }
 		};
 
 		// init engine
