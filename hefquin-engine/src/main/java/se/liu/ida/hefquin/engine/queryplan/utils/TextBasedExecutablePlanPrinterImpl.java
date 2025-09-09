@@ -26,7 +26,7 @@ public class TextBasedExecutablePlanPrinterImpl extends BaseForTextBasedPlanPrin
 	public void print( final PushBasedExecutablePlanImpl plan, final PrintStream out ) {
 		final StatsOfPushBasedExecutablePlan planStats = (StatsOfPushBasedExecutablePlan) plan.getStats();
 		@SuppressWarnings("unchecked")
-		List<Stats> statsOfTasks = (List<Stats>) planStats.getEntry("statsOfTasks");
+		final List<Stats> statsOfTasks = (List<Stats>) planStats.getEntry("statsOfTasks");
 
 		int i = 0;
 		for(final Stats statsOfTask : statsOfTasks){
