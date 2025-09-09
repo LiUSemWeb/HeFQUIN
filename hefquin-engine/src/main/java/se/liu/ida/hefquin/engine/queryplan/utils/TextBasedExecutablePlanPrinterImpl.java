@@ -18,6 +18,9 @@ public class TextBasedExecutablePlanPrinterImpl extends BaseForTextBasedPlanPrin
 		if ( plan instanceof PushBasedExecutablePlanImpl p ) {
 			print(p, out);
 		}
+		else {
+			throw new IllegalArgumentException("Unsupported type of executable plan (" + plan.getClass().getName() + ").");
+		}
 	}
 
 	public void print( final PushBasedExecutablePlanImpl plan, final PrintStream out ) {
