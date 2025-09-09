@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Basis for proper management of query-planning-related information ([#455](https://github.com/LiUSemWeb/HeFQUIN/pull/455), [#456](https://github.com/LiUSemWeb/HeFQUIN/pull/456), [#461](https://github.com/LiUSemWeb/HeFQUIN/pull/461)).
 - Extending the text-based plan printers to include information about expected variables at each level of the plan ([#457](https://github.com/LiUSemWeb/HeFQUIN/pull/457)).
 - Adding the bound join algorithm from the FedX paper ([#458](https://github.com/LiUSemWeb/HeFQUIN/pull/458)).
+- Adding basic printing of executable plans ([#473](https://github.com/LiUSemWeb/HeFQUIN/pull/473)).
 ### Changed
 - Merging the logical operators tpAdd, bgpAdd, and gpAdd into just one: gpAdd; likewise for tpOptAdd, bgpOptAdd, and gpOptAdd ([#454](https://github.com/LiUSemWeb/HeFQUIN/pull/454)).
 - Removing the old StatsPrinter in favor of the new JSON-based one ([#460](https://github.com/LiUSemWeb/HeFQUIN/pull/460)).
