@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -263,10 +264,15 @@ public class HeFQUINEngine
 
 		final QueryProcessingStatsAndExceptions stats = (QueryProcessingStatsAndExceptions) qe.getContext().get(HeFQUINConstants.sysQProcStatsAndExceptions);
 
-		if ( ex == null )
+		if ( ex == null ) {
 			return stats;
-		else
+		}
+		else if ( stats == null ) {
+			return new QueryProcessingStatsAndExceptionsImpl( -1L, -1L, -1L, -1L, null, null, Arrays.asList(ex) );
+		}
+		else {
 			return new QueryProcessingStatsAndExceptionsImpl(stats, ex);
+		}
 	}
 
 	protected QueryExecution _prepareExecution( final Query query )
