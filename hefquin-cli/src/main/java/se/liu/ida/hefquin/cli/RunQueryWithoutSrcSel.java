@@ -113,6 +113,7 @@ public class RunQueryWithoutSrcSel extends CmdARQ
 			.withSourceAssignmentPrinter( modPlanPrinting.getSourceAssignmentPrinter() )
 			.withLogicalPlanPrinter( modPlanPrinting.getLogicalPlanPrinter() )
 			.withPhysicalPlanPrinter( modPlanPrinting.getPhysicalPlanPrinter() )
+			.withExecutablePlanPrinter( modPlanPrinting.getExecutablePlanPrinter() )
 			.setSkipExecution( contains(argSkipExecution) );
 
 		if( modEngineConfig.getConfDescr() != null ){
