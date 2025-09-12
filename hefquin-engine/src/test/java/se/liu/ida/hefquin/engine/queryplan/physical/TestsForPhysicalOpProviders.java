@@ -1,10 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.physical;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.function.BiFunction;
+
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.junit.Test;
@@ -12,18 +13,36 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 public class TestsForPhysicalOpProviders {
+    interface LogicalOpConstructor extends BiFunction<FederationMember, SPARQLGraphPattern, LogicalOperator> {
+        // first arg is the federation member type your constructors accept
+    }
+
 	@Test
-	public void testProviderForPhysicalOpBindJoinWithBoundJoin_NonJoiningVar(){
+	public void testPhysicalOpBindJoinWithBoundJoin_gpAdd() {
+		assertSupportFor( LogicalOpGPAdd::new );
+	}
+
+	@Test
+	public void testPhysicalOpBindJoinWithBoundJoin_gpOptAdd() {
+		assertSupportFor( LogicalOpGPOptAdd::new );
+	}
+
+	public void assertSupportFor( final LogicalOpConstructor logicalOpConstructor ){
 		final PhysicalOpProvider provider = new PhysicalOpBindJoinWithBoundJoin.Provider();
 
 		final String queryString = "SELECT * WHERE { ?s ?p ?o OPTIONAL { ?_s ?_p ?o} }";
 		Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOpGPAdd lop = new LogicalOpGPAdd( new TestUtils.SPARQLEndpointForTest(), p );
+		final LogicalOperator lop_sparql = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
+		final LogicalOperator lop_tpf = logicalOpConstructor.apply( new TestUtils.TPFServerForTest(), p );
+		final LogicalOperator lop_brtpf = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p );
 		
 		final ExpectedVariables sp1 = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables po1 = TestUtils.getExpectedVariables( List.of("p", "o"), List.of() );
@@ -36,33 +55,17 @@ public class TestsForPhysicalOpProviders {
 		final ExpectedVariables spo2 = TestUtils.getExpectedVariables( List.of(), List.of("s", "p", "o") );
 
 		// certain vars
-		assertTrue( provider.supports(lop, sp1) );
-		assertTrue( provider.supports(lop, po1) );
-		assertTrue( provider.supports(lop, so1) );
-		assertFalse( provider.supports(lop, spo1) );
+		assertTrue(  provider.supports(lop_sparql, sp1) );
+		assertTrue(  provider.supports(lop_sparql, po1) );
+		assertTrue(  provider.supports(lop_sparql, so1) );
+		assertFalse( provider.supports(lop_sparql, spo1) );
 		// possible vars
-		assertTrue( provider.supports(lop, sp2) );
-		assertTrue( provider.supports(lop, po2) );
-		assertTrue( provider.supports(lop, so2) );
-		assertFalse( provider.supports(lop, spo2) );
-	}
-
-	@Test
-	public void testProviderForPhysicalOpBindJoinWithBoundJoin_fm(){
-		final PhysicalOpProvider provider = new PhysicalOpBindJoinWithBoundJoin.Provider();
-
-		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
-		Element el = QueryFactory.create(queryString).getQueryPattern();
-		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-
-		final LogicalOpGPAdd lop_sparql = new LogicalOpGPAdd( new TestUtils.SPARQLEndpointForTest(), p );
-		final LogicalOpGPAdd lop_tpf = new LogicalOpGPAdd( new TestUtils.TPFServerForTest(), p );
-		final LogicalOpGPAdd lop_brtfp = new LogicalOpGPAdd( new TestUtils.BRTPFServerForTest(), p );
-		
-		final ExpectedVariables vars = TestUtils.getExpectedVariables( List.of(), List.of() );
-
-		assertTrue(  provider.supports(lop_sparql, vars) );
-		assertFalse( provider.supports(lop_tpf,    vars) );
-		assertFalse( provider.supports(lop_brtfp,  vars) );
+		assertTrue(  provider.supports(lop_sparql, sp2) );
+		assertTrue(  provider.supports(lop_sparql, po2) );
+		assertTrue(  provider.supports(lop_sparql, so2) );
+		assertFalse( provider.supports(lop_sparql, spo2) );
+		// unsupported federation member types
+		assertFalse( provider.supports(lop_tpf,    sp1) );
+		assertFalse( provider.supports(lop_brtpf,  sp1) );
 	}
 }
