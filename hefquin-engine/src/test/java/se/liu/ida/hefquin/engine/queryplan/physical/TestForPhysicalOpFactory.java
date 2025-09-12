@@ -16,6 +16,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpProviders.LogicalOpConstructor;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
 
 public class TestForPhysicalOpFactory
 {
@@ -23,18 +24,32 @@ public class TestForPhysicalOpFactory
 	public void testOpBindJoinWithBoundJoin_gpAdd(){
 		final PhysicalOpFactory factory = new PhysicalOpFactory()
 			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() );
-		assertSupportFor(LogicalOpGPAdd::new, factory);
+		assertSupportForOpBindJoinWithBoundJoin( LogicalOpGPAdd::new, factory );
 	}
 
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpOptAdd(){
 		final PhysicalOpFactory factory = new PhysicalOpFactory()
 			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() );
-		assertSupportFor(LogicalOpGPAdd::new, factory);
+		assertSupportForOpBindJoinWithBoundJoin( LogicalOpGPAdd::new, factory );
+	}
+
+	@Test
+	public void testOpBindJoinWithUNION_gpAdd(){
+		final PhysicalOpFactory factory = new PhysicalOpFactory()
+			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() );
+		assertSupportForOpBindJoinWithUNION( LogicalOpGPAdd::new, factory );
+	}
+
+	@Test
+	public void testOpBindJoinWithUNION_gpOptAdd(){
+		final PhysicalOpFactory factory = new PhysicalOpFactory()
+			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() );
+		assertSupportForOpBindJoinWithUNION( LogicalOpGPAdd::new, factory );
 	}
 
 
-	public void assertSupportFor( final LogicalOpConstructor logicalOpConstructor, final PhysicalOpFactory factory ){
+	public void assertSupportForOpBindJoinWithBoundJoin( final LogicalOpConstructor logicalOpConstructor, final PhysicalOpFactory factory ){
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
@@ -47,5 +62,17 @@ public class TestForPhysicalOpFactory
 		assertEquals( PhysicalOpBindJoinWithBoundJoin.class, factory.create(lop, sp).getClass());
 		// non-joinable var missing
 		assertThrows( UnsupportedOperationException.class, () -> factory.create(lop, spo) );
+	}
+
+	public void assertSupportForOpBindJoinWithUNION( final LogicalOpConstructor logicalOpConstructor, final PhysicalOpFactory factory ){
+		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
+		Element el = QueryFactory.create(queryString).getQueryPattern();
+		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
+		final LogicalOperator lop = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
+
+		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
+
+		// wrong type returned
+		assertEquals( PhysicalOpBindJoinWithUNION.class, factory.create(lop, sp).getClass());
 	}
 }
