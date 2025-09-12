@@ -5,8 +5,11 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithUNION;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpProvider;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
@@ -74,4 +77,29 @@ public class PhysicalOpBindJoinWithUNION extends BaseForPhysicalOpSingleInputJoi
 		return "> UNIONBindJoin" + lop.toString();
 	}
 
+	public static class Provider implements PhysicalOpProvider
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOperator create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithUNION(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithUNION(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

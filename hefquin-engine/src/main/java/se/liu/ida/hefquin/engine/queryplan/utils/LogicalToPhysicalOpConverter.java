@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -9,6 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
@@ -24,6 +26,10 @@ import se.liu.ida.hefquin.federation.TPFServer;
  */
 public class LogicalToPhysicalOpConverter
 {
+	final private static PhysicalOpFactory factory = new PhysicalOpFactory()
+			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() )
+			.register( new PhysicalOpBindJoinWithUNION.Provider() );
+
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
 		if (      lop instanceof NullaryLogicalOp ) return convert( (NullaryLogicalOp) lop );
 		else if ( lop instanceof UnaryLogicalOp )   return convert( (UnaryLogicalOp) lop );
@@ -45,9 +51,9 @@ public class LogicalToPhysicalOpConverter
 
 	// --------- unary operators -----------
 
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
-		if (      lop instanceof LogicalOpGPAdd x )     return convert(x);
-		else if ( lop instanceof LogicalOpGPOptAdd x )  return convert(x);
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {
+		if (      lop instanceof LogicalOpGPAdd x )     return convert(x, inputVars);
+		else if ( lop instanceof LogicalOpGPOptAdd x )  return convert(x, inputVars);
 		else if ( lop instanceof LogicalOpFilter x )    return convert(x);
 		else if ( lop instanceof LogicalOpBind x )      return convert(x);
 		else if ( lop instanceof LogicalOpLocalToGlobal x ) return convert (x);
@@ -55,11 +61,11 @@ public class LogicalToPhysicalOpConverter
 		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 
-	public static UnaryPhysicalOp convert( final LogicalOpGPAdd lop ) {
+	public static UnaryPhysicalOp convert( final LogicalOpGPAdd lop, final ExpectedVariables inputVars ) {
 		final FederationMember fm = lop.getFederationMember();
 
 		if (      fm instanceof SPARQLEndpoint ) {
-			return new PhysicalOpBindJoinWithBoundJoin(lop);
+			return (UnaryPhysicalOp) factory.create(lop, inputVars);
 		}
 		else if ( fm instanceof TPFServer && lop.containsTriplePatternOnly() ) {
 			return new PhysicalOpIndexNestedLoopsJoin(lop);

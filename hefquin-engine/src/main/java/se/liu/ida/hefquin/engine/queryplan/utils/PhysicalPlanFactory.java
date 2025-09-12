@@ -247,7 +247,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final UnaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
+		final UnaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert( rootOp, subplan.getExpectedVariables() );
 		return createPlan(pop, qpInfo, subplan);
 	}
 
