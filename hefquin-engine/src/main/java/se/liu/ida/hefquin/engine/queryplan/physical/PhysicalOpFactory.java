@@ -49,8 +49,6 @@ public class PhysicalOpFactory
 	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables inputVars ) {
 		for ( final PhysicalOpProvider provider : providers ) {
 			if ( provider.supports(lop, inputVars) ) {
-				System.err.println(lop.getClass());
-				System.err.println(provider.getClass());
 				return provider.create(lop);
 			}
 		}
