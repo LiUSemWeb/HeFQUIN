@@ -108,13 +108,14 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
 		}
 
-		private static boolean isSupported( final FederationMember fm, final SPARQLGraphPattern pattern,
-				final ExpectedVariables vars ) {
+		private boolean isSupported( final FederationMember fm,
+		                                    final SPARQLGraphPattern pattern,
+		                                    final ExpectedVariables vars )
+		{
 			return (fm instanceof SPARQLEndpoint) && hasNonJoiningVar(pattern, vars);
 		}
 
-		private static boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
-
+		private boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
 			for ( final Var v : pattern.getCertainVariables() ) {
 				if ( ! vars.getCertainVariables().contains(v) && ! vars.getPossibleVariables().contains(v) ) {
 					return true;
