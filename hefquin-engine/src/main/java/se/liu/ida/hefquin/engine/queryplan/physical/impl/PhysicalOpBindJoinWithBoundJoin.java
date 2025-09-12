@@ -1,13 +1,19 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpProvider;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
 /**
@@ -75,5 +81,46 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 	@Override
 	public String toString() {
 		return "> BoundJoinBindJoin" + lop.toString();
+	}
+
+	public static class Provider implements PhysicalOpProvider
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars );
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars );
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOperator create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithBoundJoin(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithBoundJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+
+		private static boolean isSupported( final FederationMember fm, final SPARQLGraphPattern pattern,
+				final ExpectedVariables vars ) {
+			return (fm instanceof SPARQLEndpoint) && hasNonJoiningVar(pattern, vars);
+		}
+
+		private static boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
+
+			for ( final Var v : pattern.getCertainVariables() ) {
+				if ( ! vars.getCertainVariables().contains(v) && ! vars.getPossibleVariables().contains(v) ) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
