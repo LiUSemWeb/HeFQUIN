@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpProvider;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -83,7 +83,7 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 		return "> BoundJoinBindJoin" + lop.toString();
 	}
 
-	public static class Provider implements PhysicalOpProvider
+	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
@@ -109,8 +109,8 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 		}
 
 		private boolean isSupported( final FederationMember fm,
-		                                    final SPARQLGraphPattern pattern,
-		                                    final ExpectedVariables vars )
+		                             final SPARQLGraphPattern pattern,
+		                             final ExpectedVariables vars )
 		{
 			return (fm instanceof SPARQLEndpoint) && hasNonJoiningVar(pattern, vars);
 		}

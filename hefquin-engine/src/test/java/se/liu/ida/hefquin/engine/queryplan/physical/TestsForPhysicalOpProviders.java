@@ -46,7 +46,7 @@ public class TestsForPhysicalOpProviders {
 	}
 
 	public void assertSupportForOpBindJoinWithBoundJoin( final LogicalOpConstructor logicalOpConstructor ){
-		final PhysicalOpProvider provider = new PhysicalOpBindJoinWithBoundJoin.Provider();
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithBoundJoin.Factory();
 
 		final String queryString = "SELECT * WHERE { ?s ?p ?o OPTIONAL { ?_s ?_p ?o} }";
 		Element el = QueryFactory.create(queryString).getQueryPattern();
@@ -66,22 +66,22 @@ public class TestsForPhysicalOpProviders {
 		final ExpectedVariables spo2 = TestUtils.getExpectedVariables( List.of(), List.of("s", "p", "o") );
 
 		// certain vars
-		assertTrue(  provider.supports(lop_sparql, sp1) );
-		assertTrue(  provider.supports(lop_sparql, po1) );
-		assertTrue(  provider.supports(lop_sparql, so1) );
-		assertFalse( provider.supports(lop_sparql, spo1) );
+		assertTrue(  factory.supports(lop_sparql, sp1) );
+		assertTrue(  factory.supports(lop_sparql, po1) );
+		assertTrue(  factory.supports(lop_sparql, so1) );
+		assertFalse( factory.supports(lop_sparql, spo1) );
 		// possible vars
-		assertTrue(  provider.supports(lop_sparql, sp2) );
-		assertTrue(  provider.supports(lop_sparql, po2) );
-		assertTrue(  provider.supports(lop_sparql, so2) );
-		assertFalse( provider.supports(lop_sparql, spo2) );
+		assertTrue(  factory.supports(lop_sparql, sp2) );
+		assertTrue(  factory.supports(lop_sparql, po2) );
+		assertTrue(  factory.supports(lop_sparql, so2) );
+		assertFalse( factory.supports(lop_sparql, spo2) );
 		// unsupported federation member types
-		assertFalse( provider.supports(lop_tpf,    sp1) );
-		assertFalse( provider.supports(lop_brtpf,  sp1) );
+		assertFalse( factory.supports(lop_tpf,    sp1) );
+		assertFalse( factory.supports(lop_brtpf,  sp1) );
 	}
 
 	public void assertSupportForOpBindJoinWithUNION( final LogicalOpConstructor logicalOpConstructor ){
-		final PhysicalOpProvider provider = new PhysicalOpBindJoinWithUNION.Provider();
+		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithUNION.Factory();
 
 		final String queryString = "SELECT * WHERE { ?s ?p ?o OPTIONAL { ?_s ?_p ?o} }";
 		Element el = QueryFactory.create(queryString).getQueryPattern();
@@ -101,17 +101,17 @@ public class TestsForPhysicalOpProviders {
 		final ExpectedVariables spo2 = TestUtils.getExpectedVariables( List.of(), List.of("s", "p", "o") );
 
 		// certain vars
-		assertTrue( provider.supports(lop_sparql, sp1) );
-		assertTrue( provider.supports(lop_sparql, po1) );
-		assertTrue( provider.supports(lop_sparql, so1) );
-		assertTrue( provider.supports(lop_sparql, spo1) );
+		assertTrue( factory.supports(lop_sparql, sp1) );
+		assertTrue( factory.supports(lop_sparql, po1) );
+		assertTrue( factory.supports(lop_sparql, so1) );
+		assertTrue( factory.supports(lop_sparql, spo1) );
 		// possible vars
-		assertTrue( provider.supports(lop_sparql, sp2) );
-		assertTrue( provider.supports(lop_sparql, po2) );
-		assertTrue( provider.supports(lop_sparql, so2) );
-		assertTrue( provider.supports(lop_sparql, spo2) );
+		assertTrue( factory.supports(lop_sparql, sp2) );
+		assertTrue( factory.supports(lop_sparql, po2) );
+		assertTrue( factory.supports(lop_sparql, so2) );
+		assertTrue( factory.supports(lop_sparql, spo2) );
 		// unsupported federation member types
-		assertFalse( provider.supports(lop_tpf,    sp1) );
-		assertFalse( provider.supports(lop_brtpf,  sp1) );
+		assertFalse( factory.supports(lop_tpf,    sp1) );
+		assertFalse( factory.supports(lop_brtpf,  sp1) );
 	}
 }

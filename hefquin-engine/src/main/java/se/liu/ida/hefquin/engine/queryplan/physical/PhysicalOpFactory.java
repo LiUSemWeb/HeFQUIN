@@ -3,15 +3,15 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
-public interface PhysicalOpProvider
+public interface PhysicalOpFactory
 {
 	/**
-	 * Returns true if this provider can create a physical operator for the given
+	 * Returns true if this factory can create a physical operator for the given
 	 * logical operator and expected input variables.
 	 * 
 	 * @param lop       the logical operator to check
 	 * @param inputVars expected input variables
-	 * @return {@code true} if this provider can handle the inputs; {@code false}
+	 * @return {@code true} if this factory can handle the inputs; {@code false}
 	 *         otherwise
 	 */
 	boolean supports( LogicalOperator lop, ExpectedVariables inputVars );

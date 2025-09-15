@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 /**
  * Class used to create physical operators ({@link PhysicalOperator}) from
  * logical operators ({@link LogicalOperator}) by consulting a registry of
- * factories ({@link PhysicalOpProvider}).
+ * factories ({@link PhysicalOpFactory}).
  *
  * Factories are queried in the order they were registered. The first factory
  * that supports the operator given the provided input variables is used to create
@@ -23,7 +23,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
 public class PhysicalOpRegistry
 {
-	private final List<PhysicalOpProvider> factories = new ArrayList<>();
+	private final List<PhysicalOpFactory> factories = new ArrayList<>();
 
 	/**
      * Registers a factory at the end of the lookup chain.
@@ -31,7 +31,7 @@ public class PhysicalOpRegistry
      * @param factory the factory to add
      * @return this registry (for chaining)
      */
-	public PhysicalOpRegistry register( final PhysicalOpProvider factory ) {
+	public PhysicalOpRegistry register( final PhysicalOpFactory factory ) {
 		factories.add(factory);
 		return this;
 	}
@@ -47,7 +47,7 @@ public class PhysicalOpRegistry
      * @throws UnsupportedOperationException if no factory supports the inputs
      */
 	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-		for ( final PhysicalOpProvider factory : factories ) {
+		for ( final PhysicalOpFactory factory : factories ) {
 			if ( factory.supports(lop, inputVars) ) {
 				return factory.create(lop);
 			}

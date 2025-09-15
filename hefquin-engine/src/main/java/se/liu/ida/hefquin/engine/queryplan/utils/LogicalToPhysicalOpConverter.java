@@ -10,7 +10,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpRegistry;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
@@ -26,9 +26,9 @@ import se.liu.ida.hefquin.federation.TPFServer;
  */
 public class LogicalToPhysicalOpConverter
 {
-	final private static PhysicalOpFactory factory = new PhysicalOpFactory()
-			.register( new PhysicalOpBindJoinWithBoundJoin.Provider() )
-			.register( new PhysicalOpBindJoinWithUNION.Provider() );
+	final private static PhysicalOpRegistry factory = new PhysicalOpRegistry()
+			.register( new PhysicalOpBindJoinWithBoundJoin.Factory() )
+			.register( new PhysicalOpBindJoinWithUNION.Factory() );
 
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
 		if (      lop instanceof NullaryLogicalOp ) return convert( (NullaryLogicalOp) lop );
