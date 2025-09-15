@@ -18,7 +18,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpProviders.
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
 
-public class TestForPhysicalOpFactory
+public class TestForPhysicalOpRegistry
 {
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpAdd(){
