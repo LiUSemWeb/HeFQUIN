@@ -112,7 +112,6 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 			if( lop instanceof LogicalOpGPOptAdd op ){
 				return op.containsTriplePatternOnly() ;
 			}
-			System.err.println("Incorrect type: " + lop.getClass());
 			return false;
 		}
 
