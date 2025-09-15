@@ -20,7 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithB
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
 import se.liu.ida.hefquin.federation.FederationMember;
 
-public class TestsForPhysicalOpProviders {
+public class TestsForPhysicalOpFactories {
     interface LogicalOpConstructor extends BiFunction<FederationMember, SPARQLGraphPattern, LogicalOperator> {
         // first arg is the federation member type your constructors accept
     }
