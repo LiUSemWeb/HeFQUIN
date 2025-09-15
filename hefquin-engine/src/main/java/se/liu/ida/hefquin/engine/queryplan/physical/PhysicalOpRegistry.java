@@ -7,49 +7,49 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
 /**
- * Factory used to create physical operators ({@link PhysicalOperator}) from
+ * Class used to create physical operators ({@link PhysicalOperator}) from
  * logical operators ({@link LogicalOperator}) by consulting a registry of
- * providers ({@link PhysicalOpProvider}).
+ * factories ({@link PhysicalOpProvider}).
  *
- * Providers are queried in the order they were registered. The first provider
+ * Factories are queried in the order they were registered. The first factory
  * that supports the operator given the provided input variables is used to create
  * the physical operator.
  * 
- * All providers should be registered during initialization.
+ * All factories should be registered during initialization.
  *
- * If no registered provider supports the given inputs, the factory throws
+ * If no registered factory supports the given inputs, the registry throws
  * {@link UnsupportedOperationException}.
  */
 
-public class PhysicalOpFactory
+public class PhysicalOpRegistry
 {
-	private final List<PhysicalOpProvider> providers = new ArrayList<>();
+	private final List<PhysicalOpProvider> factories = new ArrayList<>();
 
 	/**
-     * Registers a provider at the end of the lookup chain.
+     * Registers a factory at the end of the lookup chain.
      *
-     * @param provider the provider to add
-     * @return this factory (for chaining)
+     * @param factory the factory to add
+     * @return this registry (for chaining)
      */
-	public PhysicalOpFactory register( final PhysicalOpProvider provider ) {
-		providers.add(provider);
+	public PhysicalOpRegistry register( final PhysicalOpProvider factory ) {
+		factories.add(factory);
 		return this;
 	}
 
 	/**
      * Creates a physical operator for the given logical operator by
-     * consulting registered providers in order, or throws {@link UnsupportedOperationException}
-	 * if no registered provider supports the given inputs.
+     * consulting registered factories in order, or throws {@link UnsupportedOperationException}
+	 * if no registered factory supports the given inputs.
      *
      * @param lop        logical operator
      * @param inputVars  expected input variables
-     * @return the operator produced by the first supporting provider
-     * @throws UnsupportedOperationException if no provider supports the inputs
+     * @return the operator produced by the first supporting factory
+     * @throws UnsupportedOperationException if no factory supports the inputs
      */
 	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-		for ( final PhysicalOpProvider provider : providers ) {
-			if ( provider.supports(lop, inputVars) ) {
-				return provider.create(lop);
+		for ( final PhysicalOpProvider factory : factories ) {
+			if ( factory.supports(lop, inputVars) ) {
+				return factory.create(lop);
 			}
 		}
 		throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
