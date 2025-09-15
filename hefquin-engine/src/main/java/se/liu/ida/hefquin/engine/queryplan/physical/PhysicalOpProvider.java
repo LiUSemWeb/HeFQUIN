@@ -14,7 +14,7 @@ public interface PhysicalOpProvider
 	 * @return {@code true} if this provider can handle the inputs; {@code false}
 	 *         otherwise
 	 */
-	boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars );
+	boolean supports( LogicalOperator lop, ExpectedVariables inputVars );
 
 	/**
 	 * Creates a physical operator for the given logical operator.
@@ -26,5 +26,5 @@ public interface PhysicalOpProvider
 	 * @return a physical operator
 	 * @throws IllegalArgumentException if the precondition was violated
 	 */
-	PhysicalOperator create( final LogicalOperator lop );
+	PhysicalOperator create( LogicalOperator lop );
 }
