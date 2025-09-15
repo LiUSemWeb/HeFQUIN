@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
 import org.apache.jena.sparql.core.Var;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
@@ -116,8 +118,11 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 		}
 
 		private boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
+			final Set<Var> certainVars = vars != null ? vars.getCertainVariables() : Set.of();
+			final Set<Var> possibleVars = vars != null ? vars.getPossibleVariables() : Set.of();
+
 			for ( final Var v : pattern.getCertainVariables() ) {
-				if ( ! vars.getCertainVariables().contains(v) && ! vars.getPossibleVariables().contains(v) ) {
+				if ( ! certainVars.contains(v) && ! possibleVars.contains(v) ) {
 					return true;
 				}
 			}
