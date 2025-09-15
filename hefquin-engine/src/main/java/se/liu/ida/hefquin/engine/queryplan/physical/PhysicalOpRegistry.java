@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -44,7 +45,7 @@ public class PhysicalOpRegistry
      * @param lop        logical operator
      * @param inputVars  expected input variables
      * @return the operator produced by the first supporting factory
-     * @throws UnsupportedOperationException if no factory supports the inputs
+     * @throws NoSuchElementException if no factory supports the inputs
      */
 	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables inputVars ) {
 		for ( final PhysicalOpFactory factory : factories ) {
@@ -52,6 +53,6 @@ public class PhysicalOpRegistry
 				return factory.create(lop);
 			}
 		}
-		throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+		throw new NoSuchElementException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
 	}
 }
