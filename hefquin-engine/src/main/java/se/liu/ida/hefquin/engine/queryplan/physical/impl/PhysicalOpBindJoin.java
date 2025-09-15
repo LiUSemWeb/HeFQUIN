@@ -5,8 +5,11 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -99,5 +102,30 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 	public String toString() {
 		return "> bindJoin" + lop.toString();
 	}
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+			if( lop instanceof LogicalOpGPAdd op ){
+				return op.containsTriplePatternOnly() ;
+			}
+			if( lop instanceof LogicalOpGPOptAdd op ){
+				return op.containsTriplePatternOnly() ;
+			}
+			System.err.println("Incorrect type: " + lop.getClass());
+			return false;
+		}
 
+		@Override
+		public PhysicalOperator create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoin(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }
