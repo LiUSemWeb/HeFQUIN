@@ -24,9 +24,7 @@ import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceIm
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 
 public class TestUtils {
-		// ---- helper functions -----
-	
-	public LogicalOpGPAdd getLogicalOpGPAdd( final SPARQLGraphPattern pattern ){
+	protected LogicalOpGPAdd getLogicalOpGPAdd( final SPARQLGraphPattern pattern ){
 		final FederationMember fm = new SPARQLEndpointForTest();
 		return new LogicalOpGPAdd(fm, pattern);
 	}
@@ -40,12 +38,12 @@ public class TestUtils {
 			public Set<Var> getCertainVariables() {
 				return certainVars.stream().map(Var::alloc).collect(Collectors.toSet());
 			}
-			
+
 			@Override
 			public Set<Var> getPossibleVariables() {
 				return possibleVars.stream().map(Var::alloc).collect(Collectors.toSet());
 			}
-			
+
 		};
 	}
 
