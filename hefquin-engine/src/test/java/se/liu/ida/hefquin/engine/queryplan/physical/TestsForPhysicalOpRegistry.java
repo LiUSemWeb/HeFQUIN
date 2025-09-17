@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.syntax.Element;
@@ -52,29 +53,29 @@ public class TestsForPhysicalOpRegistry
 	public void assertSupportForOpBindJoinWithBoundJoin( final LogicalOpConstructor logicalOpConstructor,
 	                                                     final PhysicalOpRegistry registry ){
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
-		Element el = QueryFactory.create(queryString).getQueryPattern();
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
 		final LogicalOperator lop = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables spo = TestUtils.getExpectedVariables( List.of("s", "p", "o"), List.of() );
 
-		// wrong type returned
+		// assert type
 		assertEquals( PhysicalOpBindJoinWithBoundJoin.class, registry.create(lop, sp).getClass());
 		// non-joinable var missing
-		assertThrows( UnsupportedOperationException.class, () -> registry.create(lop, spo) );
+		assertThrows( NoSuchElementException.class, () -> registry.create(lop, spo) );
 	}
 
 	public void assertSupportForOpBindJoinWithUNION( final LogicalOpConstructor logicalOpConstructor,
 	                                                 final PhysicalOpRegistry registry ){
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
-		Element el = QueryFactory.create(queryString).getQueryPattern();
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
 		final LogicalOperator lop = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 
-		// wrong type returned
+		// assert type
 		assertEquals( PhysicalOpBindJoinWithUNION.class, registry.create(lop, sp).getClass());
 	}
 }
