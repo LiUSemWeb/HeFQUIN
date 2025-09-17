@@ -22,7 +22,10 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
@@ -30,6 +33,10 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
@@ -42,47 +49,31 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithV
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 public class TestsForPhysicalOpFactories {
     interface LogicalOpConstructor extends BiFunction<FederationMember, SPARQLGraphPattern, LogicalOperator> {
-        // first arg is the federation member type your constructors accept
+        // first arg is the federation member the LogicalOperator constructors accept
+        // second arg is the SPARQLGraphPattern the LogicalOperator constructors accept
     }
-	// Complete:
-	// - PhysicalOpBinaryUnion.java
-	// - PhysicalOpBind.java
-	// - PhysicalOpBindJoin.java
-	// - PhysicalOpBindJoinWithBoundJoin.java
-	// - PhysicalOpBindJoinWithFILTER.java
-	// - PhysicalOpBindJoinWithUNION.java
-	// - PhysicalOpBindJoinWithVALUES.java
-	// - PhysicalOpBindJoinWithVALUESorFILTER.java
-	// - PhysicalOpFilter.java
-	// - PhysicalOpGlobalToLocal.java
-	// - PhysicalOpHashJoin.java
-	// TODO:
-	// - PhysicalOpHashRJoin.java
-	// - PhysicalOpIndexNestedLoopsJoin.java
-	// - PhysicalOpLocalToGlobal.java
-	// - PhysicalOpMultiwayUnion.java
-	// - PhysicalOpNaiveNestedLoopsJoin.java
-	// - PhysicalOpParallelMultiLeftJoin.java
-	// - PhysicalOpRequest.java
-	// - PhysicalOpSymmetricHashJoin.java
-	// - PhysicalPlanWithBinaryRootImpl.java
-	// - PhysicalPlanWithNaryRootImpl.java
-	// - PhysicalPlanWithNullaryRootImpl.java
-	// - PhysicalPlanWithUnaryRootImpl.java
 
 	@Test
 	public void testPhysicalOpBinaryUnion() {
 		final PhysicalOpFactory factory = new PhysicalOpBinaryUnion.Factory();
 
 		final LogicalOperator lop_union = LogicalOpUnion.getInstance();
-		final LogicalOperator lop_join = LogicalOpJoin.getInstance();
 
-		assertTrue(  factory.supports(lop_union, (ExpectedVariables) null));
-		assertFalse( factory.supports(lop_join, (ExpectedVariables) null));
+		assertEquals( PhysicalOpBinaryUnion.class, factory.create(lop_union).getClass() );
+		assertTrue( factory.supports(lop_union, (ExpectedVariables) null));
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
 	}
 
 	@Test
@@ -93,10 +84,10 @@ public class TestsForPhysicalOpFactories {
 		final Expr bindExpr = NodeValue.makeInteger(42);
 		final VarExprList bindExpressions = new VarExprList(v, bindExpr);
 		final LogicalOperator lop_bind = new LogicalOpBind(bindExpressions);
-		final LogicalOperator lop_join = LogicalOpJoin.getInstance();
 
-		assertTrue(  factory.supports(lop_bind, (ExpectedVariables) null));
-		assertFalse( factory.supports(lop_join, (ExpectedVariables) null));
+		assertEquals( PhysicalOpBind.class, factory.create(lop_bind).getClass() );
+		assertTrue( factory.supports(lop_bind, (ExpectedVariables) null));
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
 	}
 
 	@Test
@@ -148,8 +139,9 @@ public class TestsForPhysicalOpFactories {
 		final Expr e = new E_IsIRI( new ExprVar(v) );
 		final LogicalOperator lop = new LogicalOpFilter(e);
 
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
 		assertEquals( PhysicalOpFilter.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
 	}
 
 	@Test
@@ -157,8 +149,9 @@ public class TestsForPhysicalOpFactories {
 		final PhysicalOpFactory factory = new PhysicalOpGlobalToLocal.Factory();
 		final LogicalOperator lop = new LogicalOpGlobalToLocal( TestUtils.getVocabularyMappingForTest() );
 
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
 		assertEquals( PhysicalOpGlobalToLocal.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
 	}
 
 	@Test
@@ -166,8 +159,91 @@ public class TestsForPhysicalOpFactories {
 		final PhysicalOpFactory factory = new PhysicalOpHashJoin.Factory();
 		final LogicalOperator lop = LogicalOpJoin.getInstance();
 
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
 		assertEquals( PhysicalOpHashJoin.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpUnion.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpHashRJoin() {
+		final PhysicalOpFactory factory = new PhysicalOpHashRJoin.Factory();
+		final LogicalOperator lop = LogicalOpRightJoin.getInstance();
+
+		assertEquals( PhysicalOpHashRJoin.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpIndexNestedLoopsJoin() {
+		final PhysicalOpFactory factory = new PhysicalOpIndexNestedLoopsJoin.Factory();
+		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
+		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPOptAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
+	}
+
+	@Test
+	public void testPhysicalOpLocalToGlobal() {
+		final PhysicalOpFactory factory = new PhysicalOpLocalToGlobal.Factory();
+		final LogicalOperator lop = new LogicalOpLocalToGlobal( TestUtils.getVocabularyMappingForTest() );
+
+		assertEquals( PhysicalOpLocalToGlobal.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpMultiwayUnion() {
+		final PhysicalOpFactory factory = new PhysicalOpMultiwayUnion.Factory();
+		final LogicalOperator lop = LogicalOpMultiwayUnion.getInstance();
+
+		assertEquals( PhysicalOpMultiwayUnion.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpJoin.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpNaiveNestedLoopsJoin() {
+		final PhysicalOpFactory factory = new PhysicalOpNaiveNestedLoopsJoin.Factory();
+		final LogicalOperator lop = LogicalOpJoin.getInstance();
+
+		assertEquals( PhysicalOpNaiveNestedLoopsJoin.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpUnion.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpParallelMultiLeftJoin() {
+		// TODO: Making the factory for PhysicalOpParallelMultiLeftJoin is not
+		// straightforward. It already contains a method checkApplicability(...), which
+		// can be viewed as equivalent to the PhysicalOpFactory#supported; however,
+		// checkApplicability(...) also requires access to all PhysicalPlan[] children...
+		// Should we treat this a special case?
+	}
+
+	@Test
+	public void testPhysicalOpRequest() {
+		final PhysicalOpFactory factory = new PhysicalOpRequest.Factory();
+
+		final Var v1 = Var.alloc("x");
+		final Var v2 = Var.alloc("y");
+		final Var v3 = Var.alloc("z");
+		final TriplePattern tp = new TriplePatternImpl(v1, v2, v3);
+		final FederationMember fm = new TestUtils.SPARQLEndpointForTest();
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp) );
+
+		assertEquals( PhysicalOpRequest.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpUnion.getInstance(), (ExpectedVariables) null) );
+	}
+
+	@Test
+	public void testPhysicalOpSymmetricHashJoin() {
+		final PhysicalOpFactory factory = new PhysicalOpSymmetricHashJoin.Factory();
+
+		final BinaryLogicalOp lop = LogicalOpJoin.getInstance();
+		assertEquals( PhysicalOpSymmetricHashJoin.class, factory.create(lop).getClass() );
+		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
+		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null) );
 	}
 
 	// ---- helper functions -----
@@ -246,5 +322,26 @@ public class TestsForPhysicalOpFactories {
 		// unsupported federation member types
 		assertFalse( factory.supports(lop_tpf, (ExpectedVariables) null ) );
 		assertFalse( factory.supports(lop_brtpf,  (ExpectedVariables) null ) );
+	}
+
+	public void assertSupportForOpIndexNestedLoopsJoin( final LogicalOpConstructor logicalOpConstructor,
+	                                                    final Class<? extends PhysicalOperator> opClass,
+	                                                    final PhysicalOpFactory factory ){
+
+		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
+		final Element el = QueryFactory.create(queryString).getQueryPattern();
+		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
+		final LogicalOperator lop_sparql = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
+		final LogicalOperator lop_tpf = logicalOpConstructor.apply( new TestUtils.TPFServerForTest(), p );
+		final LogicalOperator lop_brtpf = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p );
+
+		assertEquals( opClass, factory.create(lop_sparql).getClass() );
+		assertEquals( opClass, factory.create(lop_tpf).getClass() );
+		assertEquals( opClass, factory.create(lop_brtpf).getClass() );
+
+		assertTrue( factory.supports(lop_sparql, (ExpectedVariables) null) );
+		assertTrue( factory.supports(lop_tpf, (ExpectedVariables) null) );
+		assertTrue( factory.supports(lop_brtpf, (ExpectedVariables) null) );
+		assertFalse( factory.supports(LogicalOpUnion.getInstance(), (ExpectedVariables) null) );
 	}
 }
