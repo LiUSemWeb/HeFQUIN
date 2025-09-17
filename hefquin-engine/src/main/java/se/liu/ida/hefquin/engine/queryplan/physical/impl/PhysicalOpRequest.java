@@ -8,8 +8,11 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPAR
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -94,4 +97,20 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		return lop.toString();
 	}
 
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+			return lop instanceof LogicalOpRequest;
+		}
+
+		@Override
+		public PhysicalOperator create( final LogicalOperator lop ) {
+			if ( lop instanceof  LogicalOpRequest<?,?> op ) {
+				return new PhysicalOpRequest<>(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }
