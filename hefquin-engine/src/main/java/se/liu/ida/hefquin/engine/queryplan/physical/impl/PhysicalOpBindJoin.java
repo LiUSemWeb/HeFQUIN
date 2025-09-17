@@ -107,10 +107,10 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
-				return op.containsTriplePatternOnly() ;
+				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
 			}
 			if( lop instanceof LogicalOpGPOptAdd op ){
-				return op.containsTriplePatternOnly() ;
+				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
 			}
 			return false;
 		}

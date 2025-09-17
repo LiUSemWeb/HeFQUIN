@@ -264,14 +264,14 @@ public class TestsForPhysicalOpFactories {
 
 		assertEquals( PhysicalOpBindJoin.class, factory.create(lop_sparql).getClass() );
 
-		assertTrue( factory.supports( lop_sparql, (ExpectedVariables) null ) );
-		assertTrue( factory.supports( lop_tpf, (ExpectedVariables) null ) );
+		assertFalse( factory.supports( lop_sparql, (ExpectedVariables) null ) );
+		assertFalse( factory.supports( lop_tpf, (ExpectedVariables) null ) );
 		assertTrue( factory.supports( lop_brtpf, (ExpectedVariables) null ) );
 
 		// all other pattern types should fail
 		final ElementGroup el2 = new ElementGroup();
 		final SPARQLGraphPattern p2 = new GenericSPARQLGraphPatternImpl1(el2);
-		final LogicalOperator lop_unsupported = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p2 );
+		final LogicalOperator lop_unsupported = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p2 );
 		assertFalse( factory.supports( lop_unsupported, (ExpectedVariables) null ) );
 	}
 
