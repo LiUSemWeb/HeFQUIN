@@ -219,7 +219,7 @@ public class ExecOpParallelMultiwayLeftJoin extends UnaryExecutableOpBaseWithBat
 			this.execCxt = execCxt;
 
 			final UnaryLogicalOp addLop = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(req);
-			final UnaryPhysicalOp addPop = LogicalToPhysicalOpConverter.convert(addLop, inputVarsFromNonOptionalPart);
+			final UnaryPhysicalOp addPop = (UnaryPhysicalOp) LogicalToPhysicalOpConverter.convert(addLop, inputVarsFromNonOptionalPart);
 			this.execOp = addPop.createExecOp(false, null, inputVarsFromNonOptionalPart);
 
 			this.mySink = new IntermediateResultElementSink() {

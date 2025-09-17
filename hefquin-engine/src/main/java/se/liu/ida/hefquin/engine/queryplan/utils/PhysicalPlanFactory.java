@@ -139,7 +139,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlan( final NullaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo ) {
-		final NullaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
+		final NullaryPhysicalOp pop = (NullaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
 		return createPlan(pop, qpInfo);
 	}
 
@@ -247,7 +247,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final UnaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert( rootOp, subplan.getExpectedVariables() );
+		final UnaryPhysicalOp pop = (UnaryPhysicalOp) LogicalToPhysicalOpConverter.convert( rootOp, subplan.getExpectedVariables() );
 		return createPlan(pop, qpInfo, subplan);
 	}
 
@@ -396,7 +396,7 @@ public class PhysicalPlanFactory
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
+		final BinaryPhysicalOp pop = (BinaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
 		return createPlan(pop, qpInfo, subplan1, subplan2);
 	}
 
@@ -444,7 +444,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan... subplans ) {
-		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
+		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
 		return createPlan(pop, qpInfo, subplans);
 	}
 
@@ -466,7 +466,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final List<PhysicalPlan> subplans ) {
-		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
+		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
 		return createPlan(pop, qpInfo, subplans);
 	}
 
