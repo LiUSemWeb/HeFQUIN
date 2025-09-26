@@ -36,7 +36,8 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
 	@Override
 	public LogicalOpBind getLogicalOperator() {
 		return lop;
-	}
+ 	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
