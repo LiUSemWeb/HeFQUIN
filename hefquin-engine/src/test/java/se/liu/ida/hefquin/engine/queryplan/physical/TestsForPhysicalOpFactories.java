@@ -240,7 +240,7 @@ public class TestsForPhysicalOpFactories {
 	public void testPhysicalOpSymmetricHashJoin() {
 		final PhysicalOpFactory factory = new PhysicalOpSymmetricHashJoin.Factory();
 
-		final BinaryLogicalOp lop = LogicalOpJoin.getInstance();
+		final LogicalOpJoin lop = LogicalOpJoin.getInstance();
 		assertEquals( PhysicalOpSymmetricHashJoin.class, factory.create(lop).getClass() );
 		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
 		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null) );

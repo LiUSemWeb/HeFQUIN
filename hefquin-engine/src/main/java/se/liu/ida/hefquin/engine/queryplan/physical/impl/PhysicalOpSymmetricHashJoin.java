@@ -55,12 +55,12 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-			return lop instanceof BinaryLogicalOp;
+			return lop instanceof LogicalOpJoin;
 		}
 
 		@Override
 		public PhysicalOperator create( final LogicalOperator lop ) {
-			if ( lop instanceof BinaryLogicalOp ) {
+			if ( lop instanceof LogicalOpJoin ) {
 				return new PhysicalOpSymmetricHashJoin( (LogicalOpJoin) lop);
 			}
 
