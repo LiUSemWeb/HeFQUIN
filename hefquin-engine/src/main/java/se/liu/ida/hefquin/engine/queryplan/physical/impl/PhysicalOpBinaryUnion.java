@@ -64,7 +64,7 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-			return lop instanceof LogicalOpUnion;
+			return ( lop instanceof LogicalOpUnion );
 		}
 
 		@Override

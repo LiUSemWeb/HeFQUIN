@@ -42,7 +42,7 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-			return lop instanceof LogicalOpBind;
+			return ( lop instanceof LogicalOpBind );
 		}
 
 		@Override

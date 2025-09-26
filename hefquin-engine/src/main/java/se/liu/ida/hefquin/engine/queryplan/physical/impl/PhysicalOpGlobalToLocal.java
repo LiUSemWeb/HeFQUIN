@@ -56,10 +56,7 @@ public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-			if( lop instanceof LogicalOpGlobalToLocal ){
-				return true;
-			}
-			return false;
+			return ( lop instanceof LogicalOpGlobalToLocal );
 		}
 
 		@Override
