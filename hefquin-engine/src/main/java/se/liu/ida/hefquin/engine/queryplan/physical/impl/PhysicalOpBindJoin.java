@@ -102,6 +102,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 	public String toString() {
 		return "> bindJoin" + lop.toString();
 	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
