@@ -106,7 +106,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
-		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
 				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
 			}

@@ -53,7 +53,7 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
-		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpJoin );
 		}
 

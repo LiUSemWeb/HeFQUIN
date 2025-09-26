@@ -14,7 +14,7 @@ public interface PhysicalOpFactory
 	 * @return {@code true} if this factory can handle the inputs; {@code false}
 	 *         otherwise
 	 */
-	boolean supports( LogicalOperator lop, ExpectedVariables inputVars );
+	boolean supports( LogicalOperator lop, ExpectedVariables... inputVars );
 
 	/**
 	 * Creates a physical operator for the given logical operator.

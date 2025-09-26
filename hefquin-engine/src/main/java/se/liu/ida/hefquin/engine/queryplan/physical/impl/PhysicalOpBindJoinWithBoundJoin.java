@@ -88,12 +88,12 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
-		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return isSupported( op.getFederationMember(), op.getPattern(), inputVars );
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );
 			}
 			if ( lop instanceof LogicalOpGPOptAdd op ) {
-				return isSupported( op.getFederationMember(), op.getPattern(), inputVars );
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );
 			}
 			return false;
 		}

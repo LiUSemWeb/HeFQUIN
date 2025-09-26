@@ -139,7 +139,7 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
-		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
 				return isSupported( op.getFederationMember() );
 			}
