@@ -48,10 +48,7 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables inputVars ) {
-			if( lop instanceof LogicalOpFilter ){
-				return true;
-			}
-			return false;
+			return ( lop instanceof LogicalOpFilter );
 		}
 
 		@Override
