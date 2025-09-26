@@ -21,7 +21,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
  * If no registered factory supports the given inputs, the registry throws
  * {@link UnsupportedOperationException}.
  */
-
 public class PhysicalOpRegistry
 {
 	private final List<PhysicalOpFactory> factories = new ArrayList<>();
