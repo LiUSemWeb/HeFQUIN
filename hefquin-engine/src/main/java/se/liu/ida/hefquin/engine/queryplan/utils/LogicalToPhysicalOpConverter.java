@@ -23,8 +23,8 @@ public class LogicalToPhysicalOpConverter
 		.register( new PhysicalOpLocalToGlobal.Factory() )         // Apply vocab mappings local to global
 		.register( new PhysicalOpBindJoin.Factory() )              // Bind-join for brTPF interface
 		.register( new PhysicalOpBindJoinWithBoundJoin.Factory() ) // Bind-join for SPARQL interface
-		.register( new PhysicalOpBindJoinWithUNION.Factory() )     // (fallback) if no non-joining var available
-		// .register( new PhysicalOpBindJoinWithVALUESorFILTER.Factory() )
+		.register( new PhysicalOpBindJoinWithVALUESorFILTER.Factory() ) // (fallback) if no non-joining var available
+		// .register( new PhysicalOpBindJoinWithUNION.Factory() )
 		// .register( new PhysicalOpBindJoinWithFILTER.Factory() )
 		// .register( new PhysicalOpBindJoinWithVALUES.Factory() )
 		.register( new PhysicalOpSymmetricHashJoin.Factory() )     // Inner join
