@@ -47,7 +47,7 @@ public class PhysicalOpRegistry
 	 * @return the operator produced by the first supporting factory
 	 * @throws NoSuchElementException if no factory supports the inputs
 	 */
-	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+	public PhysicalOperator create( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		for ( final PhysicalOpFactory factory : factories ) {
 			if ( factory.supports(lop, inputVars) ) {
 				return factory.create(lop);

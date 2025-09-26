@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
@@ -247,7 +249,10 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final UnaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = (UnaryPhysicalOp) LogicalToPhysicalOpConverter.convert( rootOp, subplan.getExpectedVariables() );
+		// Collect input vars
+		final ExpectedVariables inputVars = subplan.getExpectedVariables();
+
+		final UnaryPhysicalOp pop = (UnaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplan);
 	}
 
@@ -396,7 +401,11 @@ public class PhysicalPlanFactory
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = (BinaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
+		// Collect input vars
+		final ExpectedVariables inputVars1 = subplan1.getExpectedVariables();
+		final ExpectedVariables inputVars2 = subplan2.getExpectedVariables();
+
+		final BinaryPhysicalOp pop = (BinaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars1, inputVars2);
 		return createPlan(pop, qpInfo, subplan1, subplan2);
 	}
 
@@ -444,7 +453,12 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final PhysicalPlan... subplans ) {
-		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
+		// Collect input vars
+		final ExpectedVariables[] inputVars = Arrays.stream(subplans)
+				.map( PhysicalPlan::getExpectedVariables )
+				.toArray( ExpectedVariables[]::new );
+
+		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplans);
 	}
 
@@ -466,7 +480,12 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlan( final NaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo,
 	                                       final List<PhysicalPlan> subplans ) {
-		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
+		// Collect input vars
+		final ExpectedVariables[] inputVars = subplans.stream()
+				.map( PhysicalPlan::getExpectedVariables )
+				.toArray( ExpectedVariables[]::new );
+
+		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplans);
 	}
 

@@ -35,10 +35,10 @@ public class LogicalToPhysicalOpConverter
 	;
 
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
-		return convert(lop, null);
+		return convert(lop, (ExpectedVariables[]) null);
 	}
 
-	public static PhysicalOperator convert( final LogicalOperator lop, final ExpectedVariables inputVars ) {
+	public static PhysicalOperator convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
 	}
 }
