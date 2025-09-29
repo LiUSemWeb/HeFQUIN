@@ -1,9 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpRegistry;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 /**
@@ -35,10 +43,42 @@ public class LogicalToPhysicalOpConverter
 	;
 
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
-		return convert(lop, (ExpectedVariables[]) null);
+		return convert( lop, (ExpectedVariables[]) null );
 	}
 
 	public static PhysicalOperator convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
+	}
+
+	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
+		return (NullaryPhysicalOp) convert( (LogicalOperator) lop );
+	}
+
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
+		return (UnaryPhysicalOp) convert( (LogicalOperator) lop );
+	}
+
+	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
+		return (BinaryPhysicalOp) convert( (LogicalOperator) lop );
+	}
+
+	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
+		return (NaryPhysicalOp) convert( (LogicalOperator) lop );
+	}
+
+	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop, final ExpectedVariables... inputVars ) {
+		return (NullaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+	}
+
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables... inputVars ) {
+		return (UnaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+	}
+
+	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop, final ExpectedVariables... inputVars ) {
+		return (BinaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+	}
+
+	public static NaryPhysicalOp convert( final NaryLogicalOp lop, final ExpectedVariables... inputVars ) {
+		return (NaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
 	}
 }

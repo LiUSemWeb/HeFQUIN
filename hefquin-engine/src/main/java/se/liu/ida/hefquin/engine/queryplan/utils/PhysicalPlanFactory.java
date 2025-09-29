@@ -141,7 +141,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlan( final NullaryLogicalOp rootOp,
 	                                       final QueryPlanningInfo qpInfo ) {
-		final NullaryPhysicalOp pop = (NullaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp);
+		final NullaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp);
 		return createPlan(pop, qpInfo);
 	}
 
@@ -252,7 +252,7 @@ public class PhysicalPlanFactory
 		// Collect input vars
 		final ExpectedVariables inputVars = subplan.getExpectedVariables();
 
-		final UnaryPhysicalOp pop = (UnaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
+		final UnaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplan);
 	}
 
@@ -405,7 +405,7 @@ public class PhysicalPlanFactory
 		final ExpectedVariables inputVars1 = subplan1.getExpectedVariables();
 		final ExpectedVariables inputVars2 = subplan2.getExpectedVariables();
 
-		final BinaryPhysicalOp pop = (BinaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars1, inputVars2);
+		final BinaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp, inputVars1, inputVars2);
 		return createPlan(pop, qpInfo, subplan1, subplan2);
 	}
 
@@ -458,7 +458,7 @@ public class PhysicalPlanFactory
 				.map( PhysicalPlan::getExpectedVariables )
 				.toArray( ExpectedVariables[]::new );
 
-		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
+		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplans);
 	}
 
@@ -485,7 +485,7 @@ public class PhysicalPlanFactory
 				.map( PhysicalPlan::getExpectedVariables )
 				.toArray( ExpectedVariables[]::new );
 
-		final NaryPhysicalOp pop = (NaryPhysicalOp) LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
+		final NaryPhysicalOp pop = LogicalToPhysicalOpConverter.convert(rootOp, inputVars);
 		return createPlan(pop, qpInfo, subplans);
 	}
 
