@@ -3,6 +3,10 @@ package se.liu.ida.hefquin.engine.queryplan.physical;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 
+/**
+ * Implementations must expose a singleton instance via a public static
+ * {@code get()} method on the implementation class.
+ */
 public interface PhysicalOpFactory
 {
 	/**
