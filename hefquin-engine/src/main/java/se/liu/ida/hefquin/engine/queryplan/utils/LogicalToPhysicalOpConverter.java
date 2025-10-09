@@ -22,24 +22,24 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 public class LogicalToPhysicalOpConverter
 {
 	final private static PhysicalOpRegistry registry = new PhysicalOpRegistry()
-		.register( new PhysicalOpBinaryUnion.Factory() )           // Binary union
-		.register( new PhysicalOpMultiwayUnion.Factory() )         // Multiway union
-		.register( new PhysicalOpBind.Factory() )                  // Bind clauses
-		.register( new PhysicalOpFilter.Factory() )                // Filter clauses
-		.register( new PhysicalOpRequest.Factory() )               // Request at a federation member
-		.register( new PhysicalOpGlobalToLocal.Factory() )         // Apply vocab mappings global to local
-		.register( new PhysicalOpLocalToGlobal.Factory() )         // Apply vocab mappings local to global
-		.register( new PhysicalOpBindJoin.Factory() )              // Bind-join for brTPF interface
-		.register( new PhysicalOpBindJoinWithBoundJoin.Factory() ) // Bind-join for SPARQL interface
-		.register( new PhysicalOpBindJoinWithVALUESorFILTER.Factory() ) // (fallback) if no non-joining var available
-		// .register( new PhysicalOpBindJoinWithUNION.Factory() )
-		// .register( new PhysicalOpBindJoinWithFILTER.Factory() )
-		// .register( new PhysicalOpBindJoinWithVALUES.Factory() )
-		.register( new PhysicalOpSymmetricHashJoin.Factory() )     // Inner join
-		.register( new PhysicalOpHashRJoin.Factory() )             // Right outer join
-		.register( new PhysicalOpIndexNestedLoopsJoin.Factory() )  // Index NLJ algorithm, fm to request join partners
-		// .register( new PhysicalOpHashJoin.Factory() )
-		// .register( new PhysicalOpNaiveNestedLoopsJoin.Factory() )
+		.register( PhysicalOpBinaryUnion.Factory.get() )                // Binary union
+		.register( PhysicalOpMultiwayUnion.Factory.get() )              // Multiway union
+		.register( PhysicalOpBind.Factory.get() )                       // Bind clauses
+		.register( PhysicalOpFilter.Factory.get() )                     // Filter clauses
+		.register( PhysicalOpRequest.Factory.get() )                    // Request at a federation member
+		.register( PhysicalOpGlobalToLocal.Factory.get() )              // Apply vocab mappings global to local
+		.register( PhysicalOpLocalToGlobal.Factory.get() )              // Apply vocab mappings local to global
+		.register( PhysicalOpBindJoin.Factory.get() )                   // Bind-join for brTPF interface
+		.register( PhysicalOpBindJoinWithBoundJoin.Factory.get() )      // Bind-join for SPARQL interface
+		.register( PhysicalOpBindJoinWithVALUESorFILTER.Factory.get() ) // (fallback) if no non-joining var available
+		// .register( PhysicalOpBindJoinWithUNION.Factory.get() )
+		// .register( PhysicalOpBindJoinWithFILTER.Factory.get() )
+		// .register( PhysicalOpBindJoinWithVALUES.Factory.get() )
+		.register( PhysicalOpSymmetricHashJoin.Factory.get() )          // Inner join
+		.register( PhysicalOpHashRJoin.Factory.get() )                  // Right outer join
+		.register( PhysicalOpIndexNestedLoopsJoin.Factory.get() )       // Index NLJ algorithm, fm to request join partners
+		// .register( PhysicalOpHashJoin.Factory.get() )
+		// .register( PhysicalOpNaiveNestedLoopsJoin.Factory.get() )
 	;
 
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
