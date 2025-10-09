@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -55,13 +54,19 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 
 	public static class Factory implements PhysicalOpFactory
 	{
+		private static final Factory INSTANCE = new Factory();
+
+		public static Factory get() {
+			return INSTANCE;
+		}
+
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpMultiwayUnion );
 		}
 
 		@Override
-		public PhysicalOperator create( final LogicalOperator lop ) {
+		public PhysicalOpMultiwayUnion create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpMultiwayUnion ) {
 				return new PhysicalOpMultiwayUnion();
 			}

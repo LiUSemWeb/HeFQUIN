@@ -9,7 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -105,6 +104,12 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 
 	public static class Factory implements PhysicalOpFactory
 	{
+		private static final Factory INSTANCE = new Factory();
+
+		public static Factory get() {
+			return INSTANCE;
+		}
+
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
@@ -117,7 +122,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		}
 
 		@Override
-		public PhysicalOperator create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoin create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
 				return new PhysicalOpBindJoin(op);
 			}

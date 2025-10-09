@@ -8,7 +8,6 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
@@ -40,13 +39,19 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
 
 	public static class Factory implements PhysicalOpFactory
 	{
+		private static final Factory INSTANCE = new Factory();
+
+		public static Factory get() {
+			return INSTANCE;
+		}
+
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpBind );
 		}
 
 		@Override
-		public PhysicalOperator create( final LogicalOperator lop ) {
+		public PhysicalOpBind create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpBind op ) {
 				return new PhysicalOpBind(op);
 			}

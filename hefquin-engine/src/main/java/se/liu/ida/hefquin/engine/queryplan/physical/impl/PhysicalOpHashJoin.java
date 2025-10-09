@@ -7,7 +7,6 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -54,13 +53,20 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 
 	public static class Factory implements PhysicalOpFactory
 	{
+		private static final Factory INSTANCE = new Factory();
+
+		public static Factory get() {
+			return INSTANCE;
+		}
+
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			// The implementation covers the case were there are no join variables (cartesion product)
 			return ( lop instanceof LogicalOpJoin );
 		}
 
 		@Override
-		public PhysicalOperator create( final LogicalOperator lop ) {
+		public PhysicalOpHashJoin create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpJoin op ) {
 				return new PhysicalOpHashJoin(op);
 			}
