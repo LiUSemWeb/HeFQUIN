@@ -39,7 +39,7 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpHashRJoin.Factory.get() )                  // Right outer join
 		.register( PhysicalOpIndexNestedLoopsJoin.Factory.get() )       // Index NLJ algorithm, fm to request join partners
 		// .register( PhysicalOpHashJoin.Factory.get() )
-		// .register( PhysicalOpNaiveNestedLoopsJoin.Factory.get() )
+		.register( PhysicalOpNaiveNestedLoopsJoin.Factory.get() )
 	;
 
 	public static PhysicalOperator convert( final LogicalOperator lop ) {
