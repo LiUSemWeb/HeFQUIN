@@ -42,43 +42,41 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpNaiveNestedLoopsJoin.Factory.getInstance() )
 	;
 
-	public static PhysicalOperator convert( final LogicalOperator lop ) {
-		return convert( lop, (ExpectedVariables[]) null );
+	protected static PhysicalOperator _convert( final LogicalOperator lop ) {
+		return _convert( lop, (ExpectedVariables[]) null );
 	}
 
-	public static PhysicalOperator convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+	protected static PhysicalOperator _convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
 	}
 
 	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
-		return (NullaryPhysicalOp) convert( (LogicalOperator) lop );
+		return (NullaryPhysicalOp) _convert(lop);
 	}
 
 	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
-		return (UnaryPhysicalOp) convert( (LogicalOperator) lop );
+		return (UnaryPhysicalOp) _convert(lop);
 	}
 
 	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
-		return (BinaryPhysicalOp) convert( (LogicalOperator) lop );
+		return (BinaryPhysicalOp) _convert(lop);
 	}
 
 	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
-		return (NaryPhysicalOp) convert( (LogicalOperator) lop );
+		return (NaryPhysicalOp) _convert(lop);
 	}
 
-	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop, final ExpectedVariables... inputVars ) {
-		return (NullaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {
+		return (UnaryPhysicalOp) _convert(lop, inputVars);
 	}
 
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables... inputVars ) {
-		return (UnaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
-	}
-
-	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop, final ExpectedVariables... inputVars ) {
-		return (BinaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop,
+	                                        final ExpectedVariables inputVars1,
+	                                        final ExpectedVariables inputVars2 ) {
+		return (BinaryPhysicalOp) _convert(lop, inputVars1, inputVars2);
 	}
 
 	public static NaryPhysicalOp convert( final NaryLogicalOp lop, final ExpectedVariables... inputVars ) {
-		return (NaryPhysicalOp) convert( (LogicalOperator) lop, inputVars );
+		return (NaryPhysicalOp) _convert(lop, inputVars);
 	}
 }
