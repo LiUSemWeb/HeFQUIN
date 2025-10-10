@@ -75,10 +75,10 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory INSTANCE = new Factory();
+		private static final Factory singleton = new Factory();
 
-		public static Factory get() {
-			return INSTANCE;
+		public static Factory getInstance() {
+			return singleton;
 		}
 
 		@Override

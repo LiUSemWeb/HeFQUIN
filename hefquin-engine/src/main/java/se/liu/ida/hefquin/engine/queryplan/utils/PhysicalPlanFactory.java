@@ -113,7 +113,7 @@ public class PhysicalPlanFactory
 	 */
 	public static <R extends DataRetrievalRequest, M extends FederationMember>
 	PhysicalPlan createPlanWithRequest( final LogicalOpRequest<R,M> lop ) {
-		final NullaryPhysicalOp pop = PhysicalOpRequest.Factory.get().create(lop);
+		final NullaryPhysicalOp pop = PhysicalOpRequest.Factory.getInstance().create(lop);
 		return createPlan(pop);
 	}
 
@@ -173,7 +173,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpGPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoin.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -182,7 +182,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithIndexNLJ( final LogicalOpGPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpIndexNestedLoopsJoin.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpIndexNestedLoopsJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -191,7 +191,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinFILTER( final LogicalOpGPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithFILTER.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithFILTER.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -200,7 +200,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinUNION( final LogicalOpGPAdd lop,
 	                                                        final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithUNION.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithUNION.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -209,7 +209,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinVALUES( final LogicalOpGPAdd lop,
 	                                                         final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUES.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUES.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -218,7 +218,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinVALUESorFILTER( final LogicalOpGPAdd lop,
 	                                                                 final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUESorFILTER.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithVALUESorFILTER.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -227,7 +227,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoinBoundJoin( final LogicalOpGPAdd lop,
 	                                                            final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithBoundJoin.Factory.get().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinWithBoundJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -294,7 +294,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlanWithUnion( final LogicalOpUnion lop,
 	                                                final PhysicalPlan subplan1,
 	                                                final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpBinaryUnion.Factory.get().create(lop);
+		final BinaryPhysicalOp pop = PhysicalOpBinaryUnion.Factory.getInstance().create(lop);
 
 		return createPlan(pop, subplan1, subplan2);
 	}
@@ -313,7 +313,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlanWithHashJoin( final LogicalOpJoin lop,
 	                                                   final PhysicalPlan subplan1,
 	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpHashJoin.Factory.get().create(lop);
+		final BinaryPhysicalOp pop = PhysicalOpHashJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan1, subplan2);
 	}
 
@@ -331,7 +331,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlanWithSymmetricHashJoin( final LogicalOpJoin lop,
 	                                                            final PhysicalPlan subplan1,
 	                                                            final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpSymmetricHashJoin.Factory.get().create(lop);
+		final BinaryPhysicalOp pop = PhysicalOpSymmetricHashJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan1, subplan2);
 	}
 
@@ -349,7 +349,7 @@ public class PhysicalPlanFactory
 	public static PhysicalPlan createPlanWithNaiveNLJ( final LogicalOpJoin lop,
 	                                                   final PhysicalPlan subplan1,
 	                                                   final PhysicalPlan subplan2 ) {
-		final BinaryPhysicalOp pop = PhysicalOpNaiveNestedLoopsJoin.Factory.get().create(lop);
+		final BinaryPhysicalOp pop = PhysicalOpNaiveNestedLoopsJoin.Factory.getInstance().create(lop);
 		return createPlan(pop, subplan1, subplan2);
 	}
 
