@@ -158,9 +158,19 @@ public class TestsForPhysicalOpFactories {
 		final PhysicalOpFactory factory = new PhysicalOpHashJoin.Factory();
 		final LogicalOperator lop = LogicalOpJoin.getInstance();
 
+		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
+		final ExpectedVariables vars2 = TestUtils.getExpectedVariables( List.of("x"),      List.of() );
+		final ExpectedVariables vars3 = TestUtils.getExpectedVariables( List.of(),         List.of("x", "y") );
+		final ExpectedVariables vars4 = TestUtils.getExpectedVariables( List.of(),         List.of("x") );
+		final ExpectedVariables vars5 = TestUtils.getExpectedVariables( List.of(),         List.of() );
+
+		assertTrue( factory.supports(lop, vars1, vars2) );  // overlap certain
+		assertFalse( factory.supports(lop, vars1, vars3) ); // overlap certain/possible
+		assertFalse( factory.supports(lop, vars3, vars4) ); // overlap possible/possible
+		assertFalse( factory.supports(lop, vars1, vars5) ); // no overlap
+
 		assertEquals( PhysicalOpHashJoin.class, factory.create(lop).getClass() );
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
-		assertFalse( factory.supports(LogicalOpUnion.getInstance(), (ExpectedVariables) null) );
+		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null ) );
 	}
 
 	@Test
