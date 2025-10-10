@@ -25,7 +25,6 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
@@ -239,11 +238,21 @@ public class TestsForPhysicalOpFactories {
 	@Test
 	public void testPhysicalOpSymmetricHashJoin() {
 		final PhysicalOpFactory factory = new PhysicalOpSymmetricHashJoin.Factory();
-
 		final LogicalOpJoin lop = LogicalOpJoin.getInstance();
+
+		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
+		final ExpectedVariables vars2 = TestUtils.getExpectedVariables( List.of("x"),      List.of() );
+		final ExpectedVariables vars3 = TestUtils.getExpectedVariables( List.of(),         List.of("x", "y") );
+		final ExpectedVariables vars4 = TestUtils.getExpectedVariables( List.of(),         List.of("x") );
+		final ExpectedVariables vars5 = TestUtils.getExpectedVariables( List.of(),         List.of() );
+
+		assertTrue( factory.supports(lop, vars1, vars2) );  // overlap certain
+		assertFalse( factory.supports(lop, vars1, vars3) ); // overlap certain/possible
+		assertFalse( factory.supports(lop, vars3, vars4) ); // overlap possible/possible
+		assertFalse( factory.supports(lop, vars1, vars5) ); // no overlap
+
 		assertEquals( PhysicalOpSymmetricHashJoin.class, factory.create(lop).getClass() );
-		assertTrue( factory.supports(lop, (ExpectedVariables) null) );
-		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null) );
+		assertFalse( factory.supports( new LogicalOpGlobalToLocal(null), (ExpectedVariables) null ) );
 	}
 
 	// ---- helper functions -----

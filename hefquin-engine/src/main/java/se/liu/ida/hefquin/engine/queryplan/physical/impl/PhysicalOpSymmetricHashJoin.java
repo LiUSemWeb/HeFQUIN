@@ -1,6 +1,11 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -59,7 +64,13 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-			return ( lop instanceof LogicalOpJoin );
+			// inputVars contains null value?
+			for ( final ExpectedVariables vars : inputVars ) {
+				if ( vars == null ) return false;
+			}
+
+			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
+			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
 		}
 
 		@Override
