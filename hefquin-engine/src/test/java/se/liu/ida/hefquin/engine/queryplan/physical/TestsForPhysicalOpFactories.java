@@ -66,7 +66,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpBinaryUnion() {
-		final PhysicalOpFactory factory = new PhysicalOpBinaryUnion.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBinaryUnion.Factory.getInstance();
 
 		final LogicalOperator lop_union = LogicalOpUnion.getInstance();
 
@@ -77,7 +77,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpBind() {
-		final PhysicalOpFactory factory = new PhysicalOpBind.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBind.Factory.getInstance();
 
 		final Var v = Var.alloc("x");
 		final Expr bindExpr = NodeValue.makeInteger(42);
@@ -97,42 +97,42 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpBindJoinWithBoundJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithBoundJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinWithBoundJoin.Factory.getInstance();
 		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithBoundJoin.class, factory );
 		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithBoundJoin.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithFILTER() {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithFILTER.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinWithFILTER.Factory.getInstance();
 		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithFILTER.class, factory );
 		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithFILTER.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithUNION() {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithUNION.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinWithUNION.Factory.getInstance();
 		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithUNION.class, factory );
 		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithUNION.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUES() {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithVALUES.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUES.Factory.getInstance();
 		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithVALUES.class, factory );
 		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithVALUES.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUESorFILTER() {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoinWithVALUESorFILTER.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUESorFILTER.Factory.getInstance();
 		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
 		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpFilter() {
-		final PhysicalOpFactory factory = new PhysicalOpFilter.Factory();
+		final PhysicalOpFactory factory = PhysicalOpFilter.Factory.getInstance();
 
 		final Var v = Var.alloc("x");
 		final Expr e = new E_IsIRI( new ExprVar(v) );
@@ -145,7 +145,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpGlobalToLocal() {
-		final PhysicalOpFactory factory = new PhysicalOpGlobalToLocal.Factory();
+		final PhysicalOpFactory factory = PhysicalOpGlobalToLocal.Factory.getInstance();
 		final LogicalOperator lop = new LogicalOpGlobalToLocal( TestUtils.getVocabularyMappingForTest() );
 
 		assertEquals( PhysicalOpGlobalToLocal.class, factory.create(lop).getClass() );
@@ -155,7 +155,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpHashJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpHashJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpHashJoin.Factory.getInstance();
 		final LogicalOperator lop = LogicalOpJoin.getInstance();
 
 		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
@@ -175,7 +175,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpHashRJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpHashRJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpHashRJoin.Factory.getInstance();
 		final LogicalOperator lop = LogicalOpRightJoin.getInstance();
 
 		assertEquals( PhysicalOpHashRJoin.class, factory.create(lop).getClass() );
@@ -185,14 +185,14 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpIndexNestedLoopsJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpIndexNestedLoopsJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpIndexNestedLoopsJoin.Factory.getInstance();
 		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
 		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPOptAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpLocalToGlobal() {
-		final PhysicalOpFactory factory = new PhysicalOpLocalToGlobal.Factory();
+		final PhysicalOpFactory factory = PhysicalOpLocalToGlobal.Factory.getInstance();
 		final LogicalOperator lop = new LogicalOpLocalToGlobal( TestUtils.getVocabularyMappingForTest() );
 
 		assertEquals( PhysicalOpLocalToGlobal.class, factory.create(lop).getClass() );
@@ -202,7 +202,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpMultiwayUnion() {
-		final PhysicalOpFactory factory = new PhysicalOpMultiwayUnion.Factory();
+		final PhysicalOpFactory factory = PhysicalOpMultiwayUnion.Factory.getInstance();
 		final LogicalOperator lop = LogicalOpMultiwayUnion.getInstance();
 
 		assertEquals( PhysicalOpMultiwayUnion.class, factory.create(lop).getClass() );
@@ -212,7 +212,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpNaiveNestedLoopsJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpNaiveNestedLoopsJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpNaiveNestedLoopsJoin.Factory.getInstance();
 		final LogicalOperator lop = LogicalOpJoin.getInstance();
 
 		assertEquals( PhysicalOpNaiveNestedLoopsJoin.class, factory.create(lop).getClass() );
@@ -231,7 +231,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpRequest() {
-		final PhysicalOpFactory factory = new PhysicalOpRequest.Factory();
+		final PhysicalOpFactory factory = PhysicalOpRequest.Factory.getInstance();
 
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
@@ -247,7 +247,7 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpSymmetricHashJoin() {
-		final PhysicalOpFactory factory = new PhysicalOpSymmetricHashJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpSymmetricHashJoin.Factory.getInstance();
 		final LogicalOpJoin lop = LogicalOpJoin.getInstance();
 
 		final ExpectedVariables vars1 = TestUtils.getExpectedVariables( List.of("x", "y"), List.of() );
@@ -268,7 +268,7 @@ public class TestsForPhysicalOpFactories {
 	// ---- helper functions -----
 
 	public void assertSupportForOpBindJoin( final LogicalOpConstructor logicalOpConstructor ) {
-		final PhysicalOpFactory factory = new PhysicalOpBindJoin.Factory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoin.Factory.getInstance();
 
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
