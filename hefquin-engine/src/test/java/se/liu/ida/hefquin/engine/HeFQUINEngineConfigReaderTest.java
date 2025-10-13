@@ -272,8 +272,7 @@ public class HeFQUINEngineConfigReaderTest
 	protected Resource parseAndCreateResource( final String turtle ) {
 		final Model m = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(m);
 
 		return m.createResource("http://example.org/a");

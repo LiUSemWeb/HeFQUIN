@@ -28,8 +28,8 @@ public class ExecOpBindTest
 {
 	@Test
 	public void extendTwoSolMapsSeparate() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
-		final Node lit2 = NodeFactory.createLiteral( "2", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
+		final Node lit2 = NodeFactory.createLiteralDT( "2", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
 		final SolutionMapping sm1 = SolutionMappingUtils.createSolutionMapping(v1, lit8);
@@ -47,11 +47,11 @@ public class ExecOpBindTest
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
 		assertTrue( it.hasNext() );
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
 		assertEquals( lit9, it.next().asJenaBinding().get(v2) );
 
 		assertTrue( it.hasNext() );
-		final Node lit3 = NodeFactory.createLiteral( "3", XSDDatatype.XSDinteger );
+		final Node lit3 = NodeFactory.createLiteralDT( "3", XSDDatatype.XSDinteger );
 		assertEquals( lit3, it.next().asJenaBinding().get(v2) );
 
 		assertFalse( it.hasNext() );
@@ -59,8 +59,8 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendTwoSolMapsTogether() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
-		final Node lit2 = NodeFactory.createLiteral( "2", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
+		final Node lit2 = NodeFactory.createLiteralDT( "2", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
 		final List<SolutionMapping> input = new ArrayList<>(2);
@@ -78,11 +78,11 @@ public class ExecOpBindTest
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
 		assertTrue( it.hasNext() );
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
 		assertEquals( lit9, it.next().asJenaBinding().get(v2) );
 
 		assertTrue( it.hasNext() );
-		final Node lit3 = NodeFactory.createLiteral( "3", XSDDatatype.XSDinteger );
+		final Node lit3 = NodeFactory.createLiteralDT( "3", XSDDatatype.XSDinteger );
 		assertEquals( lit3, it.next().asJenaBinding().get(v2) );
 
 		assertFalse( it.hasNext() );
@@ -90,7 +90,7 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendTwoSolMapsSeparateWithOneFailing() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
 		final Node uri = NodeFactory.createURI( "http://example.org" );
 		final Var v1 = Var.alloc("v1");
 
@@ -109,7 +109,7 @@ public class ExecOpBindTest
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
 		assertTrue( it.hasNext() );
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
 		assertEquals( lit9, it.next().asJenaBinding().get(v2) );
 
 		assertTrue( it.hasNext() );
@@ -120,7 +120,7 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendTwoSolMapsTogetherWithOneFailing() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
 		final Node uri = NodeFactory.createURI( "http://example.org" );
 		final Var v1 = Var.alloc("v1");
 
@@ -139,7 +139,7 @@ public class ExecOpBindTest
 		final Iterator<SolutionMapping> it = sink.getCollectedSolutionMappings().iterator();
 
 		assertTrue( it.hasNext() );
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
 		assertEquals( lit9, it.next().asJenaBinding().get(v2) );
 
 		assertTrue( it.hasNext() );
@@ -150,7 +150,7 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendSolMapWithSameVariable() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
 		final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping(v1, lit8);
@@ -165,8 +165,8 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendTwoSolMapsWithTwoVariablesSeparate() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
-		final Node lit2 = NodeFactory.createLiteral( "2", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
+		final Node lit2 = NodeFactory.createLiteralDT( "2", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
 		final SolutionMapping inSM1 = SolutionMappingUtils.createSolutionMapping(v1, lit8);
@@ -189,15 +189,15 @@ public class ExecOpBindTest
 
 		assertTrue( it.hasNext() );
 		final Binding sm1 = it.next().asJenaBinding();
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
-		final Node lit7 = NodeFactory.createLiteral( "7", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
+		final Node lit7 = NodeFactory.createLiteralDT( "7", XSDDatatype.XSDinteger );
 		assertEquals( lit9, sm1.get(v2) );
 		assertEquals( lit7, sm1.get(v3) );
 
 		assertTrue( it.hasNext() );
 		final Binding sm2 = it.next().asJenaBinding();
-		final Node lit3 = NodeFactory.createLiteral( "3", XSDDatatype.XSDinteger );
-		final Node lit1 = NodeFactory.createLiteral( "1", XSDDatatype.XSDinteger );
+		final Node lit3 = NodeFactory.createLiteralDT( "3", XSDDatatype.XSDinteger );
+		final Node lit1 = NodeFactory.createLiteralDT( "1", XSDDatatype.XSDinteger );
 		assertEquals( lit3, sm2.get(v2) );
 		assertEquals( lit1, sm2.get(v3) );
 
@@ -206,8 +206,8 @@ public class ExecOpBindTest
 
 	@Test
 	public void extendTwoSolMapsWithTwoVariablesTogether() throws ExecOpExecutionException {
-		final Node lit8 = NodeFactory.createLiteral( "8", XSDDatatype.XSDinteger );
-		final Node lit2 = NodeFactory.createLiteral( "2", XSDDatatype.XSDinteger );
+		final Node lit8 = NodeFactory.createLiteralDT( "8", XSDDatatype.XSDinteger );
+		final Node lit2 = NodeFactory.createLiteralDT( "2", XSDDatatype.XSDinteger );
 		final Var v1 = Var.alloc("v1");
 
 		final List<SolutionMapping> input = new ArrayList<>(2);
@@ -230,15 +230,15 @@ public class ExecOpBindTest
 
 		assertTrue( it.hasNext() );
 		final Binding sm1 = it.next().asJenaBinding();
-		final Node lit9 = NodeFactory.createLiteral( "9", XSDDatatype.XSDinteger );
-		final Node lit7 = NodeFactory.createLiteral( "7", XSDDatatype.XSDinteger );
+		final Node lit9 = NodeFactory.createLiteralDT( "9", XSDDatatype.XSDinteger );
+		final Node lit7 = NodeFactory.createLiteralDT( "7", XSDDatatype.XSDinteger );
 		assertEquals( lit9, sm1.get(v2) );
 		assertEquals( lit7, sm1.get(v3) );
 
 		assertTrue( it.hasNext() );
 		final Binding sm2 = it.next().asJenaBinding();
-		final Node lit3 = NodeFactory.createLiteral( "3", XSDDatatype.XSDinteger );
-		final Node lit1 = NodeFactory.createLiteral( "1", XSDDatatype.XSDinteger );
+		final Node lit3 = NodeFactory.createLiteralDT( "3", XSDDatatype.XSDinteger );
+		final Node lit1 = NodeFactory.createLiteralDT( "1", XSDDatatype.XSDinteger );
 		assertEquals( lit3, sm2.get(v2) );
 		assertEquals( lit1, sm2.get(v3) );
 
