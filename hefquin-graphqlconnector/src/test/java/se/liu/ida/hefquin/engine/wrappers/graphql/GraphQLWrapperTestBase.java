@@ -104,12 +104,12 @@ public class GraphQLWrapperTestBase {
     protected final Node uri12 = NodeFactory.createURI(config.mapTypeToClass("Book"));
 
     // Literal nodes
-    protected final Node lit1 = NodeFactory.createLiteral("auth3", XSDBaseStringType.XSDstring);
-    protected final Node lit2 = NodeFactory.createLiteral("book5", XSDBaseStringType.XSDstring);
-    protected final Node lit3 = NodeFactory.createLiteral("39", XSDBaseNumericType.XSDunsignedInt);
-    protected final Node lit4 = NodeFactory.createLiteral("William Shakespeare", XSDBaseStringType.XSDstring);
-    protected final Node lit5 = NodeFactory.createLiteral("MYSTERY", XSDBaseStringType.XSDstring);
-    protected final Node lit6 = NodeFactory.createLiteral("auth4", XSDBaseStringType.XSDstring);
+    protected final Node lit1 = NodeFactory.createLiteralDT("auth3", XSDBaseStringType.XSDstring);
+    protected final Node lit2 = NodeFactory.createLiteralDT("book5", XSDBaseStringType.XSDstring);
+    protected final Node lit3 = NodeFactory.createLiteralDT("39", XSDBaseNumericType.XSDunsignedInt);
+    protected final Node lit4 = NodeFactory.createLiteralDT("William Shakespeare", XSDBaseStringType.XSDstring);
+    protected final Node lit5 = NodeFactory.createLiteralDT("MYSTERY", XSDBaseStringType.XSDstring);
+    protected final Node lit6 = NodeFactory.createLiteralDT("auth4", XSDBaseStringType.XSDstring);
 
     /**
      * Initializes a GraphQL endpoint for the tests
