@@ -39,8 +39,7 @@ public class FederationDescriptionReaderTest
 
 		final Model fd = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(fd);
 
 		final FederationCatalog cat = FederationDescriptionReader.readFromModel(fd);
@@ -73,8 +72,7 @@ public class FederationDescriptionReaderTest
 
 		final Model fd = ModelFactory.createDefaultModel();
 		FederationDescriptionReader.readFromModel(fd);
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(fd);
 
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -99,8 +97,7 @@ public class FederationDescriptionReaderTest
 
 		final Model fd = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(fd);
 
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -125,8 +122,7 @@ public class FederationDescriptionReaderTest
 
 		final Model fd = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(fd);
 
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -151,8 +147,7 @@ public class FederationDescriptionReaderTest
 
 		final Model fd = ModelFactory.createDefaultModel();
 
-		final RDFParserBuilder b = RDFParser.fromString(turtle);
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse(fd);
 
 		final Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -177,8 +172,7 @@ public class FederationDescriptionReaderTest
 						+ "                     fd:vocabularyMappingsFile \"dbpedia/vocabularyMappings.nt\".";
 
 		final Model fd = ModelFactory.createDefaultModel();
-		final RDFParserBuilder b = RDFParser.fromString( turtle );
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse( fd );
 
 		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
@@ -199,8 +193,7 @@ public class FederationDescriptionReaderTest
 						+ "                     fd:vocabularyMappingsFile \"src/test/resources/dbpedia/vocabularyMappings.nt\".";
 
 		final Model fd = ModelFactory.createDefaultModel();
-		final RDFParserBuilder b = RDFParser.fromString( turtle );
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse( fd );
 
 		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
@@ -221,8 +214,7 @@ public class FederationDescriptionReaderTest
 						+ "                     fd:vocabularyMappingsFile \"dummy/vocab.nt\".";
 
 		final Model fd = ModelFactory.createDefaultModel();
-		final RDFParserBuilder b = RDFParser.fromString( turtle );
-		b.lang( Lang.TURTLE );
+		final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
 		b.parse( fd );
 
 		final Exception exception = assertThrows( IllegalArgumentException.class, () -> {
