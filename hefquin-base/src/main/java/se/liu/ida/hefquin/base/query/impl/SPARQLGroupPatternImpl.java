@@ -14,7 +14,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.serializer.FormatterElement;
 import org.apache.jena.sparql.serializer.SerializationContext;
 
-import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.SPARQLGroupPattern;
