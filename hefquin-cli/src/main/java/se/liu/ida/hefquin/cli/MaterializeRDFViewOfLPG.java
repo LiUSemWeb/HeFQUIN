@@ -306,7 +306,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			// Create and write the triples that capture the properties of
 			// of the current edge, which are triples in the set that is
 			// called ep in the paper.
-			writeTriplesForProperties( NodeFactory.createTripleNode(edgeTriple),
+			writeTriplesForProperties( NodeFactory.createTripleTerm(edgeTriple),
 			                           edgeValue.getEdge().getProperties(),
 			                           l2rConf,
 			                           rdfOutStream );
@@ -339,7 +339,7 @@ public class MaterializeRDFViewOfLPG extends CmdARQ
 			final RDFDatatype dt = TypeMapper.getInstance().getTypeByValue( lpv.getValue() );
 			final Node lit;
 			if ( dt == null )
-				lit = NodeFactory.createLiteral( lpv.toString() );
+				lit = NodeFactory.createLiteralString( lpv.toString() );
 			else
 				lit = NodeFactory.createLiteralByValue( lpv.getValue(), dt );
 
