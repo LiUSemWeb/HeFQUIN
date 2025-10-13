@@ -36,7 +36,7 @@ public class CompositeNodeLabelMappingImplTest {
         resultNode = nodeLabelMapping.map("3");
         assertNotNull(resultNode);
         assertTrue(resultNode.isLiteral());
-        assertEquals(resultNode.getLiteral().toString(), "three");
+        assertEquals(resultNode.getLiteralLexicalForm(), "three");
 
         resultNode = nodeLabelMapping.map("100");
         assertNotNull(resultNode);
@@ -56,7 +56,7 @@ public class CompositeNodeLabelMappingImplTest {
         assertNotNull(resultString);
         assertEquals(resultString, "0");
 
-        node = NodeFactory.createLiteral("three");
+        node = NodeFactory.createLiteralString("three");
         resultString = nodeLabelMapping.unmap(node);
         assertNotNull(resultString);
         assertEquals(resultString, "3");
@@ -79,7 +79,7 @@ public class CompositeNodeLabelMappingImplTest {
         boolean IRIIsPossible = nodeLabelMapping.isPossibleResult(node);
         assertTrue(IRIIsPossible);
 
-        node = NodeFactory.createLiteral("three");
+        node = NodeFactory.createLiteralString("three");
         IRIIsPossible = nodeLabelMapping.isPossibleResult(node);
         assertTrue(IRIIsPossible);
 
@@ -112,7 +112,7 @@ public class CompositeNodeLabelMappingImplTest {
      */
     @Test(expected = UnSupportedNodeLabelException.class)
     public void unmapNodeLabelWithInvalidLiteral(){
-        final Node node = NodeFactory.createLiteral("test");
+        final Node node = NodeFactory.createLiteralString("test");
         nodeLabelMapping.unmap(node);
     }
 

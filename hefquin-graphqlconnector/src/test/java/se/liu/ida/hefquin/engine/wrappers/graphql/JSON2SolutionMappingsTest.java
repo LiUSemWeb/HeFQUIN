@@ -127,15 +127,15 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase
         final Var v4 = Var.alloc("nr");
 
         final BindingBuilder bindingBuilder = BindingBuilder.create();
-        final Binding b1 = bindingBuilder.add(v1, NodeFactory.createLiteral("J.R.R. Tolkien", XSDPlainType.XSDstring))
-                                        .add(v2,NodeFactory.createLiteral("The Return of the King", XSDPlainType.XSDstring))
-                                        .add(v3,NodeFactory.createLiteral("FANTASY", XSDPlainType.XSDstring))
-                                        .add(v4,NodeFactory.createLiteral("416", XSDPlainType.XSDint)).build();
+        final Binding b1 = bindingBuilder.add(v1, NodeFactory.createLiteralDT("J.R.R. Tolkien", XSDPlainType.XSDstring))
+                                         .add(v2, NodeFactory.createLiteralDT("The Return of the King", XSDPlainType.XSDstring))
+                                         .add(v3, NodeFactory.createLiteralDT("FANTASY", XSDPlainType.XSDstring))
+                                         .add(v4, NodeFactory.createLiteralDT("416", XSDPlainType.XSDint)).build();
         bindingBuilder.reset();
-        final Binding b2 = bindingBuilder.add(v1, NodeFactory.createLiteral("J.R.R. Tolkien", XSDPlainType.XSDstring))
-                                        .add(v2,NodeFactory.createLiteral("The Fellowship of the Ring", XSDPlainType.XSDstring))
-                                        .add(v3,NodeFactory.createLiteral("FANTASY", XSDPlainType.XSDstring))
-                                        .add(v4,NodeFactory.createLiteral("423", XSDPlainType.XSDint)).build();
+        final Binding b2 = bindingBuilder.add(v1, NodeFactory.createLiteralDT("J.R.R. Tolkien", XSDPlainType.XSDstring))
+                                         .add(v2, NodeFactory.createLiteralDT("The Fellowship of the Ring", XSDPlainType.XSDstring))
+                                         .add(v3, NodeFactory.createLiteralDT("FANTASY", XSDPlainType.XSDstring))
+                                         .add(v4, NodeFactory.createLiteralDT("423", XSDPlainType.XSDint)).build();
 
         expectedSolutionMappings.add(new SolutionMappingImpl(b1));
         expectedSolutionMappings.add(new SolutionMappingImpl(b2));
@@ -240,8 +240,8 @@ public class JSON2SolutionMappingsTest extends GraphQLWrapperTestBase
         final Var v2 = Var.alloc("nr");
 
         final BindingBuilder bindingBuilder = BindingBuilder.create();
-        final Binding b1 = bindingBuilder.add(v1, NodeFactory.createLiteral("The imaginary book for this example", XSDPlainType.XSDstring))
-                                        .add(v2,NodeFactory.createLiteral("978", XSDPlainType.XSDint)).build();
+        final Binding b1 = bindingBuilder.add(v1, NodeFactory.createLiteralDT("The imaginary book for this example", XSDPlainType.XSDstring))
+                                         .add(v2, NodeFactory.createLiteralDT("978", XSDPlainType.XSDint)).build();
 
         expectedSolutionMappings.add(new SolutionMappingImpl(b1));
 

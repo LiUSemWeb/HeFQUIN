@@ -49,8 +49,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -114,8 +113,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -179,8 +177,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -245,8 +242,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -262,7 +258,7 @@ public class LPG2RDFConfigurationReaderTest {
         final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
-        assertEquals(resultNodeLabel.getLiteral().toString(), "directorOf");
+        assertEquals(resultNodeLabel.getLiteralLexicalForm(), "directorOf");
 
         final String edgeLabel = "0";
         final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(edgeLabel);
@@ -329,8 +325,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -353,7 +348,7 @@ public class LPG2RDFConfigurationReaderTest {
         resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
-        assertEquals(resultNodeLabel.getLiteral().toString(), "actorOf");
+        assertEquals(resultNodeLabel.getLiteralLexicalForm(), "actorOf");
 
         nodeLabel = "0";
         resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(nodeLabel);
@@ -414,8 +409,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -479,8 +473,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -558,8 +551,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -634,8 +626,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -651,7 +642,7 @@ public class LPG2RDFConfigurationReaderTest {
         final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
-        assertEquals(resultNodeLabel.getLiteral().toString(), "0");
+        assertEquals(resultNodeLabel.getLiteralLexicalForm(), "0");
 
         final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
@@ -697,8 +688,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -707,7 +697,7 @@ public class LPG2RDFConfigurationReaderTest {
         final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
-        assertEquals(resultNode.getBlankNodeId().toString(), "0");
+        assertEquals(resultNode.getBlankNodeLabel(), "0");
 
         final String label = "0";
         final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
@@ -758,8 +748,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -768,18 +757,18 @@ public class LPG2RDFConfigurationReaderTest {
         final Node resultNode = lpg2RDFConfiguration.getRDFTermForLPGNode(node);
         assertNotNull(resultNode);
         assertTrue(resultNode.isBlank());
-        assertEquals(resultNode.getBlankNodeId().toString(), "0");
+        assertEquals(resultNode.getBlankNodeLabel(), "0");
 
-        final String label = "0";
+        final String label = "MyLabel";
         final Node resultNodeLabel = lpg2RDFConfiguration.getRDFTermForNodeLabel(label);
         assertNotNull(resultNodeLabel);
         assertTrue(resultNodeLabel.isLiteral());
-        assertEquals(resultNodeLabel.getLiteral().toString(), "0");
+        assertEquals( "MyLabel", resultNodeLabel.getLiteralLexicalForm() );
 
         final Node resultEdgeLabel = lpg2RDFConfiguration.getIRIForEdgeLabel(label);
         assertNotNull(resultEdgeLabel);
         assertTrue(resultEdgeLabel.isURI());
-        assertEquals(resultEdgeLabel.getURI(), "https://example.org/relationship/0");
+        assertEquals( "https://example.org/relationship/MyLabel", resultEdgeLabel.getURI() );
 
         final String propertyName = "0";
         final Node resultPropertyName = lpg2RDFConfiguration.getIRIForPropertyName(propertyName);
@@ -821,8 +810,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -886,8 +874,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -950,8 +937,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1029,8 +1015,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         final LPG2RDFConfiguration lpg2RDFConfiguration = new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1108,8 +1093,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1150,8 +1134,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1192,8 +1175,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1235,8 +1217,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1278,8 +1259,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1319,8 +1299,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1361,8 +1340,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1403,8 +1381,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1445,8 +1422,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1466,8 +1442,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1512,8 +1487,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1558,8 +1532,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1619,8 +1592,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1680,8 +1652,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);
@@ -1742,8 +1713,7 @@ public class LPG2RDFConfigurationReaderTest {
 
         final Model lpg2rdf = ModelFactory.createDefaultModel();
 
-        final RDFParserBuilder b = RDFParser.fromString(turtle);
-        b.lang( Lang.TURTLE );
+        final RDFParserBuilder b = RDFParser.fromString( turtle, Lang.TURTLE );
         b.parse(lpg2rdf);
 
         new LPG2RDFConfigurationReader().read(lpg2rdf);

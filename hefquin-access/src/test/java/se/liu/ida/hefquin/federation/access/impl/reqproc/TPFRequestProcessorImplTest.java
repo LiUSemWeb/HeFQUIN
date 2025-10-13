@@ -83,7 +83,7 @@ public class TPFRequestProcessorImplTest extends FederationTestBase
 		// setting up
 		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
 		final Node p = NodeFactory.createVariable("p");
-		final Node o = NodeFactory.createLiteral("Berlin", "en");
+		final Node o = NodeFactory.createLiteralLang("Berlin", "en");
 
 		// performing the tested operation
 		final TPFResponse resp = performTestRequest(s, p, o);
@@ -100,7 +100,7 @@ public class TPFRequestProcessorImplTest extends FederationTestBase
 		// setting up
 		final Node s = NodeFactory.createURI("http://dbpedia.org/resource/Berlin");
 		final Node p = NodeFactory.createVariable("p");
-		final Node o = NodeFactory.createLiteral("38.1", XSDDatatype.XSDdouble);
+		final Node o = NodeFactory.createLiteralDT("38.1", XSDDatatype.XSDdouble);
 
 		// performing the tested operation
 		final TPFResponse resp = performTestRequest(s, p, o);

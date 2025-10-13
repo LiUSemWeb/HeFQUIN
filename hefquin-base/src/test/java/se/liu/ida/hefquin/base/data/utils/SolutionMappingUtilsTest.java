@@ -99,7 +99,7 @@ public class SolutionMappingUtilsTest
 		final Var v1 = Var.alloc("v1");
 
 		final Binding sm1 = BindingFactory.binding( v1, NodeFactory.createURI("http://example.org") );
-		final Binding sm2 = BindingFactory.binding( v1, NodeFactory.createLiteral("test","en") );
+		final Binding sm2 = BindingFactory.binding( v1, NodeFactory.createLiteralLang("test","en") );
 
 		final List<Binding> solmaps = new ArrayList<>();
 		solmaps.add(sm1);

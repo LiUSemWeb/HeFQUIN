@@ -48,6 +48,35 @@
       <artifactId>hefquin-engine</artifactId>
       <version>0.0.7-SNAPSHOT</version>
     </dependency>
+<!--
+ I needed to added the following two dependencies when upgrading the
+ code base to Jena v5.5.0, because that version of Jena has 'client5'
+ of 'org.apache.httpcomponents' as dependencies (i.e., it is not any
+ longer using v4 of 'httpclient'). Therefore, 'httpclient' needed to
+ be added as an explicit dependency here.
+
+ After I did that, I ran into a conflict regarding 'commons-codec':
+ there were two versions (1.16.0 and 1.18.0) as indirect dependencies,
+ which made the use of 'MurmurHash3' in 'BlankNodeAllocatorHash' fail.
+
+ Perhaps we should upgrade the code of hefquin-service to also use
+ 'client5' of 'org.apache.httpcomponents'. That way, we have fewer
+ explicit/direct dependencies and, thus, fewer cases of possible
+ conflicts that may arise due to indirect dependencies.
+
+ -Olaf
+-->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+    </dependency>
+<!-- ^^ -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>

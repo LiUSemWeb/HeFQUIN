@@ -123,7 +123,7 @@ public class SparqlServletTest {
 	}
 
 	private void validateDelimited( final String results, final boolean tsv ) throws IOException {
-		final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord( true ).build();
+		final CSVFormat format = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord( true ).get();
 		try ( CSVParser parser = CSVParser.parse( results, format ) ) {
 			final List<String> vars = parser.getHeaderNames();
 			final List<CSVRecord> values = parser.getRecords();
