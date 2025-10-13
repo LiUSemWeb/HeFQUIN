@@ -12,7 +12,7 @@ public class NodeLabelMappingImpl_SingleMatchToLiteral implements NodeLabelMappi
 
     public NodeLabelMappingImpl_SingleMatchToLiteral(final String label, final String literal){
         this.label=label;
-        this.node = NodeFactory.createLiteral(literal);
+        this.node = NodeFactory.createLiteralString(literal);
     }
 
     @Override

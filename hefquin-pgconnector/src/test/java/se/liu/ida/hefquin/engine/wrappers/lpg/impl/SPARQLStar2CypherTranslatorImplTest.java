@@ -113,7 +113,7 @@ public class SPARQLStar2CypherTranslatorImplTest
     public void translateNodePropertyLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Triple tp = Triple.create(conf.getRDFTermForLPGNode(node22), conf.getIRIForPropertyName("name"),
-                NodeFactory.createLiteral("Uma Thurman"));
+                NodeFactory.createLiteralString("Uma Thurman"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(tp, conf).getCypherQuery();
         assertEquals(
@@ -148,7 +148,7 @@ public class SPARQLStar2CypherTranslatorImplTest
     public void translateVarPropertyLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Triple tp = Triple.create(Var.alloc("s"), conf.getIRIForPropertyName("name"),
-                NodeFactory.createLiteral("Quentin Tarantino"));
+                NodeFactory.createLiteralString("Quentin Tarantino"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(tp, conf).getCypherQuery();
         assertEquals(
@@ -268,7 +268,7 @@ public class SPARQLStar2CypherTranslatorImplTest
     public void translateNodeVarLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Triple t = Triple.create(conf.getRDFTermForLPGNode(node22), Var.alloc("p"),
-                NodeFactory.createLiteral("Quentin Tarantino"));
+                NodeFactory.createLiteralString("Quentin Tarantino"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(t, conf).getCypherQuery();
         assertEquals(
@@ -391,7 +391,7 @@ public class SPARQLStar2CypherTranslatorImplTest
     @Test
     public void translateVarVarLiteral() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
-        final Triple t = Triple.create(Var.alloc("s"), Var.alloc("p"), NodeFactory.createLiteral("The Matrix"));
+        final Triple t = Triple.create(Var.alloc("s"), Var.alloc("p"), NodeFactory.createLiteralString("The Matrix"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(t, conf).getCypherQuery();
         assertEquals(
@@ -503,7 +503,7 @@ public class SPARQLStar2CypherTranslatorImplTest
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Var s = Var.alloc("s");
         final Triple tp = Triple.create(s, conf.getIRIForPropertyName("name"),
-                NodeFactory.createLiteral("Quentin Tarantino"));
+                NodeFactory.createLiteralString("Quentin Tarantino"));
         final Set<Node> certainNodes = Collections.singleton(s);
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(tp, conf, gen, certainNodes, emptySet,
@@ -521,7 +521,7 @@ public class SPARQLStar2CypherTranslatorImplTest
     public void certainNodeVarVarLiteralTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Var s = Var.alloc("s");
-        final Triple t = Triple.create(s, Var.alloc("p"), NodeFactory.createLiteral("The Matrix"));
+        final Triple t = Triple.create(s, Var.alloc("p"), NodeFactory.createLiteralString("The Matrix"));
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(t, conf, gen, Collections.singleton(s),
                         emptySet, emptySet, emptySet, emptySet).getCypherQuery();
@@ -802,7 +802,7 @@ public class SPARQLStar2CypherTranslatorImplTest
         final Triple inner = Triple.create(Var.alloc("s"), conf.getIRIForEdgeLabel("DIRECTED"), Var.alloc("o"));
         final Triple t = Triple.create( NodeFactory.createTripleTerm(inner),
                                         conf.getIRIForPropertyName("certainty"),
-                                        NodeFactory.createLiteral("0.8") );
+                                        NodeFactory.createLiteralString("0.8") );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(t, conf).getCypherQuery();
         assertEquals(new CypherQueryBuilder()
@@ -842,7 +842,7 @@ public class SPARQLStar2CypherTranslatorImplTest
         final Triple inner = Triple.create(Var.alloc("s"), conf.getIRIForEdgeLabel("DIRECTED"), Var.alloc("o"));
         final Triple t = Triple.create( NodeFactory.createTripleTerm(inner),
                                         Var.alloc("p"),
-                                        NodeFactory.createLiteral("0.8") );
+                                        NodeFactory.createLiteralString("0.8") );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl()
                 .translateTriplePattern(t, conf).getCypherQuery();
         assertEquals(new CypherQueryBuilder()
@@ -891,10 +891,10 @@ public class SPARQLStar2CypherTranslatorImplTest
         final Set<Triple> bgp = new HashSet<>();
         bgp.add( Triple.create(m, conf.getLabelPredicate(), conf.getRDFTermForNodeLabel("Movie")) );
         bgp.add( Triple.create(p, conf.getLabelPredicate(), conf.getRDFTermForNodeLabel("Person")) );
-        bgp.add( Triple.create(p, conf.getIRIForPropertyName("name"), NodeFactory.createLiteral("Uma Thurman")) );
+        bgp.add( Triple.create(p, conf.getIRIForPropertyName("name"), NodeFactory.createLiteralString("Uma Thurman")) );
         bgp.add( Triple.create(m, conf.getIRIForPropertyName("released"), Var.alloc("y")) );
         bgp.add( Triple.create(NodeFactory.createTripleNode(p, conf.getIRIForEdgeLabel("ACTED_IN"), m),
-                        conf.getIRIForPropertyName("source"), NodeFactory.createLiteral("IMDB")) );
+                        conf.getIRIForPropertyName("source"), NodeFactory.createLiteralString("IMDB")) );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).getCypherQuery();
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))
@@ -932,10 +932,10 @@ public class SPARQLStar2CypherTranslatorImplTest
         final Set<Triple> bgp = new HashSet<>();
         bgp.add( Triple.create(m, conf.getLabelPredicate(), conf.getRDFTermForNodeLabel("Movie")) );
         bgp.add( Triple.create(p, conf.getLabelPredicate(), conf.getRDFTermForNodeLabel("Person")) );
-        bgp.add( Triple.create(p, conf.getIRIForPropertyName("name"), NodeFactory.createLiteral("Uma Thurman")) );
+        bgp.add( Triple.create(p, conf.getIRIForPropertyName("name"), NodeFactory.createLiteralString("Uma Thurman")) );
         bgp.add( Triple.create(m, conf.getIRIForPropertyName("released"), Var.alloc("y")) );
         bgp.add( Triple.create(NodeFactory.createTripleNode(p, conf.getIRIForEdgeLabel("ACTED_IN"), m),
-                        conf.getIRIForPropertyName("source"), NodeFactory.createLiteral("IMDB")) );
+                        conf.getIRIForPropertyName("source"), NodeFactory.createLiteralString("IMDB")) );
 
         final SPARQLStar2CypherTranslator translator = new SPARQLStar2CypherTranslatorImpl();
         final CypherQuery procTranslation = translator.rewriteJoins((CypherMatchQuery) translator.translateBGP(bgp, conf, false).getCypherQuery());
@@ -1026,7 +1026,7 @@ public class SPARQLStar2CypherTranslatorImplTest
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Var s = Var.alloc("s");
         final Set<Triple> bgp = new HashSet<>();
-        bgp.add( Triple.create(s, conf.getIRIForPropertyName("source"), NodeFactory.createLiteral("IMDB")) );
+        bgp.add( Triple.create(s, conf.getIRIForPropertyName("source"), NodeFactory.createLiteralString("IMDB")) );
         bgp.add( Triple.create(s, Var.alloc("p"), Var.alloc("o")) );
 
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).getCypherQuery();
@@ -1141,7 +1141,7 @@ public class SPARQLStar2CypherTranslatorImplTest
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Var p = Var.alloc("p");
         final Set<Triple> bgp = new HashSet<>();
-        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node23), p, NodeFactory.createLiteral("2005")) );
+        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node23), p, NodeFactory.createLiteralString("2005")) );
         bgp.add( Triple.create(conf.getRDFTermForLPGNode(node22), p, Var.alloc("o")) );
 
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).getCypherQuery();
@@ -1166,8 +1166,8 @@ public class SPARQLStar2CypherTranslatorImplTest
     public void crossProductTest() {
         final LPG2RDFConfiguration conf = new DefaultLPG2RDFConfigurationForTests();
         final Set<Triple> bgp = new HashSet<>();
-        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node23), Var.alloc("p1"), NodeFactory.createLiteral("2005")) );
-        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node22), Var.alloc("p2"), NodeFactory.createLiteral("2005")) );
+        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node23), Var.alloc("p1"), NodeFactory.createLiteralString("2005")) );
+        bgp.add( Triple.create(conf.getRDFTermForLPGNode(node22), Var.alloc("p2"), NodeFactory.createLiteralString("2005")) );
         final CypherQuery translation = new SPARQLStar2CypherTranslatorImpl().translateBGP(bgp, conf, false).getCypherQuery();
         assertEquals(new CypherQueryBuilder()
                         .add(new NodeMatchClause(a1))

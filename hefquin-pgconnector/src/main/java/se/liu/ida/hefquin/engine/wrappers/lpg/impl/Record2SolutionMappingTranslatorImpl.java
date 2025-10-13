@@ -63,7 +63,7 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 builder.add(var, conf.getRDFTermForLPGNode(((LPGNodeValue) current.getValue()).getNode()));
             } else if (expression instanceof TripleMapExpression) {
                 final Map<String, Object> map = ((MapValue) current.getValue()).getMap();
-                builder.add(var, NodeFactory.createTripleNode(
+                builder.add(var, NodeFactory.createTripleTerm(
                         conf.getRDFTermForLPGNode((LPGNode) map.get("s")),
                         conf.getIRIForEdgeLabel(map.get("e").toString()),
                         conf.getRDFTermForLPGNode((LPGNode) map.get("t"))));
@@ -74,14 +74,14 @@ public class Record2SolutionMappingTranslatorImpl implements Record2SolutionMapp
                 if (index == 0) {
                     builder.add(var, conf.getIRIForPropertyName(current.getValue().toString()));
                 } else if (index == 1) {
-                    builder.add(var, NodeFactory.createLiteral(current.getValue().toString()));
+                    builder.add(var, NodeFactory.createLiteralString(current.getValue().toString()));
                 } else {
                     throw new IllegalArgumentException("Invalid Return Statement");
                 }
             } else if (expression instanceof FirstLabelExpression) {
                 builder.add(var, conf.getRDFTermForNodeLabel(current.getValue().toString()));
             } else if (expression instanceof PropertyAccessExpression) {
-                builder.add(var, NodeFactory.createLiteral(current.getValue().toString()));
+                builder.add(var, NodeFactory.createLiteralString(current.getValue().toString()));
             } else if (expression instanceof LiteralExpression) {
                 builder.add(var, conf.getLabelPredicate());
             } else {

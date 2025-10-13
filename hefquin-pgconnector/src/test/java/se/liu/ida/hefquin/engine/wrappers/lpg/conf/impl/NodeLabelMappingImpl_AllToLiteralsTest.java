@@ -26,7 +26,7 @@ public class NodeLabelMappingImpl_AllToLiteralsTest {
 
     @Test
     public void unmapLiteralNodeLabel(){
-        final Node node = NodeFactory.createLiteral("0");
+        final Node node = NodeFactory.createLiteralString("0");
         final String resultString = nodeLabelMapping.unmap(node);
         assertNotNull(resultString);
         assertEquals(resultString, "0");
@@ -34,7 +34,7 @@ public class NodeLabelMappingImpl_AllToLiteralsTest {
 
     @Test
     public void nodeLabelIsPossibleResult(){
-        final Node node = NodeFactory.createLiteral("0");
+        final Node node = NodeFactory.createLiteralString("0");
         final Node IRINode = NodeFactory.createURI(NSNODELABEL + "0");
         final boolean literalIsPossible = nodeLabelMapping.isPossibleResult(node);
         final boolean IRIIsPossible = nodeLabelMapping.isPossibleResult(IRINode);
