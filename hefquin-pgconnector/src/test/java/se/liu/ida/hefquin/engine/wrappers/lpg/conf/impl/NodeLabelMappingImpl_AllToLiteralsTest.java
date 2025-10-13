@@ -21,7 +21,7 @@ public class NodeLabelMappingImpl_AllToLiteralsTest {
         final Node resultNode = nodeLabelMapping.map(label);
         assertNotNull(resultNode);
         assertTrue(resultNode.isLiteral());
-        assertEquals(resultNode.getLiteral().toString(), "0");
+        assertEquals(resultNode.getLiteralLexicalForm(), "0");
     }
 
     @Test

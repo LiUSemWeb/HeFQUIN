@@ -41,17 +41,16 @@
   </scm>
 
   <dependencies>
-    <!-- hefquin-engine -->
-    <dependency>
-      <groupId>se.liu.research.hefquin</groupId>
-      <artifactId>hefquin-engine</artifactId>
-      <version>0.0.7-SNAPSHOT</version>
-    </dependency>
       <!-- hefquin-service -->
     <dependency>
       <groupId>se.liu.research.hefquin</groupId>
       <artifactId>hefquin-service</artifactId>
       <version>0.0.7-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-cmds</artifactId>
+      <version>5.5.0</version>
     </dependency>
   </dependencies>
 

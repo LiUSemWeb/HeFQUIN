@@ -238,8 +238,6 @@ public class OpExecutorHeFQUIN extends OpExecutor
 
 	    @Override public void visit(OpMinus opMinus)              { unsupportedOpFound = true; }
 
-	    @Override public void visit(OpDiff opDiff)                { unsupportedOpFound = true; }
-
 	    @Override public void visit(OpUnion opUnion)              {} // supported
 
 	    @Override public void visit(OpFilter opFilter)            {} // supported
@@ -261,6 +259,8 @@ public class OpExecutorHeFQUIN extends OpExecutor
 	    @Override public void visit(OpAssign opAssign)            { unsupportedOpFound = true; }
 
 	    @Override public void visit(OpExtend opExtend)            {} // supported
+
+	    @Override public void visit(OpUnfold opUnfold)            { unsupportedOpFound = true; }
 
 	    //@Override public void visit(OpFind opFind)                { unsupportedOpFound = true; }
 

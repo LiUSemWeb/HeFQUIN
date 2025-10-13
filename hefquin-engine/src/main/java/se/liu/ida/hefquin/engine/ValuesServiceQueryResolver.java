@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
@@ -19,9 +20,9 @@ import org.apache.jena.sparql.syntax.ElementData;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementService;
 import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.ElementVisitor;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
-import org.apache.jena.sparql.syntax.PatternVarsVisitor;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransform;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCleanGroupsOfOne;
 import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
@@ -326,13 +327,14 @@ public class ValuesServiceQueryResolver
 		// Check that none of the variables bound by the given VALUES clause is
 		// mentioned anywhere else except as the variable of a SERVICE clause.
 		//   i) collect all the variables mentioned anywhere else
-		final PatternVarsVisitor varCollect = new PatternVarsVisitorWithoutServiceVars( new HashSet<>() );
+		final Set<Var> collectedVars = new HashSet<>();
+		final ElementVisitor varCollect = new PatternVarsVisitorWithoutServiceVars(collectedVars);
 		for ( int i = startPos+1; i < elmts.size(); i++ ) {
 			ElementWalker.walk( elmts.get(i), varCollect );
 		}
 		//   ii) and check that none of them is bound by the given VALUES clause
 		for ( final Var v : valClause.getVars() ) {
-			if ( varCollect.acc.contains(v) )
+			if ( collectedVars.contains(v) )
 				throw new MyUnsupportedQueryException("HeFQUIN does not support VALUES clauses with variables that are mentioned anywhere else than as the variable of a SERVICE clause (which is not the case for variable ?" + v.getVarName() + ").");
 		}
 
@@ -642,7 +644,7 @@ public class ValuesServiceQueryResolver
 
 			if ( ! newServiceNode.isURI() ) {
 				final String typeNameForMsg = ( newServiceNode.isLiteral() ) ? "literal" : newServiceNode.getClass().getName();
-				throw new MyIllegalQueryException("A VALUES clause can only assign IRIs to service variables. This is not the case for variable ?" + sn.getName() + ", which is assigned a " + typeNameForMsg + " (" + newServiceNode.toString(true)+ ").");
+				throw new MyIllegalQueryException("A VALUES clause can only assign IRIs to service variables. This is not the case for variable ?" + sn.getName() + ", which is assigned a " + typeNameForMsg + " (" + newServiceNode.toString()+ ").");
 			}
 
 			return new ElementService( newServiceNode, inside, e.getSilent() );

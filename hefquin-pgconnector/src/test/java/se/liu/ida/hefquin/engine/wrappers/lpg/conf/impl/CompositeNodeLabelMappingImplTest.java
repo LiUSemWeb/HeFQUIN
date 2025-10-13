@@ -36,7 +36,7 @@ public class CompositeNodeLabelMappingImplTest {
         resultNode = nodeLabelMapping.map("3");
         assertNotNull(resultNode);
         assertTrue(resultNode.isLiteral());
-        assertEquals(resultNode.getLiteral().toString(), "three");
+        assertEquals(resultNode.getLiteralLexicalForm(), "three");
 
         resultNode = nodeLabelMapping.map("100");
         assertNotNull(resultNode);

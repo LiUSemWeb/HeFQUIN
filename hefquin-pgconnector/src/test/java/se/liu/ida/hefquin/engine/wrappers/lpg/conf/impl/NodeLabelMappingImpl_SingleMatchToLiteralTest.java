@@ -22,7 +22,7 @@ public class NodeLabelMappingImpl_SingleMatchToLiteralTest {
         final Node resultNode = nodeLabelMapping.map("DIRECTED");
         assertNotNull(resultNode);
         assertTrue(resultNode.isLiteral());
-        assertEquals(resultNode.getLiteral().toString(), "directorOf");
+        assertEquals(resultNode.getLiteralLexicalForm(), "directorOf");
     }
 
     @Test
