@@ -123,8 +123,11 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 		}
 
 		private boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
-			final Set<Var> certainVars = vars != null ? vars.getCertainVariables() : Set.of();
-			final Set<Var> possibleVars = vars != null ? vars.getPossibleVariables() : Set.of();
+			if ( vars == null )
+				return true;
+
+			final Set<Var> certainVars = vars.getCertainVariables();
+			final Set<Var> possibleVars = vars.getPossibleVariables();
 
 			for ( final Var v : pattern.getCertainVariables() ) {
 				if ( ! certainVars.contains(v) && ! possibleVars.contains(v) ) {
