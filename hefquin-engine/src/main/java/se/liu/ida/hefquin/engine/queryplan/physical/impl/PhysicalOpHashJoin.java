@@ -28,7 +28,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpHashJoin( final LogicalOpJoin lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpHashJoin( final LogicalOpJoin lop ) {
 		super(lop);
 	}
 
@@ -56,14 +58,12 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 		return "> hashJoin ";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			// inputVars contains null value?

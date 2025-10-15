@@ -27,11 +27,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -67,14 +69,12 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 		return "> VALUESorFILTERBindJoin" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {

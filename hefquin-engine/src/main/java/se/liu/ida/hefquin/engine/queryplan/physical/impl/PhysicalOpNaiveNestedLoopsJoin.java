@@ -23,7 +23,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
 		super(lop);
 	}
 
@@ -49,14 +51,12 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 		return "> naiveNestedLoop ";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpJoin );

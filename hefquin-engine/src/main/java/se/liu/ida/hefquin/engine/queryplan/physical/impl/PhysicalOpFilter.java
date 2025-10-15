@@ -21,8 +21,9 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
                               implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpFilter lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpFilter( final LogicalOpFilter lop ) {
+	protected PhysicalOpFilter( final LogicalOpFilter lop ) {
 		this.lop = lop;
 	}
 
@@ -43,14 +44,12 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
 		return lop;
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpFilter );

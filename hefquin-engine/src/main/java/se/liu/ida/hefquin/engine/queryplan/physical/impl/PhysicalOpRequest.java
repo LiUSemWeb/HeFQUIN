@@ -43,8 +43,9 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
                        implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
+	protected PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -96,14 +97,12 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		return lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpRequest );

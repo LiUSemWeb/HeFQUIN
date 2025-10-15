@@ -33,8 +33,9 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
                                  implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRightJoin lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
+	protected PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -73,14 +74,12 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 		return "> hashRJoin ";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpRightJoin );

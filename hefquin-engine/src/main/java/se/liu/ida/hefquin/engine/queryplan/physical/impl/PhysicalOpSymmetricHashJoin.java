@@ -25,43 +25,43 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 {
-    public PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
-        super(lop);
-    }
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
+		super(lop);
+	}
 
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof PhysicalOpSymmetricHashJoin
-				&& ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
+	           && ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
 	}
 
-    @Override
-    public BinaryExecutableOp createExecOp( final boolean collectExceptions,
-                                            final QueryPlanningInfo qpInfo,
+	@Override
+	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables ... inputVars ) {
-        assert inputVars.length == 2;
+		assert inputVars.length == 2;
 
-        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
-    }
+		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+	}
 
-    @Override
-    public void visit(final PhysicalPlanVisitor visitor) {
-        visitor.visit(this);
-    }
+	@Override
+	public void visit( final PhysicalPlanVisitor visitor ) {
+		visitor.visit(this);
+	}
 
     @Override
     public String toString(){
        return "> symmetricHashJoin ";
     }
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			// inputVars contains null value?

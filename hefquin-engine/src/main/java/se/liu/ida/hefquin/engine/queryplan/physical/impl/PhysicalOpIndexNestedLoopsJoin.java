@@ -60,11 +60,13 @@ import se.liu.ida.hefquin.federation.TPFServer;
  */
 public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -135,14 +137,12 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 		return "> indexNestedLoop" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {

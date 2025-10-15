@@ -21,8 +21,9 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
                                    implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpUnion lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
+	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -59,14 +60,12 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 		return "> binaryUnion ";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpUnion );

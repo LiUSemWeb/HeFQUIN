@@ -37,11 +37,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -75,6 +77,10 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 	@Override
 	public String toString() {
 		return "> FILTERBindJoin " + "(" + getID() + ") " +  lop.toString();
+	}
+
+	public static Factory getFactory() {
+		return factory;
 	}
 
 	public static class Factory implements PhysicalOpFactory

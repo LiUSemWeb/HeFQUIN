@@ -38,14 +38,16 @@ import se.liu.ida.hefquin.federation.FederationMember;
  */
 public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpBindJoin( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
 			throw new IllegalArgumentException();
 	}
 
-	public PhysicalOpBindJoin( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
@@ -102,14 +104,12 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		return "> bindJoin" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){

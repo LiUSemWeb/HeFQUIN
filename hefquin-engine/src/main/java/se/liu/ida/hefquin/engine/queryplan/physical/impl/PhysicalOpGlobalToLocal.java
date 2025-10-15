@@ -23,8 +23,9 @@ public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
                                      implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpGlobalToLocal lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpGlobalToLocal( final LogicalOpGlobalToLocal lop ) {
+	protected PhysicalOpGlobalToLocal( final LogicalOpGlobalToLocal lop ) {
 		this.lop = lop;
 	}
 
@@ -51,14 +52,12 @@ public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
 		return "> g2l " + "(vocab.mapping: " + lop.getVocabularyMapping().hashCode() + ")";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
-
-		public static Factory getInstance() {
-			return singleton;
-		}
-
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			return ( lop instanceof LogicalOpGlobalToLocal );
