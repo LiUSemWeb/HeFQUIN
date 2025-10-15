@@ -51,10 +51,10 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 		visitor.visit(this);
 	}
 
-    @Override
-    public String toString(){
-       return "> symmetricHashJoin ";
-    }
+	@Override
+	public String toString() {
+		return "> symmetricHashJoin ";
+	}
 
 	public static Factory getFactory() {
 		return factory;
