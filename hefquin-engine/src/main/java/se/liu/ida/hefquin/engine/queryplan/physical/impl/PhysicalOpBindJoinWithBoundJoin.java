@@ -1,13 +1,20 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
 /**
@@ -37,11 +44,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithBoundJoin( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithBoundJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithBoundJoin( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithBoundJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -75,5 +84,57 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 	@Override
 	public String toString() {
 		return "> BoundJoinBindJoin" + lop.toString();
+	}
+
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpBindJoinWithBoundJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithBoundJoin(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithBoundJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+
+		private boolean isSupported( final FederationMember fm,
+		                             final SPARQLGraphPattern pattern,
+		                             final ExpectedVariables vars )
+		{
+			return (fm instanceof SPARQLEndpoint) && hasNonJoiningVar(pattern, vars);
+		}
+
+		private boolean hasNonJoiningVar( final SPARQLGraphPattern pattern, final ExpectedVariables vars ) {
+			if ( vars == null )
+				return true;
+
+			final Set<Var> certainVars = vars.getCertainVariables();
+			final Set<Var> possibleVars = vars.getPossibleVariables();
+
+			for ( final Var v : pattern.getCertainVariables() ) {
+				if ( ! certainVars.contains(v) && ! possibleVars.contains(v) ) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

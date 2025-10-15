@@ -8,8 +8,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNested
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinSPARQL;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpIndexNestedLoopsJoinTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -58,11 +60,13 @@ import se.liu.ida.hefquin.federation.TPFServer;
  */
 public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInputJoin
 {
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -133,4 +137,39 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 		return "> indexNestedLoop" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return isSupported( op.getFederationMember() );
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return isSupported( op.getFederationMember() );
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpIndexNestedLoopsJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpIndexNestedLoopsJoin(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpIndexNestedLoopsJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+
+		private boolean isSupported( final FederationMember fm ) {
+			return    fm instanceof SPARQLEndpoint
+			       || fm instanceof TPFServer
+			       || fm instanceof BRTPFServer;
+		}
+	}
 }

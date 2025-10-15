@@ -1,10 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -18,33 +25,61 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 {
-    public PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
-        super(lop);
-    }
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
+		super(lop);
+	}
 
 	@Override
 	public boolean equals( final Object o ) {
 		return o instanceof PhysicalOpSymmetricHashJoin
-				&& ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
+	           && ((PhysicalOpSymmetricHashJoin) o).lop.equals(lop);
 	}
 
-    @Override
-    public BinaryExecutableOp createExecOp( final boolean collectExceptions,
-                                            final QueryPlanningInfo qpInfo,
+	@Override
+	public BinaryExecutableOp createExecOp( final boolean collectExceptions,
+	                                        final QueryPlanningInfo qpInfo,
 	                                        final ExpectedVariables ... inputVars ) {
-        assert inputVars.length == 2;
+		assert inputVars.length == 2;
 
-        return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
-    }
+		return new ExecOpSymmetricHashJoin( inputVars[0], inputVars[1], collectExceptions, qpInfo );
+	}
 
-    @Override
-    public void visit(final PhysicalPlanVisitor visitor) {
-        visitor.visit(this);
-    }
+	@Override
+	public void visit( final PhysicalPlanVisitor visitor ) {
+		visitor.visit(this);
+	}
 
-    @Override
-    public String toString(){
-       return "> symmetricHashJoin ";
-    }
+	@Override
+	public String toString() {
+		return "> symmetricHashJoin ";
+	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			// inputVars contains null value?
+			for ( final ExpectedVariables vars : inputVars ) {
+				if ( vars == null ) return false;
+			}
+
+			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
+			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+		}
+
+		@Override
+		public PhysicalOpSymmetricHashJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpJoin ) {
+				return new PhysicalOpSymmetricHashJoin( (LogicalOpJoin) lop);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

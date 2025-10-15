@@ -5,8 +5,10 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -18,6 +20,8 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
                                      implements NaryPhysicalOpForLogicalOp
 {
+	protected static final Factory factory = new Factory();
+
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
 		visitor.visit(this);
@@ -50,4 +54,24 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 		return "> multiwayUnion " + "(" + getID() + ")";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpMultiwayUnion );
+		}
+
+		@Override
+		public PhysicalOpMultiwayUnion create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpMultiwayUnion ) {
+				return new PhysicalOpMultiwayUnion();
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

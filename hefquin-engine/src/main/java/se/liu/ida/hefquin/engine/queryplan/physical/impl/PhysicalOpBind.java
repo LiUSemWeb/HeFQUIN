@@ -5,7 +5,9 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBind;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
@@ -13,8 +15,9 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
                             implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpBind lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpBind( final LogicalOpBind lop ) {
+	protected PhysicalOpBind( final LogicalOpBind lop ) {
 		this.lop = lop;
 	}
 
@@ -33,6 +36,26 @@ public class PhysicalOpBind extends BaseForQueryPlanOperator
 	@Override
 	public LogicalOpBind getLogicalOperator() {
 		return lop;
+ 	}
+
+	public static Factory getFactory() {
+		return factory;
 	}
 
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpBind );
+		}
+
+		@Override
+		public PhysicalOpBind create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpBind op ) {
+				return new PhysicalOpBind(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

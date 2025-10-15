@@ -8,8 +8,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPAR
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
@@ -41,8 +43,9 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
                        implements NullaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRequest<ReqType,MemberType> lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
+	protected PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -94,4 +97,24 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		return lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpRequest );
+		}
+
+		@Override
+		public PhysicalOpRequest<?, ?> create( final LogicalOperator lop ) {
+			if ( lop instanceof  LogicalOpRequest<?,?> op ) {
+				return new PhysicalOpRequest<>(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

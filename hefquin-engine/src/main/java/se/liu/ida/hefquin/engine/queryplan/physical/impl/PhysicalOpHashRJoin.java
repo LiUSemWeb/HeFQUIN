@@ -7,8 +7,10 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -31,8 +33,9 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
                                  implements BinaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpRightJoin lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
+	protected PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
 		assert lop != null;
 		this.lop = lop;
 	}
@@ -71,4 +74,24 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 		return "> hashRJoin ";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpRightJoin );
+		}
+
+		@Override
+		public PhysicalOpHashRJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpRightJoin op ) {
+				return new PhysicalOpHashRJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

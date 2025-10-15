@@ -5,7 +5,9 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpFilter;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
@@ -19,8 +21,9 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
                               implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpFilter lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpFilter( final LogicalOpFilter lop ) {
+	protected PhysicalOpFilter( final LogicalOpFilter lop ) {
 		this.lop = lop;
 	}
 
@@ -41,4 +44,24 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
 		return lop;
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpFilter );
+		}
+
+		@Override
+		public PhysicalOpFilter create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpFilter op ) {
+				return new PhysicalOpFilter(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

@@ -5,7 +5,9 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpLocalToGlobal;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 
@@ -21,8 +23,9 @@ public class PhysicalOpLocalToGlobal extends BaseForQueryPlanOperator
                                      implements UnaryPhysicalOpForLogicalOp
 {
 	protected final LogicalOpLocalToGlobal lop;
+	protected static final Factory factory = new Factory();
 
-	public PhysicalOpLocalToGlobal( final LogicalOpLocalToGlobal lop ) {
+	protected PhysicalOpLocalToGlobal( final LogicalOpLocalToGlobal lop ) {
 		this.lop = lop;
 	}
 
@@ -48,4 +51,24 @@ public class PhysicalOpLocalToGlobal extends BaseForQueryPlanOperator
 		return "> l2g " + "(vocab.mapping: " + lop.getVocabularyMapping().hashCode() + ")";
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpLocalToGlobal );
+		}
+
+		@Override
+		public PhysicalOpLocalToGlobal create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpLocalToGlobal op ) {
+				return new PhysicalOpLocalToGlobal(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

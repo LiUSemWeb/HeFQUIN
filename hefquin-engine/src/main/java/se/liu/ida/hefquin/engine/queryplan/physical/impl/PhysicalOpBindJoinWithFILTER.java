@@ -5,8 +5,10 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
@@ -35,11 +37,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -75,4 +79,39 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		return "> FILTERBindJoin " + "(" + getID() + ") " +  lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		private static final Factory singleton = new Factory();
+
+		public static Factory getInstance() {
+			return singleton;
+		}
+
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpBindJoinWithFILTER create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithFILTER(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithFILTER(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

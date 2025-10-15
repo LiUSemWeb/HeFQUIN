@@ -4,7 +4,9 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpNaiveNestedLoopsJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -21,7 +23,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpNaiveNestedLoopsJoin( final LogicalOpJoin lop ) {
 		super(lop);
 	}
 
@@ -45,5 +49,26 @@ public class PhysicalOpNaiveNestedLoopsJoin extends BaseForPhysicalOpBinaryJoin
 	@Override
 	public String toString() {
 		return "> naiveNestedLoop ";
+	}
+
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			return ( lop instanceof LogicalOpJoin );
+		}
+
+		@Override
+		public PhysicalOpNaiveNestedLoopsJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpJoin op ) {
+				return new PhysicalOpNaiveNestedLoopsJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
 	}
 }

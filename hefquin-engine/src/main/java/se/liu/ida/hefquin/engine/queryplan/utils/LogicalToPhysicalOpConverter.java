@@ -1,21 +1,18 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpRegistry;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 
 /**
  * This class provides methods to convert logical operators into
@@ -24,125 +21,62 @@ import se.liu.ida.hefquin.federation.TPFServer;
  */
 public class LogicalToPhysicalOpConverter
 {
-	public static PhysicalOperator convert( final LogicalOperator lop ) {
-		if (      lop instanceof NullaryLogicalOp ) return convert( (NullaryLogicalOp) lop );
-		else if ( lop instanceof UnaryLogicalOp )   return convert( (UnaryLogicalOp) lop );
-		else if ( lop instanceof BinaryLogicalOp )  return convert( (BinaryLogicalOp) lop );
-		else if ( lop instanceof NaryLogicalOp )    return convert( (NaryLogicalOp) lop );
-		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+	final private static PhysicalOpRegistry registry = new PhysicalOpRegistry()
+		.register( PhysicalOpBinaryUnion.getFactory() )                // Binary union
+		.register( PhysicalOpMultiwayUnion.getFactory() )              // Multiway union
+		.register( PhysicalOpBind.getFactory() )                       // Bind clauses
+		.register( PhysicalOpFilter.getFactory() )                     // Filter clauses
+		.register( PhysicalOpRequest.getFactory() )                    // Request at a federation member
+		.register( PhysicalOpGlobalToLocal.getFactory() )              // Apply vocab mappings global to local
+		.register( PhysicalOpLocalToGlobal.getFactory() )              // Apply vocab mappings local to global
+		.register( PhysicalOpBindJoin.getFactory() )                   // Bind-join for brTPF interface
+		.register( PhysicalOpBindJoinWithBoundJoin.getFactory() )      // Bind-join for SPARQL interface
+		.register( PhysicalOpBindJoinWithVALUESorFILTER.getFactory() ) // (fallback) if no non-joining var available
+		// .register( PhysicalOpBindJoinWithUNION.getFactory() )
+		// .register( PhysicalOpBindJoinWithFILTER.getFactory() )
+		// .register( PhysicalOpBindJoinWithVALUES.getFactory() )
+		.register( PhysicalOpSymmetricHashJoin.getFactory() )          // Inner join
+		.register( PhysicalOpHashRJoin.getFactory() )                  // Right outer join
+		.register( PhysicalOpIndexNestedLoopsJoin.getFactory() )       // Index NLJ algorithm, fm to request join partners
+		// .register( PhysicalOpHashJoin.getFactory() )
+		.register( PhysicalOpNaiveNestedLoopsJoin.getFactory() )
+	;
+
+	protected static PhysicalOperator _convert( final LogicalOperator lop ) {
+		return _convert( lop, (ExpectedVariables[]) null );
 	}
 
-	// --------- nullary operators -----------
+	protected static PhysicalOperator _convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+		return registry.create(lop, inputVars);
+	}
 
 	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
-		if ( lop instanceof LogicalOpRequest reqOp ) return convert(reqOp);
-		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+		return (NullaryPhysicalOp) _convert(lop);
 	}
-
-	public static NullaryPhysicalOp convert( final LogicalOpRequest<?,?> lop ) {
-		return new PhysicalOpRequest<>(lop);
-	}
-
-	// --------- unary operators -----------
 
 	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
-		if (      lop instanceof LogicalOpGPAdd x )     return convert(x);
-		else if ( lop instanceof LogicalOpGPOptAdd x )  return convert(x);
-		else if ( lop instanceof LogicalOpFilter x )    return convert(x);
-		else if ( lop instanceof LogicalOpBind x )      return convert(x);
-		else if ( lop instanceof LogicalOpLocalToGlobal x ) return convert (x);
-		else if ( lop instanceof LogicalOpGlobalToLocal x ) return convert (x);
-		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+		return (UnaryPhysicalOp) _convert(lop);
 	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpGPAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		if (      fm instanceof SPARQLEndpoint ) {
-			return new PhysicalOpBindJoinWithBoundJoin(lop);
-		}
-		else if ( fm instanceof TPFServer && lop.containsTriplePatternOnly() ) {
-			return new PhysicalOpIndexNestedLoopsJoin(lop);
-		}
-		else if ( fm instanceof BRTPFServer && lop.containsTriplePatternOnly() ) {
-			return new PhysicalOpIndexNestedLoopsJoin(lop);
-		}
-
-		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
-	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpGPOptAdd lop ) {
-		final FederationMember fm = lop.getFederationMember();
-
-		if (      fm instanceof SPARQLEndpoint ) {
-			return new PhysicalOpBindJoinWithBoundJoin(lop);
-		}
-		else if ( fm instanceof TPFServer && lop.containsTriplePatternOnly() ) {
-			return new PhysicalOpIndexNestedLoopsJoin(lop);
-		}
-		else if ( fm instanceof BRTPFServer && lop.containsTriplePatternOnly() ) {
-			return new PhysicalOpIndexNestedLoopsJoin(lop);
-		}
-
-		else throw new UnsupportedOperationException("Unsupported type of federation member: " + fm.getClass().getName() + ".");
-	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpFilter lop ) {
-		return new PhysicalOpFilter(lop);
-	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpBind lop ) {
-		return new PhysicalOpBind(lop);
-	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpLocalToGlobal lop ) {
-		return new PhysicalOpLocalToGlobal(lop);
-	}
-
-	public static UnaryPhysicalOp convert( final LogicalOpGlobalToLocal lop ) {
-		return new PhysicalOpGlobalToLocal(lop);
-	}
-
-	// --------- binary operators -----------
 
 	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
-		if (      lop instanceof LogicalOpJoin )     return convert( (LogicalOpJoin) lop );
-		else if ( lop instanceof LogicalOpUnion )    return convert( (LogicalOpUnion) lop );
-		else if ( lop instanceof LogicalOpRightJoin ) return convert( (LogicalOpRightJoin) lop );
-		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+		return (BinaryPhysicalOp) _convert(lop);
 	}
-
-	public static BinaryPhysicalOp convert( final LogicalOpJoin lop ) {
-		return new PhysicalOpSymmetricHashJoin(lop);
-	}
-
-	public static BinaryPhysicalOp convert( final LogicalOpUnion lop ) {
-		return new PhysicalOpBinaryUnion(lop);
-	}
-
-	public static BinaryPhysicalOp convert( final LogicalOpRightJoin lop ) {
-		return new PhysicalOpHashRJoin(lop);
-	}
-
-	// --------- n-ary operators -----------
 
 	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
-		if (      lop instanceof LogicalOpMultiwayJoin )  return convert( (LogicalOpMultiwayJoin) lop );
-		else if ( lop instanceof LogicalOpMultiwayLeftJoin ) return convert( (LogicalOpMultiwayLeftJoin) lop );
-		else if ( lop instanceof LogicalOpMultiwayUnion ) return convert( (LogicalOpMultiwayUnion) lop );
-		else throw new UnsupportedOperationException("Unsupported type of logical operator: " + lop.getClass().getName() + ".");
+		return (NaryPhysicalOp) _convert(lop);
 	}
 
-	public static NaryPhysicalOp convert( final LogicalOpMultiwayJoin lop ) {
-		throw new UnsupportedOperationException();
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {
+		return (UnaryPhysicalOp) _convert(lop, inputVars);
 	}
 
-	public static NaryPhysicalOp convert( final LogicalOpMultiwayLeftJoin lop ) {
-		throw new UnsupportedOperationException();
+	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop,
+	                                        final ExpectedVariables inputVars1,
+	                                        final ExpectedVariables inputVars2 ) {
+		return (BinaryPhysicalOp) _convert(lop, inputVars1, inputVars2);
 	}
 
-	public static NaryPhysicalOp convert( final LogicalOpMultiwayUnion lop ) {
-		return new PhysicalOpMultiwayUnion();
+	public static NaryPhysicalOp convert( final NaryLogicalOp lop, final ExpectedVariables... inputVars ) {
+		return (NaryPhysicalOp) _convert(lop, inputVars);
 	}
-
 }

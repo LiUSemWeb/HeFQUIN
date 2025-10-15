@@ -1,10 +1,17 @@
 package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 
+import java.util.Set;
+
+import org.apache.jena.sparql.core.Var;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 
 /**
@@ -21,7 +28,9 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
  */
 public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 {
-	public PhysicalOpHashJoin( final LogicalOpJoin lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpHashJoin( final LogicalOpJoin lop ) {
 		super(lop);
 	}
 
@@ -47,5 +56,32 @@ public class PhysicalOpHashJoin extends BaseForPhysicalOpBinaryJoin
 	@Override
 	public String toString() {
 		return "> hashJoin ";
+	}
+
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			// inputVars contains null value?
+			for ( final ExpectedVariables vars : inputVars ) {
+				if ( vars == null ) return false;
+			}
+
+			final Set<Var> joinVars = ExpectedVariablesUtils.intersectionOfCertainVariables(inputVars);
+			return ( joinVars != null && ! joinVars.isEmpty() && lop instanceof LogicalOpJoin );
+		}
+
+		@Override
+		public PhysicalOpHashJoin create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpJoin op ) {
+				return new PhysicalOpHashJoin(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
 	}
 }

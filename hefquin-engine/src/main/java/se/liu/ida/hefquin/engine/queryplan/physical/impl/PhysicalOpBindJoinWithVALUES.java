@@ -6,8 +6,10 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUES;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
@@ -36,11 +38,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithVALUES( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithVALUES( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithVALUES( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -76,4 +80,33 @@ public class PhysicalOpBindJoinWithVALUES extends BaseForPhysicalOpSingleInputJo
 		return "> VALUESBindJoin" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpBindJoinWithVALUES create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithVALUES(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithVALUES(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }

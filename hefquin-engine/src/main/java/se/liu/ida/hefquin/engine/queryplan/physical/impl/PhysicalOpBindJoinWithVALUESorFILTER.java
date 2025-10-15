@@ -5,8 +5,10 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithVALUESorFILTER;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
+import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 
@@ -25,11 +27,13 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
+	protected static final Factory factory = new Factory();
+
+	protected PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
 	}
 
-	public PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinWithVALUESorFILTER( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 	}
 
@@ -65,4 +69,33 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 		return "> VALUESorFILTERBindJoin" + lop.toString();
 	}
 
+	public static Factory getFactory() {
+		return factory;
+	}
+
+	public static class Factory implements PhysicalOpFactory
+	{
+		@Override
+		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return op.getFederationMember() instanceof SPARQLEndpoint;
+			}
+			return false;
+		}
+
+		@Override
+		public PhysicalOpBindJoinWithVALUESorFILTER create( final LogicalOperator lop ) {
+			if ( lop instanceof LogicalOpGPAdd op ) {
+				return new PhysicalOpBindJoinWithVALUESorFILTER(op);
+			}
+			else if ( lop instanceof LogicalOpGPOptAdd op ) {
+				return new PhysicalOpBindJoinWithVALUESorFILTER(op);
+			}
+
+			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
+		}
+	}
 }
