@@ -51,11 +51,12 @@ public class LogicalOpUtils
     public static UnaryLogicalOp createLogicalAddOpFromPhysicalReqOp( final PhysicalOperator op ) {
         final LogicalOperator lop = ((PhysicalOperatorForLogicalOperator) op).getLogicalOperator();
 
-        if ( ! (lop instanceof LogicalOpRequest) ) {
+        if ( lop instanceof LogicalOpRequest reqOp ) {
+            return createLogicalAddOpFromLogicalReqOp(reqOp);
+        }
+        else {
             throw new IllegalArgumentException( "unsupported type of logical operator: " + lop.getClass().getName() );
         }
-
-        return createLogicalAddOpFromLogicalReqOp( (LogicalOpRequest<?, ?>) lop );
     }
 
     public static UnaryLogicalOp createLogicalAddOpFromLogicalReqOp( final LogicalOpRequest<?, ?> reqOp ) {

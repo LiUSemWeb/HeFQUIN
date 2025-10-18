@@ -14,13 +14,13 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
 /**
  * In cases in which there are unions with requests under joins (which may
  * happen only if we do not use {@link UnionPullUp}, this heuristics turns
- * the requests into xxAdd operators with the previous join arguments as
+ * the requests into gpAdd operators with the previous join arguments as
  * subplans. The rationale of this heuristics is that it allows us to use
  * bind joins and index nested loops joins in cases in which otherwise only
- * local join algorithms (e.g., hash join) could be used. In this sense, the
- * effect of this heuristics is similar to that of {@link UnionPullUp}, but
- * without pulling out unions completely and, thus, without producing a great
- * number of join subplans.
+ * local join algorithms (e.g., symmetric hash join) could be used. In this
+ * sense, the effect of this heuristics is similar to that of {@link UnionPullUp},
+ * but without pulling out unions completely and, thus, without producing
+ * a great number of join subplans.
  *
  * For instance, consider the following plan.
  *
@@ -41,27 +41,26 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * <br/>
  * 
  * In this case, the joins can be implemented only by using a local join
- * algorithm (e.g., hash join), which also means that the requests inside
- * the unions are executed by physical request operators and, thus, may
- * end up retrieving a lot of unnecessary triples from fm2 and from fm3
- * (i.e., triples that do not participate in the joins).
- * In contrast, when applying this heuristic to that plan, the resulting
- * plan is:
+ * algorithm (e.g., symmetric hash join), which also means that the requests
+ * inside the unions are executed by physical request operators and, thus,
+ * may end up retrieving a lot of unnecessary triples from fm2 and from fm3
+ * (i.e., triples that do not participate in the joins). In contrast, when
+ * applying this heuristic to that plan, the resulting plan is:
  *
  * <br/>
  * <code>
  * mu(
- *     tpAdd_fm2^(?y,p3,?z) (
+ *     gpAdd_fm2^(?y,p3,?z) (
  *         mu(
- *             tpAdd__fm2^(?x,p2,?y) (
+ *             gpAdd__fm2^(?x,p2,?y) (
  *                 req_fm1^(s,p,?x)
  *             ),
- *             tpAdd__fm3^(?x,p2,?y) (
+ *             gpAdd__fm3^(?x,p2,?y) (
  *                 req_fm1^(s,p,?x)
  *             )
  *         )
  *     ),
- *     tpAdd_fm3^(?y,p3,?z) (
+ *     gpAdd_fm3^(?y,p3,?z) (
  *         mu(
  *             ...
  *         )
@@ -70,15 +69,15 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * </code>
  * <br/>
  *
- * where the subplan under the second tpAdd operator is the same as the
- * subplan under the first tpAdd operator. Now, the tpAdd operators can
+ * where the subplan under the second gpAdd operator is the same as the
+ * subplan under the first gpAdd operator. Now, the gpAdd operators can
  * be implemented using bind joins or index nested loops joins, which may
  * reduce the number of unnecessary triples retrieved from fm2 and fm3.
  *
  * The heuristic assumes that we have already applied a join ordering
  * heuristics beforehand; i.e., the subplans under the multiway joins
  * already have a reasonable order before this heuristics turns such
- * a multiway join into stages of xxAdd operators (with the union
+ * a multiway join into stages of gpAdd operators (with the union
  * operators in between the stages). Based on this assumption, the
  * heuristics always processes the subplans of multiway joins from
  * left to right; i.e., the left-most union subplan becomes the first
@@ -93,7 +92,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  *
  * In addition to requests under unions (that are under joins), this heuristic
  * even considers combinations of a filter operator with a request operator,
- * in which case the request would also be turned into an xxAdd operator, but
+ * in which case the request would also be turned into an gpAdd operator, but
  * with the filter on top of it. Moreover, any other subplan under such unions
  * (that are under joins) is joined with the previous join arguments. To
  * illustrate these cases, consider the following example plan.
@@ -118,7 +117,7 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * <code>
  * mu(
  *     filter^condition(
- *         tpAdd_fm2^(?x,p2,?y) (
+ *         gpAdd_fm2^(?x,p2,?y) (
  *             req_fm1^(s,p,?x)
  *         )
  *     ),
@@ -219,24 +218,21 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 			final LogicalPlan newSubPlan;
 
 			final LogicalOperator oldSubPlanRootOp = oldSubPlan.getRootOperator();
-			if ( oldSubPlanRootOp instanceof LogicalOpRequest ) {
-				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) oldSubPlanRootOp;
+			if ( oldSubPlanRootOp instanceof LogicalOpRequest reqOp ) {
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
 				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, inputPlan);
 				newSubPlan = addOpPlan;
 			}
-			else if (    oldSubPlanRootOp instanceof LogicalOpFilter
+			else if (    oldSubPlanRootOp instanceof LogicalOpFilter filterOp
 			          && oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
-				final LogicalOpFilter filterOp = (LogicalOpFilter) oldSubPlanRootOp;
 				final LogicalOpRequest<?,?> reqOp = (LogicalOpRequest<?,?>) oldSubPlan.getSubPlan(0).getRootOperator();
 				final UnaryLogicalOp addOp = LogicalOpUtils.createLogicalAddOpFromLogicalReqOp(reqOp);
 				final LogicalPlan addOpPlan = new LogicalPlanWithUnaryRootImpl(addOp, inputPlan);
 				final LogicalPlan filterOpPlan = new LogicalPlanWithUnaryRootImpl(filterOp, addOpPlan);
 				newSubPlan = filterOpPlan;
 			}
-			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal
-					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest){
-				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlanRootOp;
+			else if ( oldSubPlanRootOp instanceof LogicalOpLocalToGlobal l2gLop
+					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );
 
@@ -246,12 +242,9 @@ public class PushJoinUnderUnionWithRequests implements HeuristicForLogicalOptimi
 
 				newSubPlan = new LogicalPlanWithUnaryRootImpl( l2gLop, addOpPlan );
 			}
-			else if ( oldSubPlanRootOp instanceof LogicalOpFilter
+			else if ( oldSubPlanRootOp instanceof LogicalOpFilter filterOp
 					&& oldSubPlan.getSubPlan(0).getRootOperator() instanceof LogicalOpLocalToGlobal
-					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest
-			){
-				final LogicalOpFilter filterOp = (LogicalOpFilter) oldSubPlanRootOp;
-
+					&& oldSubPlan.getSubPlan(0).getSubPlan(0).getRootOperator() instanceof LogicalOpRequest ) {
 				final LogicalOpLocalToGlobal l2gLop = (LogicalOpLocalToGlobal) oldSubPlan.getSubPlan(0).getRootOperator();
 				final LogicalOpGlobalToLocal g2l = new LogicalOpGlobalToLocal( l2gLop.getVocabularyMapping() );
 				final LogicalPlan newInputPlan = new LogicalPlanWithUnaryRootImpl( g2l, inputPlan );

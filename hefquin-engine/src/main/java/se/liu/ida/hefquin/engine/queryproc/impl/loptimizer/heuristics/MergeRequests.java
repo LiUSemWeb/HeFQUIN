@@ -43,8 +43,8 @@ import se.liu.ida.hefquin.federation.access.utils.SPARQLRequestUtils;
  * tries to push other operators into requests (filters, unions, optional).
  *
  * The aforementioned join-related merge is performed not only for binary join
- * operators but also for tpAdd/bgpAdd operators over request operators, as well
- * as for pairs of requests under a multi-join. In the latter case, the multi-join
+ * operators but also for gpAdd operators over request operators, as well as
+ * for pairs of requests under a multi-join. In the latter case, the multi-join
  * operator is replaced by the merged request operator only if there are no other
  * subplans under that multi-join operator.
  *
@@ -89,7 +89,8 @@ public class MergeRequests implements HeuristicForLogicalOptimization
 			if ( childOp instanceof LogicalOpRequest reqOp ) {
 				final FederationMember fm = gpAdd.getFederationMember();
 				if (    fm.getInterface().supportsSPARQLPatternRequests()
-				     && reqOp.getFederationMember().equals(fm) ) {
+				     && reqOp.getFederationMember().equals(fm)
+				     && ! gpAdd.hasParameterVariables() ) {
 					return mergePatternIntoRequest( gpAdd.getPattern(),
 					                                fm,
 					                                (SPARQLRequest) reqOp.getRequest() );
