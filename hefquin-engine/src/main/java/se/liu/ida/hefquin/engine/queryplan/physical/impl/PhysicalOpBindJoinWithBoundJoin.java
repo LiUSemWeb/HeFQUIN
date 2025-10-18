@@ -95,7 +95,8 @@ public class PhysicalOpBindJoinWithBoundJoin extends BaseForPhysicalOpSingleInpu
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );
+				return    isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] )
+				       && ! op.hasParameterVariables();
 			}
 			if ( lop instanceof LogicalOpGPOptAdd op ) {
 				return isSupported( op.getFederationMember(), op.getPattern(), inputVars[0] );

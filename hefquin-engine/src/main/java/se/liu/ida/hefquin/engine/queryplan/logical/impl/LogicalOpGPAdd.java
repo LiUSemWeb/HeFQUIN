@@ -58,7 +58,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	 * 
 	 */
 	public boolean hasParameterVariables() {
-		return paramVars == null || paramVars.isEmpty();
+		return paramVars != null && ! paramVars.isEmpty();
 	}
 
 	/**

@@ -94,7 +94,8 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return op.getFederationMember() instanceof SPARQLEndpoint;
+				return    op.getFederationMember() instanceof SPARQLEndpoint
+				       && ! op.hasParameterVariables();
 			}
 			if ( lop instanceof LogicalOpGPOptAdd op ) {
 				return op.getFederationMember() instanceof SPARQLEndpoint;

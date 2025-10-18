@@ -19,8 +19,8 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * the algorithm supports the brTPF interface.
  *
  * <p>
- * <b>Semantics:</b> This operator implements the logical operators tpAdd
- * (see {@link LogicalOpTPAdd}) and tpOptAdd (see {@link LogicalOpTPOptAdd}).
+ * <b>Semantics:</b> This operator implements the logical operators gpAdd
+ * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
  * That is, for a given triple pattern, a federation  member, and an input
  * sequence of solution mappings (produced by the sub-plan under this
  * operator), the operator produces the solutions resulting from the join
@@ -44,6 +44,9 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
+			throw new IllegalArgumentException();
+
+		if ( lop.hasParameterVariables() )
 			throw new IllegalArgumentException();
 	}
 
@@ -113,10 +116,13 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
-				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
+				return    op.containsTriplePatternOnly()
+				       && op.getFederationMember() instanceof BRTPFServer
+				       && ! op.hasParameterVariables();
 			}
 			if( lop instanceof LogicalOpGPOptAdd op ){
-				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
+				return    op.containsTriplePatternOnly()
+				       && op.getFederationMember() instanceof BRTPFServer;
 			}
 			return false;
 		}
