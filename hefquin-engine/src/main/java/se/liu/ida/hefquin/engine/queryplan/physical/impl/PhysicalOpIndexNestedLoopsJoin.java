@@ -64,6 +64,8 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 
 	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPAdd lop ) {
 		super(lop);
+
+		assert ! lop.hasParameterVariables();
 	}
 
 	protected PhysicalOpIndexNestedLoopsJoin( final LogicalOpGPOptAdd lop ) {
@@ -146,7 +148,8 @@ public class PhysicalOpIndexNestedLoopsJoin extends BaseForPhysicalOpSingleInput
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return isSupported( op.getFederationMember() );
+				return    isSupported( op.getFederationMember() )
+				       && ! op.hasParameterVariables();
 			}
 			if ( lop instanceof LogicalOpGPOptAdd op ) {
 				return isSupported( op.getFederationMember() );
