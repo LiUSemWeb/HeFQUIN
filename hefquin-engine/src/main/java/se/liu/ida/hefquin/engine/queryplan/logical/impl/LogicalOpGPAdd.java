@@ -19,7 +19,7 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
-	protected final List<Var> params;
+	protected final List<Var> paramVars;
 
 	// will be initialized on demand 
 	protected TriplePattern tp = null;
@@ -27,13 +27,17 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 
 	public LogicalOpGPAdd( final FederationMember fm,
 	                       final SPARQLGraphPattern pattern,
-	                       final List<Var> params ) {
+	                       final List<Var> paramVars ) {
 		assert fm != null;
 		assert pattern != null;
 
 		this.fm = fm;
 		this.pattern = pattern;
-		this.params = params;
+
+		if ( paramVars != null && ! paramVars.isEmpty() )
+			this.paramVars = paramVars;
+		else
+			this.paramVars = null;
 	}
 
 	public FederationMember getFederationMember() {
@@ -45,6 +49,32 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 			return tp;
 		else
 			return pattern;
+	}
+
+	/**
+	 * Returns {@code true} if this gpAdd operator has a (nonempty) list of
+	 * variables as parameter. if it has, {@link #getParameterVariables()}
+	 * can be used to access this parameter.
+	 * 
+	 */
+	public boolean hasParameterVariables() {
+		return paramVars == null || paramVars.isEmpty();
+	}
+
+	/**
+	 * Returns the (nonempty) list of variables that is a parameter
+	 * of this gpAdd operator (if any).
+	 * <p>
+	 * If this gpAdd operator does not have such a parameter, then
+	 * an {@link UnsupportedOperationException} is thrown. You can
+	 * use {@link #hasParameterVariables()} to ask whether this gpAdd
+	 * operator is this parameter.
+	 */
+	public Iterable<Var> getParameterVariables() {
+		if ( ! hasParameterVariables() )
+			throw new UnsupportedOperationException("Requesting variables of a gpAdd operator that does not have this parameter.");
+
+		return paramVars;
 	}
 
 	/**
