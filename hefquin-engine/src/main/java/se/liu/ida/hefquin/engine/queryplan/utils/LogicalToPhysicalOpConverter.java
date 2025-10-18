@@ -29,7 +29,7 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpRequest.getFactory() )                    // Request at a federation member
 		.register( PhysicalOpGlobalToLocal.getFactory() )              // Apply vocab mappings global to local
 		.register( PhysicalOpLocalToGlobal.getFactory() )              // Apply vocab mappings local to global
-		.register( PhysicalOpBindJoin.getFactory() )                   // Bind-join for brTPF interface
+		.register( PhysicalOpBindJoinBRTPF.getFactory() )                   // Bind-join for brTPF interface
 		.register( PhysicalOpBindJoinWithBoundJoin.getFactory() )      // Bind-join for SPARQL interface
 		.register( PhysicalOpBindJoinWithVALUESorFILTER.getFactory() ) // (fallback) if no non-joining var available
 		// .register( PhysicalOpBindJoinWithUNION.getFactory() )

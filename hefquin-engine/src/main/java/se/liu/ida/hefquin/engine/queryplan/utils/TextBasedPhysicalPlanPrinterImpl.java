@@ -86,8 +86,8 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpBindJoin op ) {
-			out.append( indentLevelString + "brTPF bind join (" + op.getID() + ") " );
+		public void visit( final PhysicalOpBindJoinBRTPF op ) {
+			out.append( indentLevelString + "brTPF-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );

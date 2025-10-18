@@ -6,7 +6,7 @@ public interface PhysicalPlanVisitor
 {
 	void visit( PhysicalOpRequest<?,?> op );
 
-	void visit( PhysicalOpBindJoin op );
+	void visit( PhysicalOpBindJoinBRTPF op );
 	void visit( PhysicalOpBindJoinWithVALUES op );
 	void visit( PhysicalOpBindJoinWithUNION op );
 	void visit( PhysicalOpBindJoinWithFILTER op );

@@ -53,7 +53,7 @@ public class CFRNumberOfRequests extends CFRBase
 			else
 				throw new IllegalArgumentException( "Unsupported type of operator: " + lop.getClass().getName() );
 		}
-		else if ( rootOp instanceof PhysicalOpBindJoin ){
+		else if ( rootOp instanceof PhysicalOpBindJoinBRTPF ){
 //			The actual number of requests depends on the block size used for the bind-join requests, and page size of response.
 //		    This implementation is under an assumption that the number of pages is evenly distributed among bind-join requests.
 			numReq = initiateCardinalityEstimation(plan);

@@ -38,7 +38,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
@@ -283,7 +283,7 @@ public class TestsForPhysicalOpFactories
 	// ---- helper functions -----
 
 	public void assertSupportForOpBindJoin( final ConstructorGPAddAndGPOptAdd ctor ) {
-		final PhysicalOpFactory factory = PhysicalOpBindJoin.getFactory();
+		final PhysicalOpFactory factory = PhysicalOpBindJoinBRTPF.getFactory();
 
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
@@ -296,7 +296,7 @@ public class TestsForPhysicalOpFactories
 		final LogicalOperator lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p1 );
 		final LogicalOperator lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p1 );
 
-		assertEquals( PhysicalOpBindJoin.class, factory.create(lop_sparql).getClass() );
+		assertEquals( PhysicalOpBindJoinBRTPF.class, factory.create(lop_sparql).getClass() );
 
 		assertFalse( factory.supports( lop_sparql, (ExpectedVariables) null ) );
 		assertFalse( factory.supports( lop_tpf, (ExpectedVariables) null ) );

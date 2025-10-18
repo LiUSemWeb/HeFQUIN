@@ -173,7 +173,7 @@ public class PhysicalPlanFactory
 	 */
 	public static PhysicalPlan createPlanWithBindJoin( final LogicalOpGPAdd lop,
 	                                                   final PhysicalPlan subplan ) {
-		final UnaryPhysicalOp pop = PhysicalOpBindJoin.getFactory().create(lop);
+		final UnaryPhysicalOp pop = PhysicalOpBindJoinBRTPF.getFactory().create(lop);
 		return createPlan(pop, subplan);
 	}
 
@@ -555,7 +555,7 @@ public class PhysicalPlanFactory
 		throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
 	}
 
-	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoin pop ) {
+	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinBRTPF pop ) {
 		return extractRequestAsPlan( pop.getLogicalOperator() );
 	}
 
