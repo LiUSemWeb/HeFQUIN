@@ -1,5 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -18,17 +19,21 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
+	protected final List<Var> params;
 
 	// will be initialized on demand 
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
-	public LogicalOpGPAdd( final FederationMember fm, final SPARQLGraphPattern pattern ) {
+	public LogicalOpGPAdd( final FederationMember fm,
+	                       final SPARQLGraphPattern pattern,
+	                       final List<Var> params ) {
 		assert fm != null;
 		assert pattern != null;
 
 		this.fm = fm;
 		this.pattern = pattern;
+		this.params = params;
 	}
 
 	public FederationMember getFederationMember() {

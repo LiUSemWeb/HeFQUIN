@@ -64,7 +64,7 @@ public class LogicalOpUtils
 
         if( req instanceof SPARQLRequest sparqlReq ) {
             final SPARQLGraphPattern pattern = sparqlReq.getQueryPattern();
-            return new LogicalOpGPAdd( fm, pattern );
+            return new LogicalOpGPAdd(fm, pattern, null);
         }
         else {
             throw new IllegalArgumentException( "unsupported type of request: " + req.getClass().getName() );
