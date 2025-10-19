@@ -42,28 +42,12 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpNaiveNestedLoopsJoin.getFactory() )
 	;
 
-	protected static PhysicalOperator _convert( final LogicalOperator lop ) {
-		return _convert( lop, (ExpectedVariables[]) null );
-	}
-
 	protected static PhysicalOperator _convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
 	}
 
 	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
 		return (NullaryPhysicalOp) _convert(lop);
-	}
-
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
-		return (UnaryPhysicalOp) _convert(lop);
-	}
-
-	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
-		return (BinaryPhysicalOp) _convert(lop);
-	}
-
-	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
-		return (NaryPhysicalOp) _convert(lop);
 	}
 
 	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {
