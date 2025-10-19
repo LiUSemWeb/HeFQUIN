@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -129,11 +130,13 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 		if ( o == this )
 			return true;
 
-		if ( ! (o instanceof LogicalOpGPAdd) )
-			return false;
+		if ( o instanceof LogicalOpGPAdd otherGPAdd ) {
+			return    otherGPAdd.fm.equals(fm)
+			       && otherGPAdd.pattern.equals(pattern)
+			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars);
+		}
 
-		final LogicalOpGPAdd oo = (LogicalOpGPAdd) o;
-		return oo.fm.equals(fm) && oo.pattern.equals(pattern); 
+		return false;
 	}
 
 	@Override

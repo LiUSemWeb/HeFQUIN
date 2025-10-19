@@ -98,11 +98,12 @@ public class LogicalOpGPOptAdd extends BaseForQueryPlanOperator implements Unary
 		if ( o == this )
 			return true;
 
-		if ( ! (o instanceof LogicalOpGPOptAdd) )
-			return false;
+		if ( o instanceof LogicalOpGPOptAdd otherGPOptAdd ) {
+			return    otherGPOptAdd.fm.equals(fm)
+			       && otherGPOptAdd.pattern.equals(pattern);
+		}
 
-		final LogicalOpGPOptAdd oo = (LogicalOpGPOptAdd) o;
-		return oo.fm.equals(fm) && oo.pattern.equals(pattern); 
+		return false; 
 	}
 
 	@Override
