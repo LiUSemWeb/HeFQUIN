@@ -12,15 +12,15 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpBindJoinWithFILTER op );
 	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
     void visit( PhysicalOpBindJoinWithBoundJoin op );
-	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
-
-	void visit( PhysicalOpParallelMultiLeftJoin op );
+	void visit( PhysicalOpBindJoinViaWrapper op );
 
 	void visit( PhysicalOpHashJoin op );
 	void visit( PhysicalOpSymmetricHashJoin op );
+	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 
 	void visit( PhysicalOpHashRJoin op );
+	void visit( PhysicalOpParallelMultiLeftJoin op );
 
 	void visit( PhysicalOpBinaryUnion op );
 	void visit( PhysicalOpMultiwayUnion op );
