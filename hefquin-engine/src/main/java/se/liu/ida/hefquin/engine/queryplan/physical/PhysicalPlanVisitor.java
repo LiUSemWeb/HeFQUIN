@@ -13,7 +13,7 @@ public interface PhysicalPlanVisitor
 	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
     void visit( PhysicalOpBindJoinWithBoundJoin op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
-	void visit( PhysicalOpBindJoinViaWrapper op );
+	void visit( PhysicalOpBindJoinViaMaterializingWrapper op );
 
 	void visit( PhysicalOpHashJoin op );
 	void visit( PhysicalOpSymmetricHashJoin op );

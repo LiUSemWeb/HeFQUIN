@@ -12,26 +12,36 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.federation.WrappedFederationMember;
+import se.liu.ida.hefquin.federation.wrappers.MaterializingWrapper;
+import se.liu.ida.hefquin.federation.wrappers.Wrapper;
 
 /**
  * A physical operator that .. TODO
  */
-public class PhysicalOpBindJoinViaWrapper extends BaseForPhysicalOpSingleInputJoin
+public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOpSingleInputJoin
 {
 	protected static final Factory factory = new Factory();
 
 	public static Factory getFactory() { return factory; }
 
-	protected PhysicalOpBindJoinViaWrapper( final LogicalOpGPAdd lop ) {
+	protected PhysicalOpBindJoinViaMaterializingWrapper( final LogicalOpGPAdd lop ) {
 		super(lop);
 
-		assert lop.getFederationMember() instanceof WrappedFederationMember;
+		// checks
 		assert lop.hasParameterVariables();
+		assert lop.getFederationMember() instanceof WrappedFederationMember;
+
+		// further checks
+		final WrappedFederationMember wfm = (WrappedFederationMember) lop.getFederationMember();
+		final Wrapper wrapper = wfm.getWrapper();
+		assert wrapper instanceof MaterializingWrapper;
+		assert wrapper.isSupportedPattern( lop.getPattern() );
+		assert wrapper.isSupportedNumberOfArguments( lop.numberOfParameterVariables() );
 	}
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBindJoinViaWrapper oo && oo.lop.equals(lop);
+		return o instanceof PhysicalOpBindJoinViaMaterializingWrapper oo && oo.lop.equals(lop);
 	}
 
 	@Override
@@ -41,6 +51,7 @@ public class PhysicalOpBindJoinViaWrapper extends BaseForPhysicalOpSingleInputJo
 	{
 		final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) lop;
 		final WrappedFederationMember wfm = (WrappedFederationMember) gpAdd.getFederationMember();
+		final MaterializingWrapper wrapper = (MaterializingWrapper) wfm.getWrapper();
 
 		gpAdd.getPattern();
 		gpAdd.getParameterVariables();
@@ -69,28 +80,26 @@ public class PhysicalOpBindJoinViaWrapper extends BaseForPhysicalOpSingleInputJo
 			if(    lop instanceof LogicalOpGPAdd gpAdd
 			    && gpAdd.hasParameterVariables()
 			    && gpAdd.getFederationMember() instanceof WrappedFederationMember wfm
-			    && wfm.isSupportedPattern(gpAdd.getPattern()) ) {
+			    && wfm.getWrapper() instanceof MaterializingWrapper wrapper
+			    && wrapper.isSupportedNumberOfArguments(gpAdd.numberOfParameterVariables())
+			    && wrapper.isSupportedPattern(gpAdd.getPattern()) ) {
 				// check that each of the parameter variables is certainly bound
 				final Set<Var> certainInputVars = inputVars[0].getCertainVariables();
-				int cnt = 0;
 				for ( final Var v : gpAdd.getParameterVariables() ) {
-					cnt++;
 					if ( ! certainInputVars.contains(v) )
 						return false;
 				}
 
-				// check that the number of parameter variables is supported
-				if ( wfm.isSupportedNumberOfArguments(cnt) )
-					return true;
+				return true;
 			}
 
 			return false;
 		}
 
 		@Override
-		public PhysicalOpBindJoinViaWrapper create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoinViaMaterializingWrapper create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return new PhysicalOpBindJoinViaWrapper(op);
+				return new PhysicalOpBindJoinViaMaterializingWrapper(op);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

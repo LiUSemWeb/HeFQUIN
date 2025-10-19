@@ -63,6 +63,15 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	}
 
 	/**
+	 * Returns the number of parameter variables that this operator has.
+	 * This number is the size of the list that can be accessed via
+	 * {@link #getParameterVariables()}.
+	 */
+	public int numberOfParameterVariables() {
+		return paramVars == null ? 0 : paramVars.size();
+	}
+
+	/**
 	 * Returns the (nonempty) list of variables that is a parameter
 	 * of this gpAdd operator (if any).
 	 * <p>

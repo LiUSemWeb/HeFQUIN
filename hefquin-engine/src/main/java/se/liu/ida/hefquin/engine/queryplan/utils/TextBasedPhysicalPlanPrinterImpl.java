@@ -100,7 +100,7 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpBindJoinViaWrapper op ) {
+		public void visit( final PhysicalOpBindJoinViaMaterializingWrapper op ) {
 			out.append( indentLevelString + "wrapper-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );

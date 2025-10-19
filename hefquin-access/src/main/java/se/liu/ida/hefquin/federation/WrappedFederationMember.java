@@ -1,9 +1,11 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.wrappers.Wrapper;
 
 public interface WrappedFederationMember extends FederationMember
 {
-	boolean isSupportedPattern( SPARQLGraphPattern p );
-	boolean isSupportedNumberOfArguments( int n );
+	/**
+	 * Returns the wrapper for this federation member.
+	 */
+	Wrapper getWrapper();
 }
