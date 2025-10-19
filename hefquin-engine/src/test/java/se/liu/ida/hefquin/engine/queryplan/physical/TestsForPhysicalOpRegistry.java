@@ -8,20 +8,36 @@ import java.util.NoSuchElementException;
 
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpFactories.ConstructorGPAddAndGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 import static se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpFactories.gpAddConstructor;
 
 public class TestsForPhysicalOpRegistry
 {
+	@Test
+	public void testOpRequest(){
+		final PhysicalOpRegistry registry = new PhysicalOpRegistry();
+		registry.register( PhysicalOpRequest.getFactory() );
+
+		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1( new ElementTriplesBlock() );
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( new TestUtils.SPARQLEndpointForTest(),
+		                                                          new SPARQLRequestImpl(p) );
+
+		assertEquals( PhysicalOpRequest.class, registry.create(lop).getClass() );
+	}
+
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpAdd(){
 		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
