@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.base.query.utils.ExpectedVariablesUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
@@ -26,6 +27,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 {
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpSymmetricHashJoin( final LogicalOpJoin lop ) {
 		super(lop);
@@ -56,11 +58,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 		return "> symmetricHashJoin ";
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -74,7 +72,7 @@ public class PhysicalOpSymmetricHashJoin extends BaseForPhysicalOpBinaryJoin
 		}
 
 		@Override
-		public PhysicalOpSymmetricHashJoin create( final LogicalOperator lop ) {
+		public PhysicalOpSymmetricHashJoin create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpJoin ) {
 				return new PhysicalOpSymmetricHashJoin( (LogicalOpJoin) lop);
 			}

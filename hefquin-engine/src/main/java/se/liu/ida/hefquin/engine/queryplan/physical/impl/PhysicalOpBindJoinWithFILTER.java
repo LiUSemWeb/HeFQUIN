@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
@@ -38,6 +39,7 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
 		super(lop);
@@ -79,11 +81,7 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		return "> FILTERBindJoin " + "(" + getID() + ") " +  lop.toString();
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		private static final Factory singleton = new Factory();
 
@@ -104,7 +102,7 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		}
 
 		@Override
-		public PhysicalOpBindJoinWithFILTER create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoinWithFILTER create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
 				return new PhysicalOpBindJoinWithFILTER(op);
 			}

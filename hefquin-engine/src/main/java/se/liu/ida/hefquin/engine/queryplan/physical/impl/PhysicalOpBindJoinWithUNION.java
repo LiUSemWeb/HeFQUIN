@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithUNION;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
@@ -37,6 +38,7 @@ import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 public class PhysicalOpBindJoinWithUNION extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpBindJoinWithUNION( final LogicalOpGPAdd lop ) {
 		super(lop);
@@ -78,11 +80,7 @@ public class PhysicalOpBindJoinWithUNION extends BaseForPhysicalOpSingleInputJoi
 		return "> UNIONBindJoin" + lop.toString();
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -97,7 +95,7 @@ public class PhysicalOpBindJoinWithUNION extends BaseForPhysicalOpSingleInputJoi
 		}
 
 		@Override
-		public PhysicalOpBindJoinWithUNION create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoinWithUNION create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
 				return new PhysicalOpBindJoinWithUNION(op);
 			}

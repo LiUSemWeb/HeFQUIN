@@ -9,6 +9,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFa
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
@@ -42,8 +43,10 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
                        extends BaseForQueryPlanOperator
                        implements NullaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpRequest<ReqType,MemberType> lop;
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
+
+	protected final LogicalOpRequest<ReqType,MemberType> lop;
 
 	protected PhysicalOpRequest( final LogicalOpRequest<ReqType,MemberType> lop ) {
 		assert lop != null;
@@ -97,11 +100,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		return lop.toString();
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -109,7 +108,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		}
 
 		@Override
-		public PhysicalOpRequest<?, ?> create( final LogicalOperator lop ) {
+		public PhysicalOpRequest<?, ?> create( final NullaryLogicalOp lop ) {
 			if ( lop instanceof  LogicalOpRequest<?,?> op ) {
 				return new PhysicalOpRequest<>(op);
 			}

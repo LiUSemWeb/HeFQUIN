@@ -5,6 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
@@ -20,8 +21,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
                                    implements BinaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpUnion lop;
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
+
+	protected final LogicalOpUnion lop;
 
 	protected PhysicalOpBinaryUnion( final LogicalOpUnion lop ) {
 		assert lop != null;
@@ -60,11 +63,7 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 		return "> binaryUnion ";
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -72,7 +71,7 @@ public class PhysicalOpBinaryUnion extends BaseForQueryPlanOperator
 		}
 
 		@Override
-		public PhysicalOpBinaryUnion create( final LogicalOperator lop ) {
+		public PhysicalOpBinaryUnion create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpUnion op ) {
 				return new PhysicalOpBinaryUnion(op);
 			}

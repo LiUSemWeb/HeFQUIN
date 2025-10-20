@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -22,8 +23,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOpForLogicalOp;
 public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
                                      implements UnaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpGlobalToLocal lop;
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
+
+	protected final LogicalOpGlobalToLocal lop;
 
 	protected PhysicalOpGlobalToLocal( final LogicalOpGlobalToLocal lop ) {
 		this.lop = lop;
@@ -52,11 +55,7 @@ public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
 		return "> g2l " + "(vocab.mapping: " + lop.getVocabularyMapping().hashCode() + ")";
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -64,7 +63,7 @@ public class PhysicalOpGlobalToLocal extends BaseForQueryPlanOperator
 		}
 
 		@Override
-		public PhysicalOpGlobalToLocal create( final LogicalOperator lop ) {
+		public PhysicalOpGlobalToLocal create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGlobalToLocal op ) {
 				return new PhysicalOpGlobalToLocal(op);
 			}

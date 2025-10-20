@@ -7,6 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.BinaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpHashRJoin;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
+import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOpForLogicalOp;
@@ -32,8 +33,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
                                  implements BinaryPhysicalOpForLogicalOp
 {
-	protected final LogicalOpRightJoin lop;
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
+
+	protected final LogicalOpRightJoin lop;
 
 	protected PhysicalOpHashRJoin(final LogicalOpRightJoin lop ) {
 		assert lop != null;
@@ -74,11 +77,7 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 		return "> hashRJoin ";
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -86,7 +85,7 @@ public class PhysicalOpHashRJoin extends BaseForQueryPlanOperator
 		}
 
 		@Override
-		public PhysicalOpHashRJoin create( final LogicalOperator lop ) {
+		public PhysicalOpHashRJoin create( final BinaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpRightJoin op ) {
 				return new PhysicalOpHashRJoin(op);
 			}

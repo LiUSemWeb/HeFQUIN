@@ -6,6 +6,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOpForLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
@@ -21,6 +22,7 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
                                      implements NaryPhysicalOpForLogicalOp
 {
 	protected static final Factory factory = new Factory();
+	public static PhysicalOpFactory getFactory() { return factory; }
 
 	@Override
 	public void visit( final PhysicalPlanVisitor visitor ) {
@@ -54,11 +56,7 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 		return "> multiwayUnion " + "(" + getID() + ")";
 	}
 
-	public static Factory getFactory() {
-		return factory;
-	}
-
-	public static class Factory implements PhysicalOpFactory
+	protected static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
@@ -66,7 +64,7 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 		}
 
 		@Override
-		public PhysicalOpMultiwayUnion create( final LogicalOperator lop ) {
+		public PhysicalOpMultiwayUnion create( final NaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpMultiwayUnion ) {
 				return new PhysicalOpMultiwayUnion();
 			}

@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
@@ -21,8 +22,7 @@ import se.liu.ida.hefquin.federation.wrappers.Wrapper;
 public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOpSingleInputJoin
 {
 	protected static final Factory factory = new Factory();
-
-	public static Factory getFactory() { return factory; }
+	public static PhysicalOpFactory getFactory() { return factory; }
 
 	protected PhysicalOpBindJoinViaMaterializingWrapper( final LogicalOpGPAdd lop ) {
 		super(lop);
@@ -97,7 +97,7 @@ public class PhysicalOpBindJoinViaMaterializingWrapper extends BaseForPhysicalOp
 		}
 
 		@Override
-		public PhysicalOpBindJoinViaMaterializingWrapper create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoinViaMaterializingWrapper create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
 				return new PhysicalOpBindJoinViaMaterializingWrapper(op);
 			}

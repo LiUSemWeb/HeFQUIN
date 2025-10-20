@@ -14,7 +14,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
+import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpFactories.ConstructorGPAddAndGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
@@ -41,28 +41,28 @@ public class TestsForPhysicalOpRegistry
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpAdd(){
 		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( new PhysicalOpBindJoinWithBoundJoin.Factory() );
+			.register( PhysicalOpBindJoinWithBoundJoin.getFactory() );
 		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, factory);
 	}
 
 	@Test
 	public void testOpBindJoinWithBoundJoin_gpOptAdd(){
 		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( new PhysicalOpBindJoinWithBoundJoin.Factory() );
+			.register( PhysicalOpBindJoinWithBoundJoin.getFactory() );
 		assertSupportForOpBindJoinWithBoundJoin(gpAddConstructor, factory);
 	}
 
 	@Test
 	public void testOpBindJoinWithUNION_gpAdd(){
 		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( new PhysicalOpBindJoinWithUNION.Factory() );
+			.register( PhysicalOpBindJoinWithUNION.getFactory() );
 		assertSupportForOpBindJoinWithUNION(gpAddConstructor, factory);
 	}
 
 	@Test
 	public void testOpBindJoinWithUNION_gpOptAdd(){
 		final PhysicalOpRegistry factory = new PhysicalOpRegistry()
-			.register( new PhysicalOpBindJoinWithUNION.Factory() );
+			.register( PhysicalOpBindJoinWithUNION.getFactory() );
 		assertSupportForOpBindJoinWithUNION(gpAddConstructor, factory);
 	}
 
@@ -72,7 +72,7 @@ public class TestsForPhysicalOpRegistry
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOperator lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables spo = TestUtils.getExpectedVariables( List.of("s", "p", "o"), List.of() );
@@ -88,7 +88,7 @@ public class TestsForPhysicalOpRegistry
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOperator lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 

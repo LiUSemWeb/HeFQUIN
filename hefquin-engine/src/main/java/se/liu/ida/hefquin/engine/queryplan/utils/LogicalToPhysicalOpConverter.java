@@ -2,7 +2,6 @@ package se.liu.ida.hefquin.engine.queryplan.utils;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
-import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
@@ -10,7 +9,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpRegistry;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
@@ -42,25 +40,23 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpNaiveNestedLoopsJoin.getFactory() )
 	;
 
-	protected static PhysicalOperator _convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
-		return registry.create(lop, inputVars);
-	}
-
 	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
-		return (NullaryPhysicalOp) _convert(lop);
+		return registry.create(lop);
 	}
 
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {
-		return (UnaryPhysicalOp) _convert(lop, inputVars);
+	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop,
+	                                       final ExpectedVariables inputVars ) {
+		return registry.create(lop, inputVars);
 	}
 
 	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop,
 	                                        final ExpectedVariables inputVars1,
 	                                        final ExpectedVariables inputVars2 ) {
-		return (BinaryPhysicalOp) _convert(lop, inputVars1, inputVars2);
+		return registry.create(lop, inputVars1, inputVars2);
 	}
 
-	public static NaryPhysicalOp convert( final NaryLogicalOp lop, final ExpectedVariables... inputVars ) {
-		return (NaryPhysicalOp) _convert(lop, inputVars);
+	public static NaryPhysicalOp convert( final NaryLogicalOp lop,
+	                                      final ExpectedVariables... inputVars ) {
+		return registry.create(lop, inputVars);
 	}
 }
