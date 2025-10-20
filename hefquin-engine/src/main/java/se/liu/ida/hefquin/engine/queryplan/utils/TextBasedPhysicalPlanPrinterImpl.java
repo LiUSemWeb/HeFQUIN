@@ -86,11 +86,37 @@ public class TextBasedPhysicalPlanPrinterImpl extends BaseForTextBasedPlanPrinte
 		}
 
 		@Override
-		public void visit( final PhysicalOpBindJoin op ) {
-			out.append( indentLevelString + "brTPF bind join (" + op.getID() + ") " );
+		public void visit( final PhysicalOpBindJoinBRTPF op ) {
+			out.append( indentLevelString + "brTPF-based bind join (" + op.getID() + ") " );
 			out.append( System.lineSeparator() );
 			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
 			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
+			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( System.lineSeparator() );
+		}
+
+		@Override
+		public void visit( final PhysicalOpBindJoinViaMaterializingWrapper op ) {
+			out.append( indentLevelString + "wrapper-based bind join (" + op.getID() + ") " );
+			out.append( System.lineSeparator() );
+			printLogicalOperator( op, indentLevelStringForOpDetail + singleBase, out, np );
+			printOperatorInfoFmAndPattern( op, indentLevelStringForOpDetail );
+
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( "  - parameter variables:" );
+			final LogicalOpGPAdd gpAdd = (LogicalOpGPAdd) op.getLogicalOperator();
+			if ( gpAdd.hasParameterVariables() ) {
+				for ( final Var v : gpAdd.getParameterVariables() )
+					out.append( " " + v.toString() );
+			}
+			else {
+				out.append( " none" );
+			}
+			out.append( System.lineSeparator() );
 
 			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );

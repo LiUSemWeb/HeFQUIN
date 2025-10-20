@@ -19,8 +19,8 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * the algorithm supports the brTPF interface.
  *
  * <p>
- * <b>Semantics:</b> This operator implements the logical operators tpAdd
- * (see {@link LogicalOpTPAdd}) and tpOptAdd (see {@link LogicalOpTPOptAdd}).
+ * <b>Semantics:</b> This operator implements the logical operators gpAdd
+ * (see {@link LogicalOpGPAdd}) and gpOptAdd (see {@link LogicalOpGPOptAdd}).
  * That is, for a given triple pattern, a federation  member, and an input
  * sequence of solution mappings (produced by the sub-plan under this
  * operator), the operator produces the solutions resulting from the join
@@ -36,18 +36,21 @@ import se.liu.ida.hefquin.federation.FederationMember;
  * implementation of this algorithm.
  * </p>
  */
-public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
+public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 {
 	protected static final Factory factory = new Factory();
 
-	protected PhysicalOpBindJoin( final LogicalOpGPAdd lop ) {
+	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPAdd lop ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
 			throw new IllegalArgumentException();
+
+		if ( lop.hasParameterVariables() )
+			throw new IllegalArgumentException();
 	}
 
-	protected PhysicalOpBindJoin( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPOptAdd lop ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
@@ -56,7 +59,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 
 	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof PhysicalOpBindJoin && ((PhysicalOpBindJoin) o).lop.equals(lop);
+		return o instanceof PhysicalOpBindJoinBRTPF && ((PhysicalOpBindJoinBRTPF) o).lop.equals(lop);
 	}
 
 	@Override
@@ -101,7 +104,7 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 
 	@Override
 	public String toString() {
-		return "> bindJoin" + lop.toString();
+		return "> brTPF-based bind join " + "(" + getID() + ") " +  lop.toString();
 	}
 
 	public static Factory getFactory() {
@@ -113,21 +116,24 @@ public class PhysicalOpBindJoin extends BaseForPhysicalOpSingleInputJoin
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
-				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
+				return    op.containsTriplePatternOnly()
+				       && op.getFederationMember() instanceof BRTPFServer
+				       && ! op.hasParameterVariables();
 			}
 			if( lop instanceof LogicalOpGPOptAdd op ){
-				return op.containsTriplePatternOnly() && op.getFederationMember() instanceof BRTPFServer ;
+				return    op.containsTriplePatternOnly()
+				       && op.getFederationMember() instanceof BRTPFServer;
 			}
 			return false;
 		}
 
 		@Override
-		public PhysicalOpBindJoin create( final LogicalOperator lop ) {
+		public PhysicalOpBindJoinBRTPF create( final LogicalOperator lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return new PhysicalOpBindJoin(op);
+				return new PhysicalOpBindJoinBRTPF(op);
 			}
 			else if ( lop instanceof LogicalOpGPOptAdd op ) {
-				return new PhysicalOpBindJoin(op);
+				return new PhysicalOpBindJoinBRTPF(op);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

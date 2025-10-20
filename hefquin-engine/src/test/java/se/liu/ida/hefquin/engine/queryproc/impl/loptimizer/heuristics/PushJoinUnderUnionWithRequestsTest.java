@@ -210,10 +210,10 @@ public class PushJoinUnderUnionWithRequestsTest extends EngineTestBase
 		final LogicalOpRequest<?,?> reqOp2 = new LogicalOpRequest<>( fmB, new TriplePatternRequestImpl(tp2) );
 		final LogicalOpRequest<?,?> reqOp3 = new LogicalOpRequest<>( fmC, new TriplePatternRequestImpl(tp3) );
 
-		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4),
+		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
 		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp1) );
 
-		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4),
+		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl( new LogicalOpGPAdd(fmD, tp4, null),
 		                                                                 new LogicalPlanWithNullaryRootImpl(reqOp2) );
 
 		final LogicalPlan unionSubPlan = LogicalPlanUtils.createPlanWithBinaryUnion(gpAddPlan1, gpAddPlan2);

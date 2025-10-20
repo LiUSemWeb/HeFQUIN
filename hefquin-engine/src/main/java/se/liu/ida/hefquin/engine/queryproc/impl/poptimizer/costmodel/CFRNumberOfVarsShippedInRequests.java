@@ -75,7 +75,7 @@ public class CFRNumberOfVarsShippedInRequests extends CFRBase
 			return futureIntResSize.thenApply( intResSize -> intResSize * (numberOfVars - numberOfJoinVars) );
 		}
 		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
-		          || pop instanceof PhysicalOpBindJoin ) {
+		          || pop instanceof PhysicalOpBindJoinBRTPF ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfVars + intResSize * numberOfJoinVars );
 		}
 

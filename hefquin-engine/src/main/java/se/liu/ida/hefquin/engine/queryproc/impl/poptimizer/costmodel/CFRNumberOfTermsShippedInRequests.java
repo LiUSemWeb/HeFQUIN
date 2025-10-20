@@ -72,7 +72,7 @@ public class CFRNumberOfTermsShippedInRequests extends CFRBase
 		}
 		else if (    pop instanceof PhysicalOpBindJoinWithFILTER
 		          || pop instanceof PhysicalOpBindJoinWithVALUES
-		          || pop instanceof PhysicalOpBindJoin ) {
+		          || pop instanceof PhysicalOpBindJoinBRTPF ) {
 			return futureIntResSize.thenApply( intResSize -> numberOfTerms + intResSize * numberOfJoinVars );
 		}
 

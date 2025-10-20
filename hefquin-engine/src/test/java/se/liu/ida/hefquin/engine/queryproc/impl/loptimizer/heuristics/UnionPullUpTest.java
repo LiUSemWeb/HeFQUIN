@@ -406,10 +406,10 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
@@ -462,10 +462,10 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern() );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);

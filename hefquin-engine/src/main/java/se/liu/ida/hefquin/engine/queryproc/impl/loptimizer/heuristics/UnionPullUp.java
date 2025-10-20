@@ -27,9 +27,9 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  * <br/>
  * 
  * In this case, the join can be implemented only by using a local join
- * algorithm (e.g., hash join), which also means that the two requests
- * within the union are executed by physical request operators and, thus,
- * end up retrieving all triples from fm2 and from fm3.
+ * algorithm (e.g., symmetric hash join), which also means that the two
+ * requests within the union are executed by physical request operators
+ * and, thus, end up retrieving all triples from fm2 and from fm3.
  * In contrast, after pulling up the union operator, the resulting plan
  * is:
  * 
@@ -65,7 +65,6 @@ import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOp
  */
 public class UnionPullUp implements HeuristicForLogicalOptimization
 {
-
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
 		final int numberOfSubPlans = inputPlan.numberOfSubPlans();

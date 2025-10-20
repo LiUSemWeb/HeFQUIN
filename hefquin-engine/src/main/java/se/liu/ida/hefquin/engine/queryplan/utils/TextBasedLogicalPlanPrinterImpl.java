@@ -122,6 +122,17 @@ public class TextBasedLogicalPlanPrinterImpl extends BaseForTextBasedPlanPrinter
 			printFederationMember( op.getFederationMember(), indentLevelStringForOpDetail + singleBase, out );
 			printSPARQLGraphPattern( op.getPattern(), indentLevelStringForOpDetail + singleBase );
 
+			out.append( indentLevelStringForOpDetail + singleBase );
+			out.append( "  - parameter variables:" );
+			if ( op.hasParameterVariables() ) {
+				for ( final Var v : op.getParameterVariables() )
+					out.append( " " + v.toString() );
+			}
+			else {
+				out.append( " none" );
+			}
+			out.append( System.lineSeparator() );
+
 			printExpectedVariables( indentLevelStringForOpDetail + singleBase );
 			printQueryPlanningInfo( indentLevelStringForOpDetail + singleBase );
 

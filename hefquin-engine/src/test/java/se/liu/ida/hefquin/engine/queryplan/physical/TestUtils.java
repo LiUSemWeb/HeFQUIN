@@ -11,9 +11,7 @@ import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFInterface;
@@ -23,12 +21,8 @@ import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 
-public class TestUtils {
-	protected LogicalOpGPAdd getLogicalOpGPAdd( final SPARQLGraphPattern pattern ){
-		final FederationMember fm = new SPARQLEndpointForTest();
-		return new LogicalOpGPAdd(fm, pattern);
-	}
-
+public class TestUtils
+{
 	protected static ExpectedVariables getExpectedVariables( final List<String> certainVars,
 	                                                         final List<String> possibleVars )
 	{

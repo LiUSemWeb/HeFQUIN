@@ -6,21 +6,21 @@ public interface PhysicalPlanVisitor
 {
 	void visit( PhysicalOpRequest<?,?> op );
 
-	void visit( PhysicalOpBindJoin op );
+	void visit( PhysicalOpBindJoinBRTPF op );
 	void visit( PhysicalOpBindJoinWithVALUES op );
 	void visit( PhysicalOpBindJoinWithUNION op );
 	void visit( PhysicalOpBindJoinWithFILTER op );
 	void visit( PhysicalOpBindJoinWithVALUESorFILTER op );
     void visit( PhysicalOpBindJoinWithBoundJoin op );
-	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 	void visit( PhysicalOpIndexNestedLoopsJoin op );
-
-	void visit( PhysicalOpParallelMultiLeftJoin op );
+	void visit( PhysicalOpBindJoinViaMaterializingWrapper op );
 
 	void visit( PhysicalOpHashJoin op );
 	void visit( PhysicalOpSymmetricHashJoin op );
+	void visit( PhysicalOpNaiveNestedLoopsJoin op );
 
 	void visit( PhysicalOpHashRJoin op );
+	void visit( PhysicalOpParallelMultiLeftJoin op );
 
 	void visit( PhysicalOpBinaryUnion op );
 	void visit( PhysicalOpMultiwayUnion op );

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QueryFactory;
@@ -39,7 +38,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRightJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION;
@@ -58,11 +57,27 @@ import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHash
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
-public class TestsForPhysicalOpFactories {
-    interface LogicalOpConstructor extends BiFunction<FederationMember, SPARQLGraphPattern, LogicalOperator> {
-        // first arg is the federation member the LogicalOperator constructors accept
-        // second arg is the SPARQLGraphPattern the LogicalOperator constructors accept
-    }
+public class TestsForPhysicalOpFactories
+{
+	interface ConstructorGPAddAndGPOptAdd {
+		LogicalOperator create( FederationMember fm, SPARQLGraphPattern pattern );
+	}
+
+	protected static final ConstructorGPAddAndGPOptAdd gpAddConstructor = new ConstructorGPAddAndGPOptAdd() {
+		@Override
+		public LogicalOperator create( final FederationMember fm,
+		                               final SPARQLGraphPattern pattern ) {
+			return new LogicalOpGPAdd(fm, pattern, null);
+		}
+	};
+
+	protected static final ConstructorGPAddAndGPOptAdd gpOptAddConstructor = new ConstructorGPAddAndGPOptAdd() {
+		@Override
+		public LogicalOperator create( final FederationMember fm,
+		                               final SPARQLGraphPattern pattern ) {
+			return new LogicalOpGPOptAdd(fm, pattern);
+		}
+	};
 
 	@Test
 	public void testPhysicalOpBinaryUnion() {
@@ -91,43 +106,43 @@ public class TestsForPhysicalOpFactories {
 
 	@Test
 	public void testPhysicalOpBindJoin() {
-		assertSupportForOpBindJoin( LogicalOpGPAdd::new );
-		assertSupportForOpBindJoin( LogicalOpGPOptAdd::new );
+		assertSupportForOpBindJoin(gpAddConstructor);
+		assertSupportForOpBindJoin(gpOptAddConstructor);
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithBoundJoin() {
 		final PhysicalOpFactory factory = PhysicalOpBindJoinWithBoundJoin.getFactory();
-		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithBoundJoin.class, factory );
-		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithBoundJoin.class, factory );
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithBoundJoin.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithBoundJoin.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithFILTER() {
 		final PhysicalOpFactory factory = PhysicalOpBindJoinWithFILTER.getFactory();
-		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithFILTER.class, factory );
-		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithFILTER.class, factory );
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithFILTER.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithFILTER.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithUNION() {
 		final PhysicalOpFactory factory = PhysicalOpBindJoinWithUNION.getFactory();
-		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithUNION.class, factory );
-		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithUNION.class, factory );
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithUNION.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithUNION.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUES() {
 		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUES.getFactory();
-		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithVALUES.class, factory );
-		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithVALUES.class, factory );
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithVALUES.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithVALUES.class, factory );
 	}
 
 	@Test
 	public void testPhysicalOpBindJoinWithVALUESorFILTER() {
 		final PhysicalOpFactory factory = PhysicalOpBindJoinWithVALUESorFILTER.getFactory();
-		assertSupportForOpBindJoinWithX( LogicalOpGPAdd::new, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
-		assertSupportForOpBindJoinWithX( LogicalOpGPOptAdd::new, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
+		assertSupportForOpBindJoinWithX( gpAddConstructor, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
+		assertSupportForOpBindJoinWithX( gpOptAddConstructor, PhysicalOpBindJoinWithVALUESorFILTER.class, factory );
 	}
 
 	@Test
@@ -186,8 +201,8 @@ public class TestsForPhysicalOpFactories {
 	@Test
 	public void testPhysicalOpIndexNestedLoopsJoin() {
 		final PhysicalOpFactory factory = PhysicalOpIndexNestedLoopsJoin.getFactory();
-		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
-		assertSupportForOpIndexNestedLoopsJoin( LogicalOpGPOptAdd::new, PhysicalOpIndexNestedLoopsJoin.class, factory );
+		assertSupportForOpIndexNestedLoopsJoin( gpAddConstructor, PhysicalOpIndexNestedLoopsJoin.class, factory );
+		assertSupportForOpIndexNestedLoopsJoin( gpOptAddConstructor, PhysicalOpIndexNestedLoopsJoin.class, factory );
 	}
 
 	@Test
@@ -267,8 +282,8 @@ public class TestsForPhysicalOpFactories {
 
 	// ---- helper functions -----
 
-	public void assertSupportForOpBindJoin( final LogicalOpConstructor logicalOpConstructor ) {
-		final PhysicalOpFactory factory = PhysicalOpBindJoin.getFactory();
+	public void assertSupportForOpBindJoin( final ConstructorGPAddAndGPOptAdd ctor ) {
+		final PhysicalOpFactory factory = PhysicalOpBindJoinBRTPF.getFactory();
 
 		final Var v1 = Var.alloc("x");
 		final Var v2 = Var.alloc("y");
@@ -277,11 +292,11 @@ public class TestsForPhysicalOpFactories {
         el.addTriple(Triple.create(v1, v2, v3));
 
 		final SPARQLGraphPattern p1 = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOperator lop_sparql = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p1 );
-		final LogicalOperator lop_tpf = logicalOpConstructor.apply( new TestUtils.TPFServerForTest(), p1 );
-		final LogicalOperator lop_brtpf = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p1 );
+		final LogicalOperator lop_sparql = ctor.create( new TestUtils.SPARQLEndpointForTest(), p1 );
+		final LogicalOperator lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p1 );
+		final LogicalOperator lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p1 );
 
-		assertEquals( PhysicalOpBindJoin.class, factory.create(lop_sparql).getClass() );
+		assertEquals( PhysicalOpBindJoinBRTPF.class, factory.create(lop_sparql).getClass() );
 
 		assertFalse( factory.supports( lop_sparql, (ExpectedVariables) null ) );
 		assertFalse( factory.supports( lop_tpf, (ExpectedVariables) null ) );
@@ -290,20 +305,20 @@ public class TestsForPhysicalOpFactories {
 		// all other pattern types should fail
 		final ElementGroup el2 = new ElementGroup();
 		final SPARQLGraphPattern p2 = new GenericSPARQLGraphPatternImpl1(el2);
-		final LogicalOperator lop_unsupported = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p2 );
+		final LogicalOperator lop_unsupported = ctor.create( new TestUtils.BRTPFServerForTest(), p2 );
 		assertFalse( factory.supports( lop_unsupported, (ExpectedVariables) null ) );
 	}
 
-	public void assertSupportForOpBindJoinWithX( final LogicalOpConstructor logicalOpConstructor,
+	public void assertSupportForOpBindJoinWithX( final ConstructorGPAddAndGPOptAdd ctor,
 	                                             final Class<? extends PhysicalOperator> opClass,
 	                                             final PhysicalOpFactory factory ){
 
 		final String queryString = "SELECT * WHERE { ?s ?p ?o OPTIONAL { ?_s ?_p ?o} }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOperator lop = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
-		final LogicalOperator lop_tpf = logicalOpConstructor.apply( new TestUtils.TPFServerForTest(), p );
-		final LogicalOperator lop_brtpf = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p );
+		final LogicalOperator lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final LogicalOperator lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p );
+		final LogicalOperator lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p );
 
 		final ExpectedVariables sp1 = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables po1 = TestUtils.getExpectedVariables( List.of("p", "o"), List.of() );
@@ -343,16 +358,16 @@ public class TestsForPhysicalOpFactories {
 		assertFalse( factory.supports(lop_brtpf,  (ExpectedVariables) null ) );
 	}
 
-	public void assertSupportForOpIndexNestedLoopsJoin( final LogicalOpConstructor logicalOpConstructor,
+	public void assertSupportForOpIndexNestedLoopsJoin( final ConstructorGPAddAndGPOptAdd ctor,
 	                                                    final Class<? extends PhysicalOperator> opClass,
 	                                                    final PhysicalOpFactory factory ){
 
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final LogicalOperator lop_sparql = logicalOpConstructor.apply( new TestUtils.SPARQLEndpointForTest(), p );
-		final LogicalOperator lop_tpf = logicalOpConstructor.apply( new TestUtils.TPFServerForTest(), p );
-		final LogicalOperator lop_brtpf = logicalOpConstructor.apply( new TestUtils.BRTPFServerForTest(), p );
+		final LogicalOperator lop_sparql = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final LogicalOperator lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p );
+		final LogicalOperator lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p );
 
 		assertEquals( opClass, factory.create(lop_sparql).getClass() );
 		assertEquals( opClass, factory.create(lop_tpf).getClass() );

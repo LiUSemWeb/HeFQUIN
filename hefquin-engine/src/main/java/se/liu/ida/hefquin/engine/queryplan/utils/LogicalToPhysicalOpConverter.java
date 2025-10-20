@@ -29,7 +29,7 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpRequest.getFactory() )                    // Request at a federation member
 		.register( PhysicalOpGlobalToLocal.getFactory() )              // Apply vocab mappings global to local
 		.register( PhysicalOpLocalToGlobal.getFactory() )              // Apply vocab mappings local to global
-		.register( PhysicalOpBindJoin.getFactory() )                   // Bind-join for brTPF interface
+		.register( PhysicalOpBindJoinBRTPF.getFactory() )                   // Bind-join for brTPF interface
 		.register( PhysicalOpBindJoinWithBoundJoin.getFactory() )      // Bind-join for SPARQL interface
 		.register( PhysicalOpBindJoinWithVALUESorFILTER.getFactory() ) // (fallback) if no non-joining var available
 		// .register( PhysicalOpBindJoinWithUNION.getFactory() )
@@ -42,28 +42,12 @@ public class LogicalToPhysicalOpConverter
 		.register( PhysicalOpNaiveNestedLoopsJoin.getFactory() )
 	;
 
-	protected static PhysicalOperator _convert( final LogicalOperator lop ) {
-		return _convert( lop, (ExpectedVariables[]) null );
-	}
-
 	protected static PhysicalOperator _convert( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 		return registry.create(lop, inputVars);
 	}
 
 	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
 		return (NullaryPhysicalOp) _convert(lop);
-	}
-
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop ) {
-		return (UnaryPhysicalOp) _convert(lop);
-	}
-
-	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop ) {
-		return (BinaryPhysicalOp) _convert(lop);
-	}
-
-	public static NaryPhysicalOp convert( final NaryLogicalOp lop ) {
-		return (NaryPhysicalOp) _convert(lop);
 	}
 
 	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop, final ExpectedVariables inputVars ) {

@@ -16,6 +16,7 @@ public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+		assert ! lop.hasParameterVariables();
 	}
 
 	public BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint( final LogicalOpGPOptAdd lop ) {

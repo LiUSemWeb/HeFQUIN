@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.logical.impl;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.core.Var;
@@ -18,17 +20,25 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 {
 	protected final FederationMember fm;
 	protected final SPARQLGraphPattern pattern;
+	protected final List<Var> paramVars;
 
 	// will be initialized on demand 
 	protected TriplePattern tp = null;
 	protected boolean tpCheckDone = false;
 
-	public LogicalOpGPAdd( final FederationMember fm, final SPARQLGraphPattern pattern ) {
+	public LogicalOpGPAdd( final FederationMember fm,
+	                       final SPARQLGraphPattern pattern,
+	                       final List<Var> paramVars ) {
 		assert fm != null;
 		assert pattern != null;
 
 		this.fm = fm;
 		this.pattern = pattern;
+
+		if ( paramVars != null && ! paramVars.isEmpty() )
+			this.paramVars = paramVars;
+		else
+			this.paramVars = null;
 	}
 
 	public FederationMember getFederationMember() {
@@ -40,6 +50,41 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 			return tp;
 		else
 			return pattern;
+	}
+
+	/**
+	 * Returns {@code true} if this gpAdd operator has a (nonempty) list of
+	 * variables as parameter. if it has, {@link #getParameterVariables()}
+	 * can be used to access this parameter.
+	 * 
+	 */
+	public boolean hasParameterVariables() {
+		return paramVars != null && ! paramVars.isEmpty();
+	}
+
+	/**
+	 * Returns the number of parameter variables that this operator has.
+	 * This number is the size of the list that can be accessed via
+	 * {@link #getParameterVariables()}.
+	 */
+	public int numberOfParameterVariables() {
+		return paramVars == null ? 0 : paramVars.size();
+	}
+
+	/**
+	 * Returns the (nonempty) list of variables that is a parameter
+	 * of this gpAdd operator (if any).
+	 * <p>
+	 * If this gpAdd operator does not have such a parameter, then
+	 * an {@link UnsupportedOperationException} is thrown. You can
+	 * use {@link #hasParameterVariables()} to ask whether this gpAdd
+	 * operator is this parameter.
+	 */
+	public Iterable<Var> getParameterVariables() {
+		if ( ! hasParameterVariables() )
+			throw new UnsupportedOperationException("Requesting variables of a gpAdd operator that does not have this parameter.");
+
+		return paramVars;
 	}
 
 	/**
@@ -94,11 +139,13 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 		if ( o == this )
 			return true;
 
-		if ( ! (o instanceof LogicalOpGPAdd) )
-			return false;
+		if ( o instanceof LogicalOpGPAdd otherGPAdd ) {
+			return    otherGPAdd.fm.equals(fm)
+			       && otherGPAdd.pattern.equals(pattern)
+			       && Objects.deepEquals(paramVars, otherGPAdd.paramVars);
+		}
 
-		final LogicalOpGPAdd oo = (LogicalOpGPAdd) o;
-		return oo.fm.equals(fm) && oo.pattern.equals(pattern); 
+		return false;
 	}
 
 	@Override
