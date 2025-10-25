@@ -2,16 +2,13 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TriplesResponse;
-import se.liu.ida.hefquin.federation.access.TriplesRetrievalInterface;
+import se.liu.ida.hefquin.federation.access.impl.RequestProcessor;
 
-public interface TriplesRetrievalProcessor<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
-            extends RequestProcessor<ReqType,MemberType>
+public interface TriplesRetrievalProcessor<ReqType extends DataRetrievalRequest,
+                                           RespType extends TriplesResponse,
+                                           MemberType extends FederationMember>
+		extends RequestProcessor<ReqType,RespType,MemberType>
 {
-	/**
-	 * Assumes that fm has a {@link TriplesRetrievalInterface}.
-	 */
-	@Override
-	TriplesResponse performRequest( ReqType req, MemberType fm ) throws FederationAccessException;
+
 }

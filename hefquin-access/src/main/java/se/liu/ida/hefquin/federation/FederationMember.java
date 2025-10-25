@@ -3,10 +3,13 @@ package se.liu.ida.hefquin.federation;
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.access.DataRetrievalInterface;
 
+/**
+ * This interface captures any kind of federation member.
+ */
 public interface FederationMember
 {
 	DataRetrievalInterface getInterface();
-	
+
 	/**
 	 * For federation members for which sub-queries need to be rewritten
 	 * based on a particular vocabulary mapping, this function return that

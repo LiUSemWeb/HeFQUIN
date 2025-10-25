@@ -295,9 +295,48 @@ public abstract class EngineTestBase
 		}
 
 		@Override
-		public CompletableFuture<SolMapsResponse> issueRequest(
-				final SPARQLRequest req,
-				final SPARQLEndpoint fm )
+		public < ReqType extends DataRetrievalRequest,
+		         RespType extends DataRetrievalResponse<?>,
+		         MemberType extends FederationMember >
+		CompletableFuture<RespType> issueRequest( final ReqType req,
+		                                          final MemberType fm )
+				throws FederationAccessException
+		{
+			if ( req instanceof SPARQLRequest reqSPARQL && fm instanceof SPARQLEndpoint fmSPARQL ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqSPARQL, fmSPARQL);
+				return resp;
+			}
+
+			if ( req instanceof BRTPFRequest reqBRTPF && fm instanceof BRTPFServer fmBRTPF ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqBRTPF, fmBRTPF);
+				return resp;
+			}
+
+			if ( req instanceof TPFRequest reqTPF && fm instanceof BRTPFServer fmBRTPF ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqTPF, fmBRTPF);
+				return resp;
+			}
+
+			if ( req instanceof TPFRequest reqTPF && fm instanceof TPFServer fmTPF && !(fm instanceof BRTPFServer)) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqTPF, fmTPF);
+				return resp;
+			}
+
+			if ( req instanceof Neo4jRequest reqNeo && fm instanceof Neo4jServer fmNeo ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) _issueRequest(reqNeo, fmNeo);
+				return resp;
+			}
+
+			throw new UnsupportedOperationException();
+		}
+
+		protected CompletableFuture<SolMapsResponse> _issueRequest( final SPARQLRequest req,
+		                                                            final SPARQLEndpoint fm )
 						throws FederationAccessException
 		{
 			final SolMapsResponse response;
@@ -314,11 +353,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
-		                                                    final TPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final TPFRequest req,
+		                                                        final TPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -329,11 +365,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req,
-		                                                    final BRTPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final TPFRequest req,
+		                                                        final BRTPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -348,11 +381,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req,
-		                                                    final BRTPFServer fm )
-				throws FederationAccessException
-		{
+		protected CompletableFuture<TPFResponse> _issueRequest( final BRTPFRequest req,
+		                                                        final BRTPFServer fm ) {
 			final TPFResponse response;
 			if ( itTriplesForResponse != null ) {
 				response = new TPFResponseForTest( itTriplesForResponse.next(), fm, req );
@@ -363,9 +393,8 @@ public abstract class EngineTestBase
 			return CompletableFuture.completedFuture(response);
 		}
 
-		@Override
-		public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req,
-		                                                       final Neo4jServer fm )
+		protected CompletableFuture<RecordsResponse> _issueRequest( final Neo4jRequest req,
+		                                                            final Neo4jServer fm )
 				throws FederationAccessException
 		{
 			final Neo4jRequestProcessor reqProc = new Neo4jRequestProcessorImpl();

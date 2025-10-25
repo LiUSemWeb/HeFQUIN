@@ -21,10 +21,17 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.FederationAccessStats;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
 
 public class FederationAccessManagerWithCache implements FederationAccessManager
 {
@@ -36,11 +43,11 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	protected long cacheRequestsSPARQL  = 0L;
 	protected long cacheRequestsTPF     = 0L;
 	protected long cacheRequestsBRTPF   = 0L;
-	protected long cacheRequestsNeo4j   = 0L;
+	protected long cacheRequestsOther   = 0L;
 	protected long cacheHitsSPARQL  = 0L;
 	protected long cacheHitsTPF     = 0L;
 	protected long cacheHitsBRTPF   = 0L;
-	protected long cacheHitsNeo4j   = 0L;
+	protected long cacheHitsOther   = 0L;
 	protected long cacheHitsSPARQLCardinality  = 0L;
 	protected long cacheHitsTPFCardinality     = 0L;
 	protected long cacheHitsBRTPFCardinality   = 0L;
@@ -72,97 +79,47 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 	}
 
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public CompletableFuture<SolMapsResponse> issueRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
-			throws FederationAccessException 
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<RespType> issueRequest( final ReqType req,
+	                                          final MemberType fm )
+			throws FederationAccessException
 	{
-		cacheRequestsSPARQL++;
+		// update the statistics
+		if ( req instanceof SPARQLRequest )
+			cacheRequestsSPARQL++;
+		else if ( req instanceof TPFRequest )
+			cacheRequestsTPF++;
+		else if ( req instanceof BRTPFRequest )
+			cacheRequestsBRTPF++;
+		else
+			cacheRequestsOther++;
+
 		final Key key = new Key(req, fm);
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
-			cacheHitsSPARQL++;
-			return (CompletableFuture<SolMapsResponse>) cachedResponse;
+			// update the statistics
+			if ( req instanceof SPARQLRequest )
+				cacheHitsSPARQL++;
+			else if ( req instanceof TPFRequest )
+				cacheHitsTPF++;
+			else if ( req instanceof BRTPFRequest )
+				cacheHitsBRTPF++;
+			else
+				cacheHitsOther++;
+
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<RespType> cachedResponse2 = (CompletableFuture<RespType>) cachedResponse;
+			return cachedResponse2;
 		}
 
-		final CompletableFuture<SolMapsResponse> newResponse = fedAccMan.issueRequest(req, fm);
+		final CompletableFuture<RespType> newResponse = fedAccMan.issueRequest(req, fm);
 		cache.put(key, newResponse);
 		return newResponse;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest(final TPFRequest req, final TPFServer fm) 
-			throws FederationAccessException 
-	{
-		cacheRequestsTPF++;
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsTPF++;
-			return (CompletableFuture<TPFResponse>) cachedResponse;
-		}
-
-		final CompletableFuture<TPFResponse> newResponse = fedAccMan.issueRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest(final TPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException 
-	{
-		cacheRequestsTPF++;
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsTPF++;
-			return (CompletableFuture<TPFResponse>) cachedResponse;
-		}
-
-		final CompletableFuture<TPFResponse> newResponse = fedAccMan.issueRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest(final BRTPFRequest req, final BRTPFServer fm)
-			throws FederationAccessException 
-	{
-		cacheRequestsBRTPF++;
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsBRTPF++;
-			return (CompletableFuture<TPFResponse>) cachedResponse;
-		}
-
-		final CompletableFuture<TPFResponse> newResponse = fedAccMan.issueRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public CompletableFuture<RecordsResponse> issueRequest(final Neo4jRequest req, final Neo4jServer fm)
-			throws FederationAccessException 
-	{
-		cacheRequestsNeo4j++;
-		final Key key = new Key(req, fm);
-		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
-		if ( cachedResponse != null ) {
-			cacheHitsNeo4j++;
-			return (CompletableFuture<RecordsResponse>) cachedResponse;
-		}
-
-		final CompletableFuture<RecordsResponse> newResponse = fedAccMan.issueRequest(req, fm);
-		cache.put(key, newResponse);
-		return newResponse;
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final SPARQLRequest req, final SPARQLEndpoint fm)
 			throws FederationAccessException 
@@ -171,7 +128,9 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsSPARQLCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse2;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
@@ -179,7 +138,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return newResponse;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final TPFServer fm)
 			throws FederationAccessException 
@@ -188,7 +146,9 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse2;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
@@ -196,7 +156,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return newResponse;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final TPFRequest req, final BRTPFServer fm)
 			throws FederationAccessException 
@@ -205,7 +164,9 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse2;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
@@ -213,7 +174,6 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		return newResponse;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public CompletableFuture<CardinalityResponse> issueCardinalityRequest(final BRTPFRequest req, final BRTPFServer fm)
 			throws FederationAccessException 
@@ -222,7 +182,9 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		final CompletableFuture<? extends DataRetrievalResponse<?>> cachedResponse = cache.get(key);
 		if ( cachedResponse != null ) {
 			cacheHitsBRTPFCardinality++;
-			return (CompletableFuture<CardinalityResponse>) cachedResponse;
+			@SuppressWarnings("unchecked")
+			final CompletableFuture<CardinalityResponse> cachedResponse2 = (CompletableFuture<CardinalityResponse>) cachedResponse;
+			return cachedResponse2;
 		}
 
 		final CompletableFuture<CardinalityResponse> newResponse = fedAccMan.issueCardinalityRequest(req, fm);
@@ -286,12 +248,12 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		cacheRequestsSPARQL  = 0L;
 		cacheRequestsTPF     = 0L;
 		cacheRequestsBRTPF   = 0L;
-		cacheRequestsNeo4j   = 0L;
+		cacheRequestsOther   = 0L;
 
 		cacheHitsSPARQL  = 0L;
 		cacheHitsTPF     = 0L;
 		cacheHitsBRTPF   = 0L;
-		cacheHitsNeo4j   = 0L;
+		cacheHitsOther   = 0L;
 	}
 
 	@Override
@@ -313,33 +275,33 @@ public class FederationAccessManagerWithCache implements FederationAccessManager
 		stats.put("numberOfSPARQLRequestsIssuedAtCache", Long.valueOf(cacheRequestsSPARQL));
 		stats.put("numberOfTPFRequestsIssuedAtCache",    Long.valueOf(cacheRequestsTPF));
 		stats.put("numberOfBRTPFRequestsIssuedAtCache",  Long.valueOf(cacheRequestsBRTPF));
-		stats.put("numberOfNeo4jRequestsIssuedAtCache",  Long.valueOf(cacheRequestsNeo4j));
+		stats.put("numberOfOtherRequestsIssuedAtCache",  Long.valueOf(cacheRequestsOther));
 
 		final long overallNumberOfRequestsIssuedAtCache = cacheRequestsSPARQL
 		                                                + cacheRequestsTPF
 		                                                + cacheRequestsBRTPF
-		                                                + cacheRequestsNeo4j;
+		                                                + cacheRequestsOther;
 		stats.put("overallNumberOfRequestsIssuedAtCache", Long.valueOf(overallNumberOfRequestsIssuedAtCache));
 
 		stats.put("numberOfCacheHitsSPARQL", Long.valueOf(cacheHitsSPARQL));
 		stats.put("numberOfCacheHitsTPF",    Long.valueOf(cacheHitsTPF));
 		stats.put("numberOfCacheHitsBRTPF",  Long.valueOf(cacheHitsBRTPF));
-		stats.put("numberOfCacheHitsNeo4j",  Long.valueOf(cacheHitsNeo4j));
+		stats.put("numberOfCacheHitsOther",  Long.valueOf(cacheHitsOther));
 
 		final long overallNumberOfCacheHits = cacheHitsSPARQL
 		                                    + cacheHitsTPF
 		                                    + cacheHitsBRTPF
-		                                    + cacheHitsNeo4j;
+		                                    + cacheHitsOther;
 		stats.put("overallNumberOfCacheHits", Long.valueOf(overallNumberOfCacheHits));
 
 		final double cacheHitRateSPARQL = ( (double) cacheHitsSPARQL / cacheRequestsSPARQL );
 		final double cacheHitRateTPF    = ( (double) cacheHitsTPF    / cacheRequestsTPF );
 		final double cacheHitRateBRTPF  = ( (double) cacheHitsBRTPF  / cacheRequestsBRTPF );
-		final double cacheHitRateNeo4j  = ( (double) cacheHitsNeo4j  / cacheRequestsNeo4j );
+		final double cacheHitRateOther  = ( (double) cacheHitsOther  / cacheRequestsOther );
 		stats.put("cacheHitRateSPARQL", Double.valueOf(cacheHitRateSPARQL));
 		stats.put("cacheHitRateTPF",    Double.valueOf(cacheHitRateTPF));
 		stats.put("cacheHitRateBRTPF",  Double.valueOf(cacheHitRateBRTPF));
-		stats.put("cacheHitRateNeo4j",  Double.valueOf(cacheHitRateNeo4j));
+		stats.put("cacheHitRateOther",  Double.valueOf(cacheHitRateOther));
 
 		final double cacheHitRate = ( (double) overallNumberOfCacheHits / overallNumberOfRequestsIssuedAtCache );
 		stats.put("cacheHitRate", cacheHitRate);

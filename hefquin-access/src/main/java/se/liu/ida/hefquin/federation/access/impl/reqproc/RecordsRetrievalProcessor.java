@@ -2,17 +2,16 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.RecordsResponse;
-import se.liu.ida.hefquin.federation.access.RecordsRetrievalInterface;
+import se.liu.ida.hefquin.federation.access.impl.RequestProcessor;
 
 public interface RecordsRetrievalProcessor <ReqType extends DataRetrievalRequest,
                                             MemberType extends FederationMember>
-        extends RequestProcessor<ReqType,MemberType>
+	extends RequestProcessor<ReqType,RecordsResponse,MemberType>
 {
-    /**
-     * Assumes that fm has a {@link RecordsRetrievalInterface}.
-     */
-    @Override
-    RecordsResponse performRequest( ReqType req, MemberType fm ) throws FederationAccessException;
+	@Override
+	default boolean isSupportedResponseType( final Class<? extends DataRetrievalResponse<?>> t ) {
+		return RecordsResponse.class.isAssignableFrom(t);
+	}
 }
