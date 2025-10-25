@@ -35,7 +35,9 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 		return performRequest( req, fm.getInterface(), fm );
 	}
 
-	protected TPFResponse performRequest( final TPFRequest req, final TPFInterface iface, final FederationMember fm ) throws FederationAccessException {
+	protected TPFResponse performRequest( final TPFRequest req,
+	                                      final TPFInterface iface,
+	                                      final FederationMember fm ) throws FederationAccessException {
 		final String requestURL = iface.createRequestURL(req);
 		final TriplePattern tp = req.getQueryPattern();
 		final Map<String, String> headers = Map.of(

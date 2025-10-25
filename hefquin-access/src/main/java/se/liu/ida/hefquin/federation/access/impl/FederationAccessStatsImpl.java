@@ -8,12 +8,12 @@ public class FederationAccessStatsImpl extends StatsImpl implements FederationAc
 	protected static final String enNumberOfSPARQLRequestsIssued   = "numberOfSPARQLRequestsIssued";
 	protected static final String enNumberOfTPFRequestsIssued      = "numberOfTPFRequestsIssued";
 	protected static final String enNumberOfBRTPFRequestsIssued    = "numberOfBRTPFRequestsIssued";
-	protected static final String enNumberOfNeo4jRequestsIssued    = "numberOfNeo4jRequestsIssued";
+	protected static final String enNumberOfOtherRequestsIssued    = "numberOfOtherRequestsIssued";
 
 	protected static final String enNumberOfSPARQLRequestsCompleted   = "numberOfSPARQLRequestsCompleted";
 	protected static final String enNumberOfTPFRequestsCompleted      = "numberOfTPFRequestsCompleted";
 	protected static final String enNumberOfBRTPFRequestsCompleted    = "numberOfBRTPFRequestsCompleted";
-	protected static final String enNumberOfNeo4jRequestsCompleted    = "numberOfNeo4jRequestsCompleted";
+	protected static final String enNumberOfOtherRequestsCompleted    = "numberOfOtherRequestsCompleted";
 
 	protected static final String enOverallNumberOfRequestsIssued    = "overallNumberOfRequestsIssued";
 	protected static final String enOverallNumberOfRequestsCompleted  = "overallNumberOfRequestsCompleted";
@@ -21,31 +21,31 @@ public class FederationAccessStatsImpl extends StatsImpl implements FederationAc
 	public FederationAccessStatsImpl( final long numberOfSPARQLRequestsIssued,
 	                                  final long numberOfTPFRequestsIssued,
 	                                  final long numberOfBRTPFRequestsIssued,
-	                                  final long numberOfNeo4jRequestsIssued,
+	                                  final long numberOfOtherRequestsIssued,
 	                                  final long numberOfSPARQLRequestsCompleted,
 	                                  final long numberOfTPFRequestsCompleted,
 	                                  final long numberOfBRTPFRequestsCompleted,
-	                                  final long numberOfNeo4jRequestsCompleted ) {
+	                                  final long numberOfOtherRequestsCompleted ) {
 		put( enNumberOfSPARQLRequestsIssued,  Long.valueOf(numberOfSPARQLRequestsIssued) );
 		put( enNumberOfTPFRequestsIssued,     Long.valueOf(numberOfTPFRequestsIssued) );
 		put( enNumberOfBRTPFRequestsIssued,   Long.valueOf(numberOfBRTPFRequestsIssued) );
-		put( enNumberOfNeo4jRequestsIssued,   Long.valueOf(numberOfNeo4jRequestsIssued) );
+		put( enNumberOfOtherRequestsIssued,   Long.valueOf(numberOfOtherRequestsIssued) );
 
 		put( enNumberOfSPARQLRequestsCompleted,  Long.valueOf(numberOfSPARQLRequestsCompleted) );
 		put( enNumberOfTPFRequestsCompleted,     Long.valueOf(numberOfTPFRequestsCompleted) );
 		put( enNumberOfBRTPFRequestsCompleted,   Long.valueOf(numberOfBRTPFRequestsCompleted) );
-		put( enNumberOfNeo4jRequestsCompleted,   Long.valueOf(numberOfNeo4jRequestsCompleted) );
+		put( enNumberOfOtherRequestsCompleted,   Long.valueOf(numberOfOtherRequestsCompleted) );
 
 		final long overallNumberOfRequestsIssued = numberOfSPARQLRequestsIssued
 		                                         + numberOfTPFRequestsIssued
 		                                         + numberOfBRTPFRequestsIssued
-		                                         + numberOfNeo4jRequestsIssued;
+		                                         + numberOfOtherRequestsIssued;
 		put( enOverallNumberOfRequestsIssued, Long.valueOf(overallNumberOfRequestsIssued) );
 
 		final long overallNumberOfRequestsCompleted = numberOfSPARQLRequestsCompleted
 		                                            + numberOfTPFRequestsCompleted
 		                                            + numberOfBRTPFRequestsCompleted
-		                                            + numberOfNeo4jRequestsCompleted;
+		                                            + numberOfOtherRequestsCompleted;
 		put( enOverallNumberOfRequestsCompleted, Long.valueOf(overallNumberOfRequestsCompleted) );
 	}
 
@@ -65,7 +65,7 @@ public class FederationAccessStatsImpl extends StatsImpl implements FederationAc
 	public long getNumberOfBRTPFRequestsIssued() { return (Long) getEntry(enNumberOfBRTPFRequestsIssued); }
 
 	@Override
-	public long getNumberOfNeo4jRequestsIssued() { return (Long) getEntry(enNumberOfNeo4jRequestsIssued); }
+	public long getNumberOfOtherRequestsIssued() { return (Long) getEntry(enNumberOfOtherRequestsIssued); }
 
 	@Override
 	public long getNumberOfSPARQLRequestsCompleted() { return (Long) getEntry(enNumberOfSPARQLRequestsCompleted); }
@@ -77,6 +77,6 @@ public class FederationAccessStatsImpl extends StatsImpl implements FederationAc
 	public long getNumberOfBRTPFRequestsCompleted() { return (Long) getEntry(enNumberOfBRTPFRequestsCompleted); }
 
 	@Override
-	public long getNumberOfNeo4jRequestsCompleted() { return (Long) getEntry(enNumberOfNeo4jRequestsCompleted); }
+	public long getNumberOfOtherRequestsCompleted() { return (Long) getEntry(enNumberOfOtherRequestsCompleted); }
 
 }

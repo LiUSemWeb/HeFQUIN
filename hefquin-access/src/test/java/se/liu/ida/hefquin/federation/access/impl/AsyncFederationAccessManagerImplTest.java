@@ -18,6 +18,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.federation.BRTPFServer;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
@@ -54,6 +55,44 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 			System.err.println("Terminating the thread pool was interrupted." );
 			ex.printStackTrace();
 		}
+	}
+
+	@Test
+	public void oneRequestTPFOverTPF()
+			throws FederationAccessException, InterruptedException, ExecutionException
+	{
+		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createBlankNode(),
+		                                                NodeFactory.createBlankNode(),
+		                                                NodeFactory.createBlankNode() );
+		final TPFRequest req = new TPFRequestImpl(tp);
+		final TPFServer fm = new TPFServerForTest();
+
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
+		final TPFResponse resp = fr.get();
+
+		assertEquals( req, resp.getRequest() );
+		assertEquals( fm, resp.getFederationMember() );
+	}
+
+	@Test
+	public void oneRequestTPFOverBRTPF()
+			throws FederationAccessException, InterruptedException, ExecutionException
+	{
+		final TriplePattern tp = new TriplePatternImpl( NodeFactory.createBlankNode(),
+		                                                NodeFactory.createBlankNode(),
+		                                                NodeFactory.createBlankNode() );
+		final TPFRequest req = new TPFRequestImpl(tp);
+		final BRTPFServer fm = new BRTPFServerForTest();
+
+		final FederationAccessManager fedAccessMgr = createFedAccessMgrForTests(execServiceForFedAccess, SLEEP_MILLIES);
+
+		final CompletableFuture<TPFResponse> fr = fedAccessMgr.issueRequest(req, fm);
+		final TPFResponse resp = fr.get();
+
+		assertEquals( req, resp.getRequest() );
+		assertEquals( fm, resp.getFederationMember() );
 	}
 
 	@Test
@@ -160,10 +199,10 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		final SPARQLRequestProcessor reqProc = new MySPARQLRequestProcessor(sleepMillis);
 		final TPFRequestProcessor reqProcTPF = new MyTPFRequestProcessor(sleepMillis);
 		final BRTPFRequestProcessor reqProcBRTPF = new BRTPFRequestProcessor() {
-			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { return null; }
+			@Override public TPFResponse performRequest(BRTPFRequest req, BRTPFServer fm) { throw new UnsupportedOperationException(); }
 		};
 		final Neo4jRequestProcessor reqProcNeo4j = new Neo4jRequestProcessor() {
-			@Override public RecordsResponse performRequest(Neo4jRequest req, Neo4jServer fm) { return null; }
+			@Override public RecordsResponse performRequest(Neo4jRequest req, Neo4jServer fm) { throw new UnsupportedOperationException(); }
 		};
 
 		return new AsyncFederationAccessManagerImpl(execServiceForFedAccess, reqProc, reqProcTPF, reqProcBRTPF, reqProcNeo4j);
@@ -194,7 +233,22 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		public MySPARQLRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
 
 		@Override
-		public SolMapsResponse performRequest(SPARQLRequest req, SPARQLEndpoint fm) {
+		public boolean isSupportedRequestType( final Class<? extends DataRetrievalRequest> t ) {
+			return SPARQLRequest.class.isAssignableFrom(t);
+		}
+
+		@Override
+		public boolean isSupportedResponseType( final Class<? extends DataRetrievalResponse<?>> t ) {
+			return SolMapsResponse.class.isAssignableFrom(t);
+		}
+
+		@Override
+		public boolean isSupportedMemberType( final Class<? extends FederationMember> t ) {
+			return SPARQLEndpoint.class.isAssignableFrom(t);
+		}
+
+		@Override
+		public SolMapsResponse performRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
 			sleep();
 			return new SolMapsResponseImpl( new ArrayList<>(), fm, req, new Date() );
 		}
@@ -206,13 +260,13 @@ public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 		public MyTPFRequestProcessor( final long sleepMillis ) { super(sleepMillis); }
 
 		@Override
-		public TPFResponse performRequest(TPFRequest req, TPFServer fm) {
+		public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) {
 			sleep();
 			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
 		}
 
 		@Override
-		public TPFResponse performRequest(TPFRequest req, BRTPFServer fm) {
+		public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) {
 			sleep();
 			return new TPFResponseImpl( new ArrayList<>(), new ArrayList<>(), "dummy next page", fm, req, new Date() );
 		}

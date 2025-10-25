@@ -85,7 +85,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 		// issue the query as a request, the response will then be processed to create
 		// the CardinalityResponse to be returned
 		final SPARQLRequest reqCount = new SPARQLRequestImpl( new SPARQLQueryImpl( countQuery ) );
-		return issueRequest( reqCount, fm ).thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
+		final CompletableFuture<SolMapsResponse> ftr = issueRequest(reqCount, fm);
+		return ftr.thenApply( getFctToObtainCardinalityResponseFromSolMapsResponse() );
 	}
 
 	@Override
@@ -94,7 +95,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final TPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
 	@Override
@@ -103,7 +105,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
 	@Override
@@ -112,7 +115,8 @@ public abstract class FederationAccessManagerBase1 implements FederationAccessMa
 			final BRTPFServer fm )
 					throws FederationAccessException
 	{
-		return issueRequest(req, fm).thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
+		final CompletableFuture<TPFResponse> ftr = issueRequest(req, fm);
+		return ftr.thenApply( getFctToObtainCardinalityResponseFromTPFResponse() );
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import org.apache.jena.sparql.core.Quad;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.access.impl.RequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
 
 /**

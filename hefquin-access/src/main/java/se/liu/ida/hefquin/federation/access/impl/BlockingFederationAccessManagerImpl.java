@@ -17,7 +17,8 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	protected AtomicLong counterSPARQLRequests  = new AtomicLong(0L);
 	protected AtomicLong counterTPFRequests     = new AtomicLong(0L);
 	protected AtomicLong counterBRTPFRequests   = new AtomicLong(0L);
-	protected AtomicLong counterNeo4jRequests   = new AtomicLong(0L);
+	protected AtomicLong counterOtherRequests   = new AtomicLong(0L);
+	protected AtomicLong counterRequests        = new AtomicLong(0L);
 
 	public BlockingFederationAccessManagerImpl(
 			final SPARQLRequestProcessor reqProcSPARQL,
@@ -28,47 +29,26 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 	}
 
 	@Override
-	public CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm )
+	public < ReqType extends DataRetrievalRequest,
+	         RespType extends DataRetrievalResponse<?>,
+	         MemberType extends FederationMember >
+	CompletableFuture<RespType> issueRequest( final ReqType req,
+	                                          final MemberType fm )
 			throws FederationAccessException
 	{
-		counterSPARQLRequests.incrementAndGet();
-		final SolMapsResponse response = reqProcSPARQL.performRequest(req, fm);
-		return CompletableFuture.completedFuture(response);
-	}
+		final RequestProcessor<ReqType, RespType, MemberType> reqProc = getReqProc(req, fm);
 
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final TPFServer fm )
-			throws FederationAccessException
-	{
-		counterTPFRequests.incrementAndGet();
-		final TPFResponse response = reqProcTPF.performRequest(req, fm);
-		return CompletableFuture.completedFuture(response);
-	}
+		// update the statistics
+		if ( reqProc instanceof SPARQLRequestProcessor )
+			counterSPARQLRequests.incrementAndGet();
+		else if ( reqProc instanceof TPFRequestProcessor )
+			counterTPFRequests.incrementAndGet();
+		else if ( reqProc instanceof BRTPFRequestProcessor )
+			counterBRTPFRequests.incrementAndGet();
+		else
+			counterOtherRequests.incrementAndGet();
 
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final BRTPFServer fm )
-			throws FederationAccessException
-	{
-		counterTPFRequests.incrementAndGet();
-		final TPFResponse response = reqProcTPF.performRequest(req, fm);
-		return CompletableFuture.completedFuture(response);
-	}
-
-	@Override
-	public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req, final BRTPFServer fm )
-			throws FederationAccessException
-	{
-		counterBRTPFRequests.incrementAndGet();
-		final TPFResponse response = reqProcBRTPF.performRequest(req, fm);
-		return CompletableFuture.completedFuture(response);
-	}
-
-	@Override
-	public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req, final Neo4jServer fm )
-			throws FederationAccessException
-	{
-		counterNeo4jRequests.incrementAndGet();
-		final RecordsResponse response = reqProcNeo4j.performRequest(req, fm);
+		final RespType response = reqProc.performRequest(req, fm);
 		return CompletableFuture.completedFuture(response);
 	}
 
@@ -77,7 +57,7 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 		counterSPARQLRequests.set(0L);
 		counterTPFRequests.set(0L);
 		counterBRTPFRequests.set(0L);
-		counterNeo4jRequests.set(0L);
+		counterOtherRequests.set(0L);
 	}
 
 	@Override
@@ -85,11 +65,11 @@ public class BlockingFederationAccessManagerImpl extends FederationAccessManager
 		return new FederationAccessStatsImpl( counterSPARQLRequests.get(),
 		                                      counterTPFRequests.get(),
 		                                      counterBRTPFRequests.get(),
-		                                      counterNeo4jRequests.get(),
+		                                      counterOtherRequests.get(),
 		                                      counterSPARQLRequests.get(),
 		                                      counterTPFRequests.get(),
 		                                      counterBRTPFRequests.get(),
-		                                      counterNeo4jRequests.get() );
+		                                      counterOtherRequests.get() );
 	}
 
 	@Override
