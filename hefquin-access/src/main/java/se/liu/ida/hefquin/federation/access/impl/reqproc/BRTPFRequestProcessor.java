@@ -1,11 +1,11 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public interface BRTPFRequestProcessor
 	extends TriplesRetrievalProcessor<BRTPFRequest,TPFResponse,BRTPFServer>

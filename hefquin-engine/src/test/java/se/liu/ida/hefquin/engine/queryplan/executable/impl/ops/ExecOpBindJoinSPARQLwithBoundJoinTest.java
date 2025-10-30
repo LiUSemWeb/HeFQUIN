@@ -22,7 +22,7 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpBindJoinSPARQLwithBoundJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {

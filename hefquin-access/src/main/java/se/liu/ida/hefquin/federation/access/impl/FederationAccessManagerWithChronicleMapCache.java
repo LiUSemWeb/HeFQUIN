@@ -13,9 +13,6 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyLRU;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -29,6 +26,9 @@ import se.liu.ida.hefquin.federation.access.impl.cache.CardinalityCacheEntryFact
 import se.liu.ida.hefquin.federation.access.impl.cache.CardinalityCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.ChronicleMapCardinalityCache;
 import se.liu.ida.hefquin.federation.access.impl.response.CachedCardinalityResponseImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * A FederationAccessManager implementation that incorporates persistent disk

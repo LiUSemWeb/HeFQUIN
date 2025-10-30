@@ -1,9 +1,9 @@
-package se.liu.ida.hefquin.federation.impl;
+package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Objects;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.federation.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 public class Neo4jServerImpl extends BaseForFederationMember
                              implements Neo4jServer

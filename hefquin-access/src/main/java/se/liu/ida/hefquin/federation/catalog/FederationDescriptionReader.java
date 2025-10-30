@@ -23,11 +23,11 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
-import se.liu.ida.hefquin.federation.impl.BRTPFServerImpl;
-import se.liu.ida.hefquin.federation.impl.GraphQLEndpointImpl;
-import se.liu.ida.hefquin.federation.impl.Neo4jServerImpl;
-import se.liu.ida.hefquin.federation.impl.SPARQLEndpointImpl;
-import se.liu.ida.hefquin.federation.impl.TPFServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
+import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
+import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 public class FederationDescriptionReader

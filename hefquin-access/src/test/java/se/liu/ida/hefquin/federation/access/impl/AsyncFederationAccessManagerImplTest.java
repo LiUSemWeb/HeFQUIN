@@ -17,12 +17,8 @@ import org.junit.Test;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.FederationTestBase;
-import se.liu.ida.hefquin.federation.Neo4jServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
@@ -31,6 +27,10 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class AsyncFederationAccessManagerImplTest extends FederationTestBase
 {

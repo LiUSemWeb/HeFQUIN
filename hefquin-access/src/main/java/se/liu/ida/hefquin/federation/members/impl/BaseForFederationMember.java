@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.impl;
+package se.liu.ida.hefquin.federation.members.impl;
 
 import se.liu.ida.hefquin.federation.FederationMember;
 

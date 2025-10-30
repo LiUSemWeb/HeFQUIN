@@ -1,9 +1,10 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.federation.impl.BRTPFServerImpl;
-import se.liu.ida.hefquin.federation.impl.Neo4jServerImpl;
-import se.liu.ida.hefquin.federation.impl.SPARQLEndpointImpl;
-import se.liu.ida.hefquin.federation.impl.TPFServerImpl;
+import se.liu.ida.hefquin.federation.members.TPFServer;
+import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
+import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
 
 public abstract class FederationTestBase
 {

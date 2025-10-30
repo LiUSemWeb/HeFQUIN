@@ -30,8 +30,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRoot
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizationException;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class CardinalityBasedJoinOrderingBaseTest extends EngineTestBase
 {

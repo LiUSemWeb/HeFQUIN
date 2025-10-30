@@ -1,9 +1,9 @@
 package se.liu.ida.hefquin.federation.access.impl.reqproc;
 
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 public interface Neo4jRequestProcessor
 	extends RecordsRetrievalProcessor<Neo4jRequest, Neo4jServer>

@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.impl;
+package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Objects;
 import java.util.Set;
@@ -9,8 +9,8 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 {

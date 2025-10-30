@@ -19,11 +19,11 @@ import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 {

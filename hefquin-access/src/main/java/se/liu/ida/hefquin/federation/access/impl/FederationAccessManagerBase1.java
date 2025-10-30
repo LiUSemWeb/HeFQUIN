@@ -16,9 +16,6 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.SPARQLQueryImpl;
 import se.liu.ida.hefquin.base.query.utils.QueryPatternUtils;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityEstimationUnavailableError;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
@@ -33,6 +30,9 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.CardinalityResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.CardinalityResponseImplWithoutCardinality;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * As a basis for classes that implement the {@link FederationAccessManager}

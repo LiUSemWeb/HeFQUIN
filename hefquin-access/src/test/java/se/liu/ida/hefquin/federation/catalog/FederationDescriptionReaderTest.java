@@ -14,8 +14,8 @@ import org.apache.jena.riot.RiotNotFoundException;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class FederationDescriptionReaderTest
 {

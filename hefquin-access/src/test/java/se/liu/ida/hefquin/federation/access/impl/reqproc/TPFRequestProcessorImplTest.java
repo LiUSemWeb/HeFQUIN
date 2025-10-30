@@ -13,12 +13,12 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class TPFRequestProcessorImplTest extends FederationTestBase
 {

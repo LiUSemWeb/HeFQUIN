@@ -3,11 +3,11 @@ package se.liu.ida.hefquin.federation.access.impl.reqproc;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.federation.FederationTestBase;
-import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.Neo4jRequest;
 import se.liu.ida.hefquin.federation.access.RecordsResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.Neo4jRequestImpl;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
 
 import static org.junit.Assert.assertEquals;
 

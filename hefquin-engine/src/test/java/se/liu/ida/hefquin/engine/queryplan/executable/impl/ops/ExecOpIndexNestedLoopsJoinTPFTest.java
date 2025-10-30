@@ -9,7 +9,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class ExecOpIndexNestedLoopsJoinTPFTest extends TestsForTPAddAlgorithms<TPFServer>
 {

@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 		extends BaseForPhysicalOpSingleInputJoin

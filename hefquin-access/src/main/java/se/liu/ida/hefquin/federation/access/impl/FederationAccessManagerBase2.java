@@ -3,10 +3,7 @@ package se.liu.ida.hefquin.federation.access.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -18,6 +15,9 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * Abstract base class for implementations of the {@link FederationAccessManager}

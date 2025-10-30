@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation;
+package se.liu.ida.hefquin.federation.members;
 
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 

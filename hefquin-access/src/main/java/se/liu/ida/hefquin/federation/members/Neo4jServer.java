@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation;
+package se.liu.ida.hefquin.federation.members;
 
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
@@ -8,14 +8,12 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
+import se.liu.ida.hefquin.federation.FederationMember;
 
-public interface GraphQLEndpoint extends FederationMember
+public interface Neo4jServer extends FederationMember
 {
-	/** Returns the URL at which this GraphQL endpoint can be reached. */
+	/** Returns the URL at which this Neo4j server can be reached. */
 	String getURL();
-
-	GraphQLSchema getSchema();
 
 	@Override
 	default boolean supportsMoreThanTriplePatterns() {

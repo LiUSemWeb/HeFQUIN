@@ -1,4 +1,4 @@
-package se.liu.ida.hefquin.federation.impl;
+package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Objects;
 
@@ -10,8 +10,8 @@ import org.apache.jena.riot.out.NodeFormatterNT;
 import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class TPFServerImpl extends BaseForFederationMember
                            implements TPFServer

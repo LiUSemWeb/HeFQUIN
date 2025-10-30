@@ -1,10 +1,10 @@
-package se.liu.ida.hefquin.federation.impl;
+package se.liu.ida.hefquin.federation.members.impl;
 
 import java.util.Objects;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
-import se.liu.ida.hefquin.federation.GraphQLEndpoint;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 
 public class GraphQLEndpointImpl extends BaseForFederationMember
                                  implements GraphQLEndpoint

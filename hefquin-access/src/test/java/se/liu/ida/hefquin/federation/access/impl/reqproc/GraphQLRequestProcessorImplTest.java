@@ -19,12 +19,12 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
-import se.liu.ida.hefquin.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
-import se.liu.ida.hefquin.federation.impl.GraphQLEndpointImpl;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
+import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
 
 public class GraphQLRequestProcessorImplTest extends FederationTestBase
 {

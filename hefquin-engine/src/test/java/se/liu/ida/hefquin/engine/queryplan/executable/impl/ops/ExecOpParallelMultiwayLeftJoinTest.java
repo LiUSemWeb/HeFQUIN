@@ -36,11 +36,11 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediat
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
 {

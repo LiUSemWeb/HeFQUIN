@@ -12,7 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.federation.WrappedFederationMember;
+import se.liu.ida.hefquin.federation.members.WrappedFederationMember;
 import se.liu.ida.hefquin.federation.wrappers.MaterializingWrapper;
 import se.liu.ida.hefquin.federation.wrappers.Wrapper;
 

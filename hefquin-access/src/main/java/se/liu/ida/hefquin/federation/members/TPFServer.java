@@ -1,22 +1,24 @@
-package se.liu.ida.hefquin.federation;
+package se.liu.ida.hefquin.federation.members;
 
 import org.apache.jena.sparql.algebra.op.OpBGP;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
-import se.liu.ida.hefquin.base.query.BGP;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
 
-public interface Neo4jServer extends FederationMember
+public interface TPFServer extends FederationMember
 {
-	/** Returns the URL at which this Neo4j server can be reached. */
-	String getURL();
+	String getBaseURL();
+
+	String createRequestURL( TPFRequest req );
 
 	@Override
 	default boolean supportsMoreThanTriplePatterns() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -24,15 +26,14 @@ public interface Neo4jServer extends FederationMember
 		if ( p instanceof TriplePattern )
 			return true;
 
-		if ( p instanceof BGP )
-			return true;
-
 		if (    p instanceof GenericSPARQLGraphPatternImpl1 gp
-		     && gp.asJenaElement() instanceof ElementTriplesBlock )
+		     && gp.asJenaElement() instanceof ElementTriplesBlock e
+		     && e.getPattern().size() == 1 )
 			return true;
 
 		if (    p instanceof GenericSPARQLGraphPatternImpl2 gp
-		     && gp.asJenaOp() instanceof OpBGP )
+		     && gp.asJenaOp() instanceof OpBGP opBGP
+		     && opBGP.getPattern().size() == 1 )
 			return true;
 
 		return false;

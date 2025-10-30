@@ -1,6 +1,7 @@
-package se.liu.ida.hefquin.federation;
+package se.liu.ida.hefquin.federation.members;
 
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
+import se.liu.ida.hefquin.federation.FederationMember;
 
 public interface SPARQLEndpoint extends FederationMember
 {
