@@ -1,9 +1,15 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 
 public interface SPARQLEndpoint extends FederationMember
 {
+	/** Returns the URL at which this SPARQL endpoint can be reached. */
+	String getURL();
+
 	@Override
-	SPARQLEndpointInterface getInterface();
+	default boolean supportsMoreThanTriplePatterns() { return true; }
+
+	@Override
+	default boolean isSupportedPattern( final SPARQLGraphPattern p ) { return true; }
 }

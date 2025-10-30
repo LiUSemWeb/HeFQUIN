@@ -23,7 +23,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -33,8 +32,6 @@ import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
@@ -199,7 +196,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfNoCacheHit1() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -216,7 +213,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfNoCacheHit2() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -233,7 +230,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfCacheHitInMemory1() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -254,7 +251,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfCacheHitInMemory2() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -275,7 +272,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfCacheHitFromDisk1() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -300,7 +297,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfCacheHitFromDisk2() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -325,8 +322,8 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfSameRequestTwoFederationMembers1() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TPFServer fm1 = new MyTPFServerForTest( "http://example.org/tpf/1" );
-		final TPFServer fm2 = new MyTPFServerForTest( "http://example.org/tpf/2" );
+		final TPFServer fm1 = new TPFServerForTest( "http://example.org/tpf/1" );
+		final TPFServer fm2 = new TPFServerForTest( "http://example.org/tpf/2" );
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -362,8 +359,8 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfSameRequestTwoFederationMembers2() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/brtpf/1" );
-		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/brtpf/2" );
+		final BRTPFServer fm1 = new BRTPFServerForTest( "http://example.org/brtpf/1" );
+		final BRTPFServer fm2 = new BRTPFServerForTest( "http://example.org/brtpf/2" );
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -399,7 +396,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfTwoRequestOneFederationMemberAsync1() throws FederationAccessException, InterruptedException, ExecutionException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -418,7 +415,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void tpfTwoRequestOneFederationMemberAsync2() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -437,7 +434,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void brtpfNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -457,7 +454,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void brtpfCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -479,7 +476,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void brtpfCacheHitFromDisk() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -504,8 +501,8 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 
 	@Test
 	public void brtpfSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException {
-		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/brtpf/1" );
-		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/brtpf/2" );
+		final BRTPFServer fm1 = new BRTPFServerForTest( "http://example.org/brtpf/1" );
+		final BRTPFServer fm2 = new BRTPFServerForTest( "http://example.org/brtpf/2" );
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr1 = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                                SLEEP_MILLIS,
 		                                                                                                42 );
@@ -570,7 +567,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 		final Binding solMap2 = BindingFactory.binding( x2, v2 );
 		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of(solMap2) );
 
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -598,7 +595,7 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 		final Binding solMap2 = BindingFactory.binding( x2, v2 );
 		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of(solMap2) );
 
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithPersistedDiskCache fedAccessMgr = createFedAccessMgrForTests( execServiceForFedAccess,
 		                                                                                               SLEEP_MILLIS,
 		                                                                                               42 );
@@ -641,52 +638,6 @@ public class FederationAccessManagerWithPersistedDiskCacheTest extends Federatio
 			                                                                            reqProcBRTPF, 
 			                                                                            reqProcNeo4j );
 		return new FederationAccessManagerWithPersistedDiskCache( fedAccMan, 10000 );
-	}
-
-	protected static class MyTPFServerForTest implements TPFServer
-	{
-		protected final TPFInterface iface;
-
-		public MyTPFServerForTest() {
-			this( "http://example.org/tpf" );
-		}
-
-		public MyTPFServerForTest(final String url) {
-			iface = new TPFInterfaceImpl( url, "subject", "predicate", "object" );
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-
-		@Override
-		public TPFInterface getInterface() {
-			return iface;
-		}
-	}
-
-	protected static class MyBRTPFServerForTest implements BRTPFServer
-	{
-		protected final BRTPFInterface iface;
-
-		public MyBRTPFServerForTest() {
-			this( "http://example.org/brtpf" );
-		}
-
-		public MyBRTPFServerForTest(final String url) {
-			 iface = new BRTPFInterfaceImpl(url, "subject", "predicate", "object", "values");
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-
-		@Override
-		public BRTPFInterface getInterface() {
-			return iface;
-		}
 	}
 
 	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl

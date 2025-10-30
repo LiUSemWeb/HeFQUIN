@@ -1,4 +1,6 @@
-package se.liu.ida.hefquin.federation.access.impl.iface;
+package se.liu.ida.hefquin.federation.impl;
+
+import java.util.Objects;
 
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
@@ -7,15 +9,23 @@ import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterNT;
 import org.apache.jena.sparql.exec.http.Params;
 
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
+import se.liu.ida.hefquin.base.data.VocabularyMapping;
+import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
-import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
-import se.liu.ida.hefquin.federation.access.impl.DataRetrievalInterfaceBase;
 
-public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFInterface
+public class TPFServerImpl extends BaseForFederationMember
+                           implements TPFServer
 {
+	// TODO: these string should not be hard-coded but extracted from the
+	//       Hydra description returned in each response to a TPF request
+	//       see: https://github.com/LiUSemWeb/HeFQUIN/issues/232
+	public final static String DfltHttpQueryArgumentForSubject   = "subject";
+	public final static String DfltHttpQueryArgumentForPredicate = "predicate";
+	public final static String DfltHttpQueryArgumentForObject    = "object";
+
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
+
+	protected final VocabularyMapping vm;
 
 	public final String baseURL;
 	public final String baseURLWithFinalSeparator;
@@ -23,14 +33,26 @@ public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFI
 	public final String httpQueryArgumentForPredicate;
 	public final String httpQueryArgumentForObject;
 
-	public TPFInterfaceImpl( final String baseURL,
-	                         final String httpQueryArgumentForSubject,
-	                         final String httpQueryArgumentForPredicate,
-	                         final String httpQueryArgumentForObject ) {
+	public TPFServerImpl( final String baseURL,
+	                      final VocabularyMapping vm ) {
+		this( baseURL,
+		      DfltHttpQueryArgumentForSubject,
+		      DfltHttpQueryArgumentForPredicate,
+		      DfltHttpQueryArgumentForObject,
+		      vm );
+	}
+
+	public TPFServerImpl( final String baseURL,
+	                      final String httpQueryArgumentForSubject,
+	                      final String httpQueryArgumentForPredicate,
+	                      final String httpQueryArgumentForObject,
+	                      final VocabularyMapping vm ) {
 		assert baseURL != null;
 		assert httpQueryArgumentForSubject    != null;
 		assert httpQueryArgumentForPredicate  != null;
 		assert httpQueryArgumentForObject     != null;
+
+		this.vm = vm;
 
 		this.baseURL = baseURL;
 		this.httpQueryArgumentForSubject    = httpQueryArgumentForSubject;
@@ -46,28 +68,22 @@ public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFI
 	}
 
 	@Override
+	public VocabularyMapping getVocabularyMapping() { return vm; }
+
+	@Override
+	public String getBaseURL() { return baseURL; }
+
+	@Override
+	public String toString() { return "TPF server at " + baseURL; }
+
+	@Override
 	public boolean equals( final Object o ) {
-		return o instanceof TPFInterface;
-	}
+		if ( o == this )
+			return true;
 
-	@Override
-	public boolean supportsTriplePatternRequests() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsBGPRequests() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsSPARQLPatternRequests() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsRequest( final DataRetrievalRequest req ) {
-		return req instanceof TriplePatternRequest;
+		return    o instanceof TPFServer tpf
+		       && tpf.getBaseURL().equals(baseURL)
+		       && Objects.equals( tpf.getVocabularyMapping(), vm );
 	}
 
 	@Override
@@ -134,10 +150,4 @@ public class TPFInterfaceImpl extends DataRetrievalInterfaceBase implements TPFI
 
 		return params;
 	}
-
-	@Override
-	public String toString() {
-		return "TPFInterface server at " + baseURL;
-	}
-
 }

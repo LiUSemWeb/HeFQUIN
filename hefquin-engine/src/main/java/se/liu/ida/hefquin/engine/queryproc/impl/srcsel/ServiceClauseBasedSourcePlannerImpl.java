@@ -231,35 +231,35 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 	}
 
 	protected LogicalPlan createPlanForBGP( final BGP bgp, final FederationMember fm ) {
-		// If the federation member has an interface that supports BGP
-		// requests, then we can simply create a BGP request operator.
-		if ( fm.getInterface().supportsBGPRequests() ) {
+		// If the federation member has an interface that supports only
+		// triple pattern requests, ...
+		if ( ! fm.supportsMoreThanTriplePatterns() ) {
+			// ... then we create a multiway join of triple pattern request
+			// operators.
+			if ( bgp.getTriplePatterns().size() == 0 ) {
+				throw new IllegalArgumentException( "the given BGP is empty" );
+			}
+
+			final List<LogicalPlan> subPlans = new ArrayList<>();
+			for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
+				final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
+				final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
+				final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op);
+				subPlans.add( subPlan );
+			}
+
+			return mergeIntoMultiwayJoin(subPlans);
+		}
+
+		// Otherwise, if the federation member supports BGP requests, ...
+		if ( fm.isSupportedPattern(bgp) ) {
+			// ... then we can simply create a BGP request operator.
 			final BGPRequest req = new BGPRequestImpl(bgp);
 			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
 			return new LogicalPlanWithNullaryRootImpl(op);
 		}
 
-		// If the interface of the federation member does not support
-		// BGP requests (but triple pattern requests), then we create
-		// a multiway join of triple pattern request operators.
-
-		if ( ! fm.getInterface().supportsTriplePatternRequests() ) {
-			throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
-		}
-
-		if ( bgp.getTriplePatterns().size() == 0 ) {
-			throw new IllegalArgumentException( "the given BGP is empty" );
-		}
-
-		final List<LogicalPlan> subPlans = new ArrayList<>();
-		for ( final TriplePattern tp : bgp.getTriplePatterns() ) {
-			final TriplePatternRequest req = new TriplePatternRequestImpl(tp);
-			final LogicalOpRequest<?,?> op = new LogicalOpRequest<>(fm, req);
-			final LogicalPlan subPlan = new LogicalPlanWithNullaryRootImpl(op);
-			subPlans.add( subPlan );
-		}
-
-		return mergeIntoMultiwayJoin(subPlans);
+		throw new IllegalArgumentException( "the given federation member cannot handle triple patterns requests (" + fm.toString() + ")" );
 	}
 
 	protected LogicalPlan mergeIntoMultiwayJoin( final LogicalPlan ... subPlans ) {

@@ -24,7 +24,7 @@ public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implement
 
 	@Override
 	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) throws FederationAccessException {
-		final String requestURL = fm.getInterface().createRequestURL(req);
+		final String requestURL = fm.createRequestURL(req);
 		final TriplePattern tp = req.getTriplePattern();
 		final Map<String, String> headers = Map.of(
 			"Accept", WebContent.defaultRDFAcceptHeader,

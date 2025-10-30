@@ -24,6 +24,7 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
@@ -253,7 +254,7 @@ public class TestsForPhysicalOpFactories
 		final Var v2 = Var.alloc("y");
 		final Var v3 = Var.alloc("z");
 		final TriplePattern tp = new TriplePatternImpl(v1, v2, v3);
-		final FederationMember fm = new TestUtils.SPARQLEndpointForTest();
+		final FederationMember fm = new EngineTestBase.SPARQLEndpointForTest();
 		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( fm, new SPARQLRequestImpl(tp) );
 
 		assertEquals( PhysicalOpRequest.class, factory.create(lop).getClass() );
@@ -293,9 +294,9 @@ public class TestsForPhysicalOpFactories
         el.addTriple(Triple.create(v1, v2, v3));
 
 		final SPARQLGraphPattern p1 = new GenericSPARQLGraphPatternImpl1(el);
-		final UnaryLogicalOp lop_sparql = ctor.create( new TestUtils.SPARQLEndpointForTest(), p1 );
-		final UnaryLogicalOp lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p1 );
-		final UnaryLogicalOp lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p1 );
+		final UnaryLogicalOp lop_sparql = ctor.create( new EngineTestBase.SPARQLEndpointForTest(), p1 );
+		final UnaryLogicalOp lop_tpf = ctor.create( new EngineTestBase.TPFServerForTest(), p1 );
+		final UnaryLogicalOp lop_brtpf = ctor.create( new EngineTestBase.BRTPFServerForTest(), p1 );
 
 		assertEquals( PhysicalOpBindJoinBRTPF.class, factory.create(lop_sparql).getClass() );
 
@@ -306,7 +307,7 @@ public class TestsForPhysicalOpFactories
 		// all other pattern types should fail
 		final ElementGroup el2 = new ElementGroup();
 		final SPARQLGraphPattern p2 = new GenericSPARQLGraphPatternImpl1(el2);
-		final LogicalOperator lop_unsupported = ctor.create( new TestUtils.BRTPFServerForTest(), p2 );
+		final LogicalOperator lop_unsupported = ctor.create( new EngineTestBase.BRTPFServerForTest(), p2 );
 		assertFalse( factory.supports( lop_unsupported, (ExpectedVariables) null ) );
 	}
 
@@ -317,9 +318,9 @@ public class TestsForPhysicalOpFactories
 		final String queryString = "SELECT * WHERE { ?s ?p ?o OPTIONAL { ?_s ?_p ?o} }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final UnaryLogicalOp lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
-		final UnaryLogicalOp lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p );
-		final UnaryLogicalOp lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p );
+		final UnaryLogicalOp lop = ctor.create( new EngineTestBase.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop_tpf = ctor.create( new EngineTestBase.TPFServerForTest(), p );
+		final UnaryLogicalOp lop_brtpf = ctor.create( new EngineTestBase.BRTPFServerForTest(), p );
 
 		final ExpectedVariables sp1 = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables po1 = TestUtils.getExpectedVariables( List.of("p", "o"), List.of() );
@@ -366,9 +367,9 @@ public class TestsForPhysicalOpFactories
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final UnaryLogicalOp lop_sparql = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
-		final UnaryLogicalOp lop_tpf = ctor.create( new TestUtils.TPFServerForTest(), p );
-		final UnaryLogicalOp lop_brtpf = ctor.create( new TestUtils.BRTPFServerForTest(), p );
+		final UnaryLogicalOp lop_sparql = ctor.create( new EngineTestBase.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop_tpf = ctor.create( new EngineTestBase.TPFServerForTest(), p );
+		final UnaryLogicalOp lop_brtpf = ctor.create( new EngineTestBase.BRTPFServerForTest(), p );
 
 		assertEquals( opClass, factory.create(lop_sparql).getClass() );
 		assertEquals( opClass, factory.create(lop_tpf).getClass() );

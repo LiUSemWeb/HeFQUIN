@@ -106,7 +106,7 @@ public class BaseForTextBasedPlanPrinters
 	                                             final String indentString,
 	                                             final PrintStream out ) {
 		out.append( indentString );
-		out.append( "  - fm (" + fm.getInterface().getID() + ") " + fm.getInterface().toString() );
+		out.append( "  - fm (" + fm.getID() + ") " + fm.toString() );
 		out.append( System.lineSeparator() );
 	}
 

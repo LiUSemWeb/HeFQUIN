@@ -7,10 +7,8 @@ import org.apache.jena.riot.WebContent;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
 import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
@@ -27,18 +25,17 @@ public class TPFRequestProcessorImpl extends TPFRequestProcessorBase implements 
 
 	@Override
 	public TPFResponse performRequest( final TPFRequest req, final TPFServer fm ) throws FederationAccessException {
-		return performRequest( req, fm.getInterface(), fm );
+		return _performRequest( req, fm );
 	}
 
 	@Override
 	public TPFResponse performRequest( final TPFRequest req, final BRTPFServer fm ) throws FederationAccessException {
-		return performRequest( req, fm.getInterface(), fm );
+		return _performRequest( req, fm );
 	}
 
-	protected TPFResponse performRequest( final TPFRequest req,
-	                                      final TPFInterface iface,
-	                                      final FederationMember fm ) throws FederationAccessException {
-		final String requestURL = iface.createRequestURL(req);
+	protected TPFResponse _performRequest( final TPFRequest req,
+	                                       final TPFServer fm ) throws FederationAccessException {
+		final String requestURL = fm.createRequestURL(req);
 		final TriplePattern tp = req.getQueryPattern();
 		final Map<String, String> headers = Map.of(
 			"Accept", WebContent.defaultRDFAcceptHeader,

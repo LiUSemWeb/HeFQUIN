@@ -27,23 +27,23 @@ public class CardinalityCacheKey implements Serializable
 	public CardinalityCacheKey( final DataRetrievalRequest req, final FederationMember fm ) {
 		if ( req instanceof SPARQLRequest sparqlRequest && fm instanceof SPARQLEndpoint sparqlEndpoint ) {
 			query = sparqlRequest.toString();
-			url = sparqlEndpoint.getInterface().getURL();
+			url = sparqlEndpoint.getURL();
 			bindings = "";
 		}
 		else if ( req instanceof TPFRequest tpfRequest ) {
 			query = tpfRequest.toString();
 			bindings = "";
 			if ( fm instanceof TPFServer tpfServer )
-				url = tpfServer.getInterface().createRequestURL( tpfRequest );
+				url = tpfServer.createRequestURL( tpfRequest );
 			else if ( fm instanceof BRTPFServer brtpfServer )
-				url = brtpfServer.getInterface().createRequestURL( tpfRequest );
+				url = brtpfServer.createRequestURL( tpfRequest );
 			else
 				throw new IllegalArgumentException( "Unexpected type of server: " + fm.getClass().getName() );
 
 		}
 		else if ( req instanceof BRTPFRequest brtpfRequest && fm instanceof BRTPFServer brtpfServer ) {
 			query = brtpfRequest.getTriplePattern().toString();
-			url = brtpfServer.getInterface().createRequestURL( brtpfRequest );
+			url = brtpfServer.createRequestURL( brtpfRequest );
 			bindings = brtpfRequest.getSolutionMappings().toString();
 		}
 		else {

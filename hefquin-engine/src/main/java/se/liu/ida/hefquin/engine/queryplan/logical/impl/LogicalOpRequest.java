@@ -17,7 +17,6 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	public LogicalOpRequest( final MemberType fm, final ReqType req ) {
 		assert fm != null;
 		assert fm != req;
-		assert fm.getInterface().supportsRequest(req);
 
 		this.fm = fm;
 		this.req = req;
@@ -63,7 +62,7 @@ public class LogicalOpRequest<ReqType extends DataRetrievalRequest, MemberType e
 	@Override
 	public String toString(){
 		return "req" + " (" + getID() + ")"
-		  		+ "\t - fm (" + fm.getInterface().toString() + ")"
+		  		+ "\t - fm (" + fm.toString() + ")"
 		  		+ "\t - pattern (" + req.toString() + ")";
 		
 	}

@@ -70,7 +70,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 		final QueryExecution qe;
 		try {
 			qe = QueryExecutionHTTPBuilder.create()
-					.endpoint(   fm.getInterface().getURL() )
+					.endpoint(   fm.getURL() )
 					.httpClient( httpClient )
 					.query(      req.getQuery().asJenaQuery() )
 					.timeout(    overallTimeout, TimeUnit.MILLISECONDS )
@@ -78,7 +78,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 					.build();
 		}
 		catch ( final Exception e ) {
-			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", e, req, fm);
+			throw new FederationAccessException("Initiating the remote execution of a query at the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", e, req, fm);
 		}
 
 		final ResultSet result = qe.execSelect();
@@ -95,7 +95,7 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 		}
 		catch ( final Exception ex ) {
 			try { result.close(); } catch ( final Exception e ) { e.printStackTrace(); }
-			throw new FederationAccessException("Consuming the query result from the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
+			throw new FederationAccessException("Consuming the query result from the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
 		result.close();
@@ -116,12 +116,12 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 
 		final RDFConnection conn;
 		try {
-			conn = RDFConnectionRemote.service( fm.getInterface().getURL() )
+			conn = RDFConnectionRemote.service( fm.getURL() )
 					.httpClient(httpClient)
 					.build();
 		}
 		catch ( final Exception ex ) {
-			throw new FederationAccessException("Creating the connection to the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
+			throw new FederationAccessException("Creating the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
 		try {
@@ -129,14 +129,14 @@ public class SPARQLRequestProcessorImpl implements SPARQLRequestProcessor
 		}
 		catch ( final Exception ex ) {
 			try { conn.close(); } catch ( final Exception e ) { e.printStackTrace(); }
-			throw new FederationAccessException("Issuing the given query to the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
+			throw new FederationAccessException("Issuing the given query to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
 		try {
 			conn.close();
 		}
 		catch ( final Exception ex ) {
-			throw new FederationAccessException("Closing the connection to the SPARQL endpoint at '" + fm.getInterface().getURL() + "' caused an exception.", ex, req, fm);
+			throw new FederationAccessException("Closing the connection to the SPARQL endpoint at '" + fm.getURL() + "' caused an exception.", ex, req, fm);
 		}
 
 		return new SolMapsResponseImpl(sink.solMaps, fm, req, requestStartTime);

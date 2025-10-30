@@ -1,11 +1,9 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
-import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
+import se.liu.ida.hefquin.federation.impl.BRTPFServerImpl;
+import se.liu.ida.hefquin.federation.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.impl.SPARQLEndpointImpl;
+import se.liu.ida.hefquin.federation.impl.TPFServerImpl;
 
 public abstract class FederationTestBase
 {
@@ -28,74 +26,47 @@ public abstract class FederationTestBase
 
 
 	protected TPFServer getDBpediaTPFServer() {
-		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
-		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
-		return new TPFServer() {
-			@Override public TPFInterface getInterface() { return tpfServerIface; }
-
-			@Override
-			public VocabularyMapping getVocabularyMapping() {
-				return null;
-			}
-		};
+		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
+		                          null ); // no vocab.mapping
 	}
 
-	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
+	protected static class SPARQLEndpointForTest extends SPARQLEndpointImpl
 	{
-		final SPARQLEndpointInterface iface;
-
-		public SPARQLEndpointForTest() { this("http://example.org/sparql"); }
-
-		public SPARQLEndpointForTest( final String ifaceURL ) {
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+		public SPARQLEndpointForTest() {
+			super("http://example.org/sparql", null);
 		}
 
-		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-
+		public SPARQLEndpointForTest( final String url ) {
+			super(url, null);
+		}
 	}
 
-	protected static class TPFServerForTest implements TPFServer
+	protected static class TPFServerForTest extends TPFServerImpl
 	{
-		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
-
-		public TPFServerForTest() { }
-
-		@Override
-		public TPFInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-	}
-
-	protected static class BRTPFServerForTest implements BRTPFServer
-	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
-
-		public BRTPFServerForTest() { }
-
-		@Override
-		public BRTPFInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-	}
-
-	protected static class Neo4jServerImpl4Test implements Neo4jServer
-	{
-		public Neo4jServerImpl4Test() {}
-
-		@Override
-		public Neo4jInterface getInterface() {
-			return new Neo4jInterfaceImpl("http://localhost:7474/db/neo4j/tx");
+		public TPFServerForTest() {
+			super("http://example.org/", null);
 		}
 
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
+		public TPFServerForTest( final String baseURL ) {
+			super(baseURL, null);
+		}
+	}
+
+	protected static class BRTPFServerForTest extends BRTPFServerImpl
+	{
+		public BRTPFServerForTest() {
+			super("http://example.org/", null);
+		}
+
+		public BRTPFServerForTest( final String baseURL ) {
+			super(baseURL, null);
+		}
+	}
+
+	protected static class Neo4jServerImpl4Test extends Neo4jServerImpl
+	{
+		public Neo4jServerImpl4Test() {
+			super("http://localhost:7474/db/neo4j/tx", null);
 		}
 	}
 

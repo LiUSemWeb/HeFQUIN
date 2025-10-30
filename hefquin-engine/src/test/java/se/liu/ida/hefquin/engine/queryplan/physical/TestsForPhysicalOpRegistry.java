@@ -14,6 +14,7 @@ import org.junit.Test;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryplan.physical.TestsForPhysicalOpFactories.ConstructorGPAddAndGPOptAdd;
@@ -32,7 +33,7 @@ public class TestsForPhysicalOpRegistry
 		registry.register( PhysicalOpRequest.getFactory() );
 
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1( new ElementTriplesBlock() );
-		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( new TestUtils.SPARQLEndpointForTest(),
+		final LogicalOpRequest<?,?> lop = new LogicalOpRequest<>( new EngineTestBase.SPARQLEndpointForTest(),
 		                                                          new SPARQLRequestImpl(p) );
 
 		assertEquals( PhysicalOpRequest.class, registry.create(lop).getClass() );
@@ -72,7 +73,7 @@ public class TestsForPhysicalOpRegistry
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final UnaryLogicalOp lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop = ctor.create( new EngineTestBase.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 		final ExpectedVariables spo = TestUtils.getExpectedVariables( List.of("s", "p", "o"), List.of() );
@@ -88,7 +89,7 @@ public class TestsForPhysicalOpRegistry
 		final String queryString = "SELECT * WHERE { ?s ?p ?o }";
 		final Element el = QueryFactory.create(queryString).getQueryPattern();
 		final SPARQLGraphPattern p = new GenericSPARQLGraphPatternImpl1(el);
-		final UnaryLogicalOp lop = ctor.create( new TestUtils.SPARQLEndpointForTest(), p );
+		final UnaryLogicalOp lop = ctor.create( new EngineTestBase.SPARQLEndpointForTest(), p );
 
 		final ExpectedVariables sp = TestUtils.getExpectedVariables( List.of("s", "p"), List.of() );
 

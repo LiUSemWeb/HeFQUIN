@@ -1,9 +1,8 @@
 package se.liu.ida.hefquin.federation;
 
-import se.liu.ida.hefquin.federation.access.BRTPFInterface;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 
 public interface BRTPFServer extends TPFServer
 {
-	@Override
-	BRTPFInterface getInterface();
+	String createRequestURL( BRTPFRequest req );
 }

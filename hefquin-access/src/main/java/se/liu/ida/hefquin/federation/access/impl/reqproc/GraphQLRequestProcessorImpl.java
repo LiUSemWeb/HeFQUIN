@@ -37,8 +37,8 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 
 		final Date startTime = new Date();
 		final GraphQLQuery query = req.getGraphQLQuery();
-		final String url = fm.getInterface().getURL();
-		
+		final String url = fm.getURL();
+
 		final JsonObject jsonObj;
 		try {
 			jsonObj = GraphQLConnection.performRequest(query, url, connectionTimeout, readTimeout);

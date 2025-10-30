@@ -21,23 +21,13 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLException;
 import se.liu.ida.hefquin.engine.wrappers.graphql.GraphQLSchemaInitializer;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.GraphQLEndpoint;
-import se.liu.ida.hefquin.federation.Neo4jServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.BRTPFInterface;
-import se.liu.ida.hefquin.federation.access.GraphQLInterface;
-import se.liu.ida.hefquin.federation.access.Neo4jInterface;
-import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceUtils;
-import se.liu.ida.hefquin.federation.access.impl.iface.GraphQLInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.Neo4jInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceUtils;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.federation.impl.BRTPFServerImpl;
+import se.liu.ida.hefquin.federation.impl.GraphQLEndpointImpl;
+import se.liu.ida.hefquin.federation.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.impl.SPARQLEndpointImpl;
+import se.liu.ida.hefquin.federation.impl.TPFServerImpl;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 public class FederationDescriptionReader
@@ -245,54 +235,22 @@ public class FederationDescriptionReader
 
 	protected FederationMember createSPARQLEndpoint( final String uri, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
-
-		final SPARQLEndpointInterface iface = new SPARQLEndpointInterfaceImpl(uri);
-		final SPARQLEndpoint fm = new SPARQLEndpoint() {
-			@Override public SPARQLEndpointInterface getInterface() { return iface; }
-			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
-			@Override public String toString( ) { return "SPARQL endpoint (" + iface.toString() + ")"; }
-		};
-
-		return fm;
+		return new SPARQLEndpointImpl(uri, vm);
 	}
 
 	protected FederationMember createTPFServer( final String uri, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
-
-		final TPFInterface iface = TPFInterfaceUtils.createTPFInterface(uri);
-		final TPFServer fm = new TPFServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
-			@Override public TPFInterface getInterface() { return iface; }
-			@Override public String toString( ) { return "TPF server (" + iface.toString() + ")"; }
-		};
-
-		return fm;
+		return new TPFServerImpl(uri, vm);
 	}
 
 	protected FederationMember createBRTPFServer( final String uri, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
-
-		final BRTPFInterface iface = BRTPFInterfaceUtils.createBRTPFInterface(uri);
-		final BRTPFServer fm = new BRTPFServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
-			@Override public BRTPFInterface getInterface() { return iface; }
-			@Override public String toString( ) { return "brTPF server (" + iface.toString() + ")"; }
-		};
-
-		return fm;
+		return new BRTPFServerImpl(uri, vm);
 	}
 
 	protected FederationMember createNeo4jServer( final String uri, final VocabularyMapping vm ) {
 		verifyExpectedURI(uri);
-
-		final Neo4jInterface iface = new Neo4jInterfaceImpl(uri);
-		final Neo4jServer fm = new Neo4jServer() {
-			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
-			@Override public Neo4jInterface getInterface() { return iface; }
-			@Override public String toString( ) { return "Neo4j server (" + iface.toString() + ")"; }
-		};
-
-		return fm;
+		return new Neo4jServerImpl(uri, vm);
 	}
 
 	protected FederationMember createGraphQLServer( final String uri, final VocabularyMapping vm ) {
@@ -313,14 +271,7 @@ public class FederationDescriptionReader
 			throw new IllegalArgumentException(e);
 		}
 
-		final GraphQLInterface iface = new GraphQLInterfaceImpl(uri);
-
-		return new GraphQLEndpoint() {
-			@Override public VocabularyMapping getVocabularyMapping() { return vm; }
-			@Override public GraphQLInterface getInterface() { return iface; }
-			@Override public GraphQLSchema getSchema() { return schema; }
-			@Override public String toString( ) { return "GraphQL endpoint at " + uri; }
-		};
+		return new GraphQLEndpointImpl(uri, schema, vm);
 	}
 
 	/**

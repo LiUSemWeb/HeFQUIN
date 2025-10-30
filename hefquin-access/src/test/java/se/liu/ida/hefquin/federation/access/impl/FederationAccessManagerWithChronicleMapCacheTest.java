@@ -25,7 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
@@ -35,8 +34,6 @@ import se.liu.ida.hefquin.federation.Neo4jServer;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
@@ -222,7 +219,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -239,7 +236,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -259,7 +256,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfCacheHitFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42 );
 		fedAccessMgr1.clearCardinalityCache();
 
@@ -280,8 +277,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm1 = new MyTPFServerForTest( "http://example.org/sparql/1" );
-		final TPFServer fm2 = new MyTPFServerForTest( "http://example.org/sparql/2" );
+		final TPFServer fm1 = new TPFServerForTest( "http://example.org/sparql/1" );
+		final TPFServer fm2 = new TPFServerForTest( "http://example.org/sparql/2" );
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -305,7 +302,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -322,7 +319,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -339,7 +336,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final TPFServer fm = new MyTPFServerForTest();
+		final TPFServer fm = new TPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( tpfReq, fm ).get();
@@ -359,7 +356,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -376,7 +373,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -396,7 +393,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerCacheHitFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42 );
 		fedAccessMgr1.clearCardinalityCache();
 
@@ -417,8 +414,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/sparql/1" );
-		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/sparql/2" );
+		final BRTPFServer fm1 = new BRTPFServerForTest( "http://example.org/sparql/1" );
+		final BRTPFServer fm2 = new BRTPFServerForTest( "http://example.org/sparql/2" );
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -442,7 +439,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -459,7 +456,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -476,7 +473,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void tpfWithBrtpfServerCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( tpfReq, fm ).get();
@@ -496,7 +493,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfNoCacheHit() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -513,7 +510,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfCacheHitInMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -533,7 +530,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfCacheHitFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42 );
 		fedAccessMgr1.clearCardinalityCache();
 
@@ -554,8 +551,8 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfSameRequestTwoFederationMembers() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm1 = new MyBRTPFServerForTest( "http://example.org/sparql/1" );
-		final BRTPFServer fm2 = new MyBRTPFServerForTest( "http://example.org/sparql/2" );
+		final BRTPFServer fm1 = new BRTPFServerForTest( "http://example.org/sparql/1" );
+		final BRTPFServer fm2 = new BRTPFServerForTest( "http://example.org/sparql/2" );
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -579,7 +576,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfTwoRequestsAsync() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -596,7 +593,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfOneRequestDifferentBindings() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -631,7 +628,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 		final Binding solMap2 = BindingFactory.binding( x2, v2 );
 		final BRTPFRequest brtpfReq2 = new BRTPFRequestImpl( tp, Set.of(solMap2) );
 
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -652,7 +649,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfCacheInvalidationFromMemory() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr.clearCardinalityCache();
 
@@ -669,7 +666,7 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 
 	@Test
 	public void brtpfCacheInvalidationFromDisk() throws FederationAccessException, InterruptedException, ExecutionException, IOException {
-		final BRTPFServer fm = new MyBRTPFServerForTest();
+		final BRTPFServer fm = new BRTPFServerForTest();
 		final FederationAccessManagerWithChronicleMapCache fedAccessMgr1 = createFedAccessMgrForTests( 42, 0, 100 );
 		fedAccessMgr1.clearCardinalityCache();
 		fedAccessMgr1.issueCardinalityRequest( brtpfReq, fm ).get();
@@ -726,52 +723,6 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 			                                                                            reqProcBRTPF,
 			                                                                            reqProcNeo4j );
 		return new FederationAccessManagerWithChronicleMapCache( fedAccMan, cacheCapacity, timeToLive );
-	}
-
-	protected static class MyTPFServerForTest implements TPFServer
-	{
-		protected final TPFInterface iface;
-
-		public MyTPFServerForTest() {
-			this( "http://example.org/tpf" );
-		}
-
-		public MyTPFServerForTest(final String url) {
-			iface = new TPFInterfaceImpl( url, "subject", "predicate", "object" );
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-
-		@Override
-		public TPFInterface getInterface() {
-			return iface;
-		}
-	}
-
-	protected static class MyBRTPFServerForTest implements BRTPFServer
-	{
-		protected final BRTPFInterface iface;
-
-		public MyBRTPFServerForTest() {
-			this( "http://example.org/brtpf" );
-		}
-
-		public MyBRTPFServerForTest(final String url) {
-			 iface = new BRTPFInterfaceImpl(url, "subject", "predicate", "object", "values");
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-
-		@Override
-		public BRTPFInterface getInterface() {
-			return iface;
-		}
 	}
 
 	protected static class MySPARQLRequestProcessor extends SPARQLRequestProcessorImpl

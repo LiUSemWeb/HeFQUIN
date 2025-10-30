@@ -16,8 +16,6 @@ import org.junit.Test;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
 
 public class FederationDescriptionReaderTest
 {
@@ -49,13 +47,11 @@ public class FederationDescriptionReaderTest
 		final FederationMember fm1 = cat.getFederationMemberByURI("http://dbpedia.org/sparql");
 		assertTrue( fm1.getVocabularyMapping() == null );
 		assertTrue( fm1 instanceof SPARQLEndpoint );
-		assertTrue( fm1.getInterface() instanceof SPARQLEndpointInterface );
-		assertEquals( "http://dbpedia.org/sparql", ((SPARQLEndpointInterface) fm1.getInterface()).getURL() );
+		assertEquals( "http://dbpedia.org/sparql", ((SPARQLEndpoint) fm1).getURL() );
 
 		final FederationMember fm2 = cat.getFederationMemberByURI("http://fragments.dbpedia.org/2016-04/en");
 		assertTrue( fm2.getVocabularyMapping() == null );
 		assertTrue( fm2 instanceof TPFServer );
-		assertTrue( fm2.getInterface() instanceof TPFInterface );
 	}
 
 	@Test

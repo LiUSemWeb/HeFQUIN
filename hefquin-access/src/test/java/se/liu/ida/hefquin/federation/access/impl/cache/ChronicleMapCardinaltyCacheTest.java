@@ -3,7 +3,6 @@ package se.liu.ida.hefquin.federation.access.impl.cache;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntryFactory;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicy;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheInvalidationPolicyAlwaysValid;
@@ -14,10 +13,8 @@ import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheReplacementPolicyL
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
-import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
-import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-public class ChronicleMapCardinaltyCacheTest
+public class ChronicleMapCardinaltyCacheTest extends FederationTestBase
 {
 	protected final FederationMember fm = new SPARQLEndpointForTest( "http://example.org" );
 
@@ -272,25 +269,6 @@ public class ChronicleMapCardinaltyCacheTest
 		return new SPARQLRequestImpl( tp );
 	}
 
-	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
-	{
-		final String url;
-
-		public SPARQLEndpointForTest( final String url ) {
-			this.url = url;
-		}
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			return null;
-		}
-
-		@Override
-		public SPARQLEndpointInterface getInterface() {
-			return new SPARQLEndpointInterfaceImpl( url );
-		}
-
-	}
 
 	public static class CachePoliciesForTest
 			implements CachePolicies<CardinalityCacheKey, Integer, CardinalityCacheEntry>

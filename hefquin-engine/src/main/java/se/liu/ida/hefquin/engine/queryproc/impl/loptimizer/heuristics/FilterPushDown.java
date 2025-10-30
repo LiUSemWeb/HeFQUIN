@@ -12,14 +12,16 @@ import org.apache.jena.sparql.expr.ExprList;
 import org.apache.jena.sparql.expr.ExprVars;
 
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.*;
 import se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 
 /**
  * Pushes filter conditions as much as possible towards the leaf nodes
@@ -142,14 +144,23 @@ public class FilterPushDown implements HeuristicForLogicalOptimization
 	protected LogicalPlan createPlanForRequestUnderFilter( final LogicalOpFilter filterOp,
 	                                                       final LogicalOpRequest<?,?> reqOp,
 	                                                       final LogicalPlan inputPlan ) {
-		if ( reqOp.getFederationMember().getInterface().supportsSPARQLPatternRequests() ) {
-			final SPARQLEndpoint ep = (SPARQLEndpoint) reqOp.getFederationMember();
-			final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-			return MergeRequests.mergeFilterIntoSPARQLEndpointRequest(filterOp, ep, req);
-		}
-		else {
+		final FederationMember fm = reqOp.getFederationMember();
+
+		if ( ! fm.supportsMoreThanTriplePatterns() ) {
 			return inputPlan;
 		}
+
+		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+		final ExprList exprList = filterOp.getFilterExpressions();
+		final SPARQLGraphPattern mergedPattern = req.getQueryPattern().mergeWith(exprList);
+
+		if ( ! fm.isSupportedPattern(mergedPattern) ) {
+			return inputPlan;
+		}
+
+		final SPARQLRequest mergedReq = new SPARQLRequestImpl(mergedPattern);
+		final LogicalOpRequest<?,?> mergedReqOp = new LogicalOpRequest<>(fm, mergedReq);
+		return new LogicalPlanWithNullaryRootImpl(mergedReqOp);
 	}
 
 	protected LogicalPlan createPlanForFilterUnderFilter( final LogicalOpFilter parentFilterOp,

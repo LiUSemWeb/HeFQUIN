@@ -25,15 +25,32 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.federation.*;
-import se.liu.ida.hefquin.federation.access.*;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
+import se.liu.ida.hefquin.federation.BRTPFServer;
+import se.liu.ida.hefquin.federation.FederationMember;
+import se.liu.ida.hefquin.federation.Neo4jServer;
+import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.TPFServer;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
+import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.FederationAccessStats;
+import se.liu.ida.hefquin.federation.access.Neo4jRequest;
+import se.liu.ida.hefquin.federation.access.RecordsResponse;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.impl.BaseForFederationMember;
+import se.liu.ida.hefquin.federation.impl.TPFServerImpl;
 
 public abstract class EngineTestBase
 {
@@ -45,19 +62,11 @@ public abstract class EngineTestBase
 
 
 	protected TPFServer getDBpediaTPFServer() {
-		final String       tpfServerBaseURL = "http://fragments.dbpedia.org/2016-04/en";
-		final TPFInterface tpfServerIface   = new TPFInterfaceImpl(tpfServerBaseURL, "subject", "predicate", "object");
-		return new TPFServer() {
-			@Override public TPFInterface getInterface() { return tpfServerIface; }
-
-			@Override
-			public VocabularyMapping getVocabularyMapping() {
-				return null;
-			}
-		};
+		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",
+		                          null ); // no vocab.mapping
 	}
 
-	protected static abstract class FederationMemberBaseForTest implements FederationMember
+	protected static abstract class FederationMemberBaseForTest extends BaseForFederationMember
 	{
 		protected final Graph data;
 
@@ -129,23 +138,23 @@ public abstract class EngineTestBase
 		}
 	}
 
-	protected static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
+	public static class SPARQLEndpointForTest extends FederationMemberBaseForTest implements SPARQLEndpoint
 	{
-		final SPARQLEndpointInterface iface;
+		protected final String url;
 
 		public SPARQLEndpointForTest() { this("http://example.org/sparql", null); }
 
-		public SPARQLEndpointForTest( final String ifaceURL ) { this(ifaceURL, null); }
+		public SPARQLEndpointForTest( final String url ) { this(url, null); }
 
 		public SPARQLEndpointForTest( final Graph data ) { this("http://example.org/sparql", data); }
 
-		public SPARQLEndpointForTest( final String ifaceURL, final Graph data ) {
+		public SPARQLEndpointForTest( final String url, final Graph data ) {
 			super(data);
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
+			this.url  = url;
 		}
 
 		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
+		public String getURL() { return url; }
 
 		public SolMapsResponse performRequest( final SPARQLRequest req )
 				throws FederationAccessException
@@ -177,15 +186,16 @@ public abstract class EngineTestBase
 		public VocabularyMapping getVocabularyMapping() { return vm; }
 	}
 
-	protected static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
+	public static class TPFServerForTest extends FederationMemberBaseForTest implements TPFServer
 	{
-		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
-
 		public TPFServerForTest() { this(null); }
 		public TPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
-		public TPFInterface getInterface() { return iface; }
+		public String getBaseURL() { return "http://example.org/"; }
+
+		@Override
+		public String createRequestURL( final TPFRequest req ) { throw new UnsupportedOperationException(); }
 
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
@@ -193,16 +203,19 @@ public abstract class EngineTestBase
 		}
 	}
 
-
-	protected static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
+	public static class BRTPFServerForTest extends FederationMemberBaseForTest implements BRTPFServer
 	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
-
 		public BRTPFServerForTest() { this(null); }
 		public BRTPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
-		public BRTPFInterface getInterface() { return iface; }
+		public String getBaseURL() { return "http://example.org/"; }
+
+		@Override
+		public String createRequestURL( final TPFRequest req ) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public String createRequestURL( final BRTPFRequest req ) { throw new UnsupportedOperationException(); }
 
 		public TPFResponse performRequest( final TPFRequest req ) {
 			final List<Triple> result = getMatchingTriples(req);
