@@ -17,6 +17,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Changing the cardinality-based join ordering heuristic to avoid cardinality requests for plans without joins ([#465](https://github.com/LiUSemWeb/HeFQUIN/pull/465)).
 - Removing the "GreedyBasedReordering" heuristic from the default sequence of heuristics of the logical optimizer ([#467](https://github.com/LiUSemWeb/HeFQUIN/pull/467)).
 - Upgrading the code base to version 5.5.0 of Jena ([#478](https://github.com/LiUSemWeb/HeFQUIN/pull/478)).
+- Reorganizes completely how the federation access manager works ([#480](https://github.com/LiUSemWeb/HeFQUIN/pull/480)).
 
 
 ## [0.0.6] - 2025-06-30
