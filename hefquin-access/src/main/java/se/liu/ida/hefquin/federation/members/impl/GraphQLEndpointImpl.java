@@ -1,8 +1,5 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
-import java.util.Objects;
-
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 
@@ -11,21 +8,16 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 {
 	protected final String url;
 	protected final GraphQLSchema schema;
-	protected final VocabularyMapping vm;
 
 	public GraphQLEndpointImpl( final String url,
-	                            final GraphQLSchema schema,
-	                            final VocabularyMapping vm ) {
+	                            final GraphQLSchema schema ) {
 		assert url != null && ! url.isEmpty();
 		assert schema != null;
 
 		this.url = url;
 		this.schema = schema;
-		this.vm = vm;
 	}
 
-	@Override
-	public VocabularyMapping getVocabularyMapping() { return vm; }
 	@Override
 	public String getURL() { return url; }
 
@@ -37,13 +29,12 @@ public class GraphQLEndpointImpl extends BaseForFederationMember
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
+		if ( super.equals(o) == false )
+			return false;
 
 		return    o instanceof GraphQLEndpoint ep
 		       && ep.getURL().equals(url)
-		       && ep.getSchema().equals(schema)
-		       && Objects.equals( ep.getVocabularyMapping(), vm );
+		       && ep.getSchema().equals(schema);
 	}
 
 }

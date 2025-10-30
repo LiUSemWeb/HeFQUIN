@@ -1,6 +1,5 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.sparql.engine.binding.Binding;
@@ -26,11 +25,11 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 	public BRTPFServerImpl( final String baseURL,
 	                        final VocabularyMapping vm ) {
 		this( baseURL,
-			      DfltHttpQueryArgumentForSubject,
-			      DfltHttpQueryArgumentForPredicate,
-			      DfltHttpQueryArgumentForObject,
-			      DfltHttpQueryArgumentForBindings,
-			      vm );
+		      DfltHttpQueryArgumentForSubject,
+		      DfltHttpQueryArgumentForPredicate,
+		      DfltHttpQueryArgumentForObject,
+		      DfltHttpQueryArgumentForBindings,
+		      vm );
 	}
 
 	public BRTPFServerImpl( final String baseURL,
@@ -55,12 +54,11 @@ public class BRTPFServerImpl extends TPFServerImpl implements BRTPFServer
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
+		if ( super.equals(o) == false )
+			return false;
 
 		return    o instanceof BRTPFServer brtpf
-		       && brtpf.getBaseURL().equals(baseURL)
-		       && Objects.equals( brtpf.getVocabularyMapping(), vm );
+		       && brtpf.getBaseURL().equals(baseURL);
 	}
 
 	@Override

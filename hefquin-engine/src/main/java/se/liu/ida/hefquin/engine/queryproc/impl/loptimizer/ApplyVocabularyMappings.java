@@ -30,6 +30,7 @@ import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.BGPRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.RDFBasedFederationMember;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization {
@@ -39,12 +40,16 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 	 */
 	@Override
 	public LogicalPlan apply( final LogicalPlan inputPlan ) {
-		if ( inputPlan.getRootOperator() instanceof LogicalOpRequest requestOp ) {
-			final VocabularyMapping vm = requestOp.getFederationMember().getVocabularyMapping();
-			if ( vm != null) { // If fm has a vocabulary mapping vm
+		if ( inputPlan.getRootOperator() instanceof LogicalOpRequest reqOp )
+		{
+			if (    reqOp.getFederationMember() instanceof RDFBasedFederationMember fm
+			     && fm.getVocabularyMapping() != null )
+			{
 				final LogicalPlan newInputPlan = rewriteToUseLocalVocabulary(inputPlan);
 
+				final VocabularyMapping vm = fm.getVocabularyMapping();
 				final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(vm);
+
 				return new LogicalPlanWithUnaryRootImpl(l2g, newInputPlan);
 			}
 			else {
@@ -93,21 +98,25 @@ public class ApplyVocabularyMappings implements HeuristicForLogicalOptimization 
 		if(!(inputPlan.getRootOperator() instanceof LogicalOpRequest)) {
 			throw new IllegalArgumentException( "Input plan does not have a request operator as root: " + inputPlan.getRootOperator().getClass().getName() );
 		}
+
 		final LogicalOpRequest<?, ?> reqOp = (LogicalOpRequest<?, ?>) inputPlan.getRootOperator();
-		final FederationMember fm = reqOp.getFederationMember();
-		if (fm.getVocabularyMapping() == null) { // If no vocabulary mapping, nothing to translate.
+
+		if (    reqOp.getFederationMember() instanceof RDFBasedFederationMember fm
+		     && fm.getVocabularyMapping() != null )
+		{
+			if(!(reqOp.getRequest() instanceof SPARQLRequest)) {
+				throw new IllegalArgumentException( "Request must be a SPARQLRequest: " + reqOp.getRequest().getClass().getName() );
+			}
+
+			final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
+			final SPARQLGraphPattern p = req.getQueryPattern();
+
+			final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
+			return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);			
+		}
+		else  { // If no vocabulary mapping, nothing to translate.
 			return inputPlan;
 		}
-
-		if(!(reqOp.getRequest() instanceof SPARQLRequest)) {
-			throw new IllegalArgumentException( "Request must be a SPARQLRequest: " + reqOp.getRequest().getClass().getName() );
-		}
-
-		final SPARQLRequest req = (SPARQLRequest) reqOp.getRequest();
-		final SPARQLGraphPattern p = req.getQueryPattern();
-
-		final SPARQLGraphPattern newP = VocabularyMappingUtils.translateGraphPattern(p, fm.getVocabularyMapping());
-		return ( newP.equals(p) ) ? inputPlan : rewriteReqOf(newP, fm);
 	}
 
 	/**

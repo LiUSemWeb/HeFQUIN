@@ -7,10 +7,9 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
-import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 
-public interface TPFServer extends FederationMember
+public interface TPFServer extends RDFBasedFederationMember
 {
 	String getBaseURL();
 

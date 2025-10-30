@@ -1,7 +1,5 @@
 package se.liu.ida.hefquin.federation.members.impl;
 
-import java.util.Objects;
-
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
@@ -13,7 +11,7 @@ import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
-public class TPFServerImpl extends BaseForFederationMember
+public class TPFServerImpl extends BaseForRDFBasedFederationMember
                            implements TPFServer
 {
 	// TODO: these string should not be hard-coded but extracted from the
@@ -24,8 +22,6 @@ public class TPFServerImpl extends BaseForFederationMember
 	public final static String DfltHttpQueryArgumentForObject    = "object";
 
 	protected static final NodeFormatter nodeFormatter = new NodeFormatterNT();
-
-	protected final VocabularyMapping vm;
 
 	public final String baseURL;
 	public final String baseURLWithFinalSeparator;
@@ -47,12 +43,12 @@ public class TPFServerImpl extends BaseForFederationMember
 	                      final String httpQueryArgumentForPredicate,
 	                      final String httpQueryArgumentForObject,
 	                      final VocabularyMapping vm ) {
+		super(vm);
+
 		assert baseURL != null;
 		assert httpQueryArgumentForSubject    != null;
 		assert httpQueryArgumentForPredicate  != null;
 		assert httpQueryArgumentForObject     != null;
-
-		this.vm = vm;
 
 		this.baseURL = baseURL;
 		this.httpQueryArgumentForSubject    = httpQueryArgumentForSubject;
@@ -68,9 +64,6 @@ public class TPFServerImpl extends BaseForFederationMember
 	}
 
 	@Override
-	public VocabularyMapping getVocabularyMapping() { return vm; }
-
-	@Override
 	public String getBaseURL() { return baseURL; }
 
 	@Override
@@ -78,12 +71,11 @@ public class TPFServerImpl extends BaseForFederationMember
 
 	@Override
 	public boolean equals( final Object o ) {
-		if ( o == this )
-			return true;
+		if ( super.equals(o) == false )
+			return false;
 
 		return    o instanceof TPFServer tpf
-		       && tpf.getBaseURL().equals(baseURL)
-		       && Objects.equals( tpf.getVocabularyMapping(), vm );
+		       && tpf.getBaseURL().equals(baseURL);
 	}
 
 	@Override

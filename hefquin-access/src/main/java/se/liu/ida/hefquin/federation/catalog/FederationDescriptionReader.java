@@ -140,6 +140,9 @@ public class FederationDescriptionReader
 			}
 			else if ( ifaceType.equals(FDVocab.BoltInterface) )
 			{
+				if ( vocabMap != null )
+					throw new IllegalArgumentException("Neo4j endpoints cannot have a vocabulary mapping.");
+
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("Bolt endpointAddress is required!");
@@ -160,11 +163,14 @@ public class FederationDescriptionReader
 					throw new IllegalArgumentException();
 				}
 
-				final FederationMember fm = createNeo4jServer(addrStr, vocabMap);
+				final FederationMember fm = createNeo4jServer(addrStr);
 				membersByURI.put(addrStr, fm);
 			}
 			else if ( ifaceType.equals(FDVocab.GraphQLEndpointInterface) )
 			{
+				if ( vocabMap != null )
+					throw new IllegalArgumentException("GraphQL endpoints cannot have a vocabulary mapping.");
+
 				final StmtIterator endpointAddressesIterator = iface.listProperties(FDVocab.endpointAddress);
 				if ( ! endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("GraphQL endpointAddress is required!");
@@ -185,7 +191,7 @@ public class FederationDescriptionReader
 					throw new IllegalArgumentException();
 				}
 
-				final FederationMember fm = createGraphQLServer(addrStr, vocabMap);
+				final FederationMember fm = createGraphQLServer(addrStr);
 				membersByURI.put(addrStr, fm);
 			}
 			else {
@@ -248,12 +254,12 @@ public class FederationDescriptionReader
 		return new BRTPFServerImpl(uri, vm);
 	}
 
-	protected FederationMember createNeo4jServer( final String uri, final VocabularyMapping vm ) {
+	protected FederationMember createNeo4jServer( final String uri ) {
 		verifyExpectedURI(uri);
-		return new Neo4jServerImpl(uri, vm);
+		return new Neo4jServerImpl(uri);
 	}
 
-	protected FederationMember createGraphQLServer( final String uri, final VocabularyMapping vm ) {
+	protected FederationMember createGraphQLServer( final String uri ) {
 		verifyExpectedURI(uri);
 
 		final GraphQLSchemaInitializer init = new GraphQLSchemaInitializerImpl();
@@ -271,7 +277,7 @@ public class FederationDescriptionReader
 			throw new IllegalArgumentException(e);
 		}
 
-		return new GraphQLEndpointImpl(uri, schema, vm);
+		return new GraphQLEndpointImpl(uri, schema);
 	}
 
 	/**

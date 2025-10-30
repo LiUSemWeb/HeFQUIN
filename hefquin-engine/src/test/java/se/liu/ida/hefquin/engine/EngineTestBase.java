@@ -74,9 +74,6 @@ public abstract class EngineTestBase
 			this.data = data;
 		}
 
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-
 		protected List<Triple> getMatchingTriples( final TriplePatternRequest req ) {
 			return getMatchingTriples( req.getQueryPattern() );
 		}
@@ -154,6 +151,9 @@ public abstract class EngineTestBase
 		}
 
 		@Override
+		public VocabularyMapping getVocabularyMapping() { return null; }
+
+		@Override
 		public String getURL() { return url; }
 
 		public SolMapsResponse performRequest( final SPARQLRequest req )
@@ -192,6 +192,9 @@ public abstract class EngineTestBase
 		public TPFServerForTest( final Graph data ) { super(data); }
 
 		@Override
+		public VocabularyMapping getVocabularyMapping() { return null; }
+
+		@Override
 		public String getBaseURL() { return "http://example.org/"; }
 
 		@Override
@@ -207,6 +210,9 @@ public abstract class EngineTestBase
 	{
 		public BRTPFServerForTest() { this(null); }
 		public BRTPFServerForTest( final Graph data ) { super(data); }
+
+		@Override
+		public VocabularyMapping getVocabularyMapping() { return null; }
 
 		@Override
 		public String getBaseURL() { return "http://example.org/"; }

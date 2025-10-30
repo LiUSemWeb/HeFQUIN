@@ -18,4 +18,12 @@ public abstract class BaseForFederationMember implements FederationMember
 
 	@Override public int getID() { return id; }
 
+	@Override
+	public boolean equals( final Object o ) {
+		if ( o == this )
+			return true;
+
+		return    o instanceof BaseForFederationMember fm
+		       && fm.getID() == id;
+	}
 }

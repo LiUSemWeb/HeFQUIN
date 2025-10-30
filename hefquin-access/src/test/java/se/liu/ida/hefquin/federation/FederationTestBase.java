@@ -67,7 +67,7 @@ public abstract class FederationTestBase
 	protected static class Neo4jServerImpl4Test extends Neo4jServerImpl
 	{
 		public Neo4jServerImpl4Test() {
-			super("http://localhost:7474/db/neo4j/tx", null);
+			super("http://localhost:7474/db/neo4j/tx");
 		}
 	}
 

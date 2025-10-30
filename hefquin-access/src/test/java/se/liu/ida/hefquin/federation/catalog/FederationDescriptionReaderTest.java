@@ -2,6 +2,7 @@ package se.liu.ida.hefquin.federation.catalog;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThrows;
 
@@ -45,13 +46,13 @@ public class FederationDescriptionReaderTest
 		assertEquals( 2, cat.getAllFederationMembers().size() );
 
 		final FederationMember fm1 = cat.getFederationMemberByURI("http://dbpedia.org/sparql");
-		assertTrue( fm1.getVocabularyMapping() == null );
 		assertTrue( fm1 instanceof SPARQLEndpoint );
+		assertNull( ((SPARQLEndpoint) fm1).getVocabularyMapping() );
 		assertEquals( "http://dbpedia.org/sparql", ((SPARQLEndpoint) fm1).getURL() );
 
 		final FederationMember fm2 = cat.getFederationMemberByURI("http://fragments.dbpedia.org/2016-04/en");
-		assertTrue( fm2.getVocabularyMapping() == null );
 		assertTrue( fm2 instanceof TPFServer );
+		assertNull( ((TPFServer) fm2).getVocabularyMapping() );
 	}
 
 	@Test
@@ -173,7 +174,8 @@ public class FederationDescriptionReaderTest
 
 		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
 		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
-		assertNotNull( fm.getVocabularyMapping() );
+		assertTrue( fm instanceof SPARQLEndpoint );
+		assertNotNull( ((SPARQLEndpoint) fm).getVocabularyMapping() );
 	}
 
 	@Test
@@ -194,7 +196,8 @@ public class FederationDescriptionReaderTest
 
 		final FederationCatalog cat = FederationDescriptionReader.readFromModel( fd );
 		final FederationMember fm = cat.getFederationMemberByURI( "http://dbpedia.org/sparql" );
-		assertNotNull( fm.getVocabularyMapping() );
+		assertTrue( fm instanceof SPARQLEndpoint );
+		assertNotNull( ((SPARQLEndpoint) fm).getVocabularyMapping() );
 	}
 
 	@Test

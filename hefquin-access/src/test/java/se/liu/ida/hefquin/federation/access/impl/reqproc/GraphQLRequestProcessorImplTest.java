@@ -32,8 +32,7 @@ public class GraphQLRequestProcessorImplTest extends FederationTestBase
 	{
 		public GraphQLEndpointTest() {
 			super( "http://localhost:4000/graphql",
-			       new GraphQLSchemaForTest(),
-			       null );
+			       new GraphQLSchemaForTest() );
 		}
 	}
 
