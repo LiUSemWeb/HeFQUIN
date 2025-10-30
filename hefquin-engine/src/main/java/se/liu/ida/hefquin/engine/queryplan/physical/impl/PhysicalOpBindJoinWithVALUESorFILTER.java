@@ -11,7 +11,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
 * A physical operator that implements (a batching version of) the bind

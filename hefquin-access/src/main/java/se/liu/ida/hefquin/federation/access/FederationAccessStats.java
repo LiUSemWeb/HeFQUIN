@@ -10,10 +10,10 @@ public interface FederationAccessStats extends Stats
 	long getNumberOfSPARQLRequestsIssued();
 	long getNumberOfTPFRequestsIssued();
 	long getNumberOfBRTPFRequestsIssued();
-	long getNumberOfNeo4jRequestsIssued();
+	long getNumberOfOtherRequestsIssued();
 
 	long getNumberOfSPARQLRequestsCompleted();
 	long getNumberOfTPFRequestsCompleted();
 	long getNumberOfBRTPFRequestsCompleted();
-	long getNumberOfNeo4jRequestsCompleted();
+	long getNumberOfOtherRequestsCompleted();
 }

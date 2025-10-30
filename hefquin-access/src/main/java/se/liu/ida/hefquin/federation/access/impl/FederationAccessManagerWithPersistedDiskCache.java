@@ -5,9 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CacheEntry;
 import se.liu.ida.hefquin.base.datastructures.impl.cache.CachePolicies;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
@@ -17,6 +14,9 @@ import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.cache.CardinalityCacheKey;
 import se.liu.ida.hefquin.federation.access.impl.cache.PersistableCardinalityCacheImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 /**
  * A FederationAccessManager implementation that incorporates persistent disk

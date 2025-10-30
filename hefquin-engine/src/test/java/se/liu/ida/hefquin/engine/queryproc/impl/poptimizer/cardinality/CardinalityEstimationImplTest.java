@@ -22,7 +22,6 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CardinalityEstimation;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
@@ -31,6 +30,7 @@ import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class CardinalityEstimationImplTest extends EngineTestBase
 {

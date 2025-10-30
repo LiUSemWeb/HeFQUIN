@@ -6,11 +6,11 @@ import org.apache.jena.riot.WebContent;
 
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.utils.BuildInfo;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseBuilder;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implements BRTPFRequestProcessor
 {
@@ -24,7 +24,7 @@ public class BRTPFRequestProcessorImpl extends TPFRequestProcessorBase implement
 
 	@Override
 	public TPFResponse performRequest( final BRTPFRequest req, final BRTPFServer fm ) throws FederationAccessException {
-		final String requestURL = fm.getInterface().createRequestURL(req);
+		final String requestURL = fm.createRequestURL(req);
 		final TriplePattern tp = req.getTriplePattern();
 		final Map<String, String> headers = Map.of(
 			"Accept", WebContent.defaultRDFAcceptHeader,

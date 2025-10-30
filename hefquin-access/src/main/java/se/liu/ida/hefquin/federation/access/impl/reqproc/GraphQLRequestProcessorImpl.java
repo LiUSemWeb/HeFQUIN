@@ -7,11 +7,11 @@ import org.apache.jena.atlas.json.JsonObject;
 import se.liu.ida.hefquin.engine.wrappers.graphql.conn.GraphQLConnection;
 import se.liu.ida.hefquin.engine.wrappers.graphql.conn.GraphQLConnectionException;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
-import se.liu.ida.hefquin.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.federation.access.JSONResponse;
 import se.liu.ida.hefquin.federation.access.impl.response.JSONResponseImpl;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
 
 public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 	protected final int connectionTimeout;
@@ -37,8 +37,8 @@ public class GraphQLRequestProcessorImpl implements GraphQLRequestProcessor {
 
 		final Date startTime = new Date();
 		final GraphQLQuery query = req.getGraphQLQuery();
-		final String url = fm.getInterface().getURL();
-		
+		final String url = fm.getURL();
+
 		final JsonObject jsonObj;
 		try {
 			jsonObj = GraphQLConnection.performRequest(query, url, connectionTimeout, readTimeout);

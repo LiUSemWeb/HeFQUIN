@@ -16,11 +16,11 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTestBase
 {

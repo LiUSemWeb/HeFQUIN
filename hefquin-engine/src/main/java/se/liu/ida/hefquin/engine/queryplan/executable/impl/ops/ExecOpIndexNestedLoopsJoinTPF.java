@@ -3,8 +3,8 @@ package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class ExecOpIndexNestedLoopsJoinTPF extends BaseForExecOpIndexNestedLoopsJoinWithTPFRequests<TPFServer>
 {

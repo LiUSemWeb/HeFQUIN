@@ -7,13 +7,13 @@ import se.liu.ida.hefquin.base.data.Triple;
 import se.liu.ida.hefquin.base.data.utils.TriplesToSolMapsConverter;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<BindingsRestrictedTriplePatternRequest,BRTPFServer,BRTPFRequest>
 {

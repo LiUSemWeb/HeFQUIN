@@ -7,14 +7,14 @@ import java.util.concurrent.ExecutionException;
 
 import se.liu.ida.hefquin.base.utils.CompletableFutureUtils;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.Neo4jServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.access.impl.req.BRTPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class FederationAccessUtils
 {

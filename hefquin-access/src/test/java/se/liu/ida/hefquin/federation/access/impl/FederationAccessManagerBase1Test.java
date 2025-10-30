@@ -19,17 +19,25 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.data.utils.SolutionMappingUtils;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationTestBase;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.Neo4jServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.*;
+import se.liu.ida.hefquin.federation.access.BRTPFRequest;
+import se.liu.ida.hefquin.federation.access.CardinalityResponse;
+import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
+import se.liu.ida.hefquin.federation.access.DataRetrievalResponse;
+import se.liu.ida.hefquin.federation.access.FederationAccessException;
+import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
+import se.liu.ida.hefquin.federation.access.SolMapsResponse;
+import se.liu.ida.hefquin.federation.access.TPFRequest;
+import se.liu.ida.hefquin.federation.access.TPFResponse;
+import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class FederationAccessManagerBase1Test extends FederationTestBase
 {
@@ -174,7 +182,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final SolMapsResponse r = fedAccessMgr.issueRequest( req, fm ).get();
+		final CompletableFuture<SolMapsResponse> ftr = fedAccessMgr.issueRequest( req, fm );
+		final SolMapsResponse r = ftr.get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
@@ -209,7 +218,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		final int card = 42;
 		final FederationAccessManager fedAccessMgr = createMyFedAccessMgr( card, true );
-		final TPFResponse r = fedAccessMgr.issueRequest( req, fm ).get();
+		final CompletableFuture<TPFResponse> ftr = fedAccessMgr.issueRequest( req, fm );
+		final TPFResponse r = ftr.get();
 		assertTrue( r.isError() );
 		assertThrows( UnsupportedOperationDueToRetrievalError.class, () -> r.getResponseData() );
 	}
@@ -237,7 +247,30 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 		}
 
 		@Override
-		public CompletableFuture<SolMapsResponse> issueRequest( final SPARQLRequest req, final SPARQLEndpoint fm ) {
+		public <ReqType extends DataRetrievalRequest,
+		        RespType extends DataRetrievalResponse<?>,
+		        MemberType extends FederationMember>
+		CompletableFuture<RespType> issueRequest( final ReqType req, final MemberType fm)
+				throws FederationAccessException
+		{
+			if (    req instanceof SPARQLRequest reqSPARQL
+			     && fm instanceof SPARQLEndpoint fmSPARQL ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) create( reqSPARQL, fmSPARQL );
+				return resp;
+			}
+
+			if ( req instanceof TPFRequest || req instanceof BRTPFRequest ) {
+				@SuppressWarnings("unchecked")
+				final CompletableFuture<RespType> resp = (CompletableFuture<RespType>) createTPFResponse( fm, req );
+				return resp;
+			}
+
+			throw new UnsupportedOperationException();
+		}
+
+		protected CompletableFuture<SolMapsResponse> create( final SPARQLRequest req,
+		                                                     final SPARQLEndpoint fm ) {
 			final Node countNode = NodeFactory.createLiteralByValue( card, XSDDatatype.XSDint );
 			final SolutionMapping sm = SolutionMappingUtils.createSolutionMapping( countVar, countNode );
 			final SolMapsResponse r;
@@ -260,28 +293,8 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 			});
 		}
 
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final TPFServer fm ) {
-			return createFutureTPFResponse( fm, req );
-		}
-
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final TPFRequest req, final BRTPFServer fm ) {
-			return createFutureTPFResponse( fm, req );
-		}
-
-		@Override
-		public CompletableFuture<TPFResponse> issueRequest( final BRTPFRequest req, final BRTPFServer fm ) {
-			return createFutureTPFResponse( fm, req );
-		}
-
-		@Override
-		public CompletableFuture<RecordsResponse> issueRequest( final Neo4jRequest req, final Neo4jServer fm ) {
-			return null;
-		}
-
-		protected CompletableFuture<TPFResponse> createFutureTPFResponse( final FederationMember fm,
-		                                                                  final DataRetrievalRequest req )
+		protected CompletableFuture<TPFResponse> createTPFResponse( final FederationMember fm,
+		                                                            final DataRetrievalRequest req )
 		{
 			final TPFResponse r;
 			if ( ! simulateError ) {
@@ -323,14 +336,12 @@ public class FederationAccessManagerBase1Test extends FederationTestBase
 
 		@Override
 		protected void _resetStats() {
-			// TODO Auto-generated method stub
-			
+			// nothing to do here
 		}
 
 		@Override
 		protected FederationAccessStatsImpl _getStats() {
-			// TODO Auto-generated method stub
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

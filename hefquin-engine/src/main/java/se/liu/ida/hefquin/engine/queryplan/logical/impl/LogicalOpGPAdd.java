@@ -161,14 +161,14 @@ public class LogicalOpGPAdd extends BaseForQueryPlanOperator implements UnaryLog
 	@Override
 	public String toString(){
 		final int codeOfPattern = pattern.toString().hashCode();
-		final int codeOfFm = fm.getInterface().toString().hashCode();
+		final int codeOfFm = fm.toString().hashCode();
 
 		return "> gpAdd" +
 				"[" + codeOfPattern + ", "+ codeOfFm + "]"+
 				" ( "
 				+ pattern.toString()
 				+ ", "
-				+ fm.getInterface().toString()
+				+ fm.toString()
 				+ " )";
 	}
 

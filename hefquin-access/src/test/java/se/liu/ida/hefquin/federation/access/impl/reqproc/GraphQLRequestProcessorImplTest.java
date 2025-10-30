@@ -9,7 +9,6 @@ import java.util.Set;
 import org.apache.jena.atlas.json.JsonString;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLArgument;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLEntrypoint;
 import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLField;
@@ -20,36 +19,21 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.impl.GraphQLFieldType;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.GraphQLQuery;
 import se.liu.ida.hefquin.engine.wrappers.graphql.query.impl.GraphQLQueryImpl;
 import se.liu.ida.hefquin.federation.FederationTestBase;
-import se.liu.ida.hefquin.federation.GraphQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.GraphQLInterface;
 import se.liu.ida.hefquin.federation.access.GraphQLRequest;
 import se.liu.ida.hefquin.federation.access.JSONResponse;
-import se.liu.ida.hefquin.federation.access.impl.iface.GraphQLInterfaceImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.GraphQLRequestImpl;
+import se.liu.ida.hefquin.federation.members.GraphQLEndpoint;
+import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
 
-public class GraphQLRequestProcessorImplTest extends FederationTestBase {
-
-    protected static class GraphQLEndpointTest implements GraphQLEndpoint {
-
-		protected final GraphQLInterface iface = new GraphQLInterfaceImpl("http://localhost:4000/graphql");
-		protected final GraphQLSchema schema = new GraphQLSchemaForTest();
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() {
-			throw new UnsupportedOperationException();
+public class GraphQLRequestProcessorImplTest extends FederationTestBase
+{
+	protected static class GraphQLEndpointTest extends GraphQLEndpointImpl
+	{
+		public GraphQLEndpointTest() {
+			super( "http://localhost:4000/graphql",
+			       new GraphQLSchemaForTest() );
 		}
-
-		@Override
-		public GraphQLInterface getInterface() {
-			return iface;
-		}
-
-		@Override
-		public GraphQLSchema getSchema() {
-			return schema;
-		}
-
 	}
 
 	protected static class GraphQLSchemaForTest implements GraphQLSchema

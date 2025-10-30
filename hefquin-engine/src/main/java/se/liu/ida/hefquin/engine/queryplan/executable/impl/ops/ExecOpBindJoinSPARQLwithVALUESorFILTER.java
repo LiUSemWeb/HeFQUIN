@@ -14,7 +14,7 @@ import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 /**
  * Implementation of (a batching version of) the bind join algorithm that starts by

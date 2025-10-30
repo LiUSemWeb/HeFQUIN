@@ -12,9 +12,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.expr.Expr;
 import org.junit.Test;
 
-import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
+import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
@@ -30,11 +30,8 @@ import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpUnion;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithNaryRootImpl;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalPlanWithUnaryRootImpl;
-import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.access.DataRetrievalInterface;
-import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 
-public class UnionPullUpTest
+public class UnionPullUpTest extends EngineTestBase
 {
 	@Test
 	public void rewritePlanWithUnionRootAndUnionChild() {
@@ -406,10 +403,10 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
 		final LogicalPlan resultPlan = new UnionPullUp().apply(gpAddPlan2);
@@ -462,10 +459,10 @@ public class UnionPullUpTest
 		subPlans.add(lp2);
 		final LogicalPlan unionPlan = new LogicalPlanWithNaryRootImpl( LogicalOpMultiwayUnion.getInstance(), subPlans );
 
-		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd1 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan1 = new LogicalPlanWithUnaryRootImpl(gpAdd1, unionPlan);
 
-		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new DummyFederationMember(), new DummyTriplePattern(), null );
+		final LogicalOpGPAdd gpAdd2 = new LogicalOpGPAdd( new TPFServerForTest(), new DummyTriplePattern(), null );
 		final LogicalPlan gpAddPlan2 = new LogicalPlanWithUnaryRootImpl(gpAdd2, gpAddPlan1);
 
 		final LogicalOpLocalToGlobal l2g = new LogicalOpLocalToGlobal(null);
@@ -539,19 +536,6 @@ public class UnionPullUpTest
 	protected static class DummyLogicalOp implements NullaryLogicalOp {
 		@Override public void visit(LogicalPlanVisitor visitor) { throw new UnsupportedOperationException(); }
 		@Override public ExpectedVariables getExpectedVariables(ExpectedVariables... inputVars) { throw new UnsupportedOperationException(); }
-		@Override public int getID() { throw new UnsupportedOperationException(); }
-	}
-
-	protected static class DummyFederationMember implements FederationMember {
-		@Override public DataRetrievalInterface getInterface() { return new DummyDataRetrievalInterface(); }
-		@Override public VocabularyMapping getVocabularyMapping() { throw new UnsupportedOperationException(); }
-	}
-
-	protected static class DummyDataRetrievalInterface implements DataRetrievalInterface {
-		@Override public boolean supportsTriplePatternRequests() { return true; }
-		@Override public boolean supportsBGPRequests() { throw new UnsupportedOperationException(); }
-		@Override public boolean supportsSPARQLPatternRequests() { throw new UnsupportedOperationException(); }
-		@Override public boolean supportsRequest(DataRetrievalRequest req) { throw new UnsupportedOperationException(); }
 		@Override public int getID() { throw new UnsupportedOperationException(); }
 	}
 

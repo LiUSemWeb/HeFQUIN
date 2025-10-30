@@ -11,15 +11,6 @@ import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
-import se.liu.ida.hefquin.federation.BRTPFServer;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
-import se.liu.ida.hefquin.federation.TPFServer;
-import se.liu.ida.hefquin.federation.access.BRTPFInterface;
-import se.liu.ida.hefquin.federation.access.SPARQLEndpointInterface;
-import se.liu.ida.hefquin.federation.access.TPFInterface;
-import se.liu.ida.hefquin.federation.access.impl.iface.BRTPFInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.SPARQLEndpointInterfaceImpl;
-import se.liu.ida.hefquin.federation.access.impl.iface.TPFInterfaceImpl;
 
 public class TestUtils
 {
@@ -64,50 +55,6 @@ public class TestUtils
 				throw new UnsupportedOperationException("Unimplemented method 'isEquivalenceOnly'");
 			}
 		};
-	}
-
-	protected static class SPARQLEndpointForTest implements SPARQLEndpoint
-	{
-		final SPARQLEndpointInterface iface;
-
-		public SPARQLEndpointForTest() { this("http://example.org/sparql"); }
-
-		public SPARQLEndpointForTest( final String ifaceURL ) {
-			iface = new SPARQLEndpointInterfaceImpl(ifaceURL);
-		}
-
-		@Override
-		public SPARQLEndpointInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-
-	}
-
-	protected static class TPFServerForTest implements TPFServer
-	{
-		protected final TPFInterface iface = new TPFInterfaceImpl("http://example.org/", "subject", "predicate", "object");
-
-		public TPFServerForTest() { }
-
-		@Override
-		public TPFInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
-	}
-
-	protected static class BRTPFServerForTest implements BRTPFServer
-	{
-		final BRTPFInterface iface = new BRTPFInterfaceImpl("http://example.org/", "subject", "predicate", "object", "values");
-
-		public BRTPFServerForTest() { }
-
-		@Override
-		public BRTPFInterface getInterface() { return iface; }
-
-		@Override
-		public VocabularyMapping getVocabularyMapping() { return null; }
 	}
 
 }

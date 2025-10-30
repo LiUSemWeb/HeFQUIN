@@ -16,10 +16,10 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanWithNullaryRoot;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.CardinalityEstimator;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.CardinalityResponse;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 import static se.liu.ida.hefquin.engine.queryplan.info.QueryPlanProperty.CARDINALITY;
 

@@ -11,11 +11,11 @@ import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.BindingsRestrictedTriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
 
 /**
  * Implementation of (a batching version of) the bind join algorithm

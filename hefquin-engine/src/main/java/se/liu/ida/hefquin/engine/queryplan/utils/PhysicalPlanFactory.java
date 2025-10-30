@@ -6,6 +6,7 @@ import java.util.List;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
+import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
@@ -22,14 +23,15 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOp
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
-import se.liu.ida.hefquin.federation.BRTPFServer;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.TPFServer;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TPFRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
+import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
+import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class PhysicalPlanFactory
 {
@@ -534,25 +536,20 @@ public class PhysicalPlanFactory
 
 	public static PhysicalPlan extractRequestAsPlan( final LogicalOpGPAdd gpAdd ) {
 		final FederationMember fm = gpAdd.getFederationMember();
+		final SPARQLGraphPattern gp = gpAdd.getPattern();
 
-		if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
-			final SPARQLRequest req = new SPARQLRequestImpl( gpAdd.getPattern() );
+		if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
+			final TriplePattern tp = gpAdd.getTP();
+			final TPFRequest req = new TPFRequestImpl(tp);
 			return createPlanWithRequest(req, fm);
 		}
-
-		if ( fm.getInterface().supportsTriplePatternRequests() ) {
-			final TriplePattern tp = gpAdd.getTP();
-
-			if ( tp == null )
-				throw new IllegalArgumentException( "The graph pattern should be a triple pattern, but it is a " + gpAdd.getPattern().getClass().getName() );
-
-			if ( fm instanceof TPFServer || fm instanceof BRTPFServer ) {
-				final TPFRequest req = new TPFRequestImpl(tp);
-				return createPlanWithRequest(req, fm);
-			}
+		else if ( fm.isSupportedPattern(gp) ) {
+			final SPARQLRequest req = new SPARQLRequestImpl(gp);
+			return createPlanWithRequest(req, fm);
 		}
-
-		throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		else {
+			throw new IllegalArgumentException("Unsupported type of federation member (type: " + fm.getClass().getName() + ").");
+		}
 	}
 
 	public static PhysicalPlan extractRequestAsPlan( final PhysicalOpBindJoinBRTPF pop ) {
@@ -595,7 +592,7 @@ public class PhysicalPlanFactory
 
 			final FederationMember fm = gpAdd.getFederationMember();
 
-			if ( fm.getInterface().supportsSPARQLPatternRequests() ) {
+			if ( fm instanceof SPARQLEndpoint ) {
 				plans.add( createPlanWithBindJoinFILTER(gpAdd, subplan) );
 				plans.add( createPlanWithBindJoinUNION(gpAdd, subplan) );
 				//plans.add( createPlanWithBindJoinVALUES(gpAdd, subplan) );

@@ -6,12 +6,12 @@ import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.VariableByBlankNodeSubstitutionException;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
-import se.liu.ida.hefquin.federation.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.impl.req.SPARQLRequestImpl;
+import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpIndexNestedLoopsJoinSPARQL extends BaseForExecOpIndexNestedLoopsJoinWithSolMapsRequests<SPARQLGraphPattern,SPARQLEndpoint,SPARQLRequest>
 {
