@@ -9,6 +9,8 @@ import org.apache.jena.sparql.engine.binding.Binding;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.EngineTestBase;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.access.*;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
@@ -21,6 +23,8 @@ public class TestUtils extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 		};

@@ -36,10 +36,8 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediat
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 
 public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<SPARQLEndpoint>
@@ -1443,14 +1441,9 @@ public class ExecOpParallelMultiwayLeftJoinTest extends TestsForTPAddAlgorithms<
 			final Graph dataForMember2,
 			final TriplePattern tp2 ) throws ExecutionException
 	{
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
-		};
+		final ExecutorService execService = getExecutorServiceForTest();
+		final ExecutionContext execCxt = getExecContextForTests(execService);
+
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final SPARQLEndpoint fm1 = createFedMemberForTest(dataForMember1);

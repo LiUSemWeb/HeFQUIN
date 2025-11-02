@@ -7,7 +7,7 @@ import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 
 public interface QueryPlanner
 {
-	Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query ) throws QueryPlanningException;
+	Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query, QueryProcContext ctxt ) throws QueryPlanningException;
 
 	SourcePlanner getSourcePlanner();
 

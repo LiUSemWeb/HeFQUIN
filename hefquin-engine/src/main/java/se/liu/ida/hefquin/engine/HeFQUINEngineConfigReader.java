@@ -20,6 +20,8 @@ import org.apache.jena.vocabulary.RDF;
 
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalPlanPrinter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanPrinter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
 import se.liu.ida.hefquin.engine.queryproc.LogicalOptimizer;
@@ -159,14 +161,14 @@ public class HeFQUINEngineConfigReader
 	public QueryProcessor readQueryProcessor( final Resource confRsrc,
 	                                          final Context ctx,
 	                                          final FederationAccessManager fedAccessMgr ) {
-		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
-
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( confRsrc, ECVocab.queryProcessor );
+
+		final ExtendedContext ctxx = new ExtendedContextImpl2(ctx, fedAccessMgr);
+		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
 
 		final CostModel cm = readCostModel(rsrc, ctxx);
 		ctxx.complete(cm);
 
-		final QueryPlanner planner = readQueryPlanner(rsrc, ctxx);
 		final QueryPlanCompiler compiler = readQueryPlanCompiler(rsrc, ctxx);
 		final ExecutionEngine exec = readExecutionEngine(rsrc, ctxx);
 
@@ -194,6 +196,9 @@ public class HeFQUINEngineConfigReader
 	                                      final ExtendedContext ctx ) {
 		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( queryProcRsrc, ECVocab.queryPlanner );
 
+		ctx.complete( readLogicalToPhysicalPlanConverter(rsrc, ctx) );
+		ctx.complete( readLogicalToPhysicalOpConverter(rsrc, ctx) );
+
 		final SourcePlanner spl = readSourcePlanner(rsrc, ctx);
 		final LogicalOptimizer lopt = readLogicalOptimizer(rsrc, ctx);
 		final PhysicalOptimizer popt = readPhysicalOptimizer(rsrc, ctx);
@@ -203,6 +208,34 @@ public class HeFQUINEngineConfigReader
 		                             ctx.getLogicalPlanPrinter(),
 		                             ctx.getPhysicalPlanPrinter(),
 		                             ctx.getExecutablePlanPrinter() );
+	}
+
+	public LogicalToPhysicalPlanConverter readLogicalToPhysicalPlanConverter( final Resource qplRsrc, final ExtendedContext ctx ) {
+		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( qplRsrc, ECVocab.lptoppConverter );
+
+		final Object i;
+		try {
+			i = instantiate(rsrc, ctx);
+		}
+		catch ( final Exception e ) {
+			throw new IllegalArgumentException("Instantiating the LogicalToPhysicalPlanConverter caused an exception (type: " + e.getClass().getName() + "): " + e.getMessage() );
+		}
+
+		return (LogicalToPhysicalPlanConverter) i;
+	}
+
+	public LogicalToPhysicalOpConverter readLogicalToPhysicalOpConverter( final Resource qplRsrc, final ExtendedContext ctx ) {
+		final Resource rsrc = ModelUtils.getSingleMandatoryResourceProperty( qplRsrc, ECVocab.loptopopConverter );
+
+		final Object i;
+		try {
+			i = instantiate(rsrc, ctx);
+		}
+		catch ( final Exception e ) {
+			throw new IllegalArgumentException("Instantiating the LogicalToPhysicalOpConverter caused an exception (type: " + e.getClass().getName() + "): " + e.getMessage() );
+		}
+
+		return (LogicalToPhysicalOpConverter) i;
 	}
 
 	public SourcePlanner readSourcePlanner( final Resource qplRsrc, final ExtendedContext ctx ) {
@@ -430,6 +463,8 @@ public class HeFQUINEngineConfigReader
 
 	protected interface ExtendedContext extends Context {
 		void complete( CostModel cm );
+		void complete( LogicalToPhysicalPlanConverter c );
+		void complete( LogicalToPhysicalOpConverter c );
 		QueryProcContext getQueryProcContext();
 		CostModel getCostModel();
 	}
@@ -441,6 +476,12 @@ public class HeFQUINEngineConfigReader
 
 		@Override
 		public void complete( final CostModel cm ) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public void complete( final LogicalToPhysicalPlanConverter c ) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public void complete( final LogicalToPhysicalOpConverter c ) { throw new UnsupportedOperationException(); }
 
 		@Override
 		public QueryProcContext getQueryProcContext() { throw new UnsupportedOperationException(); }
@@ -477,15 +518,18 @@ public class HeFQUINEngineConfigReader
 	}
 
 	protected class ExtendedContextImpl2 implements ExtendedContext {
-		protected final QueryProcContext qprocCtx;
 		protected final Context ctx;
+		protected final FederationAccessManager fedAccessMgr;
 
 		protected CostModel costModel = null;
-		protected boolean completed = false;
+		protected LogicalToPhysicalPlanConverter lp2pp = null;
+		protected LogicalToPhysicalOpConverter lop2pop = null;
+
+		protected QueryProcContext qprocCtx = null;
 
 		public ExtendedContextImpl2( final Context ctx, final FederationAccessManager fedAccessMgr ) {
-			qprocCtx = createQueryProcContext(ctx, fedAccessMgr);
 			this.ctx = ctx;
+			this.fedAccessMgr = fedAccessMgr;
 		}
 
 		@Override
@@ -494,13 +538,29 @@ public class HeFQUINEngineConfigReader
 		}
 
 		@Override
+		public void complete( final LogicalToPhysicalPlanConverter c ) { lp2pp = c; }
+
+		@Override
+		public void complete( final LogicalToPhysicalOpConverter c ) { lop2pop = c; }
+
+		@Override
 		public QueryProcContext getQueryProcContext() {
+			if ( qprocCtx != null )
+				return qprocCtx;
+
+			if ( lp2pp == null )
+				throw new UnsupportedOperationException("LogicalToPhysicalPlanConverter not set yet.");
+
+			if ( lop2pop == null )
+				throw new UnsupportedOperationException("LogicalToPhysicalOpConverter not set yet.");
+
+			qprocCtx = createQueryProcContext(ctx, fedAccessMgr, lp2pp, lop2pop);
 			return qprocCtx;
 		}
 
 		@Override
 		public CostModel getCostModel() {
-			if ( ! completed )
+			if ( costModel == null )
 				throw new UnsupportedOperationException();
 
 			return costModel;
@@ -545,10 +605,14 @@ public class HeFQUINEngineConfigReader
 	}
 
 	protected QueryProcContext createQueryProcContext( final Context ctx,
-	                                                   final FederationAccessManager fedAccessMgr ) {
+	                                                   final FederationAccessManager fedAccessMgr,
+	                                                   final LogicalToPhysicalPlanConverter lp2pp,
+	                                                   final LogicalToPhysicalOpConverter lop2pop ) {
 		return new ExecutionContextImpl( fedAccessMgr,
 		                                 ctx.getFederationCatalog(),
 		                                 ctx.getExecutorServiceForPlanTasks(),
+		                                 lp2pp,
+		                                 lop2pop,
 		                                 ctx.isExperimentRun(),
 		                                 ctx.skipExecution() );
 	}

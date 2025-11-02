@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -25,6 +26,11 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -45,6 +51,7 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -60,6 +67,21 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
+	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
+		final LogicalToPhysicalOpConverter lop2pop = new LogicalToPhysicalOpConverterImpl();
+
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
+		};
+	}
 
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",

@@ -8,10 +8,6 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
 
 public class PhysicalOptimizerWithoutOptimization extends PhysicalOptimizerBase
 {
-	public PhysicalOptimizerWithoutOptimization( final LogicalToPhysicalPlanConverter l2pConverter ) {
-		super(l2pConverter);
-	}
-
 	@Override
 	public boolean assumesLogicalMultiwayJoins() {
 		return false;

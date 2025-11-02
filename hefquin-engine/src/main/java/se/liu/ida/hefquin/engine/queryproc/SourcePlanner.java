@@ -13,5 +13,6 @@ public interface SourcePlanner
 	 * multiway joins ({@link LogicalOpMultiwayJoin}), and multiway unions
 	 * ({@link LogicalOpMultiwayUnion}). 
 	 */
-	Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query ) throws SourcePlanningException;
+	Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Query query,
+	                                                               QueryProcContext ctxt ) throws SourcePlanningException;
 }

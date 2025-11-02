@@ -8,7 +8,9 @@
         ec:queryPlanner [
             ec:sourcePlanner _:bSourcePlanner ;
             ec:logicalOptimizer _:bLogicalOptimizer ;
-            ec:physicalOptimizer _:bPhysicalOptimizer
+            ec:physicalOptimizer _:bPhysicalOptimizer ;
+            ec:lptoppConverter _:bLogicalToPhysicalPlanConverter ;
+            ec:loptopopConverter _:bLogicalToPhysicalOpConverter
         ] ;
         ec:planCompiler _:bPlanCompiler ;
         ec:executionEngine _:bExecutionEngine ;
@@ -25,12 +27,11 @@ _:bFederationAccessManager rdf:type ec:FederationAccessManager ;
     ) .
 
 _:bSourcePlanner rdf:type ec:SourcePlanner ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" ;
-    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] ) .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" .
 
 _:bLogicalOptimizer rdf:type ec:LogicalOptimizer ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl" ;
-    ec:constructorArguments ( [rdf:value ec:value:QueryProcContext] _:bListOfHeuristics ) .
+    ec:constructorArguments ( _:bListOfHeuristics ) .
 
 _:bListOfHeuristics
     ec:elementsTypeName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicForLogicalOptimization" ;
@@ -50,14 +51,15 @@ _:bListOfHeuristics
     ) .
 
 _:bPhysicalOptimizer rdf:type ec:PhysicalOptimizer ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" ;
-    ec:constructorArguments (
-          [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter" ;
-            ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
-            ec:constructorArguments ( [rdf:value false]    # ignorePhysicalOpsForLogicalAddOps
-                                      [rdf:value false] )  # ignoreParallelMultiLeftJoin
-          ]
-    ) .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" .
+
+_:bLogicalToPhysicalPlanConverter rdf:type ec:LogicalToPhysicalPlanConverter ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
+    ec:constructorArguments ( [rdf:value false]      # ignorePhysicalOpsForLogicalAddOps
+                              [rdf:value false] ) .  # ignoreParallelMultiLeftJoin
+
+_:bLogicalToPhysicalOpConverter rdf:type ec:LogicalToPhysicalOpConverter ;
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl" .
 
 _:bPlanCompiler rdf:type ec:PlanCompiler ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;

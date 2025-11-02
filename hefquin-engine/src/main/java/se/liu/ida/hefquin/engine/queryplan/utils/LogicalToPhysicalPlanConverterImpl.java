@@ -20,25 +20,25 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
-	protected final LogicalToPhysicalOpConverter lop2pop;
-
 	protected final boolean ignorePhysicalOpsForLogicalAddOps;
 	protected final boolean ignoreParallelMultiLeftJoin;
 
 	public LogicalToPhysicalPlanConverterImpl( final boolean ignorePhysicalOpsForLogicalAddOps,
 	                                           final boolean ignoreParallelMultiLeftJoin ) {
-		lop2pop = new LogicalToPhysicalOpConverterImpl();
-
 		this.ignorePhysicalOpsForLogicalAddOps = ignorePhysicalOpsForLogicalAddOps;
 		this.ignoreParallelMultiLeftJoin = ignoreParallelMultiLeftJoin;
 	}
 
 	@Override
-	public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
-		return new Worker().convert(lp, keepMultiwayJoins);
+	public PhysicalPlan convert( final LogicalPlan lp,
+	                             final boolean keepMultiwayJoins,
+	                             final QueryProcContext ctxt ) {
+		final Worker w = new Worker( ctxt.getLogicalToPhysicalOpConverter() );
+		return w.convert(lp, keepMultiwayJoins);
 	}
 
 	// makes sure that sub-plans that are contained multiple times in the
@@ -47,7 +47,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	// overall physical plan that is produced
 	protected class Worker
 	{
-		final protected Map<LogicalPlan, PhysicalPlan> convertedSubPlans = new HashMap<>();
+		protected final Map<LogicalPlan, PhysicalPlan> convertedSubPlans = new HashMap<>();
+		protected final LogicalToPhysicalOpConverter lop2pop;
+
+		public Worker( final LogicalToPhysicalOpConverter lop2pop ) {
+			this.lop2pop = lop2pop;
+		}
 
 		public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
 			final PhysicalPlan alreadyConverted = convertedSubPlans.get(lp);

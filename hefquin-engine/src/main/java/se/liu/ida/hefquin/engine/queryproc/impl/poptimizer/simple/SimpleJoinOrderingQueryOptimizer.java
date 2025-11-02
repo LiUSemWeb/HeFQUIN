@@ -5,7 +5,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperatorForLogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
@@ -25,10 +24,7 @@ public class SimpleJoinOrderingQueryOptimizer extends PhysicalOptimizerBase
 {
     protected final JoinPlanOptimizer joinPlanOptimizer;
 
-    public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer,
-                                             final LogicalToPhysicalPlanConverter l2pConverter ) {
-        super(l2pConverter);
-
+    public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer ) {
         assert joinPlanOptimizer != null;
         this.joinPlanOptimizer = joinPlanOptimizer;
     }

@@ -32,8 +32,6 @@ import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediat
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionException;
 import se.liu.ida.hefquin.federation.FederationMember;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
-import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 /**
  * This is an abstract class with tests for any algorithm that is
@@ -589,14 +587,9 @@ public abstract class TestsForTPAddAlgorithms<MemberType extends FederationMembe
 			final ExpectedVariables expectedVariables,
 			final boolean useOuterJoinSemantics ) throws ExecutionException
 	{
-		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
-		final ExecutionContext execCxt = new ExecutionContext() {
-			@Override public FederationCatalog getFederationCatalog() { return null; }
-			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
-			@Override public ExecutorService getExecutorServiceForPlanTasks() { return getExecutorServiceForTest(); }
-			@Override public boolean isExperimentRun() { return false; }
-			@Override public boolean skipExecution() { return false; }
-		};
+		final ExecutorService execService = getExecutorServiceForTest();
+		final ExecutionContext execCxt = getExecContextForTests(execService);
+
 		final CollectingIntermediateResultElementSink sink = new CollectingIntermediateResultElementSink();
 
 		final MemberType fm = createFedMemberForTest(dataForMember);

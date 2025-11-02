@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpMultiwayLeftJoin;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpRequest;
-import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
@@ -350,9 +349,8 @@ public class ServiceClauseBasedSourcePlannerImplTest extends SourcePlannerImplTe
 	// --------- helper functions ---------
 
 	@Override
-	protected SourcePlanner createSourcePlanner( final QueryProcContext ctxt )
-	{
-		return new ServiceClauseBasedSourcePlannerImpl(ctxt);
+	protected SourcePlanner createSourcePlanner() {
+		return new ServiceClauseBasedSourcePlannerImpl();
 	}
 
 }

@@ -4,5 +4,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 
 public interface LogicalOptimizer
 {
-	LogicalPlan optimize( LogicalPlan inputPlan, boolean keepNaryOperators ) throws LogicalOptimizationException;
+	LogicalPlan optimize( LogicalPlan inputPlan,
+	                      boolean keepNaryOperators,
+	                      QueryProcContext ctxt ) throws LogicalOptimizationException;
 }

@@ -32,7 +32,15 @@ _:b2 ec:sourcePlanner
                 #_:bExhaustiveSrcPlanner ;
      ec:logicalOptimizer [
          ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.HeuristicsBasedLogicalOptimizerImpl" ;
-         ec:constructorArguments ( ec:value:QueryProcContext _:bListOfHeuristics )
+         ec:constructorArguments ( _:bListOfHeuristics )
+     ] ;
+     ec:lptoppConverter [
+         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
+         ec:constructorArguments ( [rdf:value false]    # ignorePhysicalOpsForLogicalAddOps
+                                   [rdf:value false] )  # ignoreParallelMultiLeftJoin
+     ] ;
+     ec:loptopopConverter [
+         ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl"
      ] ;
      ec:physicalOptimizer
                 _:bNoPhysOptimizer .
@@ -73,21 +81,13 @@ _:bFormulaForSelectivity
         "se.liu.ida.hefquin.engine.queryproc.impl.loptimizer.heuristics.formula.FmAwareWeightedJoinAndUnboundVariableCount" .
 
 _:bServiceBasedSrcPlanner
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" ;
-    ec:constructorArguments ( ec:value:QueryProcContext ) .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ServiceClauseBasedSourcePlannerImpl" .
 
 _:bExhaustiveSrcPlanner
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl" ;
-    ec:constructorArguments ( ec:value:QueryProcContext ) .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.srcsel.ExhaustiveSourcePlannerImpl" .
 
-_:bArgL2PConverter
-    ec:argumentTypeName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter" ;
-    ec:javaClassName    "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl" ;
-    ec:constructorArguments ( false      # ignorePhysicalOpsForLogicalAddOps
-                              false ) .  # ignoreParallelMultiLeftJoin
 _:bNoPhysOptimizer
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" ;
-    ec:constructorArguments ( _:bArgL2PConverter ) .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerWithoutOptimization" .
 
 _:bCostBasedGreedyOptimizer
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.SimpleJoinOrderingQueryOptimizer" ;
@@ -96,7 +96,6 @@ _:bCostBasedGreedyOptimizer
           ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CostModelBasedGreedyJoinPlanOptimizerImpl" ;
           ec:constructorArguments ( ec:value:CostModel )
         ]
-        _:bArgL2PConverter
     ) .
 
 _:bCardBasedGreedyOptimizer
@@ -106,7 +105,6 @@ _:bCardBasedGreedyOptimizer
           ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.CardinalityBasedGreedyJoinPlanOptimizerImpl" ;
           ec:constructorArguments ( ec:value:QueryProcContext )
         ]
-        _:bArgL2PConverter
     ) .
 
 _:bDPBasedBushyOptimizer
@@ -116,7 +114,6 @@ _:bDPBasedBushyOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedBushyJoinPlanOptimizer" ;
           ec:constructorArguments ( ec:value:CostModel )
         ]
-        _:bArgL2PConverter
     ) .
 
 _:bDPBasedLinearOptimizer
@@ -126,7 +123,6 @@ _:bDPBasedLinearOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.DPBasedLinearJoinPlanOptimizer" ;
           ec:constructorArguments ( ec:value:CostModel )
         ]
-        _:bArgL2PConverter
     ) .
 
 _:bRandomJoinPlanOptimizer
@@ -136,7 +132,6 @@ _:bRandomJoinPlanOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.simple.RandomizedJoinPlanOptimizerImpl" ;
           ec:constructorArguments ( )
         ]
-        _:bArgL2PConverter
     ) .
 
 _:bIterativeImprovementOptimizer
@@ -146,7 +141,6 @@ _:bIterativeImprovementOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.StoppingConditionByNumberOfGenerations" ;
           ec:constructorArguments ( 5 )  # generationThreshold
         ]
-        _:bArgL2PConverter
         ec:value:CostModel
         [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
@@ -161,7 +155,6 @@ _:bSimulatedAnnealingOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.EquilibriumConditionByRelativeSubplanCount" ;
           ec:constructorArguments ( 16 )  # scalingFactor
         ]
-        _:bArgL2PConverter
         ec:value:CostModel
         [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
@@ -180,7 +173,6 @@ _:bTwoPhaseOptimizer
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.randomized.EquilibriumConditionByRelativeSubplanCount" ;
           ec:constructorArguments ( 16 )  # scalingFactor
         ]
-        _:bArgL2PConverter
         ec:value:CostModel
         [ ec:argumentTypeName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
           ec:javaClassName    "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.rewriting.RuleInstances" ;
@@ -191,7 +183,6 @@ _:bTwoPhaseOptimizer
 _:bEvolutionaryOptimizer
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.evolutionaryAlgorithm.EvolutionaryAlgorithmQueryOptimizer" ;
     ec:constructorArguments (
-        _:bArgL2PConverter
         ec:value:CostModel
         ec:value:QueryProcContext
         8   # nmCandidates
