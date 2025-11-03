@@ -26,6 +26,20 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
@@ -68,7 +82,27 @@ public abstract class EngineTestBase
 	public static boolean skipLiveWebTests = true;
 
 	protected LogicalToPhysicalOpConverter getLOP2POPForTests() {
-		return new LogicalToPhysicalOpConverterImpl();
+		return new LogicalToPhysicalOpConverterImpl( List.of(
+				PhysicalOpBinaryUnion.getFactory(),
+				PhysicalOpMultiwayUnion.getFactory(),
+				PhysicalOpBind.getFactory(),
+				PhysicalOpFilter.getFactory(),
+				PhysicalOpRequest.getFactory(),
+				PhysicalOpGlobalToLocal.getFactory(),
+				PhysicalOpLocalToGlobal.getFactory(),
+				PhysicalOpBindJoinBRTPF.getFactory(),
+				PhysicalOpBindJoinWithBoundJoin.getFactory(),
+				PhysicalOpBindJoinWithVALUESorFILTER.getFactory(),
+				//PhysicalOpBindJoinWithUNION.getFactory(),
+				//PhysicalOpBindJoinWithFILTER.getFactory(),
+				//PhysicalOpBindJoinWithVALUES.getFactory(),
+				PhysicalOpSymmetricHashJoin.getFactory(),
+				PhysicalOpHashRJoin.getFactory(),
+				PhysicalOpIndexNestedLoopsJoin.getFactory(),
+				//PhysicalOpHashJoin.getFactory(),
+				PhysicalOpNaiveNestedLoopsJoin.getFactory()
+			)
+		);
 	}
 
 	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {

@@ -59,7 +59,31 @@ _:bLogicalToPhysicalPlanConverter rdf:type ec:LogicalToPhysicalPlanConverter ;
                               [rdf:value false] ) .  # ignoreParallelMultiLeftJoin
 
 _:bLogicalToPhysicalOpConverter rdf:type ec:LogicalToPhysicalOpConverter ;
-    ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl" .
+    ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl" ;
+    ec:constructorArguments ( _:bListOfPhysicalOpFactories ) .
+
+_:bListOfPhysicalOpFactories
+    ec:elementsTypeName "se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpFactory" ;
+    ec:elements (
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER$Factory" ]
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithUNION$Factory" ]
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithFILTER$Factory" ]
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUES$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin$Factory" ]
+        #[ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashJoin$Factory" ]
+        [ ec:javaClassName "se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin$Factory" ]
+    ) .
 
 _:bPlanCompiler rdf:type ec:PlanCompiler ;
     ec:javaClassName "se.liu.ida.hefquin.engine.queryproc.impl.compiler.QueryPlanCompilerForPushBasedExecution" ;

@@ -47,7 +47,7 @@ public class PhysicalOpFilter extends BaseForQueryPlanOperator
 		return lop;
 	}
 
-	protected static class Factory implements PhysicalOpFactory
+	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {

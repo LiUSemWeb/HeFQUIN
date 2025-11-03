@@ -71,7 +71,7 @@ public class PhysicalOpBindJoinWithVALUESorFILTER extends BaseForPhysicalOpSingl
 		return "> VALUESorFILTERBindJoin" + lop.toString();
 	}
 
-	protected static class Factory implements PhysicalOpFactory
+	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {

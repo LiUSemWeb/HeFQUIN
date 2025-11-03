@@ -81,7 +81,7 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		return "> FILTERBindJoin " + "(" + getID() + ") " +  lop.toString();
 	}
 
-	protected static class Factory implements PhysicalOpFactory
+	public static class Factory implements PhysicalOpFactory
 	{
 		private static final Factory singleton = new Factory();
 
