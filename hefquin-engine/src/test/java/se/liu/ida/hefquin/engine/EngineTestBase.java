@@ -67,10 +67,14 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
+	protected LogicalToPhysicalOpConverter getLOP2POPForTests() {
+		return new LogicalToPhysicalOpConverterImpl();
+	}
+
 	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
 		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
-		final LogicalToPhysicalOpConverter lop2pop = new LogicalToPhysicalOpConverterImpl();
+		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
 		return new ExecutionContext() {
 			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }

@@ -25,7 +25,6 @@ import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
-import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionEngine;
@@ -357,7 +356,7 @@ public class QueryProcessorImplTest extends EngineTestBase
 	                                                  final FederationAccessManager fedAccessMgr ) throws QueryProcException {
 		final ExecutorService execServiceForPlanTasks = Executors.newFixedThreadPool(10);
 		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
-		final LogicalToPhysicalOpConverter lop2pop = new LogicalToPhysicalOpConverterImpl();
+		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
 
 		final QueryProcContext ctxt = new QueryProcContext() {
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
