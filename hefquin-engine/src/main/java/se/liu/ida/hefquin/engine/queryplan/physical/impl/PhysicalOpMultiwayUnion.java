@@ -56,7 +56,7 @@ public class PhysicalOpMultiwayUnion extends BaseForQueryPlanOperator
 		return "> multiwayUnion " + "(" + getID() + ")";
 	}
 
-	protected static class Factory implements PhysicalOpFactory
+	public static class Factory implements PhysicalOpFactory
 	{
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {

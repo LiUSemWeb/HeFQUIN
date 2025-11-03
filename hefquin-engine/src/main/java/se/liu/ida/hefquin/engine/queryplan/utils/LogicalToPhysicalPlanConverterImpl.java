@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 
 public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlanConverter
 {
@@ -33,8 +34,11 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	}
 
 	@Override
-	public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
-		return new Worker().convert(lp, keepMultiwayJoins);
+	public PhysicalPlan convert( final LogicalPlan lp,
+	                             final boolean keepMultiwayJoins,
+	                             final QueryProcContext ctxt ) {
+		final Worker w = new Worker( ctxt.getLogicalToPhysicalOpConverter() );
+		return w.convert(lp, keepMultiwayJoins);
 	}
 
 	// makes sure that sub-plans that are contained multiple times in the
@@ -43,7 +47,12 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 	// overall physical plan that is produced
 	protected class Worker
 	{
-		final protected Map<LogicalPlan, PhysicalPlan> convertedSubPlans = new HashMap<>();
+		protected final Map<LogicalPlan, PhysicalPlan> convertedSubPlans = new HashMap<>();
+		protected final LogicalToPhysicalOpConverter lop2pop;
+
+		public Worker( final LogicalToPhysicalOpConverter lop2pop ) {
+			this.lop2pop = lop2pop;
+		}
 
 		public PhysicalPlan convert( final LogicalPlan lp, final boolean keepMultiwayJoins ) {
 			final PhysicalPlan alreadyConverted = convertedSubPlans.get(lp);
@@ -120,20 +129,20 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 
 		protected PhysicalPlan createPhysicalPlanWithNullaryRoot( final NullaryLogicalOp lop,
 		                                                          final QueryPlanningInfo qpInfo ) {
-			return PhysicalPlanFactory.createPlan(lop, qpInfo);
+			return PhysicalPlanFactory.createPlan(lop, qpInfo, lop2pop);
 		}
 
 		protected PhysicalPlan createPhysicalPlanWithUnaryRoot( final UnaryLogicalOp lop,
 		                                                        final QueryPlanningInfo qpInfo,
 		                                                        final PhysicalPlan child ) {
-			return PhysicalPlanFactory.createPlan(lop, qpInfo, child);
+			return PhysicalPlanFactory.createPlan(lop, qpInfo, lop2pop, child);
 		}
 
 		protected PhysicalPlan createPhysicalPlanWithBinaryRoot( final BinaryLogicalOp lop,
 		                                                         final QueryPlanningInfo qpInfo,
 		                                                         final PhysicalPlan child1,
 		                                                         final PhysicalPlan child2 ) {
-			return PhysicalPlanFactory.createPlan(lop, qpInfo, child1, child2);
+			return PhysicalPlanFactory.createPlan(lop, qpInfo, lop2pop, child1, child2);
 		}
 
 		protected PhysicalPlan createPhysicalPlanWithNaryRoot( final NaryLogicalOp lop,
@@ -147,7 +156,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 			if ( lop instanceof LogicalOpMultiwayLeftJoin mlj )
 				return createPhysicalPlanForMultiwayLeftJoin( mlj, qpInfo, children, keepMultiwayJoins );
 
-			return PhysicalPlanFactory.createPlan(lop, qpInfo, children);
+			return PhysicalPlanFactory.createPlan(lop, qpInfo, lop2pop, children);
 		}
 
 		protected PhysicalPlan createPhysicalPlanForMultiwayJoin( final LogicalOpMultiwayJoin lop,
@@ -186,7 +195,7 @@ public class LogicalToPhysicalPlanConverterImpl implements LogicalToPhysicalPlan
 					qpInfoForSubPlan = null;
 
 				if( ! ignorePhysicalOpsForLogicalAddOps ) {
-					currentSubPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentSubPlan, nextChild, qpInfoForSubPlan);
+					currentSubPlan = PhysicalPlanFactory.createPlanWithDefaultUnaryOpIfPossible(currentSubPlan, nextChild, qpInfoForSubPlan, lop2pop);
 				}
 				else {
 					currentSubPlan = createPhysicalPlanWithBinaryRoot(

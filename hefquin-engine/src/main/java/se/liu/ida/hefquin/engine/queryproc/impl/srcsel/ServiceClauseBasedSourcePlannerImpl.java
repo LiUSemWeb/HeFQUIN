@@ -39,51 +39,49 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  */
 public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 {
-	public ServiceClauseBasedSourcePlannerImpl( final QueryProcContext ctxt ) {
-		super(ctxt);
-	}
-
 	@Override
-	protected Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp )
+	protected Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Op jenaOp,
+	                                                                         final QueryProcContext ctxt )
 			throws SourcePlanningException
 	{
-		final LogicalPlan sa = createPlan(jenaOp);
+		final LogicalPlan sa = createPlan(jenaOp, ctxt);
 		final SourcePlanningStats myStats = new SourcePlanningStatsImpl();
 
 		return new Pair<>(sa, myStats);
 	}
 
-	protected LogicalPlan createPlan( final Op jenaOp ) {
-		if ( jenaOp instanceof OpSequence ) {
-			return createPlanForSequence( (OpSequence) jenaOp );
+	protected LogicalPlan createPlan( final Op jenaOp, final QueryProcContext ctxt ) {
+		if ( jenaOp instanceof OpSequence opSeq ) {
+			return createPlanForSequence(opSeq, ctxt);
 		}
-		else if ( jenaOp instanceof OpJoin ) {
-			return createPlanForJoin( (OpJoin) jenaOp );
+		else if ( jenaOp instanceof OpJoin opJoin ) {
+			return createPlanForJoin(opJoin, ctxt);
 		}
-		else if ( jenaOp instanceof OpLeftJoin ) {
-			return createPlanForLeftJoin( (OpLeftJoin) jenaOp );
+		else if ( jenaOp instanceof OpLeftJoin opLJoin ) {
+			return createPlanForLeftJoin(opLJoin, ctxt);
 		}
-		else if ( jenaOp instanceof OpConditional ) {
-			return createPlanForLeftJoin( (OpConditional) jenaOp );
+		else if ( jenaOp instanceof OpConditional opCond ) {
+			return createPlanForLeftJoin(opCond, ctxt);
 		}
-		else if ( jenaOp instanceof OpUnion ) {
-			return createPlanForUnion( (OpUnion) jenaOp );
+		else if ( jenaOp instanceof OpUnion opUnion ) {
+			return createPlanForUnion(opUnion, ctxt);
 		}
-		else if ( jenaOp instanceof OpFilter ) {
-			return createPlanForFilter( (OpFilter) jenaOp );
+		else if ( jenaOp instanceof OpFilter opFilter ) {
+			return createPlanForFilter(opFilter, ctxt);
 		}
-		else if ( jenaOp instanceof OpExtend ) {
-			return createPlanForBind( (OpExtend) jenaOp );
+		else if ( jenaOp instanceof OpExtend opExtend ) {
+			return createPlanForBind(opExtend, ctxt);
 		}
-		else if ( jenaOp instanceof OpService ) {
-			return createPlanForServicePattern( (OpService) jenaOp ); 
+		else if ( jenaOp instanceof OpService opService ) {
+			return createPlanForServicePattern(opService, ctxt); 
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported type of query pattern: " + jenaOp.getClass().getName() );
 		}
 	}
 
-	protected LogicalPlan createPlanForSequence( final OpSequence jenaOp ) {
+	protected LogicalPlan createPlanForSequence( final OpSequence jenaOp,
+	                                             final QueryProcContext ctxt ) {
 		if ( jenaOp.size() == 0 ) {
 			throw new IllegalArgumentException( "empty sequence of operators" );
 		}
@@ -91,52 +89,59 @@ public class ServiceClauseBasedSourcePlannerImpl extends SourcePlannerBase
 		// convert the sequence of Op objects into a multiway join
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Op subOp : jenaOp.getElements() ) {
-			subPlans.add( createPlan(subOp) );
+			subPlans.add( createPlan(subOp, ctxt) );
 		}
 		return mergeIntoMultiwayJoin(subPlans);
 	}
 
-	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp ) {
-		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
-		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+	protected LogicalPlan createPlanForJoin( final OpJoin jenaOp,
+	                                         final QueryProcContext ctxt ) {
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), ctxt );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), ctxt );
 		return mergeIntoMultiwayJoin(leftSubPlan,rightSubPlan);
 	}
 
-	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp ) {
+	protected LogicalPlan createPlanForLeftJoin( final OpLeftJoin jenaOp,
+	                                             final QueryProcContext ctxt) {
 		if ( jenaOp.getExprs() != null && ! jenaOp.getExprs().isEmpty() ) {
 			throw new IllegalArgumentException( "OpLeftJoin with filter condition is not supported" );
 		}
 
-		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
-		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), ctxt );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), ctxt );
 		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
 	}
 
-	protected LogicalPlan createPlanForLeftJoin( final OpConditional jenaOp ) {
-		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
-		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+	protected LogicalPlan createPlanForLeftJoin( final OpConditional jenaOp,
+	                                             final QueryProcContext ctxt ) {
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), ctxt );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), ctxt );
 		return mergeIntoMultiwayLeftJoin(leftSubPlan, rightSubPlan);
 	}
 
-	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp ) {
-		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft() );
-		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight() );
+	protected LogicalPlan createPlanForUnion( final OpUnion jenaOp,
+	                                          final QueryProcContext ctxt ) {
+		final LogicalPlan leftSubPlan = createPlan( jenaOp.getLeft(), ctxt );
+		final LogicalPlan rightSubPlan = createPlan( jenaOp.getRight(), ctxt );
 		return mergeIntoMultiwayUnion(leftSubPlan,rightSubPlan);
 	}
 
-	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp ) {
-		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
+	protected LogicalPlan createPlanForFilter( final OpFilter jenaOp,
+	                                           final QueryProcContext ctxt ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
 		final LogicalOpFilter rootOp = new LogicalOpFilter( jenaOp.getExprs() );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 
-	protected LogicalPlan createPlanForBind( final OpExtend jenaOp ) {
-		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp() );
+	protected LogicalPlan createPlanForBind( final OpExtend jenaOp,
+	                                         final QueryProcContext ctxt ) {
+		final LogicalPlan subPlan = createPlan( jenaOp.getSubOp(), ctxt );
 		final LogicalOpBind rootOp = new LogicalOpBind( jenaOp.getVarExprList() );
 		return new LogicalPlanWithUnaryRootImpl(rootOp, subPlan);
 	}
 
-	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp ) {
+	protected LogicalPlan createPlanForServicePattern( final OpService jenaOp,
+	                                                   final QueryProcContext ctxt ) {
 		if ( jenaOp.getService().isVariable() ) {
 			throw new IllegalArgumentException( "unsupported SERVICE pattern" );
 		}

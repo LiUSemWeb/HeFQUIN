@@ -13,6 +13,7 @@ import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizer;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanner;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningException;
 import se.liu.ida.hefquin.engine.queryproc.QueryPlanningStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 
@@ -58,9 +59,10 @@ public class QueryPlannerImpl implements QueryPlanner
 	public PhysicalOptimizer getPhysicalOptimizer() { return poptimizer; }
 
 	@Override
-	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query ) throws QueryPlanningException {
+	public Pair<PhysicalPlan, QueryPlanningStats> createPlan( final Query query,
+	                                                          final QueryProcContext ctxt ) throws QueryPlanningException {
 		final long t1 = System.currentTimeMillis();
-		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query);
+		final Pair<LogicalPlan, SourcePlanningStats> saAndStats = sourcePlanner.createSourceAssignment(query, ctxt);
 
 		if ( srcasgPrinter != null ) {
 			System.out.println("--------- Source Assignment ---------");
@@ -71,7 +73,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		final LogicalPlan lp;
 		if ( loptimizer != null ) {
 			final boolean keepNaryOperators = poptimizer.assumesLogicalMultiwayJoins();
-			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators);
+			lp = loptimizer.optimize(saAndStats.object1, keepNaryOperators, ctxt);
 		}
 		else {
 			lp = saAndStats.object1;
@@ -83,7 +85,7 @@ public class QueryPlannerImpl implements QueryPlanner
 		}
 
 		final long t3 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp);
+		final Pair<PhysicalPlan, PhysicalOptimizationStats> planAndStats = poptimizer.optimize(lp, ctxt);
 
 		final long t4 = System.currentTimeMillis();
 

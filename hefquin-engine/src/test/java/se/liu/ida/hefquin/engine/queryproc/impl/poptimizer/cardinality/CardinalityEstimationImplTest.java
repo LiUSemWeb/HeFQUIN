@@ -379,7 +379,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 
 		final LogicalOpRequest<?,?>  reqOp = new LogicalOpRequest<>(fm, req);
 
-		return PhysicalPlanFactory.createPlan(reqOp);
+		return PhysicalPlanFactory.createPlan( reqOp, getLOP2POPForTests() );
 	}
 
 	protected PhysicalPlan createJoinPlan( final int card1, final int card2 ) {
@@ -391,7 +391,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	protected PhysicalPlan createJoinPlan( final PhysicalPlan subplan1,
 	                                       final PhysicalPlan subplan2 ) {
 		final LogicalOpJoin joinOp = LogicalOpJoin.getInstance();
-		return PhysicalPlanFactory.createPlan(joinOp, subplan1, subplan2);
+		return PhysicalPlanFactory.createPlan(joinOp, getLOP2POPForTests(), subplan1, subplan2);
 	}
 
 	protected PhysicalPlan createUnionPlan( final int card1, final int card2 ) {
@@ -401,9 +401,9 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	}
 
 	protected PhysicalPlan createUnionPlan( final PhysicalPlan subplan1,
-										   final PhysicalPlan subplan2 ) {
+	                                        final PhysicalPlan subplan2 ) {
 		final LogicalOpUnion unionOp = LogicalOpUnion.getInstance();
-		return PhysicalPlanFactory.createPlan(unionOp, subplan1, subplan2);
+		return PhysicalPlanFactory.createPlan(unionOp, getLOP2POPForTests(), subplan1, subplan2);
 	}
 
 	protected PhysicalPlan createGPAddPlan( final int card1, final int card2 ) {
@@ -420,7 +420,7 @@ public class CardinalityEstimationImplTest extends EngineTestBase
 	                                        final TriplePattern tp ) {
 		final FederationMember fm = new TPFServerForTest();
 		final LogicalOpGPAdd gpAdd = new LogicalOpGPAdd(fm, tp, null);
-		return PhysicalPlanFactory.createPlan(gpAdd, subplan);
+		return PhysicalPlanFactory.createPlan(gpAdd, getLOP2POPForTests(), subplan);
 	}
 
 

@@ -16,9 +16,11 @@ import java.util.List;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.CostEstimationUtils;
 
@@ -32,17 +34,21 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 	}
 
 	@Override
-	public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
-		return new GreedyEnumerationAlgorithm(subplans);
+	public EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans,
+	                                                            final QueryProcContext ctxt ) {
+		return new GreedyEnumerationAlgorithm(subplans, ctxt);
 	}
 
 
 	protected class GreedyEnumerationAlgorithm implements EnumerationAlgorithm
 	{
 		protected final List<PhysicalPlan> subplans;
+		final LogicalToPhysicalOpConverter lop2pop;
 
-		public GreedyEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
+		public GreedyEnumerationAlgorithm( final List<PhysicalPlan> subplans,
+		                                   final QueryProcContext ctxt ) {
 			this.subplans = subplans;
+			lop2pop = ctxt.getLogicalToPhysicalOpConverter();
 		}
 
 		@Override
@@ -135,7 +141,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 				final PhysicalPlan subplan = subplans.get(i);
 				final Set<Var> joinVars = PhysicalPlanUtils.intersectionOfAllVariables(currentPlan, subplan);
 				if ( ! joinVars.isEmpty() ) {
-					nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan) );
+					nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan, lop2pop) );
 				}
 			}
 
@@ -150,7 +156,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 			// which will all be cartesian products.
 			for ( int i = 0; i < subplans.size(); i++ ) {
 				final PhysicalPlan subplan = subplans.get(i);
-				nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan) );
+				nextPossiblePlans.put( i, createAllJoinPlans(currentPlan, subplan, lop2pop) );
 			}
 
 			return nextPossiblePlans;
@@ -163,9 +169,10 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 	 * in which the first given plan is the child.
 	 */
 	protected List<PhysicalPlan> createAllJoinPlans( final PhysicalPlan leftOrChild,
-	                                                 final PhysicalPlan rightOrTop ) {
+	                                                 final PhysicalPlan rightOrTop,
+	                                                 final LogicalToPhysicalOpConverter lop2pop ) {
 		final List<PhysicalPlan> plans = new ArrayList<>();
-		plans.add( PhysicalPlanFactory.createPlanWithJoin(leftOrChild,rightOrTop) );
+		plans.add( PhysicalPlanFactory.createPlanWithJoin(leftOrChild,rightOrTop, lop2pop) );
 
 		final PhysicalOperator rootOfSubPlan = rightOrTop.getRootOperator();
 		if ( rootOfSubPlan instanceof PhysicalOpRequest ) {
@@ -176,7 +183,7 @@ public class CostModelBasedGreedyJoinPlanOptimizerImpl extends JoinPlanOptimizer
 		else if (    rootOfSubPlan instanceof PhysicalOpBinaryUnion
 		          || rootOfSubPlan instanceof PhysicalOpMultiwayUnion ) {
 			if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(rightOrTop) ) {
-				final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(leftOrChild, rightOrTop, null);
+				final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(leftOrChild, rightOrTop, null, lop2pop);
 				plans.add(planWithUnariesUnderUnion);
 			}
 		}

@@ -27,6 +27,8 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.TriplePatternImpl;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.CollectingIntermediateResultElementSink;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.impl.AsyncFederationAccessManagerImpl;
@@ -81,6 +83,8 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 		};
@@ -140,6 +144,8 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 			@Override public FederationCatalog getFederationCatalog() { return null; }
 			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { return null; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { return false; }
 			@Override public boolean skipExecution() { return false; }
 		};

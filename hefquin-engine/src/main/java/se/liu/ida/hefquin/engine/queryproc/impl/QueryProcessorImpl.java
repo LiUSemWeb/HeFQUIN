@@ -60,7 +60,7 @@ public class QueryProcessorImpl implements QueryProcessor
 			throws QueryProcException
 	{
 		final long t1 = System.currentTimeMillis();
-		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query);
+		final Pair<PhysicalPlan, QueryPlanningStats> qepAndStats = planner.createPlan(query, ctxt);
 
 		final long t2 = System.currentTimeMillis();
 

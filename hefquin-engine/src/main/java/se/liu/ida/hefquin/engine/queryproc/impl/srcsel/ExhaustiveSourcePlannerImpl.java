@@ -33,39 +33,37 @@ import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
  */
 public class ExhaustiveSourcePlannerImpl extends ServiceClauseBasedSourcePlannerImpl
 {
-	public ExhaustiveSourcePlannerImpl( final QueryProcContext ctxt ) {
-		super(ctxt);
-	}
-
 	@Override
-	protected LogicalPlan createPlan( final Op jenaOp ) {
-		if ( jenaOp instanceof OpBGP ) {
-			return createPlanForBGP( (OpBGP) jenaOp );
+	protected LogicalPlan createPlan( final Op jenaOp, final QueryProcContext ctxt ) {
+		if ( jenaOp instanceof OpBGP bgp ) {
+			return createPlanForBGP(bgp, ctxt);
 		}
 		else if ( jenaOp instanceof OpService ) {
 			throw new IllegalArgumentException( "queries with SERVICE patterns are not supported by this source planner (" + getClass().getName() + ")" ); 
 		}
 
-		return super.createPlan(jenaOp);
+		return super.createPlan(jenaOp, ctxt);
 	}
 
-	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp ) {
+	protected LogicalPlan createPlanForBGP( final OpBGP bgpOp,
+	                                        final QueryProcContext ctxt ) {
 		final BasicPattern bgp = bgpOp.getPattern();
 		assert ! bgp.isEmpty();
 
 		if ( bgp.size() == 1 ) {
-			return createSubPlanForTP( bgp.get(0) );
+			return createSubPlanForTP( bgp.get(0), ctxt );
 		}
 
 		final List<LogicalPlan> subPlans = new ArrayList<>();
 		for ( final Triple tp : bgp.getList() ) {
-			subPlans.add( createSubPlanForTP(tp) );
+			subPlans.add( createSubPlanForTP(tp, ctxt) );
 		}
 
 		return LogicalPlanUtils.createPlanWithMultiwayJoin(subPlans);
 	}
 
-	protected LogicalPlan createSubPlanForTP( final Triple tp ) {
+	protected LogicalPlan createSubPlanForTP( final Triple tp,
+	                                          final QueryProcContext ctxt ) {
 		final Set<FederationMember> allFMs = ctxt.getFederationCatalog().getAllFederationMembers();
 		assert ! allFMs.isEmpty();
 

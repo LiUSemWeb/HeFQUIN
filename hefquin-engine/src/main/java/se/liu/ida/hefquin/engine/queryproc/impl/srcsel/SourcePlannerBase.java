@@ -14,15 +14,9 @@ import se.liu.ida.hefquin.engine.queryproc.SourcePlanningStats;
 
 public abstract class SourcePlannerBase implements SourcePlanner
 {
-	protected final QueryProcContext ctxt;
-
-	protected SourcePlannerBase( final QueryProcContext ctxt ) {
-		assert ctxt != null;
-		this.ctxt = ctxt;
-	}
-
 	@Override
-	public final Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query )
+	public final Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( final Query query,
+	                                                                            final QueryProcContext ctxt )
 			throws SourcePlanningException
 	{
 		final Op jenaOp;
@@ -38,9 +32,9 @@ public abstract class SourcePlannerBase implements SourcePlanner
 			throw new UnsupportedOperationException( query.getClass().getName() );
 		}
 
-		return createSourceAssignment(jenaOp);
+		return createSourceAssignment(jenaOp, ctxt);
 	}
 
-	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment(Op jenaOp)
+	protected abstract Pair<LogicalPlan, SourcePlanningStats> createSourceAssignment( Op jenaOp, QueryProcContext ctxt )
 			throws SourcePlanningException;
 }

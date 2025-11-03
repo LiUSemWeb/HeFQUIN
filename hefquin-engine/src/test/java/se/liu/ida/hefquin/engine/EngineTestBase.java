@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -25,6 +26,25 @@ import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl2;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBinaryUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBind;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinBRTPF;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithBoundJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpBindJoinWithVALUESorFILTER;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpGlobalToLocal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpHashRJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpIndexNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpLocalToGlobal;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpMultiwayUnion;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpNaiveNestedLoopsJoin;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpRequest;
+import se.liu.ida.hefquin.engine.queryplan.physical.impl.PhysicalOpSymmetricHashJoin;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverterImpl;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverterImpl;
+import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.BRTPFRequest;
 import se.liu.ida.hefquin.federation.access.BindingsRestrictedTriplePatternRequest;
@@ -45,6 +65,7 @@ import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
+import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
@@ -60,6 +81,45 @@ public abstract class EngineTestBase
 	 */
 	public static boolean skipLiveWebTests = true;
 
+	protected LogicalToPhysicalOpConverter getLOP2POPForTests() {
+		return new LogicalToPhysicalOpConverterImpl( List.of(
+				PhysicalOpBinaryUnion.getFactory(),
+				PhysicalOpMultiwayUnion.getFactory(),
+				PhysicalOpBind.getFactory(),
+				PhysicalOpFilter.getFactory(),
+				PhysicalOpRequest.getFactory(),
+				PhysicalOpGlobalToLocal.getFactory(),
+				PhysicalOpLocalToGlobal.getFactory(),
+				PhysicalOpBindJoinBRTPF.getFactory(),
+				PhysicalOpBindJoinWithBoundJoin.getFactory(),
+				PhysicalOpBindJoinWithVALUESorFILTER.getFactory(),
+				//PhysicalOpBindJoinWithUNION.getFactory(),
+				//PhysicalOpBindJoinWithFILTER.getFactory(),
+				//PhysicalOpBindJoinWithVALUES.getFactory(),
+				PhysicalOpSymmetricHashJoin.getFactory(),
+				PhysicalOpHashRJoin.getFactory(),
+				PhysicalOpIndexNestedLoopsJoin.getFactory(),
+				//PhysicalOpHashJoin.getFactory(),
+				PhysicalOpNaiveNestedLoopsJoin.getFactory()
+			)
+		);
+	}
+
+	protected ExecutionContext getExecContextForTests( final ExecutorService execService ) {
+		final FederationAccessManager fedAccessMgr = new FederationAccessManagerForTest();
+		final LogicalToPhysicalPlanConverter lp2pp = new LogicalToPhysicalPlanConverterImpl(false, false);
+		final LogicalToPhysicalOpConverter lop2pop = getLOP2POPForTests();
+
+		return new ExecutionContext() {
+			@Override public FederationCatalog getFederationCatalog() { throw new UnsupportedOperationException(); }
+			@Override public FederationAccessManager getFederationAccessMgr() { return fedAccessMgr; }
+			@Override public ExecutorService getExecutorServiceForPlanTasks() { return execService; }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { return lp2pp; }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { return lop2pop; }
+			@Override public boolean isExperimentRun() { return false; }
+			@Override public boolean skipExecution() { return false; }
+		};
+	}
 
 	protected TPFServer getDBpediaTPFServer() {
 		return new TPFServerImpl( "http://fragments.dbpedia.org/2016-04/en",

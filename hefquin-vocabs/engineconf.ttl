@@ -76,6 +76,14 @@ ec:PhysicalOptimizer rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Physical Optimizer"@en .
 
+ec:LogicalToPhysicalPlanConverter rdf:type owl:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Logical-to-Physical Plan Converter"@en .
+
+ec:LogicalToPhysicalOpConverter rdf:type owl:Class ;
+    rdfs:subClassOf ec:InstantiableJavaClass ;
+    rdfs:label      "Logical-to-Physical Operator Converter"@en .
+
 ec:PlanCompiler rdf:type owl:Class ;
     rdfs:subClassOf ec:InstantiableJavaClass ;
     rdfs:label      "Plan Compiler"@en .
@@ -110,6 +118,18 @@ ec:queryPlanner rdf:type rdf:Property ;
     rdfs:range      ec:QueryPlanner ;
     rdfs:label      "query planner"@en ;
     rdfs:comment    "Specifies the query planner to be used by the query processor."@en .
+
+ec:lptoppConverter rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryPlanner ;
+    rdfs:range      ec:LogicalToPhysicalPlanConverter ;
+    rdfs:label      "logical-to-physical plan converter"@en ;
+    rdfs:comment    "Specifies the logical-to-physical plan converter to be used by the query planner."@en .
+
+ec:loptopopConverter rdf:type rdf:Property ;
+    rdfs:domain     ec:QueryPlanner ;
+    rdfs:range      ec:LogicalToPhysicalOpConverter ;
+    rdfs:label      "logical-to-physical operator converter"@en ;
+    rdfs:comment    "Specifies the logical-to-physical operator converter to be used by the query planner."@en .
 
 ec:planCompiler rdf:type rdf:Property ;
     rdfs:domain     ec:QueryProcessor ;

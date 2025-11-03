@@ -1,5 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.utils;
 
+import java.util.NoSuchElementException;
+
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.logical.BinaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.logical.NaryLogicalOp;
@@ -8,55 +10,97 @@ import se.liu.ida.hefquin.engine.queryplan.logical.UnaryLogicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.BinaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NaryPhysicalOp;
 import se.liu.ida.hefquin.engine.queryplan.physical.NullaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOpRegistry;
 import se.liu.ida.hefquin.engine.queryplan.physical.UnaryPhysicalOp;
-import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
 
 /**
- * This class provides methods to convert logical operators into
- * physical operators by using the respective default type of
- * physical operator for each type of logical operator.
+ * Implementations of this interface provide methods to
+ * convert logical operators into physical operators.
  */
-public class LogicalToPhysicalOpConverter
+public interface LogicalToPhysicalOpConverter
 {
-	final private static PhysicalOpRegistry registry = new PhysicalOpRegistry()
-		.register( PhysicalOpBinaryUnion.getFactory() )                // Binary union
-		.register( PhysicalOpMultiwayUnion.getFactory() )              // Multiway union
-		.register( PhysicalOpBind.getFactory() )                       // Bind clauses
-		.register( PhysicalOpFilter.getFactory() )                     // Filter clauses
-		.register( PhysicalOpRequest.getFactory() )                    // Request at a federation member
-		.register( PhysicalOpGlobalToLocal.getFactory() )              // Apply vocab mappings global to local
-		.register( PhysicalOpLocalToGlobal.getFactory() )              // Apply vocab mappings local to global
-		.register( PhysicalOpBindJoinBRTPF.getFactory() )                   // Bind-join for brTPF interface
-		.register( PhysicalOpBindJoinWithBoundJoin.getFactory() )      // Bind-join for SPARQL interface
-		.register( PhysicalOpBindJoinWithVALUESorFILTER.getFactory() ) // (fallback) if no non-joining var available
-		// .register( PhysicalOpBindJoinWithUNION.getFactory() )
-		// .register( PhysicalOpBindJoinWithFILTER.getFactory() )
-		// .register( PhysicalOpBindJoinWithVALUES.getFactory() )
-		.register( PhysicalOpSymmetricHashJoin.getFactory() )          // Inner join
-		.register( PhysicalOpHashRJoin.getFactory() )                  // Right outer join
-		.register( PhysicalOpIndexNestedLoopsJoin.getFactory() )       // Index NLJ algorithm, fm to request join partners
-		// .register( PhysicalOpHashJoin.getFactory() )
-		.register( PhysicalOpNaiveNestedLoopsJoin.getFactory() )
-	;
+	/**
+	 * Returns a physical operator that implements the given logical
+	 * operator. If this converter knows of multiple types of physical
+	 * operators that may be used for the given logical operator, then
+	 * the default type is used. If this converter does not know of any
+	 * type of physical operator that may be used for the given logical
+	 * operator, then an {@link UnsupportedOperationException} is thrown.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @return a physical operator for the given logical operator
+	 * @throws NoSuchElementException if this converter does not know of
+	 *                     type of physical operator for the given input
+	 */
+	NullaryPhysicalOp convert( NullaryLogicalOp lop );
 
-	public static NullaryPhysicalOp convert( final NullaryLogicalOp lop ) {
-		return registry.create(lop);
-	}
+	/**
+	 * Returns a physical operator that implements the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the subplan under this operator will produce
+	 * solution mappings with the given variables.
+	 * <p>
+	 * If this converter knows of multiple types of physical operators
+	 * that may be applied in this case, then the default type is used.
+	 * If this converter does not know of any type of physical operator
+	 * that may be applied in this case, then an
+	 * {@link UnsupportedOperationException} is thrown.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars - the variables that can be expected to be bound
+	 *                    in solution mappings that the physical operator
+	 *                    will have to process
+	 * @return a physical operator for the given logical operator
+	 * @throws NoSuchElementException if this converter does not know of
+	 *                     type of physical operator for the given input
+	 */
+	UnaryPhysicalOp convert( UnaryLogicalOp lop, ExpectedVariables inputVars );
 
-	public static UnaryPhysicalOp convert( final UnaryLogicalOp lop,
-	                                       final ExpectedVariables inputVars ) {
-		return registry.create(lop, inputVars);
-	}
+	/**
+	 * Returns a physical operator that implements the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the two subplans under this operator will
+	 * produce solution mappings with the given variables, respectively.
+	 * <p>
+	 * If this converter knows of multiple types of physical operators
+	 * that may be applied in this case, then the default type is used.
+	 * If this converter does not know of any type of physical operator
+	 * that may be applied in this case, then an
+	 * {@link UnsupportedOperationException} is thrown.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars1 - the variables that can be expected to be bound
+	 *                     in solution mappings that the physical operator
+	 *                     will have to process as its left input
+	 * @param inputVars2 - the variables that can be expected to be bound
+	 *                     in solution mappings that the physical operator
+	 *                     will have to process as its right input
+	 * @return a physical operator for the given logical operator
+	 * @throws NoSuchElementException if this converter does not know of
+	 *                     type of physical operator for the given input
+	 */
+	BinaryPhysicalOp convert( BinaryLogicalOp lop,
+	                          ExpectedVariables inputVars1,
+	                          ExpectedVariables inputVars2 );
 
-	public static BinaryPhysicalOp convert( final BinaryLogicalOp lop,
-	                                        final ExpectedVariables inputVars1,
-	                                        final ExpectedVariables inputVars2 ) {
-		return registry.create(lop, inputVars1, inputVars2);
-	}
-
-	public static NaryPhysicalOp convert( final NaryLogicalOp lop,
-	                                      final ExpectedVariables... inputVars ) {
-		return registry.create(lop, inputVars);
-	}
+	/**
+	 * Returns a physical operator that implements the given logical
+	 * operator under the assumption that this operator will be used
+	 * in a plan in which the subplans under this operator will produce
+	 * solution mappings with the given variables, respectively.
+	 * <p>
+	 * If this converter knows of multiple types of physical operators
+	 * that may be applied in this case, then the default type is used.
+	 * If this converter does not know of any type of physical operator
+	 * that may be applied in this case, then an
+	 * {@link UnsupportedOperationException} is thrown.
+	 *
+	 * @param lop - the logical operator to be converted
+	 * @param inputVars - the variables that can be expected to be bound
+	 *                    in solution mappings that the physical operator
+	 *                    will have to process for each of its inputs
+	 * @return a physical operator for the given logical operator
+	 * @throws NoSuchElementException if this converter does not know of
+	 *                     type of physical operator for the given case
+	 */
+	NaryPhysicalOp convert( NaryLogicalOp lop, ExpectedVariables... inputVars );
 }

@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -39,10 +40,13 @@ import se.liu.ida.hefquin.federation.members.BRTPFServer;
  */
 public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 {
-	protected static final Factory factory = new Factory();
+	protected static final Factory factory = new Factory( BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE );
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPAdd lop ) {
+	protected final int batchSize;
+
+	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPAdd lop,
+	                                   final int batchSize ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
@@ -50,13 +54,18 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 
 		if ( lop.hasParameterVariables() )
 			throw new IllegalArgumentException();
+
+		this.batchSize = batchSize;
 	}
 
-	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPOptAdd lop ) {
+	protected PhysicalOpBindJoinBRTPF( final LogicalOpGPOptAdd lop,
+	                                   final int batchSize ) {
 		super(lop);
 
 		if ( ! lop.containsTriplePatternOnly() )
 			throw new IllegalArgumentException();
+
+		this.batchSize = batchSize;
 	}
 
 	@Override
@@ -92,7 +101,7 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 			                                brtpf,
 			                                inputVars[0],
 			                                useOuterJoinSemantics,
-			                                ExecOpBindJoinBRTPF.DEFAULT_BATCH_SIZE,
+			                                batchSize,
 			                                collectExceptions,
 			                                qpInfo );
 		else
@@ -109,8 +118,15 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 		return "> brTPF-based bind join " + "(" + getID() + ") " +  lop.toString();
 	}
 
-	protected static class Factory implements PhysicalOpFactory
+	public static class Factory implements PhysicalOpFactory
 	{
+		public final int batchSize;
+
+		public Factory( final int batchSize ) {
+			assert batchSize > 0;
+			this.batchSize = batchSize;
+		}
+
 		@Override
 		public boolean supports( final LogicalOperator lop, final ExpectedVariables... inputVars ) {
 			if( lop instanceof LogicalOpGPAdd op ){
@@ -128,10 +144,10 @@ public class PhysicalOpBindJoinBRTPF extends BaseForPhysicalOpSingleInputJoin
 		@Override
 		public PhysicalOpBindJoinBRTPF create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return new PhysicalOpBindJoinBRTPF(op);
+				return new PhysicalOpBindJoinBRTPF(op, batchSize);
 			}
 			else if ( lop instanceof LogicalOpGPOptAdd op ) {
-				return new PhysicalOpBindJoinBRTPF(op);
+				return new PhysicalOpBindJoinBRTPF(op, batchSize);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );

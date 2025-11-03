@@ -13,6 +13,8 @@ import se.liu.ida.hefquin.base.query.TriplePattern;
 import se.liu.ida.hefquin.base.query.impl.GenericSPARQLGraphPatternImpl1;
 import se.liu.ida.hefquin.engine.EngineTestBase;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalPlanConverter;
 import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanner;
 import se.liu.ida.hefquin.engine.queryproc.SourcePlanningException;
@@ -22,7 +24,7 @@ import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
 public abstract class SourcePlannerImplTestBase extends EngineTestBase
 {
-	protected abstract SourcePlanner createSourcePlanner(QueryProcContext ctxt);
+	protected abstract SourcePlanner createSourcePlanner();
 
 	protected LogicalPlan createLogicalPlan( final String queryString,
 	                                         final FederationCatalog fedCat )
@@ -32,12 +34,14 @@ public abstract class SourcePlannerImplTestBase extends EngineTestBase
 			@Override public FederationCatalog getFederationCatalog() { return fedCat; }
 			@Override public FederationAccessManager getFederationAccessMgr() { throw new UnsupportedOperationException(); }
 			@Override public ExecutorService getExecutorServiceForPlanTasks() { throw new UnsupportedOperationException(); }
+			@Override public LogicalToPhysicalPlanConverter getLogicalToPhysicalPlanConverter() { throw new UnsupportedOperationException(); }
+			@Override public LogicalToPhysicalOpConverter getLogicalToPhysicalOpConverter() { throw new UnsupportedOperationException(); }
 			@Override public boolean isExperimentRun() { throw new UnsupportedOperationException(); }
 			@Override public boolean skipExecution() { return false; }
 		};
 
 		final Query query = new GenericSPARQLGraphPatternImpl1( QueryFactory.create(queryString).getQueryPattern() );
-		return createSourcePlanner(ctxt).createSourceAssignment(query).object1;
+		return createSourcePlanner().createSourceAssignment(query, ctxt).object1;
 	}
 
 	public static void assertEqualTriplePatternsVUV( final String expectedSubjectVarName,

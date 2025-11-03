@@ -35,8 +35,6 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  */
 public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 {
-	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
-
 	protected final Element pattern;
 
 	/**
@@ -54,8 +52,7 @@ public class ExecOpBindJoinSPARQLwithUNION extends BaseForExecOpBindJoinSPARQL
 	 *
 	 * @param batchSize - the number of solution mappings to be included in
 	 *          each bind-join request; this value must not be smaller than
-	 *          {@link #minimumRequestBlockSize}; as a default value for this
-	 *          parameter, use {@link #DEFAULT_BATCH_SIZE}
+	 *          {@link #minimumRequestBlockSize}
 	 *
 	 * @param collectExceptions - <code>true</code> if this operator has to
 	 *          collect exceptions (which is handled entirely by one of the
