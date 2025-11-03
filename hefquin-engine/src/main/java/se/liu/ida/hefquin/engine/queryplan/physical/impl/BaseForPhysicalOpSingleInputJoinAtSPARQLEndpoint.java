@@ -12,17 +12,25 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 public abstract class BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 		extends BaseForPhysicalOpSingleInputJoin
 {
-	public BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint( final LogicalOpGPAdd lop ) {
+	protected final int batchSize;
+
+	public BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint( final LogicalOpGPAdd lop,
+	                                                         final int batchSize ) {
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
 		assert ! lop.hasParameterVariables();
+
+		this.batchSize = batchSize;
 	}
 
-	public BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint( final LogicalOpGPOptAdd lop ) {
+	public BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint( final LogicalOpGPOptAdd lop,
+	                                                         final int batchSize ) {
 		super(lop);
 
 		assert lop.getFederationMember() instanceof SPARQLEndpoint;
+
+		this.batchSize = batchSize;
 	}
 
 	@Override

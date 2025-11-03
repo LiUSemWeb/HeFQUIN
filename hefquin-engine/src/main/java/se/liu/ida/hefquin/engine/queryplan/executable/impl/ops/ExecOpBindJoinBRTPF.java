@@ -42,8 +42,6 @@ import se.liu.ida.hefquin.federation.members.BRTPFServer;
  */
 public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<TriplePattern,BRTPFServer>
 {
-	public final static int DEFAULT_BATCH_SIZE = BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE;
-
 	/**
 	 * @param tp - the triple pattern to be evaluated (in a bind-join
 	 *          manner) at the federation member given as 'fm'
@@ -59,8 +57,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	 *
 	 * @param batchSize - the number of solution mappings to be included in
 	 *          each bind-join request; this value must not be smaller than
-	 *          {@link #minimumRequestBlockSize}; as a default value for this
-	 *          parameter, use {@link #DEFAULT_BATCH_SIZE}
+	 *          {@link #minimumRequestBlockSize}
 	 *
 	 * @param collectExceptions - <code>true</code> if this operator has to
 	 *          collect exceptions (which is handled entirely by one of the

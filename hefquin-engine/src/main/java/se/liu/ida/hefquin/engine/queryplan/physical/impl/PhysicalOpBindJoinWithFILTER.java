@@ -3,6 +3,7 @@ package se.liu.ida.hefquin.engine.queryplan.physical.impl;
 import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.base.query.SPARQLGraphPattern;
 import se.liu.ida.hefquin.engine.queryplan.executable.UnaryExecutableOp;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.BaseForExecOpBindJoinWithRequestOps;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpBindJoinSPARQLwithFILTER;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
@@ -38,15 +39,17 @@ import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
  */
 public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJoinAtSPARQLEndpoint
 {
-	protected static final Factory factory = new Factory();
+	protected static final Factory factory = new Factory( BaseForExecOpBindJoinWithRequestOps.DEFAULT_BATCH_SIZE );
 	public static PhysicalOpFactory getFactory() { return factory; }
 
-	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop ) {
-		super(lop);
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPAdd lop,
+	                                        final int batchSize ) {
+		super(lop, batchSize);
 	}
 
-	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop ) {
-		super(lop);
+	protected PhysicalOpBindJoinWithFILTER( final LogicalOpGPOptAdd lop,
+	                                        final int batchSize ) {
+		super(lop, batchSize);
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		                                           sparqlEndpoint,
 		                                           inputVars[0],
 		                                           useOuterJoinSemantics,
-		                                           ExecOpBindJoinSPARQLwithFILTER.DEFAULT_BATCH_SIZE,
+		                                           batchSize,
 		                                           collectExceptions,
 		                                           qpInfo );
 	}
@@ -83,10 +86,11 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 
 	public static class Factory implements PhysicalOpFactory
 	{
-		private static final Factory singleton = new Factory();
+		public final int batchSize;
 
-		public static Factory getInstance() {
-			return singleton;
+		public Factory( final int batchSize ) {
+			assert batchSize > 0;
+			this.batchSize = batchSize;
 		}
 
 		@Override
@@ -104,10 +108,10 @@ public class PhysicalOpBindJoinWithFILTER extends BaseForPhysicalOpSingleInputJo
 		@Override
 		public PhysicalOpBindJoinWithFILTER create( final UnaryLogicalOp lop ) {
 			if ( lop instanceof LogicalOpGPAdd op ) {
-				return new PhysicalOpBindJoinWithFILTER(op);
+				return new PhysicalOpBindJoinWithFILTER(op, batchSize);
 			}
 			else if ( lop instanceof LogicalOpGPOptAdd op ) {
-				return new PhysicalOpBindJoinWithFILTER(op);
+				return new PhysicalOpBindJoinWithFILTER(op, batchSize);
 			}
 
 			throw new UnsupportedOperationException( "Unsupported type of logical operator: " + lop.getClass().getName() + "." );
