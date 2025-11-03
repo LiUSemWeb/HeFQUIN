@@ -35,8 +35,6 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
 
 public class PhysicalPlanFactory
 {
-	protected static final LogicalToPhysicalOpConverter LOP2POP = new LogicalToPhysicalOpConverterImpl();
-
 	/**
 	 * Creates a physical plan in which the root operator is the physical
 	 * operator that the given {@link LogicalToPhysicalOpConverter} returns
