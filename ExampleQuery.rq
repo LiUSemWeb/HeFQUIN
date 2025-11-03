@@ -3,12 +3,16 @@ PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX dbo:    <http://dbpedia.org/ontology/>
 
-SELECT * WHERE {
-	SERVICE <http://dbpedia.org/sparql> {
+SELECT ?c ?cc ?o ?s1 ?s2 WHERE {
+	VALUES ?s1 { <http://fragments.dbpedia.org/2016-04/en> }
+	#VALUES ?s1 { <http://dbpedia.org/sparql> }
+	SERVICE ?s1 {
 		<http://dbpedia.org/resource/Berlin> dbo:country ?c .
 		?c owl:sameAs ?cc
+		FILTER ( CONTAINS(STR(?cc), "wikidata" ) )
 	}
-	SERVICE <https://query.wikidata.org/sparql> {
+	VALUES ?s2 { <https://query.wikidata.org/sparql> }
+	SERVICE ?s2 {
 		?cc rdfs:label ?o
 	}
 }
