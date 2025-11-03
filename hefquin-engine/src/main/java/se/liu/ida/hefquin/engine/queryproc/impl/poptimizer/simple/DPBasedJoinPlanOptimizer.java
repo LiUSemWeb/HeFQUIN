@@ -8,9 +8,11 @@ import se.liu.ida.hefquin.base.utils.Pair;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.physical.impl.*;
+import se.liu.ida.hefquin.engine.queryplan.utils.LogicalToPhysicalOpConverter;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanUtils;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.CostModel;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCost;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.utils.PhysicalPlanWithCostUtils;
@@ -25,17 +27,22 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	}
 
 	@Override
-	protected EnumerationAlgorithm initializeEnumerationAlgorithm( final List<PhysicalPlan> subplans ) {
-		return new DynamicProgrammingOptimizerImpl(subplans);
+	protected EnumerationAlgorithm initializeEnumerationAlgorithm(
+			final List<PhysicalPlan> subplans,
+			final QueryProcContext ctxt ) {
+		return new DynamicProgrammingOptimizerImpl(subplans, ctxt);
 	}
 
 
 	protected class DynamicProgrammingOptimizerImpl implements EnumerationAlgorithm
 	{
 		protected final List<PhysicalPlan> subplans;
+		protected final LogicalToPhysicalOpConverter lop2pop;
 
-		public DynamicProgrammingOptimizerImpl( final List<PhysicalPlan> subplans ) {
+		public DynamicProgrammingOptimizerImpl( final List<PhysicalPlan> subplans,
+		                                        final QueryProcContext ctxt ) {
 			this.subplans = subplans;
+			lop2pop = ctxt.getLogicalToPhysicalOpConverter();
 		}
 
 		@Override
@@ -54,9 +61,10 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 
 				final boolean atLeastOneFound = determineOptimalCandidatesAtStageN( subsets,
 				                                                                    optmPlansPerStage,
-				                                                                    true ); // ignoreCartesianProductJoins
+				                                                                    true, // ignoreCartesianProductJoins
+				                                                                    lop2pop );
 				if ( ! atLeastOneFound ) {
-					determineOptimalCandidatesAtStageN( subsets, optmPlansPerStage, false );
+					determineOptimalCandidatesAtStageN( subsets, optmPlansPerStage, false, lop2pop );
 				}
 			}
 
@@ -124,6 +132,9 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	 * @param ignoreCartesianProductJoins is given as true if this function has
 	 *          to ignore any joins that would produce cartesian products (i.e.,
 	 *          joins between subplans that don't share any variable)
+	 *
+	 * @param lop2pop is the logical-to-physical operator converter to be used
+	 *          for converting the logical (join) operators into physical ones
 	 * 
 	 * @return true if at least one possible join plan was added; the only case
 	 *         in which this may be false is if 'ignoreCartesianProductJoins' is
@@ -132,7 +143,8 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 	 */
 	protected boolean determineOptimalCandidatesAtStageN( final List<List<PhysicalPlan>> subsets,
 	                                                      final OptimalPlansPerStage optPlansPerStage,
-	                                                      final boolean ignoreCartesianProductJoins )
+	                                                      final boolean ignoreCartesianProductJoins,
+	                                                      final LogicalToPhysicalOpConverter lop2pop )
 			throws PhysicalOptimizationException
 	{
 		boolean atLeastOnePlanFound = false;
@@ -168,7 +180,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 					}
 				}
 
-				candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin(optmLeft,optmRight) );
+				candidatePlans.add( PhysicalPlanFactory.createPlanWithJoin(optmLeft,optmRight, lop2pop) );
 
 				final PhysicalOperator rightRootOp = optmRight.getRootOperator();
 				if ( rightRootOp instanceof PhysicalOpRequest ) {
@@ -179,7 +191,7 @@ public abstract class DPBasedJoinPlanOptimizer extends JoinPlanOptimizerBase
 				else if (    rightRootOp instanceof PhysicalOpBinaryUnion
 				          || rightRootOp instanceof PhysicalOpMultiwayUnion ) {
 					if ( PhysicalPlanFactory.checkUnaryOpApplicableToUnionPlan(optmRight) ) {
-						final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(optmLeft, optmRight, null);
+						final PhysicalPlan planWithUnariesUnderUnion = PhysicalPlanFactory.createPlanWithUnaryOpForUnionPlan(optmLeft, optmRight, null, lop2pop);
 						candidatePlans.add(planWithUnariesUnderUnion);
 					}
 				}

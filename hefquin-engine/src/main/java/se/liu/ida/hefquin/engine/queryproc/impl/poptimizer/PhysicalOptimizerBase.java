@@ -20,7 +20,7 @@ public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 		final LogicalToPhysicalPlanConverter lp2pp = ctxt.getLogicalToPhysicalPlanConverter();
 		final PhysicalPlan initialPhysicalPlan = lp2pp.convert(lp, keepMultiwayJoins, ctxt);
 
-		return optimize(initialPhysicalPlan);
+		return optimize(initialPhysicalPlan, ctxt);
 	}
 
 	/**
@@ -33,5 +33,7 @@ public abstract class PhysicalOptimizerBase implements PhysicalOptimizer
 	 */
 	protected abstract boolean keepMultiwayJoinsInInitialPhysicalPlan();
 
-	protected abstract Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( PhysicalPlan initialPhysicalPlan ) throws PhysicalOptimizationException;
+	protected abstract Pair<PhysicalPlan, PhysicalOptimizationStats> optimize(
+			PhysicalPlan initialPhysicalPlan,
+			QueryProcContext ctxt ) throws PhysicalOptimizationException;
 }

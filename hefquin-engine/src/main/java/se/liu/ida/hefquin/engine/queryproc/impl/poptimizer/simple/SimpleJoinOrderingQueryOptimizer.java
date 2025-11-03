@@ -8,6 +8,7 @@ import se.liu.ida.hefquin.engine.queryplan.physical.PhysicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.utils.PhysicalPlanFactory;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationException;
 import se.liu.ida.hefquin.engine.queryproc.PhysicalOptimizationStats;
+import se.liu.ida.hefquin.engine.queryproc.QueryProcContext;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizationStatsImpl;
 import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerBase;
 
@@ -22,59 +23,66 @@ import se.liu.ida.hefquin.engine.queryproc.impl.poptimizer.PhysicalOptimizerBase
  */
 public class SimpleJoinOrderingQueryOptimizer extends PhysicalOptimizerBase
 {
-    protected final JoinPlanOptimizer joinPlanOptimizer;
+	protected final JoinPlanOptimizer joinPlanOptimizer;
 
-    public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer ) {
-        assert joinPlanOptimizer != null;
-        this.joinPlanOptimizer = joinPlanOptimizer;
-    }
+	public SimpleJoinOrderingQueryOptimizer( final JoinPlanOptimizer joinPlanOptimizer ) {
+		assert joinPlanOptimizer != null;
+		this.joinPlanOptimizer = joinPlanOptimizer;
+	}
 
-    @Override
-    public boolean assumesLogicalMultiwayJoins() {
-        return true;
-    }
+	@Override
+	public boolean assumesLogicalMultiwayJoins() {
+		return true;
+	}
 
-    @Override
-    public boolean keepMultiwayJoinsInInitialPhysicalPlan() {
-        return true;
-    }
+	@Override
+	public boolean keepMultiwayJoinsInInitialPhysicalPlan() {
+		return true;
+	}
 
-    @Override
-    public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize( final PhysicalPlan initialPlan ) throws PhysicalOptimizationException {
-        final PhysicalPlan bestPlan = optimizePlan(initialPlan);
+	@Override
+	public Pair<PhysicalPlan, PhysicalOptimizationStats> optimize(
+			final PhysicalPlan initialPlan,
+			final QueryProcContext ctxt )
+					throws PhysicalOptimizationException
+	{
+		return new Pair<>( optimizePlan(initialPlan, ctxt),
+		                   new PhysicalOptimizationStatsImpl() );
+	}
 
-        final PhysicalOptimizationStatsImpl myStats = new PhysicalOptimizationStatsImpl();
+	public PhysicalPlan optimizePlan( final PhysicalPlan plan,
+	                                  final QueryProcContext ctxt )
+			throws PhysicalOptimizationException
+	{
+		if ( plan.numberOfSubPlans() == 0 ) {
+			return plan;
+		}
 
-        return new Pair<>(bestPlan, myStats);
-    }
+		final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan, ctxt);
 
-    public PhysicalPlan optimizePlan( final PhysicalPlan plan ) throws PhysicalOptimizationException {
-        if ( plan.numberOfSubPlans() == 0 ) {
-            return plan;
-        }
+		if ( hasMultiwayJoinAsRoot(plan) ){
+			return joinPlanOptimizer.determineJoinPlan(optSubPlans, ctxt);
+		}
+		else {
+			return PhysicalPlanFactory.createPlan( plan.getRootOperator(), optSubPlans );
+		}
+	}
 
-        final PhysicalPlan[] optSubPlans = getOptimizedSubPlans(plan);
+	protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan,
+	                                               final QueryProcContext ctxt )
+			throws PhysicalOptimizationException
+	{
+		final int numChildren = plan.numberOfSubPlans();
+		final PhysicalPlan[] children = new PhysicalPlan[numChildren];
+		for ( int i = 0; i < numChildren; ++i ) {
+			children[i] = optimizePlan( plan.getSubPlan(i), ctxt );
+		}
+		return children;
+	}
 
-        if ( hasMultiwayJoinAsRoot(plan) ){
-            return joinPlanOptimizer.determineJoinPlan(optSubPlans);
-        }
-        else {
-            return PhysicalPlanFactory.createPlan( plan.getRootOperator(), optSubPlans );
-        }
-    }
-
-    protected PhysicalPlan[] getOptimizedSubPlans( final PhysicalPlan plan ) throws PhysicalOptimizationException {
-        final int numChildren = plan.numberOfSubPlans();
-        final PhysicalPlan[] children = new PhysicalPlan[numChildren];
-        for ( int i = 0; i < numChildren; ++i ) {
-            children[i] = optimizePlan( plan.getSubPlan(i) );
-        }
-        return children;
-    }
-
-    protected boolean hasMultiwayJoinAsRoot( final PhysicalPlan plan ) {
-        final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
-        return rootOp instanceof LogicalOpMultiwayJoin;
-    }
+	protected boolean hasMultiwayJoinAsRoot( final PhysicalPlan plan ) {
+		final LogicalOperator rootOp = ((PhysicalOperatorForLogicalOperator) plan.getRootOperator()).getLogicalOperator();
+		return rootOp instanceof LogicalOpMultiwayJoin;
+	}
 
 }

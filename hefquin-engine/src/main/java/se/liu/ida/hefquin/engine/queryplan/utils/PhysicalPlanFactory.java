@@ -359,17 +359,6 @@ public class PhysicalPlanFactory
 	}
 
 	/**
-	 * Creates a plan with a binary join as root operator, using
-	 * the default physical operator for such a join (as per
-	 * {@link LogicalToPhysicalOpConverter}).
-	 */
-	@Deprecated
-	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
-	                                               final PhysicalPlan subplan2 ) {
-		return createPlanWithJoin(subplan1, subplan2, LOP2POP);
-	}
-
-	/**
 	 * Creates a plan with a binary join as root operator, using the
 	 * default physical operator for such a join (as per the given
 	 * {@link LogicalToPhysicalOpConverter}).
@@ -378,27 +367,6 @@ public class PhysicalPlanFactory
 	                                               final PhysicalPlan subplan2,
 	                                               final LogicalToPhysicalOpConverter lop2pop ) {
 		return createPlanWithJoin(subplan1, subplan2, null, lop2pop);
-	}
-
-	/**
-	 * Creates a plan with a binary join as root operator, using
-	 * the default physical operator for such a join (as per
-	 * {@link LogicalToPhysicalOpConverter}).
-	 * <p>
-	 * The qpInfo argument may be <code>null</code>. Provide an actual
-	 * {@link QueryPlanningInfo} object only if this object already exists
-	 * and the resulting plan is indeed meant to be associated with it (for
-	 * instance, when creating a physical plan for a logical plan that is
-	 * associated with this object). Also, do not create different physical
-	 * plans with the same {@link QueryPlanningInfo} object because these
-	 * objects may later be extended with additional properties for each plan;
-	 * instead, make copies of such an object if needed.
-	 */
-	@Deprecated
-	public static PhysicalPlan createPlanWithJoin( final PhysicalPlan subplan1,
-	                                               final PhysicalPlan subplan2,
-	                                               final QueryPlanningInfo qpInfo ) {
-		return createPlanWithJoin( subplan1, subplan2, qpInfo, LOP2POP );
 	}
 
 	/**
@@ -672,31 +640,6 @@ public class PhysicalPlanFactory
 	 * objects may later be extended with additional properties for each plan;
 	 * instead, make copies of such an object if needed.
 	 */
-	@Deprecated
-	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan,
-	                                                              final PhysicalPlan unionPlan,
-	                                                              final QueryPlanningInfo qpInfo ) {
-		return createPlanWithUnaryOpForUnionPlan(inputPlan, unionPlan, qpInfo, LOP2POP);
-	}
-
-	/**
-	 * This function takes two physical plans as input, with the assumptions
-	 * that the second of these plans i) has a union as its root operator and
-	 * ii) every sub plan under this union is either a request or a filter
-	 * with a request.
-	 *
-	 * Given such input plans, the function turns the requests under the union
-	 * into gpAdd operators with the first given plan as a common subplan.
-	 * <p>
-	 * The qpInfo argument may be <code>null</code>. Provide an actual
-	 * {@link QueryPlanningInfo} object only if this object already exists
-	 * and the resulting plan is indeed meant to be associated with it (for
-	 * instance, when creating a physical plan for a logical plan that is
-	 * associated with this object). Also, do not create different physical
-	 * plans with the same {@link QueryPlanningInfo} object because these
-	 * objects may later be extended with additional properties for each plan;
-	 * instead, make copies of such an object if needed.
-	 */
 	public static PhysicalPlan createPlanWithUnaryOpForUnionPlan( final PhysicalPlan inputPlan,
 	                                                              final PhysicalPlan unionPlan,
 	                                                              final QueryPlanningInfo qpInfo,
@@ -712,30 +655,6 @@ public class PhysicalPlanFactory
 		}
 
 		return createPlan( LogicalOpMultiwayUnion.getInstance(), qpInfo, lop2pop, newUnionSubPlans );
-	}
-
-	/**
-	 * If the second of the two given plans is either a request, a filter
-	 * with request, or a union over requests, then this function turns the
-	 * request(s) into gpAdd operators with the first given plan as subplan.
-	 *
-	 * Otherwise, the function returns a plan with a binary join over the two
-	 * given plans (using the default physical operator).
-	 * <p>
-	 * The qpInfo argument may be <code>null</code>. Provide an actual
-	 * {@link QueryPlanningInfo} object only if this object already exists
-	 * and the resulting plan is indeed meant to be associated with it (for
-	 * instance, when creating a physical plan for a logical plan that is
-	 * associated with this object). Also, do not create different physical
-	 * plans with the same {@link QueryPlanningInfo} object because these
-	 * objects may later be extended with additional properties for each plan;
-	 * instead, make copies of such an object if needed.
-	 **/
-	@Deprecated
-	public static PhysicalPlan createPlanWithDefaultUnaryOpIfPossible( final PhysicalPlan inputPlan,
-	                                                                   final PhysicalPlan nextPlan,
-	                                                                   final QueryPlanningInfo qpInfo ) {
-		return createPlanWithDefaultUnaryOpIfPossible(inputPlan, nextPlan, qpInfo, LOP2POP);
 	}
 
 	/**
