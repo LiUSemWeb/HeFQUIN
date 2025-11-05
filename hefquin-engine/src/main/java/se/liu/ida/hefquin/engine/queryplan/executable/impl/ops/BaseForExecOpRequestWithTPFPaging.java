@@ -13,7 +13,6 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.TPFResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
