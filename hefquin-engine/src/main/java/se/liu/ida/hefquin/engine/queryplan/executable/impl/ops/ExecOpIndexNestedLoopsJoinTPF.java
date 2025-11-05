@@ -18,7 +18,7 @@ public class ExecOpIndexNestedLoopsJoinTPF extends BaseForExecOpIndexNestedLoops
 
 	@Override
 	protected NullaryExecutableOp createRequestOperator( final TriplePatternRequest req ) {
-		return new ExecOpRequestTPFatTPFServer(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, false, null);
 	}
 
 }

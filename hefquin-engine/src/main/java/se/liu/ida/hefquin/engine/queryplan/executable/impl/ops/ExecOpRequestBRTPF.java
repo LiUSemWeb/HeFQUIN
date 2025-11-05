@@ -30,14 +30,6 @@ public class ExecOpRequestBRTPF extends BaseForExecOpRequestWithTPFPaging<Bindin
 	}
 
 	@Override
-	protected TPFResponse performPageRequest( final BRTPFRequest req,
-	                                          final FederationAccessManager fedAccessMgr )
-			throws FederationAccessException
-	{
-		return FederationAccessUtils.performRequest(fedAccessMgr, req, fm);
-	}
-
-	@Override
 	protected Iterator<SolutionMapping> convert( final Iterable<Triple> itTriples ) {
 		return TriplesToSolMapsConverter.convert( itTriples, req.getTriplePattern() );
 	}

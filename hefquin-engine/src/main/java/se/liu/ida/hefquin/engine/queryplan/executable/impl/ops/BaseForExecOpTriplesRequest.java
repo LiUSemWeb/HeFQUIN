@@ -21,7 +21,7 @@ import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalEr
  * broken into multiple requests as would be the case when
  * interacting with, e.g., a TPF server which employs paging.
  * For interactions with TPF servers, there is a different
- * base class: {@link BaseForExecOpTriplePatternRequestWithTPF}.
+ * base class: {@link ExecOpRequestTPF}.
  */
 public abstract class BaseForExecOpTriplesRequest<ReqType extends DataRetrievalRequest, MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>

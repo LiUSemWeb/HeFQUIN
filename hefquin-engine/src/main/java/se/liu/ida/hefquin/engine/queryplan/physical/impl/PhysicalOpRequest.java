@@ -5,8 +5,7 @@ import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestForSolMapsResponses;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPF;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalOperator;
 import se.liu.ida.hefquin.engine.queryplan.logical.NullaryLogicalOp;
@@ -79,14 +78,19 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 			return new ExecOpRequestForSolMapsResponses<>(sreq, sep, collectExceptions, qpInfo);
 		}
 		else if ( fm instanceof TPFServer tpf && req instanceof TriplePatternRequest tpreq ) {
-			return new ExecOpRequestTPFatTPFServer(tpreq, tpf, collectExceptions, qpInfo);
+			return new ExecOpRequestTPF<>(tpreq, tpf, collectExceptions, qpInfo);
 		}
 		else if ( fm instanceof BRTPFServer brtpf && req instanceof TriplePatternRequest tpreq ) {
-			return new ExecOpRequestTPFatBRTPFServer(tpreq, brtpf, collectExceptions, qpInfo);
+			return new ExecOpRequestTPF<>(tpreq, brtpf, collectExceptions, qpInfo);
 		}
 		else if ( fm instanceof BRTPFServer brtpf && req instanceof BindingsRestrictedTriplePatternRequest brtpreq ) {
 			return new ExecOpRequestBRTPF(brtpreq, brtpf, collectExceptions, qpInfo);
 		}
+/*
+		else if ( fm instanceof RESTEndpoint ep && req instanceof SPARQLRequest sreq ) {
+			return new ExecOpRequestREST(sreq, ep, collectExceptions, qpInfo);
+		}
+*/
 		else
 			throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
 	}

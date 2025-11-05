@@ -97,7 +97,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 			}
 
 			final TriplePatternRequest req = new TriplePatternRequestImpl(restrictedTP);
-			return new ExecOpRequestTPFatBRTPFServer(req, fm, false, null);
+			return new ExecOpRequestTPF<>(req, fm, false, null);
 		}
 
 		final BindingsRestrictedTriplePatternRequest req = new BindingsRestrictedTriplePatternRequestImpl(query, solMaps);
@@ -107,7 +107,7 @@ public class ExecOpBindJoinBRTPF extends BaseForExecOpBindJoinWithRequestOps<Tri
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
 		final TriplePatternRequest req = new TriplePatternRequestImpl(query);
-		return new ExecOpRequestTPFatBRTPFServer(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, false, null);
 	}
 
 }

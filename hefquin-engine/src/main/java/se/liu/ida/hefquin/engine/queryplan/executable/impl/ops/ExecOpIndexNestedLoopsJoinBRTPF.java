@@ -18,7 +18,7 @@ public class ExecOpIndexNestedLoopsJoinBRTPF extends BaseForExecOpIndexNestedLoo
 
 	@Override
 	protected NullaryExecutableOp createRequestOperator( final TriplePatternRequest req ) {
-		return new ExecOpRequestTPFatBRTPFServer(req, fm, false, null);
+		return new ExecOpRequestTPF<>(req, fm, false, null);
 	}
 
 }
