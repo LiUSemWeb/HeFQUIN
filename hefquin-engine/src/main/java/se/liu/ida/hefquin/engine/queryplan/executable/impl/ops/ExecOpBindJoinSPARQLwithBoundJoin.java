@@ -131,7 +131,7 @@ public class ExecOpBindJoinSPARQLwithBoundJoin extends BaseForExecOpBindJoinSPAR
 		final Element elmt = createUnion(solMaps);
 		final SPARQLGraphPattern pattern = new GenericSPARQLGraphPatternImpl1(elmt);
 		final SPARQLRequest request = new SPARQLRequestImpl(pattern);
-		return new ExecOpRequestSPARQL(request, fm, false, null);
+		return new ExecOpRequestForSolMapsResponses<>(request, fm, false, null);
 	}
 
 	protected Element createUnion( final Iterable<Binding> solMaps ) {

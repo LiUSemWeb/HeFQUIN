@@ -4,7 +4,7 @@ import se.liu.ida.hefquin.base.query.ExpectedVariables;
 import se.liu.ida.hefquin.engine.queryplan.base.impl.BaseForQueryPlanOperator;
 import se.liu.ida.hefquin.engine.queryplan.executable.NullaryExecutableOp;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestBRTPF;
-import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestSPARQL;
+import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestForSolMapsResponses;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatBRTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ops.ExecOpRequestTPFatTPFServer;
 import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
@@ -20,6 +20,7 @@ import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.TriplePatternRequest;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -75,7 +76,7 @@ public class PhysicalOpRequest<ReqType extends DataRetrievalRequest, MemberType 
 		final ReqType req = lop.getRequest();
 		final MemberType fm = lop.getFederationMember();
 		if ( fm instanceof SPARQLEndpoint sep && req instanceof SPARQLRequest sreq ) {
-			return new ExecOpRequestSPARQL(sreq, sep, collectExceptions, qpInfo);
+			return new ExecOpRequestForSolMapsResponses<>(sreq, sep, collectExceptions, qpInfo);
 		}
 		else if ( fm instanceof TPFServer tpf && req instanceof TriplePatternRequest tpreq ) {
 			return new ExecOpRequestTPFatTPFServer(tpreq, tpf, collectExceptions, qpInfo);

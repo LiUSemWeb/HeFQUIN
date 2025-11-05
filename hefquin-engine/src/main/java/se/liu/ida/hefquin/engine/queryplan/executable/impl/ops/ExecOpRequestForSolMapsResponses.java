@@ -1,6 +1,7 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
+import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
 import se.liu.ida.hefquin.engine.queryplan.executable.ExecOpExecutionException;
 import se.liu.ida.hefquin.engine.queryplan.executable.IntermediateResultElementSink;
 import se.liu.ida.hefquin.engine.queryplan.executable.impl.ExecutableOperatorStatsImpl;
@@ -9,22 +10,21 @@ import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.access.DataRetrievalRequest;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
-import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalRequest,
-                                                  MemberType extends FederationMember>
+public class ExecOpRequestForSolMapsResponses<ReqType extends DataRetrievalRequest,
+                                                       MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private long timeAfterResponse = 0L;
 	private long solMapsRetrieved = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
 
-	public BaseForExecOpSolMapsRequest( final ReqType req,
-	                                    final MemberType fm,
-	                                    final boolean collectExceptions,
-	                                    final QueryPlanningInfo qpInfo ) {
+	public ExecOpRequestForSolMapsResponses( final ReqType req,
+	                                         final MemberType fm,
+	                                         final boolean collectExceptions,
+	                                         final QueryPlanningInfo qpInfo ) {
 		super(req, fm, collectExceptions, qpInfo);
 	}
 
@@ -34,7 +34,7 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 	{
 		final SolMapsResponse response;
 		try {
-			response = performRequest( execCxt.getFederationAccessMgr() );
+			response = FederationAccessUtils.performRequest( execCxt.getFederationAccessMgr(), req, fm );
 		}
 		catch ( final FederationAccessException e ) {
 			throw new ExecOpExecutionException( "Performing the request caused an exception.", e, this );
@@ -64,8 +64,6 @@ public abstract class BaseForExecOpSolMapsRequest<ReqType extends DataRetrievalR
 		final int cnt = sink.send(solutionMappings);
 		numberOfOutputMappingsProduced += cnt;
 	}
-
-	protected abstract SolMapsResponse performRequest( FederationAccessManager fedAccessMgr ) throws FederationAccessException;
 
 	@Override
 	public void resetStats() {
