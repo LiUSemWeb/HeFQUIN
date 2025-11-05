@@ -36,7 +36,7 @@ import se.liu.ida.hefquin.federation.access.impl.FederationAccessManagerWithCach
 import se.liu.ida.hefquin.federation.access.impl.req.TriplePatternRequestImpl;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 
-public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
+public class ExecOpRequestTPFTest extends ExecOpTestBase
 {
 	protected static ExecutorService execServiceForFedAccess;
 
@@ -68,7 +68,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node o = NodeFactory.createVariable("o");
 		final TriplePattern tp = new TriplePatternImpl(s,p,o);
 
-		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
+		final ExecOpRequestTPF<?> op = new ExecOpRequestTPF<>(
 				new TriplePatternRequestImpl(tp),
 				getDBpediaTPFServer(),
 				false,
@@ -101,7 +101,7 @@ public class ExecOpRequestTPFatTPFServerTest extends ExecOpTestBase
 		final Node p = NodeFactory.createURI("http://example.org/p");
 		final Var v = Var.alloc("v");
 		final TriplePattern tp = new TriplePatternImpl(s,p,v);
-		final ExecOpRequestTPFatTPFServer op = new ExecOpRequestTPFatTPFServer(
+		final ExecOpRequestTPF<?> op = new ExecOpRequestTPF<>(
 				new TriplePatternRequestImpl(tp),
 				new TPFServerForTest(),
 				false,
