@@ -19,7 +19,7 @@ import se.liu.ida.hefquin.federation.members.TPFServer;
 public class FederationAccessUtils
 {
 	public static DataRetrievalResponse<?>[] performRequest( final FederationAccessManager fedAccessMgr,
-	                                                      final LogicalOpRequest<?,?>... reqOps )
+	                                                         final LogicalOpRequest<?,?>... reqOps )
 			  throws FederationAccessException
 	{
 		@SuppressWarnings("unchecked")
@@ -28,23 +28,23 @@ public class FederationAccessUtils
 		for ( int i = 0; i < reqOps.length; ++i ) {
 			final DataRetrievalRequest req = reqOps[i].getRequest();
 			final FederationMember fm = reqOps[i].getFederationMember();
-			if ( fm instanceof SPARQLEndpoint && req instanceof SPARQLRequest ) {
-				futures[i] = fedAccessMgr.issueRequest( (SPARQLRequest) req, (SPARQLEndpoint) fm );
+			if ( fm instanceof SPARQLEndpoint ep && req instanceof SPARQLRequest sreq ) {
+				futures[i] = fedAccessMgr.issueRequest(sreq, ep);
 			}
-			else if ( fm instanceof TPFServer && req instanceof TriplePatternRequest ) {
-				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueRequest( reqTPF, (TPFServer) fm );
+			else if ( fm instanceof TPFServer tpf && req instanceof TriplePatternRequest tpreq ) {
+				final TPFRequest reqTPF = ensureTPFRequest(tpreq);
+				futures[i] = fedAccessMgr.issueRequest(reqTPF, tpf);
 			}
-			else if ( fm instanceof BRTPFServer && req instanceof TriplePatternRequest ) {
-				final TPFRequest reqTPF = ensureTPFRequest( (TriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueRequest( reqTPF, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer brtpf && req instanceof TriplePatternRequest tpreq ) {
+				final TPFRequest reqTPF = ensureTPFRequest(tpreq);
+				futures[i] = fedAccessMgr.issueRequest(reqTPF, brtpf);
 			}
-			else if ( fm instanceof BRTPFServer && req instanceof BindingsRestrictedTriplePatternRequest ) {
-				final BRTPFRequest reqBRTPF = ensureBRTPFRequest( (BindingsRestrictedTriplePatternRequest) req );
-				futures[i] = fedAccessMgr.issueRequest( reqBRTPF, (BRTPFServer) fm );
+			else if ( fm instanceof BRTPFServer brtpf && req instanceof BindingsRestrictedTriplePatternRequest brreq ) {
+				final BRTPFRequest reqBRTPF = ensureBRTPFRequest(brreq);
+				futures[i] = fedAccessMgr.issueRequest(reqBRTPF, brtpf);
 			}
-			else if ( fm instanceof Neo4jServer && req instanceof Neo4jRequest ) {
-				futures[i] = fedAccessMgr.issueRequest( (Neo4jRequest) req, (Neo4jServer) fm );
+			else if ( fm instanceof Neo4jServer neo && req instanceof Neo4jRequest nreq ) {
+				futures[i] = fedAccessMgr.issueRequest(nreq, neo);
 			}
 			else {
 				throw new IllegalArgumentException("Unsupported combination of federation member (type: " + fm.getClass().getName() + ") and request type (" + req.getClass().getName() + ")");
@@ -119,85 +119,17 @@ public class FederationAccessUtils
 		}
 	}
 
-	public static SolMapsResponse performRequest( final FederationAccessManager fedAccessMgr,
-	                                              final SPARQLRequest req,
-	                                              final SPARQLEndpoint fm )
-			  throws FederationAccessException
+	public static < ReqType extends DataRetrievalRequest,
+	                RespType extends DataRetrievalResponse<?>,
+	                MemberType extends FederationMember >
+	RespType performRequest( final FederationAccessManager fedAccessMgr,
+	                         final ReqType req,
+	                         final MemberType fm ) throws FederationAccessException
 	{
-		return getSolMapsResponse( fedAccessMgr.issueRequest(req,fm), req, fm );
-	}
+		final CompletableFuture<RespType> f = fedAccessMgr.issueRequest(req,fm);
 
-	public static TPFResponse performRequest( final FederationAccessManager fedAccessMgr,
-	                                          final TPFRequest req,
-	                                          final TPFServer fm )
-			  throws FederationAccessException
-	{
-		return getTPFResponse( fedAccessMgr.issueRequest(req,fm), req, fm );
-	}
-
-	public static TPFResponse performRequest( final FederationAccessManager fedAccessMgr,
-	                                          final TPFRequest req,
-	                                          final BRTPFServer fm )
-			  throws FederationAccessException
-	{
-		return getTPFResponse( fedAccessMgr.issueRequest(req,fm), req, fm );
-	}
-
-	public static TPFResponse performRequest( final FederationAccessManager fedAccessMgr,
-	                                          final BRTPFRequest req,
-	                                          final BRTPFServer fm )
-			  throws FederationAccessException
-	{
-		return getTPFResponse( fedAccessMgr.issueRequest(req,fm), req, fm );
-	}
-
-	public static RecordsResponse performRequest(final FederationAccessManager fedAccessMgr,
-												 final Neo4jRequest req,
-												 final Neo4jServer fm )
-			  throws FederationAccessException
-	{
-		return getRecordsResponse( fedAccessMgr.issueRequest(req,fm), req, fm );
-	}
-
-	protected static SolMapsResponse getSolMapsResponse( final CompletableFuture<SolMapsResponse> futureResp,
-	                                                     final DataRetrievalRequest req,
-	                                                     final FederationMember fm )
-			  throws FederationAccessException
-	{
 		try {
-			return futureResp.get();
-		}
-		catch ( final InterruptedException e ) {
-			throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", e, req, fm);
-		}
-		catch ( final ExecutionException e ) {
-			throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", e, req, fm);
-		}
-	}
-
-	protected static TPFResponse getTPFResponse( final CompletableFuture<TPFResponse> futureResp,
-	                                             final DataRetrievalRequest req,
-	                                             final FederationMember fm )
-			  throws FederationAccessException
-	{
-		try {
-			return futureResp.get();
-		}
-		catch ( final InterruptedException e ) {
-			throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", e, req, fm);
-		}
-		catch ( final ExecutionException e ) {
-			throw new FederationAccessException("Getting the response to a data retrieval request caused an exception.", e, req, fm);
-		}
-	}
-
-	protected static RecordsResponse getRecordsResponse( final CompletableFuture<RecordsResponse> futureResp,
-	                                                   final DataRetrievalRequest req,
-	                                                   final FederationMember fm )
-			  throws FederationAccessException
-	{
-		try {
-			return futureResp.get();
+			return f.get();
 		}
 		catch ( final InterruptedException e ) {
 			throw new FederationAccessException("Unexpected interruption when getting the response to a data retrieval request.", e, req, fm);
