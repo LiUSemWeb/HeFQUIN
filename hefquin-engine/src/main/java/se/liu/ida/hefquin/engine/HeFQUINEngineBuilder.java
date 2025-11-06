@@ -19,6 +19,7 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
+import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
 /**
@@ -222,6 +223,10 @@ public class HeFQUINEngineBuilder
 		final OpExecutorFactory factory = new OpExecutorFactory() {
 			@Override
 			public OpExecutor create( final ExecutionContext execCxt ) {
+				final Boolean b = execCxt.getContext().get( HeFQUINConstants.sysExecuteWithJena );
+				if ( b != null && b == true )
+					return OpExecutor.stdFactory.create(execCxt);
+
 				return new OpExecutorHeFQUIN(qProc, execCxt);
 			}
 		};

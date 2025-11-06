@@ -25,7 +25,7 @@ public abstract class BaseForExecOpBindJoinSPARQL extends BaseForExecOpBindJoinW
 
 	@Override
 	protected NullaryExecutableOp createExecutableReqOpForAll() {
-		return new ExecOpRequestForSolMapsResponses<>( new SPARQLRequestImpl(query), fm, false, null );
+		return new ExecOpRequestSPARQL<>( new SPARQLRequestImpl(query), fm, false, null );
 	}
 
 }

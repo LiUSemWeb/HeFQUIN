@@ -13,18 +13,18 @@ import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.SolMapsResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 
-public class ExecOpRequestForSolMapsResponses<ReqType extends DataRetrievalRequest,
-                                                       MemberType extends FederationMember>
+public class ExecOpRequestSPARQL<ReqType extends DataRetrievalRequest,
+                                 MemberType extends FederationMember>
                 extends BaseForExecOpRequest<ReqType,MemberType>
 {
 	private long timeAfterResponse = 0L;
 	private long solMapsRetrieved = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
 
-	public ExecOpRequestForSolMapsResponses( final ReqType req,
-	                                         final MemberType fm,
-	                                         final boolean collectExceptions,
-	                                         final QueryPlanningInfo qpInfo ) {
+	public ExecOpRequestSPARQL( final ReqType req,
+	                            final MemberType fm,
+	                            final boolean collectExceptions,
+	                            final QueryPlanningInfo qpInfo ) {
 		super(req, fm, collectExceptions, qpInfo);
 	}
 
@@ -53,7 +53,7 @@ public class ExecOpRequestForSolMapsResponses<ReqType extends DataRetrievalReque
 	protected void process( final SolMapsResponse response, final IntermediateResultElementSink sink )
 		throws ExecOpExecutionException
 	{
-		final Iterable<SolutionMapping> solutionMappings;;
+		final Iterable<SolutionMapping> solutionMappings;
 		try {
 			solutionMappings = response.getResponseData();
 		}

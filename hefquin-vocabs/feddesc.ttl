@@ -93,3 +93,33 @@ fd:mappingConfiguration a rdf:Property ;
     rdfs:range  rdf:Resource ;
     rdfs:label "mapping configuration"@en ;
     rdfs:comment "Mapping configuration for translating non-RDF data models to RDF (e.g., GraphQL, LPG)."@en .
+
+
+
+
+fd:RESTInterface a owl:Class ;
+    rdfs:subClassOf fd:EndpointInterface ;
+    rdfs:label "REST Endpoint Interface"@en ;
+    rdfs:comment "An interface to access a federation member that provides a REST API."@en .
+
+fd:QueryParameter a owl:Class ;
+    rdfs:label "Query Parameter"@en ;
+    rdfs:comment "Declaration of a query parameter for a REST API."@en .
+
+fd:queryParameters a rdf:Property ;
+    rdfs:domain fd:RESTInterface ;
+    rdfs:range  rdf:List ;
+    rdfs:label "query parameters"@en ;
+    rdfs:comment "List of query parameters for a REST API. The elements of such a list are expected to be of type fd:QueryParameter."@en .
+
+fd:paramName a rdf:Property ;
+    rdfs:domain fd:QueryParameter ;
+    rdfs:range  xsd:string ;
+    rdfs:label "name of query parameter"@en ;
+    rdfs:comment "The name of query parameters for a REST API."@en .
+
+fd:paramType a rdf:Property ;
+    rdfs:domain fd:QueryParameter ;
+    rdfs:range  rdf:Resource ;
+    rdfs:label "type of query parameter"@en ;
+    rdfs:comment "The type of query parameters for a REST API, which is expected to be specified as a datatype IRI (e.g., xsd:string, xsd:float)."@en .

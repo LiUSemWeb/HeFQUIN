@@ -23,6 +23,14 @@ ex:europaSPARQL
       fd:interface [ a                  fd:SPARQLEndpointInterface ;
                      fd:endpointAddress <https://data.europa.eu/sparql> ] .
 
+ex:openMeteo
+      a            fd:FederationMember ;
+      fd:interface [ a                  fd:RESTInterface ;
+                     fd:endpointAddress <https://api.open-meteo.com/v1/forecast> ;
+                     fd:queryParameters ( [ fd:paramName "latitude" ; fd:paramType xsd:float ]
+                                          [ fd:paramName "longitude" ; fd:paramType xsd:float ]
+                                          [ fd:paramName "current" ; fd:paramType xsd:string ] ) ] .
+
 #ex:neo4jTest
 #      a            fd:FederationMember ;
 #      fd:interface [ a                  fd:BoltInterface ;

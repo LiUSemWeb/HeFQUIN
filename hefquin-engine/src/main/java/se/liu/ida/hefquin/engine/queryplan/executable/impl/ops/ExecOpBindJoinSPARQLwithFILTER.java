@@ -97,7 +97,7 @@ public class ExecOpBindJoinSPARQLwithFILTER extends BaseForExecOpBindJoinSPARQL
 
 		final SPARQLGraphPattern patternForReq = new GenericSPARQLGraphPatternImpl1(group);
 		final SPARQLRequest request = new SPARQLRequestImpl(patternForReq);
-		return new ExecOpRequestForSolMapsResponses<>(request, fm, false, null);
+		return new ExecOpRequestSPARQL<>(request, fm, false, null);
 	}
 
 	public static Expr createFilterExpression( final Iterable<Binding> solMaps ) {

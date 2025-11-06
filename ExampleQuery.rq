@@ -2,6 +2,7 @@ PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 PREFIX dbo:    <http://dbpedia.org/ontology/>
+PREFIX ex:     <http://example.org/>
 
 SELECT ?c ?cc ?o ?s1 ?s2 WHERE {
 	VALUES ?s1 { <http://fragments.dbpedia.org/2016-04/en> }
@@ -16,6 +17,13 @@ SELECT ?c ?cc ?o ?s1 ?s2 WHERE {
 		?cc rdfs:label ?o
 	}
 }
+
+#SELECT * WHERE {
+#	SERVICE <https://api.open-meteo.com/v1/forecast> {
+#		?x ex:temperature ?temp .
+#		?x ex:windSpeed ?wind .
+#	}
+#}
 
 # An example query that must take into account vocabulary mappings
 #SELECT * WHERE {

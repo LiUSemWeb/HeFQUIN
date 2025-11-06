@@ -8,4 +8,6 @@ public class HeFQUINConstants {
 	public static final Symbol sysEngine                  = Symbol.create(systemVarNS+"engine");
 
 	public static final Symbol sysQProcStatsAndExceptions = Symbol.create(systemVarNS+"queryProcStatsAndExceptions");
+
+	public static final Symbol sysExecuteWithJena         = Symbol.create(systemVarNS+"executeWithJena");
 }

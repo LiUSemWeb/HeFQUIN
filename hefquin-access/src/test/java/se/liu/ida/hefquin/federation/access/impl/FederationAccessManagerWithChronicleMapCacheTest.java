@@ -36,6 +36,7 @@ import se.liu.ida.hefquin.federation.access.impl.req.TPFRequestImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.BRTPFRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.Neo4jRequestProcessor;
+import se.liu.ida.hefquin.federation.access.impl.reqproc.RESTRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessor;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.SPARQLRequestProcessorImpl;
 import se.liu.ida.hefquin.federation.access.impl.reqproc.TPFRequestProcessor;
@@ -44,6 +45,7 @@ import se.liu.ida.hefquin.federation.access.impl.response.SolMapsResponseImpl;
 import se.liu.ida.hefquin.federation.access.impl.response.TPFResponseImpl;
 import se.liu.ida.hefquin.federation.members.BRTPFServer;
 import se.liu.ida.hefquin.federation.members.Neo4jServer;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.SPARQLEndpoint;
 import se.liu.ida.hefquin.federation.members.TPFServer;
 
@@ -716,12 +718,19 @@ public class FederationAccessManagerWithChronicleMapCacheTest extends Federation
 				return null;
 			}
 		};
+		final RESTRequestProcessor reqProcREST = new RESTRequestProcessor() {
+			@Override
+			public StringResponse performRequest( RESTRequest req, RESTEndpoint fm ) {
+				throw new UnsupportedOperationException();
+			}
+		};
 
 		final FederationAccessManager fedAccMan = new AsyncFederationAccessManagerImpl( execServiceForFedAccess,
 			                                                                            reqProc,
 			                                                                            reqProcTPF,
 			                                                                            reqProcBRTPF,
-			                                                                            reqProcNeo4j );
+			                                                                            reqProcNeo4j,
+			                                                                            reqProcREST );
 		return new FederationAccessManagerWithChronicleMapCache( fedAccMan, cacheCapacity, timeToLive );
 	}
 

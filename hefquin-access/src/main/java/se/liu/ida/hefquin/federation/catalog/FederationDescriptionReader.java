@@ -2,18 +2,25 @@ package se.liu.ida.hefquin.federation.catalog;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.atlas.json.io.parserjavacc.javacc.ParseException;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 
 import se.liu.ida.hefquin.base.data.VocabularyMapping;
 import se.liu.ida.hefquin.base.data.mappings.impl.VocabularyMappingWrappingImpl;
@@ -23,11 +30,14 @@ import se.liu.ida.hefquin.engine.wrappers.graphql.data.GraphQLSchema;
 import se.liu.ida.hefquin.engine.wrappers.graphql.impl.GraphQLSchemaInitializerImpl;
 import se.liu.ida.hefquin.federation.FederationMember;
 import se.liu.ida.hefquin.federation.catalog.impl.FederationCatalogImpl;
+import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.impl.BRTPFServerImpl;
 import se.liu.ida.hefquin.federation.members.impl.GraphQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.Neo4jServerImpl;
+import se.liu.ida.hefquin.federation.members.impl.RESTEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.SPARQLEndpointImpl;
 import se.liu.ida.hefquin.federation.members.impl.TPFServerImpl;
+import se.liu.ida.hefquin.jenaext.ModelUtils;
 import se.liu.ida.hefquin.vocabulary.FDVocab;
 
 public class FederationDescriptionReader
@@ -74,14 +84,8 @@ public class FederationDescriptionReader
 				if ( endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("More Than One SPARQL endpointAddress!");
 
-				final String addrStr;
-				if ( addr.isLiteral() ) {
-					addrStr = addr.asLiteral().getLexicalForm();
-				}
-				else if ( addr.isURIResource() ) {
-					addrStr = addr.asResource().getURI();
-				}
-				else {
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
 					throw new IllegalArgumentException();
 				}
 
@@ -99,14 +103,8 @@ public class FederationDescriptionReader
 				if ( exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("More Than One TPF exampleFragmentAddress!");
 
-				final String addrStr;
-				if ( addr.isLiteral() ) {
-					addrStr = addr.asLiteral().getLexicalForm();
-				}
-				else if ( addr.isURIResource() ) {
-					addrStr = addr.asResource().getURI();
-				}
-				else {
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
 					throw new IllegalArgumentException();
 				}
 
@@ -124,14 +122,8 @@ public class FederationDescriptionReader
 				if ( exampleFragmentAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("More Than One brTPF exampleFragmentAddress!");
 
-				final String addrStr;
-				if ( addr.isLiteral() ) {
-					addrStr = addr.asLiteral().getLexicalForm();
-				}
-				else if ( addr.isURIResource() ) {
-					addrStr = addr.asResource().getURI();
-				}
-				else {
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
 					throw new IllegalArgumentException();
 				}
 
@@ -152,14 +144,8 @@ public class FederationDescriptionReader
 				if ( endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("More Than One Bolt endpointAddress!");
 
-				final String addrStr;
-				if ( addr.isLiteral() ) {
-					addrStr = addr.asLiteral().getLexicalForm();
-				}
-				else if ( addr.isURIResource() ) {
-					addrStr = addr.asResource().getURI();
-				}
-				else {
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
 					throw new IllegalArgumentException();
 				}
 
@@ -180,18 +166,66 @@ public class FederationDescriptionReader
 				if ( endpointAddressesIterator.hasNext() )
 					throw new IllegalArgumentException("More Than One GraphQL endpointAddress!");
 
-				final String addrStr;
-				if ( addr.isLiteral() ) {
-					addrStr = addr.asLiteral().getLexicalForm();
-				}
-				else if ( addr.isURIResource() ) {
-					addrStr = addr.asResource().getURI();
-				}
-				else {
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
 					throw new IllegalArgumentException();
 				}
 
 				final FederationMember fm = createGraphQLServer(addrStr);
+				membersByURI.put(addrStr, fm);
+			}
+			else if ( ifaceType.equals(FDVocab.RESTInterface) )
+			{
+				if ( vocabMap != null )
+					throw new IllegalArgumentException("REST APIs cannot have a vocabulary mapping.");
+
+				final RDFNode addr = ModelUtils.getSingleMandatoryProperty( iface, FDVocab.endpointAddress );
+
+				final String addrStr = getAsURIString(addr);
+				if ( addrStr == null ) {
+					throw new IllegalArgumentException();
+				}
+
+				final Resource queryParamsList = ModelUtils.getSingleMandatoryResourceProperty( iface, FDVocab.queryParameters );
+				if ( ! queryParamsList.canAs(RDFList.class) )
+					throw new IllegalArgumentException( FDVocab.queryParameters.getLocalName() + " property of " + iface.toString() + " should be a list." );
+
+				final Iterator<RDFNode> queryParamsIterator = queryParamsList.as( RDFList.class ).iterator();
+				final List<RESTEndpoint.Parameter> params = new ArrayList<>();
+				while ( queryParamsIterator.hasNext() ) {
+					final RDFNode x = queryParamsIterator.next();
+					if ( ! x.isResource() )
+						throw new IllegalArgumentException( "One of the query parameters of " + iface.toString() + " is not a resource (but, probably, a literal instead)." );
+
+					final Resource p = x.asResource();
+					final String name = ModelUtils.getSingleMandatoryProperty_XSDString(p, FDVocab.paramName);
+					final String type = getAsURIString( ModelUtils.getSingleMandatoryProperty(p, FDVocab.paramType) );
+					if ( type == null )
+						throw new IllegalArgumentException();
+
+					final RDFDatatype dt;
+					if ( XSDDatatype.XSDstring.getURI().equals(type) ) {
+						dt = XSDDatatype.XSDstring;
+					}
+					else if ( XSDDatatype.XSDinteger.getURI().equals(type) ) {
+						dt = XSDDatatype.XSDinteger;
+					}
+					else if ( XSDDatatype.XSDfloat.getURI().equals(type) ) {
+						dt = XSDDatatype.XSDfloat;
+					}
+					else {
+						throw new IllegalArgumentException("Unexpected data type for query parameter: " +  type.toString() );
+					}
+
+					final RESTEndpoint.Parameter param = new RESTEndpoint.Parameter() {
+						@Override public String getName() { return name; }
+						@Override public RDFDatatype getType() { return dt; }
+					};
+
+					params.add(param);
+				}
+
+				final FederationMember fm = createRESTEndpoint(addrStr, params);
 				membersByURI.put(addrStr, fm);
 			}
 			else {
@@ -280,6 +314,12 @@ public class FederationDescriptionReader
 		return new GraphQLEndpointImpl(uri, schema);
 	}
 
+	protected FederationMember createRESTEndpoint( final String uri,
+	                                               final List<RESTEndpoint.Parameter> params ) {
+		verifyExpectedURI(uri);
+		return new RESTEndpointImpl(uri, params);
+	}
+
 	/**
 	 * Verifies that the given string represents an HTTP URI
 	 * or an HTTPS URI and, if so, returns that URI.
@@ -298,6 +338,25 @@ public class FederationDescriptionReader
 		}
 
 		return uri;
+	}
+
+	/**
+	 * Returns a string that represents a URI obtained from the given RDF node.
+	 * In particular, if the node is a URI, then that URI is returned (as a
+	 * string); if the node is an xsd:anyURI literal with a valid URI as its
+	 * lexical form, then that URI is returned; otherwise, {@code null} is
+	 * returned.
+	 */
+	protected String getAsURIString( final RDFNode n ) {
+		if ( n.isLiteral() && n.asLiteral().getDatatypeURI().equals(XSD.anyURI.getURI()) ) {
+			return n.asLiteral().getLexicalForm();
+		}
+		else if ( n.isURIResource() ) {
+			return n.asResource().getURI();
+		}
+		else {
+			return null;
+		}
 	}
 
 }
