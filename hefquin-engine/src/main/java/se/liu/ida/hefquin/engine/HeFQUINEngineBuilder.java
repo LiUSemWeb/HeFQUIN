@@ -4,12 +4,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.jena.query.ARQ;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 import org.apache.jena.sparql.engine.main.QC;
+import org.apache.jena.sparql.lang.SPARQLParser;
+import org.apache.jena.sparql.lang.SPARQLParserFactory;
+import org.apache.jena.sparql.lang.SPARQLParserRegistry;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
@@ -19,6 +23,8 @@ import se.liu.ida.hefquin.engine.queryproc.QueryProcessor;
 import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
+import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
 
@@ -233,6 +239,20 @@ public class HeFQUINEngineBuilder
 
 		ARQ.init();
 		QC.setFactory( ARQ.getContext(), factory );
+
+		final SPARQLParserFactory f = new SPARQLParserFactory() {
+			@Override
+			public boolean accept( final Syntax syntax ) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public SPARQLParser create( final Syntax syntax ) {
+				return new ParserSPARQL12HeFQUIN();
+			}
+		};
+
+		SPARQLParserRegistry.addFactory( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN, f );
 	}
 
 }
