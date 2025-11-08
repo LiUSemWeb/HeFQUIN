@@ -1043,7 +1043,10 @@ Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ;
 #endif
   el = GroupGraphPattern()
 #ifdef SPARQL_12_HeFQUIN
-    { return new ElementServiceWithParams(n, el, silent, paramVars) ; }
+    { if ( paramVars == null )
+        return new ElementService(n, el, silent) ;
+      else
+        return new ElementServiceWithParams(n, el, silent, paramVars) ; }
 #endif
 #if !defined(SPARQL_12_HeFQUIN)
     { return new ElementService(n, el, silent) ; }

@@ -2046,7 +2046,10 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       ;
     }
     el = GroupGraphPattern();
-      {if (true) return new ElementServiceWithParams(n, el, silent, paramVars) ;}
+      if ( paramVars == null )
+        {if (true) return new ElementService(n, el, silent) ;}
+      else
+        {if (true) return new ElementServiceWithParams(n, el, silent, paramVars) ;}
     throw new Error("Missing return statement in function");
   }
 
