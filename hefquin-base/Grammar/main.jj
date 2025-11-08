@@ -119,6 +119,7 @@ import org.apache.jena.sparql.modify.request.* ;
 #ifdef SPARQL_12_HeFQUIN
 import java.util.List;
 import java.util.ArrayList;
+import se.liu.ida.hefquin.jenaext.sparql.syntax.ElementServiceWithParams;
 #endif
 
 #ifdef ARQ
@@ -1014,7 +1015,12 @@ Element GraphGraphPattern() : { Element el ; Node n ;}
     { return new ElementNamedGraph(n, el) ; }
 }
 
+#ifdef SPARQL_12_HeFQUIN
 Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; Var v ; List<Var> paramVars = null ; }
+#endif
+#if !defined(SPARQL_12_HeFQUIN)
+Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; }
+#endif
 {
   <SERVICE> 
   (<SILENT>
@@ -1024,17 +1030,24 @@ Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ;
 #ifdef SPARQL_12_HeFQUIN
   (<PARAMS>
    <LPAREN>
+   v = Var()
+   { paramVars = new ArrayList<Var>(); }
+   { paramVars.add(v); }
    (
+    ( <COMMA> )?
     v = Var()
-    { if ( paramVars == null ) paramVars = new ArrayList<Var>(); }
     { paramVars.add(v); }
    )*
    <RPAREN>
   )?
 #endif
   el = GroupGraphPattern()
-    { System.out.println("paramVars " + paramVars); }
+#ifdef SPARQL_12_HeFQUIN
+    { return new ElementServiceWithParams(n, el, silent, paramVars) ; }
+#endif
+#if !defined(SPARQL_12_HeFQUIN)
     { return new ElementService(n, el, silent) ; }
+#endif
 }
 
 Element Bind() : {  Var v ; Expr expr ; }

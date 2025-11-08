@@ -52,15 +52,21 @@ cat "$GRAMMAR" | cpp -P -DSPARQL -DSPARQL_12 -DSPARQL_12_HeFQUIN >> sparql_12_he
     ## ---- Fixups
     
     # Fix unnecessary imports
-##     echo "---- Fixing Java warnings in ${NAME}TokenManager ..."
-## 
-##     F="$DIR/${CLASS}TokenManager.java"
-## 
-##     sed -e 's/@SuppressWarnings."unused".//' \
-##         -e 's/import .*//' -e 's/MatchLoop: do/do/' \
-##         -e 's/int hiByte = (int)(curChar/int hiByte = (curChar/' \
-## 	< $F > F
-##     mv F $F
+    echo "---- Fixing Java warnings in ${CLASS}TokenManager ..."
+ 
+    F="$DIR/${CLASS}TokenManager.java"
+ 
+    sed -e 's/@SuppressWarnings."unused".//' \
+        -e 's/import .*//' -e 's/MatchLoop: do/do/' \
+        -e 's/int hiByte = (int)(curChar/int hiByte = (curChar/' \
+        < $F > F
+    mv F $F
+
+    F="$DIR/${CLASS}TokenManager.java"
+
+    sed -e 's/public class/\n@SuppressWarnings("all")\npublic class/' < $F > F 
+    mv F $F
+
 
     ## JavaCharStream -- SimpleCharStream is OK.
     F="$DIR/JavaCharStream.java"
