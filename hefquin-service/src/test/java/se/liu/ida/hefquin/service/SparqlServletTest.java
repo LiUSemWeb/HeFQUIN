@@ -40,7 +40,7 @@ public class SparqlServletTest {
 	private static Server server;
 
 	// Default query
-	private static final String DEFAULT_QUERY                = "SELECT (1 AS ?x) WHERE { SERVICE <http://example.org> PARAMS(?v) {} }";
+	private static final String DEFAULT_QUERY                = "SELECT (1 AS ?x) WHERE {}";
 
 	// Request Content-Types
 	private static final String CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
