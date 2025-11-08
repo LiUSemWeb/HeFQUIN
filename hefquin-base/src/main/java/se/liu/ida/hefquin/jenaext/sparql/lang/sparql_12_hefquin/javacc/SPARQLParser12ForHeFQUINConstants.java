@@ -281,157 +281,159 @@ public interface SPARQLParser12ForHeFQUINConstants {
   /** RegularExpression Id. */
   int SILENT = 140;
   /** RegularExpression Id. */
-  int DROP = 141;
+  int PARAMS = 141;
   /** RegularExpression Id. */
-  int INTO = 142;
+  int DROP = 142;
   /** RegularExpression Id. */
-  int TO = 143;
+  int INTO = 143;
   /** RegularExpression Id. */
-  int DFT = 144;
+  int TO = 144;
   /** RegularExpression Id. */
-  int ALL = 145;
+  int DFT = 145;
   /** RegularExpression Id. */
-  int WITH = 146;
+  int ALL = 146;
   /** RegularExpression Id. */
-  int USING = 147;
+  int WITH = 147;
   /** RegularExpression Id. */
-  int DIGITS = 148;
+  int USING = 148;
   /** RegularExpression Id. */
-  int INTEGER = 149;
+  int DIGITS = 149;
   /** RegularExpression Id. */
-  int DECIMAL = 150;
+  int INTEGER = 150;
   /** RegularExpression Id. */
-  int DOUBLE = 151;
+  int DECIMAL = 151;
   /** RegularExpression Id. */
-  int EXPONENT = 152;
+  int DOUBLE = 152;
   /** RegularExpression Id. */
-  int INTEGER_POSITIVE = 153;
+  int EXPONENT = 153;
   /** RegularExpression Id. */
-  int DECIMAL_POSITIVE = 154;
+  int INTEGER_POSITIVE = 154;
   /** RegularExpression Id. */
-  int DOUBLE_POSITIVE = 155;
+  int DECIMAL_POSITIVE = 155;
   /** RegularExpression Id. */
-  int INTEGER_NEGATIVE = 156;
+  int DOUBLE_POSITIVE = 156;
   /** RegularExpression Id. */
-  int DECIMAL_NEGATIVE = 157;
+  int INTEGER_NEGATIVE = 157;
   /** RegularExpression Id. */
-  int DOUBLE_NEGATIVE = 158;
+  int DECIMAL_NEGATIVE = 158;
   /** RegularExpression Id. */
-  int QUOTE_3D = 159;
+  int DOUBLE_NEGATIVE = 159;
   /** RegularExpression Id. */
-  int QUOTE_3S = 160;
+  int QUOTE_3D = 160;
   /** RegularExpression Id. */
-  int ECHAR = 161;
+  int QUOTE_3S = 161;
   /** RegularExpression Id. */
-  int UCHAR = 162;
+  int ECHAR = 162;
   /** RegularExpression Id. */
-  int UCHAR4 = 163;
+  int UCHAR = 163;
   /** RegularExpression Id. */
-  int UCHAR8 = 164;
+  int UCHAR4 = 164;
   /** RegularExpression Id. */
-  int STRING_LITERAL1 = 165;
+  int UCHAR8 = 165;
   /** RegularExpression Id. */
-  int STRING_LITERAL2 = 166;
+  int STRING_LITERAL1 = 166;
   /** RegularExpression Id. */
-  int STRING_LITERAL_LONG1 = 167;
+  int STRING_LITERAL2 = 167;
   /** RegularExpression Id. */
-  int STRING_LITERAL_LONG2 = 168;
+  int STRING_LITERAL_LONG1 = 168;
   /** RegularExpression Id. */
-  int LPAREN = 169;
+  int STRING_LITERAL_LONG2 = 169;
   /** RegularExpression Id. */
-  int RPAREN = 170;
+  int LPAREN = 170;
   /** RegularExpression Id. */
-  int NIL = 171;
+  int RPAREN = 171;
   /** RegularExpression Id. */
-  int LBRACE = 172;
+  int NIL = 172;
   /** RegularExpression Id. */
-  int RBRACE = 173;
+  int LBRACE = 173;
   /** RegularExpression Id. */
-  int LBRACKET = 174;
+  int RBRACE = 174;
   /** RegularExpression Id. */
-  int RBRACKET = 175;
+  int LBRACKET = 175;
   /** RegularExpression Id. */
-  int ANON = 176;
+  int RBRACKET = 176;
   /** RegularExpression Id. */
-  int SEMICOLON = 177;
+  int ANON = 177;
   /** RegularExpression Id. */
-  int COMMA = 178;
+  int SEMICOLON = 178;
   /** RegularExpression Id. */
-  int DOT = 179;
+  int COMMA = 179;
   /** RegularExpression Id. */
-  int EQ = 180;
+  int DOT = 180;
   /** RegularExpression Id. */
-  int NE = 181;
+  int EQ = 181;
   /** RegularExpression Id. */
-  int GT = 182;
+  int NE = 182;
   /** RegularExpression Id. */
-  int LT = 183;
+  int GT = 183;
   /** RegularExpression Id. */
-  int LE = 184;
+  int LT = 184;
   /** RegularExpression Id. */
-  int GE = 185;
+  int LE = 185;
   /** RegularExpression Id. */
-  int L_TRIPLE = 186;
+  int GE = 186;
   /** RegularExpression Id. */
-  int R_TRIPLE = 187;
+  int L_TRIPLE = 187;
   /** RegularExpression Id. */
-  int LT2 = 188;
+  int R_TRIPLE = 188;
   /** RegularExpression Id. */
-  int GT2 = 189;
+  int LT2 = 189;
   /** RegularExpression Id. */
-  int L_ANN = 190;
+  int GT2 = 190;
   /** RegularExpression Id. */
-  int R_ANN = 191;
+  int L_ANN = 191;
   /** RegularExpression Id. */
-  int TILDE = 192;
+  int R_ANN = 192;
   /** RegularExpression Id. */
-  int BANG = 193;
+  int TILDE = 193;
   /** RegularExpression Id. */
-  int COLON = 194;
+  int BANG = 194;
   /** RegularExpression Id. */
-  int SC_OR = 195;
+  int COLON = 195;
   /** RegularExpression Id. */
-  int SC_AND = 196;
+  int SC_OR = 196;
   /** RegularExpression Id. */
-  int PLUS = 197;
+  int SC_AND = 197;
   /** RegularExpression Id. */
-  int MINUS = 198;
+  int PLUS = 198;
   /** RegularExpression Id. */
-  int STAR = 199;
+  int MINUS = 199;
   /** RegularExpression Id. */
-  int SLASH = 200;
+  int STAR = 200;
   /** RegularExpression Id. */
-  int DATATYPE = 201;
+  int SLASH = 201;
   /** RegularExpression Id. */
-  int AT = 202;
+  int DATATYPE = 202;
   /** RegularExpression Id. */
-  int VBAR = 203;
+  int AT = 203;
   /** RegularExpression Id. */
-  int CARAT = 204;
+  int VBAR = 204;
   /** RegularExpression Id. */
-  int QMARK = 205;
+  int CARAT = 205;
   /** RegularExpression Id. */
-  int PN_CHARS_BASE = 206;
+  int QMARK = 206;
   /** RegularExpression Id. */
-  int PN_CHARS_U = 207;
+  int PN_CHARS_BASE = 207;
   /** RegularExpression Id. */
-  int PN_CHARS = 208;
+  int PN_CHARS_U = 208;
   /** RegularExpression Id. */
-  int PN_PREFIX = 209;
+  int PN_CHARS = 209;
   /** RegularExpression Id. */
-  int PN_LOCAL = 210;
+  int PN_PREFIX = 210;
   /** RegularExpression Id. */
-  int VARNAME = 211;
+  int PN_LOCAL = 211;
   /** RegularExpression Id. */
-  int PN_LOCAL_ESC = 212;
+  int VARNAME = 212;
   /** RegularExpression Id. */
-  int PLX = 213;
+  int PN_LOCAL_ESC = 213;
   /** RegularExpression Id. */
-  int HEX = 214;
+  int PLX = 214;
   /** RegularExpression Id. */
-  int PERCENT = 215;
+  int HEX = 215;
   /** RegularExpression Id. */
-  int UNKNOWN = 216;
+  int PERCENT = 216;
+  /** RegularExpression Id. */
+  int UNKNOWN = 217;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -579,6 +581,7 @@ public interface SPARQLParser12ForHeFQUINConstants {
     "\"copy\"",
     "\"meta\"",
     "\"silent\"",
+    "\"params\"",
     "\"drop\"",
     "\"into\"",
     "\"to\"",

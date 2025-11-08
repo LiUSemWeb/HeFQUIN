@@ -27,6 +27,7 @@ import se.liu.ida.hefquin.engine.HeFQUINEngine;
 import se.liu.ida.hefquin.engine.IllegalQueryException;
 import se.liu.ida.hefquin.engine.QueryProcessingStatsAndExceptions;
 import se.liu.ida.hefquin.engine.UnsupportedQueryException;
+import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
 
 /**
  * Servlet for handling SPARQL queries via HTTP GET and POST requests.
@@ -202,7 +203,7 @@ public class SparqlServlet extends HttpServlet {
 	private static JsonObject execute( final String queryString, final String mimeType )
 			throws UnsupportedQueryException, IllegalQueryException
 	{
-		final Query query = QueryFactory.create( queryString );
+		final Query query = QueryFactory.create( queryString, SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN );
 		final ResultsFormat resultsFormat = ServletUtils.convert( mimeType );
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

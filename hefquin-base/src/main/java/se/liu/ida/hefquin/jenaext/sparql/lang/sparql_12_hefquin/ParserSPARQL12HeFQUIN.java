@@ -26,7 +26,6 @@ public class ParserSPARQL12HeFQUIN extends SPARQLParser
 
     @Override
     protected Query parse$(final Query query, String queryString) {
-System.out.println("HeFQUIN parser !!!!");
         query.setSyntax(SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN);
         Action action = (SPARQLParser12ForHeFQUIN parser) -> parser.QueryUnit();
         perform(query, queryString, action);

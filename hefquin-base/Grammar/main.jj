@@ -116,6 +116,11 @@ import org.apache.jena.sparql.expr.aggregate.lib.* ;
 import org.apache.jena.update.* ;
 import org.apache.jena.sparql.modify.request.* ;
 
+#ifdef SPARQL_12_HeFQUIN
+import java.util.List;
+import java.util.ArrayList;
+#endif
+
 #ifdef ARQ
 import org.apache.jena.sparql.core.Quad ;
 import java.util.List;
@@ -1009,14 +1014,26 @@ Element GraphGraphPattern() : { Element el ; Node n ;}
     { return new ElementNamedGraph(n, el) ; }
 }
 
-Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; }
+Element ServiceGraphPattern() : { Element el ; Node n ; boolean silent = false ; Var v ; List<Var> paramVars = null ; }
 {
   <SERVICE> 
   (<SILENT>
    { silent=true; }
   )?
   n = VarOrIri()
+#ifdef SPARQL_12_HeFQUIN
+  (<PARAMS>
+   <LPAREN>
+   (
+    v = Var()
+    { if ( paramVars == null ) paramVars = new ArrayList<Var>(); }
+    { paramVars.add(v); }
+   )*
+   <RPAREN>
+  )?
+#endif
   el = GroupGraphPattern()
+    { System.out.println("paramVars " + paramVars); }
     { return new ElementService(n, el, silent) ; }
 }
 
@@ -2938,6 +2955,9 @@ TOKEN [IGNORE_CASE] :
 | < COPY:         "copy" >
 | < META:         "meta" >
 | < SILENT:       "silent" >
+#ifdef SPARQL_12_HeFQUIN
+| < PARAMS:       "params" >
+#endif
 | < DROP:         "drop" >
 | < INTO:         "into" >
 | < TO:           "to" >

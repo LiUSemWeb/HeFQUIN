@@ -10,6 +10,8 @@ import org.apache.jena.sparql.expr.aggregate.* ;
 import org.apache.jena.sparql.expr.aggregate.lib.* ;
 import org.apache.jena.update.* ;
 import org.apache.jena.sparql.modify.request.* ;
+import java.util.List;
+import java.util.ArrayList;
 
 @SuppressWarnings("all")
 public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQLParserBase implements SPARQLParser12ForHeFQUINConstants {
@@ -1994,7 +1996,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   }
 
   final public Element ServiceGraphPattern() throws ParseException {
-                                  Element el ; Node n ; boolean silent = false ;
+                                  Element el ; Node n ; boolean silent = false ; Var v ; List<Var> paramVars = null ;
     jj_consume_token(SERVICE);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SILENT:
@@ -2006,7 +2008,33 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       ;
     }
     n = VarOrIri();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case PARAMS:
+      jj_consume_token(PARAMS);
+      jj_consume_token(LPAREN);
+      label_15:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case VAR1:
+        case VAR2:
+          ;
+          break;
+        default:
+          jj_la1[72] = jj_gen;
+          break label_15;
+        }
+        v = Var();
+      if ( paramVars == null ) paramVars = new ArrayList<Var>();
+      paramVars.add(v);
+      }
+      jj_consume_token(RPAREN);
+      break;
+    default:
+      jj_la1[73] = jj_gen;
+      ;
+    }
     el = GroupGraphPattern();
+      System.out.println("paramVars " + paramVars);
       {if (true) return new ElementService(n, el, silent) ;}
     throw new Error("Missing return statement in function");
   }
@@ -2046,7 +2074,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       InlineDataFull();
       break;
     default:
-      jj_la1[72] = jj_gen;
+      jj_la1[74] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2058,7 +2086,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     emitDataBlockVariable(v) ;
     t = jj_consume_token(LBRACE);
     beginLine = t.beginLine; beginColumn = t.beginColumn; t = null;
-    label_15:
+    label_16:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IRIref:
@@ -2084,8 +2112,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[73] = jj_gen;
-        break label_15;
+        jj_la1[75] = jj_gen;
+        break label_16;
       }
       n = DataBlockValue();
       startDataBlockValueRow(beginLine, beginColumn) ;
@@ -2103,7 +2131,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       break;
     case LPAREN:
       jj_consume_token(LPAREN);
-      label_16:
+      label_17:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case VAR1:
@@ -2111,8 +2139,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
           ;
           break;
         default:
-          jj_la1[74] = jj_gen;
-          break label_16;
+          jj_la1[76] = jj_gen;
+          break label_17;
         }
         v = Var();
                  emitDataBlockVariable(v) ;
@@ -2120,12 +2148,12 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[75] = jj_gen;
+      jj_la1[77] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
     jj_consume_token(LBRACE);
-    label_17:
+    label_18:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LPAREN:
@@ -2133,15 +2161,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[76] = jj_gen;
-        break label_17;
+        jj_la1[78] = jj_gen;
+        break label_18;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LPAREN:
         t = jj_consume_token(LPAREN);
       beginLine = t.beginLine; beginColumn = t.beginColumn; t = null;
       startDataBlockValueRow(beginLine, beginColumn) ;
-        label_18:
+        label_19:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case IRIref:
@@ -2167,8 +2195,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
             ;
             break;
           default:
-            jj_la1[77] = jj_gen;
-            break label_18;
+            jj_la1[79] = jj_gen;
+            break label_19;
           }
           n = DataBlockValue();
           emitDataBlockValue(n, beginLine, beginColumn) ;
@@ -2184,7 +2212,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         finishDataBlockValueRow(beginLine, beginColumn) ;
         break;
       default:
-        jj_la1[78] = jj_gen;
+        jj_la1[80] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -2234,7 +2262,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                          {if (true) return n ;}
       break;
     default:
-      jj_la1[79] = jj_gen;
+      jj_la1[81] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2255,7 +2283,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       reifId = VarOrReifierId();
       break;
     default:
-      jj_la1[80] = jj_gen;
+      jj_la1[82] = jj_gen;
       ;
     }
       {if (true) return reifId;}
@@ -2282,7 +2310,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                        {if (true) return n ;}
       break;
     default:
-      jj_la1[81] = jj_gen;
+      jj_la1[83] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2300,15 +2328,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Element GroupOrUnionGraphPattern() throws ParseException {
       Element el = null ; ElementUnion el2 = null ;
     el = GroupGraphPattern();
-    label_19:
+    label_20:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNION:
         ;
         break;
       default:
-        jj_la1[82] = jj_gen;
-        break label_19;
+        jj_la1[84] = jj_gen;
+        break label_20;
       }
       jj_consume_token(UNION);
       if ( el2 == null )
@@ -2415,7 +2443,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       c = FunctionCall();
       break;
     default:
-      jj_la1[83] = jj_gen;
+      jj_la1[85] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2456,20 +2484,20 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                  beginLine, beginColumn) ;
         break;
       default:
-        jj_la1[84] = jj_gen;
+        jj_la1[86] = jj_gen;
         ;
       }
       expr = Expression();
                             args.add(expr) ;
-      label_20:
+      label_21:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
           ;
           break;
         default:
-          jj_la1[85] = jj_gen;
-          break label_20;
+          jj_la1[87] = jj_gen;
+          break label_21;
         }
         jj_consume_token(COMMA);
         expr = Expression();
@@ -2478,7 +2506,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[86] = jj_gen;
+      jj_la1[88] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2496,15 +2524,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_consume_token(LPAREN);
       expr = Expression();
                           exprList.add(expr) ;
-      label_21:
+      label_22:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case COMMA:
           ;
           break;
         default:
-          jj_la1[87] = jj_gen;
-          break label_21;
+          jj_la1[89] = jj_gen;
+          break label_22;
         }
         jj_consume_token(COMMA);
         expr = Expression();
@@ -2513,7 +2541,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[88] = jj_gen;
+      jj_la1[90] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2557,7 +2585,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       ConstructTriples(acc);
       break;
     default:
-      jj_la1[89] = jj_gen;
+      jj_la1[91] = jj_gen;
       ;
     }
     jj_consume_token(RBRACE);
@@ -2602,12 +2630,12 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ConstructTriples(acc);
         break;
       default:
-        jj_la1[90] = jj_gen;
+        jj_la1[92] = jj_gen;
         ;
       }
       break;
     default:
-      jj_la1[91] = jj_gen;
+      jj_la1[93] = jj_gen;
       ;
     }
   }
@@ -2653,7 +2681,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       ReifiedTripleBlock(acc);
       break;
     default:
-      jj_la1[92] = jj_gen;
+      jj_la1[94] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2670,7 +2698,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       PropertyListNotEmpty(s, acc);
       break;
     default:
-      jj_la1[93] = jj_gen;
+      jj_la1[95] = jj_gen;
       ;
     }
   }
@@ -2679,15 +2707,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       Node p = null ;
     p = Verb();
     ObjectList(s, p, acc);
-    label_22:
+    label_23:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
         ;
         break;
       default:
-        jj_la1[94] = jj_gen;
-        break label_22;
+        jj_la1[96] = jj_gen;
+        break label_23;
       }
       jj_consume_token(SEMICOLON);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -2701,7 +2729,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ObjectList(s, p, acc);
         break;
       default:
-        jj_la1[95] = jj_gen;
+        jj_la1[97] = jj_gen;
         ;
       }
     }
@@ -2722,7 +2750,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                               p = nRDFtype ;
       break;
     default:
-      jj_la1[96] = jj_gen;
+      jj_la1[98] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2733,15 +2761,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public void ObjectList(Node s, Node p, TripleCollector acc) throws ParseException {
                                                         Node o ;
     Object(s, p, acc);
-    label_23:
+    label_24:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
         ;
         break;
       default:
-        jj_la1[97] = jj_gen;
-        break label_23;
+        jj_la1[99] = jj_gen;
+        break label_24;
       }
       jj_consume_token(COMMA);
       Object(s, p, acc);
@@ -2797,7 +2825,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       ReifiedTripleBlockPath(acc);
       break;
     default:
-      jj_la1[98] = jj_gen;
+      jj_la1[100] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2817,7 +2845,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       PropertyListPathNotEmpty(s, acc);
       break;
     default:
-      jj_la1[99] = jj_gen;
+      jj_la1[101] = jj_gen;
       ;
     }
   }
@@ -2839,20 +2867,20 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       p = VerbSimple();
       break;
     default:
-      jj_la1[100] = jj_gen;
+      jj_la1[102] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
     ObjectListPath(s, p, path, acc);
-    label_24:
+    label_25:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEMICOLON:
         ;
         break;
       default:
-        jj_la1[101] = jj_gen;
-        break label_24;
+        jj_la1[103] = jj_gen;
+        break label_25;
       }
       jj_consume_token(SEMICOLON);
       path = null ; p = null ;
@@ -2881,14 +2909,14 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
           p = VerbSimple();
           break;
         default:
-          jj_la1[102] = jj_gen;
+          jj_la1[104] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         ObjectListPath(s, p, path, acc);
         break;
       default:
-        jj_la1[103] = jj_gen;
+        jj_la1[105] = jj_gen;
         ;
       }
     }
@@ -2911,15 +2939,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public void ObjectListPath(Node s, Node p, Path path, TripleCollector acc) throws ParseException {
                                                                        Node o ;
     ObjectPath(s, p, path, acc);
-    label_25:
+    label_26:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
         ;
         break;
       default:
-        jj_la1[104] = jj_gen;
-        break label_25;
+        jj_la1[106] = jj_gen;
+        break label_26;
       }
       jj_consume_token(COMMA);
       ObjectPath(s, p, path, acc);
@@ -2944,15 +2972,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Path PathAlternative() throws ParseException {
                            Path p1 , p2 ;
     p1 = PathSequence();
-    label_26:
+    label_27:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case VBAR:
         ;
         break;
       default:
-        jj_la1[105] = jj_gen;
-        break label_26;
+        jj_la1[107] = jj_gen;
+        break label_27;
       }
       jj_consume_token(VBAR);
       p2 = PathSequence();
@@ -2965,15 +2993,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Path PathSequence() throws ParseException {
                         Path p1 , p2 ;
     p1 = PathEltOrInverse();
-    label_27:
+    label_28:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SLASH:
         ;
         break;
       default:
-        jj_la1[106] = jj_gen;
-        break label_27;
+        jj_la1[108] = jj_gen;
+        break label_28;
       }
       jj_consume_token(SLASH);
       p2 = PathEltOrInverse();
@@ -2993,7 +3021,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       p = PathMod(p);
       break;
     default:
-      jj_la1[107] = jj_gen;
+      jj_la1[109] = jj_gen;
       ;
     }
      {if (true) return p ;}
@@ -3017,7 +3045,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
        p = PathFactory.pathInverse(p) ;
       break;
     default:
-      jj_la1[108] = jj_gen;
+      jj_la1[110] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3041,7 +3069,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
               {if (true) return PathFactory.pathOneOrMore1(p) ;}
       break;
     default:
-      jj_la1[109] = jj_gen;
+      jj_la1[111] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3071,7 +3099,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[110] = jj_gen;
+      jj_la1[112] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3101,15 +3129,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       case CARAT:
         p = PathOneInPropertySet();
                                    pNegSet.add(p) ;
-        label_28:
+        label_29:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case VBAR:
             ;
             break;
           default:
-            jj_la1[111] = jj_gen;
-            break label_28;
+            jj_la1[113] = jj_gen;
+            break label_29;
           }
           jj_consume_token(VBAR);
           p = PathOneInPropertySet();
@@ -3117,13 +3145,13 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         }
         break;
       default:
-        jj_la1[112] = jj_gen;
+        jj_la1[114] = jj_gen;
         ;
       }
       jj_consume_token(RPAREN);
       break;
     default:
-      jj_la1[113] = jj_gen;
+      jj_la1[115] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3158,13 +3186,13 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                {if (true) return new P_ReverseLink(nRDFtype) ;}
         break;
       default:
-        jj_la1[114] = jj_gen;
+        jj_la1[116] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[115] = jj_gen;
+      jj_la1[117] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3183,7 +3211,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                     {if (true) return n ;}
       break;
     default:
-      jj_la1[116] = jj_gen;
+      jj_la1[118] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3212,7 +3240,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                         {if (true) return n ;}
       break;
     default:
-      jj_la1[117] = jj_gen;
+      jj_la1[119] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3233,7 +3261,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       Node listHead = nRDFnil ; Node lastCell = null ; int mark ; Node n ; Token t ;
     t = jj_consume_token(LPAREN);
     int beginLine = t.beginLine; int beginColumn = t.beginColumn; t = null;
-    label_29:
+    label_30:
     while (true) {
       Node cell = createListNode( beginLine, beginColumn) ;
       if ( listHead == nRDFnil )
@@ -3275,8 +3303,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[118] = jj_gen;
-        break label_29;
+        jj_la1[120] = jj_gen;
+        break label_30;
       }
     }
     jj_consume_token(RPAREN);
@@ -3290,7 +3318,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       Node listHead = nRDFnil ; Node lastCell = null ; int mark ; Node n ; Token t ;
     t = jj_consume_token(LPAREN);
     int beginLine = t.beginLine; int beginColumn = t.beginColumn; t = null;
-    label_30:
+    label_31:
     while (true) {
       Node cell = createListNode( beginLine, beginColumn) ;
       if ( listHead == nRDFnil )
@@ -3332,8 +3360,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[119] = jj_gen;
-        break label_30;
+        jj_la1[121] = jj_gen;
+        break label_31;
       }
     }
     jj_consume_token(RPAREN);
@@ -3345,7 +3373,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
 
   final public void AnnotationPath(TripleCollector acc, Node s, Node p, Path path, Node o) throws ParseException {
                                                                                 Node reifId = null ;
-    label_31:
+    label_32:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_ANN:
@@ -3353,8 +3381,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[120] = jj_gen;
-        break label_31;
+        jj_la1[122] = jj_gen;
+        break label_32;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TILDE:
@@ -3370,7 +3398,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         AnnotationBlockPath(acc, reifId);
         break;
       default:
-        jj_la1[121] = jj_gen;
+        jj_la1[123] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -3386,7 +3414,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
 
   final public void Annotation(TripleCollector acc, Node s, Node p, Node o) throws ParseException {
                                                                  Node reifId = null ;
-    label_32:
+    label_33:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_ANN:
@@ -3394,8 +3422,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[122] = jj_gen;
-        break label_32;
+        jj_la1[124] = jj_gen;
+        break label_33;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TILDE:
@@ -3411,7 +3439,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         AnnotationBlock(acc, reifId);
         break;
       default:
-        jj_la1[123] = jj_gen;
+        jj_la1[125] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -3464,7 +3492,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                             {if (true) return n ;}
       break;
     default:
-      jj_la1[124] = jj_gen;
+      jj_la1[126] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3511,7 +3539,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                            {if (true) return n ;}
       break;
     default:
-      jj_la1[125] = jj_gen;
+      jj_la1[127] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3565,7 +3593,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                        {if (true) return n;}
       break;
     default:
-      jj_la1[126] = jj_gen;
+      jj_la1[128] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3584,7 +3612,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       reifId = Reifier();
       break;
     default:
-      jj_la1[127] = jj_gen;
+      jj_la1[129] = jj_gen;
       ;
     }
     reifId = insertTripleReifier(acc, reifId, s, p, o, tok.beginLine, tok.beginColumn) ;
@@ -3638,7 +3666,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       s = TripleTerm();
       break;
     default:
-      jj_la1[128] = jj_gen;
+      jj_la1[130] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3691,7 +3719,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       o = TripleTerm();
       break;
     default:
-      jj_la1[129] = jj_gen;
+      jj_la1[131] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3754,7 +3782,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                        {if (true) return n;}
       break;
     default:
-      jj_la1[130] = jj_gen;
+      jj_la1[132] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3805,7 +3833,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                        {if (true) return n;}
       break;
     default:
-      jj_la1[131] = jj_gen;
+      jj_la1[133] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3829,7 +3857,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                                        p = nRDFtype ;
       break;
     default:
-      jj_la1[132] = jj_gen;
+      jj_la1[134] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3874,7 +3902,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       n = TripleTermData();
       break;
     default:
-      jj_la1[133] = jj_gen;
+      jj_la1[135] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3916,7 +3944,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       n = TripleTermData();
       break;
     default:
-      jj_la1[134] = jj_gen;
+      jj_la1[136] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3938,7 +3966,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                               n = createNode(iri) ;
       break;
     default:
-      jj_la1[135] = jj_gen;
+      jj_la1[137] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3956,7 +3984,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       t = jj_consume_token(VAR2);
       break;
     default:
-      jj_la1[136] = jj_gen;
+      jj_la1[138] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3974,15 +4002,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Expr ConditionalOrExpression() throws ParseException {
                                    Expr expr1, expr2 ;
     expr1 = ConditionalAndExpression();
-    label_33:
+    label_34:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SC_OR:
         ;
         break;
       default:
-        jj_la1[137] = jj_gen;
-        break label_33;
+        jj_la1[139] = jj_gen;
+        break label_34;
       }
       jj_consume_token(SC_OR);
       expr2 = ConditionalAndExpression();
@@ -3995,15 +4023,15 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Expr ConditionalAndExpression() throws ParseException {
                                     Expr expr1, expr2 ;
     expr1 = ValueLogical();
-    label_34:
+    label_35:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SC_AND:
         ;
         break;
       default:
-        jj_la1[138] = jj_gen;
-        break label_34;
+        jj_la1[140] = jj_gen;
+        break label_35;
       }
       jj_consume_token(SC_AND);
       expr2 = ValueLogical();
@@ -4075,13 +4103,13 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         expr1 = new E_NotOneOf(expr1, a) ;
         break;
       default:
-        jj_la1[139] = jj_gen;
+        jj_la1[141] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[140] = jj_gen;
+      jj_la1[142] = jj_gen;
       ;
     }
       {if (true) return expr1 ;}
@@ -4098,7 +4126,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Expr AdditiveExpression() throws ParseException {
                               Expr expr1, expr2, expr3 ; boolean addition ; Node n ;
     expr1 = MultiplicativeExpression();
-    label_35:
+    label_36:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INTEGER_POSITIVE:
@@ -4112,8 +4140,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[141] = jj_gen;
-        break label_35;
+        jj_la1[143] = jj_gen;
+        break label_36;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
@@ -4150,11 +4178,11 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
          addition = false ;
           break;
         default:
-          jj_la1[142] = jj_gen;
+          jj_la1[144] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-        label_36:
+        label_37:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case STAR:
@@ -4162,8 +4190,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
             ;
             break;
           default:
-            jj_la1[143] = jj_gen;
-            break label_36;
+            jj_la1[145] = jj_gen;
+            break label_37;
           }
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case STAR:
@@ -4177,7 +4205,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                             expr2 = new E_Divide(expr2, expr3) ;
             break;
           default:
-            jj_la1[144] = jj_gen;
+            jj_la1[146] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -4188,7 +4216,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
          expr1 = new E_Subtract(expr1, expr2) ;
         break;
       default:
-        jj_la1[145] = jj_gen;
+        jj_la1[147] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -4200,7 +4228,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   final public Expr MultiplicativeExpression() throws ParseException {
                                     Expr expr1, expr2 ;
     expr1 = UnaryExpression();
-    label_37:
+    label_38:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case STAR:
@@ -4208,8 +4236,8 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         ;
         break;
       default:
-        jj_la1[146] = jj_gen;
-        break label_37;
+        jj_la1[148] = jj_gen;
+        break label_38;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case STAR:
@@ -4223,7 +4251,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       expr1 = new E_Divide(expr1, expr2) ;
         break;
       default:
-        jj_la1[147] = jj_gen;
+        jj_la1[149] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -4346,7 +4374,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                  {if (true) return expr ;}
       break;
     default:
-      jj_la1[148] = jj_gen;
+      jj_la1[150] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4473,7 +4501,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                            {if (true) return asExpr(n) ;}
       break;
     default:
-      jj_la1[149] = jj_gen;
+      jj_la1[151] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4530,7 +4558,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       n = ExprTripleTerm();
       break;
     default:
-      jj_la1[150] = jj_gen;
+      jj_la1[152] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4576,7 +4604,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       n = ExprTripleTerm();
       break;
     default:
-      jj_la1[151] = jj_gen;
+      jj_la1[153] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -4680,7 +4708,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
               {if (true) return makeFunction_BNode() ;}
         break;
       default:
-        jj_la1[152] = jj_gen;
+        jj_la1[154] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -5065,7 +5093,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       {if (true) return new E_TripleObject(expr) ;}
       break;
     default:
-      jj_la1[153] = jj_gen;
+      jj_la1[155] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5085,7 +5113,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       flagsExpr = Expression();
       break;
     default:
-      jj_la1[154] = jj_gen;
+      jj_la1[156] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5106,7 +5134,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       expr3 = Expression();
       break;
     default:
-      jj_la1[155] = jj_gen;
+      jj_la1[157] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5129,7 +5157,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       expr4 = Expression();
       break;
     default:
-      jj_la1[156] = jj_gen;
+      jj_la1[158] = jj_gen;
       ;
     }
     jj_consume_token(RPAREN);
@@ -5171,7 +5199,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                    distinct = true ;
         break;
       default:
-        jj_la1[157] = jj_gen;
+        jj_la1[159] = jj_gen;
         ;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -5276,7 +5304,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         expr = Expression();
         break;
       default:
-        jj_la1[158] = jj_gen;
+        jj_la1[160] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -5293,7 +5321,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                       distinct = true ;
         break;
       default:
-        jj_la1[159] = jj_gen;
+        jj_la1[161] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5309,7 +5337,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                       distinct = true ;
         break;
       default:
-        jj_la1[160] = jj_gen;
+        jj_la1[162] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5325,7 +5353,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                       distinct = true ;
         break;
       default:
-        jj_la1[161] = jj_gen;
+        jj_la1[163] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5341,7 +5369,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                       distinct = true ;
         break;
       default:
-        jj_la1[162] = jj_gen;
+        jj_la1[164] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5357,7 +5385,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                          distinct = true ;
         break;
       default:
-        jj_la1[163] = jj_gen;
+        jj_la1[165] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5373,7 +5401,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                       distinct = true ;
         break;
       default:
-        jj_la1[164] = jj_gen;
+        jj_la1[166] = jj_gen;
         ;
       }
       expr = Expression();
@@ -5385,14 +5413,14 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         sep = String();
         break;
       default:
-        jj_la1[165] = jj_gen;
+        jj_la1[167] = jj_gen;
         ;
       }
       jj_consume_token(RPAREN);
       agg = AggregatorFactory.createGroupConcat(distinct, expr, sep, ordered) ;
       break;
     default:
-      jj_la1[166] = jj_gen;
+      jj_la1[168] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5415,7 +5443,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       a = ArgList();
       break;
     default:
-      jj_la1[167] = jj_gen;
+      jj_la1[169] = jj_gen;
       ;
     }
     if ( a == null )
@@ -5448,13 +5476,13 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
        {if (true) return createLiteralDT(lex, uri, token.beginLine, token.beginColumn);}
         break;
       default:
-        jj_la1[168] = jj_gen;
+        jj_la1[170] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[169] = jj_gen;
+      jj_la1[171] = jj_gen;
       ;
     }
     {if (true) return createLiteralString(lex, token.beginLine, token.beginColumn) ;}
@@ -5480,7 +5508,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       n = NumericLiteralNegative();
       break;
     default:
-      jj_la1[170] = jj_gen;
+      jj_la1[172] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5504,7 +5532,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                  {if (true) return createLiteralDouble(t.image) ;}
       break;
     default:
-      jj_la1[171] = jj_gen;
+      jj_la1[173] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5527,7 +5555,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                           {if (true) return createLiteralDouble(t.image) ;}
       break;
     default:
-      jj_la1[172] = jj_gen;
+      jj_la1[174] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5550,7 +5578,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                           {if (true) return createLiteralDouble(t.image) ;}
       break;
     default:
-      jj_la1[173] = jj_gen;
+      jj_la1[175] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5568,7 +5596,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
             {if (true) return XSD_FALSE ;}
       break;
     default:
-      jj_la1[174] = jj_gen;
+      jj_la1[176] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5595,7 +5623,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                                  lex = stripQuotes3(t.image) ;
       break;
     default:
-      jj_la1[175] = jj_gen;
+      jj_la1[177] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5618,7 +5646,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                          {if (true) return iri ;}
       break;
     default:
-      jj_la1[176] = jj_gen;
+      jj_la1[178] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5637,7 +5665,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       {if (true) return resolvePName(t.image, t.beginLine, t.beginColumn) ;}
       break;
     default:
-      jj_la1[177] = jj_gen;
+      jj_la1[179] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5656,7 +5684,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
                {if (true) return createBNode(t.beginLine, t.beginColumn) ;}
       break;
     default:
-      jj_la1[178] = jj_gen;
+      jj_la1[180] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -5679,7 +5707,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[179];
+  final private int[] jj_la1 = new int[181];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -5697,25 +5725,25 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
       jj_la1_init_6();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xe400000,0x380000,0x380000,0x0,0x0,0x1800000,0x1800000,0x6000,0x6000,0x6000,0x0,0x0,0x7e00,0x0,0x6e00,0x6e00,0x0,0x0,0x0,0xe00,0x0,0x0,0x0,0x40000000,0x30000000,0x6e00,0x0,0x6e00,0xe00,0x6e00,0x0,0x6e00,0x6e00,0x20000000,0x10000000,0x30000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0x0,0xe00,0x0,0x7e00,0x0,0x0,0x7e00,0x7e00,0x7e00,0x0,0x400000,0x7e00,0x0,0x0,0x7e00,0x7e00,0x0,0x0,0x0,0x6000,0xe00,0x6000,0x0,0x0,0xe00,0x0,0xe00,0x7e00,0x7e00,0x0,0xe00,0x800000,0x0,0x0,0x0,0x0,0x7e00,0x7e00,0x0,0x7e00,0x46e00,0x0,0x46e00,0x46e00,0x0,0x7e00,0x46e00,0x46e00,0x0,0x46e00,0x46e00,0x0,0x0,0x0,0x0,0x40e00,0x0,0x40e00,0x0,0x40e00,0x40e00,0x40e00,0x40e00,0x0,0x0,0x7e00,0x7e00,0x0,0x0,0x0,0x0,0x7e00,0x7e00,0x7e00,0x0,0x7e00,0x7e00,0x7e00,0x7e00,0x40e00,0xe00,0xe00,0x6e00,0x6000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6e00,0x6e00,0x6e00,0x6e00,0x0,0x0,0x0,0x0,0x0,0x800000,0x6e00,0x800000,0x800000,0x800000,0x800000,0x800000,0x800000,0x0,0x0,0x0,0x8000,0x8000,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0xc00,0x1000,};
+      jj_la1_0 = new int[] {0xe400000,0x380000,0x380000,0x0,0x0,0x1800000,0x1800000,0x6000,0x6000,0x6000,0x0,0x0,0x7e00,0x0,0x6e00,0x6e00,0x0,0x0,0x0,0xe00,0x0,0x0,0x0,0x40000000,0x30000000,0x6e00,0x0,0x6e00,0xe00,0x6e00,0x0,0x6e00,0x6e00,0x20000000,0x10000000,0x30000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0x0,0xe00,0x0,0x7e00,0x0,0x0,0x7e00,0x7e00,0x7e00,0x0,0x400000,0x7e00,0x0,0x0,0x7e00,0x7e00,0x0,0x0,0x0,0x6000,0x0,0x6000,0xe00,0x6000,0x0,0x0,0xe00,0x0,0xe00,0x7e00,0x7e00,0x0,0xe00,0x800000,0x0,0x0,0x0,0x0,0x7e00,0x7e00,0x0,0x7e00,0x46e00,0x0,0x46e00,0x46e00,0x0,0x7e00,0x46e00,0x46e00,0x0,0x46e00,0x46e00,0x0,0x0,0x0,0x0,0x40e00,0x0,0x40e00,0x0,0x40e00,0x40e00,0x40e00,0x40e00,0x0,0x0,0x7e00,0x7e00,0x0,0x0,0x0,0x0,0x7e00,0x7e00,0x7e00,0x0,0x7e00,0x7e00,0x7e00,0x7e00,0x40e00,0xe00,0xe00,0x6e00,0x6000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6e00,0x6e00,0x6e00,0x6e00,0x0,0x0,0x0,0x0,0x0,0x800000,0x6e00,0x800000,0x800000,0x800000,0x800000,0x800000,0x800000,0x0,0x0,0x0,0x8000,0x8000,0x0,0x0,0x0,0x0,0x0,0x0,0xe00,0xc00,0x1000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x0,0x20,0x20,0x0,0x60,0x0,0x0,0x20,0x40,0x20,0x10,0x40,0x400000,0x800000,0x0,0x0,0xfc1fc000,0x200000,0xfc1fc000,0xfc1fc000,0xfc1fc00c,0xc,0xfc1fc000,0xfc1fc00c,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x100,0x100,0x110,0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3b01,0x0,0x0,0x0,0x0,0x3b01,0x0,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x2,0x0,0x0,0x400,0xfc1fc000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100000,0x100000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfc1fc000,0xfc1fc000,0x0,0x0,0x0,0xfc1fc000,0x0,0x0,0x0,0x0,0xfc1fc000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfc000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x0,0x20,0x20,0x0,0x60,0x0,0x0,0x20,0x40,0x20,0x10,0x40,0x400000,0x800000,0x0,0x0,0xfc1fc000,0x200000,0xfc1fc000,0xfc1fc000,0xfc1fc00c,0xc,0xfc1fc000,0xfc1fc00c,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x100,0x100,0x110,0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3b01,0x0,0x0,0x0,0x0,0x3b01,0x0,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x2,0x0,0x0,0x400,0xfc1fc000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100000,0x100000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfc1fc000,0xfc1fc000,0x0,0x0,0x0,0xfc1fc000,0x0,0x0,0x0,0x0,0xfc1fc000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfc000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0xfbffffed,0xfbffffed,0xfbffffed,0x0,0xfbffffed,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x10,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0xfbffffed,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0xfbffffed,0xfbffffed,0xfbffffed,0x0,0xfbffffed,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x10,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfbffffed,0xfbffffed,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0xfbffffed,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1dffffff,0x0,0x1dffffff,0x1dffffff,0x1dffffff,0x0,0x1dffffff,0x1dffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x60000000,0x60000000,0x60000000,0x0,0x0,0x60000000,0x0,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x60000000,0x0,0x60000000,0x0,0x0,0x0,0x1dffffff,0x0,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x60000000,0x0,0x60000000,0x60000000,0x60000000,0x60000000,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7dffffff,0x7dffffff,0x60000000,0x60000000,0x0,0x1dffffff,0x0,0x0,0x0,0x0,0x7dffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,};
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1dffffff,0x0,0x1dffffff,0x1dffffff,0x1dffffff,0x0,0x1dffffff,0x1dffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x60000000,0x60000000,0x60000000,0x0,0x0,0x60000000,0x0,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x60000000,0x0,0x60000000,0x0,0x0,0x0,0x1dffffff,0x0,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x60000000,0x0,0x60000000,0x60000000,0x60000000,0x60000000,0x0,0x60000000,0x60000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7dffffff,0x7dffffff,0x60000000,0x60000000,0x0,0x1dffffff,0x0,0x0,0x0,0x0,0x7dffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000000,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_4() {
-      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x427ff,0x427ff,0x1000,0x4000,0x1000,0x1000,0x1000,0x1000,0x1000,0x1000,0x40000,0x1,0x3,0x80000,0x0,0x0,0x10000,0x30000,0x7ee00000,0x0,0x0,0x7ee00000,0x7ee00000,0x7ee00000,0x0,0x0,0x7ee00000,0x0,0x0,0x7ee00000,0x7ee00000,0x0,0x0,0x1000,0x0,0x7ee00000,0x0,0x0,0x0,0x7ee00000,0x0,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0x7ee00000,0x0,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0x7ee00000,0x0,0x0,0x0,0x0,0x7ee00000,0x7ee00000,0x7ee00000,0x0,0x7ee00000,0x7ee00000,0x7ee00000,0x7ee00000,0x0,0x7ee00000,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x7e000000,0x7e000000,0x0,0x0,0x7e000000,0x0,0x0,0x7ee00000,0x7ee00000,0x7ee00000,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x7ee00000,0xe00000,0xe000000,0x70000000,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x847ff,0x847ff,0x1000,0x8000,0x1000,0x1000,0x1000,0x1000,0x1000,0x1000,0x80000,0x1,0x3,0x100000,0x0,0x0,0x20000,0x60000,0xfdc00000,0x0,0x0,0xfdc00000,0xfdc00000,0xfdc00000,0x0,0x0,0xfdc00000,0x0,0x0,0xfdc00000,0xfdc00000,0x0,0x0,0x1000,0x0,0x2000,0x0,0xfdc00000,0x0,0x0,0x0,0xfdc00000,0x0,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0xfdc00000,0x0,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0xfdc00000,0x0,0x0,0x0,0x0,0xfdc00000,0xfdc00000,0xfdc00000,0x0,0xfdc00000,0xfdc00000,0xfdc00000,0xfdc00000,0x0,0xfdc00000,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0xfc000000,0xfc000000,0x0,0x0,0xfc000000,0x0,0x0,0xfdc00000,0xfdc00000,0xfdc00000,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfdc00000,0x1c00000,0x1c000000,0xe0000000,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_5() {
-      jj_la1_5 = new int[] {0x0,0x0,0x0,0x60,0x0,0x0,0x0,0x200,0x200,0x200,0x0,0x0,0x14014be0,0x1000,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x0,0x200,0x200,0x200,0x0,0x200,0x200,0x0,0x0,0x0,0x0,0x20000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x14014be0,0x0,0x80000,0x14014be0,0x14014be0,0x14014be0,0x80000,0x0,0x14014be0,0x1000,0x80000,0x14014be0,0x14014be0,0x80000,0x1000,0x0,0xa00,0x40001e0,0x0,0xa00,0xa00,0x40001e0,0xa00,0x40001e0,0x10000,0x10000,0x0,0x200,0x0,0x40000,0xa00,0x40000,0xa00,0x14014be0,0x14014be0,0x80000,0x14014be0,0x0,0x20000,0x0,0x0,0x40000,0x14014be0,0x200,0x200,0x20000,0x200,0x200,0x40000,0x0,0x0,0x0,0x200,0x0,0x200,0x0,0x0,0x200,0x0,0x0,0x4200,0x4200,0x14014be0,0x14014be0,0x40000000,0x40000000,0x40000000,0x40000000,0x14014be0,0x14014be0,0x40109e0,0x0,0x140101e0,0x140101e0,0x40101e0,0x40101e0,0x0,0x40001e0,0x40001e0,0x0,0x0,0x0,0x0,0x3f00000,0x3f00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x40003e0,0x40003e0,0x40001e0,0x40001e0,0xa00,0x0,0x40000,0x40000,0x40000,0x0,0x40003e0,0x0,0x0,0x0,0x0,0x0,0x0,0x20000,0x0,0xa00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1e0,0x0,0x0,0x10000,};
+      jj_la1_5 = new int[] {0x0,0x0,0x0,0xc0,0x0,0x0,0x0,0x400,0x400,0x400,0x0,0x0,0x280297c0,0x2000,0x0,0x0,0x0,0x2000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x400,0x0,0x400,0x400,0x400,0x0,0x400,0x400,0x0,0x0,0x0,0x0,0x40000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x280297c0,0x0,0x100000,0x280297c0,0x280297c0,0x280297c0,0x100000,0x0,0x280297c0,0x2000,0x100000,0x280297c0,0x280297c0,0x100000,0x2000,0x0,0x0,0x0,0x1400,0x80003c0,0x0,0x1400,0x1400,0x80003c0,0x1400,0x80003c0,0x20000,0x20000,0x0,0x400,0x0,0x80000,0x1400,0x80000,0x1400,0x280297c0,0x280297c0,0x100000,0x280297c0,0x0,0x40000,0x0,0x0,0x80000,0x280297c0,0x400,0x400,0x40000,0x400,0x400,0x80000,0x0,0x0,0x0,0x400,0x0,0x400,0x0,0x0,0x400,0x0,0x0,0x8400,0x8400,0x280297c0,0x280297c0,0x80000000,0x80000000,0x80000000,0x80000000,0x280297c0,0x280297c0,0x80213c0,0x0,0x280203c0,0x280203c0,0x80203c0,0x80203c0,0x0,0x80003c0,0x80003c0,0x0,0x0,0x0,0x0,0x7e00000,0x7e00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80007c0,0x80007c0,0x80003c0,0x80003c0,0x1400,0x0,0x80000,0x80000,0x80000,0x0,0x80007c0,0x0,0x0,0x0,0x0,0x0,0x0,0x40000,0x0,0x1400,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3c0,0x0,0x0,0x20000,};
    }
    private static void jj_la1_init_6() {
-      jj_la1_6 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x80,0x0,0x0,0x0,0x0,0x0,0x80,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1002,0x1002,0x0,0x1002,0x1002,0x0,0x800,0x100,0x20a0,0x1002,0x20a0,0x2,0x800,0x1000,0x1000,0x0,0x1000,0x0,0x0,0x0,0x0,0x1,0x1,0x1,0x1,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x10,0x0,0x0,0x60,0x0,0x180,0x180,0x60,0x180,0x180,0x62,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_6 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x100,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2004,0x2004,0x0,0x2004,0x2004,0x0,0x1000,0x200,0x4140,0x2004,0x4140,0x4,0x1000,0x2000,0x2000,0x0,0x2000,0x0,0x0,0x0,0x0,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x20,0x0,0x0,0xc0,0x0,0x300,0x300,0xc0,0x300,0x300,0xc4,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1c4,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x400,0x400,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -5729,7 +5757,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -5743,7 +5771,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -5753,7 +5781,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -5763,7 +5791,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -5772,7 +5800,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -5781,7 +5809,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 179; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 181; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -5832,12 +5860,12 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[217];
+    boolean[] la1tokens = new boolean[218];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 179; i++) {
+    for (int i = 0; i < 181; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -5864,7 +5892,7 @@ public class SPARQLParser12ForHeFQUIN extends org.apache.jena.sparql.lang.SPARQL
         }
       }
     }
-    for (int i = 0; i < 217; i++) {
+    for (int i = 0; i < 218; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

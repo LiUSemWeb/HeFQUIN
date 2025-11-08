@@ -3,10 +3,13 @@ package se.liu.ida.hefquin.engine;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.query.ARQ;
+import org.apache.jena.query.QueryVisitor;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
@@ -14,6 +17,9 @@ import org.apache.jena.sparql.engine.main.QC;
 import org.apache.jena.sparql.lang.SPARQLParser;
 import org.apache.jena.sparql.lang.SPARQLParserFactory;
 import org.apache.jena.sparql.lang.SPARQLParserRegistry;
+import org.apache.jena.sparql.serializer.QuerySerializerFactory;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.serializer.SerializerRegistry;
 
 import se.liu.ida.hefquin.engine.HeFQUINEngineConfigReader.Context;
 import se.liu.ida.hefquin.engine.queryplan.utils.ExecutablePlanPrinter;
@@ -240,7 +246,7 @@ public class HeFQUINEngineBuilder
 		ARQ.init();
 		QC.setFactory( ARQ.getContext(), factory );
 
-		final SPARQLParserFactory f = new SPARQLParserFactory() {
+		final SPARQLParserFactory pFact = new SPARQLParserFactory() {
 			@Override
 			public boolean accept( final Syntax syntax ) {
 				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
@@ -252,7 +258,29 @@ public class HeFQUINEngineBuilder
 			}
 		};
 
-		SPARQLParserRegistry.addFactory( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN, f );
+		SPARQLParserRegistry.addFactory( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+		                                 pFact );
+
+		final QuerySerializerFactory sFact1 = SerializerRegistry.get().getQuerySerializerFactory( Syntax.syntaxSPARQL_12 );
+		final QuerySerializerFactory sFact2 = new QuerySerializerFactory() {
+			@Override
+			public boolean accept( final Syntax syntax ) {
+				return SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN.equals(syntax);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, Prologue prologue, IndentedWriter writer) {
+				return sFact1.create(syntax, prologue, writer);
+			}
+
+			@Override
+			public QueryVisitor create(Syntax syntax, SerializationContext context, IndentedWriter writer) {
+				return sFact1.create(syntax, context, writer);
+			}
+		};
+
+		SerializerRegistry.get().addQuerySerializer( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
+		                                             sFact2 );
 	}
 
 }
