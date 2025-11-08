@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.engine.ExecutionContext;
+import org.apache.jena.sparql.engine.QueryEngineRegistry;
 import org.apache.jena.sparql.engine.main.OpExecutor;
 import org.apache.jena.sparql.engine.main.OpExecutorFactory;
 import org.apache.jena.sparql.engine.main.QC;
@@ -30,6 +31,7 @@ import se.liu.ida.hefquin.federation.access.FederationAccessManager;
 import se.liu.ida.hefquin.federation.catalog.FederationCatalog;
 import se.liu.ida.hefquin.federation.catalog.FederationDescriptionReader;
 import se.liu.ida.hefquin.jenaext.query.SyntaxForHeFQUIN;
+import se.liu.ida.hefquin.jenaext.sparql.engine.main.QueryEngineMainForHeFQUIN;
 import se.liu.ida.hefquin.jenaext.sparql.lang.sparql_12_hefquin.ParserSPARQL12HeFQUIN;
 import se.liu.ida.hefquin.jenaintegration.sparql.HeFQUINConstants;
 import se.liu.ida.hefquin.jenaintegration.sparql.engine.main.OpExecutorHeFQUIN;
@@ -281,6 +283,8 @@ public class HeFQUINEngineBuilder
 
 		SerializerRegistry.get().addQuerySerializer( SyntaxForHeFQUIN.syntaxSPARQL_12_HeFQUIN,
 		                                             sFact2 );
+
+		QueryEngineRegistry.addFactory( QueryEngineMainForHeFQUIN.factory );
 	}
 
 }

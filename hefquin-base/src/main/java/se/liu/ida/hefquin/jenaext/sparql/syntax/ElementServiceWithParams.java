@@ -17,10 +17,10 @@ public class ElementServiceWithParams extends ElementService
 	                                 final List<Var> paramVars ) {
 		super(n, el, silent);
 
+		assert paramVars != null;
 		this.paramVars = paramVars;
 	}
 
-	/** May return {@code null}. */
 	public List<Var> getParamVars() {
 		return paramVars;
 	}
