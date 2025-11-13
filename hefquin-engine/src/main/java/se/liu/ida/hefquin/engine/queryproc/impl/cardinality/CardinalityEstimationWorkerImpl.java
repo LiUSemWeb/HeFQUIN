@@ -12,6 +12,7 @@ import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlan;
 import se.liu.ida.hefquin.engine.queryplan.logical.LogicalPlanVisitor;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpBind;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFilter;
+import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpFixedInput;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGPOptAdd;
 import se.liu.ida.hefquin.engine.queryplan.logical.impl.LogicalOpGlobalToLocal;
@@ -89,6 +90,13 @@ public class CardinalityEstimationWorkerImpl implements CardinalityEstimationWor
 		// Since we assume that the nullary plans (which have a request
 		// operator) have all been annotated already, we should never
 		// end up here.
+		throw new IllegalArgumentException();
+	}
+
+	@Override
+	public void visit( final LogicalOpFixedInput op ) {
+		// Since we assume that the nullary plans (which have a fin operator)
+		// have all been annotated already, we should never end up here.
 		throw new IllegalArgumentException();
 	}
 
