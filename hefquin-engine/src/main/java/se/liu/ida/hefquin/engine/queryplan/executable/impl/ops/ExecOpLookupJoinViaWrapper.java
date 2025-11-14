@@ -44,11 +44,13 @@ public class ExecOpLookupJoinViaWrapper
 	                                   final QueryPlanningInfo qpInfo ) {
 		super(pattern, fm, collectExceptions, qpInfo);
 
-		assert paramVars != null;
-		assert paramVars.size() > 0;
-		assert paramVars.size() == fm.getNumberOfParameters();
+		assert paramVars != null || fm.getNumberOfParameters() == 0;
+		assert paramVars == null || fm.getNumberOfParameters() == paramVars.size();
 
-		this.paramVars = paramVars;
+		if ( paramVars != null && paramVars.isEmpty() )
+			this.paramVars = null;
+		else
+			this.paramVars = paramVars;
 	}
 
 	@Override
