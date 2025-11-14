@@ -1,11 +1,6 @@
 package se.liu.ida.hefquin.engine.queryplan.executable.impl.ops;
 
-import java.util.Iterator;
 import java.util.List;
-
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.sparql.exec.http.Params;
 
 import se.liu.ida.hefquin.base.data.SolutionMapping;
 import se.liu.ida.hefquin.engine.federation.access.utils.FederationAccessUtils;
@@ -16,27 +11,26 @@ import se.liu.ida.hefquin.engine.queryplan.info.QueryPlanningInfo;
 import se.liu.ida.hefquin.engine.queryproc.ExecutionContext;
 import se.liu.ida.hefquin.federation.access.FederationAccessException;
 import se.liu.ida.hefquin.federation.access.RESTRequest;
-import se.liu.ida.hefquin.federation.access.SPARQLOverRESTRequest;
+import se.liu.ida.hefquin.federation.access.SPARQLRequest;
 import se.liu.ida.hefquin.federation.access.StringResponse;
 import se.liu.ida.hefquin.federation.access.UnsupportedOperationDueToRetrievalError;
 import se.liu.ida.hefquin.federation.access.impl.req.RESTRequestImpl;
-import se.liu.ida.hefquin.federation.members.RESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint;
 import se.liu.ida.hefquin.federation.members.WrappedRESTEndpoint.DataConversionException;
 
-public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLOverRESTRequest,
+public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLRequest,
                                                              WrappedRESTEndpoint>
 {
 	private long timeAfterResponse = 0L;
 	private long numberOfOutputMappingsProduced = 0L;
 
-	public ExecOpRequestOther( final SPARQLOverRESTRequest req,
+	public ExecOpRequestOther( final SPARQLRequest req,
 	                           final WrappedRESTEndpoint fm,
 	                           final boolean collectExceptions,
 	                           final QueryPlanningInfo qpInfo ) {
 		super(req, fm, collectExceptions, qpInfo);
 
-		assert req.getParamVars() == null || req.getParamVars().isEmpty();
+		assert fm.getNumberOfParameters() != 0;
 	}
 
 	@Override
@@ -67,28 +61,7 @@ public class ExecOpRequestOther extends BaseForExecOpRequest<SPARQLOverRESTReque
 	}
 
 	protected RESTRequest createRESTRequest() {
-		// TODO:
-		final List<Node> paramValues = List.of(
-				NodeFactory.createLiteralByValue( 52.52f ), // latitude
-				NodeFactory.createLiteralByValue( 13.41f ), // longitude
-				NodeFactory.createLiteralByValue( "temperature_2m,wind_speed_10m" ) ); // current
-		final Iterator<Node> it = paramValues.iterator();
-
-		final Params params = Params.create();
-		for ( final RESTEndpoint.Parameter pDecl : fm.getParameters() ) {
-			if ( ! it.hasNext() )
-				throw new IllegalArgumentException();
-
-			final Node v = it.next();
-			if ( ! v.getLiteralDatatype().equals(pDecl.getType()) )
-				throw new IllegalArgumentException();
-
-			final String value = v.getLiteralValue().toString();
-
-			params.add( pDecl.getName(), value );
-		}
-
-		return new RESTRequestImpl( fm.getURL(), params );
+		return new RESTRequestImpl( fm.getURL() );
 	}
 
 	protected void process( final String data, final IntermediateResultElementSink sink )
